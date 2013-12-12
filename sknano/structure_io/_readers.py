@@ -210,23 +210,34 @@ class DATAReader(StructureReader):
 
         Returns
         -------
-        dict
+        sequence
 
         """
+        section_data = None
         try:
             section_data = self._sections[section_key]
-            if colnum is not None:
-                colidx = int(colnum - 1)
-                return section_data[colidx]
-            elif colname is not None:
-                colidx = self._section_properties[section_key][colname]['index']
-                return section_data[colidx]
-            elif colindex is not None:
-                colidx = int(colindex)
-                return section_data[colindex]
-        except (KeyError, TypeError, ValueError) as e:
+            section_syntax = self._section_syntax_dict[section_key]
+        except KeyError as e:
             print(e)
         else:
+            try:
+                colidx = None
+                if colnum is not None:
+                    colidx = int(colnum - 1)
+                elif colname is not None:
+                    colidx = \
+                        self._section_properties[section_key][colname]['index']
+                elif colindex is not None:
+                    colidx = int(colindex)
+            except (KeyError, TypeError, ValueError) as e:
+                print(e)
+            else:
+                colname = section_syntax[colidx]
+                coltype = \
+                    self._section_properties[section_key][colname]['dtype']
+                section_data = \
+                    np.asarray(section_data, dtype=coltype)[:, colidx].tolist()
+        finally:
             return section_data
 
     def map_colinfo(self):
