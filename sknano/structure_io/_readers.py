@@ -12,6 +12,8 @@ __docformat__ = 'restructuredtext'
 
 from abc import ABCMeta, abstractmethod
 
+import numpy as np
+
 from pksci.chemistry import Atom, Atoms
 
 __all__ = ['StructureReader', 'DATAReader', 'XYZReader']
@@ -232,11 +234,15 @@ class DATAReader(StructureReader):
             except (KeyError, TypeError, ValueError) as e:
                 print(e)
             else:
-                colname = section_syntax[colidx]
-                coltype = \
-                    self._section_properties[section_key][colname]['dtype']
-                section_data = \
-                    np.asarray(section_data, dtype=coltype)[:, colidx].tolist()
+                try:
+                    colname = section_syntax[colidx]
+                    coltype = \
+                        self._section_properties[section_key][colname]['dtype']
+                    section_data = \
+                        np.asarray(
+                            section_data, dtype=coltype)[:, colidx].tolist()
+                except Exception as e:
+                    print(e)
         finally:
             return section_data
 
