@@ -1,0 +1,10 @@
+include MANIFEST.in
+include *.md
+include *.txt
+include *.rst
+include setup.py
+recursive-include sknano *
+recursive-include doc *
+prune doc/build
+prune doc/source/generated
+global-exclude *.pyc *~ *.bak *.swp *.pyo
