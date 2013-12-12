@@ -9,6 +9,16 @@ Tools for structure data I/O (:mod:`sknano.structure_io`)
 Contents
 ========
 
+Classes for creating abstract structure data objects for reading/writing data
+------------------------------------------------------------------------------
+
+.. autosummary::
+   :toctree: generated/
+
+   StructureData
+   LAMMPSDATA
+   XYZDATA
+
 Classes defining format specs/properties
 ----------------------------------------
 
@@ -45,14 +55,29 @@ Classes for converting structure data formats
    DATA2XYZConverter
    XYZ2DATAConverter
 
+Custom exception classes for handling errors
+--------------------------------------------
+
+.. autosummary::
+   :toctree: generated/
+
+   StructureReaderError
+   StructureInputError
+
+   StructureWriterError
+   StructureOutputError
+
+   StructureConverterError
+
 """
 from __future__ import division, print_function, absolute_import
 
 __docformat__ = 'restructuredtext'
 
-from ._converters import *
-from ._readers import *
-from ._writers import *
+from ._structure_converters import *
+from ._structure_data import *
 from ._structure_specs import *
+from ._lammps_data_structure_data import *
+from ._xyz_structure_data import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]

@@ -1,55 +1,25 @@
+# -*- coding: utf-8 -*-
 """
-===========================================================================
-Structure readers (:mod:`sknano.structure_io._readers`)
-===========================================================================
+==============================================================================
+LAMMPS data format (:mod:`sknano.structure_io._lammps_data_structure_data`)
+==============================================================================
 
-.. currentmodule:: sknano.structure_io._readers
+.. currentmodule:: sknano.structure_io._lammps_data_structure_data
 
 """
 from __future__ import division, print_function, absolute_import
 
 __docformat__ = 'restructuredtext'
 
-from abc import ABCMeta, abstractmethod
-
 import numpy as np
 
-from pksci.chemistry import Atom, Atoms
+from pksci.chemistry import Atom
+from pkshared.tools.fiofuncs import get_fpath
 
-__all__ = ['StructureReader', 'DATAReader', 'XYZReader']
+from ._structure_data import StructureReader, StructureWriter
 
 
-class StructureReader(object):
-    __metaclass__ = ABCMeta
-    """Abstract superclass for reading structure data.
-
-    Parameters
-    ----------
-    fname : str
-        structure file
-
-    """
-    def __init__(self, fname=None):
-        self._atoms = Atoms()
-        self._fname = fname
-        self._comment_line = None
-
-    @property
-    def atoms(self):
-        return self._atoms
-
-    @property
-    def comment_line(self):
-        return self._comment_line
-
-    @property
-    def fname(self):
-        return self._fname
-
-    @abstractmethod
-    def _read(self):
-        """Read in structure data from file"""
-        return NotImplemented
+__all__ = ['DATAReader', 'DATAWriter', 'LAMMPSDATA']
 
 
 class DATAReader(StructureReader):
@@ -59,9 +29,10 @@ class DATAReader(StructureReader):
     ----------
     datafile : str
         LAMMPS data file
+    atom_style : {'full', 'atomic'}, optional
 
     """
-    def __init__(self, datafile, atom_style='full'):
+    def __init__(self, datafile=None, atom_style='full'):
         super(DATAReader, self).__init__(fname=datafile)
 
         from ._structure_specs import LAMMPSDATASpecs
@@ -73,11 +44,13 @@ class DATAReader(StructureReader):
 
         self._headers = {}
         self._sections = {}
-        self._read()
-        self._parse_atoms()
-        self._Natoms = self._atoms.Natoms
         self._boxbounds = {}
-        self._parse_boxbounds()
+
+        if datafile is not None:
+            self._read()
+            self._parse_atoms()
+            self._Natoms = self._atoms.Natoms
+            self._parse_boxbounds()
 
     @property
     def headers(self):
@@ -129,9 +102,8 @@ class DATAReader(StructureReader):
                             tmp = []
                             line = f.readline().strip().split()
                             for i, props in \
-                                enumerate(
-                                    self._section_properties[
-                                        section_key].itervalues()):
+                                enumerate(self._section_properties[
+                                    section_key].itervalues()):
                                 tmp.append(props['dtype'](line[i]))
                             data.append(tmp)
                         self._sections[section_key] = data[:]
@@ -148,7 +120,7 @@ class DATAReader(StructureReader):
                     break
 
     def _parse_atoms(self):
-        """Populate Atoms list."""
+        """Populate Atoms object with Atom objects"""
         atoms = self._sections['Atoms']
         masses = self._sections['Masses']
         velocities = self._sections['Velocities']
@@ -246,34 +218,134 @@ class DATAReader(StructureReader):
         finally:
             return section_data
 
-    def map_colinfo(self):
-        pass
+
+class DATAWriter(StructureWriter):
+    """Class for writing LAMMPS data chemical file format."""
+
+    @classmethod
+    def write(cls, fname=None, atoms=None, boxbounds=None, comment_line=None):
+        """Write structure data to file.
+
+        Parameters
+        ----------
+        fname : str
+        atoms : Atoms
+            :py:class:`~pksci.chemistry.Atoms` instance.
+        boxbounds : dict, optional
+            If ``None``, determined automatically from atom coordinates.
+        comment_line : str, optional
+
+        """
+        if fname is None:
+            raise TypeError('fname argument must be a string!')
+        elif atoms is None:
+            raise TypeError('atoms argument must be an Atoms object')
+        else:
+            fname = get_fpath(fname=fname, ext='data', overwrite=True)
+            if comment_line is None:
+                comment_line = fname
+
+            atoms.fix_minus_zero_coords()
+
+            atomtypes = atoms.atomtypes
+
+            Natoms = atoms.Natoms
+            Natoms_width = \
+                8 if len(str(Natoms)) <= 12 else len(str(Natoms)) + 4
+            Ntypes = atoms.Ntypes
+            Ntypes_width = Natoms_width
+
+            if boxbounds is None:
+                boxbounds = {'x': {'min': None, 'max': None},
+                             'y': {'min': None, 'max': None},
+                             'z': {'min': None, 'max': None}}
+
+                for i, dim in enumerate(('x', 'y', 'z')):
+                    boxbounds[dim]['min'] = atoms.coords[:, i].min()
+                    boxbounds[dim]['max'] = atoms.coords[:, i].max()
+
+            lohi_width = 0
+            for dim in ('x', 'y', 'z'):
+                lohi_width = \
+                    max(lohi_width, len('{:.6f} {:.6f}'.format(
+                        boxbounds[dim]['min'], boxbounds[dim]['max'])) + 4)
+
+            with open(fname, 'w') as f:
+                f.write('# {}\n\n'.format(comment_line))
+                f.write('{}atoms\n'.format(
+                    '{:d}'.format(Natoms).ljust(Natoms_width)))
+                f.write('{}atom types\n'.format(
+                    '{:d}'.format(Ntypes).ljust(Ntypes_width)))
+                f.write('\n')
+                for dim in ('x', 'y', 'z'):
+                    f.write('{}{dim}lo {dim}hi\n'.format(
+                        '{:.6f} {:.6f}'.format(
+                            boxbounds[dim]['min'],
+                            boxbounds[dim]['max']).ljust(lohi_width),
+                        dim=dim))
+                f.write('\nMasses\n\n')
+                for atomtype, properties in atomtypes.iteritems():
+                    f.write('{}{:.4f}\n'.format(
+                        '{:d}'.format(atomtype).ljust(Natoms_width),
+                        properties['mass']))
+                f.write('\nAtoms\n\n')
+                for atomID, atom in enumerate(atoms, start=1):
+                    line = ''
+                    line += "{:>{}}".format(atomID, len(str(Natoms)) + 1)
+                    line += "{:>{}}".format(atom.moleculeID, 3)
+                    line += "{:>{}}".format(atom.atomtype,
+                                            len(str(Ntypes)) + 1)
+                    line += "{:>{}}".format('{:.1f}'.format(atom.q), 4)
+                    line += "{:>{}}".format('{:f}'.format(atom.x), 14)
+                    line += "{:>{}}".format('{:f}'.format(atom.y), 14)
+                    line += "{:>{}}".format('{:f}'.format(atom.z), 14)
+                    line += "{:>{}}".format('{:d}'.format(atom.nx), 3)
+                    line += "{:>{}}".format('{:d}'.format(atom.ny), 3)
+                    line += "{:>{}}\n".format('{:d}'.format(atom.nz), 3)
+
+                    f.write(line)
+
+                f.write('\nVelocities\n\n')
+                for atomID, atom in enumerate(atoms, start=1):
+                    line = ''
+                    line += "{:>{}}".format(atomID, len(str(Natoms)) + 1)
+                    line += "{:>{}}".format('{:f}'.format(atom.vx), 14)
+                    line += "{:>{}}".format('{:f}'.format(atom.vy), 14)
+                    line += "{:>{}}\n".format('{:f}'.format(atom.vz), 14)
+
+                    f.write(line)
 
 
-class XYZReader(StructureReader):
-    """Class for reading xyz chemical file format.
+class LAMMPSDATA(DATAReader):
+    """Class for reading and writing structure data in LAMMPS data format.
 
     Parameters
     ----------
-    xyzfile : str
-        xyz structure file
+    datafile : str, optional
 
     """
-    def __init__(self, xyzfile):
-        super(XYZReader, self).__init__(fname=xyzfile)
-        self._Natoms = None
-        self._read()
+    def __init__(self, datafile=None):
+        super(LAMMPSDATA, self).__init__(datafile=datafile)
 
-    def _read(self):
-        with open(self._fname, 'r') as f:
-            self._Natoms = int(f.readline().strip())
-            self._comment_line = f.readline().strip()
-            lines = f.readlines()
-            for line in lines:
-                s = line.strip().split()
-                if len(s) != 0:
-                    atom = \
-                        Atom(s[0], x=float(s[1]), y=float(s[2]), z=float(s[3]))
-                    #atom.x, atom.y, atom.z = \
-                    #    float(s[1]), float(s[2]), float(s[3])
-                    self._atoms.append(atom)
+    def map_colinfo(self):
+        pass
+
+    def maxbox(self):
+        pass
+
+    def maxtype(self):
+        pass
+
+    def replace(self, section_key):
+        pass
+
+    def write(self):
+        DATAWriter.write(fname=self._fname, atoms=self._atoms,
+                         boxbounds=self._boxbounds,
+                         comment_line=self._comment_line)
+
+    def newxyz(self):
+        pass
+
+    def delete(self):
+        pass

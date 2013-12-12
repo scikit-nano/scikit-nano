@@ -11,27 +11,140 @@ from __future__ import division, print_function, absolute_import
 
 __docformat__ = 'restructuredtext'
 
+from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
 
-__all__ = ['StructureData', 'LAMMPSDATA']
+from pksci.chemistry import Atoms
+
+__all__ = ['StructureData', 'StructureReader', 'StructureWriter',
+           'StructureReaderError', 'StructureInputError',
+           'StructureWriterError', 'StructureOutputError']
 
 
 class StructureData(object):
     """Base class defining common properties for structure formats."""
 
-    def __init__(self):
+    def __init__(self, fname=None):
+        self._atoms = Atoms()
+        self._comment_line = None
+        self._fname = fname
+        self._Natoms = None
         self._properties = OrderedDict()
 
+    @property
+    def atoms(self):
+        """:py:class:`~pksci.chemistry.Atoms` instance."""
+        return self._atoms
+
+    @property
+    def comment_line(self):
+        """Comment line."""
+        return self._comment_line
+
+    @comment_line.setter
+    def comment_line(self, value=str):
+        """comment line setter.
+
+        Parameters
+        ----------
+        value : str
+
+        """
+        self._comment_line = value
+
+    @property
+    def fname(self):
+        """File name."""
+        return self._fname
+
+    @fname.setter
+    def fname(self, value=str):
+        """file name setter.
+
+        Parameters
+        ----------
+        value : str
+
+        """
+        self._fname = value
+
+    @property
+    def Natoms(self):
+        """Number of atoms."""
+        return self._Natoms
+
+    @property
     def properties(self):
         """OrderedDict of format properties."""
         return self._properties
 
 
-class LAMMPSDATA(StructureData):
-    """
-    Class defining the structure file format for LAMMPS data.
+class StructureReader(StructureData):
+    __metaclass__ = ABCMeta
+    """Abstract superclass for reading structure data.
+
+    Parameters
+    ----------
+    fname : str
+        structure file
 
     """
-    def __init__(self):
-        super(LAMMPSDATA, self).__init__()
-        pass
+    def __init__(self, fname=None):
+        super(StructureReader, self).__init__(fname=fname)
+
+    @abstractmethod
+    def _read(self):
+        """Read in structure data from file"""
+        return NotImplemented
+
+
+class StructureReaderError(Exception):
+    """Base class for StructureReader exceptions."""
+    pass
+
+
+class StructureInputError(StructureReaderError):
+    """Exception raised for input file errors.
+
+    Parameters
+    ----------
+    msg : str
+        Error message.
+
+    """
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return repr(self.msg)
+
+
+class StructureWriter(object):
+    __metaclass__ = ABCMeta
+    """Abstract superclass for writing structure data."""
+
+    @abstractmethod
+    def write(self):
+        """Read in structure data from file"""
+        return NotImplemented
+
+
+class StructureWriterError(Exception):
+    """Base class for StructureReader exceptions."""
+    pass
+
+
+class StructureOutputError(StructureWriterError):
+    """Exception raised for file output errors.
+
+    Parameters
+    ----------
+    msg : str
+        Error message.
+
+    """
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return repr(self.msg)

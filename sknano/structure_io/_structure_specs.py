@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-=========================================================================
-Structure specs (:mod:`sknano.structure_io._structure_specs`)
-=========================================================================
+==============================================================================
+Structure format specifications (:mod:`sknano.structure_io._structure_specs`)
+==============================================================================
 
 .. currentmodule:: sknano.structure_io._structure_specs
 
@@ -40,6 +40,8 @@ class LAMMPSDATASpecs(StructureSpecs):
         atoms_section_syntax = {}
         atoms_section_syntax['full'] = ['atomID', 'moleculeID', 'atomtype',
                                         'q', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+        atoms_section_syntax['atomic'] = ['atomID', 'moleculeID', 'atomtype',
+                                          'x', 'y', 'z', 'nx', 'ny', 'nz']
         velocities_section_syntax = {}
         velocities_section_syntax['full'] = ['atomID', 'vx', 'vy', 'vz']
 

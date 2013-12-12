@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-=============================================================
-Structure converters (:mod:`sknano.structure_io._converters`)
-=============================================================
+===============================================================================
+Classes for converting structure data (:mod:`sknano.structure_io._converters`)
+===============================================================================
 
 .. currentmodule:: sknano.structure_io._converters
 
@@ -16,15 +16,16 @@ import os
 
 from abc import ABCMeta
 
-#import numpy as np
-
-#from ._readers import StructureReader
-#from ._writers import StructureWriter
-
 __all__ = ['StructureConverter',
            'FormatConverterError',
            'DATA2XYZConverter',
-           'XYZ2DATAConverter']
+           'XYZ2DATAConverter',
+           'StructureConverterError']
+
+
+class StructureConverterError(Exception):
+    """Base class for StructureConverter exceptions."""
+    pass
 
 
 class StructureConverter(object):
@@ -62,10 +63,8 @@ class XYZ2DATAConverter(StructureConverter):
     xyzfile : str
     boxbounds : {None, dict}, optional
         dict specifying box bounds
-        ..versionadded:: 0.3.32
     pad_box : bool, optional
         pad simulation box bounds
-        ..versionadded:: 0.3.32
     xpad : float, optional
     ypad : float, optional
     zpad : float, optional
@@ -96,14 +95,28 @@ class XYZ2DATAConverter(StructureConverter):
         return self._datafile
 
     def add_atom(self, atom=None):
-        """Add new atom to atoms."""
+        """Add new atom to atoms.
+
+        Parameters
+        ----------
+        atom : :py:class:`~pksci.chemistry.Atom` instance.
+
+        """
         self._new_atoms.append(atom)
-        self._add_new_atoms = True
+        if not self._add_new_atoms:
+            self._add_new_atoms = True
 
     def add_atomtype(self, atom=None):
-        """Add new atom type to atom type dictionary."""
+        """Add new atom type to atom type dictionary.
+
+        Parameters
+        ----------
+        atom : :py:class:`~pksci.chemistry.Atom` instance.
+
+        """
         self._new_atomtypes.append(atom)
-        self._add_new_atomtypes = True
+        if not self._add_new_atomtypes:
+            self._add_new_atomtypes = True
 
     def convert(self, return_reader=False):
         """Convert xyz to LAMMPS data chemical file format.
@@ -112,15 +125,15 @@ class XYZ2DATAConverter(StructureConverter):
         ----------
         return_reader : bool, optional
             return an instance of :py:class:`~DATAReader`
-            ..versionadded:: 0.3.32
 
         Returns
         -------
         None or DATAReader
 
         """
-        from ._readers import XYZReader, DATAReader
-        from ._writers import DATAWriter
+        from ._lammps_data_structure_data import DATAReader, DATAWriter
+        from ._xyz_structure_data import XYZReader
+
         xyzreader = XYZReader(self._xyzfile)
         atoms = xyzreader.atoms
         comment_line = xyzreader.comment_line
