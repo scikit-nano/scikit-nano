@@ -24,7 +24,7 @@ dist
 *.egg-info
 # tox testing tool
 .tox
-tasr/version.py
+sknano/version.py
 
 
 # Packages #
