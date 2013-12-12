@@ -137,12 +137,10 @@ def setup_package():
         zip_safe=False,
         dependency_links=[
             'https://github.com/androomerrill/pykit-sci/tarball/master' +
-            '#egg=pksci-0.1.0',
-            'https://github.com/androomerrill/pykit-shared/tarball/master' +
-            '#egg=pkshared-0.1.0'],
+            '#egg=pksci-0.1.0'],
         install_requires=['numpy>=1.7', 'scipy>=0.12',
                           'matplotlib>=1.2', 'openpyxl>=1.7',
-                          'pint>=0.3', 'pksci', 'pkshared'],
+                          'pksci>=0.1.0.dev'],
         entry_points={
             'console_scripts': [
                 'nanogen = sknano.scripts.nanogen:main',
