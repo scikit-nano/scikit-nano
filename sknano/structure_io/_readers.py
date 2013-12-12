@@ -198,19 +198,36 @@ class DATAReader(StructureReader):
                 self._headers[' '.join([dim + lim for lim in ('lo', 'hi')])]
             self._boxbounds[dim] = {'min': bounds[0], 'max': bounds[-1]}
 
-    def get(self, section_key):
+    def get(self, section_key, colnum=None, colname=None, colindex=None):
         """Return section with ``section key``.
 
         Parameters
         ----------
         section_key : str
+        colnum : int, optional
+        colname : str, optional
+        colindex : int, optional
 
         Returns
         -------
         dict
 
         """
-        return self._sections[section_key]
+        try:
+            section_data = self._sections[section_key]
+            if colnum is not None:
+                colidx = int(colnum - 1)
+                return section_data[colidx]
+            elif colname is not None:
+                colidx = self._section_properties[section_key][colname]['index']
+                return section_data[colidx]
+            elif colindex is not None:
+                colidx = int(colindex)
+                return section_data[colindex]
+        except (KeyError, TypeError, ValueError) as e:
+            print(e)
+        else:
+            return section_data
 
     def map_colinfo(self):
         pass

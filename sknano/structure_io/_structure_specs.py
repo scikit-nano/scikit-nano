@@ -54,6 +54,7 @@ class LAMMPSDATASpecs(StructureSpecs):
             {'Atoms': atoms_section_syntax[atom_style],
              'Masses': ['atomtype', 'mass'],
              'Velocities': velocities_section_syntax[atom_style]}
+
         for section_key in section_keys:
             self._section_properties[section_key] = OrderedDict()
             section_syntax_list = self._section_syntax_dict[section_key]
