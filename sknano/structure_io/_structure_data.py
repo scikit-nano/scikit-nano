@@ -16,14 +16,25 @@ from collections import OrderedDict
 
 from pksci.chemistry import Atoms
 
-__all__ = ['StructureData', 'StructureReader', 'StructureWriter',
+supported_structure_formats = ('xyz', 'data')
+default_structure_format = 'xyz'
+
+__all__ = ['StructureData', 'StructureDataError',
+           'StructureReader', 'StructureWriter',
            'StructureReaderError', 'StructureInputError',
-           'StructureWriterError', 'StructureOutputError']
+           'StructureWriterError', 'StructureOutputError',
+           'StructureFormatError', 'supported_structure_formats',
+           'default_structure_format']
 
 
 class StructureData(object):
-    """Base class defining common properties for structure formats."""
+    """Base class defining common properties for structure formats.
 
+    Parameters
+    ----------
+    fname : {None, str}, optional
+
+    """
     def __init__(self, fname=None):
         self._atoms = Atoms()
         self._comment_line = None
@@ -98,6 +109,37 @@ class StructureReader(StructureData):
         return NotImplemented
 
 
+class StructureWriter(object):
+    __metaclass__ = ABCMeta
+    """Abstract superclass for writing structure data."""
+
+    @abstractmethod
+    def write(self):
+        """Read in structure data from file"""
+        return NotImplemented
+
+
+class StructureFormatError(Exception):
+    """Exception raised for structure format errors.
+
+    Parameters
+    ----------
+    msg : str
+        Error message.
+
+    """
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return repr(self.msg)
+
+
+class StructureDataError(Exception):
+    """Base class for StructureData exceptions."""
+    pass
+
+
 class StructureReaderError(Exception):
     """Base class for StructureReader exceptions."""
     pass
@@ -119,18 +161,8 @@ class StructureInputError(StructureReaderError):
         return repr(self.msg)
 
 
-class StructureWriter(object):
-    __metaclass__ = ABCMeta
-    """Abstract superclass for writing structure data."""
-
-    @abstractmethod
-    def write(self):
-        """Read in structure data from file"""
-        return NotImplemented
-
-
 class StructureWriterError(Exception):
-    """Base class for StructureReader exceptions."""
+    """Base class for StructureWriter exceptions."""
     pass
 
 

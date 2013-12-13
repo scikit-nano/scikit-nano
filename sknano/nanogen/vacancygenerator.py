@@ -23,7 +23,8 @@ import os
 
 import numpy as np
 
-from ..structure_io import DATAReader, DATAWriter, XYZ2DATAConverter, XYZWriter
+from ..structure_io import DATAReader, DATAWriter, XYZWriter, \
+    XYZ2DATAConverter, StructureFormatError, supported_structure_formats
 
 __all__ = ['GrapheneVacancyGenerator',
            'NanotubeVacancyGenerator',
@@ -39,12 +40,14 @@ class VacancyGenerator(object):
         structure data filename
     Nvac : int
         total number of vacancies to "add" to structure data.
-    structure_format : str
-        chemical file format of structure data. Must be one of:
+    structure_format : {None, str}, optional
+        chemical file format of saved structure data. Must be one of:
 
             - xyz
             - data
 
+        If ``None``, then guess based on ``fname`` file extension or
+        default to ``xyz`` format.
     random_vacancies : bool, optional
         Generate random vacancies in structure data.
     uniform_vacancies : bool, optional
@@ -58,17 +61,32 @@ class VacancyGenerator(object):
         if ``rotate_data is True``, ``rotation_axis`` must be set.
 
     """
-    def __init__(self, fname=str, structure_format='xyz'):
+    def __init__(self, fname=str, structure_format=None):
+
+        if fname.endswith(supported_structure_formats) and \
+                structure_format is None:
+            for ext in supported_structure_formats:
+                if fname.endswith(ext):
+                    structure_format = ext
+                    break
+        else:
+            if structure_format is None or \
+                    structure_format not in supported_structure_formats:
+                structure_format = 'xyz'
 
         self.fname = fname
         self.structure_format = structure_format
 
         # parse structure data
         self.atoms = None
-        if structure_format == 'data':
+        if self.structure_format == 'data':
             self.data = DATAReader(fname)
-        elif structure_format == 'xyz':
+        elif self.structure_format == 'xyz':
             self.data = XYZ2DATAConverter(fname).convert(return_reader=True)
+        else:
+            raise StructureFormatError(
+                '{} is not a supported structure format'.format(
+                    structure_format))
 
         self.atoms = self.data.atoms
         self.atom_ids = self.atoms.atom_ids

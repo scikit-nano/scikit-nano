@@ -68,6 +68,7 @@ Custom exception classes for handling errors
    StructureOutputError
 
    StructureConverterError
+   StructureFormatError
 
 """
 from __future__ import division, print_function, absolute_import

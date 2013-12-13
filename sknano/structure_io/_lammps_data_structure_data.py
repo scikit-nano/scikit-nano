@@ -16,10 +16,12 @@ import numpy as np
 from pksci.chemistry import Atom
 from pkshared.tools.fiofuncs import get_fpath
 
-from ._structure_data import StructureReader, StructureWriter
+from ._structure_data import StructureReader, StructureWriter, \
+    StructureDataError
 
 
-__all__ = ['DATAReader', 'DATAWriter', 'LAMMPSDATA']
+__all__ = ['DATAReader', 'DATAWriter', 'LAMMPSDATA',
+           'LAMMPSDATAError']
 
 
 class DATAReader(StructureReader):
@@ -27,13 +29,13 @@ class DATAReader(StructureReader):
 
     Parameters
     ----------
-    datafile : str
+    fname : str
         LAMMPS data file
     atom_style : {'full', 'atomic'}, optional
 
     """
-    def __init__(self, datafile=None, atom_style='full'):
-        super(DATAReader, self).__init__(fname=datafile)
+    def __init__(self, fname=None, atom_style='full'):
+        super(DATAReader, self).__init__(fname=fname)
 
         from ._structure_specs import LAMMPSDATASpecs
         data_specs = LAMMPSDATASpecs(atom_style=atom_style)
@@ -121,35 +123,41 @@ class DATAReader(StructureReader):
 
     def _parse_atoms(self):
         """Populate Atoms object with Atom objects"""
-        atoms = self._sections['Atoms']
-        masses = self._sections['Masses']
-        velocities = self._sections['Velocities']
+        atoms_section = self._sections['Atoms']
+        atoms_section_syntax = self._section_syntax_dict['Atoms']
+
+        masses_section = self._sections['Masses']
+        masses_section_syntax = self._section_syntax_dict['Masses']
+
+        velocities_section = self._sections['Velocities']
+        velocities_section_syntax = self._section_syntax_dict['Velocities']
+
         atom_kwargs = {'atomID': None, 'moleculeID': None,
                        'q': None, 'atomtype': None, 'mass': None,
                        'x': None, 'y': None, 'z': None,
                        'vx': None, 'vy': None, 'vz': None}
-        atoms_section_syntax = self._section_syntax_dict['Atoms']
-        masses_section_syntax = self._section_syntax_dict['Masses']
-        velocities_section_syntax = self._section_syntax_dict['Velocities']
 
-        for atom in atoms:
+        for lmps_atom in atoms_section:
             for kw in atom_kwargs.iterkeys():
                 if kw in atoms_section_syntax:
                     atom_kwargs[kw] = \
-                        atom[self._section_properties['Atoms'][kw]['index']]
+                        lmps_atom[
+                            self._section_properties['Atoms'][kw]['index']]
                 elif kw in masses_section_syntax:
                     atomtype = \
-                        atom[self._section_properties[
-                            'Atoms']['atomtype']['index']]
+                        lmps_atom[
+                            self._section_properties[
+                                'Atoms']['atomtype']['index']]
                     atom_kwargs[kw] = \
-                        masses[atomtype-1][self._section_properties[
-                            'Masses'][kw]['index']]
+                        masses_section[atomtype-1][
+                            self._section_properties['Masses'][kw]['index']]
                 elif kw in velocities_section_syntax and \
-                        len(velocities) == len(atoms):
+                        len(velocities_section) == len(atoms_section):
                     atomID = \
-                        atom[self._section_properties[
-                            'Atoms']['atomID']['index']]
-                    for velocity in velocities:
+                        lmps_atom[
+                            self._section_properties[
+                                'Atoms']['atomID']['index']]
+                    for velocity in velocities_section:
                         velocity_atomID = \
                             velocity[self._section_properties[
                                 'Velocities']['atomID']['index']]
@@ -160,8 +168,8 @@ class DATAReader(StructureReader):
                 else:
                     print('unknown atom keyword: {}'.format(kw))
 
-            _atom = Atom(**atom_kwargs)
-            self._atoms.append(_atom)
+            atom = Atom(**atom_kwargs)
+            self._atoms.append(atom)
 
     #def _parse_atomtypes(self):
     #    mass_syntax = self._section_properties['Masses']['atomtype']
@@ -213,8 +221,8 @@ class DATAReader(StructureReader):
                     section_data = \
                         np.asarray(
                             section_data, dtype=coltype)[:, colidx].tolist()
-                except Exception as e:
-                    print(e)
+                except TypeError:
+                    pass
         finally:
             return section_data
 
@@ -223,7 +231,8 @@ class DATAWriter(StructureWriter):
     """Class for writing LAMMPS data chemical file format."""
 
     @classmethod
-    def write(cls, fname=None, atoms=None, boxbounds=None, comment_line=None):
+    def write(cls, fname=None, atoms=None, boxbounds=None, comment_line=None,
+              assume_unique_atoms=False):
         """Write structure data to file.
 
         Parameters
@@ -234,6 +243,7 @@ class DATAWriter(StructureWriter):
         boxbounds : dict, optional
             If ``None``, determined automatically from atom coordinates.
         comment_line : str, optional
+        assume_unique_atoms : bool, optional
 
         """
         if fname is None:
@@ -255,6 +265,19 @@ class DATAWriter(StructureWriter):
             Ntypes = atoms.Ntypes
             Ntypes_width = Natoms_width
 
+            atomID_width = len(str(Natoms)) + 1
+            atomtype_width = len(str(Ntypes)) + 1
+
+            if not assume_unique_atoms:
+                # check that each Atom in Atoms has a unique atomID
+                # if not, then assign a unique atomID to each Atom
+                # if assume_unique_atoms is True, but the atomID's are not
+                # unique, LAMMPS will not read in the correct number
+                # of atoms.
+                if len(set(atoms.atom_ids)) != atoms.Natoms:
+                    for atomID, atom in enumerate(atoms, start=1):
+                        atom.atomID = atomID
+
             if boxbounds is None:
                 boxbounds = {'x': {'min': None, 'max': None},
                              'y': {'min': None, 'max': None},
@@ -271,30 +294,31 @@ class DATAWriter(StructureWriter):
                         boxbounds[dim]['min'], boxbounds[dim]['max'])) + 4)
 
             with open(fname, 'w') as f:
-                f.write('# {}\n\n'.format(comment_line))
+                f.write('# {}\n\n'.format(comment_line.lstrip('#').strip()))
                 f.write('{}atoms\n'.format(
                     '{:d}'.format(Natoms).ljust(Natoms_width)))
-                f.write('{}atom types\n'.format(
+                f.write('{}atom types\n\n'.format(
                     '{:d}'.format(Ntypes).ljust(Ntypes_width)))
-                f.write('\n')
+
                 for dim in ('x', 'y', 'z'):
                     f.write('{}{dim}lo {dim}hi\n'.format(
                         '{:.6f} {:.6f}'.format(
                             boxbounds[dim]['min'],
                             boxbounds[dim]['max']).ljust(lohi_width),
                         dim=dim))
+
                 f.write('\nMasses\n\n')
                 for atomtype, properties in atomtypes.iteritems():
                     f.write('{}{:.4f}\n'.format(
                         '{:d}'.format(atomtype).ljust(Natoms_width),
                         properties['mass']))
+
                 f.write('\nAtoms\n\n')
-                for atomID, atom in enumerate(atoms, start=1):
+                for atom in atoms:
                     line = ''
-                    line += "{:>{}}".format(atomID, len(str(Natoms)) + 1)
+                    line += "{:>{}}".format(atom.atomID, atomID_width)
                     line += "{:>{}}".format(atom.moleculeID, 3)
-                    line += "{:>{}}".format(atom.atomtype,
-                                            len(str(Ntypes)) + 1)
+                    line += "{:>{}}".format(atom.atomtype, atomtype_width)
                     line += "{:>{}}".format('{:.1f}'.format(atom.q), 4)
                     line += "{:>{}}".format('{:f}'.format(atom.x), 14)
                     line += "{:>{}}".format('{:f}'.format(atom.y), 14)
@@ -306,9 +330,9 @@ class DATAWriter(StructureWriter):
                     f.write(line)
 
                 f.write('\nVelocities\n\n')
-                for atomID, atom in enumerate(atoms, start=1):
+                for atom in atoms:
                     line = ''
-                    line += "{:>{}}".format(atomID, len(str(Natoms)) + 1)
+                    line += "{:>{}}".format(atom.atomID, atomID_width)
                     line += "{:>{}}".format('{:f}'.format(atom.vx), 14)
                     line += "{:>{}}".format('{:f}'.format(atom.vy), 14)
                     line += "{:>{}}\n".format('{:f}'.format(atom.vz), 14)
@@ -321,11 +345,11 @@ class LAMMPSDATA(DATAReader):
 
     Parameters
     ----------
-    datafile : str, optional
+    fname : str, optional
 
     """
-    def __init__(self, datafile=None):
-        super(LAMMPSDATA, self).__init__(datafile=datafile)
+    def __init__(self, fname=None):
+        super(LAMMPSDATA, self).__init__(fname=fname)
 
     def map_colinfo(self):
         pass
@@ -336,11 +360,56 @@ class LAMMPSDATA(DATAReader):
     def maxtype(self):
         pass
 
-    def replace(self, section_key):
-        pass
+    def replace(self, section_key, new_data, colnum=None,
+                colname=None, colindex=None):
+        """Replace section data.
 
-    def write(self):
-        DATAWriter.write(fname=self._fname, atoms=self._atoms,
+        Parameters
+        ----------
+        section_key : str
+        new_data : sequence
+        colnum : int, optional
+        colname : str, optional
+        colindex : int, optional
+
+        """
+        colidx = None
+
+        # for backwards compatibility with the pizza.py data module,
+        # first check positional arguments to see if this method was called
+        # using the pizza.py data module signature which expects positional
+        # arguments of the following type:
+        #   data.replace(str, int, list)
+        if isinstance(new_data, (int, float)) and \
+                isinstance(colnum, (np.ndarray, list)):
+            colidx = int(new_data) - 1
+            new_data = np.asarray(colnum)
+        else:
+            try:
+                colidx = None
+                if colnum is not None:
+                    colidx = int(colnum - 1)
+                elif colname is not None:
+                    colidx = \
+                        self._section_properties[section_key][colname]['index']
+                elif colindex is not None:
+                    colidx = int(colindex)
+            except (KeyError, TypeError, ValueError) as e:
+                print(e)
+                raise LAMMPSDATAError('replace called with invalid arguments')
+        atom_attr = self._section_syntax_dict[section_key][colidx]
+        attr_dtype = \
+            self._section_properties[section_key][atom_attr]['dtype']
+        new_data = np.asarray(new_data, dtype=attr_dtype)
+
+        for i, atom in enumerate(self._atoms):
+            self._sections[section_key][i][colidx] = attr_dtype(new_data[i])
+            setattr(atom, atom_attr, attr_dtype(new_data[i]))
+
+    def write(self, datafile=None):
+        if datafile is None:
+            datafile = self._fname
+        DATAWriter.write(fname=datafile, atoms=self._atoms,
                          boxbounds=self._boxbounds,
                          comment_line=self._comment_line)
 
@@ -349,3 +418,19 @@ class LAMMPSDATA(DATAReader):
 
     def delete(self):
         pass
+
+
+class LAMMPSDATAError(StructureDataError):
+    """Exception raised for failed method calls.
+
+    Parameters
+    ----------
+    msg : str
+        Error message
+
+    """
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return repr(self.msg)

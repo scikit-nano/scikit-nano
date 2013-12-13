@@ -27,7 +27,8 @@ from pksci.chemistry import Atom, Atoms
 from pkshared.tools.arrayfuncs import rotation_matrix
 from pkshared.tools.refdata import ccbond
 
-from ..structure_io import DATAWriter, XYZWriter
+from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
+    supported_structure_formats
 
 __all__ = ['Graphene', 'GrapheneGenerator', 'BiLayerGrapheneGenerator']
 
@@ -272,20 +273,22 @@ class GrapheneGenerator(object):
         if self.verbose:
             print(self.structure_atoms)
 
-    def save_data(self, fname=None, structure_format='xyz', rotation_angle=-90,
+    def save_data(self, fname=None, structure_format=None, rotation_angle=-90,
                   rot_axis='x', deg2rad=True, center_CM=True):
         """Save structure data.
 
         Parameters
         ----------
-        fname : str, optional
+        fname : {None, str}, optional
             file name string
-        structure_format : str, optional
+        structure_format : {None, str}, optional
             chemical file format of saved structure data. Must be one of:
 
                 - xyz
                 - data
 
+            If ``None``, then guess based on ``fname`` file extension or
+            default to ``xyz`` format.
         rotation_angle : {None, float}, optional
             Angle of rotation
         rot_axis : {'x', 'y', 'z'}, optional
@@ -296,6 +299,13 @@ class GrapheneGenerator(object):
             Center center-of-mass on on origin.
 
         """
+        if (fname is None and structure_format not in
+                supported_structure_formats) or \
+                (fname is not None and not
+                    fname.endswith(supported_structure_formats) and
+                    structure_format not in supported_structure_formats):
+            structure_format = default_structure_format
+
         structure_atoms = list(itertools.chain(*self.structure_atoms))
         structure_atoms = Atoms(structure_atoms)
         if center_CM and self.nlayers > 1:
@@ -312,13 +322,24 @@ class GrapheneGenerator(object):
             nlayer = '{}layer'.format(self.nlayers)
             edge = 'AC' if self.edge in ('AC', 'armchair') else 'ZZ'
             atombond = '{}{}'.format(self.atom1.symbol, self.atom2.symbol)
-            fname_wordlist = (dimensions, nlayer, edge, atombond,
-                              '.'.join(('graphene', structure_format)))
+            fname_wordlist = (dimensions, nlayer, edge, atombond, 'graphene')
             fname = '_'.join(fname_wordlist)
-        if structure_format == 'xyz':
-            XYZWriter.write(fname=fname, atoms=structure_atoms)
-        elif structure_format == 'data':
+            fname += '.' + structure_format
+        else:
+            if fname.endswith(supported_structure_formats) and \
+                    structure_format is None:
+                for ext in supported_structure_formats:
+                    if fname.endswith(ext):
+                        structure_format = ext
+                        break
+            else:
+                if structure_format is None or \
+                        structure_format not in supported_structure_formats:
+                    structure_format = default_structure_format
+        if structure_format == 'data':
             DATAWriter.write(fname=fname, atoms=structure_atoms)
+        else:
+            XYZWriter.write(fname=fname, atoms=structure_atoms)
 
 
 class BiLayerGrapheneGenerator(GrapheneGenerator):
