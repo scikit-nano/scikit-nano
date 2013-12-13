@@ -223,6 +223,8 @@ class Nanotube(object):
         self._tube_length = None
         self._Natoms_per_tube = None
 
+        self._Ntubes = 1
+
         if tube_length is not None:
             self._tube_length = float(tube_length)
             self._nzcells = int(np.ceil(10 * self._tube_length / self._T))
@@ -809,6 +811,17 @@ class Nanotube(object):
         """Number of nanotube unit cells along the :math:`z`-axis."""
         return self._nzcells
 
+    @nzcells.setter
+    def nzcells(self, value=float):
+        """Set number of unit cells along the :math:`z`-axis."""
+        self._nzcells = value
+        self.compute_tube_params()
+
+    @property
+    def Ntubes(self):
+        """Number of nanotubes."""
+        return int(self._Ntubes)
+
     @property
     def tube_length(self):
         """Nanotube length :math:`L_{\\mathrm{tube}}` in **nanometers**."""
@@ -936,8 +949,18 @@ class NanotubeBundle(Nanotube):
 
         self._nxcells = int(nxcells)
         self._nycells = int(nycells)
-        self._Ntubes = self._nxcells * self._nycells
 
+        self._bundle_mass = None
+        self._bundle_density = None
+
+        self.compute_bundle_params()
+
+    def compute_bundle_params(self):
+        """Compute bundle params."""
+
+        super(NanotubeBundle, self).compute_tube_params()
+        self._Ntubes = self.compute_Ntubes(nxcells=self._nxcells,
+                                           nycells=self._nycells)
         self._bundle_mass = self.compute_bundle_mass(n=self._n, m=self._m,
                                                      nxcells=self._nxcells,
                                                      nycells=self._nycells,
@@ -950,10 +973,20 @@ class NanotubeBundle(Nanotube):
         """Number of nanotube unit cells along the :math:`x`-axis."""
         return int(self._nxcells)
 
+    @nxcells.setter
+    def nxcells(self, value=int):
+        """Set ``nxcells``"""
+        self._nxcells = value
+
     @property
     def nycells(self):
         """Number of nanotube unit cells along the :math:`y`-axis."""
         return int(self._nycells)
+
+    @nycells.setter
+    def nycells(self, value=int):
+        """Set ``nycells``"""
+        self._nycells = value
 
     @property
     def Ntubes(self):
@@ -961,9 +994,12 @@ class NanotubeBundle(Nanotube):
         return int(self._Ntubes)
 
     @Ntubes.setter
-    def Ntubes(self, value):
+    def Ntubes(self, value=int):
         """Set Ntubes."""
         self._Ntubes = value
+        self._nxcells = value
+        self._nycells = 1
+        self.compute_bundle_params()
 
     @classmethod
     def compute_Ntubes(cls, nxcells=int, nycells=int):
@@ -990,7 +1026,8 @@ class NanotubeBundle(Nanotube):
     def compute_bundle_mass(cls, n=int, m=int, nxcells=int,
                             nycells=int, nzcells=None):
         """Bundle mass in grams."""
-        Ntubes = Nanotube.compute_Ntubes(nxcells=nxcells, nycells=nycells)
+        Ntubes = \
+            NanotubeBundle.compute_Ntubes(nxcells=nxcells, nycells=nycells)
         tube_mass = Nanotube.compute_tube_mass(n=n, m=m, nzcells=nzcells)
         return Ntubes * tube_mass
 
