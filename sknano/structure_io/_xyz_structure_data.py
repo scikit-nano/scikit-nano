@@ -30,8 +30,8 @@ class XYZReader(StructureReader):
         xyz structure file
 
     """
-    def __init__(self, xyzfile=None):
-        super(XYZReader, self).__init__(fname=xyzfile)
+    def __init__(self, fname=None):
+        super(XYZReader, self).__init__(fname=fname)
         self._read()
 
     def _read(self):
@@ -86,15 +86,17 @@ class XYZDATA(XYZReader):
 
     Parameters
     ----------
-    xyzfile : str, optional
+    fname : str, optional
 
     """
-    def __init__(self, xyzfile=None):
+    def __init__(self, fname=None):
         try:
-            super(XYZDATA, self).__init__(fname=xyzfile)
+            super(XYZDATA, self).__init__(fname=fname)
         except StructureReaderError:
             pass
 
-    def write(self):
-        XYZWriter.write(fname=self._fname, atoms=self._atoms,
+    def write(self, xyzfile=None):
+        if xyzfile is None:
+            xyzfile = self._fname
+        XYZWriter.write(fname=xyzfile, atoms=self._atoms,
                         comment_line=self._comment_line)
