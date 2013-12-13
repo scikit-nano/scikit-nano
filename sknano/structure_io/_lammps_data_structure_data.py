@@ -48,7 +48,7 @@ class DATAReader(StructureReader):
         self._sections = {}
         self._boxbounds = {}
 
-        if datafile is not None:
+        if fname is not None:
             self._read()
             self._parse_atoms()
             self._Natoms = self._atoms.Natoms
