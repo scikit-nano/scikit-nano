@@ -49,6 +49,12 @@ param_strfmt['Ch'] = \
     param_strfmt['chiral_angle'] = '{:.2f}'
 param_strfmt['bond'] = '{:.3f}'
 
+gram_per_kilogram = 1e3
+kilogram_per_Dalton = 1.660538782e-27
+gram_per_Dalton = kilogram_per_Dalton * gram_per_kilogram
+cm_per_angstrom = 1e-8
+cgs_mass_C = Atom('C').m * gram_per_Dalton
+
 __all__ = ['param_units', 'param_symbols', 'param_strfmt',
            'Nanotube', 'NanotubeGenerator',
            'NanotubeBundle', 'NanotubeBundleGenerator',
@@ -233,9 +239,9 @@ class Nanotube(object):
                 else:
                     self._params[p]['var'] = p
 
-        self._compute_tube_params()
+        self.compute_tube_params()
 
-    def _compute_tube_params(self):
+    def compute_tube_params(self):
         self._d = self.compute_d(n=self._n, m=self._m)
         self._dR = self.compute_dR(n=self._n, m=self._m)
         self._t1 = self.compute_t1(n=self._n, m=self._m)
@@ -252,6 +258,9 @@ class Nanotube(object):
                                      m=self._m,
                                      nzcells=self._nzcells,
                                      bond=self._bond)
+
+        self._tube_mass = \
+            self.compute_tube_mass(n=self._n, m=self._m, nzcells=self._nzcells)
 
         self._M = self.compute_M(n=self._n, m=self._m)
 
@@ -295,7 +304,7 @@ class Nanotube(object):
     @n.setter
     def n(self, value):
         self._n = int(value)
-        self._compute_tube_params()
+        self.compute_tube_params()
 
     @property
     def m(self):
@@ -305,7 +314,7 @@ class Nanotube(object):
     @m.setter
     def m(self, value):
         self._m = int(value)
-        self._compute_tube_params()
+        self.compute_tube_params()
 
     @property
     def bond(self):
@@ -829,6 +838,33 @@ class Nanotube(object):
         T = Nanotube.compute_T(n=n, m=m, bond=bond)
         return nzcells * T / 10.
 
+    @property
+    def tube_mass(self):
+        """Nanotube mass in grams."""
+        return self._tube_mass
+
+    @classmethod
+    def compute_tube_mass(cls, n=int, m=int, nzcells=float):
+        """Compute nanotube mass in **grams**.
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
+            = (n, m)`.
+        nzcells : int
+            Number of nanotube unit cells
+
+        Returns
+        -------
+        float
+
+        """
+        Natoms_per_tube = \
+            Nanotube.compute_Natoms_per_tube(n=n, m=m, nzcells=nzcells)
+        return cgs_mass_C * Natoms_per_tube
+
     def _ncell_check(self, nzcells=None):
         """Check unit cell count.
 
@@ -902,6 +938,13 @@ class NanotubeBundle(Nanotube):
         self._nycells = int(nycells)
         self._Ntubes = self._nxcells * self._nycells
 
+        self._bundle_mass = self.compute_bundle_mass(n=self._n, m=self._m,
+                                                     nxcells=self._nxcells,
+                                                     nycells=self._nycells,
+                                                     nzcells=self._nzcells)
+        self._bundle_density = \
+            self.compute_bundle_density(n=self._n, m=self._m, bond=self._bond)
+
     @property
     def nxcells(self):
         """Number of nanotube unit cells along the :math:`x`-axis."""
@@ -916,6 +959,83 @@ class NanotubeBundle(Nanotube):
     def Ntubes(self):
         """Number of nanotubes."""
         return int(self._Ntubes)
+
+    @Ntubes.setter
+    def Ntubes(self, value):
+        """Set Ntubes."""
+        self._Ntubes = value
+
+    @classmethod
+    def compute_Ntubes(cls, nxcells=int, nycells=int):
+        """Compute number of nanotubes.
+
+        Parameters
+        ----------
+        nxcells, nycells, nzcells : int, optional
+            Number of repeat unit cells in the x,y,z directions
+
+        Returns
+        -------
+        int
+
+        """
+        return int(nxcells * nycells)
+
+    @property
+    def bundle_mass(self):
+        """Bundle mass in grams."""
+        return self._bundle_mass
+
+    @classmethod
+    def compute_bundle_mass(cls, n=int, m=int, nxcells=int,
+                            nycells=int, nzcells=None):
+        """Bundle mass in grams."""
+        Ntubes = Nanotube.compute_Ntubes(nxcells=nxcells, nycells=nycells)
+        tube_mass = Nanotube.compute_tube_mass(n=n, m=m, nzcells=nzcells)
+        return Ntubes * tube_mass
+
+    @property
+    def bundle_density(self):
+        """Bundle density in grams/cm**3"""
+        return self._bundle_density
+
+    @classmethod
+    def compute_bundle_density(cls, n=int, m=int, bond=None):
+        """Compute bundle mass.
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
+            = (n, m)`.
+        nzcells : int
+            Number of nanotube unit cells
+        bond : float, optional
+            bond length
+
+        Returns
+        -------
+        float
+            :math:`L_{\\mathrm{tube}}` in **nanometers**
+
+        """
+        m_C = cgs_mass_C
+
+        d_vdw = None
+        if bond is None:
+            bond = ccbond
+        if n == m:
+            d_vdw = 3.38
+        elif (m == 0) or (n == 0):
+            d_vdw = 3.41
+        else:
+            d_vdw = 3.39
+        bundle_density = 8 * pi**2 * m_C * np.sqrt(n**2 + m**2 + n*m) / \
+            (9 * np.sqrt(3) * (bond * 1e-8)**3 *
+                (np.sqrt(n**2 + m**2 + n*m) +
+                    pi * d_vdw / (np.sqrt(3) * bond))**2)
+        return bundle_density
 
 
 class NanotubeGenerator(Nanotube):
