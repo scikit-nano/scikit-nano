@@ -23,10 +23,38 @@ system :envvar:`PATH` and callable as :program:`tubegen`.
 
    :py:class:`~sknano.nanogen.TubeGen`
 
-.. argparse::
-   :module: sknano.scripts.nanogen
-   :func: _argparser
-   :prog: nanogen
+.. code-block:: python
+
+   > nanogen --help
+   usage: nanogen [-h]
+                  [--format {pdb,pdb-pbc,cif,bgf,pov,wien,xyz,gaussian,
+                  gaussian-pbc}]
+                  [--units {angstrom,bohr}] [--element1 ELEMENT1]
+                  [--element2 ELEMENT2] [--bond BOND] [--gutter X Y Z]
+                  [--shape {hexagonal,cubic,planar}] [--chirality n m]
+                  [--relax-tube {yes,no}]
+                  [--cell-count X Y Z | --tube-length L_tube] [--xyz2data]
+                  [--add-atomtype ELEMENT ATOM-TYPE]
+                  [--generator {tubegen,nanogen}]
+
+   optional arguments:
+     -h, --help            show this help message and exit
+     --format {pdb,pdb-pbc,cif,bgf,pov,wien,xyz,gaussian,gaussian-pbc}
+     --units {angstrom,bohr}
+     --element1 ELEMENT1
+     --element2 ELEMENT2
+     --bond BOND
+     --gutter X Y Z
+     --shape {hexagonal,cubic,planar}
+     --chirality n m
+     --relax-tube {yes,no}
+     --cell-count X Y Z
+     --tube-length L_tube
+     --xyz2data
+     --add-atomtype ELEMENT ATOM-TYPE
+     --generator {tubegen,nanogen}
+
+.. autofunction:: nanogen
 
 Examples
 --------
@@ -56,11 +84,13 @@ def _argparser():
     parser.add_argument('--units', default='angstrom',
                         choices=('angstrom', 'bohr'),
                         help='units (default: %(default)s)')
-    parser.add_argument('--element', nargs=2, metavar=('1', '2'),
-                        default=('C', 'C'),
-                        help='atomic symbol or number of basis '
-                        'atom elements (default: %(default)s)')
-    parser.add_argument('--bond-length', type=float, default=ccbond,
+    parser.add_argument('--element1', default='C',
+                        help='element symbol or atomic number of basis '
+                        'atom 1 (default: %(default)s)')
+    parser.add_argument('--element2', default='C',
+                        help='element symbol or atomic number of basis '
+                        'atom 2 (default: %(default)s)')
+    parser.add_argument('--bond', type=float, default=ccbond,
                         help='element1-element2 bond length in Angstroms '
                         '(default: %(default)s)')
     parser.add_argument('--gutter', nargs=3, type=float,
@@ -87,8 +117,7 @@ def _argparser():
                               metavar='L_tube', default=None,
                               help='tube length in nanometers '
                               '(default: %(default)s)')
-    #parser.add_argument('--ion-element', default=None, help='ion element '
-    #                    'chemical symbol (default: %(default)s)')
+
     parser.add_argument('--xyz2data', action='store_true',
                         help='convert xyz to LAMMPS data format')
     parser.add_argument('--add-atomtype', nargs=2, action='append',
@@ -96,41 +125,80 @@ def _argparser():
                         dest='new_atomtypes',
                         help='add new atom to structure data.')
 
+    parser.add_argument('--generator', choices=('tubegen', 'nanogen'),
+                        default='tubegen', help='nano-structure generator '
+                        '(default: %(default)s)')
+
     return parser
 
 
-def call_tubegen(args):
-    """Call TubeGen."""
+def nanogen(fmt='xyz', units='angstrom', element1='C', element2='C',
+            bond=1.421, gutter=(1.6735, 1.6735, 0), shape='hexagonal',
+            chirality=(10, 10), relax_tube='yes', cell_count=(1,1,1),
+            tube_length=None, xyz2data=False, new_atomtypes=None,
+            generator='tubegen'):
+    """Generate nano-structure.
 
-    tubegen = TubeGen(fmt=args.fmt, units=args.units, bond=args.bond_length,
-                      element1=args.element[0], element2=args.element[1],
-                      gutter=args.gutter, shape=args.shape,
-                      chirality=args.chirality, cell_count=args.cell_count,
-                      tube_length=args.tube_length, relax_tube=args.relax_tube)
+    Parameters
+    ----------
+    fmt : str, optional
+        output file format
+    units : str, optional
+    element1 : str, optional
+        element symbol or atomic number of basis atom 1
+    element2 : str, optional
+        element symbol or atomic number of basis atom 2
+    bond : float, optional
+        element1-element2 bond length in ``units``
+    gutter : sequence, optional
+        cell gutter
+    shape : {'hexagonal', 'cubic', 'planar'}, optional
+        crystal structure
+    chirality : sequence, optional
+        chiral indicies (n, m)
+    relax_tube : {'yes', 'no'}, optional
+    cell_count : sequence, optional
+        number of unit cells
+    tube_length : {None, float}, optional
+        tube length in **nanometers**
+    xyz2data : bool, optional
+        convert xyz to LAMMPS data format
+    new_atomtypes : {None, sequence}, optional
+        add new (element, atomtype) to LAMMPS data
+    generator : {'tubegen', 'nanogen'}, optional
+        nano-structure generator
 
-    tubegen.generate()
-    tubegen.cleanup()
+    """
+    if generator == 'tubegen':
+        tubegen = TubeGen(fmt=fmt, units=units, element1=element1,
+                          element2=element2, bond=bond, gutter=gutter,
+                          shape=shape, chirality=chirality,
+                          cell_count=cell_count, tube_length=tube_length,
+                          relax_tube=relax_tube)
 
-    if args.tube_length is not None:
-        tubegen.fix_length()
+        tubegen.generate()
+        tubegen.cleanup()
 
-    if args.xyz2data:
-        if args.fmt == 'xyz':
-            xyzconverter = XYZ2DATAConverter(tubegen.output, pad_box=True)
-            if args.new_atomtypes is not None:
-                for element, atomtype in args.new_atomtypes:
-                    atom = Atom(element, atomtype=int(atomtype))
-                    xyzconverter.add_atomtype(atom=atom)
-            xyzconverter.convert()
-        else:
-            print("can't convert {} format to data. ".format(args.fmt) +
-                  "Must be xyz format.")
+        if tube_length is not None:
+            tubegen.fix_length()
+
+        if xyz2data:
+            if fmt == 'xyz':
+                xyzconverter = XYZ2DATAConverter(tubegen.output, pad_box=True)
+                if new_atomtypes is not None:
+                    for element, atomtype in new_atomtypes:
+                        atom = Atom(element, atomtype=int(atomtype))
+                        xyzconverter.add_atomtype(atom=atom)
+                xyzconverter.convert()
+            else:
+                print("can't convert {} format to data. ".format(fmt) +
+                      "Must be xyz format.")
 
 
 def main():
 
     args = _argparser().parse_args()
-    call_tubegen(args)
+    nanogen(**vars(args))
 
 if __name__ == '__main__':
     sys.exit(main())
