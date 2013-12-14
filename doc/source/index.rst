@@ -32,12 +32,17 @@ Reference
    scripts.rst
    structure_io
 
-pykit docs
-----------
-    - `pykit-sci docs <http://projects.geekspin.net/pksci/doc>`_
-    - `pkkit-shared docs <http://projects.geekspin.net/pkshared/doc>`_
+.. _pykits:
+
+pykit projects
+------------------------------
+    * `pykit-sci docs`_
+    * `pykit-shared docs`_
 
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+.. _pykit-sci docs: http://projects.geekspin.net/pksci/doc
+.. _pykit-shared docs: http://projects.geekspin.net/pkshared/doc
