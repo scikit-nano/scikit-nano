@@ -75,6 +75,8 @@ from pkshared.tools.refdata import ccbond
 from ..nanogen import TubeGen, format_ext
 from ..structure_io import XYZ2DATAConverter
 
+__all__ = ['nanogen']
+
 
 def _argparser():
     parser = argparse.ArgumentParser()
