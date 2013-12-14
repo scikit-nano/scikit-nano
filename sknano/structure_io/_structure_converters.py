@@ -32,8 +32,6 @@ class StructureConverter(object):
     __metaclass__ = ABCMeta
     """Abstract superclass for converting structure data."""
     pass
-#StructureReader.register(StructureConverter)
-#StructureWriter.register(StructureConverter)
 
 
 class FormatConverterError(Exception):
@@ -43,7 +41,7 @@ class FormatConverterError(Exception):
 
 class DATA2XYZConverter(StructureConverter):
     """
-    Class for converting structure data from ``xyz`` to LAMMPS ``data`` format.
+    Class for converting structure data from LAMMPS ``data`` format to ``xyz``.
 
     Parameters
     ----------
