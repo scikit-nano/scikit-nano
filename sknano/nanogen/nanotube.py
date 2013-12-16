@@ -944,6 +944,7 @@ class NanotubeBundle(Nanotube):
     """
     def __init__(self, n=int, m=int, nxcells=1, nycells=1, nzcells=1,
                  element1='C', element2='C', bond=ccbond, tube_length=None,
+                 vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
                  verbose=False):
 
         super(NanotubeBundle, self).__init__(
@@ -952,13 +953,16 @@ class NanotubeBundle(Nanotube):
 
         self._nxcells = int(nxcells)
         self._nycells = int(nycells)
+        self._vdw_spacing = vdw_spacing
+        self._bundle_packing = bundle_packing
+        self._bundle_geometry = bundle_geometry
 
         self._bundle_mass = None
         self._bundle_density = None
 
         self.compute_bundle_params()
 
-    def compute_bundle_params(self):
+    def compute_bundle_params(self, d_vdw=None):
         """Compute bundle params."""
 
         super(NanotubeBundle, self).compute_tube_params()
@@ -968,8 +972,11 @@ class NanotubeBundle(Nanotube):
                                                      nxcells=self._nxcells,
                                                      nycells=self._nycells,
                                                      nzcells=self._nzcells)
+        if d_vdw is None:
+            d_vdw = self._vdw_spacing
         self._bundle_density = \
-            self.compute_bundle_density(n=self._n, m=self._m, bond=self._bond)
+            self.compute_bundle_density(n=self._n, m=self._m,
+                                        d_vdw=d_vdw, bond=self._bond)
 
     @property
     def nxcells(self):
