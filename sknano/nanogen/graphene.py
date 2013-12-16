@@ -296,7 +296,7 @@ class GrapheneGenerator(object):
         deg2rad : bool, optional
             Convert ``rotation_angle`` from degrees to radians.
         center_CM : bool, optional
-            Center center-of-mass on on origin.
+            Center center-of-mass on origin.
 
         """
         if (fname is None and structure_format not in
@@ -306,17 +306,6 @@ class GrapheneGenerator(object):
                     structure_format not in supported_structure_formats):
             structure_format = default_structure_format
 
-        structure_atoms = list(itertools.chain(*self.structure_atoms))
-        structure_atoms = Atoms(structure_atoms)
-        if center_CM and self.nlayers > 1:
-            structure_atoms.center_CM(r_indices=[2])
-        if rotation_angle is not None:
-            R_matrix = rotation_matrix(rotation_angle,
-                                       rot_axis=rot_axis,
-                                       deg2rad=deg2rad)
-            structure_atoms.rotate(R_matrix)
-            #for layer_atoms in self.structure_atoms:
-            #    layer_atoms.rotate(R_matrix)
         if fname is None:
             dimensions = '{}nmx{}nm'.format(self.Lx, self.Ly)
             nlayer = '{}layer'.format(self.nlayers)
@@ -336,6 +325,19 @@ class GrapheneGenerator(object):
                 if structure_format is None or \
                         structure_format not in supported_structure_formats:
                     structure_format = default_structure_format
+
+        structure_atoms = list(itertools.chain(*self.structure_atoms))
+        structure_atoms = Atoms(structure_atoms)
+        if center_CM and self.nlayers > 1:
+            structure_atoms.center_CM()
+        if rotation_angle is not None:
+            R_matrix = rotation_matrix(rotation_angle,
+                                       rot_axis=rot_axis,
+                                       deg2rad=deg2rad)
+            structure_atoms.rotate(R_matrix)
+            #for layer_atoms in self.structure_atoms:
+            #    layer_atoms.rotate(R_matrix)
+
         if structure_format == 'data':
             DATAWriter.write(fname=fname, atoms=structure_atoms)
         else:
