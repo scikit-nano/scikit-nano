@@ -6,8 +6,12 @@ Package for generating nano-structures (:mod:`sknano.nanogen`)
 
 .. currentmodule:: sknano.nanogen
 
-sknano package for generating nano-structures including graphene and
-nanotubes.
+sknano package for generating nano-structures including graphene,
+bi-layer graphene, :math:`N`-layer graphene, single-walled carbon nanotubes
+and single-walled carbon nanotube bundles.
+
+.. versionchanged:: 0.2.4
+   NanotubeBundleGenerator implemented
 
 Contents
 ========
@@ -37,10 +41,6 @@ Structure generator classes
    MWNTGenerator
 
    TubeGen
-
-.. note::
-   The :py:class:`~sknano.nanogen.NanotubeGenerator` class
-   does not yet generate nanotube *bundles*. Only single tubes.
 
 .. seealso:: CLI module :py:mod:`sknano.scripts.nanogen`
 

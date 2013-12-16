@@ -10,10 +10,12 @@ Nanotube structure tools (:mod:`sknano.nanogen.nanotube`)
 from __future__ import division, print_function, absolute_import
 __docformat__ = 'restructuredtext'
 
+import copy
+#import itertools
+
 from fractions import gcd
 from math import pi
 from collections import OrderedDict
-#import itertools
 
 import numpy as np
 
@@ -49,6 +51,7 @@ param_strfmt['Ch'] = \
     param_strfmt['chiral_angle'] = '{:.2f}'
 param_strfmt['bond'] = '{:.3f}'
 
+d_vdw = 3.4
 gram_per_kilogram = 1e3
 kilogram_per_Dalton = 1.660538782e-27
 gram_per_Dalton = kilogram_per_Dalton * gram_per_kilogram
@@ -56,6 +59,7 @@ cm_per_angstrom = 1e-8
 cgs_mass_C = Atom('C').m * gram_per_Dalton
 
 __all__ = ['param_units', 'param_symbols', 'param_strfmt',
+           'NanotubeError', 'ChiralityError',
            'Nanotube', 'NanotubeGenerator',
            'NanotubeBundle', 'NanotubeBundleGenerator',
            'SWNTGenerator', 'MWNTGenerator']
@@ -1220,7 +1224,7 @@ class NanotubeGenerator(Nanotube):
         deg2rad : bool, optional
             Convert ``rotation_angle`` from degrees to radians.
         center_CM : bool, optional
-            Center center-of-mass on on origin.
+            Center center-of-mass on origin.
 
         """
         if (fname is None and structure_format not in
@@ -1230,15 +1234,6 @@ class NanotubeGenerator(Nanotube):
                     structure_format not in supported_structure_formats):
             structure_format = default_structure_format
 
-        #structure_atoms = list(itertools.chain(*self.structure_atoms))
-        structure_atoms = Atoms(self.structure_atoms)
-        if center_CM:
-            structure_atoms.center_CM(r_indices=[2])
-        if rotation_angle is not None:
-            R_matrix = rotation_matrix(rotation_angle,
-                                       rot_axis=rot_axis,
-                                       deg2rad=deg2rad)
-            structure_atoms.rotate(R_matrix)
         if fname is None:
             chirality = '{}{}r'.format('{}'.format(self._n).zfill(2),
                                        '{}'.format(self._m).zfill(2))
@@ -1258,6 +1253,22 @@ class NanotubeGenerator(Nanotube):
                 if structure_format is None or \
                         structure_format not in supported_structure_formats:
                     structure_format = default_structure_format
+
+        #structure_atoms = list(itertools.chain(*self.structure_atoms))
+        structure_atoms = None
+        if isinstance(self.structure_atoms, list):
+            structure_atoms = Atoms(self.structure_atoms)
+        elif isinstance(self.structure_atoms, Atoms):
+            structure_atoms = self.structure_atoms
+
+        if center_CM:
+            structure_atoms.center_CM()
+        if rotation_angle is not None:
+            R_matrix = rotation_matrix(rotation_angle,
+                                       rot_axis=rot_axis,
+                                       deg2rad=deg2rad)
+            structure_atoms.rotate(R_matrix)
+
         if structure_format == 'data':
             DATAWriter.write(fname=fname, atoms=structure_atoms)
         else:
@@ -1266,6 +1277,8 @@ class NanotubeGenerator(Nanotube):
 
 class NanotubeBundleGenerator(NanotubeGenerator):
     u"""Class for generating nanotube bundles.
+
+    .. versionadded:: 0.2.4
 
     Parameters
     ----------
@@ -1300,9 +1313,18 @@ class NanotubeBundleGenerator(NanotubeGenerator):
                  autogen=True, verbose=False):
 
         super(NanotubeBundleGenerator, self).__init__(
-            n=n, m=m, nxcells=nxcells, nycells=nycells, nzcells=nzcells,
+            n=n, m=m, nzcells=nzcells,
             element1=element1, element2=element2, bond=bond,
-            tube_length=tube_length, verbose=verbose)
+            tube_length=tube_length, autogen=False, verbose=verbose)
+
+        self._nxcells = nxcells
+        self._nycells = nycells
+
+        self._r1 = np.zeros(3)
+        self._r2 = np.zeros(3)
+        self._r1[0] = Nanotube.compute_dt(n=n, m=m, bond=bond) + d_vdw
+        self._r2[0] = self._r1[0] * np.cos(np.pi / 3)
+        self._r2[1] = self._r1[0] * np.sin(np.pi / 3)
 
         if autogen:
             super(NanotubeBundleGenerator, self).generate_unit_cell()
@@ -1310,10 +1332,79 @@ class NanotubeBundleGenerator(NanotubeGenerator):
 
     def generate_structure_data(self):
         """Generate structure data."""
-        super(NanotubeBundleGenerator, self).generate_structure()
+        super(NanotubeBundleGenerator, self).generate_structure_data()
+        swcnt0 = copy.deepcopy(self.structure_atoms)
+        self.structure_atoms = Atoms()
         for nx in xrange(self._nxcells):
             for ny in xrange(self._nycells):
-                pass
+                swcnt = Atoms(atoms=swcnt0, deepcopy=True)
+                swcnt.center_CM()
+                dr = nx * self._r1 + ny * self._r2
+                swcnt.translate(dr)
+                self.structure_atoms.extend(swcnt.atoms)
+
+    def save_data(self, fname=None, structure_format=None,
+                  rotation_angle=None, rot_axis=None, deg2rad=True,
+                  center_CM=True):
+        """Save structure data.
+
+        Parameters
+        ----------
+        fname : {None, str}, optional
+            file name string
+        structure_format : {None, str}, optional
+            chemical file format of saved structure data. Must be one of:
+
+                - xyz
+                - data
+
+            If ``None``, then guess based on ``fname`` file extension or
+            default to ``xyz`` format.
+        rotation_angle : {None, float}, optional
+            Angle of rotation
+        rot_axis : {'x', 'y', 'z'}, optional
+            Rotation axis
+        deg2rad : bool, optional
+            Convert ``rotation_angle`` from degrees to radians.
+        center_CM : bool, optional
+            Center center-of-mass on origin.
+
+        """
+        if (fname is None and structure_format not in
+                supported_structure_formats) or \
+                (fname is not None and not
+                    fname.endswith(supported_structure_formats) and
+                    structure_format not in supported_structure_formats):
+            structure_format = default_structure_format
+
+        if fname is None:
+            chirality = '{}{}r'.format('{}'.format(self._n).zfill(2),
+                                       '{}'.format(self._m).zfill(2))
+            nxcells = ''.join(('{}'.format(self._nxcells),
+                               plural_word_check('cell', self._nxcells)))
+            nycells = ''.join(('{}'.format(self._nycells),
+                               plural_word_check('cell', self._nycells)))
+            nzcells = ''.join(('{}'.format(self._nzcells),
+                               plural_word_check('cell', self._nzcells)))
+            cells = 'x'.join((nxcells, nycells, nzcells))
+
+            fname_wordlist = (chirality, cells)
+            fname = '_'.join(fname_wordlist)
+            fname += '.' + structure_format
+        else:
+            if fname.endswith(supported_structure_formats) and \
+                    structure_format is None:
+                for ext in supported_structure_formats:
+                    if fname.endswith(ext):
+                        structure_format = ext
+                        break
+            else:
+                if structure_format is None or \
+                        structure_format not in supported_structure_formats:
+                    structure_format = default_structure_format
+
+        super(NanotubeBundleGenerator, self).save_data(
+            fname=fname, structure_format=structure_format)
 
 
 class SWNTGenerator(NanotubeGenerator):
