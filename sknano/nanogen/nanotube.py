@@ -21,7 +21,7 @@ import numpy as np
 from pksci.chemistry import Atom, Atoms
 from pkshared.tools.arrayfuncs import rotation_matrix
 from pkshared.tools.strfuncs import plural_word_check
-from pkshared.tools.refdata import ccbond
+from pkshared.tools.refdata import CCbond
 
 from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
     supported_structure_formats
@@ -178,7 +178,7 @@ class Nanotube(object):
     """
 
     def __init__(self, n=int, m=int, nzcells=1, element1='C', element2='C',
-                 bond=ccbond, tube_length=None, verbose=False):
+                 bond=CCbond, tube_length=None, verbose=False):
 
         self._params = OrderedDict()
 
@@ -512,7 +512,7 @@ class Nanotube(object):
 
         if magnitude:
             if bond is None:
-                bond = ccbond
+                bond = CCbond
             return bond * np.sqrt(3 * (p**2 + q**2 + p * q))
         else:
             return (p, q)
@@ -568,7 +568,7 @@ class Nanotube(object):
 
         """
         if bond is None:
-            bond = ccbond
+            bond = CCbond
 
         return bond * np.sqrt(3 * (n**2 + m**2 + n * m))
 
@@ -768,7 +768,7 @@ class Nanotube(object):
 
         """
         if bond is None:
-            bond = ccbond
+            bond = CCbond
         if n is not None and m is not None:
             Ch = Nanotube.compute_Ch(n=n, m=m, bond=bond)
             dR = Nanotube.compute_dR(n=n, m=m)
@@ -943,7 +943,7 @@ class NanotubeBundle(Nanotube):
 
     """
     def __init__(self, n=int, m=int, nxcells=1, nycells=1, nzcells=1,
-                 element1='C', element2='C', bond=ccbond, tube_length=None,
+                 element1='C', element2='C', bond=CCbond, tube_length=None,
                  vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
                  verbose=False):
 
@@ -1070,7 +1070,7 @@ class NanotubeBundle(Nanotube):
         m_C = cgs_mass_C
 
         if bond is None:
-            bond = ccbond
+            bond = CCbond
 
         if d_vdw is None:
             if n == m:
@@ -1137,7 +1137,7 @@ class NanotubeGenerator(Nanotube):
     """
 
     def __init__(self, n=int, m=int, nzcells=1, element1='C', element2='C',
-                 bond=ccbond, tube_length=None, autogen=True, verbose=False):
+                 bond=CCbond, tube_length=None, autogen=True, verbose=False):
 
         super(NanotubeGenerator, self).__init__(
             n=n, m=m, nzcells=nzcells, element1=element1, element2=element2,
@@ -1323,10 +1323,21 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
     Examples
     --------
 
+    Using the :py:class:`NanotubeBundleGenerator` class, you can
+    generate cubic close packed (ccp) or hexagonal close packed
+    bundles arrangements. In general, specifying **ccp** bundling will
+    generate rectangular bundles and specifying **hcp**
+    bundling will always generate ``rhomboidal`` (?) bundles
+    (*i.e.* bundles arranged within a rhomboid).
+    However, can enforce a specific bundle *geometry* (as long as it's
+    consistent with the bundle packing arrangement) that is especially
+    useful for generating **hcp* bundles that are trianglar or hexagonal in
+    *shape*.
+
     """
 
     def __init__(self, n=int, m=int, nxcells=1, nycells=1, nzcells=1,
-                 element1='C', element2='C', bond=ccbond, tube_length=None,
+                 element1='C', element2='C', bond=CCbond, tube_length=None,
                  vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
                  autogen=True, verbose=False):
 

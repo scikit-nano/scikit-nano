@@ -24,7 +24,7 @@ from math import ceil
 #import numpy as np
 
 from pkshared.tools.strfuncs import plural_word_check
-from pkshared.tools.refdata import ccbond
+from pkshared.tools.refdata import CCbond
 from .nanotube import Nanotube
 from ..structure_io import XYZReader, XYZWriter
 
@@ -234,7 +234,7 @@ class TubeGen(object):
 
     """
 
-    def __init__(self, fmt='xyz', units='angstrom', bond=ccbond,
+    def __init__(self, fmt='xyz', units='angstrom', bond=CCbond,
                  element1='C', element2='C', gutter=(1.6735, 1.6735, 0),
                  shape='hexagonal', chirality=(10, 10), cell_count=(1, 1, 1),
                  relax_tube='yes', tube_length=None):

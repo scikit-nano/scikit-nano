@@ -25,7 +25,7 @@ import numpy as np
 
 from pksci.chemistry import Atom, Atoms
 from pkshared.tools.arrayfuncs import rotation_matrix
-from pkshared.tools.refdata import ccbond
+from pkshared.tools.refdata import CCbond
 
 from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
     supported_structure_formats
@@ -140,7 +140,7 @@ class GrapheneGenerator(object):
     """
 
     def __init__(self, width=float, length=float, edge='armchair',
-                 element1='C', element2='C', bond=ccbond, nlayers=1,
+                 element1='C', element2='C', bond=CCbond, nlayers=1,
                  layer_spacing=3.35, stacking_order='AB',
                  autogen=True, verbose=False):
 
@@ -424,7 +424,7 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
     """
 
     def __init__(self, width=float, length=float, edge='armchair',
-                 element1='C', element2='C', bond=ccbond,
+                 element1='C', element2='C', bond=CCbond,
                  layer_spacing=3.35, stacking_order='AB',
                  rotation_angle=None, deg2rad=True, autogen=True,
                  verbose=False):
