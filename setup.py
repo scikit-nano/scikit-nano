@@ -30,7 +30,7 @@ Topic :: Scientific/Engineering
 
 MAJOR = 0
 MINOR = 2
-MICRO = 3
+MICRO = 4
 ISRELEASED = False
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
@@ -137,11 +137,9 @@ def setup_package():
         zip_safe=False,
         dependency_links=[
             'https://github.com/androomerrill/pykit-sci/tarball/dev' +
-            '#egg=pksci-0.1.1.dev',
-            'https://github.com/androomerrill/pykit-sci/tarball/master' +
-            '#egg=pksci-0.1.1'],
+            '#egg=pksci-0.1.2'],
         install_requires=['numpy>=1.7', 'scipy>=0.12',
-                          'pksci>=0.1.1.dev'],
+                          'pksci>=0.1.2'],
         entry_points={
             'console_scripts': [
                 'nanogen = sknano.scripts.nanogen:main',
