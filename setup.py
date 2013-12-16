@@ -137,9 +137,9 @@ def setup_package():
         zip_safe=False,
         dependency_links=[
             'https://github.com/androomerrill/pykit-sci/tarball/dev' +
-            '#egg=pksci-0.1.2'],
+            '#egg=pksci-0.1.3'],
         install_requires=['numpy>=1.7', 'scipy>=0.12',
-                          'pksci>=0.1.2.dev'],
+                          'pksci>=0.1.3.dev'],
         entry_points={
             'console_scripts': [
                 'nanogen = sknano.scripts.nanogen:main',
