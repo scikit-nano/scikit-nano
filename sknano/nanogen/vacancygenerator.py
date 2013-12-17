@@ -64,9 +64,13 @@ class VacancyGenerator(object):
                     structure_format = ext
                     break
         else:
-            if structure_format is None or \
-                    structure_format not in supported_structure_formats:
-                structure_format = 'xyz'
+            if (not fname.endswith(supported_structure_formats) and
+                    structure_format is None) or \
+                    (structure_format is not None and
+                        structure_format not in supported_structure_formats):
+                raise StructureFormatError(
+                    '{} is not a supported structure format'.format(
+                        structure_format))
 
         self.fname = fname
         self.structure_format = structure_format
@@ -77,10 +81,6 @@ class VacancyGenerator(object):
             self.data = DATAReader(fname)
         elif self.structure_format == 'xyz':
             self.data = XYZ2DATAConverter(fname).convert(return_reader=True)
-        else:
-            raise StructureFormatError(
-                '{} is not a supported structure format'.format(
-                    structure_format))
 
         self.atoms = self.data.atoms
         self.atom_ids = self.atoms.atom_ids
@@ -178,8 +178,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
     "add" some vacancies to it using the
     :py:class:`~sknano.nanogen.GrapheneVacancyGenerator` class.
 
-    >>> from sknano.nanogen import GrapheneGenerator, \
-            GrapheneVacancyGenerator
+    >>> from sknano.nanogen import GrapheneGenerator, GrapheneVacancyGenerator
     >>> ZZgraphene_1layer = GrapheneGenerator(width=5, length=10, edge='ZZ')
     >>> ZZgraphene_1layer.save_data(fname='5nmx10nm_ZZ_1layer.data',
     ...                             structure_format='data')
@@ -207,7 +206,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
     .. image:: /images/5nmx10nm_ZZ_1layer+30_vacancies.png
 
     """
-    def __init__(self, fname=str, structure_format='xyz',
+    def __init__(self, fname=str, structure_format=None,
                  rotate_structure=False, rotation_angle=None,
                  rotation_axis=None):
 
@@ -273,7 +272,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
 class NanotubeVacancyGenerator(VacancyGenerator):
 
-    def __init__(self, fname=str, structure_format='xyz',
+    def __init__(self, fname=str, structure_format=None,
                  rotate_structure=False, rotation_angle=None,
                  rotation_axis=None):
 
@@ -345,3 +344,6 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                     self.vac_ids = \
                         np.r_[self.vac_ids,
                               np.random.choice(candidate_vac_atom_ids)]
+
+        super(NanotubeVacancyGenerator, self).generate_vacancy_structure(
+            show_vmd_selection_cmd=show_vmd_selection_cmd)
