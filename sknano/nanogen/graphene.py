@@ -6,13 +6,6 @@ Graphene structure tools (:mod:`sknano.nanogen.graphene`)
 
 .. currentmodule:: sknano.nanogen.graphene
 
-.. autosummary::
-   :toctree: generated/
-
-   Graphene
-   GrapheneGenerator
-   BiLayerGrapheneGenerator
-
 """
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext'
@@ -30,13 +23,17 @@ from pkshared.tools.refdata import CCbond
 from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
     supported_structure_formats
 
-__all__ = ['Graphene', 'GrapheneGenerator', 'BiLayerGrapheneGenerator']
+__all__ = ['Graphene', 'GrapheneGenerator', 'BiLayerGrapheneGenerator',
+           'GrapheneGeneratorError']
+
+
+class GrapheneGeneratorError(Exception):
+    """Base class for GrapheneGenerator exceptions."""
+    pass
 
 
 class Graphene(object):
-    """Class for generating interactive Graphene objects.
-
-    """
+    """Class for generating interactive Graphene objects."""
     pass
 
 

@@ -59,9 +59,14 @@ cgs_mass_C = Atom('C').m * gram_per_Dalton
 
 __all__ = ['param_units', 'param_symbols', 'param_strfmt',
            'NanotubeError', 'ChiralityError',
-           'Nanotube', 'NanotubeGenerator',
+           'Nanotube', 'NanotubeGenerator', 'NanotubeGeneratorError',
            'NanotubeBundle', 'NanotubeBundleGenerator',
            'SWNTGenerator', 'MWNTGenerator']
+
+
+class NanotubeGeneratorError(Exception):
+    """Base class for NanotubeGenerator exceptions."""
+    pass
 
 
 class NanotubeError(Exception):
