@@ -1385,13 +1385,15 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
     Using the :py:class:`NanotubeBundleGenerator` class, you can
     generate cubic close packed (ccp) or hexagonal close packed
     bundles arrangements. In general, specifying **ccp** bundling will
-    generate rectangular bundles and specifying **hcp**
-    bundling will always generate ``rhomboidal`` (?) bundles
-    (*i.e.* bundles arranged within a rhomboid).
-    However, can enforce a specific bundle *geometry* (as long as it's
-    consistent with the bundle packing arrangement) that is especially
-    useful for generating **hcp** bundles that are trianglar or hexagonal in
-    *shape*.
+    generate rectangular bundles (square bundles if :math:`n_x = n_y`)
+    and specifying **hcp** bundling will generate *rhomboidal* bundles
+    (*i.e.* bundles arranged within a rhomboid) (rhombuses if
+    :math:`n_x = n_y`). However, you can also enforce a specific
+    *bundle geometry* which will try and reshape the bundle arrangement so
+    that it "fits inside" the boundaries of a specified geometric shape.
+    This allows you to generate **hcp** bundles that are trianglar,
+    hexagonal, or rectangular in *shape*, as some of the examples below
+    illustrate.
 
     To start, let's generate an hcp bundle of
     :math:`C_{\\mathrm{h}} = (10, 5)` SWCNTs and cell count
@@ -1417,8 +1419,8 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
 
     .. image:: /images/0605_hcp_7tube_hexagon-001.png
 
-    Remember, the :py:meth:`NanotubeBundleGenerator.save_data` methods
-    allow you to rotate the structure data.
+    Remember, all of the :py:meth:`~NanotubeBundleGenerator.save_data`
+    methods allow you to rotate the structure data before saving:
 
     >>> SWCNTbundle.save_data(fname='0605_hcp_7tube_hexagon_rot-30deg.xyz',
     ...                       rot_axis='z', rotation_angle=30)
