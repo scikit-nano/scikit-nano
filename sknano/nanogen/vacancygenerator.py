@@ -204,7 +204,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
     The rendered structure, with vacancies highlighted, looks like:
 
-    .. image:: /image/5nmx10nm_ZZ_1layer+30_vacancies.png
+    .. image:: /images/5nmx10nm_ZZ_1layer+30_vacancies.png
 
     """
     def __init__(self, fname=str, structure_format='xyz',
