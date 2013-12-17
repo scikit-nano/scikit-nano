@@ -138,7 +138,7 @@ def setup_package():
         dependency_links=[
             'https://github.com/androomerrill/pykit-sci/tarball/dev' +
             '#egg=pksci-0.1.3'],
-        install_requires=['numpy>=1.7', 'scipy>=0.12',
+        install_requires=['numpy>=1.8', 'scipy>=0.13',
                           'pksci>=0.1.3.dev'],
         entry_points={
             'console_scripts': [
