@@ -17,12 +17,21 @@ import os
 
 import numpy as np
 
+from pkshared.tools.refdata import CCbond
+
+from .graphene import GrapheneGenerator, GrapheneGeneratorError
+from .nanotube import NanotubeBundleGenerator, NanotubeGeneratorError
 from ..structure_io import DATAReader, DATAWriter, XYZWriter, \
     XYZ2DATAConverter, StructureFormatError, supported_structure_formats
 
 __all__ = ['GrapheneVacancyGenerator',
            'NanotubeVacancyGenerator',
-           'VacancyGenerator']
+           'VacancyGenerator', 'VacancyGeneratorError']
+
+
+class VacancyGeneratorError(Exception):
+    """Base class for VacancyGenerator exceptions."""
+    pass
 
 
 class VacancyGenerator(object):
@@ -32,30 +41,21 @@ class VacancyGenerator(object):
     ----------
     fname : str
         structure data filename
-    Nvac : int
-        total number of vacancies to "add" to structure data.
     structure_format : {None, str}, optional
-        chemical file format of saved structure data. Must be one of:
+        chemical file format of saved structure data.
+        If ``None``, then guess based on ``fname`` file extension.
+        Otherwise, must be one of:
 
             - xyz
             - data
 
-        If ``None``, then guess based on ``fname`` file extension or
-        default to ``xyz`` format.
-    random_vacancies : bool, optional
-        Generate random vacancies in structure data.
-    uniform_vacancies : bool, optional
-        Generate uniform vacancies in structure data.
-    rotate_structure : bool, optional
-        rotate structure data about specified ``rotation_axis`` by
-        ``rotation_angle``.
-    rotation_angle : float, optional
-        Angle of rotation to rotate structure data in **degrees**.
-    rotation_axis : {'x', 'y', 'z'}, optional
-        if ``rotate_data is True``, ``rotation_axis`` must be set.
+    verbose : bool, optional
+        Verbose output
 
     """
-    def __init__(self, fname=str, structure_format=None):
+    def __init__(self, fname=str, structure_format=None, verbose=False):
+
+        self.verbose = verbose
 
         if fname.endswith(supported_structure_formats) and \
                 structure_format is None:
@@ -94,8 +94,15 @@ class VacancyGenerator(object):
             np.random.choice(self.atom_ids, size=self.Nvac, replace=False)
 
     def generate_vacancy_structure(self, show_vmd_selection_cmd=True):
-        """Generate vacancy structure."""
+        """Generate vacancy structure.
 
+        Parameters
+        ----------
+        show_vmd_selection_cmd : bool, optional
+            Generate a VMD selection string that can be used to
+            select the atoms surrounding the vacancies.
+
+        """
         removed_atoms = self.atoms.filter_atoms(self.vac_ids, invert=False)
 
         if show_vmd_selection_cmd:
@@ -125,50 +132,41 @@ class VacancyGenerator(object):
 
 
 class GrapheneVacancyGenerator(VacancyGenerator):
-    """Generate vacancy structure.
+    """Generate vacancies in graphene.
 
     Parameters
     ----------
-    fname : str
-        structure data filename
-    Nvac : int
-        total number of vacancies to "add" to structure data.
-    structure_format : str
-        chemical file format of structure data. Must be one of:
+    fname : str, optional
+        Structure data filename. If you don't provide a structure data file,
+        the you **must** provide the structure data parameters to
+        generate the structure data file.
+    structure_format : {None, str}, optional
+        Chemical file format of saved structure data.
+        If ``None``, then guess based on ``fname`` file extension.
+        Otherwise, must be one of:
 
             - xyz
             - data
 
-    random_vacancies : bool, optional
-        Generate random vacancies in structure data.
-    uniform_vacancies : bool, optional
-        Generate uniform vacancies in structure data.
-    Nlayers : int, optional
-        number of graphene layers.
-    Nvac_per_layer : int, optional
-        number of vacancies per layer.
-    bin_dim : {'x', 'y', 'z'}, str
-        axis along which to generate uniform vacancies
-    nbin_sets : int
-        number of bin sets to cycle through when picking the vacancy
-        coordinates.
-    crop_data : bool, optional
-        Crop the structure data for each dimension in ``bounds`` by
-        limits specified in ``bounds``.
-    bounds : dict, optional
-        if ``crop_data is True``, ``bounds`` must be provided as a dict
-        of the form::
-
-            {'dim': {'min': float, 'max': float}}
-
-        for any dim in ``('x', 'y', 'z')''
-    rotate_structure : bool, optional
-        rotate structure data about specified ``rotation_axis`` by
-        ``rotation_angle``.
-    rotation_angle : float, optional
-        Angle of rotation to rotate structure data in **degrees**.
-    rotation_axis : {'x', 'y', 'z'}, optional
-        if ``rotate_data is True``, ``rotation_axis`` must be set.
+    width : float
+        Width of graphene sheet in **nanometers**
+    length : float
+        Length of graphene sheet in **nanometers**
+    edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
+        **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
+        the ``length`` of the sheet sheet.
+    element1, element2 : {str, int}, optional
+        Element symbol or atomic number of basis atoms 1 and 2.
+    bond : float, optional
+        bond length between nearest-neighbor atoms in **Angstroms**.
+    nlayers : int, optional
+        Number of graphene layers.
+    layer_spacing : float, optional
+        Distance between layers in **Angstroms**.
+    stacking_order : {'AA', 'AB'}, optional
+        Stacking order of graphene layers
+    verbose : bool, optional
+        Verbose output
 
     Examples
     --------
@@ -199,25 +197,84 @@ class GrapheneVacancyGenerator(VacancyGenerator):
        copy and paste the following VMD command to select
        the atoms surrounding the vacancies:
 
-       (((x - -24.157000)^2 + (y - 0.000000)^2 + (z - 37.533974)^2) <= 9) or (((x - -24.157000)^2 + (y - 0.000000)^2 + (z - 22.766509)^2) <= 9) or (((x - -22.025500)^2 + (y - 0.000000)^2 + (z - 6.768422)^2) <= 9) or (((x - -22.025500)^2 + (y - 0.000000)^2 + (z - -7.999044)^2) <= 9) or (((x - -24.867500)^2 + (y - 0.000000)^2 + (z - -12.921532)^2) <= 9) or (((x - -17.762500)^2 + (y - 0.000000)^2 + (z - 46.148329)^2) <= 9) or (((x - -19.894000)^2 + (y - 0.000000)^2 + (z - 30.150241)^2) <= 9) or (((x - -18.473000)^2 + (y - 0.000000)^2 + (z - -43.687085)^2) <= 9) or (((x - -15.631000)^2 + (y - 0.000000)^2 + (z - 47.378951)^2) <= 9) or (((x - -16.341500)^2 + (y - 0.000000)^2 + (z - 16.613398)^2) <= 9) or (((x - -14.210000)^2 + (y - 0.000000)^2 + (z - 15.382776)^2) <= 9) or (((x - -14.210000)^2 + (y - 0.000000)^2 + (z - -28.919619)^2) <= 9) or (((x - -9.947000)^2 + (y - 0.000000)^2 + (z - 32.611486)^2) <= 9) or (((x - -9.236500)^2 + (y - 0.000000)^2 + (z - 26.458375)^2) <= 9) or (((x - -11.368000)^2 + (y - 0.000000)^2 + (z - 15.382776)^2) <= 9) or (((x - -12.078500)^2 + (y - 0.000000)^2 + (z - 4.307177)^2) <= 9) or (((x - -7.815500)^2 + (y - 0.000000)^2 + (z - 19.074643)^2) <= 9) or (((x - -4.973500)^2 + (y - 0.000000)^2 + (z - -47.378951)^2) <= 9) or (((x - -3.552500)^2 + (y - 0.000000)^2 + (z - 19.074643)^2) <= 9) or (((x - -1.421000)^2 + (y - 0.000000)^2 + (z - -16.613398)^2) <= 9) or (((x - -2.842000)^2 + (y - 0.000000)^2 + (z - -19.074643)^2) <= 9) or (((x - -0.710500)^2 + (y - 0.000000)^2 + (z - -39.995218)^2) <= 9) or (((x - 12.078500)^2 + (y - 0.000000)^2 + (z - 6.768422)^2) <= 9) or (((x - 15.631000)^2 + (y - 0.000000)^2 + (z - 25.227753)^2) <= 9) or (((x - 13.499500)^2 + (y - 0.000000)^2 + (z - 16.613398)^2) <= 9) or (((x - 15.631000)^2 + (y - 0.000000)^2 + (z - 12.921532)^2) <= 9) or (((x - 14.210000)^2 + (y - 0.000000)^2 + (z - -21.535887)^2) <= 9) or (((x - 16.341500)^2 + (y - 0.000000)^2 + (z - -35.072730)^2) <= 9) or (((x - 18.473000)^2 + (y - 0.000000)^2 + (z - 30.150241)^2) <= 9) or (((x - 19.894000)^2 + (y - 0.000000)^2 + (z - 12.921532)^2) <= 9)
+       (((x - -24.157000)^2 + (y - 0.000000)^2 + (z - 37.533974)^2) <= 9) or
+       (((x - -24.157000)^2 + (y - 0.000000)^2 + (z - 22.766509)^2) <= 9) or
+       (((x - -22.025500)^2 + (y - 0.000000)^2 + (z - 6.768422)^2) <= 9) or
+       (((x - -22.025500)^2 + (y - 0.000000)^2 + (z - -7.999044)^2) <= 9) or
+       (((x - -24.867500)^2 + (y - 0.000000)^2 + (z - -12.921532)^2) <= 9) or
+       (((x - -17.762500)^2 + (y - 0.000000)^2 + (z - 46.148329)^2) <= 9) or
+       (((x - -19.894000)^2 + (y - 0.000000)^2 + (z - 30.150241)^2) <= 9) or
+       (((x - -18.473000)^2 + (y - 0.000000)^2 + (z - -43.687085)^2) <= 9) or
+       (((x - -15.631000)^2 + (y - 0.000000)^2 + (z - 47.378951)^2) <= 9) or
+       (((x - -16.341500)^2 + (y - 0.000000)^2 + (z - 16.613398)^2) <= 9) or
+       (((x - -14.210000)^2 + (y - 0.000000)^2 + (z - 15.382776)^2) <= 9) or
+       (((x - -14.210000)^2 + (y - 0.000000)^2 + (z - -28.919619)^2) <= 9) or
+       (((x - -9.947000)^2 + (y - 0.000000)^2 + (z - 32.611486)^2) <= 9) or
+       (((x - -9.236500)^2 + (y - 0.000000)^2 + (z - 26.458375)^2) <= 9) or
+       (((x - -11.368000)^2 + (y - 0.000000)^2 + (z - 15.382776)^2) <= 9) or
+       (((x - -12.078500)^2 + (y - 0.000000)^2 + (z - 4.307177)^2) <= 9) or
+       (((x - -7.815500)^2 + (y - 0.000000)^2 + (z - 19.074643)^2) <= 9) or
+       (((x - -4.973500)^2 + (y - 0.000000)^2 + (z - -47.378951)^2) <= 9) or
+       (((x - -3.552500)^2 + (y - 0.000000)^2 + (z - 19.074643)^2) <= 9) or
+       (((x - -1.421000)^2 + (y - 0.000000)^2 + (z - -16.613398)^2) <= 9) or
+       (((x - -2.842000)^2 + (y - 0.000000)^2 + (z - -19.074643)^2) <= 9) or
+       (((x - -0.710500)^2 + (y - 0.000000)^2 + (z - -39.995218)^2) <= 9) or
+       (((x - 12.078500)^2 + (y - 0.000000)^2 + (z - 6.768422)^2) <= 9) or
+       (((x - 15.631000)^2 + (y - 0.000000)^2 + (z - 25.227753)^2) <= 9) or
+       (((x - 13.499500)^2 + (y - 0.000000)^2 + (z - 16.613398)^2) <= 9) or
+       (((x - 15.631000)^2 + (y - 0.000000)^2 + (z - 12.921532)^2) <= 9) or
+       (((x - 14.210000)^2 + (y - 0.000000)^2 + (z - -21.535887)^2) <= 9) or
+       (((x - 16.341500)^2 + (y - 0.000000)^2 + (z - -35.072730)^2) <= 9) or
+       (((x - 18.473000)^2 + (y - 0.000000)^2 + (z - 30.150241)^2) <= 9) or
+       (((x - 19.894000)^2 + (y - 0.000000)^2 + (z - 12.921532)^2) <= 9)
 
     The rendered structure, with vacancies highlighted, looks like:
 
     .. image:: /images/5nmx10nm_ZZ_1layer+30_vacancies.png
 
     """
-    def __init__(self, fname=str, structure_format=None,
+    def __init__(self, fname=None, structure_format=None,
+                 width=None, length=None, edge='armchair',
+                 element1='C', element2='C', bond=CCbond,
+                 nlayers=1, layer_spacing=3.35, stacking_order='AB',
                  rotate_structure=False, rotation_angle=None,
-                 rotation_axis=None):
+                 rotation_axis=None, verbose=False):
+
+        if fname is None and width is not None and length is not None:
+            try:
+                gg = GrapheneGenerator(width=width, length=length,
+                                       edge=edge, element1=element1,
+                                       element2=element2, bond=bond,
+                                       nlayers=nlayers,
+                                       layer_spacing=layer_spacing,
+                                       stacking_order=stacking_order,
+                                       verbose=verbose)
+                gg.save_data(structure_format='data')
+                fname = gg.fname
+            except GrapheneGeneratorError:
+                raise VacancyGeneratorError('invalid parameters')
 
         super(GrapheneVacancyGenerator, self).__init__(
-            fname=fname, structure_format=structure_format)
+            fname=fname, structure_format=structure_format, verbose=verbose)
 
     def generate_vacancy_structure(self, Nvac=int, random=False, uniform=False,
-                                   Nlayers=None, Nvac_per_layer=None,
-                                   bin_dim=None, nbin_sets=None,
+                                   bin_axis=None,
                                    show_vmd_selection_cmd=True):
+        """Generate vacancy structure.
 
+        Parameters
+        ----------
+        Nvac : int
+            total number of vacancies to "add" to structure data.
+        random : bool, optional
+            Generate random vacancies in structure data.
+        uniform : bool, optional
+            Generate uniform vacancies in structure data.
+        bin_axis : {'x', 'y', 'z'}, optional
+            axis along which to generate uniform vacancies
+        show_vmd_selection_cmd : bool, optional
+
+        """
         self.Nvac = Nvac
 
         if random:
@@ -227,26 +284,39 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
             # find the coords of each layer
             y_coords = self.atom_coords['y']
+            Nlayers = len(set(y_coords))
             layer_coords = np.asarray(sorted(list(set(y_coords))))
-            bin_sets = []
-            nbins = int(Nvac / Nvac_per_layer)
-            if nbin_sets is None:
-                bin_sets.append(np.arange(0, nbins, 1))
-            else:
-                for n in xrange(nbin_sets):
-                    bin_sets.append(np.arange(n, nbins, nbin_sets))
 
+            Nvac_per_layer = int(Nvac / Nlayers)
+            extra = Nvac % Nlayers
+            nbins = Nlayers * Nvac_per_layer
+
+            bin_sets = []
+            for n in xrange(Nlayers):
+                bin_sets.append(np.arange(n, nbins, Nlayers))
             bin_set_iter = itertools.cycle((bin_sets))
 
-            vac_bin_edges = np.linspace(self.atom_coords[bin_dim].min(),
-                                        self.atom_coords[bin_dim].max(),
+            vac_bin_edges = np.linspace(self.atom_coords[bin_axis].min(),
+                                        self.atom_coords[bin_axis].max(),
                                         num=nbins+1)
-            vac_coords_along_bin_dim = \
+            vac_coords_along_bin_axis = \
                 vac_bin_edges[:-1] + np.diff(vac_bin_edges) / 2
+
+            if self.verbose:
+                print('Nvac: {}'.format(Nvac))
+                print('Nlayers: {}'.format(Nlayers))
+                print('Nvac_per_layer: {}'.format(Nvac_per_layer))
+                print('extra vacancies: {}'.format(extra))
+                print('nbins: {}'.format(nbins))
+                print('bin_sets:\n{}'.format(bin_sets))
+                print('vac_bin_edges:'
+                      '\n{}'.format(vac_bin_edges))
+                print('vac_coords_along_bin_axis:'
+                      '\n{}'.format(vac_coords_along_bin_axis))
 
             for layer_pos in layer_coords:
                 bin_set = bin_set_iter.next()
-                for vac_pos in vac_coords_along_bin_dim[bin_set]:
+                for vac_pos in vac_coords_along_bin_axis[bin_set]:
                     candidate_vac_atom_indices = \
                         np.where(
                             (self.atom_coords['x'] >=
@@ -255,12 +325,14 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                              (self.atom_coords['x'].max() - 2.5)) &
                             (np.abs(self.atom_coords['y'] - layer_pos)
                                 <= 0.5) &
-                            (np.abs(self.atom_coords[bin_dim] - vac_pos)
-                                <= 0.75))
+                            (np.abs(self.atom_coords[bin_axis] - vac_pos)
+                                <= 1))
                     candidate_vac_atom_ids = \
                         self.atom_ids[candidate_vac_atom_indices]
-                    print('candidate_vac_atom_ids: '
-                          '{}\n'.format(candidate_vac_atom_ids))
+
+                    if self.verbose:
+                        print('candidate_vac_atom_ids: '
+                              '{}\n'.format(candidate_vac_atom_ids))
 
                     self.vac_ids = \
                         np.r_[self.vac_ids, np.random.choice(
@@ -271,19 +343,98 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
 
 class NanotubeVacancyGenerator(VacancyGenerator):
+    """Generate vacancies in nanotubes.
 
-    def __init__(self, fname=str, structure_format=None,
-                 rotate_structure=False, rotation_angle=None,
-                 rotation_axis=None):
+    Parameters
+    ----------
+    fname : str, optional
+        Structure data filename. If you don't provide a structure data file,
+        the you **must** provide the structure data parameters to
+        generate the structure data file.
+    structure_format : {None, str}, optional
+        Chemical file format of saved structure data.
+        If ``None``, then guess based on ``fname`` file extension.
+        Otherwise, must be one of:
+
+            - xyz
+            - data
+
+    n, m : int, optional
+        Chiral indices defining the nanotube chiral vector
+        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
+    nx, ny, nz : int, optional
+        Number of repeat unit cells in the :math:`x, y, z` dimensions.
+    element1, element2 : {str, int}, optional
+        Element symbol or atomic number of basis atoms 1 and 2
+    bond : float, optional
+        :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
+        nearest neighbor atoms. Must be in units of **Angstroms**.
+    vdw_spacing : float, optional
+        van der Waals distance between nearest neighbor tubes
+    bundle_packing : {None, 'hexagonal', 'cubic'}, optional
+        close packing arrangement of bundles
+    bundle_geometry : {None, 'triangle', 'hexagon', 'square', 'rectangle',
+                       'rhombus', 'rhomboid'}, optional
+    Lx, Ly, Lz : float, optional
+        length of bundle in :math:`x, y, z` dimensions in **nanometers**.
+        Overrides the :math:`n_x, n_y, n_z` cell values.
+    verbose : bool, optional
+        Verbose output
+
+    Examples
+    --------
+
+    """
+    def __init__(self, fname=None, structure_format=None,
+                 n=None, m=None, nx=1, ny=1, nz=1,
+                 element1='C', element2='C', bond=CCbond,
+                 vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
+                 Lx=None, Ly=None, Lz=None, rotate_structure=False,
+                 rotation_angle=None, rotation_axis=None, verbose=False):
+
+        self.Ntubes = None
+        self.Natoms_per_tubes = None
+
+        if fname is None and n is not None and m is not None:
+            try:
+                ntbg = NanotubeBundleGenerator(n=n, m=m, nx=nx, ny=ny, nz=nz,
+                                               element1=element1,
+                                               element2=element2,
+                                               bond=bond,
+                                               vdw_spacing=vdw_spacing,
+                                               bundle_packing=bundle_packing,
+                                               bundle_geometry=bundle_geometry,
+                                               Lx=Lx, Ly=Ly, Lz=Lz,
+                                               verbose=verbose)
+                ntbg.save_data(structure_format='data')
+                fname = ntbg.fname
+                self.Ntubes = ntbg.Ntubes
+                self.Natoms_per_tube = ntbg.Natoms_per_tube
+            except NanotubeGeneratorError:
+                raise VacancyGeneratorError('invalid parameters')
 
         super(NanotubeVacancyGenerator, self).__init__(
             fname=fname, structure_format=structure_format)
 
     def generate_vacancy_structure(self, Nvac=int, random=False, uniform=False,
-                                   Ntubes=None, Nvac_per_tube=None,
-                                   bin_dim=None, nbin_sets=None,
+                                   bin_axis=None, Ntubes=None,
                                    show_vmd_selection_cmd=True):
+        """Generate vacancy structure.
 
+        Parameters
+        ----------
+        Nvac : int
+            total number of vacancies to "add" to structure data.
+        random : bool, optional
+            Generate random vacancies in structure data.
+        uniform : bool, optional
+            Generate uniform vacancies in structure data.
+        bin_axis : {'x', 'y', 'z'}, optional
+            axis along which to generate uniform vacancies
+        Ntubes : {None, int}, optional
+        show_vmd_selection_cmd : bool, optional
+
+        """
         self.Nvac = Nvac
 
         if random:
@@ -291,55 +442,74 @@ class NanotubeVacancyGenerator(VacancyGenerator):
         else:
             self.vac_ids = np.empty(0, dtype=int)
 
+            if Ntubes is None and self.Ntubes is None:
+                raise VacancyGeneratorError('please specify `Ntubes`')
+            elif Ntubes is None:
+                Ntubes = self.Ntubes
+
             Natoms = len(self.atom_ids)
-            print('Natoms: {}'.format(Natoms))
-            Natoms_per_tube = int(Natoms / Ntubes)
-            print('Natoms_per_tube: {}\n'.format(Natoms_per_tube))
+            if self.Natoms_per_tube is not None:
+                Natoms_per_tube = self.Natoms_per_tube
+            else:
+                Natoms_per_tube = int(Natoms / Ntubes)
+
+            Nvac_per_tube = int(Nvac / Ntubes)
+            extra = Nvac % Ntubes
+            nbins = Ntubes * Nvac_per_tube
 
             bin_sets = []
-            nbins = Nvac / Nvac_per_tube
-            if nbin_sets is None:
-                bin_sets.append(np.arange(0, nbins, 1))
-            else:
-                #tube_array = np.arange(Ntubes)
-                #np.random.shuffle(tube_array)
-                for n in xrange(nbin_sets):
-                    bin_sets.append(np.arange(n, nbins, nbin_sets))
-
+            for n in xrange(Ntubes):
+                bin_sets.append(np.arange(n, Nvac, Ntubes))
             bin_set_iter = itertools.cycle((bin_sets))
 
+            vac_bin_edges = np.linspace(self.atom_coords[bin_axis].min(),
+                                        self.atom_coords[bin_axis].max(),
+                                        num=nbins+1)
+            vac_coords_along_bin_axis = \
+                vac_bin_edges[:-1] + np.diff(vac_bin_edges) / 2
+
+            if self.verbose:
+                print('Natoms: {}'.format(Natoms))
+                print('Natoms_per_tube: {}'.format(Natoms_per_tube))
+                print('Nvac: {}'.format(Nvac))
+                print('Ntubes: {}'.format(Ntubes))
+                print('Nvac_per_tube: {}'.format(Nvac_per_tube))
+                print('extra vacancies: {}'.format(extra))
+                print('nbins: {}'.format(nbins))
+                print('bin_sets:\n{}'.format(bin_sets))
+                print('vac_bin_edges:'
+                      '\n{}'.format(vac_bin_edges))
+                print('vac_coords_along_bin_axis:'
+                      '\n{}'.format(vac_coords_along_bin_axis))
+
             for i in xrange(Ntubes):
-                print('tube n: {:d}'.format(i+1))
                 tube_atom_indices = \
                     np.where((self.atom_ids > (Natoms_per_tube * i)) &
                              (self.atom_ids <= (Natoms_per_tube * (i + 1))))
+
                 tube_atom_ids = self.atom_ids[tube_atom_indices]
-                print('tube_atom_ids:\n{}\n'.format(tube_atom_ids))
 
                 tube_coords = self.atoms.get_filtered_coords(tube_atom_ids,
                                                              as_dict=True,
                                                              invert=False)
 
-                vac_bin_edges = np.linspace(tube_coords[bin_dim].min(),
-                                            tube_coords[bin_dim].max(),
-                                            num=nbins+1)
-                vac_coords_along_bin_dim = \
-                    vac_bin_edges[:-1] + np.diff(vac_bin_edges) / 2
+                if self.verbose:
+                    print('tube n: {:d}'.format(i+1))
+                    print('tube_atom_ids:\n{}'.format(tube_atom_ids))
+                    print('tube_atom_coords:\n{}'.format(tube_coords))
 
-                #if nbins < Nvac_per_tube
-                #vac_coords_along_bin_dim = \
                 bin_set = bin_set_iter.next()
-
-                for vac_pos in vac_coords_along_bin_dim[bin_set]:
+                for vac_pos in vac_coords_along_bin_axis[bin_set]:
                     candidate_vac_atom_indices = \
-                        np.where(np.abs(tube_coords[bin_dim] - vac_pos) <= 1)
+                        np.where(np.abs(tube_coords[bin_axis] - vac_pos) <= 1)
                     candidate_vac_atom_ids = \
                         tube_atom_ids[candidate_vac_atom_indices]
 
-                    print(u'vac_pos along {}-axis: {:.2f} \u00c5'.format(
-                        bin_dim, vac_pos))
-                    print('N candidate_vac_atom_ids: '
-                          '{}\n'.format(len(candidate_vac_atom_ids)))
+                    if self.verbose:
+                        print(u'vac_pos along {}-axis: {:.2f} \u00c5'.format(
+                            bin_axis, vac_pos))
+                        print('N candidate_vac_atom_ids: '
+                              '{}\n'.format(len(candidate_vac_atom_ids)))
 
                     self.vac_ids = \
                         np.r_[self.vac_ids,
