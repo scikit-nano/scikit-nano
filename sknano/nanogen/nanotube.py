@@ -935,9 +935,12 @@ class NanotubeBundle(Nanotube):
         Must be in units of **Angstroms**. Default value is
         the carbon-carbon bond length in graphite:
         :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.421` \u212b ([SoFaCNTs]_)
+    Lx, Ly, Lz : float, optional
+        length of bundle in :math:`x, y, z` dimensions in **nanometers**.
+        Overrides the :math:`n_x, n_y, n_z` cell values.
+        .. versionadded:: 0.2.5
     tube_length : float, optional
         Length of nanotube in units of **nanometers**.
-        Overrides the ``nzcells`` value.
     verbose : bool, optional
         verbose output
 
@@ -945,17 +948,24 @@ class NanotubeBundle(Nanotube):
     def __init__(self, n=int, m=int, nxcells=1, nycells=1, nzcells=1,
                  element1='C', element2='C', bond=CCbond, tube_length=None,
                  vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
-                 verbose=False):
+                 Lx=None, Ly=None, Lz=None, verbose=False):
 
         super(NanotubeBundle, self).__init__(
             n=n, m=m, nzcells=nzcells, element1=element1, element2=element2,
-            bond=bond, tube_length=tube_length, verbose=verbose)
+            bond=bond, tube_length=Lz, verbose=verbose)
 
         self._nxcells = int(nxcells)
         self._nycells = int(nycells)
+
+        self._Lx = Lx
+        self._Ly = Ly
+        self._Lz = Lz
+
         self._vdw_spacing = vdw_spacing
         self._bundle_packing = bundle_packing
         self._bundle_geometry = bundle_geometry
+
+        self._Natoms_per_bundle = None
 
         self._bundle_mass = None
         self._bundle_density = None
@@ -972,6 +982,7 @@ class NanotubeBundle(Nanotube):
                                                      nxcells=self._nxcells,
                                                      nycells=self._nycells,
                                                      nzcells=self._nzcells)
+        self._Natoms_per_bundle = self._Ntubes * self._Natoms_per_tube
         if d_vdw is None:
             d_vdw = self._vdw_spacing
         self._bundle_density = \
@@ -1026,6 +1037,53 @@ class NanotubeBundle(Nanotube):
 
         """
         return int(nxcells * nycells)
+
+    @property
+    def Natoms_per_bundle(self):
+        """Number of atoms in bundle.
+
+        .. versionadded:: 0.2.5
+
+        """
+        return self._Natoms_per_bundle
+
+    @Natoms_per_bundle.setter
+    def Natoms_per_bundle(self, value=int):
+        """Set Natoms per bundle.
+
+        .. versionadded:: 0.2.5
+
+        """
+        self._Natoms_per_bundle = value
+
+    @classmethod
+    def compute_Natoms_per_bundle(cls, n=int, m=int, nzcells=int, Ntubes=None,
+                                  nxcells=None, nycells=None):
+        """Compute number of atoms per bundle.
+
+        .. versionadded:: 0.2.5
+
+        Parameters
+        ----------
+        n, m : int
+        nzcells : int
+        Ntubes : {None, int}, optional
+        nxcells, nycells : {None, int}, optional
+
+        Returns
+        -------
+        int
+
+        """
+        Natoms_per_tube = \
+            Nanotube.compute_Natoms_per_tube(n=n, m=m, nzcells=nzcells)
+        if Ntubes is None and (nxcells is None or nycells is None):
+            raise NanotubeError("Ntubes or both nx and ny cells must be set")
+        elif Ntubes is None and nxcells is not None and nycells is not None:
+            Ntubes = nxcells * nycells
+        Natoms_per_bundle = Ntubes * Natoms_per_tube
+
+        return Natoms_per_bundle
 
     @property
     def bundle_mass(self):
@@ -1294,15 +1352,12 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
         Chiral indices defining the nanotube chiral vector
         :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
     nxcells, nycells, nzcells : int, optional
-        Number of repeat unit cells in the x,y,z directions
+        Number of repeat unit cells in the :math:`x, y, z` dimensions.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis atoms 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
-    tube_length : float, optional
-        Length of nanotube in units of **nanometers**.
-        Overrides the ``nzcells`` value.
     vdw_spacing : float, optional
         van der Waals distance between nearest neighbor tubes
         .. versionadded:: 0.2.5
@@ -1311,6 +1366,10 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
         .. versionadded:: 0.2.5
     bundle_geometry : {None, 'triangle', 'hexagon', 'square', 'rectangle',
                        'rhombus', 'rhomboid'}, optional
+        .. versionadded:: 0.2.5
+    Lx, Ly, Lz : float, optional
+        length of bundle in :math:`x, y, z` dimensions in **nanometers**.
+        Overrides the :math:`n_x, n_y, n_z` cell values.
         .. versionadded:: 0.2.5
     autogen : bool, optional
         if ``True``, automatically call
@@ -1331,23 +1390,71 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
     (*i.e.* bundles arranged within a rhomboid).
     However, can enforce a specific bundle *geometry* (as long as it's
     consistent with the bundle packing arrangement) that is especially
-    useful for generating **hcp* bundles that are trianglar or hexagonal in
+    useful for generating **hcp** bundles that are trianglar or hexagonal in
     *shape*.
+
+    To start, let's generate an hcp bundle of
+    :math:`C_{\\mathrm{h}} = (10, 5)` SWCNTs and cell count
+    :math:`n_x=10, n_y=3, n_z=5`.
+
+    >>> from sknano.nanogen import NanotubeBundleGenerator
+    >>> SWCNTbundle = NanotubeBundleGenerator(n=10, m=5, nxcells=10,
+    ...                                       nycells=3, nzcells=5)
+    >>> SWCNTbundle.save_data()
+
+    The rendered structure looks like:
+
+    .. image:: /images/1005_hcp_10cellsx3cellsx5cells-001.png
+
+    Now let's generate a nice hexagon bundle, 3 tubes wide, with
+    :math:`C_{\\mathrm{h}} = (6, 5)`.
+
+    >>> SWCNTbundle = NanotubeBundleGenerator(n=6, m=5, nzcells=5,
+    ...                                       bundle_geometry='hexagon')
+    >>> SWCNTbundle.save_data()
+
+    which looks like:
+
+    .. image:: /images/0605_hcp_7tube_hexagon-001.png
+
+    Remember, the :py:meth:`NanotubeBundleGenerator.save_data` methods
+    allow you to rotate the structure data.
+
+    >>> SWCNTbundle.save_data(fname='0605_hcp_7tube_hexagon_rot-30deg.xyz',
+    ...                       rot_axis='z', rotation_angle=30)
+
+    .. image:: /images/0605_hcp_7tube_hexagon_rot-30deg-001.png
+
+    Now, just because we can, let's make a big ass hexagon bundle with
+    :math:`C_{\\mathrm{h}} = (10, 0)`.
+
+    >>> BIGASSHEXABUN = NanotubeBundleGenerator(n=10, m=0, nxcells=25,
+    ...                                         nycells=25, nzcells=1,
+    ...                                         bundle_geometry='hexagon')
+
+    You're looking at 469 :math:`(10, 0)` unit cells! That's
+    :math:`N_{\\mathrm{atoms}} = 18760`.
+
+    .. image:: /images/1000_hcp_469tube_hexagon-001.png
 
     """
 
     def __init__(self, n=int, m=int, nxcells=1, nycells=1, nzcells=1,
-                 element1='C', element2='C', bond=CCbond, tube_length=None,
+                 element1='C', element2='C', bond=CCbond,
                  vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
-                 autogen=True, verbose=False):
+                 Lx=None, Ly=None, Lz=None, autogen=True, verbose=False):
 
         super(NanotubeBundleGenerator, self).__init__(
-            n=n, m=m, nzcells=nzcells,
-            element1=element1, element2=element2, bond=bond,
-            tube_length=tube_length, autogen=False, verbose=verbose)
+            n=n, m=m, nzcells=nzcells, element1=element1, element2=element2,
+            bond=bond, autogen=False, verbose=verbose)
 
         self._nxcells = nxcells
         self._nycells = nycells
+
+        self._Lx = Lx
+        self._Ly = Ly
+        self._Lz = Ly
+
         self.compute_bundle_params()
 
         self._r1 = np.zeros(3)
@@ -1429,6 +1536,10 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
                     swcnt.translate(dr)
                     self.structure_atoms.extend(swcnt.atoms)
                     self._Ntubes += 1
+        self._Natoms_per_bundle = \
+            self.compute_Natoms_per_bundle(n=self._n, m=self._m,
+                                           nzcells=self._nzcells,
+                                           Ntubes=self._Ntubes)
 
     def save_data(self, fname=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
@@ -1503,7 +1614,9 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
                     structure_format = default_structure_format
 
         super(NanotubeBundleGenerator, self).save_data(
-            fname=fname, structure_format=structure_format)
+            fname=fname, structure_format=structure_format,
+            rotation_angle=rotation_angle, rot_axis=rot_axis,
+            deg2rad=deg2rad, center_CM=center_CM)
 
 
 class SWNTGenerator(NanotubeGenerator):
