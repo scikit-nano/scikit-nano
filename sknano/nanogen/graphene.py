@@ -176,7 +176,9 @@ class GrapheneGenerator(object):
         self.atom3 = Atom(element1)
         self.atom4 = Atom(element2)
 
-        self.Natoms = 0
+        self._Natoms = 0
+        self._Natoms_per_layer = None
+
         self.atoms = Atoms(atoms=[self.atom1,
                                   self.atom2,
                                   self.atom3,
@@ -193,6 +195,16 @@ class GrapheneGenerator(object):
     def fname(self):
         """Structure file name."""
         return self._fname
+
+    @property
+    def Natoms(self):
+        """Number of atoms."""
+        return self._Natoms
+
+    @property
+    def Natoms_per_layer(self):
+        """Number of atoms per layer."""
+        return self._Natoms_per_layer
 
     def generate_unit_cell(self):
         """Generate the unit cell.
@@ -265,7 +277,10 @@ class GrapheneGenerator(object):
                         layer_atom = Atom(atom.symbol)
                         layer_atom.r = atom.r + dr
                         layer_atoms.append(layer_atom)
-                        self.Natoms += 1
+                        self._Natoms += 1
+
+            if self._Natoms_per_layer is None:
+                self._Natoms_per_layer = layer_atoms.Natoms
 
             # translate layer to put its center of mass at the origin
             layer_atoms.center_CM(r_indices=[0, 1])

@@ -4,12 +4,6 @@
 TubeGen wrapper class (:mod:`sknano.nanogen.tubegen`)
 =========================================================
 
-.. autoclass:: TubeGen
-   :show-inheritance:
-   :inherited-members:
-   :members:
-   :undoc-members:
-
 """
 from __future__ import division, print_function, absolute_import
 
@@ -244,18 +238,18 @@ class TubeGen(object):
 
         self.T = Nanotube.compute_T(n=self.n, m=self.m)
 
-        nxcells, nycells, nzcells = cell_count
+        nx, ny, nz = cell_count
 
         self._tube_length = None
         if tube_length is not None and tube_length != 'None' \
            and shape == 'hexagonal' and \
            isinstance(tube_length, (int, float, str)):
             self._tube_length = 10 * float(tube_length)
-            nzcells = int(ceil(self._tube_length / self.T))
-        elif nzcells is not None and nzcells != 'None' and \
-                isinstance(nzcells, (int, float, str)):
-            nzcells = int(nzcells)
-            self._tube_length = nzcells * self.T
+            nz = int(ceil(self._tube_length / self.T))
+        elif nz is not None and nz != 'None' and \
+                isinstance(nz, (int, float, str)):
+            nz = int(nz)
+            self._tube_length = nz * self.T
 
         self._fmt = fmt
         self._units = units
@@ -267,7 +261,7 @@ class TubeGen(object):
         self._chirality = ','.join([str(x) for x in chirality])
         self._relax_tube = relax_tube
         self._cell_count = ','.join([str(x) for x in
-                                     (nxcells, nycells, nzcells)])
+                                     (nx, ny, nz)])
         self._genfile_name = ''
         self._kwargs = {'format': self._fmt,
                         'units': self._units,
@@ -302,7 +296,7 @@ class TubeGen(object):
         Returns
         -------
         (int, int, int)
-            tuple of `nxcells`, `nycells`, `nzcells`
+            tuple of `nx`, `ny`, `nz`
 
         """
         return tuple([int(c) for c in self._cell_count.split(',')])
