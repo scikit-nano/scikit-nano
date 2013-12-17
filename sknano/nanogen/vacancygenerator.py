@@ -35,7 +35,7 @@ class VacancyGeneratorError(Exception):
 
 
 class VacancyGenerator(object):
-    """Generate vacancies in structure data.
+    """Base class for generating vacancies in structure data.
 
     Parameters
     ----------
@@ -384,16 +384,31 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     Examples
     --------
 
+    In this example, we'll generate the structure data on-the-fly and then
+    generate some vacancies.
+
+    >>> from sknano.nanogen import NanotubeVacancyGenerator
+    >>> ntvg = NanotubeVacancyGenerator(n=10, m=5, Lz=10, fix_Lz=True,
+    ...                                 bundle_geometry='hexagon')
+    >>> ntvg.generate_vacancy_structure(Nvac=35, uniform=True, bin_axis='z')
+
+    The output of the command gave me the VMD selection command which
+    I won't reproduce here as it will be different everytime.
+    The rendered structure looks like:
+
+    .. image:: /images/1005_hcp_7tube_hexagon+35_vacancies-001.png
+
     """
     def __init__(self, fname=None, structure_format=None,
                  n=None, m=None, nx=1, ny=1, nz=1,
                  element1='C', element2='C', bond=CCbond,
                  vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
-                 Lx=None, Ly=None, Lz=None, rotate_structure=False,
-                 rotation_angle=None, rotation_axis=None, verbose=False):
+                 Lx=None, Ly=None, Lz=None, fix_Lz=False,
+                 rotate_structure=False, rotation_angle=None,
+                 rotation_axis=None, verbose=False):
 
         self.Ntubes = None
-        self.Natoms_per_tubes = None
+        self.Natoms_per_tube = None
 
         if fname is None and n is not None and m is not None:
             try:
@@ -405,6 +420,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                                                bundle_packing=bundle_packing,
                                                bundle_geometry=bundle_geometry,
                                                Lx=Lx, Ly=Ly, Lz=Lz,
+                                               fix_Lz=fix_Lz,
                                                verbose=verbose)
                 ntbg.save_data(structure_format='data')
                 fname = ntbg.fname
