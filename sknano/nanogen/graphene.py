@@ -183,9 +183,16 @@ class GrapheneGenerator(object):
                                   self.atom4])
         self.structure_atoms = None
 
+        self._fname = None
+
         if autogen:
             self.generate_unit_cell()
             self.generate_structure()
+
+    @property
+    def fname(self):
+        """Structure file name."""
+        return self._fname
 
     def generate_unit_cell(self):
         """Generate the unit cell.
@@ -339,6 +346,8 @@ class GrapheneGenerator(object):
             DATAWriter.write(fname=fname, atoms=structure_atoms)
         else:
             XYZWriter.write(fname=fname, atoms=structure_atoms)
+
+        self._fname = fname
 
 
 class BiLayerGrapheneGenerator(GrapheneGenerator):

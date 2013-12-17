@@ -1206,12 +1206,18 @@ class NanotubeGenerator(Nanotube):
             n=n, m=m, nzcells=nzcells, element1=element1, element2=element2,
             bond=bond, tube_length=tube_length, verbose=verbose)
 
+        self._fname = None
         self.unit_cell = None
         self.structure_atoms = None
 
         if autogen:
             self.generate_unit_cell()
             self.generate_structure_data()
+
+    @property
+    def fname(self):
+        """Structure file name."""
+        return self._fname
 
     def generate_unit_cell(self):
         """Generate the unit cell."""
@@ -1344,6 +1350,8 @@ class NanotubeGenerator(Nanotube):
             DATAWriter.write(fname=fname, atoms=structure_atoms)
         else:
             XYZWriter.write(fname=fname, atoms=structure_atoms)
+
+        self._fname = fname
 
 
 class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
