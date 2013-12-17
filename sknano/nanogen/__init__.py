@@ -51,6 +51,8 @@ Classes for changing structures
    :toctree: generated/
 
    VacancyGenerator
+   GrapheneVacancyGenerator
+   NanotubeVacancyGenerator
 
 """
 from __future__ import division, print_function, absolute_import

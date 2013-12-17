@@ -8,12 +8,6 @@ Module for generating vacancies in nano-structures.
 
 .. currentmodule:: sknano.nanogen.vacancygenerator
 
-.. autoclass:: VacancyGenerator
-   :members:
-   :inherited-members:
-   :show-inheritance:
-   :undoc-members:
-
 """
 from __future__ import division, print_function, absolute_import
 __docformat__ = 'restructuredtext'
