@@ -120,6 +120,13 @@ class Nanotube(object):
         .. deprecated:: 0.2.5
            Use ``Lz`` instead
 
+    fix_Lz : bool, optional
+        Generate the nanotube with length as close to the specified
+        :math:`L_z` as possible. If ``True``, then
+        non integer :math:`n_z` cells are permitted.
+
+        .. versionadded:: 0.2.6
+
     verbose : bool, optional
         verbose output
 
@@ -193,7 +200,8 @@ class Nanotube(object):
     """
 
     def __init__(self, n=int, m=int, nz=1, element1='C', element2='C',
-                 bond=CCbond, Lz=None, tube_length=None, verbose=False):
+                 bond=CCbond, Lz=None, tube_length=None, fix_Lz=False,
+                 verbose=False):
 
         if tube_length is not None and Lz is None:
             Lz = tube_length
@@ -226,6 +234,13 @@ class Nanotube(object):
         self._bond = float(bond)
         self._verbose = verbose
 
+        self._L0 = Lz  # store initial value of Lz
+
+        self._fix_Lz = fix_Lz
+        self._assume_integer_unit_cells = True
+        if fix_Lz:
+            self._assume_integer_unit_cells = False
+
         self._d = None
         self._dR = None
         self._t1 = None
@@ -248,7 +263,11 @@ class Nanotube(object):
 
         if Lz is not None:
             self._Lz = float(Lz)
-            self._nz = int(np.ceil(10 * self._Lz / self._T))
+            self._T = self.compute_T(n=self._n, m=self._m, bond=self._bond)
+            if self._assume_integer_unit_cells:
+                self._nz = int(np.ceil(10 * self._Lz / self._T))
+            else:
+                self._nz = 10 * self._Lz / self._T
         else:
             self._nz = int(nz)
 
@@ -799,7 +818,7 @@ class Nanotube(object):
         return self._Natoms_per_tube
 
     @classmethod
-    def compute_Natoms_per_tube(cls, n=int, m=int, nz=int):
+    def compute_Natoms_per_tube(cls, n=int, m=int, nz=float):
         """Compute :math:`N_{\\mathrm{atoms/tube}}`
 
         .. math::
@@ -813,7 +832,7 @@ class Nanotube(object):
             Chiral indices defining the nanotube chiral vector
             :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
             = (n, m)`.
-        nz : int
+        nz : {int, float}
             Number of nanotube unit cells
 
         Returns
@@ -832,7 +851,10 @@ class Nanotube(object):
     @nz.setter
     def nz(self, value=float):
         """Set number of unit cells along the :math:`z`-axis."""
-        self._nz = value
+        if self._assume_integer_unit_cells:
+            self._nz = int(value)
+        else:
+            self._nz = value
         self.compute_tube_params()
 
     @property
@@ -851,7 +873,7 @@ class Nanotube(object):
         self._Lz = value
 
     @classmethod
-    def compute_Lz(cls, n=int, m=int, nz=int, bond=None):
+    def compute_Lz(cls, n=int, m=int, nz=float, bond=None):
         """Compute :math:`L_{\\mathrm{tube}}`.
 
         Parameters
@@ -860,7 +882,7 @@ class Nanotube(object):
             Chiral indices defining the nanotube chiral vector
             :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
             = (n, m)`.
-        nz : int
+        nz : {int, float}
             Number of nanotube unit cells
         bond : float, optional
             bond length
@@ -880,7 +902,7 @@ class Nanotube(object):
         return self.Lz
 
     @classmethod
-    def compute_tube_length(cls, n=int, m=int, nz=int, bond=None):
+    def compute_tube_length(cls, n=int, m=int, nz=float, bond=None):
         """Compute :math:`L_{\\mathrm{tube}}`.
 
         Parameters
@@ -889,7 +911,7 @@ class Nanotube(object):
             Chiral indices defining the nanotube chiral vector
             :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
             = (n, m)`.
-        nz : int
+        nz : {int, float}
             Number of nanotube unit cells
         bond : float, optional
             bond length
@@ -917,7 +939,7 @@ class Nanotube(object):
             Chiral indices defining the nanotube chiral vector
             :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
             = (n, m)`.
-        nz : int
+        nz : {int, float}
             Number of nanotube unit cells
 
         Returns
@@ -978,6 +1000,13 @@ class NanotubeBundle(Nanotube):
         .. deprecated:: 0.2.5
            Use ``Lz`` instead
 
+    fix_Lz : bool, optional
+        Generate the nanotube with length as close to the specified
+        :math:`L_z` as possible. If ``True``, then
+        non integer :math:`n_z` cells are permitted.
+
+        .. versionadded:: 0.2.6
+
     verbose : bool, optional
         verbose output
 
@@ -985,21 +1014,20 @@ class NanotubeBundle(Nanotube):
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
                  element1='C', element2='C', bond=CCbond, tube_length=None,
                  vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
-                 Lx=None, Ly=None, Lz=None, verbose=False):
+                 Lx=None, Ly=None, Lz=None, fix_Lz=False, verbose=False):
 
         if tube_length is not None and Lz is None:
             Lz = tube_length
 
         super(NanotubeBundle, self).__init__(
             n=n, m=m, nz=nz, element1=element1, element2=element2,
-            bond=bond, Lz=Lz, verbose=verbose)
+            bond=bond, Lz=Lz, fix_Lz=fix_Lz, verbose=verbose)
 
         self._nx = int(nx)
         self._ny = int(ny)
 
         self._Lx = Lx
         self._Ly = Ly
-        self._Lz = Lz
 
         self._vdw_spacing = vdw_spacing
         self._bundle_packing = bundle_packing
@@ -1068,8 +1096,8 @@ class NanotubeBundle(Nanotube):
 
         Parameters
         ----------
-        nx, ny, nz : int, optional
-            Number of repeat unit cells in the x,y,z directions
+        nx, ny : int, optional
+            Number of repeat unit cells in the x,y directions
 
         Returns
         -------
@@ -1097,7 +1125,7 @@ class NanotubeBundle(Nanotube):
         self._Natoms_per_bundle = value
 
     @classmethod
-    def compute_Natoms_per_bundle(cls, n=int, m=int, nz=int, Ntubes=None,
+    def compute_Natoms_per_bundle(cls, n=int, m=int, nz=float, Ntubes=None,
                                   nx=None, ny=None):
         """Compute number of atoms per bundle.
 
@@ -1106,7 +1134,7 @@ class NanotubeBundle(Nanotube):
         Parameters
         ----------
         n, m : int
-        nz : int
+        nz : {int, float}
         Ntubes : {None, int}, optional
         nx, ny : {None, int}, optional
 
@@ -1214,6 +1242,13 @@ class NanotubeGenerator(Nanotube):
         .. deprecated:: 0.2.5
            Use ``Lz`` instead
 
+    fix_Lz : bool, optional
+        Generate the nanotube with length as close to the specified
+        :math:`L_z` as possible. If ``True``, then
+        non integer :math:`n_z` cells are permitted.
+
+        .. versionadded:: 0.2.6
+
     autogen : bool, optional
         if ``True``, automatically call
         :py:meth:`~NanotubeGenerator.generate_unit_cell`,
@@ -1244,7 +1279,7 @@ class NanotubeGenerator(Nanotube):
     """
 
     def __init__(self, n=int, m=int, nz=1, element1='C', element2='C',
-                 bond=CCbond, Lz=None, tube_length=None,
+                 bond=CCbond, Lz=None, tube_length=None, fix_Lz=False,
                  autogen=True, verbose=False):
 
         if tube_length is not None and Lz is None:
@@ -1252,7 +1287,7 @@ class NanotubeGenerator(Nanotube):
 
         super(NanotubeGenerator, self).__init__(
             n=n, m=m, nz=nz, element1=element1, element2=element2,
-            bond=bond, Lz=Lz, verbose=verbose)
+            bond=bond, Lz=Lz, fix_Lz=fix_Lz, verbose=verbose)
 
         self._fname = None
         self.unit_cell = None
@@ -1318,7 +1353,7 @@ class NanotubeGenerator(Nanotube):
     def generate_structure_data(self):
         """Generate structure data."""
         self.structure_atoms = []
-        for nz in xrange(self._nz):
+        for nz in xrange(int(np.ceil(self._nz))):
             dr = np.array([0.0, 0.0, nz * self.T])
             for uc_atom in self.unit_cell.atomlist:
                 nt_atom = Atom(uc_atom.symbol)
@@ -1362,8 +1397,12 @@ class NanotubeGenerator(Nanotube):
         if fname is None:
             chirality = '{}{}r'.format('{}'.format(self._n).zfill(2),
                                        '{}'.format(self._m).zfill(2))
-            nz = ''.join(('{}'.format(self._nz),
-                          plural_word_check('cell', self._nz)))
+            if self._assume_integer_unit_cells:
+                nz = ''.join(('{}'.format(self._nz),
+                              plural_word_check('cell', self._nz)))
+            else:
+                nz = ''.join(('{:.2f}'.format(self._nz),
+                              plural_word_check('cell', self._nz)))
             fname_wordlist = (chirality, nz)
             fname = '_'.join(fname_wordlist)
             fname += '.' + structure_format
@@ -1388,6 +1427,11 @@ class NanotubeGenerator(Nanotube):
 
         if center_CM:
             structure_atoms.center_CM()
+
+        if self._L0 is not None and self._fix_Lz:
+            structure_atoms.clip_bounds(abs_limit=10 * self._L0 / 2 + 0.5,
+                                        r_indices=[2])
+
         if rotation_angle is not None:
             R_matrix = rotation_matrix(rotation_angle,
                                        rot_axis=rot_axis,
@@ -1439,6 +1483,13 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
         Overrides the :math:`n_x, n_y, n_z` cell values.
 
         .. versionadded:: 0.2.5
+
+    fix_Lz : bool, optional
+        Generate the nanotube with length as close to the specified
+        :math:`L_z` as possible. If ``True``, then
+        non integer :math:`n_z` cells are permitted.
+
+        .. versionadded:: 0.2.6
 
     autogen : bool, optional
         if ``True``, automatically call
@@ -1512,18 +1563,19 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
                  element1='C', element2='C', bond=CCbond,
                  vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
-                 Lx=None, Ly=None, Lz=None, autogen=True, verbose=False):
+                 Lx=None, Ly=None, Lz=None, fix_Lz=False,
+                 autogen=True, verbose=False):
 
         super(NanotubeBundleGenerator, self).__init__(
             n=n, m=m, nz=nz, element1=element1, element2=element2,
-            Lz=Lz, bond=bond, autogen=False, verbose=verbose)
+            Lz=Lz, fix_Lz=fix_Lz, bond=bond, autogen=False,
+            verbose=verbose)
 
         self._nx = nx
         self._ny = ny
 
         self._Lx = Lx
         self._Ly = Ly
-        self._Lz = Ly
 
         self.compute_bundle_params()
 
@@ -1660,8 +1712,12 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
                              plural_word_check('cell', self._nx)))
                 ny = ''.join(('{}'.format(self._ny),
                              plural_word_check('cell', self._ny)))
-                nz = ''.join(('{}'.format(self._nz),
-                             plural_word_check('cell', self._nz)))
+                if self._assume_integer_unit_cells:
+                    nz = ''.join(('{}'.format(self._nz),
+                                  plural_word_check('cell', self._nz)))
+                else:
+                    nz = ''.join(('{:.2f}'.format(self._nz),
+                                  plural_word_check('cell', self._nz)))
                 cells = 'x'.join((nx, ny, nz))
                 fname_wordlist = (chirality, packing, cells)
             else:
