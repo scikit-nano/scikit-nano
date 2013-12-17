@@ -1429,7 +1429,7 @@ class NanotubeGenerator(Nanotube):
             structure_atoms.center_CM()
 
         if self._L0 is not None and self._fix_Lz:
-            structure_atoms.clip_bounds(abs_limit=10 * self._L0 / 2 + 0.5,
+            structure_atoms.clip_bounds(abs_limit=(10 * self._L0 + 0.5) / 2,
                                         r_indices=[2])
 
         if rotation_angle is not None:
