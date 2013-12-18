@@ -1835,6 +1835,15 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
 
     Examples
     --------
+
+    >>> from sknano.nanogen import MWNTGenerator
+    >>> mwnt = MWNTGenerator(n=40, m=40, max_Nshells=5, Lz=1.0, fix_Lz=True)
+    >>> mwnt.save_data()
+
+    >>> mwntbundle = MWNTGenerator(n=40, m=40, max_Nshells=5, Lz=1.0,
+    ...                            fix_Lz=True, bundle_geometry='hexagon')
+    >>> mwntbundle.save_data()
+
     """
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
                  element1='C', element2='C', bond=CCbond,
