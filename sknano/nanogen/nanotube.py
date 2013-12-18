@@ -974,6 +974,34 @@ class Nanotube(object):
 
         .. versionadded:: 0.2.7
 
+        The electronic type is determined as follows:
+
+        if :math:`(2n + m)\\mathrm{mod}3=0`, the nanotube is **metallic**.
+
+        if :math:`(2n + m)\\mathrm{mod}3=1`, the nanotube is
+        **semiconducting, type 1**.
+
+        if :math:`(2n + m)\\mathrm{mod}3=2`, the nanotube is
+        **semiconducting, type 2**.
+
+        The :math:`x\\mathrm{mod}y` notation is mathematical
+        shorthand for the *moduluo* operation, which computes the
+        **remainder** of the division operation: :math:`x/y`.
+        So, for example, all *armchair* nanotubes must be metallic
+        since the chiral indices satisfy: :math:`2n + m = 2n + n = 3n` and
+        therefore :math:`3n\\mathrm{mod}3` i.e. the remainder of the division
+        of :math:`3n/3=n` is always zero.
+
+        .. note::
+           Mathematically, :math:`(2n + m)\\mathrm{mod}3` is equivalent to
+           :math:`(n - m)\\mathrm{mod}3` when distinguishing
+           between metallic and semiconducting. However, when
+           :math:`(2n + m)\\mathrm{mod}3=1`, :math:`(n - m)\\mathrm{mod}3=2`,
+           and vice-versa, such that when distinguishing between
+           semiconducting *types*, one must be careful to observe this
+           convention.
+
+
         Parameters
         ----------
         n, m : int
@@ -986,11 +1014,12 @@ class Nanotube(object):
         str
 
         """
-        if (n - m) % 3 == 0:
-            return 'metallic'
+        if (2 * n + m) % 3 == 1:
+            return 'semiconducting, type 1'
+        elif (2 * n + m) % 3 == 2:
+            return 'semiconducting, type 2'
         else:
-        #elif (n - m) % 3 = 1:
-            return 'semiconducting'
+            return 'metallic'
 
 
 class NanotubeBundle(Nanotube):
@@ -1376,7 +1405,7 @@ class NanotubeGenerator(Nanotube):
         self.structure_atoms = []
         for nz in xrange(int(np.ceil(self._nz))):
             dr = np.array([0.0, 0.0, nz * self.T])
-            for uc_atom in self.unit_cell.atomlist:
+            for uc_atom in self.unit_cell.atom:
                 nt_atom = Atom(uc_atom.symbol)
                 nt_atom.r = uc_atom.r + dr
                 self.structure_atoms.append(nt_atom)
@@ -1861,6 +1890,54 @@ class MWNTGenerator(NanotubeBundleGenerator):
             super(MWNTGenerator, self).generate_unit_cell()
             self.generate_structure_data()
 
+    def generate_unit_cell(self, n=int, m=int):
+        """Generate the unit cell."""
+        t1 = Nanotube.compute_t1(n=n, m=m)
+        t2 = Nanotube.compute_t2(n=n, m=m)
+        Ch = Nanotube.compute_Ch(n=n, m=m)
+        rt = Nanotube.compute_rt(n=n, m=m)
+        N = Nanotube.compute_rt(n=n, m=m)
+        dR = Nanotube.compute_dR(n=n, m=m)
+
+        e1 = self._element1
+        e2 = self._element2
+
+        unit_cell = Atoms()
+
+        for q in xrange(t2, m + 1):
+            for p in xrange(0, t1 + n + 1):
+                M = m * p - n * q
+
+                g_atom1 = Atom(e1)
+                g_atom1.x = Ch * (q * t1 - p * t2) / N
+                g_atom1.y = np.sqrt(3) * Ch * M / (N * dR)
+
+                g_atom2 = Atom(e2)
+                g_atom2.x = g_atom1.x + Ch * (n + m) / (N * dR)
+                g_atom2.y = \
+                    g_atom1.y - np.sqrt(3) * Ch * (n - m) / (3 * N * dR)
+
+                phi1 = g_atom1.x / rt
+                phi2 = g_atom2.x / rt
+
+                if (g_atom1.x >= 0 and (q * t1 - p * t2) < N
+                        and g_atom1.y >= 0 and (M < N)):
+
+                    nt_atom1 = Atom(e1)
+
+                    nt_atom1.x = rt * np.cos(phi1)
+                    nt_atom1.y = rt * np.sin(phi1)
+                    nt_atom1.z = g_atom1.y
+                    unit_cell.append(nt_atom1)
+
+                    nt_atom2 = Atom(e2)
+                    nt_atom2.x = rt * np.cos(phi2)
+                    nt_atom2.y = rt * np.sin(phi2)
+                    nt_atom2.z = g_atom2.y
+                    unit_cell.append(nt_atom2)
+
+        return unit_cell
+
     def generate_structure_data(self):
         """Generate structure data."""
         super(MWNTGenerator, self).generate_structure_data()
@@ -1868,15 +1945,26 @@ class MWNTGenerator(NanotubeBundleGenerator):
         self._Ntubes = 0
 
         swnt0 = copy.deepcopy(self.structure_atoms)
-        self.structure_atoms = Atoms()
 
         outer_dt = self.dt
 
+        mwnt0 = Atoms(atoms=swnt0, deepcopy=True)
+
         next_dt = outer_dt - self._shell_spacing
         while next_dt >= self._min_diameter:
-            pass
+            # get chiral indices for next_dt
+            n, m = 1, 1
+            # generate unit cell for new chiral indices
+            unit_cell = self.generate_unit_cell(n=n, m=m)
+            for nz in xrange(int(np.ceil(self._nz))):
+                dr = np.array([0.0, 0.0, nz * self.T])
+                for uc_atom in unit_cell.atoms:
+                    nt_atom = Atom(uc_atom.symbol)
+                    nt_atom.r = uc_atom.r + dr
+                    self.structure_atoms.append(nt_atom)
+            self._Nshells_per_tube += 1
 
-        mwnt0 = Atoms()
+        self.structure_atoms = Atoms()
 
         if self._bundle_geometry == 'hexagon':
             nrows = max(self._nx, self._ny, 3)
