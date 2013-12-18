@@ -37,7 +37,6 @@ Structure generator classes
 
    NanotubeGenerator
    NanotubeBundleGenerator
-   SWNTGenerator
    MWNTGenerator
 
    TubeGen
@@ -53,6 +52,16 @@ Classes for changing structures
    VacancyGenerator
    GrapheneVacancyGenerator
    NanotubeVacancyGenerator
+
+Custom exception classes for handling errors
+--------------------------------------------
+
+.. autosummary::
+   :toctree: generated/
+
+   GrapheneGeneratorError
+   NanotubeGeneratorError
+   VacancyGeneratorError
 
 """
 from __future__ import division, print_function, absolute_import

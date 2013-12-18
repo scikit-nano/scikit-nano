@@ -26,7 +26,8 @@ from ..structure_io import DATAReader, DATAWriter, XYZWriter, \
 
 __all__ = ['GrapheneVacancyGenerator',
            'NanotubeVacancyGenerator',
-           'VacancyGenerator', 'VacancyGeneratorError']
+           'VacancyGenerator',
+           'VacancyGeneratorError']
 
 
 class VacancyGeneratorError(Exception):
@@ -170,7 +171,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
     Raises
     ------
-    VacancyGeneratorError
+    :py:class:`VacancyGeneratorError`
 
     Examples
     --------
@@ -204,14 +205,14 @@ class GrapheneVacancyGenerator(VacancyGenerator):
     :py:class:`GrapheneGenerator` docs for examples and more
     detailed documentation. The ``width`` and ``length`` parameters are
     required, while all others supply default values. In the following
-    example, we'll use the :py:class`GrapheneVacancyGenerator` class
+    example, we'll use the :py:class:`GrapheneVacancyGenerator` class
     to generate a ``5nm x 10nm``, single layer graphene with ``zigzag`` edges,
     and then poke some holes in it.
 
     >>> gvacgen = GrapheneVacancyGenerator(width=5, length=10, edge='ZZ')
 
     Now let's add 30 *random* vacancies to the graphene layer by
-    calling the :py:meth:`GrapheneVacancyGenerator.generate_vacancy_structure`
+    calling the :py:meth:`~GrapheneVacancyGenerator.generate_vacancy_structure`
     method:
 
     .. code-block:: python

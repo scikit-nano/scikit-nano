@@ -61,7 +61,7 @@ __all__ = ['param_units', 'param_symbols', 'param_strfmt',
            'NanotubeError', 'ChiralityError',
            'Nanotube', 'NanotubeGenerator', 'NanotubeGeneratorError',
            'NanotubeBundle', 'NanotubeBundleGenerator',
-           'SWNTGenerator', 'MWNTGenerator']
+           'MWNTGenerator']
 
 
 class NanotubeGeneratorError(Exception):
@@ -225,6 +225,7 @@ class Nanotube(object):
         self._params['dt'] = {}
         self._params['rt'] = {}
         self._params['chiral_angle'] = {}
+        self._params['electronic_type'] = {}
 
         self._n = int(n)
         self._m = int(m)
@@ -258,6 +259,7 @@ class Nanotube(object):
         self._Natoms = None
         self._Lz = None
         self._Natoms_per_tube = None
+        self._electronic_type = None
 
         self._Ntubes = 1
 
@@ -284,6 +286,7 @@ class Nanotube(object):
         self.compute_tube_params()
 
     def compute_tube_params(self):
+        """Compute nanotube parameters."""
         self._d = self.compute_d(n=self._n, m=self._m)
         self._dR = self.compute_dR(n=self._n, m=self._m)
         self._t1 = self.compute_t1(n=self._n, m=self._m)
@@ -314,6 +317,9 @@ class Nanotube(object):
                                          m=self._m,
                                          nz=self._nz)
 
+        self._electronic_type = \
+            self.compute_electronic_type(n=self._n, m=self._m)
+
         for k, v in self.__dict__.iteritems():
             p = k.strip('_')
             if p in self._params.keys():
@@ -342,6 +348,7 @@ class Nanotube(object):
 
     @n.setter
     def n(self, value):
+        """Set chiral index :math:`n`"""
         self._n = int(value)
         self.compute_tube_params()
 
@@ -352,6 +359,7 @@ class Nanotube(object):
 
     @m.setter
     def m(self, value):
+        """Set chiral index :math:`m`"""
         self._m = int(value)
         self.compute_tube_params()
 
@@ -951,24 +959,38 @@ class Nanotube(object):
             Nanotube.compute_Natoms_per_tube(n=n, m=m, nz=nz)
         return cgs_mass_C * Natoms_per_tube
 
-    def _ncell_check(self, nz=None):
-        """Check unit cell count.
+    @property
+    def electronic_type(self):
+        """Nanotube electronic type.
+
+        .. versionadded:: 0.2.7
+
+        """
+        return self._electronic_type
+
+    @classmethod
+    def compute_electronic_type(cls, n=int, m=int):
+        """Compute nanotube electronic type.
+
+        .. versionadded:: 0.2.7
 
         Parameters
         ----------
-        nz : int
-            the number of unit cells
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
+            = (n, m)`.
 
-        Raises
-        ------
-        CellError
-            if unit cell count is invalid.
+        Returns
+        -------
+        str
 
         """
-        #if (nz <= 0) or (int(nz) != nz):
-        #    raise CellError('unit cell count must be positive integer')
-        if (nz <= 0):
-            raise CellError('unit cell count must be positive')
+        if (n - m) % 3 == 0:
+            return 'metallic'
+        else:
+        #elif (n - m) % 3 = 1:
+            return 'semiconducting'
 
 
 class NanotubeBundle(Nanotube):
@@ -984,12 +1006,12 @@ class NanotubeBundle(Nanotube):
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis atoms 1 and 2
     bond : float, optional
-        bond length between nearest neighbor atoms.
+        Bond length between nearest neighbor atoms.
         Must be in units of **Angstroms**. Default value is
         the carbon-carbon bond length in graphite:
         :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.421` \u212b ([SoFaCNTs]_)
     Lx, Ly, Lz : float, optional
-        length of bundle in :math:`x, y, z` dimensions in **nanometers**.
+        Length of bundle in :math:`x, y, z` dimensions in **nanometers**.
         Overrides the :math:`n_x, n_y, n_z` cell values.
 
         .. versionadded:: 0.2.5
@@ -1008,7 +1030,7 @@ class NanotubeBundle(Nanotube):
         .. versionadded:: 0.2.6
 
     verbose : bool, optional
-        verbose output
+        Verbose output.
 
     """
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
@@ -1159,8 +1181,7 @@ class NanotubeBundle(Nanotube):
         return self._bundle_mass
 
     @classmethod
-    def compute_bundle_mass(cls, n=int, m=int, nx=int,
-                            ny=int, nz=None):
+    def compute_bundle_mass(cls, n=int, m=int, nx=int, ny=int, nz=None):
         """Bundle mass in grams."""
         Ntubes = \
             NanotubeBundle.compute_Ntubes(nx=nx, ny=ny)
@@ -1169,7 +1190,7 @@ class NanotubeBundle(Nanotube):
 
     @property
     def bundle_density(self):
-        """Bundle density in grams/cm**3"""
+        """Bundle density in :math:`g/cm^3`."""
         return self._bundle_density
 
     @classmethod
@@ -1185,7 +1206,7 @@ class NanotubeBundle(Nanotube):
         d_vdw : int
             van der Waals distance between nearest-neighbor tubes
         bond : float, optional
-            bond length
+            Bond length.
 
         Returns
         -------
@@ -1745,11 +1766,241 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
             deg2rad=deg2rad, center_CM=center_CM)
 
 
-class SWNTGenerator(NanotubeGenerator):
-    """Class for generating single-walled nanotubes."""
-    pass
+class MWNTGenerator(NanotubeBundleGenerator):
+    u"""Class for generating multi-walled nanotubes.
 
+    .. versionadded:: 0.2.7
 
-class MWNTGenerator(NanotubeGenerator):
-    """Class for generating multi-walled nanotubes."""
-    pass
+    Parameters
+    ----------
+    n, m : int
+        Chiral indices defining the nanotube chiral vector
+        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
+    nx, ny, nz : int, optional
+        Number of repeat unit cells in the :math:`x, y, z` dimensions.
+    element1, element2 : {str, int}, optional
+        Element symbol or atomic number of basis atoms 1 and 2
+    bond : float, optional
+        :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
+        nearest neighbor atoms. Must be in units of **Angstroms**.
+    vdw_spacing : float, optional
+        van der Waals distance between nearest neighbor tubes
+    bundle_packing : {None, 'hexagonal', 'cubic'}, optional
+        close packing arrangement of bundles
+    bundle_geometry : {None, 'triangle', 'hexagon', 'square', 'rectangle',
+                       'rhombus', 'rhomboid'}, optional
+    Lx, Ly, Lz : float, optional
+        length of bundle in :math:`x, y, z` dimensions in **nanometers**.
+        Overrides the :math:`n_x, n_y, n_z` cell values.
+    fix_Lz : bool, optional
+        Generate the nanotube with length as close to the specified
+        :math:`L_z` as possible. If ``True``, then
+        non integer :math:`n_z` cells are permitted.
+    autogen : bool, optional
+        if ``True``, automatically call
+        :py:meth:`~NanotubeGenerator.generate_unit_cell`,
+        followed by :py:meth:`~NanotubeGenerator.generate_structure_data`.
+    verbose : bool, optional
+        if ``True``, show verbose output
+
+    Examples
+    --------
+    """
+    def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
+                 element1='C', element2='C', bond=CCbond,
+                 vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
+                 Lx=None, Ly=None, Lz=None, fix_Lz=False,
+                 min_diameter=None, shell_spacing=3.4,
+                 autogen=True, verbose=False):
+
+        super(MWNTGenerator, self).__init__(
+            n=n, m=m, nz=nz, element1=element1, element2=element2,
+            Lz=Lz, fix_Lz=fix_Lz, bond=bond, autogen=False,
+            verbose=verbose)
+
+        self._nx = nx
+        self._ny = ny
+
+        self._Lx = Lx
+        self._Ly = Ly
+
+        self._min_diameter = min_diameter
+        self._shell_spacing = shell_spacing
+
+        self._Nshells_per_tube = 0
+
+        self.compute_bundle_params()
+
+        self._r1 = np.zeros(3)
+        self._r1[0] = Nanotube.compute_dt(n=n, m=m, bond=bond) + \
+            vdw_spacing
+
+        self._r2 = np.zeros(3)
+
+        if bundle_packing is None and \
+                bundle_geometry in ('square', 'rectangle'):
+            bundle_packing = 'cubic'
+        elif bundle_packing is None:
+            bundle_packing = 'hexagonal'
+        elif (bundle_packing == 'cubic' and bundle_geometry not in
+                (None, 'square', 'rectangle')) or \
+                (bundle_packing == 'hexagonal' and bundle_geometry not in
+                    (None, 'triangle', 'hexagon', 'rhombus', 'rhomboid')):
+            bundle_geometry = None
+
+        if bundle_packing == 'cubic':
+            self._r2[1] = self._r1[0]
+        else:
+            self._r2[0] = self._r1[0] * np.cos(np.pi / 3)
+            self._r2[1] = self._r1[0] * np.sin(np.pi / 3)
+
+        self._bundle_packing = bundle_packing
+        self._bundle_geometry = bundle_geometry
+
+        if autogen:
+            super(MWNTGenerator, self).generate_unit_cell()
+            self.generate_structure_data()
+
+    def generate_structure_data(self):
+        """Generate structure data."""
+        super(MWNTGenerator, self).generate_structure_data()
+
+        self._Ntubes = 0
+
+        swnt0 = copy.deepcopy(self.structure_atoms)
+        self.structure_atoms = Atoms()
+
+        outer_dt = self.dt
+
+        next_dt = outer_dt - self._shell_spacing
+        while next_dt >= self._min_diameter:
+            pass
+
+        mwnt0 = Atoms()
+
+        if self._bundle_geometry == 'hexagon':
+            nrows = max(self._nx, self._ny, 3)
+            if nrows % 2 != 1:
+                nrows += 1
+
+            ntubes_per_end_rows = int((nrows + 1) / 2)
+
+            row = 0
+            ntubes_per_row = nrows
+            while ntubes_per_row >= ntubes_per_end_rows:
+                if row == 0:
+                    for n in xrange(ntubes_per_row):
+                        mwnt = Atoms(atoms=mwnt0, deepcopy=True)
+                        mwnt.center_CM()
+                        dr = n * self._r1
+                        mwnt.translate(dr)
+                        self.structure_atoms.extend(mwnt.atoms)
+                        self._Ntubes += 1
+                else:
+                    for nx in xrange(ntubes_per_row):
+                        for ny in (-row, row):
+                            mwnt = Atoms(atoms=mwnt0, deepcopy=True)
+                            mwnt.center_CM()
+                            dy = np.zeros(3)
+                            dy[0] = abs(ny) * self._r2[0]
+                            dy[1] = ny * self._r2[1]
+                            dr = nx * self._r1 + dy
+                            mwnt.translate(dr)
+                            self.structure_atoms.extend(mwnt.atoms)
+                            self._Ntubes += 1
+                row += 1
+                ntubes_per_row = nrows - row
+        else:
+            for nx in xrange(self._nx):
+                for ny in xrange(self._ny):
+                    mwnt = Atoms(atoms=mwnt0, deepcopy=True)
+                    mwnt.center_CM()
+                    dr = nx * self._r1 + ny * self._r2
+                    mwnt.translate(dr)
+                    self.structure_atoms.extend(mwnt.atoms)
+                    self._Ntubes += 1
+        self._Natoms_per_bundle = \
+            self.compute_Natoms_per_bundle(n=self._n, m=self._m,
+                                           nz=self._nz,
+                                           Ntubes=self._Ntubes)
+
+    def save_data(self, fname=None, structure_format=None,
+                  rotation_angle=None, rot_axis=None, deg2rad=True,
+                  center_CM=True):
+        """Save structure data.
+
+        Parameters
+        ----------
+        fname : {None, str}, optional
+            file name string
+        structure_format : {None, str}, optional
+            chemical file format of saved structure data. Must be one of:
+
+                - xyz
+                - data
+
+            If ``None``, then guess based on ``fname`` file extension or
+            default to ``xyz`` format.
+        rotation_angle : {None, float}, optional
+            Angle of rotation
+        rot_axis : {'x', 'y', 'z'}, optional
+            Rotation axis
+        deg2rad : bool, optional
+            Convert ``rotation_angle`` from degrees to radians.
+        center_CM : bool, optional
+            Center center-of-mass on origin.
+
+        """
+        if (fname is None and structure_format not in
+                supported_structure_formats) or \
+                (fname is not None and not
+                    fname.endswith(supported_structure_formats) and
+                    structure_format not in supported_structure_formats):
+            structure_format = default_structure_format
+
+        if fname is None:
+
+            chirality = '{}{}'.format('{}'.format(self._n).zfill(2),
+                                      '{}'.format(self._m).zfill(2))
+            packing = '{}cp'.format(self._bundle_packing[0])
+            #Ntubes = ''.join(('{}'.format(self._Ntubes),
+            #                  plural_word_check('tube', self._Ntubes)))
+            Ntube = '{}tube'.format(self._Ntubes)
+
+            fname_wordlist = None
+            if self._bundle_geometry is None:
+                nx = ''.join(('{}'.format(self._nx),
+                             plural_word_check('cell', self._nx)))
+                ny = ''.join(('{}'.format(self._ny),
+                             plural_word_check('cell', self._ny)))
+                if self._assume_integer_unit_cells:
+                    nz = ''.join(('{}'.format(self._nz),
+                                  plural_word_check('cell', self._nz)))
+                else:
+                    nz = ''.join(('{:.2f}'.format(self._nz),
+                                  plural_word_check('cell', self._nz)))
+                cells = 'x'.join((nx, ny, nz))
+                fname_wordlist = (chirality, packing, cells)
+            else:
+                fname_wordlist = \
+                    (chirality, packing, Ntube, self._bundle_geometry)
+
+            fname = '_'.join(fname_wordlist)
+            fname += '.' + structure_format
+
+        else:
+            if fname.endswith(supported_structure_formats) and \
+                    structure_format is None:
+                for ext in supported_structure_formats:
+                    if fname.endswith(ext):
+                        structure_format = ext
+                        break
+            else:
+                if structure_format is None or \
+                        structure_format not in supported_structure_formats:
+                    structure_format = default_structure_format
+
+        super(MWNTGenerator, self).save_data(
+            fname=fname, structure_format=structure_format,
+            rotation_angle=rotation_angle, rot_axis=rot_axis,
+            deg2rad=deg2rad, center_CM=center_CM)
