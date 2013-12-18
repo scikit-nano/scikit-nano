@@ -419,7 +419,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     in real-time. The :py:class:`NanotubeVacancyGenerator` uses
     the :py:class:`NanotubeBundleGenerator` class to generate
     nanotubes. See the structure generator classes provided by the
-    :py:mod:`sknano.nanogen` module for more detailed docs.
+    :py:mod:`~sknano.nanogen` module for more detailed docs.
 
     In the next example, we'll generate a nanotube bundle and then
     poke some holes in it.
@@ -437,8 +437,8 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     the desired length set by ``Lz``.
 
     Next, I add 35 vacancies distributed uniformly along the ``z``
-    axis. Currently, the code is written such that when generating
-    vacancies ``uniform``ly, it will divide the total number of vacancies
+    axis. When generating vacancies *uniformly*, the code is written such
+    it will divide the total number of vacancies
     evenly among all nanotubes and distribute those vacancies uniformly
     along the specified ``bin_axis``. The circumferential location of
     vacancies is selected randomly. Future revisions will allow more precise
