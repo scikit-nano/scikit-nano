@@ -340,6 +340,7 @@ class Nanotube(object):
                         print(u"{}: {}{}".format(pvar, pval, punits))
                 else:
                     print(u"{}: {}".format(pvar, pval))
+            print()
 
     @property
     def n(self):
@@ -1405,7 +1406,7 @@ class NanotubeGenerator(Nanotube):
         self.structure_atoms = []
         for nz in xrange(int(np.ceil(self._nz))):
             dr = np.array([0.0, 0.0, nz * self.T])
-            for uc_atom in self.unit_cell.atom:
+            for uc_atom in self.unit_cell.atoms:
                 nt_atom = Atom(uc_atom.symbol)
                 nt_atom.r = uc_atom.r + dr
                 self.structure_atoms.append(nt_atom)
@@ -1795,7 +1796,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
             deg2rad=deg2rad, center_CM=center_CM)
 
 
-class MWNTGenerator(NanotubeBundleGenerator):
+class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
     u"""Class for generating multi-walled nanotubes.
 
     .. versionadded:: 0.2.7
@@ -1839,7 +1840,8 @@ class MWNTGenerator(NanotubeBundleGenerator):
                  element1='C', element2='C', bond=CCbond,
                  vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
                  Lx=None, Ly=None, Lz=None, fix_Lz=False,
-                 min_diameter=None, shell_spacing=3.4,
+                 max_Nshells=None, min_shell_diameter=0.0,
+                 shell_spacing=3.4,
                  autogen=True, verbose=False):
 
         super(MWNTGenerator, self).__init__(
@@ -1853,10 +1855,15 @@ class MWNTGenerator(NanotubeBundleGenerator):
         self._Lx = Lx
         self._Ly = Ly
 
-        self._min_diameter = min_diameter
+        self._max_Nshells = max_Nshells
+        if max_Nshells is None:
+            self._max_Nshells = np.inf
+
+        self._min_shell_diameter = min_shell_diameter
         self._shell_spacing = shell_spacing
 
-        self._Nshells_per_tube = 0
+        self._Nshells_per_tube = 1
+        self._Natoms_per_tube = 0
 
         self.compute_bundle_params()
 
@@ -1896,7 +1903,7 @@ class MWNTGenerator(NanotubeBundleGenerator):
         t2 = Nanotube.compute_t2(n=n, m=m)
         Ch = Nanotube.compute_Ch(n=n, m=m)
         rt = Nanotube.compute_rt(n=n, m=m)
-        N = Nanotube.compute_rt(n=n, m=m)
+        N = Nanotube.compute_N(n=n, m=m)
         dR = Nanotube.compute_dR(n=n, m=m)
 
         e1 = self._element1
@@ -1944,25 +1951,48 @@ class MWNTGenerator(NanotubeBundleGenerator):
 
         self._Ntubes = 0
 
+        dt = []
+        Ch = []
+        for n in xrange(1, self._n):
+            for m in xrange(1, self._m):
+                dt.append(Nanotube.compute_dt(n=n, m=m))
+                Ch.append((n, m))
+        dt = np.asarray(dt)
+        Ch = np.asarray(Ch)
+
         swnt0 = copy.deepcopy(self.structure_atoms)
-
-        outer_dt = self.dt
-
         mwnt0 = Atoms(atoms=swnt0, deepcopy=True)
+        mwnt0.center_CM()
 
-        next_dt = outer_dt - self._shell_spacing
-        while next_dt >= self._min_diameter:
+        next_dt = self.dt - 2 * self._shell_spacing
+        while next_dt >= self._min_shell_diameter and \
+                self._Nshells_per_tube < self._max_Nshells:
             # get chiral indices for next_dt
-            n, m = 1, 1
+            next_Ch_candidates = Ch[np.where(np.abs(dt - next_dt) <= 0.05)]
+            n, m = \
+                next_Ch_candidates[
+                    np.random.choice(np.arange(len(next_Ch_candidates)))]
             # generate unit cell for new chiral indices
             unit_cell = self.generate_unit_cell(n=n, m=m)
+            if self._verbose:
+                print('next_dt: {:.4f}'.format(next_dt))
+                print('n, m = {}, {}'.format(n, m))
+                print('unit_cell.Natoms: {}\n'.format(unit_cell.Natoms))
+            T = Nanotube.compute_T(n=n, m=m)
+            shell_atoms = Atoms()
             for nz in xrange(int(np.ceil(self._nz))):
-                dr = np.array([0.0, 0.0, nz * self.T])
+                dr = np.array([0.0, 0.0, nz * T])
                 for uc_atom in unit_cell.atoms:
                     nt_atom = Atom(uc_atom.symbol)
                     nt_atom.r = uc_atom.r + dr
-                    self.structure_atoms.append(nt_atom)
+                    #mwnt0.append(nt_atom)
+                    shell_atoms.append(nt_atom)
+            shell_atoms.center_CM()
+            mwnt0.extend(shell_atoms.atoms)
+            next_dt -= 2 * self._shell_spacing
             self._Nshells_per_tube += 1
+
+        self._Natoms_per_tube = mwnt0.Natoms
 
         self.structure_atoms = Atoms()
 
@@ -1978,7 +2008,7 @@ class MWNTGenerator(NanotubeBundleGenerator):
             while ntubes_per_row >= ntubes_per_end_rows:
                 if row == 0:
                     for n in xrange(ntubes_per_row):
-                        mwnt = Atoms(atoms=mwnt0, deepcopy=True)
+                        mwnt = Atoms(atoms=mwnt0.atoms, deepcopy=True)
                         mwnt.center_CM()
                         dr = n * self._r1
                         mwnt.translate(dr)
@@ -1987,7 +2017,7 @@ class MWNTGenerator(NanotubeBundleGenerator):
                 else:
                     for nx in xrange(ntubes_per_row):
                         for ny in (-row, row):
-                            mwnt = Atoms(atoms=mwnt0, deepcopy=True)
+                            mwnt = Atoms(atoms=mwnt0.atoms, deepcopy=True)
                             mwnt.center_CM()
                             dy = np.zeros(3)
                             dy[0] = abs(ny) * self._r2[0]
@@ -2001,16 +2031,18 @@ class MWNTGenerator(NanotubeBundleGenerator):
         else:
             for nx in xrange(self._nx):
                 for ny in xrange(self._ny):
-                    mwnt = Atoms(atoms=mwnt0, deepcopy=True)
+                    mwnt = Atoms(atoms=mwnt0.atoms, deepcopy=True)
                     mwnt.center_CM()
                     dr = nx * self._r1 + ny * self._r2
                     mwnt.translate(dr)
                     self.structure_atoms.extend(mwnt.atoms)
                     self._Ntubes += 1
-        self._Natoms_per_bundle = \
-            self.compute_Natoms_per_bundle(n=self._n, m=self._m,
-                                           nz=self._nz,
-                                           Ntubes=self._Ntubes)
+        self._Natoms_per_bundle = self._Ntubes * self._Natoms_per_tube
+
+        if self._verbose:
+            print('Nshells_per_tube: {}'.format(self._Nshells_per_tube))
+            print('Natoms_per_tube: {}'.format(self._Natoms_per_tube))
+            print('Natoms_per_bundle: {}'.format(self._Natoms_per_bundle))
 
     def save_data(self, fname=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
@@ -2048,11 +2080,12 @@ class MWNTGenerator(NanotubeBundleGenerator):
 
         if fname is None:
 
-            chirality = '{}{}'.format('{}'.format(self._n).zfill(2),
-                                      '{}'.format(self._m).zfill(2))
+            Nshells = '{}shell_mwnt'.format(self._Nshells_per_tube)
+
+            chirality = '{}{}_outer_Ch'.format('{}'.format(self._n).zfill(2),
+                                               '{}'.format(self._m).zfill(2))
             packing = '{}cp'.format(self._bundle_packing[0])
-            #Ntubes = ''.join(('{}'.format(self._Ntubes),
-            #                  plural_word_check('tube', self._Ntubes)))
+
             Ntube = '{}tube'.format(self._Ntubes)
 
             fname_wordlist = None
@@ -2068,10 +2101,10 @@ class MWNTGenerator(NanotubeBundleGenerator):
                     nz = ''.join(('{:.2f}'.format(self._nz),
                                   plural_word_check('cell', self._nz)))
                 cells = 'x'.join((nx, ny, nz))
-                fname_wordlist = (chirality, packing, cells)
+                fname_wordlist = (Nshells, chirality, packing, cells)
             else:
                 fname_wordlist = \
-                    (chirality, packing, Ntube, self._bundle_geometry)
+                    (Nshells, chirality, packing, Ntube, self._bundle_geometry)
 
             fname = '_'.join(fname_wordlist)
             fname += '.' + structure_format
