@@ -1840,9 +1840,13 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
     >>> mwnt = MWNTGenerator(n=40, m=40, max_Nshells=5, Lz=1.0, fix_Lz=True)
     >>> mwnt.save_data()
 
+    .. image:: /images/5shell_mwnt_4040_outer_Ch_1cellx1cellx4.06cells-001.png
+
     >>> mwntbundle = MWNTGenerator(n=40, m=40, max_Nshells=5, Lz=1.0,
     ...                            fix_Lz=True, bundle_geometry='hexagon')
     >>> mwntbundle.save_data()
+
+    .. image:: /images/5shell_mwnt_4040_outer_Ch_hcp_7tube_hexagon-001.png
 
     """
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
@@ -2110,7 +2114,11 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
                     nz = ''.join(('{:.2f}'.format(self._nz),
                                   plural_word_check('cell', self._nz)))
                 cells = 'x'.join((nx, ny, nz))
-                fname_wordlist = (Nshells, chirality, packing, cells)
+
+                if self._nx == 1 and self._ny == 1:
+                    fname_wordlist = (Nshells, chirality, cells)
+                else:
+                    fname_wordlist = (Nshells, chirality, packing, cells)
             else:
                 fname_wordlist = \
                     (Nshells, chirality, packing, Ntube, self._bundle_geometry)
