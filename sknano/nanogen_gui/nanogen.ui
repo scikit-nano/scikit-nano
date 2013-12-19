@@ -6,25 +6,64 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>505</width>
-    <height>339</height>
+    <width>775</width>
+    <height>485</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>NanoGen</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QToolBox" name="toolBox">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>240</y>
-      <width>98</width>
-      <height>27</height>
+      <x>30</x>
+      <y>20</y>
+      <width>161</width>
+      <height>221</height>
      </rect>
     </property>
-    <property name="text">
-     <string>PushButton</string>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="page">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>161</width>
+       <height>159</height>
+      </rect>
+     </property>
+     <attribute name="label">
+      <string>Page 1</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="page_2">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>73</width>
+       <height>73</height>
+      </rect>
+     </property>
+     <attribute name="label">
+      <string>Page 2</string>
+     </attribute>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>20</y>
+      <width>120</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>GroupBox</string>
     </property>
    </widget>
   </widget>
@@ -33,7 +72,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>505</width>
+     <width>775</width>
      <height>25</height>
     </rect>
    </property>
