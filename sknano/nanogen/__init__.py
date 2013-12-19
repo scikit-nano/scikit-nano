@@ -10,8 +10,14 @@ sknano package for generating nano-structures including graphene,
 bi-layer graphene, :math:`N`-layer graphene, single-walled carbon nanotubes
 and single-walled carbon nanotube bundles.
 
+.. versionchanged:: 0.2.8
+   `MWNTGenerator` implemented
+
+.. versionchanged:: 0.2.6
+   `GrapheneVacancyGenerator` and `NanotubeVacancyGenerator` implemented
+
 .. versionchanged:: 0.2.4
-   NanotubeBundleGenerator implemented
+   `NanotubeBundleGenerator` implemented
 
 Contents
 ========

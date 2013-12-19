@@ -457,12 +457,21 @@ class Nanotube(object):
 
     @property
     def N(self):
-        """Number of hexagons per nanotube unit cell :math:`N`."""
+        """Number of hexagons per nanotube unit cell :math:`N`:
+
+        .. math::
+
+           N = \\frac{4(n^2 + m^2 + nm)}{d_{R}}
+
+        """
         return self._N
 
     @classmethod
     def compute_N(cls, n=int, m=int):
         """Compute :math:`N = \\frac{2(n^2+m^2+nm)}{d_{R}}`.
+
+        Parameters
+        ----------
         n, m : int
             Chiral indices defining the nanotube chiral vector
             :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
@@ -471,7 +480,8 @@ class Nanotube(object):
         Returns
         -------
         int
-            Number of hexagons per nanotube unit cell :math:`N`.
+            Number of hexagons per nanotube unit cell:
+            :math:`N = \\frac{2(n^2+m^2+nm)}{d_{R}}`.
 
         """
         dR = Nanotube.compute_dR(n=n, m=m)
@@ -479,8 +489,13 @@ class Nanotube(object):
 
     @property
     def Natoms(self):
-        """Number of atoms per nanotube **unit cell** :math:`2N`."""
+        """Number of atoms per nanotube **unit cell** :math:`2N`.
 
+        .. math::
+
+           N_{\\mathrm{atoms}} = 2N = \\frac{4(n^2 + m^2 + nm)}{d_{R}}
+
+        """
         return self._Natoms
 
     @classmethod
@@ -501,7 +516,9 @@ class Nanotube(object):
         Returns
         -------
         int
-            Number of atoms per nanotube **unit cell** :math:`2N`.
+            Number of atoms per nanotube *unit cell*:
+            N_{\\mathrm{atoms}} = 2N = \\frac{4(n^2 + m^2 + nm)}{d_{R}}
+
 
         """
         N = Nanotube.compute_N(n=n, m=m)
@@ -509,7 +526,13 @@ class Nanotube(object):
 
     @property
     def R(self):
-        """Symmetry vector :math:`\\mathbf{R} = (p, q)`"""
+        """Symmetry vector :math:`\\mathbf{R} = (p, q)`.
+        
+        .. math::
+
+           \\mathbf{R} = p\\mathbf{a}_{1} + q\\mathbf{a}_{2}
+
+        """
         return self._R
 
     @classmethod
@@ -744,7 +767,7 @@ class Nanotube(object):
 
         .. math::
 
-           \\theta_{c} = \\atan{\\frac{\\sqrt{3} m}{2n + m}}
+           \\theta_{c} = \\tan^{-1}\\left({\\frac{\\sqrt{3} m}{2n + m}}\\right)
 
         """
         return self._chiral_angle
@@ -755,7 +778,7 @@ class Nanotube(object):
 
         .. math::
 
-           \\theta_{c} = \\atan{\\frac{\\sqrt{3} m}{2n + m}}
+           \\theta_{c} = \\tan^{-1}\\left({\\frac{\\sqrt{3} m}{2n + m}}\\right)
 
         Parameters
         ----------
@@ -764,15 +787,22 @@ class Nanotube(object):
             :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} +
             m\\mathbf{a}_{2} = (n, m)`.
 
+        Returns
+        -------
+        float
+            chiral angle :math:`\\theta_{c}` in degrees.
+
         """
         #return np.arccos((2*n + m) / (2 * np.sqrt(n**2 + m**2 + n*m)))
         return np.degrees(np.arctan(np.sqrt(3) * m / (2 * n + m)))
 
     @property
     def T(self):
-        """Unit cell length.
+        """Unit cell length :math:`|\\mathbf{T}|`.
 
-        :math:`|\\mathbf{T}| = \\frac{\\sqrt{3} |\\mathbf{C}_{h}|}{d_{R}}`
+        .. math::
+        
+           |\\mathbf{T}| = \\frac{\\sqrt{3} |\\mathbf{C}_{h}|}{d_{R}}
 
         """
         return self._T
@@ -977,31 +1007,39 @@ class Nanotube(object):
 
         The electronic type is determined as follows:
 
-        if :math:`(2n + m)\\mathrm{mod}3=0`, the nanotube is **metallic**.
+        if :math:`(2n + m)\\,\\mathrm{mod}\\,3=0`, the nanotube is
+        **metallic**.
 
-        if :math:`(2n + m)\\mathrm{mod}3=1`, the nanotube is
+        if :math:`(2n + m)\\,\\mathrm{mod}\\,3=1`, the nanotube is
         **semiconducting, type 1**.
 
-        if :math:`(2n + m)\\mathrm{mod}3=2`, the nanotube is
+        if :math:`(2n + m)\\,\\mathrm{mod}\\,3=2`, the nanotube is
         **semiconducting, type 2**.
 
-        The :math:`x\\mathrm{mod}y` notation is mathematical
-        shorthand for the *moduluo* operation, which computes the
-        **remainder** of the division operation: :math:`x/y`.
+        The :math:`x\\,\\mathrm{mod}\\,y` notation is mathematical
+        shorthand for the *modulo* operation, which computes the
+        **remainder** of the division of :math:`x` by :math:`y`.
         So, for example, all *armchair* nanotubes must be metallic
         since the chiral indices satisfy: :math:`2n + m = 2n + n = 3n` and
-        therefore :math:`3n\\mathrm{mod}3` i.e. the remainder of the division
-        of :math:`3n/3=n` is always zero.
+        therefore :math:`3n\\,\\mathrm{mod}\\,3` i.e. the remainder of the
+        division of :math:`3n/3=n` is always zero.
 
         .. note::
-           Mathematically, :math:`(2n + m)\\mathrm{mod}3` is equivalent to
-           :math:`(n - m)\\mathrm{mod}3` when distinguishing
+           Mathematically, :math:`(2n + m)\\,\\mathrm{mod}\\,3` is equivalent
+           to :math:`(n - m)\\,\\mathrm{mod}\\,3` when distinguishing
            between metallic and semiconducting. However, when
-           :math:`(2n + m)\\mathrm{mod}3=1`, :math:`(n - m)\\mathrm{mod}3=2`,
-           and vice-versa, such that when distinguishing between
-           semiconducting *types*, one must be careful to observe this
-           convention.
+           distinguishing between semiconducting types,
+           one must be careful to observe the following convention:
 
+           * Semiconducting, **type 1** means:
+
+             * :math:`(2n + m)\\,\\mathrm{mod}\\,3=1`
+             * :math:`(n - m)\\,\\mathrm{mod}\\,3=2`
+
+           * Semiconducting, **type 2** means:
+
+             * :math:`(2n + m)\\,\\mathrm{mod}\\,3=2`
+             * :math:`(n - m)\\,\\mathrm{mod}\\,3=1`
 
         Parameters
         ----------

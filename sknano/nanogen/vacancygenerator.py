@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-=============================================================================
-Generate vacancies in structures (:mod:`sknano.nanogen.vacancygenerator`)
-=============================================================================
+===============================================================================
+Generate vacancies in nano-structures (:mod:`sknano.nanogen.vacancygenerator`)
+===============================================================================
 
 Module for generating vacancies in nano-structures.
 
