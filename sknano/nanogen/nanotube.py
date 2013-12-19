@@ -1837,12 +1837,12 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
     --------
 
     >>> from sknano.nanogen import MWNTGenerator
-    >>> mwnt = MWNTGenerator(n=40, m=40, max_Nshells=5, Lz=1.0, fix_Lz=True)
+    >>> mwnt = MWNTGenerator(n=40, m=40, max_shells=5, Lz=1.0, fix_Lz=True)
     >>> mwnt.save_data()
 
     .. image:: /images/5shell_mwnt_4040_outer_Ch_1cellx1cellx4.06cells-001.png
 
-    >>> mwntbundle = MWNTGenerator(n=40, m=40, max_Nshells=5, Lz=1.0,
+    >>> mwntbundle = MWNTGenerator(n=40, m=40, max_shells=5, Lz=1.0,
     ...                            fix_Lz=True, bundle_geometry='hexagon')
     >>> mwntbundle.save_data()
 
@@ -1853,8 +1853,8 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
                  element1='C', element2='C', bond=CCbond,
                  vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
                  Lx=None, Ly=None, Lz=None, fix_Lz=False,
-                 max_Nshells=None, min_shell_diameter=0.0,
-                 shell_spacing=3.4,
+                 max_shells=None, min_shell_diameter=0.0,
+                 shell_spacing=3.4, inner_shell_Ch_type=None,
                  autogen=True, verbose=False):
 
         super(MWNTGenerator, self).__init__(
@@ -1868,12 +1868,15 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
         self._Lx = Lx
         self._Ly = Ly
 
-        self._max_Nshells = max_Nshells
-        if max_Nshells is None:
-            self._max_Nshells = np.inf
+        self._Lzmin = np.inf
+
+        self._max_shells = max_shells
+        if max_shells is None:
+            self._max_shells = np.inf
 
         self._min_shell_diameter = min_shell_diameter
         self._shell_spacing = shell_spacing
+        self._inner_shell_Ch_type = inner_shell_Ch_type
 
         self._Nshells_per_tube = 1
         self._Natoms_per_tube = 0
@@ -1966,8 +1969,8 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
 
         dt = []
         Ch = []
-        for n in xrange(1, self._n):
-            for m in xrange(1, self._m):
+        for n in xrange(0, 201):
+            for m in xrange(0, 201):
                 dt.append(Nanotube.compute_dt(n=n, m=m))
                 Ch.append((n, m))
         dt = np.asarray(dt)
@@ -1975,13 +1978,53 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
 
         swnt0 = copy.deepcopy(self.structure_atoms)
         mwnt0 = Atoms(atoms=swnt0, deepcopy=True)
+        self._Lzmin = min(self._Lzmin, self._Lz)
         mwnt0.center_CM()
 
         next_dt = self.dt - 2 * self._shell_spacing
         while next_dt >= self._min_shell_diameter and \
-                self._Nshells_per_tube < self._max_Nshells:
+                self._Nshells_per_tube < self._max_shells:
             # get chiral indices for next_dt
-            next_Ch_candidates = Ch[np.where(np.abs(dt - next_dt) <= 0.05)]
+            next_Ch_candidates = []
+            delta_dt = 0.05
+            while len(next_Ch_candidates) == 0:
+                if self._inner_shell_Ch_type in ('AC', 'armchair'):
+                    next_Ch_candidates = \
+                        Ch[np.where(
+                            np.logical_and(np.abs(dt - next_dt) <= delta_dt,
+                                           Ch[:,0] == Ch[:,1]))]
+                elif self._inner_shell_Ch_type in ('ZZ', 'zigzag'):
+                    next_Ch_candidates = \
+                        Ch[np.where(
+                            np.logical_and(np.abs(dt - next_dt) <= delta_dt,
+                                           np.logical_or(Ch[:,0] == 0,
+                                                         Ch[:,1] == 0)))]
+                elif self._inner_shell_Ch_type == 'achiral':
+                    next_Ch_candidates = \
+                        Ch[np.where(
+                            np.logical_and(np.abs(dt - next_dt) <= delta_dt,
+                                           np.logical_or(
+                                               Ch[:,0] == Ch[:,1],
+                                               np.logical_or(
+                                                   Ch[:,0] == 0,
+                                                   Ch[:,1] == 0))))]
+                elif self._inner_shell_Ch_type == 'chiral':
+                    next_Ch_candidates = \
+                        Ch[np.where(
+                            np.logical_and(np.abs(dt - next_dt) <= delta_dt,
+                                           np.logical_and(
+                                               Ch[:,0] != Ch[:,1],
+                                               np.logical_and(
+                                                   Ch[:,0] != 0,
+                                                   Ch[:,1] != 1))))]
+                else:
+                    next_Ch_candidates = \
+                        Ch[np.where(np.abs(dt - next_dt) <= delta_dt)]
+
+                next_dt -= delta_dt
+
+                #delta_dt += 0.05
+
             n, m = \
                 next_Ch_candidates[
                     np.random.choice(np.arange(len(next_Ch_candidates)))]
@@ -1992,18 +2035,26 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
                 print('n, m = {}, {}'.format(n, m))
                 print('unit_cell.Natoms: {}\n'.format(unit_cell.Natoms))
             T = Nanotube.compute_T(n=n, m=m)
+            Lz = Nanotube.compute_Lz(n=n, m=m, nz=self._nz)
+            self._Lzmin = min(self._Lzmin, Lz)
             shell_atoms = Atoms()
             for nz in xrange(int(np.ceil(self._nz))):
                 dr = np.array([0.0, 0.0, nz * T])
                 for uc_atom in unit_cell.atoms:
                     nt_atom = Atom(uc_atom.symbol)
                     nt_atom.r = uc_atom.r + dr
-                    #mwnt0.append(nt_atom)
                     shell_atoms.append(nt_atom)
             shell_atoms.center_CM()
             mwnt0.extend(shell_atoms.atoms)
             next_dt -= 2 * self._shell_spacing
             self._Nshells_per_tube += 1
+
+        if self._L0 is not None and self._fix_Lz:
+            mwnt0.clip_bounds(abs_limit=(10 * self._L0 + 0.5) / 2,
+                              r_indices=[2])
+        else:
+            mwnt0.clip_bounds(abs_limit=(10 * self._Lzmin + 0.5) / 2,
+                              r_indices=[2])
 
         self._Natoms_per_tube = mwnt0.Natoms
 
@@ -2053,6 +2104,7 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
         self._Natoms_per_bundle = self._Ntubes * self._Natoms_per_tube
 
         if self._verbose:
+            print('Ntubes: {}'.format(self._Ntubes))
             print('Nshells_per_tube: {}'.format(self._Nshells_per_tube))
             print('Natoms_per_tube: {}'.format(self._Natoms_per_tube))
             print('Natoms_per_bundle: {}'.format(self._Natoms_per_bundle))
