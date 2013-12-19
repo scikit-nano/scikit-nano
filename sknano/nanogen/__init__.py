@@ -7,16 +7,23 @@ Package for generating nano-structures (:mod:`sknano.nanogen`)
 .. currentmodule:: sknano.nanogen
 
 sknano package for generating nano-structures including graphene,
-bi-layer graphene, :math:`N`-layer graphene, single-walled carbon nanotubes
-and single-walled carbon nanotube bundles.
+bi-layer graphene, :math:`N`-layer graphene,
+single-walled nanotubes (:abbr:`SWNTs (single-walled nanotubes)`),
+multi-walled nanotubes (:abbr:`MWNTs (multi-walled nanotubes)`),
+and bundles of :abbr:`SWNTs` and :abbr:`MWNTs`.
 
-.. versionchanged:: 0.2.8
+.. note::
+   The default basis atoms are both carbon and therefore the default
+   nano-structures are carbon nano-structures. However, 
+   you can use any atom in the periodic table of elements as a basis atom.
+
+.. versionadded:: 0.2.8
    `MWNTGenerator` implemented
 
-.. versionchanged:: 0.2.6
+.. versionadded:: 0.2.6
    `GrapheneVacancyGenerator` and `NanotubeVacancyGenerator` implemented
 
-.. versionchanged:: 0.2.4
+.. versionadded:: 0.2.4
    `NanotubeBundleGenerator` implemented
 
 Contents
