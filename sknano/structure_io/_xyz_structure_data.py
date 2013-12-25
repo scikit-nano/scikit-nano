@@ -77,7 +77,7 @@ class XYZWriter(StructureWriter):
                 f.write('{:d}\n'.format(atoms.Natoms))
                 f.write('{}\n'.format(comment_line))
                 for atom in atoms:
-                    f.write('{:3s} {:10.5f} {:10.5f} {:10.5f}\n'.format(
+                    f.write('{:>3s}{:15.5f}{:15.5f}{:15.5f}\n'.format(
                         atom.symbol, atom.x, atom.y, atom.z))
 
 
