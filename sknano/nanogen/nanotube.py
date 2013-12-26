@@ -12,6 +12,8 @@ __docformat__ = 'restructuredtext'
 
 import copy
 #import itertools
+import warnings
+warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
 
 from fractions import gcd
 from collections import OrderedDict
