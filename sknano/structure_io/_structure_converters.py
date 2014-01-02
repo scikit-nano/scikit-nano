@@ -163,4 +163,4 @@ class XYZ2DATAConverter(StructureConverter):
                          boxbounds=boxbounds, comment_line=comment_line)
 
         if return_reader:
-            return DATAReader(self._datafile)
+            return DATAReader(fname=self._datafile)
