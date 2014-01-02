@@ -70,7 +70,7 @@ import argparse
 import sys
 
 from pksci.chemistry import Atom
-from pkshared.tools.refdata import ccbond
+from pkshared.tools.refdata import CCbond
 
 from ..nanogen import TubeGen, format_ext
 from ..structure_io import XYZ2DATAConverter
@@ -92,7 +92,7 @@ def _argparser():
     parser.add_argument('--element2', default='C',
                         help='element symbol or atomic number of basis '
                         'atom 2 (default: %(default)s)')
-    parser.add_argument('--bond', type=float, default=ccbond,
+    parser.add_argument('--bond', type=float, default=CCbond,
                         help='element1-element2 bond length in Angstroms '
                         '(default: %(default)s)')
     parser.add_argument('--gutter', nargs=3, type=float,
