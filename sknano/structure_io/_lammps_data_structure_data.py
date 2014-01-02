@@ -271,7 +271,7 @@ class DATAWriter(StructureWriter):
             if not assume_unique_atoms:
                 # check that each Atom in Atoms has a unique atomID
                 # if not, then assign a unique atomID to each Atom
-                # if assume_unique_atoms is True, but the atomID's are not
+                # If assume_unique_atoms is True, but the atomID's are not
                 # unique, LAMMPS will not read in the correct number
                 # of atoms.
                 if len(set(atoms.atom_ids)) != atoms.Natoms:
