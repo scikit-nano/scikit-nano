@@ -51,6 +51,7 @@ class DATAReader(StructureReader):
         if fname is not None:
             self._read()
             self._parse_atoms()
+            self._parse_atomtypes()
             self._Natoms = self._atoms.Natoms
             self._parse_boxbounds()
 
@@ -87,6 +88,8 @@ class DATAReader(StructureReader):
                                 [[ss for ss in line.split()][i] for i in
                                  range(self._data_headers[key]['items'])]]
                         if len(self._headers[key]) == 1:
+                            # since the list contains only one element,
+                            # replace list value with element 0
                             self._headers[key] = self._headers[key][0]
                         break
                 if not found:
@@ -171,8 +174,16 @@ class DATAReader(StructureReader):
             atom = Atom(**atom_kwargs)
             self._atoms.append(atom)
 
-    #def _parse_atomtypes(self):
-    #    mass_syntax = self._section_properties['Masses']['atomtype']
+    def _parse_atomtypes(self):
+        Ntypes = self._atoms.Ntypes
+        atomtypes = self._atoms.atomtypes
+        if Ntypes != self._headers['atom types']:
+            for atomtype in xrange(1, self._headers['atom types'] + 1):
+                if atomtype not in atomtypes:
+                    mass = self._sections['Masses'][atomtype - 1][
+                        self._section_properties['Masses']['mass']['index']]
+                    self._atoms.add_atomtype(
+                        Atom(atomtype=atomtype, mass=mass))
 
     def _parse_boxbounds(self):
         for dim in ('x', 'y', 'z'):
@@ -260,9 +271,11 @@ class DATAWriter(StructureWriter):
             atomtypes = atoms.atomtypes
 
             Natoms = atoms.Natoms
+            print('Natoms = {}'.format(Natoms))
             Natoms_width = \
                 8 if len(str(Natoms)) <= 12 else len(str(Natoms)) + 4
             Ntypes = atoms.Ntypes
+            print('Ntypes = {}'.format(Ntypes))
             Ntypes_width = Natoms_width
 
             atomID_width = len(str(Natoms)) + 1
@@ -277,6 +290,8 @@ class DATAWriter(StructureWriter):
                 if len(set(atoms.atom_ids)) != atoms.Natoms:
                     for atomID, atom in enumerate(atoms, start=1):
                         atom.atomID = atomID
+
+            print(atoms.atomtypes)
 
             if boxbounds is None:
                 boxbounds = {'x': {'min': None, 'max': None},
