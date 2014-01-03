@@ -13,7 +13,7 @@ __docformat__ = 'restructuredtext'
 
 import numpy as np
 
-from pksci.chemistry import Atom
+from pksci.chemistry import Atom, Atoms
 from pkshared.tools.fiofuncs import get_fpath
 
 from ._structure_data import StructureReader, StructureWriter, \
@@ -243,24 +243,32 @@ class DATAWriter(StructureWriter):
 
     @classmethod
     def write(cls, fname=None, atoms=None, boxbounds=None, comment_line=None,
-              assume_unique_atoms=False):
+              assume_unique_atoms=False, verbose=False):
         """Write structure data to file.
 
         Parameters
         ----------
         fname : str
-        atoms : Atoms
-            :py:class:`~pksci.chemistry.Atoms` instance.
+        atoms : `Atoms`
+            An :py:class:`~pksci.chemistry.Atoms` instance.
         boxbounds : dict, optional
             If ``None``, determined automatically from atom coordinates.
         comment_line : str, optional
+            A string written to the first line of data file. If ``None``,
+            then it is set to the full path of the output data file.
         assume_unique_atoms : bool, optional
+            Check that each Atom in Atoms has a unique atomID. If the check
+            fails, then assign a unique atomID to each Atom.
+            If ``assume_unique_atoms`` is True, but the atomID's are not
+            unique, LAMMPS will not be able to read the data file.
+        verbose : bool, optional
+            verbose output
 
         """
         if fname is None:
             raise TypeError('fname argument must be a string!')
-        elif atoms is None:
-            raise TypeError('atoms argument must be an Atoms object')
+        elif not isinstance(atoms, Atoms):
+            raise TypeError('atoms argument must be an ``Atoms`` instance')
         else:
             fname = get_fpath(fname=fname, ext='data', overwrite=True)
             if comment_line is None:
@@ -279,15 +287,10 @@ class DATAWriter(StructureWriter):
             atomID_width = len(str(Natoms)) + 1
             atomtype_width = len(str(Ntypes)) + 1
 
-            if not assume_unique_atoms:
-                # check that each Atom in Atoms has a unique atomID
-                # if not, then assign a unique atomID to each Atom
-                # If assume_unique_atoms is True, but the atomID's are not
-                # unique, LAMMPS will not read in the correct number
-                # of atoms.
-                if len(set(atoms.atom_ids)) != atoms.Natoms:
-                    for atomID, atom in enumerate(atoms, start=1):
-                        atom.atomID = atomID
+            if not assume_unique_atoms and \
+                    len(set(atoms.atom_ids)) != atoms.Natoms:
+                for atomID, atom in enumerate(atoms, start=1):
+                    atom.atomID = atomID
 
             if boxbounds is None:
                 boxbounds = {'x': {'min': None, 'max': None},
