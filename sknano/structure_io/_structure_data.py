@@ -28,7 +28,7 @@ __all__ = ['StructureData', 'StructureDataError',
 
 
 class StructureData(object):
-    """Base class defining common properties for structure formats.
+    """Base class defining common properties for structure data.
 
     Parameters
     ----------
