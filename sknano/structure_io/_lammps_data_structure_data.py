@@ -271,11 +271,9 @@ class DATAWriter(StructureWriter):
             atomtypes = atoms.atomtypes
 
             Natoms = atoms.Natoms
-            print('Natoms = {}'.format(Natoms))
             Natoms_width = \
                 8 if len(str(Natoms)) <= 12 else len(str(Natoms)) + 4
             Ntypes = atoms.Ntypes
-            print('Ntypes = {}'.format(Ntypes))
             Ntypes_width = Natoms_width
 
             atomID_width = len(str(Natoms)) + 1
@@ -290,8 +288,6 @@ class DATAWriter(StructureWriter):
                 if len(set(atoms.atom_ids)) != atoms.Natoms:
                     for atomID, atom in enumerate(atoms, start=1):
                         atom.atomID = atomID
-
-            print(atoms.atomtypes)
 
             if boxbounds is None:
                 boxbounds = {'x': {'min': None, 'max': None},
