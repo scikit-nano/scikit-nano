@@ -136,10 +136,12 @@ def setup_package():
             ['README', 'README.rst', '*.gif', '*.html', '*.ui']},
         zip_safe=False,
         dependency_links=[
+            'https://github.com/androomerrill/pykit-shared/tarball/dev' +
+            '#egg=pkshared-0.1.6',
             'https://github.com/androomerrill/pykit-sci/tarball/dev' +
             '#egg=pksci-0.1.3'],
         install_requires=['numpy>=1.8', 'scipy>=0.13',
-                          'pksci>=0.1.3.dev'],
+                          'pkshared>=0.1.6.dev', 'pksci>=0.1.3.dev'],
         entry_points={
             'console_scripts': [
                 'nanogen = sknano.scripts.nanogen:main',
