@@ -137,11 +137,11 @@ def setup_package():
         zip_safe=False,
         dependency_links=[
             'https://github.com/androomerrill/pykit-shared/tarball/dev' +
-            '#egg=pkshared-0.1.6',
+            '#egg=pkshared-0.1.7',
             'https://github.com/androomerrill/pykit-sci/tarball/dev' +
             '#egg=pksci-0.1.3'],
         install_requires=['numpy>=1.8', 'scipy>=0.13',
-                          'pkshared>=0.1.6.dev', 'pksci>=0.1.3.dev'],
+                          'pkshared>=0.1.7.dev', 'pksci>=0.1.3.dev'],
         entry_points={
             'console_scripts': [
                 'nanogen = sknano.scripts.nanogen:main',
