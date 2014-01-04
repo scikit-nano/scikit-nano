@@ -49,11 +49,7 @@ class DATAReader(StructureReader):
         self._boxbounds = {}
 
         if fname is not None:
-            self._read()
-            self._parse_atoms()
-            self._parse_atomtypes()
-            self._Natoms = self._atoms.Natoms
-            self._parse_boxbounds()
+            self.read()
 
     @property
     def headers(self):
@@ -70,7 +66,7 @@ class DATAReader(StructureReader):
         """Box bounds."""
         return self._boxbounds
 
-    def _read(self):
+    def read(self):
         """Read data file."""
         with open(self._fname, 'r') as f:
             self._comment_line = f.readline().strip()
@@ -123,6 +119,10 @@ class DATAReader(StructureReader):
                 line = f.readline().strip()
                 if len(line) == 0:
                     break
+
+        self._parse_atoms()
+        self._parse_atomtypes()
+        self._parse_boxbounds()
 
     def _parse_atoms(self):
         """Populate Atoms object with Atom objects"""
@@ -254,8 +254,8 @@ class DATAWriter(StructureWriter):
         boxbounds : dict, optional
             If ``None``, determined automatically from atom coordinates.
         comment_line : str, optional
-            A string written to the first line of data file. If ``None``,
-            then it is set to the full path of the output data file.
+            A string written to the first line of ``data`` file. If ``None``,
+            then it is set to the full path of the output ``data`` file.
         assume_unique_atoms : bool, optional
             Check that each Atom in Atoms has a unique atomID. If the check
             fails, then assign a unique atomID to each Atom.
@@ -265,12 +265,11 @@ class DATAWriter(StructureWriter):
             verbose output
 
         """
-        if fname is None:
-            raise TypeError('fname argument must be a string!')
-        elif not isinstance(atoms, Atoms):
+        if not isinstance(atoms, Atoms):
             raise TypeError('atoms argument must be an ``Atoms`` instance')
         else:
-            fname = get_fpath(fname=fname, ext='data', overwrite=True)
+            fname = get_fpath(fname=fname, ext='data', overwrite=True,
+                              add_fnum=False)
             if comment_line is None:
                 comment_line = fname
 
@@ -421,11 +420,29 @@ class LAMMPSDATA(DATAReader):
             setattr(atom, atom_attr, attr_dtype(new_data[i]))
 
     def write(self, datafile=None):
-        if datafile is None:
-            datafile = self._fname
-        DATAWriter.write(fname=datafile, atoms=self._atoms,
-                         boxbounds=self._boxbounds,
-                         comment_line=self._comment_line)
+        """Write data file.
+
+        Parameters
+        ----------
+        datafile : {None, str}, optional
+
+        """
+        try:
+            if (datafile is None or datafile == '') and \
+                    (self.fname is None or self.fname == ''):
+                error_msg = '`datafile` must be a string at least 1 ' + \
+                    'character long.'
+                if datafile is None:
+                    raise TypeError(error_msg)
+                else:
+                    raise ValueError(error_msg)
+            else:
+                datafile = self._fname
+            DATAWriter.write(fname=datafile, atoms=self._atoms,
+                             boxbounds=self._boxbounds,
+                             comment_line=self._comment_line)
+        except (TypeError, ValueError) as e:
+            print(e)
 
     def newxyz(self):
         pass
