@@ -14,7 +14,7 @@ __docformat__ = 'restructuredtext'
 import os
 #import re
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 
 __all__ = ['StructureConverter',
            'FormatConverterError',
@@ -28,20 +28,37 @@ class StructureConverterError(Exception):
     pass
 
 
-class StructureConverter(object):
-    __metaclass__ = ABCMeta
-    """Abstract superclass for converting structure data."""
-    pass
-
-
 class FormatConverterError(Exception):
     """Exception raised for errors in the file format."""
     pass
 
 
+class StructureConverter(object):
+    __metaclass__ = ABCMeta
+    """Abstract superclass for converting structure data."""
+    def __init__(self, infile=None, outfile=None):
+        self._infile = infile
+        self._outfile = outfile
+
+    @property
+    def infile(self):
+        return self._infile
+
+    @property
+    def outfile(self):
+        return self._outfile
+
+    @abstractmethod
+    def convert(self):
+        """Convert structure data from one format to another format."""
+        return NotImplemented
+
+
 class DATA2XYZConverter(StructureConverter):
     """
-    Class for converting structure data from LAMMPS ``data`` format to ``xyz``.
+    Class for converting structure data from LAMMPS ``data`` to ``xyz`` format.
+
+    .. versionadded:: 0.2.9
 
     Parameters
     ----------
@@ -49,7 +66,47 @@ class DATA2XYZConverter(StructureConverter):
 
     """
     def __init__(self, datafile):
-        pass
+        self._datafile = datafile
+        self._xyzfile = os.path.splitext(self._datafile)[0] + '.xyz'
+
+        super(DATA2XYZConverter, self).__init__(
+            infile=self._datafile, outfile=self._xyzfile)
+
+    @property
+    def datafile(self):
+        """LAMMPS data file"""
+        return self.infile
+
+    @property
+    def xyzfile(self):
+        """xyz file name."""
+        return self.outfile
+
+    def convert(self, return_reader=False):
+        """Convert LAMMPS ``data`` to ``xyz`` chemical file format.
+
+        Parameters
+        ----------
+        return_reader : bool, optional
+            return an instance of `XYZReader`
+
+        Returns
+        -------
+        `XYZReader` (only if `return_reader` is True)
+
+        """
+        from ._lammps_data_structure_data import DATAReader
+        from ._xyz_structure_data import XYZReader, XYZWriter
+
+        datareader = DATAReader(fname=self._datafile)
+        atoms = datareader.atoms
+        comment_line = datareader.comment_line
+
+        XYZWriter.write(fname=self._xyzfile, atoms=atoms,
+                        comment_line=comment_line)
+
+        if return_reader:
+            return XYZReader(fname=self._xyzfile)
 
 
 class XYZ2DATAConverter(StructureConverter):
@@ -60,9 +117,13 @@ class XYZ2DATAConverter(StructureConverter):
     ----------
     xyzfile : str
     boxbounds : {None, dict}, optional
-        dict specifying box bounds
+        dict specifying ``min`` and ``max`` box bounds in
+        :math:`x,y,z` dimensions. If None, then determine bounds based
+        atom coordinates.
     pad_box : bool, optional
-        pad simulation box bounds
+        If True, after determining minimum simulation box bounds,
+        expand :math:`\\pm x,\\pm y,\\pm z` dimensions of simulation box by
+        `xpad`, `ypad`, `zpad` distance.
     xpad : float, optional
     ypad : float, optional
     zpad : float, optional
@@ -73,6 +134,9 @@ class XYZ2DATAConverter(StructureConverter):
 
         self._xyzfile = xyzfile
         self._datafile = os.path.splitext(self._xyzfile)[0] + '.data'
+
+        super(XYZ2DATAConverter, self).__init__(
+            infile=self._xyzfile, outfile=self._datafile)
 
         self._boxbounds = boxbounds
         self._pad_box = pad_box
@@ -88,9 +152,13 @@ class XYZ2DATAConverter(StructureConverter):
         self._add_new_atomtypes = False
 
     @property
+    def xyzfile(self):
+        return self.infile
+
+    @property
     def datafile(self):
         """LAMMPS data file name."""
-        return self._datafile
+        return self.outfile
 
     def add_atom(self, atom=None):
         """Add new atom to atoms.
@@ -126,13 +194,13 @@ class XYZ2DATAConverter(StructureConverter):
 
         Returns
         -------
-        None or DATAReader
+        `DATAReader` (only if `return_reader` is True)
 
         """
         from ._lammps_data_structure_data import DATAReader, DATAWriter
         from ._xyz_structure_data import XYZReader
 
-        xyzreader = XYZReader(self._xyzfile)
+        xyzreader = XYZReader(fname=self._xyzfile)
         atoms = xyzreader.atoms
         comment_line = xyzreader.comment_line
         if self._add_new_atoms:
