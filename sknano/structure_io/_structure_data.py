@@ -39,7 +39,6 @@ class StructureData(object):
         self._atoms = Atoms()
         self._comment_line = None
         self._fname = fname
-        self._Natoms = None
         self._properties = OrderedDict()
 
     @property
@@ -65,12 +64,12 @@ class StructureData(object):
 
     @property
     def fname(self):
-        """File name."""
+        """fname."""
         return self._fname
 
     @fname.setter
     def fname(self, value=str):
-        """file name setter.
+        """fname setter.
 
         Parameters
         ----------
@@ -79,10 +78,15 @@ class StructureData(object):
         """
         self._fname = value
 
+    @fname.deleter
+    def fname(self):
+        """fname deleter."""
+        del self._fname
+
     @property
     def Natoms(self):
         """Number of atoms."""
-        return self._Natoms
+        return self._atoms.Natoms
 
     @property
     def properties(self):
@@ -104,7 +108,7 @@ class StructureReader(StructureData):
         super(StructureReader, self).__init__(fname=fname)
 
     @abstractmethod
-    def _read(self):
+    def read(self):
         """Read in structure data from file"""
         return NotImplemented
 
