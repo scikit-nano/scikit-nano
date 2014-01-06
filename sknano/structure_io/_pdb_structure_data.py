@@ -32,19 +32,10 @@ class PDBReader(StructureReader):
     """
     def __init__(self, fname=None):
         super(PDBReader, self).__init__(fname=fname)
-        self._read()
+        self.read()
 
-    def _read(self):
-        with open(self._fname, 'r') as f:
-            self._Natoms = int(f.readline().strip())
-            self._comment_line = f.readline().strip()
-            lines = f.readlines()
-            for line in lines:
-                s = line.strip().split()
-                if len(s) != 0:
-                    atom = \
-                        Atom(s[0], x=float(s[1]), y=float(s[2]), z=float(s[3]))
-                    self._atoms.append(atom)
+    def read(self):
+        pass
 
 
 class PDBWriter(StructureWriter):
@@ -67,7 +58,8 @@ class PDBWriter(StructureWriter):
         elif atoms is None:
             raise TypeError('atoms argument must be an Atoms object')
         else:
-            fname = get_fpath(fname=fname, ext='pdb', overwrite=True)
+            fname = get_fpath(fname=fname, ext='pdb', overwrite=True,
+                              add_fnum=False)
             if comment_line is None:
                 comment_line = fname
 
@@ -96,7 +88,4 @@ class PDBDATA(PDBReader):
             pass
 
     def write(self, pdbfile=None):
-        if pdbfile is None:
-            pdbfile = self._fname
-        PDBWriter.write(fname=pdbfile, atoms=self._atoms,
-                        comment_line=self._comment_line)
+        pass

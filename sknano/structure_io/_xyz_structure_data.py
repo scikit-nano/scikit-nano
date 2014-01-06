@@ -17,7 +17,6 @@ from pkshared.tools.fiofuncs import get_fpath
 from ._structure_data import StructureReader, StructureReaderError, \
     StructureWriter
 
-
 __all__ = ['XYZDATA', 'XYZReader', 'XYZWriter']
 
 
