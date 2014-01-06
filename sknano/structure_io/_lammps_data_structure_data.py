@@ -364,13 +364,28 @@ class LAMMPSDATA(DATAReader):
     def __init__(self, fname=None):
         super(LAMMPSDATA, self).__init__(fname=fname)
 
-    def map_colinfo(self):
+    def delete(self, key):
+        pass
+
+    def findtime(self, n):
+        pass
+
+    def iterator(self, n):
+        pass
+
+    def map(self, *pairs):
         pass
 
     def maxbox(self):
         pass
 
     def maxtype(self):
+        pass
+
+    def newxyz(self):
+        pass
+
+    def reorder(self, colname, *order):
         pass
 
     def replace(self, section_key, new_data, colnum=None,
@@ -419,6 +434,9 @@ class LAMMPSDATA(DATAReader):
             self._sections[section_key][i][colidx] = attr_dtype(new_data[i])
             setattr(atom, atom_attr, attr_dtype(new_data[i]))
 
+    def viz(self, isnap):
+        pass
+
     def write(self, datafile=None):
         """Write data file.
 
@@ -443,12 +461,6 @@ class LAMMPSDATA(DATAReader):
                              comment_line=self._comment_line)
         except (TypeError, ValueError) as e:
             print(e)
-
-    def newxyz(self):
-        pass
-
-    def delete(self):
-        pass
 
 
 class LAMMPSDATAError(StructureDataError):
