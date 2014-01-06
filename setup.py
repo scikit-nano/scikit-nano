@@ -1,4 +1,17 @@
-"""scikit-nano
+# -*- coding: utf-8 -*-
+"""scikit-nano: python toolkit for generating nano-structures.
+
+A python toolkit for nano-science. Currently, its primary use is for
+generating nano-structure data for the following nano-materials:
+
+    * Graphene, both single layer graphene and N-layer graphene.
+    * Single-walled nanotubes (SWNTs), both single SWNTs and SWNT bundles.
+    * Multi-walled nanotubes (MWNTs), both single MWNTs and MWNT bundles.
+
+It supports saving structure data in the following formats:
+
+    * `xyz`
+    * LAMMPS `data`
 
 """
 
@@ -31,7 +44,7 @@ Topic :: Scientific/Engineering
 MAJOR = 0
 MINOR = 2
 MICRO = 9
-ISRELEASED = False
+ISRELEASED = True
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 
@@ -135,13 +148,8 @@ def setup_package():
         exclude_package_data={'':
             ['README', 'README.rst', '*.gif', '*.html', '*.ui']},
         zip_safe=False,
-        dependency_links=[
-            'https://github.com/androomerrill/pykit-shared/tarball/dev' +
-            '#egg=pkshared-0.1.7',
-            'https://github.com/androomerrill/pykit-sci/tarball/dev' +
-            '#egg=pksci-0.1.3'],
         install_requires=['numpy>=1.8', 'scipy>=0.13',
-                          'pkshared>=0.1.7.dev', 'pksci>=0.1.3.dev'],
+                          'pkshared>=0.1.7', 'pksci>=0.1.4'],
         entry_points={
             'console_scripts': [
                 'nanogen = sknano.scripts.nanogen:main',
