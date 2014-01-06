@@ -29,8 +29,12 @@ class StructureSpecs(object):
 
 
 class LAMMPSDATASpecs(StructureSpecs):
-    """
-    Class defining the structure file format for LAMMPS data.
+    """Class defining the structure file format for LAMMPS data.
+
+    Parameters
+    ----------
+    atom_style : {'full'}, optional
+        LAMMPS atom style.
 
     """
     def __init__(self, atom_style='full'):
@@ -185,3 +189,10 @@ class LAMMPSDATASpecs(StructureSpecs):
     def section_syntax_dict(self):
         """Section syntax dictionary."""
         return self._section_syntax_dict
+
+
+class LAMMPSDUMPSpecs(StructureSpecs):
+    """Class defining the structure file format for LAMMPS dump."""
+
+    def __init__(self):
+        pass
