@@ -12,6 +12,7 @@ Subpackages
 
 ::
 
+ chemistry                --- abstract data structures for chemistry
  nanogen                  --- nano-structure generator
  scripts                  --- command-line scripts
  structure_io             --- helper classes for structure data I/O
@@ -26,6 +27,6 @@ Utilitiy tools
 """
 from __future__ import print_function, absolute_import
 
-__all__ = ['nanogen', 'scripts', 'structure_io']
+__all__ = ['chemistry', 'nanogen', 'scripts', 'structure_io']
 
 from sknano.version import version as __version__
