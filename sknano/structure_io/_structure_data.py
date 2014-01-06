@@ -14,7 +14,7 @@ __docformat__ = 'restructuredtext'
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
 
-from pksci.chemistry import Atoms
+from ..chemistry import Atoms
 
 supported_structure_formats = ('xyz', 'data')
 default_structure_format = 'xyz'

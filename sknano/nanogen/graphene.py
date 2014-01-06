@@ -16,10 +16,10 @@ import sys
 
 import numpy as np
 
-from pksci.chemistry import Atom, Atoms
 from pkshared.tools.arrayfuncs import rotation_matrix
 from pkshared.tools.refdata import CCbond
 
+from ..chemistry import Atom, Atoms
 from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
     supported_structure_formats
 

@@ -69,9 +69,9 @@ from __future__ import absolute_import, division, print_function
 import argparse
 import sys
 
-from pksci.chemistry import Atom
 from pkshared.tools.refdata import CCbond
 
+from ..chemistry import Atom
 from ..nanogen import TubeGen, format_ext
 from ..structure_io import XYZ2DATAConverter
 
