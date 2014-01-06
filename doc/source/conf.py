@@ -63,7 +63,7 @@ else:
     raise RuntimeError("You need a recent enough version of matplotlib")
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+#templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -73,7 +73,7 @@ master_doc = 'index'
 
 # General substitutions.
 project = u'scikit-nano'
-copyright = u'2013, Andrew Merrill'
+copyright = u'2014, Andrew Merrill'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -129,7 +129,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#html_theme = 'default'
+html_theme = 'agogo'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -159,37 +159,37 @@ pygments_style = 'sphinx'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 
-themedir = '_theme'
-if os.path.isdir(themedir):
-    html_theme = 'sknano'
-    html_theme_path = [themedir]
-
-    if 'sknanowiki' in tags:
-        # Build for the sknano wiki website
-        html_theme_options = {
-            "edit_link": True,
-            "sidebar": "right",
-            "rootlinks":
-            [("http://github.com/androomerrill/scikit-nano", "scikit-nano"),
-             ("http://projects.geekspin.net/sknano/doc", "Docs")]
-        }
-    else:
-        # Default build
-        html_theme_options = {
-            "edit_link": False,
-            "sidebar": "left",
-            "sknano_logo": False,
-            "rootlinks": []
-        }
-        html_logo = '_static/Nanotube_Logo_200x200.png'
-        html_sidebars = {'index': 'indexsidebar.html'}
-else:
-    html_style = 'default.css'
-    html_logo = '_static/Nanotube_Logo_200x200.png'
-    #html_sidebars = {'index': 'indexsidebar.html'}
+#themedir = '_theme'
+#if os.path.isdir(themedir):
+#    html_theme = 'sknano'
+#    html_theme_path = [themedir]
+#
+#    if 'sknanowiki' in tags:
+#        # Build for the sknano wiki website
+#        html_theme_options = {
+#            "edit_link": True,
+#            "sidebar": "right",
+#            "rootlinks":
+#            [("http://github.com/androomerrill/scikit-nano", "scikit-nano"),
+#             ("http://projects.geekspin.net/sknano/doc", "Docs")]
+#        }
+#    else:
+#        # Default build
+#        html_theme_options = {
+#            "edit_link": False,
+#            "sidebar": "left",
+#            "sknano_logo": False,
+#            "rootlinks": []
+#        }
+#        html_logo = '_static/Nanotube_Logo_200x200.png'
+#        html_sidebars = {'index': 'indexsidebar.html'}
+#else:
+#    html_style = 'default.css'
+#    html_logo = '_static/Nanotube_Logo_200x200.png'
+#    #html_sidebars = {'index': 'indexsidebar.html'}
 
 html_title = "%s v%s Reference Guide" % (project, version)
-html_static_path = ['_static']
+#html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
