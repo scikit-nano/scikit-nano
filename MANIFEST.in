@@ -7,4 +7,6 @@ recursive-include sknano *
 recursive-include doc *
 prune doc/build
 prune doc/source/generated
+prune doc/source/sknano
+prune doc/source/images
 global-exclude *.pyc *~ *.bak *.swp *.pyo
