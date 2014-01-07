@@ -160,7 +160,7 @@ show_authors = False
 
 #themedir = '_theme'
 html_theme = 'sknano'
-#html_theme_path = [themedir]
+html_theme_path = ['.']
 
 html_theme_options = {
     "edit_link": False,
