@@ -25,23 +25,38 @@ Installation
 Required Dependencies
 ---------------------
 
-* Python 2.7+
-* TubeGen (for generating graphene and nanotube structures)
+* `Python 2.7+ <http://python.org/download/>`_
 * VMD (for visualizing structure data)
 * Tachyon (for rendering high quality images)
 
 Installing scikit-nano
 ----------------------
 
-Assuming you already have a working
-`python <http://python.org/download/>`_ installation,
-and you've downloaded the scikit code, :command:`cd` into the
-scikit-nano folder and then run::
+Before installing this package, you need a working installation.
+
+You can install the latest stable release from the
+`Python Package Index <http://pypi.python.org/pypi/sknano>`_
+using :command:`pip`::
+
+    > pip install sknano
+
+Alternatively you can download a source code tarball from
+http://pypi.python.org/pypi/sknano or clone the source code
+from the `github repository <http://github.com/androomerrill/scikit-nano>`_
+using :command:`git`::
+
+    > git clone https://github.com/androomerrill/scikit-nano.git
+
+:command:`cd` into the source code directory and run::
 
     > python setup.py install
 
-This will install the command-line scripts system wide.
+These commands will probabily fail if you don't have *admin privileges*.
+In that case, try installing to the user base directory.
+Using :command:`pip`::
 
-To install the scripts in the user's home folder, try::
+    > pip install --user sknano
+
+Or from source::
 
     > python setup.py install --user
