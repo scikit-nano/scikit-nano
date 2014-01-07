@@ -1,14 +1,14 @@
 include MANIFEST.in
-include *.md
 include *.txt
 include *.rst
 include setup.py
 recursive-include sknano *
 recursive-include doc *
 prune doc/build
+prune doc/sphinxext/numpydoc
 prune doc/source/generated
 prune doc/source/sknano
 prune doc/source/images
 prune doc/source/_static
-prune doc/source/_template
+prune doc/source/_templates
 global-exclude *.pyc *~ *.bak *.swp *.pyo
