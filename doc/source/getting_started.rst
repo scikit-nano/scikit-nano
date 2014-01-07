@@ -32,8 +32,6 @@ Required Dependencies
 Installing scikit-nano
 ----------------------
 
-Before installing this package, you need a working python installation.
-
 You can install the latest stable release from the
 `Python Package Index <http://pypi.python.org/pypi/sknano>`_
 using :command:`pip`::
