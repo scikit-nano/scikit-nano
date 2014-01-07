@@ -44,7 +44,7 @@ Topic :: Scientific/Engineering
 MAJOR = 0
 MINOR = 2
 MICRO = 10
-ISRELEASED = False
+ISRELEASED = True
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 
