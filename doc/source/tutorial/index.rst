@@ -1,12 +1,12 @@
 ======================
-scikit-nano Tutorials
+scikit-nano Tutorial
 ======================
 
-.. sectionauthor:: Andrew Merrill
+.. sectionauthor:: Andrew Merrill <androomerrill@gmail.com>
 
 .. toctree::
    :maxdepth: 2
 
-   intro.rst
    nanogen.rst
    scripts.rst
+   examples.rst

@@ -4,6 +4,19 @@
 Getting started
 ===============
 
+.. _introduction:
+
+Introduction
+============
+
+.. include:: ../../README.rst
+   :start-line: 4
+   :end-line: -2
+
+I've adopted the *scikit-* naming convention for this project in hopes of
+contributing it to the collection of
+`SciKit libraries <http://scikits.appspot.com>`_ in the near future.
+
 .. _installation:
 
 Installation

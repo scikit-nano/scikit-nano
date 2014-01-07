@@ -5,20 +5,10 @@ scikit-nano documentation
 :Release: |release|
 :Date: |today|
 
-.. include:: ../../README.rst
-   :start-line: 4
-   :end-line: -2
-
-I've adopted the *scikit-* naming convention for this project in hopes of
-contributing it to the collection of
-`SciKit libraries <http://scikits.appspot.com>`_ in the near future.
-
-
 .. toctree::
    :maxdepth: 2
 
    getting_started.rst
-   examples.rst
 
 .. toctree::
    :maxdepth: 2

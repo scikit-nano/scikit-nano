@@ -1,6 +1,12 @@
-========================
-nanogen package tutorial
-========================
+=============================================
+Generating nanostructures (`sknano.nanogen`)
+=============================================
+
+.. sectionauthor:: Andrew Merrill <androomerrill@gmail.com>
+
+.. currentmodule:: sknano.nanogen
+
+.. _nanogen-intro:
 
 This tutorial describes the modules available in the
 :py:mod:`sknano.nanogen` sub-package.
