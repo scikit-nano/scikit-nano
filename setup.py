@@ -149,8 +149,11 @@ def setup_package():
             ['README', 'README.rst', '*.gif', '*.html', '*.ui']},
         zip_safe=False,
         install_requires=['numpy>=1.8', 'scipy>=0.13',
-                          'pkshared>=0.1.7', 'pksci>=0.1.4'],
+                          'pkshared>=0.1.8', 'pksci>=0.1.5'],
         entry_points={
+            'sphinx_themes': [
+                'path = sknano:get_path',
+            ],
             'console_scripts': [
                 'nanogen = sknano.scripts.nanogen:main',
             ]
