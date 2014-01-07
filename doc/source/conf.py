@@ -158,9 +158,9 @@ show_authors = False
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 
-themedir = '_theme'
+#themedir = '_theme'
 html_theme = 'sknano'
-html_theme_path = [themedir]
+#html_theme_path = [themedir]
 
 html_theme_options = {
     "edit_link": False,
