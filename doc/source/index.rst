@@ -5,6 +5,14 @@ scikit-nano documentation
 :Release: |release|
 :Date: |today|
 
+.. include:: ../../README.rst
+   :start-line: 4
+   :end-line: -2
+
+I've adopted the *scikit-* naming convention for this project in hopes of
+contributing it to the collection of
+`SciKit libraries <http://scikits.appspot.com>`_ in the near future.
+
 
 .. toctree::
    :maxdepth: 2
@@ -20,7 +28,9 @@ scikit-nano documentation
 .. toctree::
    :maxdepth: 1
 
+   contribute.rst
    release.rst
+   credits.rst
 
 Reference
 =========
@@ -37,6 +47,7 @@ Reference
 
 pykit projects
 ------------------------------
+    * `pykit-sci docs`_
     * `pykit-shared docs`_
 
 
@@ -44,4 +55,5 @@ pykit projects
 * :ref:`modindex`
 * :ref:`search`
 
+.. _pykit-sci docs: http://projects.geekspin.net/pksci/doc
 .. _pykit-shared docs: http://projects.geekspin.net/pkshared/doc

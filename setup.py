@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """scikit-nano: python toolkit for generating nano-structures.
 
-A python toolkit for nano-science. Currently, its primary use is for
-generating nano-structure data for the following nano-materials:
+*scikit-nano* is a python toolkit for nano-science.
+Currently, its primary use is for generating nano-structure data for the
+following nano-materials:
 
     * Graphene, both single layer graphene and N-layer graphene.
     * Single-walled nanotubes (SWNTs), both single SWNTs and SWNT bundles.
@@ -12,6 +13,9 @@ It supports saving structure data in the following formats:
 
     * `xyz`
     * LAMMPS `data`
+
+For documentation, visit:
+`scikit-nano documentation <http://projects.geekspin.net/sknano/doc>`_
 
 """
 
