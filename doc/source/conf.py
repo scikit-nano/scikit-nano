@@ -337,9 +337,7 @@ intersphinx_mapping = {
     'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
     'matplotlib': ('http://matplotlib.org', None),
     'pkshared': ('http://projects.geekspin.net/pykit-shared/doc', None),
-    'pykit-shared': ('http://projects.geekspin.net/pykit-shared/doc', None),
     'pksci': ('http://projects.geekspin.net/pykit-sci/doc', None),
-    'pykit-sci': ('http://projects.geekspin.net/pykit-sci/doc', None),
 }
 
 # -----------------------------------------------------------------------------
