@@ -5,6 +5,10 @@ scikit-nano documentation
 :Release: |release|
 :Date: |today|
 
+.. include:: ../../README.rst
+   :start-line: 4
+   :end-line: 6
+
 .. toctree::
    :maxdepth: 2
 
