@@ -31,7 +31,6 @@ needs_sphinx = '1.1'
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../sphinxext'))
 sys.path.insert(0, os.path.abspath('../sphinxext/numpydoc'))
-#sys.path.insert(0, os.path.abspath('../../sknano/tools/mpltools'))
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
@@ -168,7 +167,7 @@ html_theme_options = {
     "sknano_logo": False,
     "rootlinks":
     [("http://github.com/androomerrill/scikit-nano", "scikit-nano"),
-     ("http://projects.geekspin.net/sknano/doc", "Docs")]}
+     ("http://projects.geekspin.net/scikit-nano/doc", "Docs")]}
 html_logo = '_static/Nanotube_Logo_200x200.png'
 html_sidebars = {'index': 'indexsidebar.html'}
 
@@ -296,7 +295,7 @@ latex_use_modindex = False
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'sknano', u'scikit-nano Documentation',
+    ('index', 'scikit-nano', u'scikit-nano Documentation',
      [u'Andrew Merrill'], 1)
 ]
 
@@ -337,8 +336,10 @@ intersphinx_mapping = {
     'numpy': ('http://docs.scipy.org/doc/numpy', None),
     'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
     'matplotlib': ('http://matplotlib.org', None),
-    'pkshared': ('http://projects.geekspin.net/pkshared/doc', None),
-    'pksci': ('http://projects.geekspin.net/pksci/doc', None),
+    'pkshared': ('http://projects.geekspin.net/pykit-shared/doc', None),
+    'pykit-shared': ('http://projects.geekspin.net/pykit-shared/doc', None),
+    'pksci': ('http://projects.geekspin.net/pykit-sci/doc', None),
+    'pykit-sci': ('http://projects.geekspin.net/pykit-sci/doc', None),
 }
 
 # -----------------------------------------------------------------------------

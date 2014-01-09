@@ -15,5 +15,5 @@ It supports saving structure data in the following formats:
     * `xyz`
     * LAMMPS `data`
 
-For documentation, visit: 
-`scikit-nano documentation <http://projects.geekspin.net/sknano/doc>`_
+For documentation, visit:
+`scikit-nano documentation <http://projects.geekspin.net/scikit-nano/doc>`_

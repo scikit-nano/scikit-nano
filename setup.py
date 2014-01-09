@@ -15,17 +15,19 @@ It supports saving structure data in the following formats:
     * LAMMPS `data`
 
 For documentation, visit:
-`scikit-nano documentation <http://projects.geekspin.net/sknano/doc>`_
+`scikit-nano documentation <http://projects.geekspin.net/scikit-nano/doc>`_
 
 """
 
 DOCLINES = __doc__.split("\n")
 
-from setuptools import setup, find_packages
 import os
 import sys
 import subprocess
 
+from setuptools import find_packages
+
+from numpy.distutils.core import setup
 
 if sys.version_info[:2] < (2, 7):
     raise RuntimeError("Python version 2.7 required.")
@@ -48,7 +50,7 @@ Topic :: Scientific/Engineering
 MAJOR = 0
 MINOR = 2
 MICRO = 11
-ISRELEASED = False
+ISRELEASED = True
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 
@@ -125,6 +127,23 @@ if not release:
         a.close()
 
 
+def configuration(parent_package='', top_path=None):
+    if os.path.exists('MANIFEST'):
+        os.remove('MANIFEST')
+
+    from numpy.distutils.misc_util import Configuration
+    config = Configuration(None, parent_package, top_path)
+
+    config.set_options(ignore_setup_xxx_py=True,
+                       assume_default_configuration=True,
+                       delegate_options_to_subpackages=True,
+                       quiet=True)
+
+    config.add_subpackage('sknano')
+
+    return config
+
+
 def setup_package():
 
     # Rewrite the version file everytime
@@ -133,27 +152,25 @@ def setup_package():
     FULLVERSION, GIT_REVISION = get_version_info()
 
     setup_options = dict(
-        name='sknano',
+        name='scikit-nano',
         version=FULLVERSION,
         author='Andrew Merrill',
         author_email='androomerrill@gmail.com',
         description=DOCLINES[0],
         long_description="\n".join(DOCLINES[2:]),
-        url='https://github.com/androomerrill/scikit-nano',
+        url='http://github.com/androomerrill/scikit-nano',
         license='BSD 2-Clause',
         classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
-        platforms=["Windows", "Linux", "OS-X", "Unix"],
+        platforms=["Linux", "OS-X", "Unix", "Windows"],
         test_suite='nose.collector',
-        packages=find_packages(exclude=['doc', 'ez_setup',
-                                        'examples', 'tests']),
-        #package_data={'sknano': []},
-        #package_dir = {'': 'sknano'},
+        configuration=configuration,
+        packages=find_packages(exclude=['doc']),
         include_package_data=True,
         exclude_package_data={'':
             ['README', 'README.rst', '*.gif', '*.html', '*.ui']},
         zip_safe=False,
         install_requires=['numpy>=1.8', 'scipy>=0.13',
-                          'pkshared>=0.1.8', 'pksci>=0.1.5'],
+                          'pykit-shared>=0.1.9', 'pykit-sci>=0.1.6'],
         entry_points={
             'sphinx_themes': [
                 'path = sknano:get_path',
