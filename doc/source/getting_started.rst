@@ -26,20 +26,24 @@ Required Dependencies
 ---------------------
 
 * `Python 2.7+ <http://python.org/download/>`_
-* VMD (for visualizing structure data)
-* Tachyon (for rendering high quality images)
+
+Optional Dependencies
+---------------------
+
+* `VMD <http://www.ks.uiuc.edu/Research/vmd/>`_ (for visualizing structure data)
+* `Tachyon Ray Tracer <http://jedi.ks.uiuc.edu/~johns/raytracer/>`_ (for rendering high quality images)
 
 Installing scikit-nano
 ----------------------
 
 You can install the latest stable release from the
-`Python Package Index <http://pypi.python.org/pypi/sknano>`_
+`Python Package Index <http://pypi.python.org/pypi/scikit-nano>`_
 using :command:`pip`::
 
-    > pip install sknano
+    > pip install scikit-nano
 
 Alternatively you can download a source code tarball from
-http://pypi.python.org/pypi/sknano or clone the source code
+http://pypi.python.org/pypi/scikit-nano or clone the source code
 from the `github repository <http://github.com/androomerrill/scikit-nano>`_
 using :command:`git`::
 
@@ -53,7 +57,7 @@ These commands will probabily fail if you don't have *admin privileges*.
 In that case, try installing to the user base directory.
 Using :command:`pip`::
 
-    > pip install --user sknano
+    > pip install --user scikit-nano
 
 Or from source::
 
