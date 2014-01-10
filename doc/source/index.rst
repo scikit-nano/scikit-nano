@@ -7,7 +7,7 @@ scikit-nano documentation
 
 .. include:: ../../README.rst
    :start-line: 4
-   :end-line: 6
+   :end-line: 5
 
 .. toctree::
    :maxdepth: 2
