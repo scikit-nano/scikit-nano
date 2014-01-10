@@ -26,6 +26,17 @@ scikit-nano documentation
    release.rst
    credits.rst
 
+Package Source
+--------------
+* `Python Package Index <https://pypi.python.org/pypi/scikit-nano>`_
+* `github repo <https://github.com/androomerrill/scikit-nano>`_
+
+pykit project docs
+------------------
+* `pykit-sci docs`_
+* `pykit-shared docs`_
+
+=========
 Reference
 =========
 
@@ -36,11 +47,6 @@ Reference
    nanogen.rst
    scripts.rst
    structure_io.rst
-
-pykit projects
----------------
-    * `pykit-sci docs`_
-    * `pykit-shared docs`_
 
 
 * :ref:`genindex`
