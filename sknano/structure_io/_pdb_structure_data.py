@@ -13,7 +13,7 @@ __docformat__ = 'restructuredtext'
 
 from pkshared.tools.fiofuncs import get_fpath
 
-from ..chemistry import Atom
+#from ..chemistry import Atom
 from ._structure_data import StructureReader, StructureReaderError, \
     StructureWriter
 
@@ -48,8 +48,8 @@ class PDBWriter(StructureWriter):
         Parameters
         ----------
         fname : str
-        atoms : Atoms
-            :py:class:`~pksci.chemistry.Atoms` instance.
+        atoms : :py:class:`Atoms`
+            :py:class:`Atoms` instance.
         comment_line : str, optional
 
         """

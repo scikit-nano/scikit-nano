@@ -43,7 +43,7 @@ class StructureData(object):
 
     @property
     def atoms(self):
-        """:py:class:`~pksci.chemistry.Atoms` instance."""
+        """:py:class:`Atoms` instance."""
         return self._atoms
 
     @property

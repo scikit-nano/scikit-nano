@@ -250,7 +250,7 @@ class DATAWriter(StructureWriter):
         ----------
         fname : str
         atoms : `Atoms`
-            An :py:class:`~pksci.chemistry.Atoms` instance.
+            An :py:class:`Atoms` instance.
         boxbounds : dict, optional
             If ``None``, determined automatically from atom coordinates.
         comment_line : str, optional

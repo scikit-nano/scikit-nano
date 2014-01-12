@@ -64,7 +64,7 @@ class XYZWriter(StructureWriter):
         ----------
         fname : str
         atoms : `Atoms`
-            An :py:class:`~pksci.chemistry.Atoms` instance.
+            An :py:class:`Atoms` instance.
         comment_line : str, optional
             A string written to the first line of ``xyz`` file. If ``None``,
             then it is set to the full path of the output ``xyz`` file.

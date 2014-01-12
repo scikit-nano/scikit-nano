@@ -165,7 +165,7 @@ class XYZ2DATAConverter(StructureConverter):
 
         Parameters
         ----------
-        atom : :py:class:`~pksci.chemistry.Atom` instance.
+        atom : `Atom`
 
         """
         self._new_atoms.append(atom)
@@ -177,7 +177,7 @@ class XYZ2DATAConverter(StructureConverter):
 
         Parameters
         ----------
-        atom : :py:class:`~pksci.chemistry.Atom` instance.
+        atom : `Atom`
 
         """
         self._new_atomtypes.append(atom)
