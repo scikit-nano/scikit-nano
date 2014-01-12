@@ -26,6 +26,8 @@ Required Dependencies
 ---------------------
 
 * `Python 2.7+ <http://python.org/download/>`_
+* `numpy 1.8+ <http://sourceforge.net/projects/numpy/files/>`_
+* `pint 0.4+ <https://pypi.python.org/pypi/Pint/>`_
 
 Optional Dependencies
 ---------------------
