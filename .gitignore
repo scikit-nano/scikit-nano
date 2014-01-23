@@ -11,6 +11,7 @@
 
 # Python files #
 ################
+.ipynb_checkpoints
 .ropeproject
 # setup.py working directory
 build
