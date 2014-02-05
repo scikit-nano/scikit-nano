@@ -195,11 +195,9 @@ class Nanotube(object):
     θᴄ: 0.00°
 
     """
-    def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
-                 element1='C', element2='C',
-                 bond=CCbond, tube_length=None,
-                 Lx=None, Ly=None, Lz=None, fix_Lz=False,
-                 verbose=False):
+    def __init__(self, n=int, m=int, nx=1, ny=1, nz=1, element1='C',
+                 element2='C', bond=CCbond, tube_length=None, Lx=None, Ly=None,
+                 Lz=None, fix_Lz=False, verbose=False):
 
         if tube_length is not None and Lz is None:
             Lz = tube_length
@@ -294,12 +292,14 @@ class Nanotube(object):
 
         if Lz is not None:
             self._Lz = Qty(float(Lz), 'nanometers')
-            self._T = self.compute_T(n=self._n, m=self._m, bond=self._bond,
+            self._T = self.compute_T(n=self._n,
+                                     m=self._m,
+                                     bond=self._bond,
                                      magnitude=False)
             if self._assume_integer_unit_cells:
                 self._nz = \
-                    int(np.ceil(self._Lz.to('angstroms').magnitude /
-                                self._T.magnitude))
+                    int(np.ceil(self._Lz.to('angstroms').magnitude
+                                / self._T.magnitude))
             else:
                 self._nz = \
                     self._Lz.to('angstroms').magnitude / self._T.magnitude
@@ -1787,17 +1787,14 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
     """
 
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
-                 element1='C', element2='C', bond=CCbond,
-                 vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
-                 Lx=None, Ly=None, Lz=None, fix_Lz=False,
-                 autogen=True, verbose=False):
+                 element1='C', element2='C', bond=CCbond, vdw_spacing=3.4,
+                 bundle_packing=None, bundle_geometry=None, Lx=None, Ly=None,
+                 Lz=None, fix_Lz=False, autogen=True, verbose=False):
 
         super(NanotubeBundleGenerator, self).__init__(
-            n=n, m=m, nx=nx, ny=ny, nz=nz,
-            element1=element1, element2=element2,
-            Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz,
-            bond=bond, autogen=False,
-            verbose=verbose)
+            n=n, m=m, nx=nx, ny=ny, nz=nz, element1=element1,
+            element2=element2, Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz, bond=bond,
+            autogen=False, verbose=verbose)
 
         self.compute_bundle_params()
 
@@ -2021,19 +2018,16 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
 
     """
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
-                 element1='C', element2='C', bond=CCbond,
-                 vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
-                 Lx=None, Ly=None, Lz=None, fix_Lz=False,
-                 max_shells=None, min_shell_diameter=0.0,
-                 shell_spacing=3.4, inner_shell_Ch_type=None,
-                 autogen=True, verbose=False):
+                 element1='C', element2='C', bond=CCbond, vdw_spacing=3.4,
+                 bundle_packing=None, bundle_geometry=None, Lx=None, Ly=None,
+                 Lz=None, fix_Lz=False, max_shells=None,
+                 min_shell_diameter=0.0, shell_spacing=3.4,
+                 inner_shell_Ch_type=None, autogen=True, verbose=False):
 
         super(MWNTGenerator, self).__init__(
-            n=n, m=m, nx=nx, ny=ny, nz=nz,
-            element1=element1, element2=element2,
-            Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz,
-            bond=bond, autogen=False,
-            verbose=verbose)
+            n=n, m=m, nx=nx, ny=ny, nz=nz, element1=element1,
+            element2=element2, Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz, bond=bond,
+            autogen=False, verbose=verbose)
 
         self._Lzmin = np.inf
 
