@@ -15,7 +15,18 @@ import numpy as np
 
 from ._luts import chiral_type_name_mappings as Ch_types
 
-__all__ = ['cmp_Ch', 'generate_Ch_list', 'get_Ch_indices', 'get_Ch_type']
+__all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'filter_key_type_mappings',
+           'generate_Ch_list', 'get_Ch_indices', 'get_Ch_type']
+
+
+filter_key_type_mappings = {}
+filter_key_type_mappings['Ch_type'] = str
+for k in ('even', 'odd'):
+    filter_key_type_mappings[k + '_only'] = bool
+
+for k in ('min_index', 'max_index', 'min_n', 'max_n', 'min_m', 'max_m',
+          'n', 'm'):
+    filter_key_type_mappings[k] = int
 
 
 def cmp_Ch(Ch1, Ch2):
@@ -65,7 +76,69 @@ def cmp_Ch(Ch1, Ch2):
                 return 0
 
 
-def filter_Ch_type(
+def filter_Ch(Ch, even_only=False, odd_only=False, Ch_type=None,
+              min_index=None, max_index=None, min_n=None, max_n=None,
+              min_m=None, max_m=None, **kwargs):
+
+    if isinstance(Ch, tuple):
+        this_Ch_type = get_Ch_type(Ch)
+        n, m = Ch
+    else:
+        n, m = get_Ch_indices(Ch)
+        this_Ch_type = get_Ch_type(Ch)
+
+    if even_only:
+        if n % 2 == 0 and m % 2 == 0:
+            return True
+        else:
+            return False
+
+    elif odd_only:
+        if this_Ch_type != 'ZZ':
+            if n % 2 != 0 and m % 2 != 0:
+                return True
+            else:
+                return False
+        else:
+            if max(n, m) % 2 != 0:
+                return True
+            else:
+                return False
+
+    elif Ch_type is not None:
+        if Ch_type in Ch_types:
+            Ch_type = Ch_types[Ch_type]
+
+        if this_Ch_type == Ch_type:
+            return True
+        else:
+            return False
+
+    elif min_index is not None and isinstance(min_index, int):
+        if this_Ch_type != 'ZZ':
+            if n >= min_index and m >= min_index:
+                return True
+            else:
+                return False
+        else:
+            if max(n, m) >= min_index:
+                return True
+            else:
+                return False
+
+    elif max_index is not None and isinstance(max_index, int):
+        if n <= max_index and m <= max_index:
+            return True
+        else:
+            return False
+
+    else:
+        return True
+
+
+def filter_Ch_list(Ch_list, **kwargs):
+    return [Ch for Ch in Ch_list if filter_Ch(Ch, **kwargs)]
+
 
 def get_Ch_indices(Ch):
     """Return the chiral indicies `n` and `m`.
