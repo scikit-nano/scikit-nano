@@ -10,7 +10,6 @@ Graphene structure tools (:mod:`sknano.nanogen._graphene_generator`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext'
 
-from math import ceil, sqrt
 import itertools
 import sys
 
@@ -212,18 +211,18 @@ class GrapheneGenerator(object):
         if self.edge in ('AC', 'armchair'):
             # Set up the unit cell with the armchair edge aligned
             # along the `y`-axis.
-            self.lx = sqrt(3) * self.bond
+            self.lx = np.sqrt(3) * self.bond
             self.ly = 3 * self.bond
 
             # Set up 4 atom basis
             # Leave atom 1 at the origin
 
             # Move atom 2 to 2nd basis position
-            self.atom2.x = -sqrt(3) / 2 * self.bond
+            self.atom2.x = -np.sqrt(3) / 2 * self.bond
             self.atom2.y = self.bond / 2
 
             # Move atom 3 along a1 primitive vector
-            self.atom3.x = -sqrt(3) / 2 * self.bond
+            self.atom3.x = -np.sqrt(3) / 2 * self.bond
             self.atom3.y = 3 / 2 * self.bond
 
             # Move atom 4 from atom 2 along a2 primitive vector
@@ -233,7 +232,7 @@ class GrapheneGenerator(object):
             # Set up the unit cell with the zigzag edge aligned
             # along the `y`-axis.
             self.lx = 3 * self.bond
-            self.ly = sqrt(3) * self.bond
+            self.ly = np.sqrt(3) * self.bond
 
             # Set up 4 atom basis
             # Leave atom 1 at the origin
@@ -243,18 +242,18 @@ class GrapheneGenerator(object):
 
             # Move atom 3 to the left and up
             self.atom3.x = 3 / 2 * self.bond
-            self.atom3.y = sqrt(3) / 2 * self.bond
+            self.atom3.y = np.sqrt(3) / 2 * self.bond
 
             # Move atom 4 to the right and up
             self.atom4.x = -self.bond / 2
-            self.atom4.y = sqrt(3) / 2 * self.bond
+            self.atom4.y = np.sqrt(3) / 2 * self.bond
 
         else:
             print('unrecognized edge parameter: {}'.format(self.edge))
             sys.exit(1)
 
-        self.Nx = int(ceil(10 * self.Lx / self.lx))
-        self.Ny = int(ceil(10 * self.Ly / self.ly))
+        self.Nx = int(np.ceil(10 * self.Lx / self.lx))
+        self.Ny = int(np.ceil(10 * self.Ly / self.ly))
 
     def generate_structure(self):
         """Generate the full structure coordinates."""
