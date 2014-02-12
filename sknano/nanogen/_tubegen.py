@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =========================================================
-TubeGen wrapper class (:mod:`sknano.nanogen.tubegen`)
+TubeGen wrapper class (:mod:`sknano.nanogen._tubegen`)
 =========================================================
+
+.. currentmodule:: sknano.nanogen._tubegen
 
 """
 from __future__ import division, print_function, absolute_import
@@ -19,7 +21,7 @@ from math import ceil
 
 from pkshared.tools.strfuncs import plural_word_check
 from pkshared.tools.refdata import CCbond
-from .nanotube import Nanotube
+from ._nanotube import Nanotube
 from ..structure_io import XYZReader, XYZWriter
 
 format_ext = {'gaussian': '.com',

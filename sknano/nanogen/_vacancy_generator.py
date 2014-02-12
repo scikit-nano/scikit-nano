@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Generate vacancies in nano-structures (:mod:`sknano.nanogen.vacancygenerator`)
+Generate vacancies in structure data (:mod:`sknano.nanogen._vacancy_generator`)
 ===============================================================================
 
 Module for generating vacancies in nano-structures.
 
-.. currentmodule:: sknano.nanogen.vacancygenerator
+.. currentmodule:: sknano.nanogen._vacancy_generator
 
 """
 from __future__ import division, print_function, absolute_import
@@ -19,8 +19,9 @@ import numpy as np
 
 from pkshared.tools.refdata import CCbond
 
-from .graphene import GrapheneGenerator, GrapheneGeneratorError
-from .nanotube import NanotubeBundleGenerator, NanotubeGeneratorError
+from ._graphene_generator import GrapheneGenerator, GrapheneGeneratorError
+from ._nanotube_generator import NanotubeBundleGenerator, \
+    NanotubeGeneratorError
 from ..structure_io import DATAReader, DATAWriter, XYZWriter, \
     XYZ2DATAConverter, StructureFormatError, supported_structure_formats
 

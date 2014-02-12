@@ -14,7 +14,7 @@ and bundles of :abbr:`SWNTs` and :abbr:`MWNTs`.
 
 .. note::
    The default basis atoms are both carbon and therefore the default
-   nano-structures are carbon nano-structures. However, 
+   nano-structures are carbon nano-structures. However,
    you can use any atom in the periodic table of elements as a basis atom.
 
 .. versionadded:: 0.2.8
@@ -81,9 +81,11 @@ from __future__ import division, print_function, absolute_import
 
 __docformat__ = 'restructuredtext'
 
-from .graphene import *
-from .nanotube import *
-from .tubegen import *
-from .vacancygenerator import *
+from ._graphene import *
+from ._graphene_generator import *
+from ._nanotube import *
+from ._nanotube_generator import *
+from ._tubegen import *
+from ._vacancy_generator import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
