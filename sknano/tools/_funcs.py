@@ -9,6 +9,7 @@ Helper functions (:mod:`sknano.tools._funcs`)
 """
 from __future__ import division, print_function, absolute_import
 
+from fractions import gcd
 import re
 
 import numpy as np
@@ -16,7 +17,7 @@ import numpy as np
 from ._luts import chiral_type_name_mappings as Ch_types
 
 __all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'filter_key_type_mappings',
-           'generate_Ch_list', 'get_Ch_indices', 'get_Ch_type']
+           'generate_Ch_list', 'get_Ch_indices', 'get_Ch_type', 'totient_func']
 
 
 filter_key_type_mappings = {}
@@ -386,3 +387,27 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
         if echo_zsh_str and Ch_list is not None:
             print(' '.join([repr(str(Ch)) for Ch in Ch_list]))
         return Ch_list
+
+
+def totient_func(n=int):
+    """Compute the totatives of :math:`n`.
+
+    Parameters
+    ----------
+    n : int
+
+    Returns
+    -------
+    int : the number of totatives of :math:`n`
+
+    """
+    if not isinstance(n, int) and int(n) != n:
+        raise ValueError('n must be an integer')
+    n = int(n)
+
+    tots = 0
+    for k in xrange(1, n + 1):
+        if gcd(n, k) == 1:
+            tots += 1
+
+    return tots
