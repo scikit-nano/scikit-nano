@@ -347,7 +347,10 @@ class Nanotube(object):
         if self._verbose:
             for p, pdict in self._params.iteritems():
                 pvar = pdict['var']
-                pval = pdict['val']
+                try:
+                    pval = pdict['val'].magnitude
+                except AttributeError:
+                    pval = pdict['val']
                 punits = pdict['units']
                 pstrfmt = pdict['strfmt']
                 if punits is not None:
@@ -599,16 +602,16 @@ class Nanotube(object):
             :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
             = (n, m)`.
         length : bool, optional
-            if ``True``, return the length of R
+            if `True`, return the length of R
         magnitude : bool, optional
-            if ``True``, return the length of R without units
+            if `True`, return the length of R without units
 
         Returns
         -------
         (p, q) : tuple
             2-tuple of ints which are the components of R vector
         float
-            length of R if ``length`` is ``True``
+            length of R if `length` is `True`
 
         """
         t1 = Nanotube.compute_t1(n=n, m=m)
