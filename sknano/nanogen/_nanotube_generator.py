@@ -6,6 +6,24 @@ Nanotube structure tools (:mod:`sknano.nanogen._nanotube_generator`)
 
 .. currentmodule:: sknano.nanogen._nanotube_generator
 
+.. todo::
+
+   Add methods to perform fractional translation and cartesian translation
+   before structure generation.
+
+.. todo::
+
+   Handle different units and perform unit conversions for output coordinates.
+
+.. todo::
+
+   Provide options for setting gutter (van der Waals separation) value
+
+.. todo::
+
+   Consider replacing coordinate arrays with class attributes to make
+   code and math operations more readable
+
 """
 from __future__ import division, print_function, absolute_import
 __docformat__ = 'restructuredtext'
@@ -136,7 +154,7 @@ class NanotubeGenerator(Nanotube):
         return self._fname
 
     def generate_unit_cell(self):
-        """Generate the unit cell."""
+        """Generate the nanotube unit cell."""
         n = self._n
         m = self._m
         t1 = self._t1
@@ -151,8 +169,19 @@ class NanotubeGenerator(Nanotube):
 
         self.unit_cell = Atoms()
 
-        for q in xrange(t2, m + 1):
-            for p in xrange(0, t1 + n + 1):
+        p_min = t1 if t1 < 0 else 0
+        p_min = p_min if p_min < n else n
+        p_max = n + t1 if n + t1 > n else n
+        p_max = p_max if p_max > t1 else t1
+
+        q_min = t2 if t2 < 0 else 0
+        q_min = q_min if q_min < m else m
+        q_max = m + t2 if m + t2 > m else m
+        q_max = q_max if q_max > t2 else t2
+
+        for q in xrange(q_min, q_max + 1):
+            for p in xrange(p_min, p_max + 1):
+
                 M = m * p - n * q
 
                 g_atom1 = Atom(e1)
