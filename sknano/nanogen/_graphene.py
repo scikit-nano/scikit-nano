@@ -30,6 +30,9 @@ class Graphene(object):
                  layer_spacing=3.35, stacking_order='AB',
                  autogen=True, verbose=False):
 
+        self._n = n
+        self._m = m
+
         self.element1 = element1
         self.element2 = element2
 
@@ -74,8 +77,9 @@ class Graphene(object):
                                   self.atom4])
         self.structure_atoms = None
 
-        self._n = n
-        self._m = m
+        self._a1 = np.zeros(2, dtype=float)
+        self._a2 = np.zeros(2, dtype=float)
 
-        self._a1 = 1.5 * CCbond
-        self._a2 = np.sqrt(3) / 2 * CCbond
+        self._a1[0] = self._a2[0] = 1.5 * CCbond
+        self._a1[1] = np.sqrt(3) / 2 * CCbond
+        self._a2[1] = -self._a1[1]
