@@ -157,60 +157,73 @@ class NanotubeGenerator(Nanotube):
         """Generate the nanotube unit cell."""
         n = self._n
         m = self._m
-        t1 = self._t1
-        t2 = self._t2
         Ch = self._Ch
+        T = self._T
         rt = self._rt
         N = self._N
-        dR = self._dR
+        bond = self._bond.magnitude
+        p, q = self._R
+
+        lenR = Nanotube.compute_R(n, m, length=True, magnitude=True)
 
         e1 = self._element1
         e2 = self._element2
 
+        q1 = np.arctan((np.sqrt(3) * m) / (2 * n + m))
+        q2 = np.arctan((np.sqrt(3) * q) / (2 * p + q))
+        q3 = q1 - q2
+        q4 = 2 * np.pi / N
+        q5 = 2 * np.pi * bond * np.cos((np.pi / 6) - q1) / Ch
+
+        h1 = T / abs(np.sin(q3))
+        h2 = bond * np.sin((np.pi / 6) - q1)
+
+        if self._verbose:
+            print('q1: {}'.format(q1))
+            print('q2: {}'.format(q2))
+            print('q3: {}'.format(q3))
+            print('q4: {}'.format(q4))
+            print('q5: {}'.format(q5))
+
+            print('h1: {}'.format(h1))
+            print('h2: {}'.format(h2))
+
         self.unit_cell = Atoms()
 
-        p_min = t1 if t1 < 0 else 0
-        p_min = p_min if p_min < n else n
-        p_max = n + t1 if n + t1 > n else n
-        p_max = p_max if p_max > t1 else t1
+        for i in xrange(N):
+            k = np.floor(i * lenR / h1)
+            x1 = rt * np.cos(i * q4)
+            y1 = rt * np.sin(i * q4)
+            z1 = (i * lenR - k * h1) * np.sin(q3)
+            kk2 = abs(np.floor((z1 + 0.0001) / T))
 
-        q_min = t2 if t2 < 0 else 0
-        q_min = q_min if q_min < m else m
-        q_max = m + t2 if m + t2 > m else m
-        q_max = q_max if q_max > t2 else t2
+            if z1 >= T - 0.0001:
+                z1 -= T * kk2
+            elif z1 < 0:
+                z1 += T * kk2
 
-        for q in xrange(q_min, q_max + 1):
-            for p in xrange(p_min, p_max + 1):
+            if self._verbose:
+                print('x1, y1, z1 = {}, {}, {}'.format(x1, y1, z1))
+            self.unit_cell.append(Atom(e1, x=x1, y=y1, z=z1))
 
-                M = m * p - n * q
+            z3 = (i * lenR - k * h1) * np.sin(q3) - h2
 
-                g_atom1 = Atom(e1)
-                g_atom1.x = Ch * (q * t1 - p * t2) / N
-                g_atom1.y = np.sqrt(3) * Ch * M / (N * dR)
+            x2 = rt * np.cos(i * q4 + q5)
+            y2 = rt * np.sin(i * q4 + q5)
+            if z3 >= 0 and z3 < T:
+                z2 = (i * lenR - k * h1) * np.sin(q3) - h2
+            else:
+                z2 = (i * lenR - (k + 1) * h1) * np.sin(q3) - h2
+                kk = abs(np.floor(z2 / T))
 
-                g_atom2 = Atom(e2)
-                g_atom2.x = g_atom1.x + Ch * (n + m) / (N * dR)
-                g_atom2.y = \
-                    g_atom1.y - np.sqrt(3) * Ch * (n - m) / (3 * N * dR)
+                if z2 >= T - 0.0001:
+                    z2 -= T * kk
+                elif z2 < 0:
+                    z2 += T * kk
 
-                phi1 = g_atom1.x / rt
-                phi2 = g_atom2.x / rt
-
-                if (g_atom1.x >= 0 and (q * t1 - p * t2) < N
-                        and g_atom1.y >= 0 and (M < N)):
-
-                    nt_atom1 = Atom(e1)
-
-                    nt_atom1.x = rt * np.cos(phi1)
-                    nt_atom1.y = rt * np.sin(phi1)
-                    nt_atom1.z = g_atom1.y
-                    self.unit_cell.append(nt_atom1)
-
-                    nt_atom2 = Atom(e2)
-                    nt_atom2.x = rt * np.cos(phi2)
-                    nt_atom2.y = rt * np.sin(phi2)
-                    nt_atom2.z = g_atom2.y
-                    self.unit_cell.append(nt_atom2)
+            if self._verbose:
+                print('x2, y2, z2 = {}, {}, {}'.format(x2, y2, z2))
+            self.unit_cell.append(Atom(e2, x=x2, y=y2, z=z2))
 
     def generate_structure_data(self):
         """Generate structure data."""
