@@ -94,7 +94,8 @@ class VacancyGenerator(object):
         self.vac_ids = \
             np.random.choice(self.atom_ids, size=self.Nvac, replace=False)
 
-    def generate_vacancy_structure(self, show_vmd_selection_cmd=True):
+    def generate_vacancy_structure(self, show_vmd_selection_cmd=True,
+                                   cutoff_radius=np.sqrt(12)):
         """Generate vacancy structure.
 
         Parameters
@@ -102,6 +103,8 @@ class VacancyGenerator(object):
         show_vmd_selection_cmd : bool, optional
             Generate a VMD selection string that can be used to
             select the atoms surrounding the vacancies.
+        cutoff_radius : float, optional
+            Cutoff radius for VMD selection command
 
         """
         removed_atoms = self.atoms.filter_atoms(self.vac_ids, invert=False)
@@ -109,9 +112,11 @@ class VacancyGenerator(object):
         if show_vmd_selection_cmd:
             vmd_vac_selection_cmd = []
             for atom in removed_atoms:
-                selection_cmd = "(((x - {:.6f})^2 + ".format(atom.x) + \
-                                "(y - {:.6f})^2 + ".format(atom.y) + \
-                                "(z - {:.6f})^2) <= 9)".format(atom.z)
+                selection_cmd = \
+                    "(((x - {:.6f})^2 + ".format(atom.x) + \
+                    "(y - {:.6f})^2 + ".format(atom.y) + \
+                    "(z - {:.6f})^2) <= {:.2f})".format(atom.z,
+                                                        cutoff_radius**2)
                 vmd_vac_selection_cmd.append(selection_cmd)
 
             vmd_vac_selection_cmd = ' or '.join(vmd_vac_selection_cmd)
