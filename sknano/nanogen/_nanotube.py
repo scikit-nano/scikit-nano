@@ -219,7 +219,6 @@ class Nanotube(object):
         if bond is None:
             bond = CCbond
 
-        bond = np.float64(bond)
         if with_units and isinstance(bond, float):
             self._bond = Qty(bond, 'angstroms')
         else:
@@ -1318,7 +1317,7 @@ class NanotubeBundle(Nanotube):
             Lz = tube_length
 
         super(NanotubeBundle, self).__init__(
-            n=n, m=m, nx=ny, ny=ny, nz=nz,
+            n=n, m=m, nx=nx, ny=ny, nz=nz,
             element1=element1, element2=element2,
             bond=bond, Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz,
             with_units=with_units, verbose=verbose)
