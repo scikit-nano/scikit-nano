@@ -492,7 +492,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
                         self.structure_atoms.extend(swcnt.atoms)
                         self._Ntubes += 1
                 else:
-                    for nx in xrange(ntubes_per_row):
+                    for nx in xrange(1, ntubes_per_row + 1):
                         for ny in (-row, row):
                             swcnt = Atoms(atoms=swcnt0, deepcopy=True)
                             swcnt.center_CM()
@@ -725,50 +725,48 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
             self.generate_structure_data()
 
     def generate_unit_cell(self, n=int, m=int):
-        """Generate the unit cell."""
-        t1 = Nanotube.compute_t1(n=n, m=m)
-        t2 = Nanotube.compute_t2(n=n, m=m)
-        Ch = Nanotube.compute_Ch(n=n, m=m)
-        rt = Nanotube.compute_rt(n=n, m=m)
-        N = Nanotube.compute_N(n=n, m=m)
-        dR = Nanotube.compute_dR(n=n, m=m)
-
+        """Generate the unit cell of a MWNT shell"""
+        eps = 0.01
+        bond = self._bond
         e1 = self._element1
         e2 = self._element2
 
+        N = Nanotube.compute_N(n=n, m=m)
+        aCh = Nanotube.compute_chiral_angle(n=n, m=m, rad2deg=False)
+        rt = Nanotube.compute_rt(n=n, m=m, bond=bond, with_units=False)
+        T = Nanotube.compute_T(n=n, m=m, bond=bond, with_units=False)
+
+        tau = Nanotube.compute_tau(n=n, m=m, bond=bond, with_units=False)
+        dtau = bond * np.sin(np.pi / 6 - aCh)
+
+        psi = Nanotube.compute_psi(n=n, m=m)
+        dpsi = bond * np.cos(np.pi / 6 - aCh) / rt
+
         unit_cell = Atoms()
 
-        for q in xrange(t2, m + 1):
-            for p in xrange(0, t1 + n + 1):
-                M = m * p - n * q
+        for i in xrange(1, N + 1):
+            x1 = rt * np.cos(i * psi)
+            y1 = rt * np.sin(i * psi)
+            z1 = i * tau
 
-                g_atom1 = Atom(e1)
-                g_atom1.x = Ch * (q * t1 - p * t2) / N
-                g_atom1.y = np.sqrt(3) * Ch * M / (N * dR)
+            while z1 > T - eps:
+                z1 -= T
 
-                g_atom2 = Atom(e2)
-                g_atom2.x = g_atom1.x + Ch * (n + m) / (N * dR)
-                g_atom2.y = \
-                    g_atom1.y - np.sqrt(3) * Ch * (n - m) / (3 * N * dR)
+            atom1 = Atom(e1, x=x1, y=y1, z=z1)
+            atom1.rezero_coords()
 
-                phi1 = g_atom1.x / rt
-                phi2 = g_atom2.x / rt
+            unit_cell.append(atom1)
 
-                if (g_atom1.x >= 0 and (q * t1 - p * t2) < N
-                        and g_atom1.y >= 0 and (M < N)):
+            x2 = rt * np.cos(i * psi + dpsi)
+            y2 = rt * np.sin(i * psi + dpsi)
+            z2 = i * tau - dtau
+            while z2 > T - eps:
+                z2 -= T
 
-                    nt_atom1 = Atom(e1)
+            atom2 = Atom(e2, x=x2, y=y2, z=z2)
+            atom2.rezero_coords()
 
-                    nt_atom1.x = rt * np.cos(phi1)
-                    nt_atom1.y = rt * np.sin(phi1)
-                    nt_atom1.z = g_atom1.y
-                    unit_cell.append(nt_atom1)
-
-                    nt_atom2 = Atom(e2)
-                    nt_atom2.x = rt * np.cos(phi2)
-                    nt_atom2.y = rt * np.sin(phi2)
-                    nt_atom2.z = g_atom2.y
-                    unit_cell.append(nt_atom2)
+            unit_cell.append(atom2)
 
         return unit_cell
 
@@ -782,7 +780,7 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
         Ch = []
         for n in xrange(0, 201):
             for m in xrange(0, 201):
-                dt.append(Nanotube.compute_dt(n=n, m=m))
+                dt.append(Nanotube.compute_dt(n=n, m=m, bond=self.bond))
                 Ch.append((n, m))
         dt = np.asarray(dt)
         Ch = np.asarray(Ch)
@@ -845,8 +843,8 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
                 print('next_dt: {:.4f}'.format(next_dt))
                 print('n, m = {}, {}'.format(n, m))
                 print('unit_cell.Natoms: {}\n'.format(unit_cell.Natoms))
-            T = Nanotube.compute_T(n=n, m=m)
-            Lz = Nanotube.compute_Lz(n=n, m=m, nz=self._nz)
+            T = Nanotube.compute_T(n=n, m=m, bond=self.bond)
+            Lz = Nanotube.compute_Lz(n=n, m=m, bond=self.bond, nz=self.nz)
             self._Lzmin = min(self._Lzmin, Lz)
             shell_atoms = Atoms()
             for nz in xrange(int(np.ceil(self._nz))):
@@ -890,7 +888,7 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
                         self.structure_atoms.extend(mwnt.atoms)
                         self._Ntubes += 1
                 else:
-                    for nx in xrange(ntubes_per_row):
+                    for nx in xrange(1, ntubes_per_row + 1):
                         for ny in (-row, row):
                             mwnt = Atoms(atoms=mwnt0.atoms, deepcopy=True)
                             mwnt.center_CM()
