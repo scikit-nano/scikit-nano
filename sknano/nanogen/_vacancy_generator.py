@@ -287,29 +287,25 @@ class GrapheneVacancyGenerator(VacancyGenerator):
         super(GrapheneVacancyGenerator, self).__init__(
             fname=fname, structure_format=structure_format, verbose=verbose)
 
-    def generate_vacancy_structure(self, Nvac=int, random=False, uniform=False,
-                                   bin_axis=None,
+    def generate_vacancy_structure(self, Nvac=int, uniform=False,
+                                   bin_axis='z', distribute_evenly=False,
                                    show_vmd_selection_cmd=True):
         """Generate vacancy structure.
 
         Parameters
         ----------
         Nvac : int
-            total number of vacancies to "add" to structure data.
-        random : bool, optional
-            Generate random vacancies in structure data.
+            total number of vacancies to "add" to structure.
         uniform : bool, optional
-            Generate uniform vacancies in structure data.
-        bin_axis : {'x', 'y', 'z'}, optional
-            axis along which to generate uniform vacancies
+            Generate vacancies uniformly distributed along `bin_axis`.
         show_vmd_selection_cmd : bool, optional
+            print the VMD command needed to select the atoms surrounding
+            each vacancy position
 
         """
         self.Nvac = Nvac
 
-        if random:
-            super(GrapheneVacancyGenerator, self)._random_vacancy_generator()
-        else:
+        if uniform:
             self.vac_ids = np.empty(0, dtype=int)
 
             # find the coords of each layer
@@ -319,18 +315,19 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
             Nvac_per_layer = int(Nvac / Nlayers)
             extra = Nvac % Nlayers
-            nbins = Nlayers * Nvac_per_layer
+
+            nbins = Nvac_per_layer * Nlayers  # Nvac - extra * Nlayers
 
             bin_sets = []
             for n in xrange(Nlayers):
                 bin_sets.append(np.arange(n, nbins, Nlayers))
             bin_set_iter = itertools.cycle((bin_sets))
 
-            vac_bin_edges = np.linspace(self.atom_coords[bin_axis].min(),
-                                        self.atom_coords[bin_axis].max(),
-                                        num=nbins+1)
-            vac_coords_along_bin_axis = \
-                vac_bin_edges[:-1] + np.diff(vac_bin_edges) / 2
+            bin_edges = np.linspace(self.atom_coords[bin_axis].min(),
+                                    self.atom_coords[bin_axis].max(),
+                                    num=nbins+1)
+
+            bin_mid_pts = bin_edges[:-1] + np.diff(bin_edges) / 2
 
             if self.verbose:
                 print('Nvac: {}'.format(Nvac))
@@ -339,22 +336,25 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                 print('extra vacancies: {}'.format(extra))
                 print('nbins: {}'.format(nbins))
                 print('bin_sets:\n{}'.format(bin_sets))
-                print('vac_bin_edges:'
-                      '\n{}'.format(vac_bin_edges))
-                print('vac_coords_along_bin_axis:'
-                      '\n{}'.format(vac_coords_along_bin_axis))
+                print('bin_edges:\n{}'.format(bin_edges))
+                print('bin_mid_pts:\n{}'.format(bin_mid_pts))
 
-            for layer_pos in layer_coords:
+            ortho_axis = 'x' if bin_axis == 'z' else 'z'
+            ortho_mid_pt = self.atom_coords[ortho_axis].min() + \
+                (self.atom_coords[ortho_axis].max() -
+                 self.atom_coords[ortho_axis].min()) / 2
+            atoms_along_ortho_axis = {'+': [], '-': []}
+
+            for y in layer_coords:
                 bin_set = bin_set_iter.next()
-                for vac_pos in vac_coords_along_bin_axis[bin_set]:
+                for vac_pos in bin_mid_pts[bin_set]:
                     candidate_vac_atom_indices = \
                         np.where(
-                            (self.atom_coords['x'] >=
-                             (self.atom_coords['x'].min() + 2.5)) &
-                            (self.atom_coords['x'] <=
-                             (self.atom_coords['x'].max() - 2.5)) &
-                            (np.abs(self.atom_coords['y'] - layer_pos)
-                                <= 0.5) &
+                            (self.atom_coords[ortho_axis] >=
+                             (self.atom_coords[ortho_axis].min() + 2.5)) &
+                            (self.atom_coords[ortho_axis] <=
+                             (self.atom_coords[ortho_axis].max() - 2.5)) &
+                            (np.abs(self.atom_coords['y'] - y) <= 0.5) &
                             (np.abs(self.atom_coords[bin_axis] - vac_pos)
                                 <= 1))
                     candidate_vac_atom_ids = \
@@ -364,9 +364,35 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                         print('candidate_vac_atom_ids: '
                               '{}\n'.format(candidate_vac_atom_ids))
 
-                    self.vac_ids = \
-                        np.r_[self.vac_ids, np.random.choice(
-                            candidate_vac_atom_ids)]
+                    rand_vac_atom_id = None
+                    while True:
+                        rand_vac_atom_id = \
+                            np.random.choice(candidate_vac_atom_ids)
+                        if distribute_evenly:
+                            rand_vac_atom = \
+                                self.atoms.get_atoms(asarray=True)[
+                                    self.atom_ids == rand_vac_atom_id][0]
+                            ortho_pos = getattr(rand_vac_atom, ortho_axis)
+                            if ortho_pos >= ortho_mid_pt and \
+                                    len(atoms_along_ortho_axis['+']) < \
+                                    Nvac_per_layer / 2:
+                                atoms_along_ortho_axis['+'].append(
+                                    rand_vac_atom)
+                                break
+                            elif ortho_pos < ortho_mid_pt and \
+                                    len(atoms_along_ortho_axis['-']) < \
+                                    Nvac_per_layer / 2:
+                                atoms_along_ortho_axis['-'].append(
+                                    rand_vac_atom)
+                                break
+                            else:
+                                continue
+                        else:
+                            break
+
+                    self.vac_ids = np.r_[self.vac_ids, rand_vac_atom_id]
+        else:
+            super(GrapheneVacancyGenerator, self)._random_vacancy_generator()
 
         super(GrapheneVacancyGenerator, self).generate_vacancy_structure(
             show_vmd_selection_cmd=show_vmd_selection_cmd)
@@ -530,7 +556,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
         super(NanotubeVacancyGenerator, self).__init__(
             fname=fname, structure_format=structure_format)
 
-    def generate_vacancy_structure(self, Nvac=int, random=False, uniform=False,
+    def generate_vacancy_structure(self, Nvac=int, uniform=False,
                                    bin_axis=None, Ntubes=None,
                                    show_vmd_selection_cmd=True):
         """Generate vacancy structure.
@@ -551,9 +577,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
         """
         self.Nvac = Nvac
 
-        if random:
-            super(NanotubeVacancyGenerator, self)._random_vacancy_generator()
-        else:
+        if uniform:
             self.vac_ids = np.empty(0, dtype=int)
 
             if Ntubes is None and self.Ntubes is None:
@@ -628,6 +652,8 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                     self.vac_ids = \
                         np.r_[self.vac_ids,
                               np.random.choice(candidate_vac_atom_ids)]
+        else:
+            super(NanotubeVacancyGenerator, self)._random_vacancy_generator()
 
         super(NanotubeVacancyGenerator, self).generate_vacancy_structure(
             show_vmd_selection_cmd=show_vmd_selection_cmd)
