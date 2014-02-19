@@ -80,8 +80,8 @@ class DATAReader(StructureReader):
                     if key in line:
                         found = True
                         self._headers[key] = \
-                            [self._data_headers[key]['dtype'](s) for s in
-                                [[ss for ss in line.split()][i] for i in
+                            [self._data_headers[key]['dtype'](float(s)) for s
+                             in [[ss for ss in line.split()][i] for i in
                                  range(self._data_headers[key]['items'])]]
                         if len(self._headers[key]) == 1:
                             # since the list contains only one element,
@@ -102,10 +102,13 @@ class DATAReader(StructureReader):
                         for n in xrange(Nitems):
                             tmp = []
                             line = f.readline().strip().split()
-                            for i, props in \
-                                enumerate(self._section_properties[
+                            for i, props in enumerate(
+                                self._section_properties[
                                     section_key].itervalues()):
-                                tmp.append(props['dtype'](line[i]))
+                                try:
+                                    tmp.append(props['dtype'](float(line[i])))
+                                except IndexError:
+                                    break
                             data.append(tmp)
                         self._sections[section_key] = data[:]
                         #self._sections[section_key] = \
@@ -132,8 +135,12 @@ class DATAReader(StructureReader):
         masses_section = self._sections['Masses']
         masses_section_syntax = self._section_syntax_dict['Masses']
 
-        velocities_section = self._sections['Velocities']
-        velocities_section_syntax = self._section_syntax_dict['Velocities']
+        try:
+            velocities_section = self._sections['Velocities']
+            velocities_section_syntax = self._section_syntax_dict['Velocities']
+        except KeyError:
+            velocities_section = []
+            velocities_section_syntax = {}
 
         atom_kwargs = {'atomID': None, 'moleculeID': None,
                        'q': None, 'atomtype': None, 'mass': None,
@@ -168,8 +175,8 @@ class DATAReader(StructureReader):
                             atom_kwargs[kw] = \
                                 velocity[self._section_properties[
                                     'Velocities'][kw]['index']]
-                else:
-                    print('unknown atom keyword: {}'.format(kw))
+                #else:
+                #    print('unknown atom keyword: {}'.format(kw))
 
             atom = Atom(**atom_kwargs)
             self._atoms.append(atom)
@@ -243,7 +250,8 @@ class DATAWriter(StructureWriter):
 
     @classmethod
     def write(cls, fname=None, atoms=None, boxbounds=None, comment_line=None,
-              assume_unique_atoms=False, verbose=False):
+              assume_unique_atoms=False, enforce_consecutive_atomIDs=True,
+              pad_box=True, xpad=10., ypad=10., zpad=10., verbose=False):
         """Write structure data to file.
 
         Parameters
@@ -286,6 +294,11 @@ class DATAWriter(StructureWriter):
             atomID_width = len(str(Natoms)) + 1
             atomtype_width = len(str(Ntypes)) + 1
 
+            if enforce_consecutive_atomIDs and \
+                    atoms.atom_ids.max() != atoms.Natoms:
+                for atomID, atom in enumerate(atoms, start=1):
+                    atom.atomID = atomID
+
             if not assume_unique_atoms and \
                     len(set(atoms.atom_ids)) != atoms.Natoms:
                 for atomID, atom in enumerate(atoms, start=1):
@@ -299,6 +312,20 @@ class DATAWriter(StructureWriter):
                 for i, dim in enumerate(('x', 'y', 'z')):
                     boxbounds[dim]['min'] = atoms.coords[:, i].min()
                     boxbounds[dim]['max'] = atoms.coords[:, i].max()
+
+            boxpad = {'x': xpad, 'y': ypad, 'z': zpad}
+            pad_eps = 0.001
+            if pad_box:
+                #for dim, pad in boxpad.iteritems():
+                for i, dim in enumerate(('x', 'y', 'z')):
+                    pad = boxpad[dim]
+                    pad_delta = pad - pad_eps
+                    if abs(boxbounds[dim]['min'] - atoms.coords[:, i].min()) \
+                            < pad_delta:
+                        boxbounds[dim]['min'] = boxbounds[dim]['min'] - pad
+                    if abs(boxbounds[dim]['max'] - atoms.coords[:, i].max()) \
+                            < pad_delta:
+                        boxbounds[dim]['max'] = boxbounds[dim]['max'] + pad
 
             lohi_width = 0
             for dim in ('x', 'y', 'z'):
@@ -431,8 +458,9 @@ class LAMMPSDATA(DATAReader):
         new_data = np.asarray(new_data, dtype=attr_dtype)
 
         for i, atom in enumerate(self._atoms):
-            self._sections[section_key][i][colidx] = attr_dtype(new_data[i])
-            setattr(atom, atom_attr, attr_dtype(new_data[i]))
+            self._sections[section_key][i][colidx] = \
+                attr_dtype(float(new_data[i]))
+            setattr(atom, atom_attr, attr_dtype(float(new_data[i])))
 
     def viz(self, isnap):
         pass
