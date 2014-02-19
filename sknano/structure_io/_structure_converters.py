@@ -143,7 +143,6 @@ class XYZ2DATAConverter(StructureConverter):
         self._xpad = xpad
         self._ypad = ypad
         self._zpad = zpad
-        self._boxpad = {'x': xpad, 'y': ypad, 'z': zpad}
 
         self._new_atoms = []
         self._add_new_atoms = False
@@ -220,15 +219,10 @@ class XYZ2DATAConverter(StructureConverter):
         else:
             boxbounds = self._boxbounds
 
-        if self._pad_box:
-            for i, dim in enumerate(('x', 'y', 'z')):
-                boxbounds[dim]['min'] = \
-                    boxbounds[dim]['min'] - self._boxpad[dim]
-                boxbounds[dim]['max'] = \
-                    boxbounds[dim]['max'] + self._boxpad[dim]
-
         DATAWriter.write(fname=self._datafile, atoms=atoms,
-                         boxbounds=boxbounds, comment_line=comment_line)
+                         boxbounds=boxbounds, comment_line=comment_line,
+                         pad_box=self._pad_box, xpad=self._xpad,
+                         ypad=self._ypad, zpad=self._zpad)
 
         if return_reader:
             return DATAReader(fname=self._datafile)
