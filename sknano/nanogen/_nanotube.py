@@ -663,7 +663,7 @@ class Nanotube(object):
             if with_units and isinstance(bond, float):
                 bond = Qty(bond, units)
 
-            if magnitude:
+            if magnitude and with_units:
                 try:
                     return bond.magnitude * np.sqrt(3 * (p**2 + q**2 + p * q))
                 except AttributeError:
@@ -730,7 +730,7 @@ class Nanotube(object):
         if with_units and isinstance(bond, float):
             bond = Qty(bond, units)
 
-        if magnitude:
+        if magnitude and with_units:
             try:
                 return bond.magnitude * np.sqrt(3 * (n**2 + m**2 + n * m))
             except AttributeError:
@@ -911,32 +911,6 @@ class Nanotube(object):
         else:
             return theta
 
-    @classmethod
-    def compute_symmetry_chiral_angle(cls, n=int, m=int, rad2deg=True):
-        """Compute "chiral angle" of symmetry vector :math:`\\mathbf{R}`
-
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} +
-            m\\mathbf{a}_{2} = (n, m)`.
-        rad2deg : bool, optional
-            If `True`, return angle in degrees
-
-        Returns
-        -------
-        float
-            chiral angle :math:`\\theta_{R}`
-
-        """
-        p, q = Nanotube.compute_R(n=n, m=m)
-        theta = np.arctan((np.sqrt(3) * q) / (2 * p + q))
-        if rad2deg:
-            return np.degrees(theta)
-        else:
-            return theta
-
     @property
     def T(self):
         """Unit cell length :math:`|\\mathbf{T}|`.
@@ -950,7 +924,7 @@ class Nanotube(object):
 
     @classmethod
     def compute_T(cls, n=None, m=None, bond=None, with_units=False,
-                  units='angstrom', magnitude=True):
+                  units='angstrom', length=True, magnitude=True):
         """Compute unit cell length :math:`|\\mathbf{T}|`
 
         .. math::
@@ -972,22 +946,26 @@ class Nanotube(object):
         float
             length of unit cell in Angstroms
 
-        Raises
-        ------
-        NanotubeError
-            if the parameters not valid.
-
         """
-        if bond is None:
-            bond = CCbond
 
-        if with_units and isinstance(bond, float):
-            bond = Qty(bond, units)
+        if length:
+            if bond is None:
+                bond = CCbond
 
-        Ch = Nanotube.compute_Ch(n=n, m=m, bond=bond, with_units=with_units,
-                                 units=units, magnitude=magnitude)
-        dR = Nanotube.compute_dR(n=n, m=m)
-        return np.sqrt(3) * Ch / dR
+            if with_units and isinstance(bond, float):
+                bond = Qty(bond, units)
+
+            Ch = Nanotube.compute_Ch(n=n, m=m, bond=bond,
+                                     with_units=with_units, units=units,
+                                     magnitude=magnitude)
+            dR = Nanotube.compute_dR(n=n, m=m)
+
+            return np.sqrt(3) * Ch / dR
+        else:
+            t1 = Nanotube.compute_t1(n=n, m=m)
+            t2 = Nanotube.compute_t2(n=n, m=m)
+
+            return (t1, t2)
 
     @property
     def Natoms_per_tube(self):
@@ -1102,14 +1080,14 @@ class Nanotube(object):
 
         """
         T = Nanotube.compute_T(n=n, m=m, bond=bond, with_units=with_units,
-                               units=units, magnitude=False)
+                               units=units, length=True, magnitude=False)
         Lz = nz * T
         if with_units:
             Lz.ito('nanometer')
         else:
             Lz = Lz / 10
 
-        if magnitude:
+        if magnitude and with_units:
             try:
                 return Lz.magnitude
             except AttributeError:
@@ -1188,7 +1166,8 @@ class Nanotube(object):
         mass = Natoms_per_tube * Atoms([atom1, atom2]).m
         if with_units:
             mass = Qty(mass, units)
-        if magnitude:
+
+        if magnitude and with_units:
             try:
                 return mass.magnitude
             except AttributeError:
@@ -1265,6 +1244,46 @@ class Nanotube(object):
             return 'semiconducting, type 2'
         else:
             return 'metallic'
+
+    @classmethod
+    def compute_symmetry_chiral_angle(cls, n=int, m=int, rad2deg=True):
+        """Compute "chiral angle" of symmetry vector :math:`\\mathbf{R}`
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} +
+            m\\mathbf{a}_{2} = (n, m)`.
+        rad2deg : bool, optional
+            If `True`, return angle in degrees
+
+        Returns
+        -------
+        float
+            chiral angle :math:`\\theta_{R}`
+
+        """
+        p, q = Nanotube.compute_R(n=n, m=m)
+        theta = np.arctan((np.sqrt(3) * q) / (2 * p + q))
+        if rad2deg:
+            return np.degrees(theta)
+        else:
+            return theta
+
+    @classmethod
+    def compute_tau(cls, n=int, m=int, bond=None, with_units=False,
+                    units='angstrom', magnitude=True):
+        M = Nanotube.compute_M(n=n, m=m)
+        N = Nanotube.compute_N(n=n, m=m)
+        T = Nanotube.compute_T(n=n, m=m, bond=bond, with_units=with_units,
+                               units=units, length=True, magnitude=magnitude)
+        return M * T / N
+
+    @classmethod
+    def compute_psi(cls, n=int, m=int):
+        N = Nanotube.compute_N(n=n, m=m)
+        return 2 * np.pi / N
 
 
 class NanotubeBundle(Nanotube):
