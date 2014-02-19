@@ -455,8 +455,8 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
         if bundle_packing == 'cubic':
             self._r2[1] = self._r1[0]
         else:
-            self._r2[0] = self._r1[0] * np.cos(np.pi / 3)
-            self._r2[1] = self._r1[0] * np.sin(np.pi / 3)
+            self._r2[0] = self._r1[0] * np.cos(2 * np.pi / 3)
+            self._r2[1] = self._r1[0] * np.sin(2 * np.pi / 3)
 
         self._bundle_packing = bundle_packing
         self._bundle_geometry = bundle_geometry
@@ -629,14 +629,27 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
         Overrides the :math:`n_x, n_y, n_z` cell values.
     fix_Lz : bool, optional
         Generate the nanotube with length as close to the specified
-        :math:`L_z` as possible. If ``True``, then
+        :math:`L_z` as possible. If `True`, then
         non integer :math:`n_z` cells are permitted.
+    max_shells : int, optional
+        Maximum number of shells per MWNT.
+    min_shell_diameter : float, optional
+        Minimum shell diameter, in units of **Angstroms**.
+    shell_spacing : float, optional
+        Shell spacing in units of **Angstroms**. Default
+        value is the van der Waals interaction distance of 3.4 Angstroms.
+    inner_shell_Ch_type : {None, 'armchair', AC', 'zigzag', 'ZZ', 'achiral',
+                           'chiral'}, optional
+        If `None`, the chiralities of the inner shells are constrained only
+        by their diameter and will be chosen randomly if more than one
+        candidate chirality exists. If not `None`, then the inner
+        shell chirality type will be added as a constraint.
     autogen : bool, optional
-        if ``True``, automatically call
+        if `True`, automatically call
         :py:meth:`~NanotubeGenerator.generate_unit_cell`,
         followed by :py:meth:`~NanotubeGenerator.generate_structure_data`.
     verbose : bool, optional
-        if ``True``, show verbose output
+        if `True`, show verbose output
 
     Examples
     --------
@@ -701,8 +714,8 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
         if bundle_packing == 'cubic':
             self._r2[1] = self._r1[0]
         else:
-            self._r2[0] = self._r1[0] * np.cos(np.pi / 3)
-            self._r2[1] = self._r1[0] * np.sin(np.pi / 3)
+            self._r2[0] = self._r1[0] * np.cos(2 * np.pi / 3)
+            self._r2[1] = self._r1[0] * np.sin(2 * np.pi / 3)
 
         self._bundle_packing = bundle_packing
         self._bundle_geometry = bundle_geometry
