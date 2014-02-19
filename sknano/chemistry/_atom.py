@@ -589,3 +589,21 @@ class Atom(object):
             if abs(ri) < epsilon:
                 r[i] = 0.0
         self._r[0], self._r[1], self._r[2] = r
+
+    def rezero_coords(self, epsilon=1.0e-10):
+        """Set really really small coordinates to zero.
+
+        Set all coordinates with absolute value less than
+        epsilon to zero.
+
+        Parameters
+        ----------
+        epsilon : float
+            smallest allowed absolute value of any :math:`x,y,z` component.
+
+        """
+        r = self._r.tolist()
+        for i, ri in enumerate(r[:]):
+            if abs(ri) < epsilon:
+                r[i] = 0.0
+        self._r[0], self._r[1], self._r[2] = r
