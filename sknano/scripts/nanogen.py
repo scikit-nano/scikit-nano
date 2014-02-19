@@ -23,6 +23,12 @@ system :envvar:`PATH` and callable as :program:`tubegen`.
 
    :py:class:`~sknano.nanogen.TubeGen`
 
+   :py:class:`~sknano.nanogen.GrapheneGenerator`
+
+   :py:class:`~sknano.nanogen.NanotubeBundleGenerator`
+
+   :py:class:`~sknano.nanogen.MWNTGenerator`
+
 .. code-block:: python
 
    > nanogen --help
@@ -72,7 +78,8 @@ import sys
 from pkshared.tools.refdata import CCbond
 
 from ..chemistry import Atom
-from ..nanogen import TubeGen, format_ext
+from ..nanogen import GrapheneGenerator, NanotubeBundleGenerator, \
+    TubeGen, format_ext
 from ..structure_io import XYZ2DATAConverter
 
 __all__ = ['nanogen']
@@ -195,6 +202,21 @@ def nanogen(fmt='xyz', units='angstrom', element1='C', element2='C',
             else:
                 print("can't convert {} format to data. ".format(fmt) +
                       "Must be xyz format.")
+    else:
+        n, m = chirality
+        nx, ny, nz = cell_count
+
+        if shape == 'planar':
+            generator = GrapheneGenerator()
+        else:
+            generator = NanotubeBundleGenerator(n, m, nx=nx, ny=ny, nz=nz,
+                                                Lz=tube_length,
+                                                bundle_geometry=shape)
+
+        if fmt not in ('xyz', 'data'):
+            fmt = 'xyz'
+
+        generator.save_data(structure_format=fmt)
 
 
 def main():
