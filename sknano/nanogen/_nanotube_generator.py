@@ -30,6 +30,7 @@ __docformat__ = 'restructuredtext'
 
 import copy
 #import itertools
+#import sys
 import warnings
 warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
 
@@ -155,119 +156,61 @@ class NanotubeGenerator(Nanotube):
 
     def generate_unit_cell(self):
         """Generate the nanotube unit cell."""
-        verbose = self._verbose
+        eps = 0.01
         n = self._n
         m = self._m
-        Ch = self._Ch
-        T = self._T
-        rt = self._rt
-        N = self._N
         bond = self._bond
-        p, q = self._R
-
-        lenR = Nanotube.compute_R(n, m, bond=bond, with_units=False,
-                                  length=True, magnitude=False)
-
+        M = self._M
+        T = self._T
+        N = self._N
+        rt = self._rt
         e1 = self._element1
         e2 = self._element2
+        verbose = self._verbose
 
-        q1 = np.arctan((np.sqrt(3) * m) / (2 * n + m))
-        q2 = np.arctan((np.sqrt(3) * q) / (2 * p + q))
-        q3 = q1 - q2
-        q4 = 2 * np.pi / N
-        q5 = 2 * np.pi * bond * np.cos((np.pi / 6) - q1) / Ch
+        aCh = Nanotube.compute_chiral_angle(n=n, m=m, rad2deg=False)
 
-        h1 = T / abs(np.sin(q3))
-        h2 = bond * np.sin((np.pi / 6) - q1)
+        tau = M * T / N
+        dtau = bond * np.sin(np.pi / 6 - aCh)
+
+        psi = 2 * np.pi / N
+        dpsi = bond * np.cos(np.pi / 6 - aCh) / rt
 
         if verbose:
-            print('Ch: {}'.format(Ch))
-            print('T: {}'.format(T))
-            print('rt: {}'.format(rt))
-            print('lenR: {}\n'.format(lenR))
-
-            print('q1: {}'.format(q1))
-            print('q2: {}'.format(q2))
-            print('q3: {}'.format(q3))
-            print('q4: {}'.format(q4))
-            print('q5: {}\n'.format(q5))
-
-            print('h1: {}'.format(h1))
-            print('h2: {}\n'.format(h2))
+            print('dpsi: {}'.format(dpsi))
+            print('dtau: {}\n'.format(dtau))
 
         self.unit_cell = Atoms()
 
-        for i in xrange(N):
-            if verbose:
-                print('\ni = {}'.format(i))
-            #k = np.floor(i * lenR / h1)
-            k = int(i * lenR / h1)
-            x1 = rt * np.cos(i * q4)
-            y1 = rt * np.sin(i * q4)
-            z1 = (i * lenR - k * h1) * np.sin(q3)
-            kk2 = abs(np.floor((z1 + 0.0001) / T))
-            #kk2 = abs(np.floor(z1 / T))
+        for i in xrange(1, N + 1):
+            x1 = rt * np.cos(i * psi)
+            y1 = rt * np.sin(i * psi)
+            z1 = i * tau
 
-            #if z1 > T:
-            #    z1 -= T * kk2
-            #if z1 < 0:
-            #    z1 += T * kk2
+            while z1 > T - eps:
+                z1 -= T
 
-            #kk2 = np.abs(int(z1 / T)) + 1
-            if verbose:
-                print('x1, y1, z1 = {}, {}, {}'.format(x1, y1, z1))
-                print('kk2 = {}'.format(kk2))
-            if z1 > T - 0.02:
-                z1 -= T * kk2
-                if verbose:
-                    print('z1 > T - 0.02')
-                    print('z1 -= T * kk2 = {}'.format(z1))
-            if z1 < -0.02:
-                z1 += T * kk2
-                if verbose:
-                    print('z1 < -0.02')
-                    print('z1 += T * kk2 = {}\n'.format(z1))
+            atom1 = Atom(e1, x=x1, y=y1, z=z1)
+            atom1.rezero_coords()
 
             if verbose:
-                print('Basis Atom 1: x, y, z = {}, {}, {}'.format(x1, y1, z1))
-            self.unit_cell.append(Atom(e1, x=x1, y=y1, z=z1))
+                print('Basis Atom 1:\n{}'.format(atom1))
 
-            z3 = (i * lenR - k * h1) * np.sin(q3) - h2
+            self.unit_cell.append(atom1)
 
-            x2 = rt * np.cos(i * q4 + q5)
-            y2 = rt * np.sin(i * q4 + q5)
-            if verbose:
-                print('x2, y2, z3 = {}, {}, {}'.format(x2, y2, z3))
-            if z3 >= -0.02 and z3 <= T - 0.02:
-                if verbose:
-                    print('z3 >= -0.02 and z3 <= T - 0.02')
-                z2 = (i * lenR - k * h1) * np.sin(q3) - h2
-            else:
-                z2 = (i * lenR - (k + 1) * h1) * np.sin(q3) - h2
-                #kk = abs(np.floor(z2 / T))
-                kk = np.abs(int(z2 / T)) + 1
-                if verbose:
-                    print('kk = {}'.format(kk))
+            x2 = rt * np.cos(i * psi + dpsi)
+            y2 = rt * np.sin(i * psi + dpsi)
+            z2 = i * tau - dtau
+            while z2 > T - eps:
+                z2 -= T
 
-                #if z2 > T:
-                #    z2 -= T * kk
-                #if z2 < 0:
-                #    z2 += T * kk
-
-                if z2 > T - 0.01:
-                    z2 -= T * kk
-                    if verbose:
-                        print('z2 > T - 0.01')
-                        print('z2 -= T * kk = {}'.format(z2))
-                if z2 < -0.01:
-                    z2 += T * kk
-                    if verbose:
-                        print('z2 < -0.01')
-                        print('z2 += T * kk = {}'.format(z2))
+            atom2 = Atom(e2, x=x2, y=y2, z=z2)
+            atom2.rezero_coords()
 
             if verbose:
-                print('Basis Atom 2: x, y, z = {}, {}, {}'.format(x2, y2, z2))
-            self.unit_cell.append(Atom(e2, x=x2, y=y2, z=z2))
+                print('Basis Atom 2:\n{}'.format(atom2))
+
+            self.unit_cell.append(atom2)
 
     def generate_structure_data(self):
         """Generate structure data."""
@@ -492,7 +435,8 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
         self.compute_bundle_params()
 
         self._r1 = np.zeros(3)
-        self._r1[0] = Nanotube.compute_dt(n=n, m=m, bond=bond) + \
+        self._r1[0] = \
+            Nanotube.compute_dt(n=n, m=m, bond=bond, with_units=False) + \
             vdw_spacing
 
         self._r2 = np.zeros(3)
