@@ -79,30 +79,30 @@ class NanotubeGenerator(Nanotube):
         nearest neighbor atoms. Must be in units of **Angstroms**.
     Lz : float, optional
         Length of nanotube in units of **nanometers**.
-        Overrides the ``nz`` value.
+        Overrides the `nz` value.
 
         .. versionadded:: 0.2.5
 
     tube_length : float, optional
         Length of nanotube in units of **nanometers**.
-        Overrides the ``nz`` value.
+        Overrides the `nz` value.
 
         .. deprecated:: 0.2.5
-           Use ``Lz`` instead
+           Use `Lz` instead
 
     fix_Lz : bool, optional
         Generate the nanotube with length as close to the specified
-        :math:`L_z` as possible. If ``True``, then
+        :math:`L_z` as possible. If `True`, then
         non integer :math:`n_z` cells are permitted.
 
         .. versionadded:: 0.2.6
 
     autogen : bool, optional
-        if ``True``, automatically call
+        if `True`, automatically call
         :py:meth:`~NanotubeGenerator.generate_unit_cell`,
         followed by :py:meth:`~NanotubeGenerator.generate_structure_data`.
     verbose : bool, optional
-        if ``True``, show verbose output
+        if `True`, show verbose output
 
     Examples
     --------
@@ -237,14 +237,14 @@ class NanotubeGenerator(Nanotube):
                 - xyz
                 - data
 
-            If ``None``, then guess based on ``fname`` file extension or
-            default to ``xyz`` format.
+            If `None`, then guess based on `fname` file extension or
+            default to `xyz` format.
         rotation_angle : {None, float}, optional
             Angle of rotation
         rot_axis : {'x', 'y', 'z'}, optional
             Rotation axis
         deg2rad : bool, optional
-            Convert ``rotation_angle`` from degrees to radians.
+            Convert `rotation_angle` from degrees to radians.
         center_CM : bool, optional
             Center center-of-mass on origin.
 
@@ -348,17 +348,17 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
 
     fix_Lz : bool, optional
         Generate the nanotube with length as close to the specified
-        :math:`L_z` as possible. If ``True``, then
+        :math:`L_z` as possible. If `True`, then
         non integer :math:`n_z` cells are permitted.
 
         .. versionadded:: 0.2.6
 
     autogen : bool, optional
-        if ``True``, automatically call
+        if `True`, automatically call
         :py:meth:`~NanotubeGenerator.generate_unit_cell`,
         followed by :py:meth:`~NanotubeGenerator.generate_structure_data`.
     verbose : bool, optional
-        if ``True``, show verbose output
+        if `True`, show verbose output
 
     Examples
     --------
@@ -534,14 +534,14 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
                 - xyz
                 - data
 
-            If ``None``, then guess based on ``fname`` file extension or
-            default to ``xyz`` format.
+            If `None`, then guess based on `fname` file extension or
+            default to `xyz` format.
         rotation_angle : {None, float}, optional
             Angle of rotation
         rot_axis : {'x', 'y', 'z'}, optional
             Rotation axis
         deg2rad : bool, optional
-            Convert ``rotation_angle`` from degrees to radians.
+            Convert `rotation_angle` from degrees to radians.
         center_CM : bool, optional
             Center center-of-mass on origin.
 
@@ -933,14 +933,14 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
                 - xyz
                 - data
 
-            If ``None``, then guess based on ``fname`` file extension or
-            default to ``xyz`` format.
+            If `None`, then guess based on `fname` file extension or
+            default to `xyz` format.
         rotation_angle : {None, float}, optional
             Angle of rotation
         rot_axis : {'x', 'y', 'z'}, optional
             Rotation axis
         deg2rad : bool, optional
-            Convert ``rotation_angle`` from degrees to radians.
+            Convert `rotation_angle` from degrees to radians.
         center_CM : bool, optional
             Center center-of-mass on origin.
 

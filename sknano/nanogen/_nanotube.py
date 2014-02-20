@@ -99,14 +99,14 @@ class Nanotube(object):
 
     tube_length : float, optional
         Length of nanotube in units of **nanometers**.
-        Overrides the ``nz`` value.
+        Overrides the `nz` value.
 
         .. deprecated:: 0.2.5
-           Use ``Lz`` instead
+           Use `Lz` instead
 
     fix_Lz : bool, optional
         Generate the nanotube with length as close to the specified
-        :math:`L_z` as possible. If ``True``, then
+        :math:`L_z` as possible. If `True`, then
         non integer :math:`n_z` cells are permitted.
 
         .. versionadded:: 0.2.6
@@ -1313,11 +1313,11 @@ class NanotubeBundle(Nanotube):
         Length of nanotube in units of **nanometers**.
 
         .. deprecated:: 0.2.5
-           Use ``Lz`` instead
+           Use `Lz` instead
 
     fix_Lz : bool, optional
         Generate the nanotube with length as close to the specified
-        :math:`L_z` as possible. If ``True``, then
+        :math:`L_z` as possible. If `True`, then
         non integer :math:`n_z` cells are permitted.
 
         .. versionadded:: 0.2.6
