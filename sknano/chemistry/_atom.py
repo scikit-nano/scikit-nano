@@ -24,7 +24,7 @@ class AtomAttributes(object):
 
 class Atom(object):
 
-    """Class for creating abstract object representing an Atom.
+    """Class for creating abstract object representing an `Atom`.
 
     Parameters
     ----------
@@ -38,7 +38,7 @@ class Atom(object):
     atomtype : int, optional
         atom type, a LAMMPS atom attribute.
     q : {int, float}, optional
-        Net charge of Atom.
+        Net charge of `Atom`.
     x, y, z : float, optional
         :math:`x, y, z` components of position.
     vx, vy, vz : float, optional
@@ -50,7 +50,7 @@ class Atom(object):
     nx, ny, nz : int, optional
         :math:`n_x, n_y, n_z` image flags for LAMMPS atoms.
     CN : int, optional
-        Atom coordination number.
+        `Atom` coordination number.
 
     """
 
@@ -202,7 +202,7 @@ class Atom(object):
 
     @x.setter
     def x(self, value=float):
-        """Set Atom :math:`x`-coordinate in units of **Angstroms**.
+        """Set `Atom` :math:`x`-coordinate in units of **Angstroms**.
 
         Parameters
         ----------
@@ -227,7 +227,7 @@ class Atom(object):
 
     @y.setter
     def y(self, value=float):
-        """Set Atom :math:`y`-coordinate in units of **Angstroms**.
+        """Set `Atom` :math:`y`-coordinate in units of **Angstroms**.
 
         Parameters
         ----------
@@ -252,7 +252,7 @@ class Atom(object):
 
     @z.setter
     def z(self, value=float):
-        """Set Atom :math:`z`-coordinate in units of **Angstroms**.
+        """Set `Atom` :math:`z`-coordinate in units of **Angstroms**.
 
         Parameters
         ----------
@@ -271,7 +271,7 @@ class Atom(object):
         -------
         ndarray
             3-element ndarray of [:math:`x, y, z`] coordinates
-            of Atom.
+            of `Atom`.
 
         """
         return self._r
@@ -300,7 +300,7 @@ class Atom(object):
 
     @q.setter
     def q(self, value=float):
-        """Set Atom charge :math:`q`.
+        """Set `Atom` charge :math:`q`.
 
         Parameters
         ----------
@@ -314,7 +314,7 @@ class Atom(object):
 
     @property
     def atomID(self):
-        """Atom ID (*LAMMPS atom attribute*)."""
+        """`Atom` ID (*LAMMPS atom attribute*)."""
         return self._atomID
 
     @atomID.setter
@@ -350,7 +350,7 @@ class Atom(object):
 
     @property
     def atomtype(self):
-        """Atom type (*LAMMPS atom attribute*)."""
+        """`Atom` type (*LAMMPS atom attribute*)."""
         return self._atomtype
 
     @atomtype.setter
@@ -368,24 +368,24 @@ class Atom(object):
 
     @property
     def vx(self):
-        """:math:`v_x` component in units of ``v_units``.
+        """:math:`v_x` component in units of `v_units`.
 
         Returns
         -------
         float
-            :math:`v_x` component in units of ``v_units``.
+            :math:`v_x` component in units of `v_units`.
 
         """
         return self._v[0]
 
     @vx.setter
     def vx(self, value=float):
-        """Set Atom :math:`v_x` component.
+        """Set `Atom` :math:`v_x` component.
 
         Parameters
         ----------
         value : float
-            :math:`v_x` component in units of ``v_units``.
+            :math:`v_x` component in units of `v_units`.
 
         """
         self._check_type(value, (int, float))
@@ -393,24 +393,24 @@ class Atom(object):
 
     @property
     def vy(self):
-        """:math:`v_y` component in units of ``v_units``.
+        """:math:`v_y` component in units of `v_units`.
 
         Returns
         -------
         float
-            :math:`v_y` component in units of ``v_units``.
+            :math:`v_y` component in units of `v_units`.
 
         """
         return self._v[1]
 
     @vy.setter
     def vy(self, value=float):
-        """Set Atom :math:`v_y` component.
+        """Set `Atom` :math:`v_y` component.
 
         Parameters
         ----------
         value : float
-            :math:`v_y` component in units of ``v_units``.
+            :math:`v_y` component in units of `v_units`.
 
         """
         self._check_type(value, (int, float))
@@ -418,24 +418,24 @@ class Atom(object):
 
     @property
     def vz(self):
-        """:math:`v_z` component in units of ``v_units``.
+        """:math:`v_z` component in units of `v_units`.
 
         Returns
         -------
         float
-            :math:`v_z` component in units of ``v_units``.
+            :math:`v_z` component in units of `v_units`.
 
         """
         return self._v[2]
 
     @vz.setter
     def vz(self, value=float):
-        """Set Atom :math:`v_z` component.
+        """Set `Atom` :math:`v_z` component.
 
         Parameters
         ----------
         value : float
-            :math:`v_z` component in units of ``v_units``.
+            :math:`v_z` component in units of `v_units`.
 
         """
         self._check_type(value, (int, float))
@@ -449,20 +449,20 @@ class Atom(object):
         -------
         ndarray
             3-element ndarray of [:math:`v_x`, :math:`v_y`, :math:`v_z`]
-            velocity components of Atom.
+            velocity components of `Atom`.
 
         """
         return self._v
 
     @v.setter
     def v(self, value=np.ndarray):
-        """Set :math:`x, y, z` components of Atom velocity.
+        """Set :math:`x, y, z` components of `Atom` velocity.
 
         Parameters
         ----------
         value : array_like
             3-element ndarray of [:math:`v_x`, :math:`v_y`, :math:`v_z`]
-            velocity components of Atom.
+            velocity components of `Atom`.
 
         """
         self._check_type(value, np.ndarray)
@@ -533,7 +533,7 @@ class Atom(object):
 
     @nz.setter
     def nz(self, value=int):
-        """Set Atom :math:`n_z` image flag.
+        """Set `Atom` :math:`n_z` image flag.
 
         Parameters
         ----------
@@ -546,26 +546,26 @@ class Atom(object):
 
     @property
     def n(self):
-        """:math:`n_x, n_y, n_z` image flags of Atom.
+        """:math:`n_x, n_y, n_z` image flags of `Atom`.
 
         Returns
         -------
         ndarray
             3-element ndarray of [:math:`n_x`, :math:`n_y`, :math:`n_z`]
-            image flags of Atom.
+            image flags of `Atom`.
 
         """
         return self._n
 
     @n.setter
     def n(self, value=np.ndarray):
-        """Set :math:`n_x, n_y, n_z` image flags of Atom.
+        """Set :math:`n_x, n_y, n_z` image flags of `Atom`.
 
         Parameters
         ----------
         value : array_like
             3-element ndarray of [:math:`n_x`, :math:`n_y`, :math:`n_z`]
-            image flags of Atom.
+            image flags of `Atom`.
 
         """
         self._check_type(value, np.ndarray)

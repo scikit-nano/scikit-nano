@@ -86,10 +86,11 @@ class Atoms(MutableSequence):
                 else:
                     self._atoms.extend(atoms.atoms)
             else:
-                raise TypeError('Atoms(atoms={!r}) '.format(atoms) +
-                                'is not a valid Atoms constructor argument.\n'
-                                'atoms must be None, a list of Atom objects, '
-                                'or an Atoms object instance.')
+                raise TypeError('`Atoms(atoms={!r})` '.format(atoms) +
+                                'is not a valid `Atoms` constructor '
+                                'argument.\n atoms must be `None`, a list '
+                                'of `Atom` objects, or an `Atoms` object '
+                                'instance.')
 
             if use_kdtree:
                 self._atom_tree = self.atom_tree
@@ -120,7 +121,7 @@ class Atoms(MutableSequence):
 
     @property
     def atom_ids(self):
-        """Return array of Atom IDs."""
+        """Return array of `Atom` IDs."""
         atom_ids = []
         for atom in self._atoms:
             atom_ids.append(atom.atomID)
@@ -129,12 +130,12 @@ class Atoms(MutableSequence):
 
     @property
     def atoms(self):
-        """Return the list of Atom objects"""
+        """Return the list of `Atom` objects"""
         return self._atoms
 
     @property
     def atomlist(self):
-        """Return the list of Atom objects"""
+        """Return the list of `Atom` objects"""
         return self._atoms
 
     @property
@@ -146,7 +147,7 @@ class Atoms(MutableSequence):
                 self._atom_tree = KDTree(self.coords)
             except ImportError:
                 print('Install scipy version >= 0.13.0 to allow '
-                      'nearest-neighbor queries between Atoms.')
+                      'nearest-neighbor queries between `Atoms`.')
                 self._use_kdtree = False
                 return None
         return self._atom_tree
@@ -163,7 +164,7 @@ class Atoms(MutableSequence):
 
     @property
     def charges(self):
-        """Return list of Atom charges."""
+        """Return list of `Atom` charges."""
         #self._charges_array = np.asarray(self._charges)
         charges = []
         for atom in self._atoms:
@@ -173,12 +174,12 @@ class Atoms(MutableSequence):
 
     @property
     def CM(self):
-        """Center-of-Mass coordinates of Atoms.
+        """Center-of-Mass coordinates of `Atoms`.
 
         Returns
         -------
         ndarray
-            3-element ndarray specifying center-of-mass coordinates of Atoms.
+            3-element ndarray specifying center-of-mass coordinates of `Atoms`.
 
         """
         masses = np.asarray([self.masses])
@@ -188,7 +189,7 @@ class Atoms(MutableSequence):
 
     @property
     def coords(self):
-        """Return array of Atom coordinates."""
+        """Return array of `Atom` coordinates."""
         coords = []
         for atom in self._atoms:
             coords.append(atom.r)
@@ -197,7 +198,7 @@ class Atoms(MutableSequence):
 
     #@property
     #def positions(self):
-    #    """Return array of Atom positions."""
+    #    """Return array of `Atom` positions."""
     #    positions = []
     #    for atom in self._atoms:
     #        positions.append(atom.r)
@@ -214,7 +215,7 @@ class Atoms(MutableSequence):
 
     @property
     def m(self):
-        """Total mass of all atoms.
+        """Total mass of `Atoms`.
 
         .. deprecated:: 0.1.0
            Use :py:attr:`M` property instead.
@@ -224,12 +225,12 @@ class Atoms(MutableSequence):
 
     @property
     def M(self):
-        """Total mass of all atoms."""
+        """Total mass of `Atoms`."""
         return math.fsum(self.masses)
 
     @property
     def masses(self):
-        """Return the list of Atom masses."""
+        """Return the list of `Atom` masses."""
         #self._masses_array = np.asarray(self._masses)
         masses = []
         for atom in self._atoms:
@@ -239,12 +240,12 @@ class Atoms(MutableSequence):
 
     @property
     def Natoms(self):
-        """Number of atoms in Atoms."""
+        """Number of atoms in `Atoms`."""
         return len(self._atoms)
 
     @property
     def Ntypes(self):
-        """Number of atom types in Atoms."""
+        """Number of atom types in `Atoms`."""
         return len(self.atomtypes.keys())
 
     @property
@@ -259,7 +260,7 @@ class Atoms(MutableSequence):
 
     @property
     def symbols(self):
-        """Return array of Atom symbols."""
+        """Return array of `Atom` symbols."""
         symbols = []
         for atom in self._atoms:
             symbols.append(atom.symbol)
@@ -268,7 +269,7 @@ class Atoms(MutableSequence):
 
     @property
     def velocities(self):
-        """Return array of Atom velocities."""
+        """Return array of `Atom` velocities."""
         velocities = []
         for atom in self._atoms:
             velocities.append(atom.v)
@@ -280,8 +281,8 @@ class Atoms(MutableSequence):
 
         Parameters
         ----------
-        atom : Atom
-            an intance of an Atom object
+        atom : `Atom`
+            an intance of an `Atom` object
 
         """
         if atom.atomtype not in self._atomtypes:
@@ -294,7 +295,7 @@ class Atoms(MutableSequence):
         Parameters
         ----------
         atomtypes : sequence
-            a list of Atom object instances
+            a list of `Atom` object instances
 
         """
         for atom in atomtypes:
@@ -350,7 +351,7 @@ class Atoms(MutableSequence):
                                 break
 
     def filter_atoms(self, filter_atom_ids, invert=False):
-        """Filter Atoms.
+        """Filter `Atoms`.
 
         Parameters
         ----------
@@ -359,7 +360,7 @@ class Atoms(MutableSequence):
 
         Returns
         -------
-        filtered_atoms : Atoms
+        filtered_atoms : `Atoms`
 
         """
         #if invert:
@@ -609,7 +610,7 @@ class Atoms(MutableSequence):
         index : int
             index of target list element
         atom : `Atom`
-            Atom object instance to set target list element to
+            `Atom` instance object to set target list element to.
 
         """
         self._check_type(atom)
