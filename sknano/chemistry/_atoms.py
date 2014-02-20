@@ -25,12 +25,13 @@ __all__ = ['Atoms']
 
 class Atoms(MutableSequence):
 
-    """Class for creating abstract represention of a collection of Atoms.
+    """Class for creating abstract represention of a collection of `Atoms`.
 
     Parameters
     ----------
-    atoms : {None, sequence}, optional
-        if not ``None``, then a list of ``Atom`` objects
+    atoms : {None, sequence, `Atoms`}, optional
+        if not `None`, then a list of `Atom` instance objects or an
+        existing `Atoms` instance object.
     copylist : bool, optional
         perform shallow copy of atoms list
     deepcopy : bool, optional
@@ -38,23 +39,32 @@ class Atoms(MutableSequence):
 
     """
 
-    def __init__(self, atoms=None, copylist=True, deepcopy=False):
+    def __init__(self, atoms=None, copylist=True, deepcopy=False,
+                 use_kdtree=True):
+
         self._atoms = []
+        self._atomtypes = {}
 
         self._atom_ids = []
         self._molecule_ids = []
+
         self._charges = []
         self._coords = []
+        #self._positions = []
         self._masses = []
         self._velocities = []
         self._symbols = []
-
-        self._atomtypes = {}
+        self._CNs = []
 
         self._property_lists = \
             {'m': self._masses, 'q': self._charges, 'r': self._coords,
              'v': self._velocities, 'atomID': self._atom_ids,
-             'moleculeID': self._molecule_ids, 'symbol': self._symbols}
+             'moleculeID': self._molecule_ids, 'symbol': self._symbols,
+             'CN': self._CNs}
+
+        self._atom_tree = None
+        self._use_kdtree = use_kdtree
+
         if atoms is not None:
             if isinstance(atoms, list):
                 if copylist and not deepcopy:
@@ -80,6 +90,9 @@ class Atoms(MutableSequence):
                                 'is not a valid Atoms constructor argument.\n'
                                 'atoms must be None, a list of Atom objects, '
                                 'or an Atoms object instance.')
+
+            if use_kdtree:
+                self._atom_tree = self.atom_tree
 
     def _check_type(self, value):
         """Check that value is instance of `Atom` class.
@@ -125,6 +138,20 @@ class Atoms(MutableSequence):
         return self._atoms
 
     @property
+    def atom_tree(self):
+        """Return the :py:class:`~scipy:scipy.spatial.KDTree` of coords."""
+        if self._use_kdtree and len(self._atoms) != 0:
+            try:
+                from scipy.spatial import KDTree
+                self._atom_tree = KDTree(self.coords)
+            except ImportError:
+                print('Install scipy version >= 0.13.0 to allow '
+                      'nearest-neighbor queries between Atoms.')
+                self._use_kdtree = False
+                return None
+        return self._atom_tree
+
+    @property
     def atomtypes(self):
         """Return the atom type dictionary."""
         for atom in self._atoms:
@@ -161,13 +188,29 @@ class Atoms(MutableSequence):
 
     @property
     def coords(self):
-        """Return array of Atom position array."""
-        #self._coords_array = np.asarray(self._coords)
+        """Return array of Atom coordinates."""
         coords = []
         for atom in self._atoms:
             coords.append(atom.r)
         self._coords = coords[:]
         return np.asarray(self._coords)
+
+    #@property
+    #def positions(self):
+    #    """Return array of Atom positions."""
+    #    positions = []
+    #    for atom in self._atoms:
+    #        positions.append(atom.r)
+    #    self._positions = positions[:]
+    #    return np.asarray(self._positions)
+
+    @property
+    def CNs(self):
+        CNs = []
+        for atom in self._atoms:
+            CNs.append(atom.CN)
+        self._CN = CNs[:]
+        return np.asarray(self._CNs)
 
     @property
     def m(self):
@@ -356,6 +399,9 @@ class Atoms(MutableSequence):
                     r[i] = 0.0
             atom.x, atom.y, atom.z = r
 
+    def rezero_xyz(self, epsilon=1.0e-10):
+        return self.rezero_coords(epsilon=epsilon)
+
     def rezero_coords(self, epsilon=1.0e-10):
         """Set really really small coordinates to zero.
 
@@ -376,7 +422,7 @@ class Atoms(MutableSequence):
             atom.x, atom.y, atom.z = r
 
     def get_atoms(self, asarray=False):
-        """Return list of Atoms.
+        """Return list of `Atoms`.
 
         Parameters
         ----------
@@ -419,7 +465,7 @@ class Atoms(MutableSequence):
             return coords
 
     def get_filtered_atom_ids(self, filter_atom_ids, invert=False):
-        """Return atom ids filtered by list of ``filter_atom_ids``.
+        """Return atom ids filtered by list of `filter_atom_ids`.
 
         Parameters
         ----------
@@ -471,12 +517,12 @@ class Atoms(MutableSequence):
             filtered_coords
 
     def rotate(self, R_matrix):
-        """Rotate atom coordinates using rotation matrix ``R_matrix``.
+        """Rotate atom coordinates using rotation matrix `R_matrix`.
 
         Parameters
         ----------
         R_matrix : array_like
-            3x3 array representation of ``3D`` rotation matrix.
+            3x3 array representation of *3D rotation matrix*.
 
         """
         for atom in self._atoms:
@@ -492,7 +538,7 @@ class Atoms(MutableSequence):
             components of atoms position vector through
         r_indices : sequence, optional
             list of component indices of position vector that
-            ``dr`` vector acts upon
+            `dr` vector acts upon
 
         """
         for atom in self._atoms:
@@ -505,9 +551,9 @@ class Atoms(MutableSequence):
     def __delitem__(self, index):
         """Concrete implementation of @abstractmethod.
 
-        delete list element ``self.atoms[index]`` and delete all elements
-        from atom properties lists ``self.masses[index]``,
-        ``self.charges[index]``, and ``self.coords[index]``
+        delete list element `self.atoms[index]` and delete all elements
+        from atom properties lists `self.masses[index]`,
+        `self.charges[index]`, and `self.coords[index]`
 
         Parameters
         ----------
@@ -522,7 +568,7 @@ class Atoms(MutableSequence):
     def __getitem__(self, index):
         """Concrete implementation of @abstractmethod.
 
-        get Atom object instance at list element ``self.atoms[index]``
+        get `Atom` object instance at list element `self.atoms[index]`
 
         Parameters
         ----------
@@ -531,8 +577,8 @@ class Atoms(MutableSequence):
 
         Returns
         -------
-        Atom
-            Atom object instance at target ``self.atoms[index]``
+        `Atom`
+            `Atom` object instance at target `self.atoms[index]`
 
         """
         return self._atoms[index]
@@ -543,7 +589,7 @@ class Atoms(MutableSequence):
         Returns
         -------
         int
-            length of ``self.atoms`` list.
+            length of `self.atoms` list.
 
         """
         return len(self._atoms)
@@ -551,18 +597,18 @@ class Atoms(MutableSequence):
     def __setitem__(self, index, atom):
         """Concrete implementation of @abstractmethod.
 
-        set target list element ``self.atoms[index] = atom``
+        set target list element `self.atoms[index] = atom`
 
-        Also set element of all atom properties lists (``self.masses[index]``,
-        ``self.charges[index]``, and ``self.coords[index]``) to atom instance
-        properties (``atom.m``, ``atom.q``, ``atom.r``), respectively.
+        Also set element of all atom properties lists (`self.masses[index]`,
+        `self.charges[index]`, and `self.coords[index]`) to atom instance
+        properties (`atom.m`, `atom.q`, `atom.r`), respectively.
 
 
         Parameters
         ----------
         index : int
             index of target list element
-        atom : Atom
+        atom : `Atom`
             Atom object instance to set target list element to
 
         """
@@ -574,20 +620,20 @@ class Atoms(MutableSequence):
     def insert(self, index, atom):
         """Concrete implementation of @abstractmethod.
 
-        insert Atom instance at target list ``index``
+        insert `Atom` instance at target list `index`
 
-        Also insert Atom instance properties at the given target list index
-        for all Atom properties in ``self._property_lists.keys()``
-        into their respective target lists of Atoms properties
-        ``self._property_lists.values()``.
+        Also insert `Atom` instance properties at the given target list index
+        for all `Atom` properties in `self._property_lists.keys()`
+        into their respective target lists of `Atoms` properties
+        `self._property_lists.values()`.
 
 
         Parameters
         ----------
         index : int
             index of target list element
-        atom : Atom
-            Atom object instance to set target list element to
+        atom : `Atom`
+            `Atom` object instance to set target list element to
 
         """
         self._check_type(atom)
