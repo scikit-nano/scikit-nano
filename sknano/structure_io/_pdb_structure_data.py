@@ -63,7 +63,7 @@ class PDBWriter(StructureWriter):
             if comment_line is None:
                 comment_line = fname
 
-            atoms.fix_minus_zero_coords()
+            atoms.rezero_coords()
 
             with open(fname, 'w') as f:
                 f.write('{:d}\n'.format(atoms.Natoms))
