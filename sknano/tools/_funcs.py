@@ -31,12 +31,12 @@ for k in ('min_index', 'max_index', 'min_n', 'max_n', 'min_m', 'max_m',
 
 
 def cmp_Ch(Ch1, Ch2):
-    """Custom comparator function for sorting list of chiralities
+    """Custom comparator function for sorting chirality lists.
 
     Parameters
     ----------
     Ch1, Ch2 : {str, tuple}
-        chiralities as string or tuple
+        2-tuple or 2-tuple string of integers
 
     Returns
     -------
@@ -80,6 +80,21 @@ def cmp_Ch(Ch1, Ch2):
 def filter_Ch(Ch, even_only=False, odd_only=False, Ch_type=None,
               min_index=None, max_index=None, min_n=None, max_n=None,
               min_m=None, max_m=None, **kwargs):
+    """Filter for testing if chirality satisfies given constraint parameters.
+
+    Parameters
+    ----------
+    even_only, odd_only : bool, optional
+    Ch_type : {None, 'armchair', 'zigzag', 'achiral', 'chiral'}, optional
+    min_index, max_index : int, optional
+    min_n, max_n : int, optional
+    min_m, max_m : int, optional
+
+    Returns
+    -------
+    bool
+
+    """
 
     if isinstance(Ch, tuple):
         this_Ch_type = get_Ch_type(Ch)
@@ -138,6 +153,21 @@ def filter_Ch(Ch, even_only=False, odd_only=False, Ch_type=None,
 
 
 def filter_Ch_list(Ch_list, **kwargs):
+    """Filter for filtering list of chiralities against set of conditions.
+
+    Parameters
+    ----------
+    Ch_list : sequence
+        list of chiralities
+    kwargs : dict, optional
+        dictionary of conditions to test each chirality against.
+
+    Returns
+    -------
+    sequence
+        list of chiralities which passed conditions
+
+    """
     return [Ch for Ch in Ch_list if filter_Ch(Ch, **kwargs)]
 
 
