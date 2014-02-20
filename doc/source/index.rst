@@ -47,6 +47,7 @@ Reference
    nanogen.rst
    scripts.rst
    structure_io.rst
+   tools.rst
 
 
 * :ref:`genindex`
