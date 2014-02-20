@@ -20,6 +20,8 @@ import numpy as np
 from pkshared.tools.refdata import dimensions
 from ._atom import Atom
 
+__all__ = ['Atoms']
+
 
 class Atoms(MutableSequence):
 

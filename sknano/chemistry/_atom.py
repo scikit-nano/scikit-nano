@@ -15,6 +15,8 @@ import numpy as np
 from pkshared.tools.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols
 
+__all__ = ['Atom']
+
 
 class AtomAttributes(object):
     pass
