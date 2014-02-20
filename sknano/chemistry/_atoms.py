@@ -352,6 +352,25 @@ class Atoms(MutableSequence):
         for atom in self._atoms:
             r = atom.r.tolist()
             for i, ri in enumerate(r[:]):
+                if ri < 0 and abs(ri) < epsilon:
+                    r[i] = 0.0
+            atom.x, atom.y, atom.z = r
+
+    def rezero_coords(self, epsilon=1.0e-10):
+        """Set really really small coordinates to zero.
+
+        Set all coordinates with absolute value less than
+        epsilon to zero.
+
+        Parameters
+        ----------
+        epsilon : float
+            smallest allowed absolute value of any :math:`x,y,z` component.
+
+        """
+        for atom in self._atoms:
+            r = atom.r.tolist()
+            for i, ri in enumerate(r[:]):
                 if abs(ri) < epsilon:
                     r[i] = 0.0
             atom.x, atom.y, atom.z = r

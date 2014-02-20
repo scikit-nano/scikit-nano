@@ -588,7 +588,7 @@ class Atom(object):
         """
         r = self._r.tolist()
         for i, ri in enumerate(r[:]):
-            if abs(ri) < epsilon:
+            if ri < 0 and abs(ri) < epsilon:
                 r[i] = 0.0
         self._r[0], self._r[1], self._r[2] = r
 
