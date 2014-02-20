@@ -169,6 +169,7 @@ html_theme_options = {
     [("http://github.com/androomerrill/scikit-nano", "scikit-nano"),
      ("http://projects.geekspin.net/scikit-nano/doc", "Docs")]}
 html_logo = '_static/Nanotube_Logo_200x200.png'
+html_favicon = '_static/favicon.ico'
 html_sidebars = {'index': 'indexsidebar.html'}
 
 html_title = "%s v%s Reference Guide" % (project, version)
