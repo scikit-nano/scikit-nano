@@ -146,7 +146,7 @@ def nanogen(fmt='xyz', units='angstrom', element1='C', element2='C',
             chirality=(10, 10), relax_tube='yes', cell_count=(1,1,1),
             tube_length=None, xyz2data=False, new_atomtypes=None,
             generator='tubegen'):
-    """Generate nano-structure.
+    """Generate nano-structure data.
 
     Parameters
     ----------
