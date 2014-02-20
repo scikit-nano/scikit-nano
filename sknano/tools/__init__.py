@@ -29,9 +29,12 @@ Helper Functions
    :toctree: generated/
 
    cmp_Ch
+   filter_Ch
+   filter_Ch_list
    generate_Ch_list
    get_Ch_indices
    get_Ch_type
+   totient_func
 
 LUTs (Look-up 'tables' - lists and dictionaries)
 -------------------------------------------------
