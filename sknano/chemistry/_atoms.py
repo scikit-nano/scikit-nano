@@ -36,6 +36,9 @@ class Atoms(MutableSequence):
         perform shallow copy of atoms list
     deepcopy : bool, optional
         perform deepcopy of atoms list
+    use_kdtree : bool, optional
+        use :py:class:`~scipy:scipy.spatial.KDTree` to perform
+        nearest-neighbor analysis.
 
     """
 
@@ -207,6 +210,7 @@ class Atoms(MutableSequence):
 
     @property
     def CNs(self):
+        """Return array of `Atom` coordination numbers."""
         CNs = []
         for atom in self._atoms:
             CNs.append(atom.CN)
