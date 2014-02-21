@@ -10,6 +10,7 @@ Graphene structure tools (:mod:`sknano.nanogen._graphene_generator`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext'
 
+import copy
 import itertools
 import sys
 
@@ -22,6 +23,8 @@ from ..chemistry import Atom, Atoms
 from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
     supported_structure_formats
 
+from ._graphene import Graphene
+
 __all__ = ['GrapheneGenerator',
            'BiLayerGrapheneGenerator',
            'GrapheneGeneratorError']
@@ -32,7 +35,7 @@ class GrapheneGeneratorError(Exception):
     pass
 
 
-class GrapheneGenerator(object):
+class GrapheneGenerator(Graphene):
     """Class for generating `n`-layer graphene nanostructures.
 
     Parameters
@@ -72,7 +75,7 @@ class GrapheneGenerator(object):
     --------
 
     Start an interactive python or ipython session, then import the
-    GrapheneGenerator class.
+    `GrapheneGenerator` class.
 
     >>> from sknano.nanogen import GrapheneGenerator
 
@@ -131,60 +134,25 @@ class GrapheneGenerator(object):
 
     """
 
-    def __init__(self, width=float, length=float, edge='armchair',
-                 element1='C', element2='C', bond=CCbond, nlayers=1,
-                 layer_spacing=3.35, stacking_order='AB',
-                 autogen=True, verbose=False):
+    def __init__(self, n=None, m=None, width=None, length=None,
+                 edge=None, element1='C', element2='C', bond=CCbond,
+                 nlayers=1, layer_spacing=3.35, stacking_order='AB',
+                 autogen=True, with_units=False, verbose=False):
 
-        self.element1 = element1
-        self.element2 = element2
-
-        self.Lx = width
-        self.Ly = length
-        self.edge = edge
-        self.bond = bond
-        self.verbose = verbose
-
-        self.lx = 0.
-        self.ly = 0.
-
-        self.Nx = 0
-        self.Ny = 0
-
-        self.nlayers = nlayers
-        self.layer_spacing = layer_spacing
-        self.stacking_order = stacking_order
-
-        self.layer_shift = np.zeros(3)
-
-        if nlayers > 1 and stacking_order == 'AB':
-            if edge in ('AC', 'armchair'):
-                self.layer_shift[1] = self.bond
-            elif edge in ('ZZ', 'zigzag'):
-                self.layer_shift[0] = self.bond
-            else:
-                print('unrecognized edge parameter: {}'.format(edge))
-                sys.exit(1)
-
-        self.atom1 = Atom(element1)
-        self.atom2 = Atom(element2)
-        self.atom3 = Atom(element1)
-        self.atom4 = Atom(element2)
-
-        self._Natoms = 0
-        self._Natoms_per_layer = None
-
-        self.atoms = Atoms(atoms=[self.atom1,
-                                  self.atom2,
-                                  self.atom3,
-                                  self.atom4])
-        self.structure_atoms = None
+        super(GrapheneGenerator, self).__init__(
+            n=n, m=m, width=width, length=length, edge=edge,
+            element1=element1, element2=element2, bond=bond,
+            nlayers=nlayers, layer_spacing=layer_spacing,
+            stacking_order=stacking_order, with_units=with_units,
+            verbose=verbose)
 
         self._fname = None
+        self._unit_cell = Atoms()
+        self._structure_atoms = Atoms()
 
         if autogen:
             self.generate_unit_cell()
-            self.generate_structure()
+            self.generate_structure_data()
 
     @property
     def fname(self):
@@ -192,100 +160,81 @@ class GrapheneGenerator(object):
         return self._fname
 
     @property
-    def Natoms(self):
-        """Number of atoms."""
-        return self._Natoms
+    def unit_cell(self):
+        """Return unit cell `Atoms`."""
+        return self._unit_cell
 
     @property
-    def Natoms_per_layer(self):
-        """Number of atoms per layer."""
-        return self._Natoms_per_layer
+    def structure_atoms(self):
+        """Return structure `Atoms`."""
+        return self._structure_atoms
 
     def generate_unit_cell(self):
-        """Generate the unit cell.
+        """Generate the graphene unit cell.
 
-        Called automatically if ``autogen`` is True.
+        Called automatically if `autogen` is `True`.
 
         """
+        bond = self._bond
+        edge = self._edge
+        e1 = self._element1
+        e2 = self._element2
 
-        if self.edge in ('AC', 'armchair'):
-            # Set up the unit cell with the armchair edge aligned
-            # along the `y`-axis.
-            self.lx = np.sqrt(3) * self.bond
-            self.ly = 3 * self.bond
-
-            # Set up 4 atom basis
-            # Leave atom 1 at the origin
-
+        self._unit_cell = Atoms()
+        # Set up 4 atom basis
+        # Leave atom 1 at the origin
+        atom1, atom2, atom3, atom4 = Atom(e1), Atom(e2), Atom(e1), Atom(e2)
+        if edge == 'AC':
             # Move atom 2 to 2nd basis position
-            self.atom2.x = -np.sqrt(3) / 2 * self.bond
-            self.atom2.y = self.bond / 2
+            atom2.x = -np.sqrt(3) / 2 * bond
+            atom2.y = bond / 2
 
-            # Move atom 3 along a1 primitive vector
-            self.atom3.x = -np.sqrt(3) / 2 * self.bond
-            self.atom3.y = 3 / 2 * self.bond
+            # Move atom 3 from atom 1 along a1 primitive vector
+            atom3.x = -np.sqrt(3) / 2 * bond
+            atom3.y = 3 / 2 * bond
 
             # Move atom 4 from atom 2 along a2 primitive vector
-            self.atom4.y = 2 * self.bond
-
-        elif self.edge in ('ZZ', 'zigzag'):
-            # Set up the unit cell with the zigzag edge aligned
-            # along the `y`-axis.
-            self.lx = 3 * self.bond
-            self.ly = np.sqrt(3) * self.bond
-
-            # Set up 4 atom basis
-            # Leave atom 1 at the origin
-
-            # Move atom 2 to the right
-            self.atom2.x = self.bond
-
-            # Move atom 3 to the left and up
-            self.atom3.x = 3 / 2 * self.bond
-            self.atom3.y = np.sqrt(3) / 2 * self.bond
-
-            # Move atom 4 to the right and up
-            self.atom4.x = -self.bond / 2
-            self.atom4.y = np.sqrt(3) / 2 * self.bond
-
+            atom4.y = 2 * bond
         else:
-            print('unrecognized edge parameter: {}'.format(self.edge))
-            sys.exit(1)
+            # Move atom 2 to 2nd basis position
+            atom2.x = bond
 
-        self.Nx = int(np.ceil(10 * self.Lx / self.lx))
-        self.Ny = int(np.ceil(10 * self.Ly / self.ly))
+            # Move atom 3 from atom 1 along a1 primitive vector
+            atom3.x = 3 / 2 * bond
+            atom3.y = np.sqrt(3) / 2 * bond
 
-    def generate_structure(self):
+            # Move atom 4 from atom 2 along a2 primitive vector
+            atom4.x = -bond / 2
+            atom4.y = np.sqrt(3) / 2 * bond
+
+        for atom in (atom1, atom2, atom3, atom4):
+            self._unit_cell.append(atom)
+        self._Natoms = self._unit_cell.Natoms
+
+    def generate_structure_data(self):
         """Generate the full structure coordinates."""
-
-        self.structure_atoms = []
-
-        for nlayer in xrange(self.nlayers):
-            layer_atoms = Atoms()
-            for nx in xrange(self.Nx):
-                for ny in xrange(self.Ny):
-                    dr = np.array([nx * self.lx,
-                                   ny * self.ly,
-                                   nlayer * self.layer_spacing])
-
-                    for atom in self.atoms.atomlist:
+        self._structure_atoms = Atoms()
+        for nlayer in xrange(self._nlayers):
+            layer = Atoms()
+            for nx in xrange(self._Nx):
+                for ny in xrange(self._Ny):
+                    dr = np.array([nx * self._lx,
+                                   ny * self._ly,
+                                   nlayer * self._layer_spacing])
+                    for atom in self._unit_cell:
                         layer_atom = Atom(atom.symbol)
                         layer_atom.r = atom.r + dr
-                        layer_atoms.append(layer_atom)
-                        self._Natoms += 1
+                        layer.append(layer_atom)
 
             if self._Natoms_per_layer is None:
-                self._Natoms_per_layer = layer_atoms.Natoms
+                self._Natoms_per_layer = layer.Natoms
 
             # translate layer to put its center of mass at the origin
-            layer_atoms.center_CM(r_indices=[0, 1])
+            layer.center_CM(r_indices=[0, 1])
             if (nlayer % 2) != 0:
-                layer_atoms.translate(self.layer_shift)
+                layer.translate(self._layer_shift)
 
-            self.structure_atoms.append(layer_atoms)
-
-        if self.verbose:
-            print(self.structure_atoms)
+            self._structure_atoms.extend(layer.atoms)
 
     def save_data(self, fname=None, structure_format=None, rotation_angle=-90,
                   rot_axis='x', deg2rad=True, center_CM=True):
@@ -321,10 +270,10 @@ class GrapheneGenerator(object):
             structure_format = default_structure_format
 
         if fname is None:
-            dimensions = '{}nmx{}nm'.format(self.Lx, self.Ly)
-            nlayer = '{}layer'.format(self.nlayers)
-            edge = 'AC' if self.edge in ('AC', 'armchair') else 'ZZ'
-            atombond = '{}{}'.format(self.atom1.symbol, self.atom2.symbol)
+            dimensions = '{}nmx{}nm'.format(self._Lx, self._Ly)
+            nlayer = '{}layer'.format(self._nlayers)
+            edge = 'AC' if self._edge in ('AC', 'armchair') else 'ZZ'
+            atombond = '{}{}'.format(self._element1, self._element2)
             fname_wordlist = (dimensions, nlayer, edge, atombond, 'graphene')
             fname = '_'.join(fname_wordlist)
             fname += '.' + structure_format
@@ -340,24 +289,23 @@ class GrapheneGenerator(object):
                         structure_format not in supported_structure_formats:
                     structure_format = default_structure_format
 
-        structure_atoms = list(itertools.chain(*self.structure_atoms))
-        structure_atoms = Atoms(structure_atoms)
-        if center_CM and self.nlayers > 1:
-            structure_atoms.center_CM()
+        self._fname = fname
+
+        #structure_atoms = list(itertools.chain(*self._structure_atoms))
+        #structure_atoms = Atoms(structure_atoms)
+        if center_CM and self._nlayers > 1:
+            self._structure_atoms.center_CM()
+
         if rotation_angle is not None:
             R_matrix = rotation_matrix(rotation_angle,
                                        rot_axis=rot_axis,
                                        deg2rad=deg2rad)
-            structure_atoms.rotate(R_matrix)
-            #for layer_atoms in self.structure_atoms:
-            #    layer_atoms.rotate(R_matrix)
+            self._structure_atoms.rotate(R_matrix)
 
         if structure_format == 'data':
-            DATAWriter.write(fname=fname, atoms=structure_atoms)
+            DATAWriter.write(fname=self._fname, atoms=self._structure_atoms)
         else:
-            XYZWriter.write(fname=fname, atoms=structure_atoms)
-
-        self._fname = fname
+            XYZWriter.write(fname=self._fname, atoms=self._structure_atoms)
 
 
 class BiLayerGrapheneGenerator(GrapheneGenerator):
@@ -439,7 +387,7 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
 
     """
 
-    def __init__(self, width=float, length=float, edge='armchair',
+    def __init__(self, width=float, length=float, edge=None,
                  element1='C', element2='C', bond=CCbond,
                  layer_spacing=3.35, stacking_order='AB',
                  rotation_angle=None, deg2rad=True, autogen=True,
@@ -451,21 +399,33 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
             nlayers=2, layer_spacing=layer_spacing, autogen=False,
             verbose=verbose)
 
-        self.rotation_matrix = None
+        self._rotation_matrix = None
         if rotation_angle is not None:
-            self.rotation_matrix = rotation_matrix(rotation_angle,
-                                                   rot_axis='z',
-                                                   deg2rad=deg2rad)
+            self._rotation_matrix = rotation_matrix(rotation_angle,
+                                                    rot_axis='z',
+                                                    deg2rad=deg2rad)
 
         if autogen:
             super(BiLayerGrapheneGenerator, self).generate_unit_cell()
-            self.generate_structure()
+            self.generate_structure_data()
 
-    def generate_structure(self):
+    def generate_structure_data(self):
         """Generate the full structure coordinates."""
-        super(BiLayerGrapheneGenerator, self).generate_structure()
+        super(BiLayerGrapheneGenerator, self).generate_structure_data()
 
-        if self.rotation_matrix is not None:
-            for n in xrange(self.nlayers):
+        if self._rotation_matrix is not None:
+            bilayer = copy.deepcopy(self._structure_atoms)
+            self._structure_atoms = Atoms()
+
+            z_coords = bilayer.get_coords(as_dict=True)['z']
+            z_set = np.asarray(sorted(list(set(z_coords))))
+            epsilon = 1e-10
+
+            for n, z in enumerate(z_set):
+                layer = Atoms(atoms=bilayer.get_atoms(asarray=True)[
+                    np.where(np.abs(z_coords - z) < epsilon)].tolist(),
+                    deepcopy=True)
                 if (n % 2) != 0:
-                    self.structure_atoms[n].rotate(self.rotation_matrix)
+                    layer.rotate(self._rotation_matrix)
+
+                self._structure_atoms.extend(layer.atoms)
