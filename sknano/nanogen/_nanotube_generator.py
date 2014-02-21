@@ -190,7 +190,7 @@ class NanotubeGenerator(Nanotube):
             print('dpsi: {}'.format(dpsi))
             print('dtau: {}\n'.format(dtau))
 
-        #self._unit_cell = Atoms()
+        self._unit_cell = Atoms()
 
         for i in xrange(1, N + 1):
             x1 = rt * np.cos(i * psi)
@@ -224,7 +224,7 @@ class NanotubeGenerator(Nanotube):
 
     def generate_structure_data(self):
         """Generate structure data."""
-        #self._structure_atoms = []
+        self._structure_atoms = Atoms()
         for nz in xrange(int(np.ceil(self._nz))):
             dr = np.array([0.0, 0.0, nz * self.T])
             for uc_atom in self._unit_cell:
@@ -290,12 +290,7 @@ class NanotubeGenerator(Nanotube):
                         structure_format not in supported_structure_formats:
                     structure_format = default_structure_format
 
-        #structure_atoms = list(itertools.chain(*self._structure_atoms))
-        #structure_atoms = None
-        #if isinstance(self._structure_atoms, list):
-        #    structure_atoms = Atoms(self._structure_atoms)
-        #elif isinstance(self._structure_atoms, Atoms):
-        #    structure_atoms = self._structure_atoms
+        self._fname = fname
 
         if center_CM:
             self._structure_atoms.center_CM()
@@ -311,11 +306,9 @@ class NanotubeGenerator(Nanotube):
             self._structure_atoms.rotate(R_matrix)
 
         if structure_format == 'data':
-            DATAWriter.write(fname=fname, atoms=self._structure_atoms)
+            DATAWriter.write(fname=self._fname, atoms=self._structure_atoms)
         else:
-            XYZWriter.write(fname=fname, atoms=self._structure_atoms)
-
-        self._fname = fname
+            XYZWriter.write(fname=self._fname, atoms=self._structure_atoms)
 
 
 class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
@@ -468,6 +461,8 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
             self._r2[0] = self._r1[0] * np.cos(2 * np.pi / 3)
             self._r2[1] = self._r1[0] * np.sin(2 * np.pi / 3)
 
+        #self._r1[2] = self._r2[2] = self.T
+
         self._bundle_packing = bundle_packing
         self._bundle_geometry = bundle_geometry
 
@@ -481,7 +476,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
 
         self._Ntubes = 0
 
-        swcnt0 = copy.deepcopy(self._structure_atoms)
+        swnt0 = copy.deepcopy(self._structure_atoms)
         self._structure_atoms = Atoms()
         if self._bundle_geometry == 'hexagon':
             nrows = max(self._nx, self._ny, 3)
@@ -495,34 +490,34 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
             while ntubes_per_row >= ntubes_per_end_rows:
                 if row == 0:
                     for n in xrange(ntubes_per_row):
-                        swcnt = Atoms(atoms=swcnt0, deepcopy=True)
-                        swcnt.center_CM()
+                        swnt = Atoms(atoms=swnt0, deepcopy=True)
+                        swnt.center_CM()
                         dr = n * self._r1
-                        swcnt.translate(dr)
-                        self._structure_atoms.extend(swcnt.atoms)
+                        swnt.translate(dr)
+                        self._structure_atoms.extend(swnt.atoms)
                         self._Ntubes += 1
                 else:
                     for nx in xrange(1, ntubes_per_row + 1):
                         for ny in (-row, row):
-                            swcnt = Atoms(atoms=swcnt0, deepcopy=True)
-                            swcnt.center_CM()
+                            swnt = Atoms(atoms=swnt0, deepcopy=True)
+                            swnt.center_CM()
                             dy = np.zeros(3)
                             dy[0] = abs(ny) * self._r2[0]
                             dy[1] = ny * self._r2[1]
                             dr = nx * self._r1 + dy
-                            swcnt.translate(dr)
-                            self._structure_atoms.extend(swcnt.atoms)
+                            swnt.translate(dr)
+                            self._structure_atoms.extend(swnt.atoms)
                             self._Ntubes += 1
                 row += 1
                 ntubes_per_row = nrows - row
         else:
             for nx in xrange(self._nx):
                 for ny in xrange(self._ny):
-                    swcnt = Atoms(atoms=swcnt0, deepcopy=True)
-                    swcnt.center_CM()
+                    swnt = Atoms(atoms=swnt0, deepcopy=True)
+                    swnt.center_CM()
                     dr = nx * self._r1 + ny * self._r2
-                    swcnt.translate(dr)
-                    self._structure_atoms.extend(swcnt.atoms)
+                    swnt.translate(dr)
+                    self._structure_atoms.extend(swnt.atoms)
                     self._Ntubes += 1
         self._Natoms_per_bundle = \
             self.compute_Natoms_per_bundle(n=self._n, m=self._m,
@@ -689,8 +684,6 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
             element2=element2, Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz, bond=bond,
             autogen=False, verbose=verbose)
 
-        self._Lzmin = np.inf
-
         self._max_shells = max_shells
         if max_shells is None:
             self._max_shells = np.inf
@@ -734,7 +727,7 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
             super(MWNTGenerator, self).generate_unit_cell()
             self.generate_structure_data()
 
-    def generate_unit_cell(self, n=int, m=int):
+    def _generate_unit_cell(self, n=int, m=int):
         """Generate the unit cell of a MWNT shell"""
         eps = 0.01
         bond = self._bond
@@ -782,25 +775,27 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
 
     def generate_structure_data(self):
         """Generate structure data."""
-        super(MWNTGenerator, self).generate_structure_data()
-
-        self._Ntubes = 0
-
         dt = []
         Ch = []
         for n in xrange(0, 201):
             for m in xrange(0, 201):
-                dt.append(Nanotube.compute_dt(n=n, m=m, bond=self.bond))
+                dt.append(Nanotube.compute_dt(n=n, m=m, bond=self._bond))
                 Ch.append((n, m))
         dt = np.asarray(dt)
         Ch = np.asarray(Ch)
 
+        super(MWNTGenerator, self).generate_structure_data()
+
+        self._Ntubes = 0
+
         swnt0 = copy.deepcopy(self._structure_atoms)
+        self._structure_atoms = Atoms()
+
         mwnt0 = Atoms(atoms=swnt0, deepcopy=True)
-        self._Lzmin = min(self._Lzmin, self._Lz)
         mwnt0.center_CM()
 
-        next_dt = self.dt - 2 * self._shell_spacing
+        Lzmin = self._Lz
+        next_dt = self._dt - 2 * self._shell_spacing
         while next_dt >= self._min_shell_diameter and \
                 self._Nshells_per_tube < self._max_shells:
             # get chiral indices for next_dt
@@ -844,40 +839,42 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
 
                 #delta_dt += 0.05
 
-            n, m = \
-                next_Ch_candidates[
-                    np.random.choice(np.arange(len(next_Ch_candidates)))]
-            # generate unit cell for new chiral indices
-            unit_cell = self.generate_unit_cell(n=n, m=m)
+            n, m = next_Ch_candidates[
+                np.random.choice(np.arange(len(next_Ch_candidates)))]
+            T = Nanotube.compute_T(n=n, m=m, bond=self._bond)
+            Lz = Nanotube.compute_Lz(n=n, m=m, bond=self._bond, nz=self._nz)
+            Lzmin = min(Lzmin, Lz)
+
+            # generate unit cell for new shell chiral indices
+            shell_unit_cell = self._generate_unit_cell(n=n, m=m)
+
             if self._verbose:
-                print('next_dt: {:.4f}'.format(next_dt))
-                print('n, m = {}, {}'.format(n, m))
-                print('unit_cell.Natoms: {}\n'.format(unit_cell.Natoms))
-            T = Nanotube.compute_T(n=n, m=m, bond=self.bond)
-            Lz = Nanotube.compute_Lz(n=n, m=m, bond=self.bond, nz=self.nz)
-            self._Lzmin = min(self._Lzmin, Lz)
-            shell_atoms = Atoms()
+                print('new shell:\n'
+                      'n, m = {}, {}\n'.format(n, m) +
+                      'dt: {:.4f}\n'.format(next_dt) +
+                      'shell_unit_cell.Natoms: {}\n'.format(
+                          shell_unit_cell.Natoms))
+
+            shell = Atoms()
             for nz in xrange(int(np.ceil(self._nz))):
                 dr = np.array([0.0, 0.0, nz * T])
-                for uc_atom in unit_cell.atoms:
-                    nt_atom = Atom(uc_atom.symbol)
-                    nt_atom.r = uc_atom.r + dr
-                    shell_atoms.append(nt_atom)
-            shell_atoms.center_CM()
-            mwnt0.extend(shell_atoms.atoms)
-            next_dt -= 2 * self._shell_spacing
+                for uc_atom in shell_unit_cell:
+                    atom = Atom(uc_atom.symbol)
+                    atom.r = uc_atom.r + dr
+                    shell.append(atom)
+            shell.center_CM()
+            mwnt0.extend(shell.atoms)
             self._Nshells_per_tube += 1
+            next_dt -= 2 * self._shell_spacing
 
         if self._L0 is not None and self._fix_Lz:
-            mwnt0.clip_bounds(abs_limit=(10 * self._L0 + 0.5) / 2,
-                              r_indices=[2])
+            mwnt0.clip_bounds(
+                abs_limit=(10 * self._L0 + 0.5) / 2, r_indices=[2])
         else:
-            mwnt0.clip_bounds(abs_limit=(10 * self._Lzmin + 0.5) / 2,
-                              r_indices=[2])
+            mwnt0.clip_bounds(
+                abs_limit=(10 * Lzmin + 0.5) / 2, r_indices=[2])
 
         self._Natoms_per_tube = mwnt0.Natoms
-
-        self._structure_atoms = Atoms()
 
         if self._bundle_geometry == 'hexagon':
             nrows = max(self._nx, self._ny, 3)
