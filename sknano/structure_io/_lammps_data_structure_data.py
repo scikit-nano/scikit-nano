@@ -294,15 +294,11 @@ class DATAWriter(StructureWriter):
             atomID_width = len(str(Natoms)) + 1
             atomtype_width = len(str(Ntypes)) + 1
 
-            if enforce_consecutive_atomIDs and \
-                    atoms.atom_ids.max() != atoms.Natoms:
-                for atomID, atom in enumerate(atoms, start=1):
-                    atom.atomID = atomID
-
-            if not assume_unique_atoms and \
-                    len(set(atoms.atom_ids)) != atoms.Natoms:
-                for atomID, atom in enumerate(atoms, start=1):
-                    atom.atomID = atomID
+            if (enforce_consecutive_atomIDs and
+                atoms.atom_ids.max() != atoms.Natoms) or \
+                    (not assume_unique_atoms and
+                     len(set(atoms.atom_ids)) != atoms.Natoms):
+                atoms.assign_unique_ids()
 
             if boxbounds is None:
                 boxbounds = {'x': {'min': None, 'max': None},
@@ -319,12 +315,11 @@ class DATAWriter(StructureWriter):
                 #for dim, pad in boxpad.iteritems():
                 for i, dim in enumerate(('x', 'y', 'z')):
                     pad = boxpad[dim]
-                    pad_delta = pad - pad_eps
                     if abs(boxbounds[dim]['min'] - atoms.coords[:, i].min()) \
-                            < pad_delta:
+                            < pad - pad_eps:
                         boxbounds[dim]['min'] = boxbounds[dim]['min'] - pad
                     if abs(boxbounds[dim]['max'] - atoms.coords[:, i].max()) \
-                            < pad_delta:
+                            < pad - pad_eps:
                         boxbounds[dim]['max'] = boxbounds[dim]['max'] + pad
 
             lohi_width = 0
