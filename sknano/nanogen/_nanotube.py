@@ -16,15 +16,19 @@ warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
 
 from fractions import gcd
 from collections import OrderedDict
-from pint import UnitRegistry
-ureg = UnitRegistry()
-Qty = ureg.Quantity
 
 import numpy as np
 
+try:
+    from pint import UnitRegistry
+    ureg = UnitRegistry()
+    Qty = ureg.Quantity
+except ImportError:
+    Qty = None
+
 from pkshared.tools.refdata import CCbond
 
-from ..chemistry import Atom, Atoms
+from ..chemistry import Atom
 param_units = {}
 param_units['dt'] = \
     param_units['rt'] = \
@@ -216,6 +220,11 @@ class Nanotube(object):
         if bond is None:
             bond = CCbond
 
+        if with_units and Qty is None:
+            with_units = False
+
+        self._with_units = with_units
+
         if with_units and isinstance(bond, float):
             self._bond = Qty(bond, 'angstroms')
         else:
@@ -223,7 +232,6 @@ class Nanotube(object):
 
         #self._bond = bond_lengths[element1][element2]
 
-        self._with_units = with_units
         self._verbose = verbose
 
         self._L0 = Lz  # store initial value of Lz
@@ -324,29 +332,26 @@ class Nanotube(object):
         self._t1 = self.compute_t1(n=self._n, m=self._m)
         self._t2 = self.compute_t2(n=self._n, m=self._m)
 
-        # Compute geometric properties
-        self._Ch = self.compute_Ch(n=self._n, m=self._m,
-                                   with_units=self._with_units,
-                                   bond=self._bond)
-        self._T = self.compute_T(n=self._n, m=self._m,
-                                 with_units=self._with_units,
-                                 bond=self._bond)
-        self._dt = self.compute_dt(n=self._n, m=self._m,
-                                   with_units=self._with_units,
-                                   bond=self._bond)
-        self._rt = self.compute_rt(n=self._n, m=self._m,
-                                   with_units=self._with_units,
-                                   bond=self._bond)
+        # Compute geometric/physical properties
         self._chiral_angle = self.compute_chiral_angle(n=self._n, m=self._m)
+        self._Ch = self.compute_Ch(n=self._n, m=self._m, bond=self._bond,
+                                   with_units=self._with_units)
+        self._T = self.compute_T(n=self._n, m=self._m, bond=self._bond,
+                                 with_units=self._with_units)
+        self._dt = self.compute_dt(n=self._n, m=self._m, bond=self._bond,
+                                   with_units=self._with_units)
+        self._rt = self.compute_rt(n=self._n, m=self._m, bond=self._bond,
+                                   with_units=self._with_units)
+
         self._M = self.compute_M(n=self._n, m=self._m)
 
-        # Compute physical properties
         self._Lz = \
-            self.compute_Lz(n=self._n, m=self._m, nz=self._nz,
-                            with_units=self._with_units,
-                            bond=self._bond)
+            self.compute_Lz(n=self._n, m=self._m, nz=self._nz, bond=self._bond,
+                            with_units=self._with_units)
         self._tube_mass = \
             self.compute_tube_mass(n=self._n, m=self._m, nz=self._nz,
+                                   element1=self._element1,
+                                   element2=self._element2,
                                    with_units=self._with_units)
         self._electronic_type = \
             self.compute_electronic_type(n=self._n, m=self._m)
@@ -358,9 +363,7 @@ class Nanotube(object):
         self._N = self.compute_N(n=self._n, m=self._m)
         self._Natoms = self.compute_Natoms(n=self._n, m=self._m)
         self._Natoms_per_tube = \
-            self.compute_Natoms_per_tube(n=self._n,
-                                         m=self._m,
-                                         nz=self._nz)
+            self.compute_Natoms_per_tube(n=self._n, m=self._m, nz=self._nz)
 
         for k, v in self.__dict__.iteritems():
             p = k.strip('_')
@@ -413,6 +416,16 @@ class Nanotube(object):
     def bond(self):
         """Bond length in **Angstroms**."""
         return self._bond
+
+    @property
+    def element1(self):
+        """Element symbol of `Atom` 1."""
+        return self._element1
+
+    @property
+    def element2(self):
+        """Element symbol of `Atom` 2."""
+        return self._element2
 
     @property
     def a(self):
@@ -657,7 +670,7 @@ class Nanotube(object):
             if bond is None:
                 bond = CCbond
 
-            if with_units and isinstance(bond, float):
+            if with_units and isinstance(bond, float) and Qty is not None:
                 bond = Qty(bond, units)
 
             if magnitude and with_units:
@@ -724,7 +737,7 @@ class Nanotube(object):
         if bond is None:
             bond = CCbond
 
-        if with_units and isinstance(bond, float):
+        if with_units and isinstance(bond, float) and Qty is not None:
             bond = Qty(bond, units)
 
         if magnitude and with_units:
@@ -744,9 +757,8 @@ class Nanotube(object):
     def compute_tube_diameter(cls, n=int, m=int, bond=None, with_units=False,
                               units='angstrom', magnitude=True):
         """Alias for :meth:`Nanotube.compute_dt`"""
-        return Nanotube.compute_dt(n=n, m=m, bond=bond, units=units,
-                                   with_units=with_units,
-                                   magnitude=magnitude)
+        return Nanotube.compute_dt(n=n, m=m, bond=bond, with_units=with_units,
+                                   units=units, magnitude=magnitude)
 
     @classmethod
     def compute_dt(cls, n=int, m=int, bond=None, with_units=False,
@@ -937,11 +949,24 @@ class Nanotube(object):
         bond : float, optional
             distance between nearest neighbor atoms.
             Must be in units of **Angstroms**.
+        with_units : bool, optional
+        units : str, optional
+        length : bool, optional
+        magnitude : bool, optional
 
         Returns
         -------
-        float
-            length of unit cell in Angstroms
+        float or Qty or 2-tuple of ints
+            If `length` is `True` and `with_units` is `False`, then
+            return the length of unit cell in Angstroms.
+            If `length` is `True` and `with_units` is `True` and
+            magnitude is `True`, then return the length of unit cell
+            as a float, but with units in `units`.
+            If `length` is `True` and `with_units` is `True` and
+            magnitude is `False`, then return the length of unit cell
+            as a `Quantity` instance and with units in `units`.
+            If `length` is `False`, return the componets of the
+            translation vector as a 2-tuple of ints (:math:`t_1`, :math:`t_2`).
 
         """
 
@@ -949,7 +974,7 @@ class Nanotube(object):
             if bond is None:
                 bond = CCbond
 
-            if with_units and isinstance(bond, float):
+            if with_units and isinstance(bond, float) and Qty is not None:
                 bond = Qty(bond, units)
 
             Ch = Nanotube.compute_Ch(n=n, m=m, bond=bond,
@@ -1148,6 +1173,14 @@ class Nanotube(object):
         -------
         float
 
+        Notes
+        -----
+
+        .. todo::
+
+           handle different elements and perform accurate calculation by
+           determining number of atoms of each element.
+
         """
         Natoms_per_tube = \
             Nanotube.compute_Natoms_per_tube(n=n, m=m, nz=nz)
@@ -1160,9 +1193,10 @@ class Nanotube(object):
         atom1 = Atom(element1)
         atom2 = Atom(element2)
 
-        mass = Natoms_per_tube * Atoms([atom1, atom2]).m
-        if with_units:
-            mass = Qty(mass, units)
+        mass = Natoms_per_tube * (atom1.m + atom2.m) / 2
+        if with_units and Qty is not None:
+            mass = Qty(mass, 'Da')
+            mass.ito(units)
 
         if magnitude and with_units:
             try:
@@ -1351,14 +1385,12 @@ class NanotubeBundle(Nanotube):
 
     def compute_bundle_params(self, d_vdw=None):
         """Compute bundle params."""
-
         super(NanotubeBundle, self).compute_tube_params()
-        self._Ntubes = self.compute_Ntubes(nx=self._nx,
-                                           ny=self._ny)
+        self._Ntubes = self.compute_Ntubes(nx=self._nx, ny=self._ny)
         self._bundle_mass = \
             self.compute_bundle_mass(n=self._n, m=self._m,
                                      nx=self._nx, ny=self._ny, nz=self._nz,
-                                     with_units=self._with_units)
+                                     with_units=False)
         self._Natoms_per_bundle = self._Ntubes * self._Natoms_per_tube
         if d_vdw is None:
             d_vdw = self._vdw_spacing
@@ -1367,8 +1399,9 @@ class NanotubeBundle(Nanotube):
             d_vdw = Qty(d_vdw, 'angstrom')
 
         self._bundle_density = \
-            self.compute_bundle_density(n=self._n, m=self._m,
-                                        d_vdw=d_vdw, bond=self._bond,
+            self.compute_bundle_density(n=self.n, m=self.m, d_vdw=d_vdw,
+                                        bond=self.bond, element1=self.element1,
+                                        element2=self.element2,
                                         with_units=self._with_units)
 
     @property
@@ -1453,13 +1486,18 @@ class NanotubeBundle(Nanotube):
         return self._bundle_mass
 
     @classmethod
-    def compute_bundle_mass(cls, n=int, m=int, nx=int, ny=int, nz=None,
-                            with_units=False):
+    def compute_bundle_mass(cls, n=int, m=int, nx=int, ny=int, nz=float,
+                            element1=None, element2=None, with_units=False,
+                            units='grams', magnitude=True):
         """Bundle mass in grams."""
         Ntubes = \
             NanotubeBundle.compute_Ntubes(nx=nx, ny=ny)
         tube_mass = Nanotube.compute_tube_mass(n=n, m=m, nz=nz,
-                                               with_units=with_units)
+                                               element1=element1,
+                                               element2=element2,
+                                               with_units=with_units,
+                                               units=units,
+                                               magnitude=magnitude)
         return Ntubes * tube_mass
 
     @property
@@ -1470,7 +1508,8 @@ class NanotubeBundle(Nanotube):
     @classmethod
     def compute_bundle_density(cls, n=int, m=int, d_vdw=None, bond=None,
                                element1=None, element2=None,
-                               with_units=False):
+                               with_units=False, units='g/cm**3',
+                               magnitude=True):
         """Compute bundle mass.
 
         Parameters
@@ -1487,14 +1526,16 @@ class NanotubeBundle(Nanotube):
         Returns
         -------
         float
-            :math:`L_{\\mathrm{tube}}` in **nanometers**
+            :math:`\\rho_{\\mathrm{bundle}}` in :math:`\\frac{g}{cm^3}`
 
         """
         if bond is None:
             bond = CCbond
-
-        if isinstance(bond, float):
-            bond = Qty(bond, 'angstroms')
+        else:
+            try:
+                bond = bond.magnitude
+            except AttributeError:
+                pass
 
         if d_vdw is None:
             if n == m:
@@ -1503,26 +1544,37 @@ class NanotubeBundle(Nanotube):
                 d_vdw = 3.41
             else:
                 d_vdw = 3.39
-
-        if isinstance(d_vdw, float):
-            d_vdw = Qty(d_vdw, 'angstroms')
+        else:
+            try:
+                d_vdw = d_vdw.magnitude
+            except AttributeError:
+                pass
 
         if element1 is None:
             element1 = 'C'
         if element2 is None:
             element2 = 'C'
 
-        atom1 = Atom(element1)
-        atom2 = Atom(element2)
-
-        atom_mass = Qty(Atoms([atom1, atom2]).m, 'grams')
-
-        bundle_density = 8 * np.pi**2 * atom_mass * \
-            np.sqrt(n**2 + m**2 + n*m) / \
-            (9 * np.sqrt(3) * (bond.to('cm'))**3 *
-                (np.sqrt(n**2 + m**2 + n*m) +
-                    np.pi * d_vdw / (np.sqrt(3) * bond))**2)
-        if with_units:
-            return bundle_density
+        if element1 == element2:
+            bundle_density = 8 * np.pi**2 * Atom(element1).m * \
+                np.sqrt(n**2 + m**2 + n*m) / \
+                (9 * np.sqrt(3) * bond**3 *
+                    (np.sqrt(n**2 + m**2 + n*m) +
+                        np.pi * d_vdw / (np.sqrt(3) * bond))**2)
         else:
-            return bundle_density.magnitude
+            bundle_density = 0
+
+        if with_units and Qty is not None:
+            bundle_density = Qty(bundle_density, 'Da/angstroms**3')
+            bundle_density.ito(units)
+            if magnitude:
+                try:
+                    return bundle_density.magnitude
+                except AttributeError:
+                    return bundle_density
+            else:
+                return bundle_density
+        else:
+            # there are 1.6605e-24 grams / Da and 1e-8 cm / angstrom
+            bundle_density *= 1.6605e-24 / (1e-8)**3
+            return bundle_density
