@@ -305,6 +305,11 @@ class Atoms(MutableSequence):
         for atom in atomtypes:
             self.add_atomtype(atom)
 
+    def assign_unique_ids(self):
+        """Assign unique ID to each `Atom` in `Atoms`."""
+        for i, atom in enumerate(self._atoms, start=1):
+            atom.atomID = i
+
     def center_CM(self, r_indices=[0, 1, 2]):
         """Center atoms on CM coordinates
 
@@ -426,19 +431,22 @@ class Atoms(MutableSequence):
                     r[i] = 0.0
             atom.x, atom.y, atom.z = r
 
-    def get_atoms(self, asarray=False):
+    def getatomsattr(self, asarray=False, as_array=False):
+        pass
+
+    def get_atoms(self, asarray=False, as_array=False):
         """Return list of `Atoms`.
 
         Parameters
         ----------
-        asarray : bool, optional
+        asarray, as_array : bool, optional
 
         Returns
         -------
         sequence or ndarray
 
         """
-        if asarray:
+        if asarray or as_array:
             return np.asarray(self._atoms)
         else:
             return self._atoms
