@@ -14,9 +14,12 @@ __docformat__ = 'restructuredtext'
 import warnings
 warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
 
-from pint import UnitRegistry
-ureg = UnitRegistry()
-Qty = ureg.Quantity
+try:
+    from pint import UnitRegistry
+    ureg = UnitRegistry()
+    Qty = ureg.Quantity
+except ImportError:
+    Qty = None
 
 import numpy as np
 
@@ -92,12 +95,16 @@ class Graphene(object):
         if bond is None:
             bond = CCbond
 
+        if with_units and Qty is None:
+            with_units = False
+
+        self._with_units = with_units
+
         if with_units and isinstance(bond, float):
             self._bond = Qty(bond, 'angstroms')
         else:
             self._bond = bond
 
-        self._with_units = with_units
         self._verbose = verbose
 
         try:
