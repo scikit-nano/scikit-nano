@@ -34,12 +34,9 @@ param_units['dt'] = \
 param_units['chiral_angle'] = u'\u00b0'
 
 param_symbols = {}
-param_symbols['dt'] = u'd\u209C'
-param_symbols['rt'] = u'r\u209C'
-param_symbols['Ch'] = u'C\u2095'
 param_symbols['t1'] = u't\u2081'
 param_symbols['t2'] = u't\u2082'
-param_symbols['chiral_angle'] = u'\u03b8\u1d04'
+param_symbols['chiral_angle'] = u'\u03b8c'
 
 param_strfmt = {}
 param_strfmt['Ch'] = \
@@ -137,11 +134,11 @@ class Nanotube(object):
     M: 10
     R: (1, 0)
     bond: 1.421 Å
-    Cₕ: 42.63 Å
+    Ch: 42.63 Å
     T: 2.46 Å
-    dₜ: 13.57 Å
-    rₜ: 6.78 Å
-    θᴄ: 30.00°
+    dt: 13.57 Å
+    rt: 6.78 Å
+    θc: 30.00°
 
     Change the chirality to :math:`\\mathbf{C}_{h} = (20, 10)`.
 
@@ -156,11 +153,11 @@ class Nanotube(object):
     M: 30
     R: (1, -1)
     bond: 1.421 Å
-    Cₕ: 65.12 Å
+    Ch: 65.12 Å
     T: 11.28 Å
-    dₜ: 20.73 Å
-    rₜ: 10.36 Å
-    θᴄ: 19.11°
+    dt: 20.73 Å
+    rt: 10.36 Å
+    θc: 19.11°
 
     Change the chirality to :math:`\\mathbf{C}_{h} = (20, 0)`.
 
@@ -175,11 +172,11 @@ class Nanotube(object):
     M: 20
     R: (1, -1)
     bond: 1.421 Å
-    Cₕ: 49.22 Å
+    Ch: 49.22 Å
     T: 4.26 Å
-    dₜ: 15.67 Å
-    rₜ: 7.83 Å
-    θᴄ: 0.00°
+    dt: 15.67 Å
+    rt: 7.83 Å
+    θc: 0.00°
 
     """
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1, element1='C',
