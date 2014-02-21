@@ -142,8 +142,8 @@ class NanotubeGenerator(Nanotube):
             with_units=False, verbose=verbose)
 
         self._fname = None
-        self.unit_cell = None
-        self.structure_atoms = None
+        self._unit_cell = Atoms()
+        self._structure_atoms = Atoms()
 
         if autogen:
             self.generate_unit_cell()
@@ -153,6 +153,16 @@ class NanotubeGenerator(Nanotube):
     def fname(self):
         """Structure file name."""
         return self._fname
+
+    @property
+    def unit_cell(self):
+        """Return unit cell `Atoms`."""
+        return self._unit_cell
+
+    @property
+    def structure_atoms(self):
+        """Return structure `Atoms`."""
+        return self._structure_atoms
 
     def generate_unit_cell(self):
         """Generate the nanotube unit cell."""
@@ -180,7 +190,7 @@ class NanotubeGenerator(Nanotube):
             print('dpsi: {}'.format(dpsi))
             print('dtau: {}\n'.format(dtau))
 
-        self.unit_cell = Atoms()
+        #self._unit_cell = Atoms()
 
         for i in xrange(1, N + 1):
             x1 = rt * np.cos(i * psi)
@@ -196,7 +206,7 @@ class NanotubeGenerator(Nanotube):
             if verbose:
                 print('Basis Atom 1:\n{}'.format(atom1))
 
-            self.unit_cell.append(atom1)
+            self._unit_cell.append(atom1)
 
             x2 = rt * np.cos(i * psi + dpsi)
             y2 = rt * np.sin(i * psi + dpsi)
@@ -210,17 +220,17 @@ class NanotubeGenerator(Nanotube):
             if verbose:
                 print('Basis Atom 2:\n{}'.format(atom2))
 
-            self.unit_cell.append(atom2)
+            self._unit_cell.append(atom2)
 
     def generate_structure_data(self):
         """Generate structure data."""
-        self.structure_atoms = []
+        #self._structure_atoms = []
         for nz in xrange(int(np.ceil(self._nz))):
             dr = np.array([0.0, 0.0, nz * self.T])
-            for uc_atom in self.unit_cell.atoms:
+            for uc_atom in self._unit_cell:
                 nt_atom = Atom(uc_atom.symbol)
                 nt_atom.r = uc_atom.r + dr
-                self.structure_atoms.append(nt_atom)
+                self._structure_atoms.append(nt_atom)
 
     def save_data(self, fname=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
@@ -280,30 +290,30 @@ class NanotubeGenerator(Nanotube):
                         structure_format not in supported_structure_formats:
                     structure_format = default_structure_format
 
-        #structure_atoms = list(itertools.chain(*self.structure_atoms))
-        structure_atoms = None
-        if isinstance(self.structure_atoms, list):
-            structure_atoms = Atoms(self.structure_atoms)
-        elif isinstance(self.structure_atoms, Atoms):
-            structure_atoms = self.structure_atoms
+        #structure_atoms = list(itertools.chain(*self._structure_atoms))
+        #structure_atoms = None
+        #if isinstance(self._structure_atoms, list):
+        #    structure_atoms = Atoms(self._structure_atoms)
+        #elif isinstance(self._structure_atoms, Atoms):
+        #    structure_atoms = self._structure_atoms
 
         if center_CM:
-            structure_atoms.center_CM()
+            self._structure_atoms.center_CM()
 
         if self._L0 is not None and self._fix_Lz:
-            structure_atoms.clip_bounds(abs_limit=(10 * self._L0 + 0.5) / 2,
-                                        r_indices=[2])
+            self._structure_atoms.clip_bounds(
+                abs_limit=(10 * self._L0 + 0.5) / 2, r_indices=[2])
 
         if rotation_angle is not None:
             R_matrix = rotation_matrix(rotation_angle,
                                        rot_axis=rot_axis,
                                        deg2rad=deg2rad)
-            structure_atoms.rotate(R_matrix)
+            self._structure_atoms.rotate(R_matrix)
 
         if structure_format == 'data':
-            DATAWriter.write(fname=fname, atoms=structure_atoms)
+            DATAWriter.write(fname=fname, atoms=self._structure_atoms)
         else:
-            XYZWriter.write(fname=fname, atoms=structure_atoms)
+            XYZWriter.write(fname=fname, atoms=self._structure_atoms)
 
         self._fname = fname
 
@@ -471,8 +481,8 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
 
         self._Ntubes = 0
 
-        swcnt0 = copy.deepcopy(self.structure_atoms)
-        self.structure_atoms = Atoms()
+        swcnt0 = copy.deepcopy(self._structure_atoms)
+        self._structure_atoms = Atoms()
         if self._bundle_geometry == 'hexagon':
             nrows = max(self._nx, self._ny, 3)
             if nrows % 2 != 1:
@@ -489,7 +499,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
                         swcnt.center_CM()
                         dr = n * self._r1
                         swcnt.translate(dr)
-                        self.structure_atoms.extend(swcnt.atoms)
+                        self._structure_atoms.extend(swcnt.atoms)
                         self._Ntubes += 1
                 else:
                     for nx in xrange(1, ntubes_per_row + 1):
@@ -501,7 +511,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
                             dy[1] = ny * self._r2[1]
                             dr = nx * self._r1 + dy
                             swcnt.translate(dr)
-                            self.structure_atoms.extend(swcnt.atoms)
+                            self._structure_atoms.extend(swcnt.atoms)
                             self._Ntubes += 1
                 row += 1
                 ntubes_per_row = nrows - row
@@ -512,7 +522,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
                     swcnt.center_CM()
                     dr = nx * self._r1 + ny * self._r2
                     swcnt.translate(dr)
-                    self.structure_atoms.extend(swcnt.atoms)
+                    self._structure_atoms.extend(swcnt.atoms)
                     self._Ntubes += 1
         self._Natoms_per_bundle = \
             self.compute_Natoms_per_bundle(n=self._n, m=self._m,
@@ -785,7 +795,7 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
         dt = np.asarray(dt)
         Ch = np.asarray(Ch)
 
-        swnt0 = copy.deepcopy(self.structure_atoms)
+        swnt0 = copy.deepcopy(self._structure_atoms)
         mwnt0 = Atoms(atoms=swnt0, deepcopy=True)
         self._Lzmin = min(self._Lzmin, self._Lz)
         mwnt0.center_CM()
@@ -867,7 +877,7 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
 
         self._Natoms_per_tube = mwnt0.Natoms
 
-        self.structure_atoms = Atoms()
+        self._structure_atoms = Atoms()
 
         if self._bundle_geometry == 'hexagon':
             nrows = max(self._nx, self._ny, 3)
@@ -885,7 +895,7 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
                         mwnt.center_CM()
                         dr = n * self._r1
                         mwnt.translate(dr)
-                        self.structure_atoms.extend(mwnt.atoms)
+                        self._structure_atoms.extend(mwnt.atoms)
                         self._Ntubes += 1
                 else:
                     for nx in xrange(1, ntubes_per_row + 1):
@@ -897,7 +907,7 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
                             dy[1] = ny * self._r2[1]
                             dr = nx * self._r1 + dy
                             mwnt.translate(dr)
-                            self.structure_atoms.extend(mwnt.atoms)
+                            self._structure_atoms.extend(mwnt.atoms)
                             self._Ntubes += 1
                 row += 1
                 ntubes_per_row = nrows - row
@@ -908,7 +918,7 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
                     mwnt.center_CM()
                     dr = nx * self._r1 + ny * self._r2
                     mwnt.translate(dr)
-                    self.structure_atoms.extend(mwnt.atoms)
+                    self._structure_atoms.extend(mwnt.atoms)
                     self._Ntubes += 1
         self._Natoms_per_bundle = self._Ntubes * self._Natoms_per_tube
 
