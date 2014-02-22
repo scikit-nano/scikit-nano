@@ -43,7 +43,7 @@ class Graphene(object):
         Length of graphene sheet in **nanometers**
     edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
-        the ``length`` of the sheet sheet.
+        the `length` of the sheet.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis atoms 1 and 2.
     bond : float, optional

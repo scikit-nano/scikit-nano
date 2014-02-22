@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-=====================================================================
-Nanotube structure tools (:mod:`sknano.nanogen._nanotube_generator`)
-=====================================================================
+==========================================================================
+Nanotube structure generators (:mod:`sknano.nanogen._nanotube_generator`)
+==========================================================================
 
 .. currentmodule:: sknano.nanogen._nanotube_generator
 
@@ -49,19 +49,15 @@ from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
     supported_structure_formats
 
 from ._nanotube import Nanotube, NanotubeBundle
+from ._structure_generator import StructureGenerator, StructureGeneratorError
 
-__all__ = ['NanotubeGeneratorError',
-           'NanotubeGenerator',
+__all__ = ['NanotubeGenerator',
            'NanotubeBundleGenerator',
-           'MWNTGenerator']
+           'MWNTGenerator',
+           'NanotubeGeneratorError']
 
 
-class NanotubeGeneratorError(Exception):
-    """Base class for NanotubeGenerator exceptions."""
-    pass
-
-
-class NanotubeGenerator(Nanotube):
+class NanotubeGenerator(Nanotube, StructureGenerator):
     u"""Class for generating nanotube structures.
 
     Parameters
@@ -141,28 +137,9 @@ class NanotubeGenerator(Nanotube):
             bond=bond, Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz,
             with_units=False, verbose=verbose)
 
-        self._fname = None
-        self._unit_cell = Atoms()
-        self._structure_atoms = Atoms()
-
         if autogen:
             self.generate_unit_cell()
             self.generate_structure_data()
-
-    @property
-    def fname(self):
-        """Structure file name."""
-        return self._fname
-
-    @property
-    def unit_cell(self):
-        """Return unit cell `Atoms`."""
-        return self._unit_cell
-
-    @property
-    def structure_atoms(self):
-        """Return structure `Atoms`."""
-        return self._structure_atoms
 
     def generate_unit_cell(self):
         """Generate the nanotube unit cell."""
@@ -231,6 +208,7 @@ class NanotubeGenerator(Nanotube):
                 nt_atom = Atom(uc_atom.symbol)
                 nt_atom.r = uc_atom.r + dr
                 self._structure_atoms.append(nt_atom)
+        self.update_structure_atoms_attributes()
 
     def save_data(self, fname=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
@@ -523,6 +501,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
             self.compute_Natoms_per_bundle(n=self._n, m=self._m,
                                            nz=self._nz,
                                            Ntubes=self._Ntubes)
+        self.update_structure_atoms_attributes()
 
     def save_data(self, fname=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
@@ -918,6 +897,7 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
                     self._structure_atoms.extend(mwnt.atoms)
                     self._Ntubes += 1
         self._Natoms_per_bundle = self._Ntubes * self._Natoms_per_tube
+        self.update_structure_atoms_attributes()
 
         if self._verbose:
             print('Ntubes: {}'.format(self._Ntubes))
@@ -1010,3 +990,8 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
             fname=fname, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
             deg2rad=deg2rad, center_CM=center_CM)
+
+
+class NanotubeGeneratorError(StructureGeneratorError):
+    """Base class for NanotubeGenerator exceptions."""
+    pass

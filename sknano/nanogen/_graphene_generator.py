@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-=====================================================================
-Graphene structure tools (:mod:`sknano.nanogen._graphene_generator`)
-=====================================================================
+==========================================================================
+Graphene structure generators (:mod:`sknano.nanogen._graphene_generator`)
+==========================================================================
 
 .. currentmodule:: sknano.nanogen._graphene_generator
 
@@ -11,8 +11,6 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext'
 
 import copy
-import itertools
-import sys
 
 import numpy as np
 
@@ -24,18 +22,14 @@ from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
     supported_structure_formats
 
 from ._graphene import Graphene
+from ._structure_generator import StructureGenerator, StructureGeneratorError
 
 __all__ = ['GrapheneGenerator',
            'BiLayerGrapheneGenerator',
            'GrapheneGeneratorError']
 
 
-class GrapheneGeneratorError(Exception):
-    """Base class for GrapheneGenerator exceptions."""
-    pass
-
-
-class GrapheneGenerator(Graphene):
+class GrapheneGenerator(Graphene, StructureGenerator):
     """Class for generating `n`-layer graphene nanostructures.
 
     Parameters
@@ -46,7 +40,7 @@ class GrapheneGenerator(Graphene):
         Length of graphene sheet in **nanometers**
     edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
-        the ``length`` of the sheet sheet.
+        the `length` of the sheet.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis atoms 1 and 2.
     bond : float, optional
@@ -79,7 +73,7 @@ class GrapheneGenerator(Graphene):
 
     >>> from sknano.nanogen import GrapheneGenerator
 
-    Now generate a ``1 nm x 20 nm`` armchair edge graphene nano-ribbon.
+    Now generate a **1 nm x 20 nm** armchair edge graphene nano-ribbon.
 
     >>> ACG = GrapheneGenerator(width=1, length=20, edge='armchair')
 
@@ -91,7 +85,7 @@ class GrapheneGenerator(Graphene):
 
     .. image:: /images/1nmx20nm_AC_edge.png
 
-    Now let's generate a ``1 nm x 20 nm`` zigzag edge graphene nano-ribbon.
+    Now let's generate a **1 nm x 20 nm** zigzag edge graphene nano-ribbon.
 
     >>> ZZG = GrapheneGenerator(width=1, length=20, edge='zigzag')
     >>> ZZG.save_data(fname='1nmx20nm_ZZ_edge.xyz')
@@ -100,8 +94,8 @@ class GrapheneGenerator(Graphene):
 
     .. image:: /images/1nmx20nm_ZZ_edge.png
 
-    Now generate ``5 nm`` by ``25 nm``, ``armchair`` edge,
-    5 layer, ``AB``-stacked graphene.
+    Now generate **5 nm x 25 nm**, `armchair` edge,
+    5 layer, `AB`-stacked graphene.
 
     >>> ACG_5layers = GrapheneGenerator(width=5, length=25,
     ...                                 edge='armchair', nlayers=5)
@@ -111,7 +105,7 @@ class GrapheneGenerator(Graphene):
 
     .. image:: /images/5nmx25nm_5layer_AC_graphene.png
 
-    Now generate single layer, ``10 nm x 10 nm`` sheet of BN Graphene.
+    Now generate single layer, **10 nm x 10 nm** sheet of BN Graphene.
 
     >>> BN_graphene = GrapheneGenerator(width=10, length=10, edge='AC',
     ...                                 element1='B', element2='N')
@@ -121,7 +115,7 @@ class GrapheneGenerator(Graphene):
 
     .. image:: /images/10nmx10nm_single_layer_BN_graphene.png
 
-    Now, just because we can, generate a ``5 nm x 5 nm`` sheet of
+    Now, just because we can, generate a **5 nm x 5 nm** sheet of
     Uranium-Einsteinium Graphene.
 
     >>> UEs_graphene = GrapheneGenerator(width=5, length=5, edge='zigzag',
@@ -146,28 +140,9 @@ class GrapheneGenerator(Graphene):
             stacking_order=stacking_order, with_units=with_units,
             verbose=verbose)
 
-        self._fname = None
-        self._unit_cell = Atoms()
-        self._structure_atoms = Atoms()
-
         if autogen:
             self.generate_unit_cell()
             self.generate_structure_data()
-
-    @property
-    def fname(self):
-        """Structure file name."""
-        return self._fname
-
-    @property
-    def unit_cell(self):
-        """Return unit cell `Atoms`."""
-        return self._unit_cell
-
-    @property
-    def structure_atoms(self):
-        """Return structure `Atoms`."""
-        return self._structure_atoms
 
     def generate_unit_cell(self):
         """Generate the graphene unit cell.
@@ -236,6 +211,8 @@ class GrapheneGenerator(Graphene):
 
             self._structure_atoms.extend(layer.atoms)
 
+        self.update_structure_atoms_attributes()
+
     def save_data(self, fname=None, structure_format=None, rotation_angle=-90,
                   rot_axis='x', deg2rad=True, center_CM=True):
         """Save structure data.
@@ -250,14 +227,14 @@ class GrapheneGenerator(Graphene):
                 - xyz
                 - data
 
-            If ``None``, then guess based on ``fname`` file extension or
-            default to ``xyz`` format.
+            If `None`, then guess based on `fname` file extension or
+            default to `xyz` format.
         rotation_angle : {None, float}, optional
             Angle of rotation
         rot_axis : {'x', 'y', 'z'}, optional
             Rotation axis
         deg2rad : bool, optional
-            Convert ``rotation_angle`` from degrees to radians.
+            Convert `rotation_angle` from degrees to radians.
         center_CM : bool, optional
             Center center-of-mass on origin.
 
@@ -320,7 +297,7 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
         Length of graphene sheet in **nanometers**
     edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
-        the ``length`` of the sheet sheet.
+        the `length` of the sheet.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis atoms 1 and 2.
     bond : float, optional
@@ -331,12 +308,12 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
         Stacking order of graphene layers
     rotation_angle : {None, float}, optional
         Rotation angle of second layer specified in degrees.
-        If specified in radians, then you must set ``deg2rad=False``
+        If specified in radians, then you must set `deg2rad=False`
     deg2rad : bool, optional
         The rotation angle is specified in degrees and needs to be converted
         to radians.
     autogen : bool, optional
-        if ``True``, automatically generate unit cell and full structure
+        if `True`, automatically generate unit cell and full structure
     verbose : bool, optional
         verbose output
 
@@ -347,8 +324,8 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
 
     >>> from sknano.nanogen import BiLayerGrapheneGenerator
 
-    Generate ``1 nm`` wide by ``10 nm`` long ``AB`` stacked
-    bilayer-graphene with a ``ZZ`` edge:
+    Generate **1 nm** wide by **10 nm** long `AB` stacked
+    bilayer-graphene with a `ZZ` edge:
 
     >>> bi_graphene = BiLayerGrapheneGenerator(width=1, length=10, edge='ZZ')
 
@@ -429,3 +406,10 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
                     layer.rotate(self._rotation_matrix)
 
                 self._structure_atoms.extend(layer.atoms)
+
+        self.update_structure_atoms_attributes()
+
+
+class GrapheneGeneratorError(StructureGeneratorError):
+    """Base class for GrapheneGenerator exceptions."""
+    pass
