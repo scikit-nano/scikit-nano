@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
-"""scikit-nano: python toolkit for nano-science.
+"""Python toolkit for generating nanostructure data and nanostructure analysis.
 
-*scikit-nano* is a python toolkit for nano-science.  Its primary utility is
-generating nano-structure data (i.e., atomic coordinates) for the following
-nano-structure materials:
+*scikit-nano* is a python toolkit for generating nanostructure data and
+nanostructure analysis.
+
+Its primary utility is generating nanostructure data (i.e. atomic coordinates)
+for the following nanostructure materials:
 
     * Graphene:
 
         * Single layer graphene
-        * bi-layer graphene with layers rotated relative to each other
+        * Bi-layer graphene with layers rotated relative to each other
+          by any angle and different layer stacking arrangements
         * :math:`N`-layer graphene
 
     * Nanotubes:
@@ -24,13 +27,15 @@ It currently supports saving structure data in the following formats:
     * LAMMPS `data`
 
 Secondary to its structure generating functions are its
-*structure analysis tools* facilitated by its built-in
-abstract data structures for representing atoms including:
+*structure analysis tools* including:
 
+    * defect/vacancy structure analysis
     * nearest-neighbor analysis
     * ...
 
-For documentation, visit:
+I welcome feedback and contributions to development!
+
+For documentation, see:
 `scikit-nano documentation <http://projects.geekspin.net/scikit-nano/doc>`_
 
 """
