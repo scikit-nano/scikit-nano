@@ -42,6 +42,8 @@ Structure generator classes
 .. autosummary::
    :toctree: generated/
 
+   StructureGenerator
+
    GrapheneGenerator
    BiLayerGrapheneGenerator
 
@@ -59,6 +61,7 @@ Custom exception classes for handling errors
 .. autosummary::
    :toctree: generated/
 
+   StructureGeneratorError
    GrapheneGeneratorError
    NanotubeGeneratorError
 
@@ -71,6 +74,7 @@ from ._graphene import *
 from ._graphene_generator import *
 from ._nanotube import *
 from ._nanotube_generator import *
+from ._structure_generator import *
 from ._tubegen import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
