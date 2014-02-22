@@ -38,10 +38,10 @@ class StructureGenerator(object):
         """Return structure `Atoms`."""
         return self._structure_atoms
 
-    def update_structure_atoms_attributes(self, n=3, rc=1.5):
-        self._structure_atoms.assign_unique_ids()
-        self._structure_atoms.update_coordination_numbers(n=n, rc=rc)
-        self._structure_atoms.update_nearest_neighbors(n=n, rc=rc)
+    #def update_structure_atoms_attributes(self, n=3, rc=1.5):
+    #    self._structure_atoms.assign_unique_ids()
+    #    self._structure_atoms.update_coordination_numbers(n=n, rc=rc)
+    #    self._structure_atoms.update_nearest_neighbors(n=n, rc=rc)
 
 
 class StructureGeneratorError(Exception):

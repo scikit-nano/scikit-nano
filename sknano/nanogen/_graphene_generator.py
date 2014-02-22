@@ -211,7 +211,7 @@ class GrapheneGenerator(Graphene, StructureGenerator):
 
             self._structure_atoms.extend(layer.atoms)
 
-        self.update_structure_atoms_attributes()
+        #self.update_structure_atoms_attributes()
 
     def save_data(self, fname=None, structure_format=None, rotation_angle=-90,
                   rot_axis='x', deg2rad=True, center_CM=True):
@@ -407,7 +407,7 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
 
                 self._structure_atoms.extend(layer.atoms)
 
-        self.update_structure_atoms_attributes()
+        #self.update_structure_atoms_attributes()
 
 
 class GrapheneGeneratorError(StructureGeneratorError):

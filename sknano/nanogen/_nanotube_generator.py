@@ -208,7 +208,7 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
                 nt_atom = Atom(uc_atom.symbol)
                 nt_atom.r = uc_atom.r + dr
                 self._structure_atoms.append(nt_atom)
-        self.update_structure_atoms_attributes()
+        #self.update_structure_atoms_attributes()
 
     def save_data(self, fname=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
@@ -501,7 +501,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
             self.compute_Natoms_per_bundle(n=self._n, m=self._m,
                                            nz=self._nz,
                                            Ntubes=self._Ntubes)
-        self.update_structure_atoms_attributes()
+        #self.update_structure_atoms_attributes()
 
     def save_data(self, fname=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
@@ -897,7 +897,7 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
                     self._structure_atoms.extend(mwnt.atoms)
                     self._Ntubes += 1
         self._Natoms_per_bundle = self._Ntubes * self._Natoms_per_tube
-        self.update_structure_atoms_attributes()
+        #self.update_structure_atoms_attributes()
 
         if self._verbose:
             print('Ntubes: {}'.format(self._Ntubes))
