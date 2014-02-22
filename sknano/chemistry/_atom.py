@@ -51,13 +51,15 @@ class Atom(object):
         :math:`n_x, n_y, n_z` image flags for LAMMPS atoms.
     CN : int, optional
         `Atom` coordination number.
+    NN : `Atoms`, optional
+        Nearest-neighbor `Atoms` object instance
 
     """
 
     def __init__(self, element=None, atomID=0, moleculeID=0, atomtype=1, q=0.,
                  mass=None, x=None, y=None, z=None, vx=None, vy=None, vz=None,
                  r_units=None, v_units=None, nx=None, ny=None, nz=None,
-                 CN=None):
+                 CN=None, NN=None):
 
         self._symbol = None
         self._Z = None
@@ -128,9 +130,10 @@ class Atom(object):
         self._atomtype = int(atomtype)
 
         self._CN = CN
+        self._NN = NN
 
         self._attributes = ['symbol', 'Z', 'm', 'q', 'r', 'v', 'atomID',
-                            'moleculeID', 'atomtype', 'CN']
+                            'moleculeID', 'atomtype', 'CN', 'NN']
 
     def __str__(self):
         """Return string representation of atom."""
@@ -147,13 +150,23 @@ class Atom(object):
 
     @property
     def CN(self):
-        """Coordination number."""
+        """Return `Atom` coordination number."""
         return self._CN
 
     @CN.setter
     def CN(self, value=int):
-        """Set coordination number."""
+        """Set `Atom` coordination number."""
         self._CN = int(value)
+
+    @property
+    def NN(self):
+        """Return list of nearest-neighbor `Atom` objects."""
+        return self._NN
+
+    @NN.setter
+    def NN(self, value=list):
+        """Set list of nearest-neighbor `Atom` objects."""
+        self._NN = value
 
     @property
     def Z(self):
