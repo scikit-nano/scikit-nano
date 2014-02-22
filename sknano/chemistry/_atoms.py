@@ -533,9 +533,9 @@ class Atoms(MutableSequence):
     def getatomsattr(self, asarray=False, as_array=False):
         pass
 
-    def get_atom(self, index=None, atom_ID=None):
+    def get_atom(self, atomID=None, index=None):
         try:
-            return self._atoms[atom_ID - 1]
+            return self._atoms[atomID - 1]
         except (TypeError, IndexError):
             try:
                 return self._atoms[index]
