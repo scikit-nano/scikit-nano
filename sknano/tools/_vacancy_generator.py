@@ -44,7 +44,7 @@ class VacancyGenerator(object):
         structure data filename
     structure_format : {None, str}, optional
         chemical file format of saved structure data.
-        If ``None``, then guess based on ``fname`` file extension.
+        If `None`, then guess based on `fname` file extension.
         Otherwise, must be one of:
 
             - xyz
@@ -148,7 +148,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
         generate the structure data file.
     structure_format : {None, str}, optional
         Chemical file format of saved structure data.
-        If ``None``, then guess based on ``fname`` file extension.
+        If `None`, then guess based on `fname` file extension.
         Otherwise, must be one of:
 
             - xyz
@@ -160,7 +160,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
         Length of graphene sheet in **nanometers**
     edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
-        the ``length`` of the sheet sheet.
+        the `length` of the sheet.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis atoms 1 and 2.
     bond : float, optional
@@ -188,15 +188,15 @@ class GrapheneVacancyGenerator(VacancyGenerator):
     You can supply any existing structure data file
     (as long as its a supported format) to
     :py:class:`GrapheneVacancyGenerator` using the
-    ``fname`` keyword argument. For example, if you have an existing
+    `fname` keyword argument. For example, if you have an existing
     LAMMPS structure data file for graphene named
-    ``5nmx10nm_ZZ_1layer.data``, you could load that into your
+    *5nmx10nm_ZZ_1layer.data*, you could load that into your
     vacancy generator by typing:
 
     >>> gvacgen = GrapheneVacancyGenerator(fname='5nmx10nm_ZZ_1layer.data')
 
     If say, you had your LAMMPS data file saved with a ``.lammps``
-    extension, then you would need to specify the ``structure_format``
+    extension, then you would need to specify the `structure_format`
     keyword argument as well:
 
     >>> gvacgen = GrapheneVacancyGenerator(fname='5nmx10nm_ZZ_1layer.lammps',
@@ -208,10 +208,10 @@ class GrapheneVacancyGenerator(VacancyGenerator):
     constructor. These arguments are passed to an instance of
     :py:class:`GrapheneGenerator` "under the hood". See the
     :py:class:`GrapheneGenerator` docs for examples and more
-    detailed documentation. The ``width`` and ``length`` parameters are
+    detailed documentation. The `width` and `length` parameters are
     required, while all others supply default values. In the following
     example, we'll use the :py:class:`GrapheneVacancyGenerator` class
-    to generate a ``5nm x 10nm``, single layer graphene with ``zigzag`` edges,
+    to generate a **5nm x 10nm**, single layer graphene with `zigzag` edges,
     and then poke some holes in it.
 
     >>> gvacgen = GrapheneVacancyGenerator(width=5, length=10, edge='ZZ')
@@ -258,7 +258,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
        (((x - 19.894000)^2 + (y - 0.000000)^2 + (z - 12.921532)^2) <= 9)
 
     This will save the vacancy structure data in both
-    LAMMPS ``data`` and ``xyz`` formats. You can load the ``xyz`` file
+    LAMMPS `data` and `xyz` formats. You can load the `xyz` file
     into VMD and then copy the VMD selection command from the output above
     and paste it into VMD to highlight the atoms surrounding the vacancies.
 
@@ -413,7 +413,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
         generate the structure data file.
     structure_format : {None, str}, optional
         Chemical file format of saved structure data.
-        If ``None``, then guess based on ``fname`` file extension.
+        If `None`, then guess based on `fname` file extension.
         Otherwise, must be one of:
 
             - xyz
@@ -460,19 +460,19 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     >>> ntvg = NanotubeVacancyGenerator(n=10, m=5, Lz=10, fix_Lz=True,
     ...                                 bundle_geometry='hexagon')
 
-    Notice that I used the ``Lz`` keyword argument to specify the
+    Notice that I used the `Lz` keyword argument to specify the
     **length** of the nanotube bundle in **nanometers**, and I also
-    set ``fix_Lz=True``. If you don't set ``fix_Lz=True``, then the
+    set `fix_Lz=True`. If you don't set `fix_Lz=True`, then the
     length of the nanotube will get truncated such that it's an integer
     multiple of the unit cell length, which,
     depending on the chirality, may end up being very different than
-    the desired length set by ``Lz``.
+    the desired length set by `Lz`.
 
-    Next, I add 35 vacancies distributed uniformly along the ``z``
+    Next, I add 35 vacancies distributed uniformly along the `z`
     axis. When generating vacancies *uniformly*, the code is written such
     it will divide the total number of vacancies
     evenly among all nanotubes and distribute those vacancies uniformly
-    along the specified ``bin_axis``. The circumferential location of
+    along the specified `bin_axis`. The circumferential location of
     vacancies is selected randomly. Future revisions will allow more precise
     control of the positioning.
 
