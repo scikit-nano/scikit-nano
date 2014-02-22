@@ -1,18 +1,34 @@
 # -*- coding: utf-8 -*-
-"""scikit-nano: python toolkit for generating nano-structures.
+"""scikit-nano: python toolkit for nano-science.
 
-*scikit-nano* is a python toolkit for nano-science.
-Currently, its primary use is for generating nano-structure data for the
-following nano-materials:
+*scikit-nano* is a python toolkit for nano-science.  Its primary utility is
+generating nano-structure data (i.e., atomic coordinates) for the following
+nano-structure materials:
 
-    * Graphene, both single layer graphene and N-layer graphene.
-    * Single-walled nanotubes (SWNTs), both single SWNTs and SWNT bundles.
-    * Multi-walled nanotubes (MWNTs), both single MWNTs and MWNT bundles.
+    * Graphene:
 
-It supports saving structure data in the following formats:
+        * Single layer graphene
+        * bi-layer graphene with layers rotated relative to each other
+        * :math:`N`-layer graphene
+
+    * Nanotubes:
+
+        * Single-walled nanotubes (SWNTs)
+        * SWNT *bundles*
+        * Multi-walled nanotubes (MWNTs)
+        * MWNT *bundles*
+
+It currently supports saving structure data in the following formats:
 
     * `xyz`
     * LAMMPS `data`
+
+Secondary to its structure generating functions are its
+*structure analysis tools* facilitated by its built-in
+abstract data structures for representing atoms including:
+
+    * nearest-neighbor analysis
+    * ...
 
 For documentation, visit:
 `scikit-nano documentation <http://projects.geekspin.net/scikit-nano/doc>`_
@@ -50,7 +66,7 @@ Topic :: Scientific/Engineering
 MAJOR = 0
 MINOR = 2
 MICRO = 14
-ISRELEASED = False
+ISRELEASED = True
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 
