@@ -14,7 +14,7 @@ Introduction
    :end-line: -2
 
 This package is now featured in the collection of
-`SciKit libraries <http://scikits.appspot.com>`_.
+`SciKit libraries <http://scikits.appspot.com/scikits>`_
 
 .. _installation:
 
