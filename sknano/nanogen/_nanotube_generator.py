@@ -362,13 +362,12 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
     :math:`n_x=10, n_y=3, n_z=5`.
 
     >>> from sknano.nanogen import NanotubeBundleGenerator
-    >>> SWCNTbundle = NanotubeBundleGenerator(n=10, m=5, nx=10,
-    ...                                       ny=3, nz=5)
+    >>> SWCNTbundle = NanotubeBundleGenerator(n=10, m=5, nx=10, ny=3, nz=5)
     >>> SWCNTbundle.save_data()
 
     The rendered structure looks like:
 
-    .. image:: /images/1005_hcp_10cellsx3cellsx5cells-001.png
+    .. image:: /images/1005_hcp_10cellsx3cellsx5cells-01.png
 
     Now let's generate a nice hexagon bundle, 3 tubes wide, with
     :math:`C_{\\mathrm{h}} = (6, 5)`.
@@ -379,7 +378,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
 
     which looks like:
 
-    .. image:: /images/0605_hcp_7tube_hexagon-001.png
+    .. image:: /images/0605_hcp_7tube_hexagon-01.png
 
     Remember, all of the :py:meth:`~NanotubeBundleGenerator.save_data`
     methods allow you to rotate the structure data before saving:
@@ -387,7 +386,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
     >>> SWCNTbundle.save_data(fname='0605_hcp_7tube_hexagon_rot-30deg.xyz',
     ...                       rot_axis='z', rotation_angle=30)
 
-    .. image:: /images/0605_hcp_7tube_hexagon_rot-30deg-001.png
+    .. image:: /images/0605_hcp_7tube_hexagon_rot-30deg-01.png
 
     Now, just because we can, let's make a big ass hexagon bundle with
     :math:`C_{\\mathrm{h}} = (10, 0)`.
@@ -399,7 +398,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
     You're looking at 469 :math:`(10, 0)` unit cells! That's
     :math:`N_{\\mathrm{atoms}} = 18760`.
 
-    .. image:: /images/1000_hcp_469tube_hexagon-001.png
+    .. image:: /images/1000_hcp_469tube_hexagon-01.png
 
     """
 
@@ -475,14 +474,14 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
                         self._structure_atoms.extend(swnt.atoms)
                         self._Ntubes += 1
                 else:
-                    for nx in xrange(1, ntubes_per_row + 1):
+                    for nx in xrange(ntubes_per_row):
                         for ny in (-row, row):
                             swnt = Atoms(atoms=swnt0, deepcopy=True)
                             swnt.center_CM()
-                            dy = np.zeros(3)
-                            dy[0] = abs(ny) * self._r2[0]
-                            dy[1] = ny * self._r2[1]
-                            dr = nx * self._r1 + dy
+                            dr = np.zeros(3)
+                            dr[0] = abs(ny * self._r2[0])
+                            dr[1] = ny * self._r2[1]
+                            dr = nx * self._r1 + dr
                             swnt.translate(dr)
                             self._structure_atoms.extend(swnt.atoms)
                             self._Ntubes += 1
@@ -643,13 +642,13 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
     >>> mwnt = MWNTGenerator(n=40, m=40, max_shells=5, Lz=1.0, fix_Lz=True)
     >>> mwnt.save_data()
 
-    .. image:: /images/5shell_mwnt_4040_outer_Ch_1cellx1cellx4.06cells-001.png
+    .. image:: /images/5shell_mwnt_4040_outer_Ch_1cellx1cellx4.06cells-01.png
 
     >>> mwntbundle = MWNTGenerator(n=40, m=40, max_shells=5, Lz=1.0,
     ...                            fix_Lz=True, bundle_geometry='hexagon')
     >>> mwntbundle.save_data()
 
-    .. image:: /images/5shell_mwnt_4040_outer_Ch_hcp_7tube_hexagon-001.png
+    .. image:: /images/5shell_mwnt_4040_outer_Ch_hcp_7tube_hexagon-01.png
 
     """
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
@@ -875,14 +874,14 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
                         self._structure_atoms.extend(mwnt.atoms)
                         self._Ntubes += 1
                 else:
-                    for nx in xrange(1, ntubes_per_row + 1):
+                    for nx in xrange(ntubes_per_row):
                         for ny in (-row, row):
                             mwnt = Atoms(atoms=mwnt0.atoms, deepcopy=True)
                             mwnt.center_CM()
-                            dy = np.zeros(3)
-                            dy[0] = abs(ny) * self._r2[0]
-                            dy[1] = ny * self._r2[1]
-                            dr = nx * self._r1 + dy
+                            dr = np.zeros(3)
+                            dr[0] = abs(ny * self._r2[0])
+                            dr[1] = ny * self._r2[1]
+                            dr = nx * self._r1 + dr
                             mwnt.translate(dr)
                             self._structure_atoms.extend(mwnt.atoms)
                             self._Ntubes += 1
