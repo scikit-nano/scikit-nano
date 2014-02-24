@@ -64,14 +64,14 @@ class XYZWriter(StructureWriter):
         ----------
         fname : str
         atoms : `Atoms`
-            An :py:class:`Atoms` instance.
+            An `Atoms` instance.
         comment_line : str, optional
-            A string written to the first line of ``xyz`` file. If ``None``,
-            then it is set to the full path of the output ``xyz`` file.
+            A string written to the first line of `xyz` file. If `None`,
+            then it is set to the full path of the output `xyz` file.
 
         """
         if not isinstance(atoms, Atoms):
-            raise TypeError('atoms argument must be an ``Atoms`` instance')
+            raise TypeError('atoms argument must be an `Atoms` instance')
         else:
             fname = get_fpath(fname=fname, ext='xyz', overwrite=True,
                               add_fnum=False)

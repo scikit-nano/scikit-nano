@@ -56,7 +56,7 @@ class StructureConverter(object):
 
 class DATA2XYZConverter(StructureConverter):
     """
-    Class for converting structure data from LAMMPS ``data`` to ``xyz`` format.
+    Class for converting structure data from LAMMPS `data` to `xyz` format.
 
     .. versionadded:: 0.2.9
 
@@ -83,7 +83,7 @@ class DATA2XYZConverter(StructureConverter):
         return self.outfile
 
     def convert(self, return_reader=False):
-        """Convert LAMMPS ``data`` to ``xyz`` chemical file format.
+        """Convert LAMMPS `data` to `xyz` chemical file format.
 
         Parameters
         ----------
@@ -111,13 +111,13 @@ class DATA2XYZConverter(StructureConverter):
 
 class XYZ2DATAConverter(StructureConverter):
     """
-    Class for converting structure data from ``xyz`` to LAMMPS ``data`` format.
+    Class for converting structure data from `xyz` to LAMMPS `data` format.
 
     Parameters
     ----------
     xyzfile : str
     boxbounds : {None, dict}, optional
-        dict specifying ``min`` and ``max`` box bounds in
+        dict specifying `min` and `max` box bounds in
         :math:`x,y,z` dimensions. If None, then determine bounds based
         atom coordinates.
     pad_box : bool, optional

@@ -13,7 +13,7 @@ __docformat__ = 'restructuredtext'
 
 from pkshared.tools.fiofuncs import get_fpath
 
-#from ..chemistry import Atom
+from ..chemistry import Atoms
 from ._structure_data import StructureReader, StructureReaderError, \
     StructureWriter
 
@@ -48,15 +48,13 @@ class PDBWriter(StructureWriter):
         Parameters
         ----------
         fname : str
-        atoms : :py:class:`Atoms`
-            :py:class:`Atoms` instance.
+        atoms : `Atoms`
+            `Atoms` instance.
         comment_line : str, optional
 
         """
-        if fname is None:
-            raise TypeError('fname argument must be a string!')
-        elif atoms is None:
-            raise TypeError('atoms argument must be an Atoms object')
+        if not isinstance(atoms, Atoms):
+            raise TypeError('atoms argument must be an `Atoms` instance')
         else:
             fname = get_fpath(fname=fname, ext='pdb', overwrite=True,
                               add_fnum=False)
@@ -69,7 +67,7 @@ class PDBWriter(StructureWriter):
                 f.write('{:d}\n'.format(atoms.Natoms))
                 f.write('{}\n'.format(comment_line))
                 for atom in atoms:
-                    f.write('{:3s} {:10.5f} {:10.5f} {:10.5f}\n'.format(
+                    f.write('{:>3s}{:15.8f}{:15.8f}{:15.8f}\n'.format(
                         atom.symbol, atom.x, atom.y, atom.z))
 
 

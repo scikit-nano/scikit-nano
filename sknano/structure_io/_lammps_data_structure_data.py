@@ -25,7 +25,7 @@ __all__ = ['DATAReader', 'DATAWriter', 'LAMMPSDATA',
 
 
 class DATAReader(StructureReader):
-    """Class for reading ``LAMMPS data`` file format.
+    """Class for reading `LAMMPS data` file format.
 
     Parameters
     ----------
@@ -199,7 +199,7 @@ class DATAReader(StructureReader):
             self._boxbounds[dim] = {'min': bounds[0], 'max': bounds[-1]}
 
     def get(self, section_key, colnum=None, colname=None, colindex=None):
-        """Return section with ``section key``.
+        """Return section with `section_key`.
 
         Parameters
         ----------
@@ -260,21 +260,21 @@ class DATAWriter(StructureWriter):
         atoms : `Atoms`
             An :py:class:`Atoms` instance.
         boxbounds : dict, optional
-            If ``None``, determined automatically from atom coordinates.
+            If `None`, determined automatically from atom coordinates.
         comment_line : str, optional
-            A string written to the first line of ``data`` file. If ``None``,
-            then it is set to the full path of the output ``data`` file.
+            A string written to the first line of `data` file. If `None`,
+            then it is set to the full path of the output `data` file.
         assume_unique_atoms : bool, optional
             Check that each Atom in Atoms has a unique atomID. If the check
             fails, then assign a unique atomID to each Atom.
-            If ``assume_unique_atoms`` is True, but the atomID's are not
+            If `assume_unique_atoms` is True, but the atomID's are not
             unique, LAMMPS will not be able to read the data file.
         verbose : bool, optional
             verbose output
 
         """
         if not isinstance(atoms, Atoms):
-            raise TypeError('atoms argument must be an ``Atoms`` instance')
+            raise TypeError('atoms argument must be an `Atoms` instance')
         else:
             fname = get_fpath(fname=fname, ext='data', overwrite=True,
                               add_fnum=False)
