@@ -48,8 +48,8 @@ class PDBWriter(StructureWriter):
         Parameters
         ----------
         fname : str
-        atoms : `Atoms`
-            `Atoms` instance.
+        atoms : :py:class:`~sknano.chemistry.Atoms`
+            An :py:class:`~sknano.chemistry.Atoms` instance.
         comment_line : str, optional
 
         """

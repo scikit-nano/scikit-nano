@@ -63,8 +63,8 @@ class XYZWriter(StructureWriter):
         Parameters
         ----------
         fname : str
-        atoms : `Atoms`
-            An `Atoms` instance.
+        atoms : :py:class:`~sknano.chemistry.Atoms`
+            An :py:class:`~sknano.chemistry.Atoms` instance.
         comment_line : str, optional
             A string written to the first line of `xyz` file. If `None`,
             then it is set to the full path of the output `xyz` file.

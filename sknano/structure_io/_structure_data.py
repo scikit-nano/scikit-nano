@@ -47,7 +47,7 @@ class StructureData(object):
 
     @property
     def atoms(self):
-        """`Atoms` instance."""
+        """:py:class:`~sknano.chemistry.Atoms` instance."""
         return self._atoms
 
     @property
@@ -89,7 +89,7 @@ class StructureData(object):
 
     @property
     def Natoms(self):
-        """Number of atoms in `Atoms`"""
+        """Number of atoms in :py:class:`~sknano.chemistry.Atoms`"""
         return self._atoms.Natoms
 
     @property
