@@ -20,6 +20,9 @@ and bundles of :abbr:`SWNTs` and :abbr:`MWNTs`.
 .. versionadded:: 0.2.8
    `MWNTGenerator` implemented
 
+.. versionadded:: 0.2.6
+   `GrapheneVacancyGenerator` and `NanotubeVacancyGenerator` implemented
+
 .. versionadded:: 0.2.4
    `NanotubeBundleGenerator` implemented
 
@@ -55,6 +58,16 @@ Structure generator classes
 
 .. seealso:: CLI module :py:mod:`sknano.scripts.nanogen`
 
+Tools for manipulating nano-structures
+--------------------------------------
+
+.. autosummary::
+   :toctree: generated/
+
+   VacancyGenerator
+   GrapheneVacancyGenerator
+   NanotubeVacancyGenerator
+
 Custom exception classes for handling errors
 --------------------------------------------
 
@@ -64,6 +77,7 @@ Custom exception classes for handling errors
    StructureGeneratorError
    GrapheneGeneratorError
    NanotubeGeneratorError
+   VacancyGeneratorError
 
 """
 from __future__ import division, print_function, absolute_import
@@ -76,5 +90,6 @@ from ._nanotube import *
 from ._nanotube_generator import *
 from ._structure_generator import *
 from ._tubegen import *
+from ._vacancy_generator import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]

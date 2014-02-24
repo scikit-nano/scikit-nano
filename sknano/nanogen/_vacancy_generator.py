@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Generate vacancies in structure data (:mod:`sknano.tools._vacancy_generator`)
+Generate vacancies in structure data (:mod:`sknano.nanogen._vacancy_generator`)
 ===============================================================================
 
 Module for generating vacancies in nano-structures.
 
-.. currentmodule:: sknano.tools._vacancy_generator
+.. currentmodule:: sknano.nanogen._vacancy_generator
 
 """
 from __future__ import division, print_function, absolute_import
@@ -22,7 +22,7 @@ from ..nanogen import GrapheneGenerator, GrapheneGeneratorError, \
     NanotubeBundleGenerator, NanotubeGeneratorError
 from ..structure_io import DATAReader, DATAWriter, XYZWriter, \
     XYZ2DATAConverter, StructureFormatError, supported_structure_formats
-from .refdata import CCbond
+from ..tools.refdata import CCbond
 
 vac_type_cluster_size_map = {'double': 2, 'triple': 3}
 
@@ -292,7 +292,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
     Import the :py:class:`GrapheneVacancyGenerator` class.
 
-    >>> from sknano.tools import GrapheneVacancyGenerator
+    >>> from sknano.nanogen import GrapheneVacancyGenerator
 
     You can supply any existing structure data file
     (as long as its a supported format) to
@@ -582,7 +582,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     In the next example, we'll generate a nanotube bundle and then
     poke some holes in it.
 
-    >>> from sknano.tools import NanotubeVacancyGenerator
+    >>> from sknano.nanogen import NanotubeVacancyGenerator
     >>> ntvg = NanotubeVacancyGenerator(n=10, m=5, Lz=10, fix_Lz=True,
     ...                                 bundle_geometry='hexagon')
 
