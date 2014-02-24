@@ -172,10 +172,10 @@ class VacancyGenerator(object):
         selections = []
         for atom in self._removed_atoms:
             selection_cmd = \
-                "(((x - {:.6f})^2 + ".format(atom.x) + \
-                "(y - {:.6f})^2 + ".format(atom.y) + \
-                "(z - {:.6f})^2) <= {:.2f})".format(atom.z,
-                                                    selection_radius**2)
+                "(((x-{:.4f})^2 + ".format(atom.x) + \
+                "(y-{:.4f})^2 + ".format(atom.y) + \
+                "(z-{:.4f})^2) <= {:.2f})".format(atom.z,
+                                                  selection_radius**2)
             selections.append(selection_cmd)
 
         vmd_selection_cmd = ' or '.join(selections)
@@ -313,67 +313,85 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
     If you don't have an existing structure data file and want to generate
     your graphene structure on-the-fly, then you need to provide
-    structure parameters to the :py:class:`GrapheneVacancyGenerator`
+    structure parameters to the `GrapheneVacancyGenerator`
     constructor. These arguments are passed to an instance of
-    :py:class:`GrapheneGenerator` "under the hood". See the
-    :py:class:`GrapheneGenerator` docs for examples and more
-    detailed documentation. The `width` and `length` parameters are
-    required, while all others supply default values. In the following
-    example, we'll use the :py:class:`GrapheneVacancyGenerator` class
-    to generate a **5nm x 10nm**, single layer graphene with `zigzag` edges,
+    `GrapheneGenerator` "under the hood" (see the `GrapheneGenerator` docs
+    for examples and more detailed documentation). The `width` and `length`
+    parameters are required.
+
+    In the following example, we'll use the `GrapheneVacancyGenerator` class
+    to generate a *10nm x 2nm*, single layer graphene with `armchair` edges,
     and then poke some holes in it.
 
-    >>> gvacgen = GrapheneVacancyGenerator(width=5, length=10, edge='ZZ')
+    >>> gvacgen = GrapheneVacancyGenerator(width=10, length=2, edge='AC')
 
-    Now let's add 30 *random* vacancies to the graphene layer by
-    calling the :py:meth:`~GrapheneVacancyGenerator.generate_vacancy_structure`
+    Now let's add 20 *random* vacancies to the graphene layer by
+    calling the `~GrapheneVacancyGenerator.generate_vacancy_structure`
     method:
 
     .. code-block:: python
 
-       >>> gvacgen.generate_vacancy_structure(Nvac_sites=30, random=True)
+       >>> gvacgen.generate_vacancy_structure(Nvac_sites=20)
        copy and paste the following VMD command to select
        the atoms surrounding the vacancies:
 
-       (((x - -24.157000)^2 + (y - 0.000000)^2 + (z - 37.533974)^2) <= 9) or
-       (((x - -24.157000)^2 + (y - 0.000000)^2 + (z - 22.766509)^2) <= 9) or
-       (((x - -22.025500)^2 + (y - 0.000000)^2 + (z - 6.768422)^2) <= 9) or
-       (((x - -22.025500)^2 + (y - 0.000000)^2 + (z - -7.999044)^2) <= 9) or
-       (((x - -24.867500)^2 + (y - 0.000000)^2 + (z - -12.921532)^2) <= 9) or
-       (((x - -17.762500)^2 + (y - 0.000000)^2 + (z - 46.148329)^2) <= 9) or
-       (((x - -19.894000)^2 + (y - 0.000000)^2 + (z - 30.150241)^2) <= 9) or
-       (((x - -18.473000)^2 + (y - 0.000000)^2 + (z - -43.687085)^2) <= 9) or
-       (((x - -15.631000)^2 + (y - 0.000000)^2 + (z - 47.378951)^2) <= 9) or
-       (((x - -16.341500)^2 + (y - 0.000000)^2 + (z - 16.613398)^2) <= 9) or
-       (((x - -14.210000)^2 + (y - 0.000000)^2 + (z - 15.382776)^2) <= 9) or
-       (((x - -14.210000)^2 + (y - 0.000000)^2 + (z - -28.919619)^2) <= 9) or
-       (((x - -9.947000)^2 + (y - 0.000000)^2 + (z - 32.611486)^2) <= 9) or
-       (((x - -9.236500)^2 + (y - 0.000000)^2 + (z - 26.458375)^2) <= 9) or
-       (((x - -11.368000)^2 + (y - 0.000000)^2 + (z - 15.382776)^2) <= 9) or
-       (((x - -12.078500)^2 + (y - 0.000000)^2 + (z - 4.307177)^2) <= 9) or
-       (((x - -7.815500)^2 + (y - 0.000000)^2 + (z - 19.074643)^2) <= 9) or
-       (((x - -4.973500)^2 + (y - 0.000000)^2 + (z - -47.378951)^2) <= 9) or
-       (((x - -3.552500)^2 + (y - 0.000000)^2 + (z - 19.074643)^2) <= 9) or
-       (((x - -1.421000)^2 + (y - 0.000000)^2 + (z - -16.613398)^2) <= 9) or
-       (((x - -2.842000)^2 + (y - 0.000000)^2 + (z - -19.074643)^2) <= 9) or
-       (((x - -0.710500)^2 + (y - 0.000000)^2 + (z - -39.995218)^2) <= 9) or
-       (((x - 12.078500)^2 + (y - 0.000000)^2 + (z - 6.768422)^2) <= 9) or
-       (((x - 15.631000)^2 + (y - 0.000000)^2 + (z - 25.227753)^2) <= 9) or
-       (((x - 13.499500)^2 + (y - 0.000000)^2 + (z - 16.613398)^2) <= 9) or
-       (((x - 15.631000)^2 + (y - 0.000000)^2 + (z - 12.921532)^2) <= 9) or
-       (((x - 14.210000)^2 + (y - 0.000000)^2 + (z - -21.535887)^2) <= 9) or
-       (((x - 16.341500)^2 + (y - 0.000000)^2 + (z - -35.072730)^2) <= 9) or
-       (((x - 18.473000)^2 + (y - 0.000000)^2 + (z - 30.150241)^2) <= 9) or
-       (((x - 19.894000)^2 + (y - 0.000000)^2 + (z - 12.921532)^2) <= 9)
+       (((x - -38.7646)^2 + (y - 0.0000)^2 + (z - 2.8420)^2) <= 12.00) or
+       (((x - -38.7646)^2 + (y - 0.0000)^2 + (z - -5.6840)^2) <= 12.00) or
+       (((x - -36.3034)^2 + (y - 0.0000)^2 + (z - -2.8420)^2) <= 12.00) or
+       (((x - -36.3034)^2 + (y - 0.0000)^2 + (z - -7.1050)^2) <= 12.00) or
+       (((x - -10.4603)^2 + (y - 0.0000)^2 + (z - 7.8155)^2) <= 12.00) or
+       (((x - -6.7684)^2 + (y - 0.0000)^2 + (z - -2.8420)^2) <= 12.00) or
+       (((x - -4.3072)^2 + (y - 0.0000)^2 + (z - -7.1050)^2) <= 12.00) or
+       (((x - -3.0766)^2 + (y - 0.0000)^2 + (z - -3.5525)^2) <= 12.00) or
+       (((x - 6.7684)^2 + (y - 0.0000)^2 + (z - -4.9735)^2) <= 12.00) or
+       (((x - 6.7684)^2 + (y - 0.0000)^2 + (z - -9.2365)^2) <= 12.00) or
+       (((x - 19.0746)^2 + (y - 0.0000)^2 + (z - 4.9735)^2) <= 12.00) or
+       (((x - 22.7665)^2 + (y - 0.0000)^2 + (z - -9.9470)^2) <= 12.00) or
+       (((x - 25.2278)^2 + (y - 0.0000)^2 + (z - -1.4210)^2) <= 12.00) or
+       (((x - 27.6890)^2 + (y - 0.0000)^2 + (z - -7.1050)^2) <= 12.00) or
+       (((x - 32.6115)^2 + (y - 0.0000)^2 + (z - 5.6840)^2) <= 12.00) or
+       (((x - 33.8421)^2 + (y - 0.0000)^2 + (z - 0.7105)^2) <= 12.00) or
+       (((x - 35.0727)^2 + (y - 0.0000)^2 + (z - -1.4210)^2) <= 12.00) or
+       (((x - 37.5340)^2 + (y - 0.0000)^2 + (z - 5.6840)^2) <= 12.00) or
+       (((x - 38.7646)^2 + (y - 0.0000)^2 + (z - -9.2365)^2) <= 12.00) or
+       (((x - 39.9952)^2 + (y - 0.0000)^2 + (z - -9.9470)^2) <= 12.00)
 
     This will save the vacancy structure data in both
     LAMMPS `data` and `xyz` formats. You can load the `xyz` file
     into VMD and then copy the VMD selection command from the output above
     and paste it into VMD to highlight the atoms surrounding the vacancies.
 
-    The rendered structure, with vacancies highlighted, looks like:
+    As you know, removing atoms from a material will change the equilibrium
+    atomic arrangement of the atoms. Obtaining the new equilibrium structure
+    in the vacancy structure data requires running molecular dynamics
+    to compute the new forces on the atoms and move them to a minimum energy
+    configuration. Currently this is not supported within this toolkit and
+    requires using an external molecular dynamics package.  This toolkit
+    outputs the structure data in the native LAMMPS `data` file format and is
+    the molecular dynamics engine I used to relax the structure data after
+    adding the vacancies.
 
-    .. image:: /images/5nmx10nm_ZZ_1layer+30vacancies.png
+    The rendered, relaxed structure, with vacancies highlighted, looks like:
+
+    .. image:: /images/10nmx2nm_1layer_AC_CC_graphene+20_vacancies-01.png
+
+    In addition adding single-vacancies, you can generate di-vacancies
+    and tri-vacancies by setting `vac_type` to `double` and `triple`,
+    respectively.
+
+    Here's an example of generating single layer graphene with a
+    `di-vacancy` at each of the 20 `Nvac_sites`.
+
+    >>> gvacgen = GrapheneVacancyGenerator(width=10, length=5, edge='ZZ')
+    >>> gvacgen.generate_vacancy_structure(Nvac_sites=20, vac_type='double')
+
+    I'm not going to show the VMD selection command since it will not
+    be the same if you run this example on your computer. After generating
+    the vacancy structure, I relaxed the structure data using LAMMPS.
+
+    Here's the rendered structure, with the 40 vacancies highlighted:
+
+    .. image:: /images/10nmx5nm_1layer_ZZ_CC_graphene+40_vacancies-01.png
 
     """
     def __init__(self, fname=None, structure_format=None,
@@ -570,12 +588,12 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     Examples
     --------
 
-    The :py:class:`NanotubeVacancyGenerator` class behaves nearly
-    identically to the :py:class:`GrapheneVacancyGenerator` class.
+    The `NanotubeVacancyGenerator` class behaves nearly
+    identically to the `GrapheneVacancyGenerator` class.
     You can provide any existing structure data file in any supported
     format or else provide structure parameters to generate a structure
-    in real-time. The :py:class:`NanotubeVacancyGenerator` uses
-    the :py:class:`NanotubeBundleGenerator` class to generate
+    in real-time. The `NanotubeVacancyGenerator` uses
+    the `NanotubeBundleGenerator` class to generate
     nanotubes. See the structure generator classes provided by the
     :py:mod:`~sknano.nanogen` module for more detailed docs.
 
@@ -594,64 +612,26 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     depending on the chirality, may end up being very different than
     the desired length set by `Lz`.
 
-    Next, I add 35 vacancies distributed uniformly along the `z`
-    axis. When generating vacancies *uniformly*, the code is written such
-    it will divide the total number of vacancies
-    evenly among all nanotubes and distribute those vacancies uniformly
-    along the specified `bin_axis`. The circumferential location of
-    vacancies is selected randomly. Future revisions will allow more precise
-    control of the positioning.
+    Next, I add 35 **double** vacancies distributed uniformly along the
+    :math:`z`-axis. For the `NanotubeVacancyGenerator`, if `uniform` is `True`,
+    the code is written such it will divide the total number of vacancies
+    evenly among all nanotubes and distribute those vacancies uniformly along
+    the specified `bin_axis`. The circumferential location of vacancies is
+    selected randomly.  Future revisions will allow more precise control of the
+    positioning.
 
     .. code-block:: python
 
        >>> ntvg.generate_vacancy_structure(Nvac_sites=35, uniform=True,
-       ...                                 bin_axis='z')
-       copy and paste the following VMD command to select
-       the atoms surrounding the vacancies:
+       ...                                 bin_axis='z', vac_type='double')
 
-       (((x - -9.095133)^2 + (y - -2.248367)^2 + (z - -24.706026)^2) <= 9) or
-       (((x - -12.610821)^2 + (y - 5.052035)^2 + (z - -13.964275)^2) <= 9) or
-       (((x - -17.956207)^2 + (y - 3.045878)^2 + (z - -5.102331)^2) <= 9) or
-       (((x - -18.945873)^2 + (y - 0.000000)^2 + (z - 15.575538)^2) <= 9) or
-       (((x - -8.581958)^2 + (y - 0.000000)^2 + (z - 6.176506)^2) <= 9) or
-       (((x - -2.854725)^2 + (y - 4.324723)^2 + (z - -22.289132)^2) <= 9) or
-       (((x - -3.230898)^2 + (y - 4.051418)^2 + (z - -12.353013)^2) <= 9) or
-       (((x - -2.854725)^2 + (y - 4.324723)^2 + (z - -3.491069)^2) <= 9) or
-       (((x - -1.153094)^2 + (y - -5.052035)^2 + (z - 6.713594)^2) <= 9) or
-       (((x - -4.192292)^2 + (y - -3.045878)^2 + (z - 17.455344)^2) <= 9) or
-       (((x - 15.800554)^2 + (y - -4.764954)^2 + (z - -21.483501)^2) <= 9) or
-       (((x - 11.308348)^2 + (y - -4.563209)^2 + (z - -11.815925)^2) <= 9) or
-       (((x - 16.618640)^2 + (y - 4.324723)^2 + (z - -1.074175)^2) <= 9) or
-       (((x - 18.615445)^2 + (y - 1.820809)^2 + (z - 8.324857)^2) <= 9) or
-       (((x - 9.315470)^2 + (y - -2.657822)^2 + (z - 18.798063)^2) <= 9) or
-       (((x - -1.886743)^2 + (y - -13.298492)^2 + (z - -19.872238)^2) <= 9) or
-       (((x - -10.112855)^2 + (y - -15.971318)^2 + (z - -9.130488)^2) <= 9) or
-       (((x - -8.483271)^2 + (y - -16.848235)^2 + (z - 0.537088)^2) <= 9) or
-       (((x - -11.074249)^2 + (y - -14.965779)^2 + (z - 9.936119)^2) <= 9) or
-       (((x - -11.330403)^2 + (y - -14.577723)^2 + (z - 18.798063)^2) <= 9) or
-       (((x - -10.784342)^2 + (y - 15.329311)^2 + (z - -18.798063)^2) <= 9) or
-       (((x - -6.649470)^2 + (y - 6.743161)^2 + (z - -8.593400)^2) <= 9) or
-       (((x - -12.063915)^2 + (y - 11.919900)^2 + (z - 0.537088)^2) <= 9) or
-       (((x - -2.213175)^2 + (y - 14.168268)^2 + (z - 10.741750)^2) <= 9) or
-       (((x - -12.043054)^2 + (y - 12.384407)^2 + (z - 20.677869)^2) <= 9) or
-       (((x - 6.186367)^2 + (y - -17.054960)^2 + (z - -17.186801)^2) <= 9) or
-       (((x - 7.577549)^2 + (y - -17.054960)^2 + (z - -6.176506)^2) <= 9) or
-       (((x - 11.877172)^2 + (y - -10.541309)^2 + (z - 2.148350)^2) <= 9) or
-       (((x - 8.918597)^2 + (y - -16.684854)^2 + (z - 12.353013)^2) <= 9) or
-       (((x - 11.074249)^2 + (y - -14.965779)^2 + (z - 23.094763)^2) <= 9) or
-       (((x - 2.979573)^2 + (y - 15.329311)^2 + (z - -15.038450)^2) <= 9) or
-       (((x - 3.300900)^2 + (y - 8.174408)^2 + (z - 3.491069)^2) <= 9) or
-       (((x - 11.877172)^2 + (y - 13.298492)^2 + (z - -5.370875)^2) <= 9) or
-       (((x - 4.845319)^2 + (y - 7.154946)^2 + (z - 13.158644)^2) <= 9) or
-       (((x - 11.877172)^2 + (y - 13.298492)^2 + (z - 24.706026)^2) <= 9)
-
-    Running that command left me with the saved vacancy structure data
-    which I loaded into VMD and used the VMD selection command from above
-    to highlight the atoms surrounding the vacancies.
+    Running that command left me with the saved vacancy structure data which
+    I loaded into VMD. I used the VMD selection command that was printed to the
+    terminal window to highlight the atoms and bonds surrounding the vacancies.
 
     The rendered structure looks like:
 
-    .. image:: /images/1005_hcp_7tube_hexagon+35_vacancies-01.png
+    .. image:: /images/1005_hcp_7tube_hexagon+70_vacancies-01.png
 
     """
     def __init__(self, fname=None, structure_format=None,
