@@ -75,12 +75,11 @@ from __future__ import absolute_import, division, print_function
 import argparse
 import sys
 
-from pkshared.tools.refdata import CCbond
-
 from ..chemistry import Atom
 from ..nanogen import GrapheneGenerator, NanotubeBundleGenerator, \
     TubeGen, format_ext
 from ..structure_io import XYZ2DATAConverter
+from ..tools.refdata import CCbond
 
 __all__ = ['nanogen']
 

@@ -19,10 +19,11 @@ from math import ceil
 
 #import numpy as np
 
-from pkshared.tools.strfuncs import plural_word_check
-from pkshared.tools.refdata import CCbond
-from ._nanotube import Nanotube
 from ..structure_io import XYZReader, XYZWriter
+from ..tools import plural_word_check
+from ..tools.refdata import CCbond
+
+from ._nanotube import Nanotube
 
 format_ext = {'gaussian': '.com',
               'gaussian-pbc': '.com',

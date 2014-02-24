@@ -30,7 +30,7 @@ except ImportError:
           'nearest-neighbor queries between `Atoms`.')
     has_kdtree = False
 
-from pkshared.tools.refdata import dimensions
+from ..tools import xyz_axes
 from ._atom import Atom
 
 __all__ = ['Atoms']
@@ -634,9 +634,9 @@ class Atoms(MutableSequence):
             elif isinstance(components, str):
                 components = (components,)
 
-            return OrderedDict(zip(components,
-                                   [coords[:, dimensions.index(component)] for
-                                       component in components]))
+            return OrderedDict(zip(
+                components, [coords[:, xyz_axes.index(component)] for
+                             component in components]))
         else:
             return coords
 
@@ -685,10 +685,9 @@ class Atoms(MutableSequence):
             components = (components,)
 
         if as_dict:
-            return OrderedDict(zip(components,
-                                   [filtered_coords[
-                                       :, dimensions.index(component)] for
-                                    component in components]))
+            return OrderedDict(zip(
+                components, [filtered_coords[:, xyz_axes.index(component)]
+                             for component in components]))
         else:
             filtered_coords
 

@@ -23,9 +23,8 @@ except ImportError:
 
 import numpy as np
 
-from pkshared.tools.refdata import CCbond
-
 from ..chemistry import Atom
+from ..tools.refdata import CCbond
 
 edge_types = {'armchair': 'AC', 'zigzag': 'ZZ'}
 

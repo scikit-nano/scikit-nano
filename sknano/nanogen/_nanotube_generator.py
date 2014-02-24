@@ -40,13 +40,11 @@ warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
 
 import numpy as np
 
-from pkshared.tools.arrayfuncs import rotation_matrix
-from pkshared.tools.strfuncs import plural_word_check
-from pkshared.tools.refdata import CCbond
-
 from ..chemistry import Atom, Atoms
 from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
     supported_structure_formats
+from ..tools import plural_word_check, rotation_matrix
+from ..tools.refdata import CCbond
 
 from ._nanotube import Nanotube, NanotubeBundle
 from ._structure_generator import StructureGenerator, StructureGeneratorError

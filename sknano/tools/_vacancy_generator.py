@@ -17,13 +17,12 @@ import os
 
 import numpy as np
 
-from pkshared.tools.refdata import CCbond
-
 from ..chemistry import Atoms
 from ..nanogen import GrapheneGenerator, GrapheneGeneratorError, \
     NanotubeBundleGenerator, NanotubeGeneratorError
 from ..structure_io import DATAReader, DATAWriter, XYZWriter, \
     XYZ2DATAConverter, StructureFormatError, supported_structure_formats
+from .refdata import CCbond
 
 vac_type_cluster_size_map = {'double': 2, 'triple': 3}
 

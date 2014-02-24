@@ -26,9 +26,9 @@ try:
 except ImportError:
     Qty = None
 
-from pkshared.tools.refdata import CCbond
-
 from ..chemistry import Atom
+from ..tools.refdata import CCbond
+
 param_units = {}
 param_units['dt'] = \
     param_units['rt'] = \

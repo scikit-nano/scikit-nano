@@ -13,9 +13,9 @@ __docformat__ = 'restructuredtext'
 
 import numpy as np
 
-from pkshared.tools.fiofuncs import get_fpath
-
 from ..chemistry import Atom, Atoms
+from ..tools import get_fpath
+
 from ._structure_data import StructureReader, StructureWriter, \
     StructureDataError
 

@@ -11,9 +11,9 @@ from __future__ import division, print_function, absolute_import
 
 __docformat__ = 'restructuredtext'
 
-from pkshared.tools.fiofuncs import get_fpath
-
 from ..chemistry import Atoms
+from ..tools import get_fpath
+
 from ._structure_data import StructureReader, StructureReaderError, \
     StructureWriter, default_comment_line
 

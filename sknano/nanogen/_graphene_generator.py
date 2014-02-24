@@ -14,12 +14,11 @@ import copy
 
 import numpy as np
 
-from pkshared.tools.arrayfuncs import rotation_matrix
-from pkshared.tools.refdata import CCbond
-
 from ..chemistry import Atom, Atoms
 from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
     supported_structure_formats
+from ..tools import rotation_matrix
+from ..tools.refdata import CCbond
 
 from ._graphene import Graphene
 from ._structure_generator import StructureGenerator, StructureGeneratorError
