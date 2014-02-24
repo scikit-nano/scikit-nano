@@ -40,19 +40,20 @@ class Atom(object):
     q : {int, float}, optional
         Net charge of `Atom`.
     x, y, z : float, optional
-        :math:`x, y, z` components of position.
+        :math:`x, y, z` components of `Atom` position vector relative to
+        origin.
     vx, vy, vz : float, optional
-        :math:`v_x, v_y, v_z` components of velocity.
+        :math:`v_x, v_y, v_z` components of `Atom` velocity.
     r_units : str, optional
         Units of position components.
     v_units : str, optional
         Units of velocity components.
     nx, ny, nz : int, optional
-        :math:`n_x, n_y, n_z` image flags for LAMMPS atoms.
+        :math:`n_x, n_y, n_z` image flags, a LAMMPS atom attribute.
     CN : int, optional
         `Atom` coordination number.
-    NN : `Atoms`, optional
-        Nearest-neighbor `Atoms` object instance
+    NN : sequence, optional
+        List of nearest-neighbor `Atom` objects instances
 
     """
 
