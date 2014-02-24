@@ -651,7 +651,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
 
     The rendered structure looks like:
 
-    .. image:: /images/1005_hcp_7tube_hexagon+35_vacancies-001.png
+    .. image:: /images/1005_hcp_7tube_hexagon+35_vacancies-01.png
 
     """
     def __init__(self, fname=None, structure_format=None,
