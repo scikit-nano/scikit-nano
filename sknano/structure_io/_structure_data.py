@@ -51,6 +51,11 @@ class StructureData(object):
         return self._structure_atoms
 
     @property
+    def atoms(self):
+        """Alias for :py:attr:`~StructureData.structure_atoms`."""
+        return self.structure_atoms
+
+    @property
     def comment_line(self):
         """Comment line."""
         return self._comment_line
