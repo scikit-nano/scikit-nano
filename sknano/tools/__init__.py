@@ -34,6 +34,9 @@ Helper Functions
    generate_Ch_list
    get_Ch_indices
    get_Ch_type
+   get_fpath
+   plural_word_check
+   rotation_matrix
    totient_func
 
 LUTs (Look-up 'tables' - lists and dictionaries)
@@ -52,6 +55,14 @@ Custom exception classes for handling errors
    :toctree: generated/
 
    VacancyGeneratorError
+
+Sub-packages
+============
+
+.. autosummary::
+   :toctree: generated/
+
+   refdata
 
 """
 from __future__ import division, print_function, absolute_import
