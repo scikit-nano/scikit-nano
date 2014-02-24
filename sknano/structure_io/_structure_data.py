@@ -17,6 +17,8 @@ from collections import OrderedDict
 from ..chemistry import Atoms
 from sknano.version import version
 
+default_comment_line = \
+    'Structure data generated using scikit-nano version {}'.format(version)
 supported_structure_formats = ('xyz', 'data')
 default_structure_format = 'xyz'
 
@@ -24,8 +26,9 @@ __all__ = ['StructureData', 'StructureDataError',
            'StructureReader', 'StructureWriter',
            'StructureReaderError', 'StructureInputError',
            'StructureWriterError', 'StructureOutputError',
-           'StructureFormatError', 'supported_structure_formats',
-           'default_structure_format']
+           'StructureFormatError',
+           'supported_structure_formats', 'default_structure_format',
+           'default_comment_line']
 
 
 class StructureData(object):
@@ -38,9 +41,7 @@ class StructureData(object):
     """
     def __init__(self, fname=None):
         self._atoms = Atoms()
-        self._comment_line = \
-            'Structure data generated using scikit-nano version {}'.format(
-                version)
+        self._comment_line = default_comment_line
         self._fname = fname
         self._properties = OrderedDict()
 

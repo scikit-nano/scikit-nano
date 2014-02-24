@@ -17,7 +17,7 @@ from pkshared.tools.fiofuncs import get_fpath
 
 from ..chemistry import Atom, Atoms
 from ._structure_data import StructureReader, StructureWriter, \
-    StructureDataError
+    StructureDataError, default_comment_line
 
 
 __all__ = ['DATAReader', 'DATAWriter', 'LAMMPSDATA',
@@ -128,7 +128,7 @@ class DATAReader(StructureReader):
         self._parse_boxbounds()
 
     def _parse_atoms(self):
-        """Populate Atoms object with Atom objects"""
+        """Populate `Atoms` object with `Atom` objects"""
         atoms_section = self._sections['Atoms']
         atoms_section_syntax = self._section_syntax_dict['Atoms']
 
@@ -257,18 +257,21 @@ class DATAWriter(StructureWriter):
         Parameters
         ----------
         fname : str
-        atoms : `Atoms`
-            An :py:class:`Atoms` instance.
+        atoms : :py:class:`~sknano.chemistry.Atoms`
+            An :py:class:`~sknano.chemistry.Atoms` instance.
         boxbounds : dict, optional
-            If `None`, determined automatically from atom coordinates.
+            If `None`, determined automatically from the `atoms` coordinates.
         comment_line : str, optional
             A string written to the first line of `data` file. If `None`,
             then it is set to the full path of the output `data` file.
         assume_unique_atoms : bool, optional
-            Check that each Atom in Atoms has a unique atomID. If the check
-            fails, then assign a unique atomID to each Atom.
-            If `assume_unique_atoms` is True, but the atomID's are not
-            unique, LAMMPS will not be able to read the data file.
+            Check that each :py:class:`~sknano.chemistry.Atom` in `atoms`
+            has a unique :py:attr:`~sknano.chemistry.Atom.atomID`.
+            If the check fails, then assign a unique
+            :py:attr:`~sknano.chemistry.Atom.atomID` to each
+            :py:class:`~sknano.chemistry.Atom`.
+            If `assume_unique_atoms` is True, but the atomID's are not unique,
+            LAMMPS will not be able to read the data file.
         verbose : bool, optional
             verbose output
 
@@ -279,7 +282,8 @@ class DATAWriter(StructureWriter):
             fname = get_fpath(fname=fname, ext='data', overwrite=True,
                               add_fnum=False)
             if comment_line is None:
-                comment_line = fname
+                #comment_line = fname
+                comment_line = default_comment_line
 
             atoms.rezero_coords()
 

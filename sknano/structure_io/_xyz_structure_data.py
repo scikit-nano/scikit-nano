@@ -15,7 +15,7 @@ from pkshared.tools.fiofuncs import get_fpath
 
 from ..chemistry import Atom, Atoms
 from ._structure_data import StructureReader, StructureReaderError, \
-    StructureWriter
+    StructureWriter, default_comment_line
 
 __all__ = ['XYZDATA', 'XYZReader', 'XYZWriter']
 
@@ -76,7 +76,7 @@ class XYZWriter(StructureWriter):
             fname = get_fpath(fname=fname, ext='xyz', overwrite=True,
                               add_fnum=False)
             if comment_line is None:
-                comment_line = fname
+                comment_line = default_comment_line
 
             atoms.rezero_coords()
 

@@ -15,7 +15,7 @@ from pkshared.tools.fiofuncs import get_fpath
 
 from ..chemistry import Atoms
 from ._structure_data import StructureReader, StructureReaderError, \
-    StructureWriter
+    StructureWriter, default_comment_line
 
 
 __all__ = ['PDBDATA', 'PDBReader', 'PDBWriter']
@@ -59,7 +59,7 @@ class PDBWriter(StructureWriter):
             fname = get_fpath(fname=fname, ext='pdb', overwrite=True,
                               add_fnum=False)
             if comment_line is None:
-                comment_line = fname
+                comment_line = default_comment_line
 
             atoms.rezero_coords()
 
