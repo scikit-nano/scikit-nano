@@ -190,7 +190,7 @@ def setup_package():
         exclude_package_data={'':
             ['README', 'README.rst', '*.gif', '*.html', '*.ui']},
         zip_safe=False,
-        install_requires=['numpy>=1.8', 'pint>=0.4', 'pykit-shared>=0.1.10'],
+        install_requires=['numpy>=1.8', 'pint>=0.4'],
         entry_points={
             'console_scripts': [
                 'nanogen = sknano.scripts.nanogen:main',
