@@ -311,13 +311,18 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
 
         .. versionadded:: 0.2.5
 
-    bundle_packing : {None, 'hexagonal', 'cubic'}, optional
-        close packing arrangement of bundles
+    bundle_packing : {None, 'hcp', 'hexagonal', 'ccp', 'cubic'}, optional
+        Packing arrangement of nanotubes bundles.
+        If `bundle_packing` is `None`, then it will be determined by the
+        `bundle_geometry` parameter if `bundle_geometry` is not `None`.
+        If both `bundle_packing` and `bundle_geometry` are `None`, then
+        `bundle_packing` defaults to `hexagonal`.
 
         .. versionadded:: 0.2.5
 
     bundle_geometry : {None, 'triangle', 'hexagon', 'square', 'rectangle',
                        'rhombus', 'rhomboid'}, optional
+        Force a specific geometry on the nanotube bundle boundaries.
 
         .. versionadded:: 0.2.5
 
@@ -344,18 +349,23 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
     Examples
     --------
 
-    Using the :py:class:`NanotubeBundleGenerator` class, you can
-    generate cubic close packed (ccp) or hexagonal close packed
-    bundles arrangements. In general, specifying **ccp** bundling will
-    generate rectangular bundles (square bundles if :math:`n_x = n_y`)
-    and specifying **hcp** bundling will generate *rhomboidal* bundles
-    (*i.e.* bundles arranged within a rhomboid) (rhombuses if
-    :math:`n_x = n_y`). However, you can also enforce a specific
-    *bundle geometry* which will try and reshape the bundle arrangement so
+    Using the `NanotubeBundleGenerator` class, you can generate structure
+    data for nanotube *bundles* with either cubic close packed (ccp) or
+    hexagonal close packed (hcp) arrangement of nanotubes. The bundle
+    packing arrangement is set using the `bundle_packing` parameter.
+
+    You can also enforce a specific
+    `bundle geometry` which will try and build the nanotube bundle such
     that it "fits inside" the boundaries of a specified geometric shape.
     This allows you to generate **hcp** bundles that are trianglar,
-    hexagonal, or rectangular in *shape*, as some of the examples below
+    hexagonal, or rectangular in shape, as some of the examples below
     illustrate.
+
+    In general, setting `cubic` bundling will
+    generate rectangular bundles (square bundles if :math:`n_x = n_y`)
+    and specifying `hcp` bundling will generate *rhomboidal* bundles
+    (*i.e.* bundles arranged within a rhomboid) (rhombuses if
+    :math:`n_x = n_y`).
 
     To start, let's generate an hcp bundle of
     :math:`C_{\\mathrm{h}} = (10, 5)` SWCNTs and cell count
@@ -391,13 +401,24 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
     Now, just because we can, let's make a big ass hexagon bundle with
     :math:`C_{\\mathrm{h}} = (10, 0)`.
 
-    >>> BIGASSHEXABUN = NanotubeBundleGenerator(n=10, m=0, nx=25, ny=25, nz=1,
+    >>> BIGASSHEXABUN = NanotubeBundleGenerator(10, 0, nx=25, ny=25, nz=1,
     ...                                         bundle_geometry='hexagon')
-    ... BIGASSHEXABUN.save_data()
+    >>> BIGASSHEXABUN.save_data()
 
     Take a look at the 469 :math:`(10, 0)` unit cells in this big ass bundle!
 
     .. image:: /images/1000_hcp_469tube_hexagon-01.png
+
+    Lastly, here's a look at a bundle generated with cubic close packed
+    bundle arrangement:
+
+    >>> SWCNTbundle = NanotubeBundleGenerator(10, 10, nx=3, ny=3, nz=5,
+    ...                                       bundle_packing='cubic')
+    >>> SWCNTbundle.save_data()
+
+    The rendered `ccp` structure looks like:
+
+    .. image:: /images/1010_ccp_3cellsx3cellsx5cells-01.png
 
     """
 
@@ -425,13 +446,13 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
             bundle_packing = 'cubic'
         elif bundle_packing is None:
             bundle_packing = 'hexagonal'
-        elif (bundle_packing == 'cubic' and bundle_geometry not in
+        elif (bundle_packing in ('cubic', 'ccp') and bundle_geometry not in
                 (None, 'square', 'rectangle')) or \
-                (bundle_packing == 'hexagonal' and bundle_geometry not in
-                    (None, 'triangle', 'hexagon', 'rhombus', 'rhomboid')):
+                (bundle_packing in ('hexagonal', 'hcp') and bundle_geometry
+                 not in (None, 'triangle', 'hexagon', 'rhombus', 'rhomboid')):
             bundle_geometry = None
 
-        if bundle_packing == 'cubic':
+        if bundle_packing in ('cubic', 'ccp'):
             self._r2[1] = self._r1[0]
         else:
             self._r2[0] = self._r1[0] * np.cos(2 * np.pi / 3)
@@ -603,7 +624,7 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
         nearest neighbor atoms. Must be in units of **Angstroms**.
     vdw_spacing : float, optional
         van der Waals distance between nearest neighbor tubes
-    bundle_packing : {None, 'hexagonal', 'cubic'}, optional
+    bundle_packing : {None, 'hcp', 'hexagonal', 'ccp', 'cubic'}, optional
         close packing arrangement of bundles
     bundle_geometry : {None, 'triangle', 'hexagon', 'square', 'rectangle',
                        'rhombus', 'rhomboid'}, optional
@@ -686,13 +707,13 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
             bundle_packing = 'cubic'
         elif bundle_packing is None:
             bundle_packing = 'hexagonal'
-        elif (bundle_packing == 'cubic' and bundle_geometry not in
+        elif (bundle_packing in ('cubic', 'ccp') and bundle_geometry not in
                 (None, 'square', 'rectangle')) or \
-                (bundle_packing == 'hexagonal' and bundle_geometry not in
-                    (None, 'triangle', 'hexagon', 'rhombus', 'rhomboid')):
+                (bundle_packing in ('hexagonal', 'hcp') and bundle_geometry
+                 not in (None, 'triangle', 'hexagon', 'rhombus', 'rhomboid')):
             bundle_geometry = None
 
-        if bundle_packing == 'cubic':
+        if bundle_packing in ('cubic', 'ccp'):
             self._r2[1] = self._r1[0]
         else:
             self._r2[0] = self._r1[0] * np.cos(2 * np.pi / 3)
