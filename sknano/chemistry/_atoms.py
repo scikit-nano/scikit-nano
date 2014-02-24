@@ -228,14 +228,14 @@ class Atoms(MutableSequence):
     @property
     def coordination_numbers(self):
         """Return array of `Atom` coordination numbers."""
-        self._update_coordination_numbers()
+        self.update_coordination_numbers()
         coordination_numbers = []
         for atom in self._atoms:
             coordination_numbers.append(atom.CN)
         self._coordination_numbers = coordination_numbers[:]
         return np.asarray(self._coordination_numbers)
 
-    def _update_coordination_numbers(self):
+    def update_coordination_numbers(self):
         """Update `Atom` coordination numbers."""
         if self._use_kdtree:
             NN_d, NN_i = \
@@ -251,14 +251,14 @@ class Atoms(MutableSequence):
     @property
     def nearest_neighbors(self):
         """Return array of nearest-neighbor atoms for each `Atom`."""
-        self._update_nearest_neighbors()
+        self.update_nearest_neighbors()
         nearest_neighbors = []
         for atom in self._atoms:
             nearest_neighbors.append(atom.NN)
         self._nearest_neighbors = nearest_neighbors[:]
         return np.asarray(self._nearest_neighbors)
 
-    def _update_nearest_neighbors(self):
+    def update_nearest_neighbors(self):
         """Update `Atom` nearest-neighbors."""
         if self._use_kdtree:
             NN_d, NN_i = self.query_atom_tree(n=self.NN_number,
