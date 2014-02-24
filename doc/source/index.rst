@@ -31,11 +31,6 @@ Package Source
 * `Python Package Index <https://pypi.python.org/pypi/scikit-nano>`_
 * `github repo <https://github.com/androomerrill/scikit-nano>`_
 
-pykit project docs
-------------------
-* `pykit-sci docs`_
-* `pykit-shared docs`_
-
 =========
 Reference
 =========
@@ -53,6 +48,3 @@ Reference
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-.. _pykit-sci docs: http://projects.geekspin.net/pykit-sci/doc
-.. _pykit-shared docs: http://projects.geekspin.net/pykit-shared/doc
