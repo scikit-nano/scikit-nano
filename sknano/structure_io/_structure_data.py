@@ -15,6 +15,7 @@ from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
 
 from ..chemistry import Atoms
+from sknano.version import version
 
 supported_structure_formats = ('xyz', 'data')
 default_structure_format = 'xyz'
@@ -37,13 +38,15 @@ class StructureData(object):
     """
     def __init__(self, fname=None):
         self._atoms = Atoms()
-        self._comment_line = None
+        self._comment_line = \
+            'Structure data generated using scikit-nano version {}'.format(
+                version)
         self._fname = fname
         self._properties = OrderedDict()
 
     @property
     def atoms(self):
-        """:py:class:`Atoms` instance."""
+        """`Atoms` instance."""
         return self._atoms
 
     @property
@@ -53,7 +56,7 @@ class StructureData(object):
 
     @comment_line.setter
     def comment_line(self, value=str):
-        """comment line setter.
+        """Set the comment line string.
 
         Parameters
         ----------
@@ -64,12 +67,12 @@ class StructureData(object):
 
     @property
     def fname(self):
-        """fname."""
+        """File name"""
         return self._fname
 
     @fname.setter
     def fname(self, value=str):
-        """fname setter.
+        """Set the file name string.
 
         Parameters
         ----------
@@ -80,12 +83,12 @@ class StructureData(object):
 
     @fname.deleter
     def fname(self):
-        """fname deleter."""
+        """Delete file name string"""
         del self._fname
 
     @property
     def Natoms(self):
-        """Number of atoms."""
+        """Number of atoms in `Atoms`"""
         return self._atoms.Natoms
 
     @property
@@ -109,7 +112,7 @@ class StructureReader(StructureData):
 
     @abstractmethod
     def read(self):
-        """Read in structure data from file"""
+        """Read structure data from file"""
         return NotImplemented
 
 
@@ -119,7 +122,7 @@ class StructureWriter(object):
 
     @abstractmethod
     def write(self):
-        """Read in structure data from file"""
+        """Write structure data to file"""
         return NotImplemented
 
 
