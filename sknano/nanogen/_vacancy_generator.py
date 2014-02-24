@@ -620,10 +620,8 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     selected randomly.  Future revisions will allow more precise control of the
     positioning.
 
-    .. code-block:: python
-
-       >>> ntvg.generate_vacancy_structure(Nvac_sites=35, uniform=True,
-       ...                                 bin_axis='z', vac_type='double')
+    >>> ntvg.generate_vacancy_structure(Nvac_sites=35, uniform=True,
+    ...                                 bin_axis='z', vac_type='double')
 
     Running that command left me with the saved vacancy structure data which
     I loaded into VMD. I used the VMD selection command that was printed to the
@@ -632,6 +630,20 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     The rendered structure looks like:
 
     .. image:: /images/1005_hcp_7tube_hexagon+70_vacancies-01.png
+
+    Here's a final example which generates a *tri-vacancy* at each
+    `Nvac_sites`.
+
+    >>> ntvg = NanotubeVacancyGenerator(n=10, m=10, nz=50)
+    >>> ntvg.generate_vacancy_structure(Nvac_sites=20, uniform=True,
+    ...                                 bin_axis='z', vac_type='triple')
+
+    After relaxing the vacancy structure data in LAMMPS, the rendered
+    structure looks like:
+
+    .. image:: /images/1010_hcp_1cellx1cellx50cells+60_vacancies-01.png
+
+    This poor nanotube has taken quite a beating.
 
     """
     def __init__(self, fname=None, structure_format=None,
