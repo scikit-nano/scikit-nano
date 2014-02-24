@@ -19,10 +19,13 @@ import numpy as np
 
 from pkshared.tools.refdata import CCbond
 
+from ..chemistry import Atoms
 from ..nanogen import GrapheneGenerator, GrapheneGeneratorError, \
     NanotubeBundleGenerator, NanotubeGeneratorError
 from ..structure_io import DATAReader, DATAWriter, XYZWriter, \
     XYZ2DATAConverter, StructureFormatError, supported_structure_formats
+
+vac_type_cluster_size_map = {'double': 2, 'triple': 3}
 
 __all__ = ['GrapheneVacancyGenerator',
            'NanotubeVacancyGenerator',
@@ -56,8 +59,6 @@ class VacancyGenerator(object):
     """
     def __init__(self, fname=str, structure_format=None, verbose=False):
 
-        self.verbose = verbose
-
         if fname.endswith(supported_structure_formats) and \
                 structure_format is None:
             for ext in supported_structure_formats:
@@ -73,68 +74,177 @@ class VacancyGenerator(object):
                     '{} is not a supported structure format'.format(
                         structure_format))
 
-        self.fname = fname
-        self.structure_format = structure_format
+        self._fname = fname
+        self._structure_format = structure_format
+        self._verbose = verbose
 
         # parse structure data
-        self.atoms = None
-        if self.structure_format == 'data':
-            self.data = DATAReader(fname)
-        elif self.structure_format == 'xyz':
-            self.data = XYZ2DATAConverter(fname).convert(return_reader=True)
+        if self._structure_format == 'data':
+            self._structure_data = DATAReader(fname)
+        elif self._structure_format == 'xyz':
+            self._structure_data = \
+                XYZ2DATAConverter(fname).convert(return_reader=True)
 
-        self.atoms = self.data.atoms
-        self.atom_ids = self.atoms.atom_ids
-        self.atom_coords = self.atoms.get_coords(as_dict=True)
-        self.Nvac = 0
-        self.vac_ids = None
+        self._atoms = self._structure_data.atoms
+        self._atom_ids = self._atoms.atom_ids
+        self._atom_coords = self._atoms.get_coords(as_dict=True)
+
+        self._Nvacs = 0
+        self._Nvac_clusters = 0
+        self._Nvac_sites = 0
+
+        self._vac_ids = np.empty(0, dtype=int)
+        self._vac_type = 'single'
+        self._cluster_size = 1
+
+        self._vmd_selection_radius = np.sqrt(12)
+        self._show_vmd_selection_cmd = True
+
+    @property
+    def atoms(self):
+        return self._atoms
+
+    @property
+    def atom_ids(self):
+        return self._atom_ids
+
+    @property
+    def Nvacs(self):
+        return self._Nvacs
+
+    @property
+    def Nvac_clusters(self):
+        return self._Nvac_clusters
+
+    @Nvac_clusters.setter
+    def Nvac_clusters(self, value):
+        self._Nvac_clusters = value
+
+    @property
+    def Nvac_sites(self):
+        return self._Nvac_sites
+
+    @Nvac_sites.setter
+    def Nvac_sites(self, value):
+        self._Nvac_sites = value
+
+    @property
+    def cluster_size(self):
+        return self._cluster_size
+
+    @cluster_size.setter
+    def cluster_size(self, value):
+        self._cluster_size = value
+
+    @property
+    def vac_type(self):
+        return self._vac_type
+
+    @vac_type.setter
+    def vac_type(self, value):
+        self._vac_type = value
+
+    @property
+    def vmd_selection_radius(self):
+        return self._vmd_selection_radius
+
+    @vmd_selection_radius.setter
+    def vmd_selection_radius(self, value):
+        self._vmd_selection_radius = value
+
+    @property
+    def show_vmd_selection_cmd(self):
+        return self._show_vmd_selection_cmd
+
+    @show_vmd_selection_cmd.setter
+    def show_vmd_selection_cmd(self, value):
+        self._show_vmd_selection_cmd = value
 
     def _random_vacancy_generator(self):
         """Generate random vacancies in structure data."""
-        self.vac_ids = \
-            np.random.choice(self.atom_ids, size=self.Nvac, replace=False)
+        self._vac_ids = \
+            np.random.choice(self._atom_ids,
+                             size=self._Nvac_sites,
+                             replace=False)
 
-    def generate_vacancy_structure(self, show_vmd_selection_cmd=True,
-                                   cutoff_radius=np.sqrt(12)):
-        """Generate vacancy structure.
+    def _generate_vmd_selection_cmd(self):
 
-        Parameters
-        ----------
-        show_vmd_selection_cmd : bool, optional
-            Generate a VMD selection string that can be used to
-            select the atoms surrounding the vacancies.
-        cutoff_radius : float, optional
-            Cutoff radius for VMD selection command
+        selection_radius = self._vmd_selection_radius
+        selections = []
+        for atom in self._removed_atoms:
+            selection_cmd = \
+                "(((x - {:.6f})^2 + ".format(atom.x) + \
+                "(y - {:.6f})^2 + ".format(atom.y) + \
+                "(z - {:.6f})^2) <= {:.2f})".format(atom.z,
+                                                    selection_radius**2)
+            selections.append(selection_cmd)
 
-        """
-        removed_atoms = self.atoms.filter_atoms(self.vac_ids, invert=False)
+        vmd_selection_cmd = ' or '.join(selections)
+        print('copy and paste the following VMD command to select\n'
+              'the atoms surrounding the vacancies:\n\n'
+              '{}\n'.format(vmd_selection_cmd))
 
-        if show_vmd_selection_cmd:
-            vmd_vac_selection_cmd = []
-            for atom in removed_atoms:
-                selection_cmd = \
-                    "(((x - {:.6f})^2 + ".format(atom.x) + \
-                    "(y - {:.6f})^2 + ".format(atom.y) + \
-                    "(z - {:.6f})^2) <= {:.2f})".format(atom.z,
-                                                        cutoff_radius**2)
-                vmd_vac_selection_cmd.append(selection_cmd)
+    def _generate_single_vacancies(self):
+        self._removed_atoms = \
+            self._atoms.filter_atoms(self._vac_ids, invert=False)
 
-            vmd_vac_selection_cmd = ' or '.join(vmd_vac_selection_cmd)
-            print('copy and paste the following VMD command to select\n'
-                  'the atoms surrounding the vacancies:\n\n'
-                  '{}\n'.format(vmd_vac_selection_cmd))
+    def _generate_multi_vacancies(self):
+        vac_type_properties = {'double': {'cluster_size': 2,
+                                          'NN_cutoff': 1.5},
+                               'triple': {'cluster_size': 3,
+                                          'NN_cutoff': 1.5}}
+        vac_props = vac_type_properties[self._vac_type]
+        self._cluster_size = vac_props['cluster_size']
+        self._atoms.NN_cutoff = vac_props['NN_cutoff']
+        self._atoms.update_nearest_neighbors()
 
-        remaining_atoms = self.atoms.filter_atoms(self.vac_ids, invert=True)
-        vacancy_structure_fname = \
-            os.path.splitext(os.path.basename(self.fname))[0] + \
-            '+{}_vacancies'.format(self.Nvac)
-        DATAWriter.write(fname=vacancy_structure_fname,
-                         atoms=remaining_atoms,
-                         boxbounds=self.data.boxbounds,
-                         comment_line=self.data.comment_line)
-        XYZWriter.write(fname=vacancy_structure_fname,
-                        atoms=remaining_atoms,
-                        comment_line=self.data.comment_line)
+        vac_atoms = Atoms()
+        for vac_id in self._vac_ids:
+            vac_atom = self._atoms.get_atom(atomID=vac_id)
+            vac_atoms.append(vac_atom)
+            vac_atoms.extend(np.random.choice(vac_atom.NN,
+                                              size=self._cluster_size-1,
+                                              replace=False).tolist())
+        self._removed_atoms = \
+            self._atoms.filter_atoms(vac_atoms.atom_ids, invert=False)
+
+    def _generate_stone_wales_vacancies(self):
+        pass
+
+    def _generate_vacancy_structure(self):
+        """Generate vacancy structure."""
+        if self._vac_type in ('double', 'triple'):
+            self._generate_multi_vacancies()
+        elif self._vac_type in ('stone-wales', 'SW'):
+            self._generate_stone_wales_vacancies()
+        else:
+            self._generate_single_vacancies()
+
+        if self._show_vmd_selection_cmd:
+            self._generate_vmd_selection_cmd()
+
+        self._Nvacs = self._removed_atoms.Natoms
+
+        self._remaining_atoms = \
+            self._atoms.filter_atoms(self._removed_atoms.atom_ids, invert=True)
+        #remaining_atoms.assign_unique_ids()
+
+        self._save_vacancy_structure_data()
+
+    def _generate_output_fname(self):
+        self._output_fname = \
+            os.path.splitext(os.path.basename(self._fname))[0] + \
+            '+{}_vacancies'.format(self._Nvacs)
+
+    def _save_vacancy_structure_data(self):
+        self._generate_output_fname()
+        DATAWriter.write(fname=self._output_fname,
+                         atoms=self._remaining_atoms,
+                         boxbounds=self._structure_data.boxbounds,
+                         comment_line=self._structure_data.comment_line)
+        XYZWriter.write(fname=self._output_fname,
+                        atoms=self._remaining_atoms,
+                        comment_line=self._structure_data.comment_line)
 
 
 class GrapheneVacancyGenerator(VacancyGenerator):
@@ -195,7 +305,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
     >>> gvacgen = GrapheneVacancyGenerator(fname='5nmx10nm_ZZ_1layer.data')
 
-    If say, you had your LAMMPS data file saved with a ``.lammps``
+    If say, you had your LAMMPS data file saved with a `.lammps`
     extension, then you would need to specify the `structure_format`
     keyword argument as well:
 
@@ -222,7 +332,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
     .. code-block:: python
 
-       >>> gvacgen.generate_vacancy_structure(Nvac=30, random=True)
+       >>> gvacgen.generate_vacancy_structure(Nvac_sites=30, random=True)
        copy and paste the following VMD command to select
        the atoms surrounding the vacancies:
 
@@ -268,7 +378,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
     """
     def __init__(self, fname=None, structure_format=None,
-                 width=None, length=None, edge='armchair',
+                 width=None, length=None, edge=None,
                  element1='C', element2='C', bond=CCbond,
                  nlayers=1, layer_spacing=3.35, stacking_order='AB',
                  rotate_structure=False, rotation_angle=None,
@@ -276,10 +386,9 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
         if fname is None and width is not None and length is not None:
             try:
-                gg = GrapheneGenerator(width=width, length=length,
-                                       edge=edge, element1=element1,
-                                       element2=element2, bond=bond,
-                                       nlayers=nlayers,
+                gg = GrapheneGenerator(width=width, length=length, edge=edge,
+                                       element1=element1, element2=element2,
+                                       bond=bond, nlayers=nlayers,
                                        layer_spacing=layer_spacing,
                                        stacking_order=stacking_order,
                                        verbose=verbose)
@@ -291,52 +400,71 @@ class GrapheneVacancyGenerator(VacancyGenerator):
         super(GrapheneVacancyGenerator, self).__init__(
             fname=fname, structure_format=structure_format, verbose=verbose)
 
-    def generate_vacancy_structure(self, Nvac=int, uniform=False,
-                                   bin_axis='z', distribute_evenly=False,
+    def generate_vacancy_structure(self, Nvac_sites=None, Nvac_clusters=None,
+                                   cluster_size=None, vac_type='single',
+                                   uniform=False, bin_axis='z',
+                                   distribute_evenly=False,
+                                   vmd_selection_radius=np.sqrt(12),
                                    show_vmd_selection_cmd=True):
         """Generate vacancy structure.
 
         Parameters
         ----------
-        Nvac : int
-            total number of vacancies to "add" to structure.
+        Nvac_sites : int, optional
+            total number of vacancy sites to "add" to structure data.
+        Nvac_clusters : int, optional
+            total number of vacancy cluster sites to "add" to structure data.
         uniform : bool, optional
             Generate vacancies uniformly distributed along `bin_axis`.
         show_vmd_selection_cmd : bool, optional
-            print the VMD command needed to select the atoms surrounding
-            each vacancy position
+            Generate a VMD selection string that can be used to
+            select the atoms surrounding the vacancies.
+        vmd_selection_radius : float, optional
+            Cutoff radius for VMD selection command in units of **Angstroms**.
 
         """
-        self.Nvac = Nvac
+        if Nvac_sites is None and Nvac_clusters is None:
+            raise ValueError('`Nvac_sites` or `Nvac_clusters` must '
+                             'be an integer.')
+        elif Nvac_sites is None and Nvac_clusters is not None:
+            Nvac_sites = Nvac_clusters
+            if cluster_size is None:
+                cluster_size = 1
+
+        self._Nvac_sites = Nvac_sites
+        self._Nvac_clusters = Nvac_clusters
+        self._cluster_size = cluster_size
+
+        self._vac_type = vac_type
+        self._vmd_selection_radius = vmd_selection_radius
+        self._show_vmd_selection_cmd = show_vmd_selection_cmd
 
         if uniform:
-            self.vac_ids = np.empty(0, dtype=int)
-
             # find the coords of each layer
-            y_coords = self.atom_coords['y']
+            y_coords = self._atom_coords['y']
             Nlayers = len(set(y_coords))
             layer_coords = np.asarray(sorted(list(set(y_coords))))
 
-            Nvac_per_layer = int(Nvac / Nlayers)
-            extra = Nvac % Nlayers
+            Nvac_sites_per_layer = int(Nvac_sites / Nlayers)
+            extra = Nvac_sites % Nlayers
 
-            nbins = Nvac_per_layer * Nlayers  # Nvac - extra * Nlayers
+            nbins = Nvac_sites_per_layer * Nlayers
 
             bin_sets = []
             for n in xrange(Nlayers):
                 bin_sets.append(np.arange(n, nbins, Nlayers))
             bin_set_iter = itertools.cycle((bin_sets))
 
-            bin_edges = np.linspace(self.atom_coords[bin_axis].min(),
-                                    self.atom_coords[bin_axis].max(),
+            bin_edges = np.linspace(self._atom_coords[bin_axis].min(),
+                                    self._atom_coords[bin_axis].max(),
                                     num=nbins+1)
 
             bin_mid_pts = bin_edges[:-1] + np.diff(bin_edges) / 2
 
-            if self.verbose:
-                print('Nvac: {}'.format(Nvac))
+            if self._verbose:
                 print('Nlayers: {}'.format(Nlayers))
-                print('Nvac_per_layer: {}'.format(Nvac_per_layer))
+                print('Nvac_sites: {}'.format(Nvac_sites))
+                print('Nvac_sites_per_layer: {}'.format(Nvac_sites_per_layer))
                 print('extra vacancies: {}'.format(extra))
                 print('nbins: {}'.format(nbins))
                 print('bin_sets:\n{}'.format(bin_sets))
@@ -344,9 +472,9 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                 print('bin_mid_pts:\n{}'.format(bin_mid_pts))
 
             ortho_axis = 'x' if bin_axis == 'z' else 'z'
-            ortho_mid_pt = self.atom_coords[ortho_axis].min() + \
-                (self.atom_coords[ortho_axis].max() -
-                 self.atom_coords[ortho_axis].min()) / 2
+            ortho_mid_pt = self._atom_coords[ortho_axis].min() + \
+                (self._atom_coords[ortho_axis].max() -
+                 self._atom_coords[ortho_axis].min()) / 2
             atoms_along_ortho_axis = {'+': [], '-': []}
 
             for y in layer_coords:
@@ -354,17 +482,17 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                 for vac_pos in bin_mid_pts[bin_set]:
                     candidate_vac_atom_indices = \
                         np.where(
-                            (self.atom_coords[ortho_axis] >=
-                             (self.atom_coords[ortho_axis].min() + 2.5)) &
-                            (self.atom_coords[ortho_axis] <=
-                             (self.atom_coords[ortho_axis].max() - 2.5)) &
-                            (np.abs(self.atom_coords['y'] - y) <= 0.5) &
-                            (np.abs(self.atom_coords[bin_axis] - vac_pos)
+                            (self._atom_coords[ortho_axis] >=
+                             (self._atom_coords[ortho_axis].min() + 2.5)) &
+                            (self._atom_coords[ortho_axis] <=
+                             (self._atom_coords[ortho_axis].max() - 2.5)) &
+                            (np.abs(self._atom_coords['y'] - y) <= 0.5) &
+                            (np.abs(self._atom_coords[bin_axis] - vac_pos)
                                 <= 1))
                     candidate_vac_atom_ids = \
-                        self.atom_ids[candidate_vac_atom_indices]
+                        self._atom_ids[candidate_vac_atom_indices]
 
-                    if self.verbose:
+                    if self._verbose:
                         print('candidate_vac_atom_ids: '
                               '{}\n'.format(candidate_vac_atom_ids))
 
@@ -374,18 +502,18 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                             np.random.choice(candidate_vac_atom_ids)
                         if distribute_evenly:
                             rand_vac_atom = \
-                                self.atoms.get_atoms(asarray=True)[
-                                    self.atom_ids == rand_vac_atom_id][0]
+                                self._atoms.get_atoms(asarray=True)[
+                                    self._atom_ids == rand_vac_atom_id][0]
                             ortho_pos = getattr(rand_vac_atom, ortho_axis)
                             if ortho_pos >= ortho_mid_pt and \
                                     len(atoms_along_ortho_axis['+']) < \
-                                    Nvac_per_layer / 2:
+                                    Nvac_sites_per_layer / 2:
                                 atoms_along_ortho_axis['+'].append(
                                     rand_vac_atom)
                                 break
                             elif ortho_pos < ortho_mid_pt and \
                                     len(atoms_along_ortho_axis['-']) < \
-                                    Nvac_per_layer / 2:
+                                    Nvac_sites_per_layer / 2:
                                 atoms_along_ortho_axis['-'].append(
                                     rand_vac_atom)
                                 break
@@ -394,12 +522,11 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                         else:
                             break
 
-                    self.vac_ids = np.r_[self.vac_ids, rand_vac_atom_id]
+                    self._vac_ids = np.r_[self._vac_ids, rand_vac_atom_id]
         else:
             super(GrapheneVacancyGenerator, self)._random_vacancy_generator()
 
-        super(GrapheneVacancyGenerator, self).generate_vacancy_structure(
-            show_vmd_selection_cmd=show_vmd_selection_cmd)
+        super(GrapheneVacancyGenerator, self)._generate_vacancy_structure()
 
 
 class NanotubeVacancyGenerator(VacancyGenerator):
@@ -478,7 +605,8 @@ class NanotubeVacancyGenerator(VacancyGenerator):
 
     .. code-block:: python
 
-       >>> ntvg.generate_vacancy_structure(Nvac=35, uniform=True, bin_axis='z')
+       >>> ntvg.generate_vacancy_structure(Nvac_sites=35, uniform=True,
+       ...                                 bin_axis='z')
        copy and paste the following VMD command to select
        the atoms surrounding the vacancies:
 
@@ -535,8 +663,8 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                  rotate_structure=False, rotation_angle=None,
                  rotation_axis=None, verbose=False):
 
-        self.Ntubes = None
-        self.Natoms_per_tube = None
+        self._Ntubes = None
+        self._Natoms_per_tube = None
 
         if fname is None and n is not None and m is not None:
             try:
@@ -552,23 +680,27 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                                                verbose=verbose)
                 ntbg.save_data(structure_format='data')
                 fname = ntbg.fname
-                self.Ntubes = ntbg.Ntubes
-                self.Natoms_per_tube = ntbg.Natoms_per_tube
+                self._Ntubes = ntbg.Ntubes
+                self._Natoms_per_tube = ntbg.Natoms_per_tube
             except NanotubeGeneratorError:
                 raise VacancyGeneratorError('invalid parameters')
 
         super(NanotubeVacancyGenerator, self).__init__(
             fname=fname, structure_format=structure_format)
 
-    def generate_vacancy_structure(self, Nvac=int, uniform=False,
-                                   bin_axis=None, Ntubes=None,
+    def generate_vacancy_structure(self, Nvac_sites=None, Nvac_clusters=None,
+                                   cluster_size=None, vac_type='single',
+                                   uniform=False, bin_axis='z', Ntubes=None,
+                                   vmd_selection_radius=np.sqrt(12),
                                    show_vmd_selection_cmd=True):
         """Generate vacancy structure.
 
         Parameters
         ----------
-        Nvac : int
-            total number of vacancies to "add" to structure data.
+        Nvac_sites : int, optional
+            total number of vacancy sites to "add" to structure data.
+        Nvac_clusters : int, optional
+            total number of vacancy cluster sites to "add" to structure data.
         random : bool, optional
             Generate random vacancies in structure data.
         uniform : bool, optional
@@ -577,45 +709,61 @@ class NanotubeVacancyGenerator(VacancyGenerator):
             axis along which to generate uniform vacancies
         Ntubes : {None, int}, optional
         show_vmd_selection_cmd : bool, optional
+            Generate a VMD selection string that can be used to
+            select the atoms surrounding the vacancies.
+        vmd_selection_radius : float, optional
+            Cutoff radius for VMD selection command in units of **Angstroms**.
 
         """
-        self.Nvac = Nvac
+
+        if Nvac_sites is None and Nvac_clusters is None:
+            raise ValueError('`Nvac_sites` or `Nvac_clusters` must be an '
+                             'integer.')
+        elif Nvac_sites is None and Nvac_clusters is not None:
+            Nvac_sites = Nvac_clusters
+            if cluster_size is None:
+                cluster_size = 1
+
+        self._Nvac_sites = Nvac_sites
+        self._Nvac_clusters = Nvac_clusters
+        self._cluster_size = cluster_size
+        self._vac_type = vac_type
+        self._vmd_selection_radius = vmd_selection_radius
+        self._show_vmd_selection_cmd = show_vmd_selection_cmd
 
         if uniform:
-            self.vac_ids = np.empty(0, dtype=int)
-
-            if Ntubes is None and self.Ntubes is None:
+            if Ntubes is None and self._Ntubes is None:
                 raise VacancyGeneratorError('please specify `Ntubes`')
             elif Ntubes is None:
-                Ntubes = self.Ntubes
+                Ntubes = self._Ntubes
 
-            Natoms = len(self.atom_ids)
-            if self.Natoms_per_tube is not None:
-                Natoms_per_tube = self.Natoms_per_tube
+            Natoms = len(self._atom_ids)
+            if self._Natoms_per_tube is not None:
+                Natoms_per_tube = self._Natoms_per_tube
             else:
                 Natoms_per_tube = int(Natoms / Ntubes)
 
-            Nvac_per_tube = int(Nvac / Ntubes)
-            extra = Nvac % Ntubes
-            nbins = Ntubes * Nvac_per_tube
+            Nvac_sites_per_tube = int(Nvac_sites / Ntubes)
+            extra = Nvac_sites % Ntubes
+            nbins = Ntubes * Nvac_sites_per_tube
 
             bin_sets = []
             for n in xrange(Ntubes):
-                bin_sets.append(np.arange(n, Nvac, Ntubes))
+                bin_sets.append(np.arange(n, Nvac_sites, Ntubes))
             bin_set_iter = itertools.cycle((bin_sets))
 
-            vac_bin_edges = np.linspace(self.atom_coords[bin_axis].min(),
-                                        self.atom_coords[bin_axis].max(),
+            vac_bin_edges = np.linspace(self._atom_coords[bin_axis].min(),
+                                        self._atom_coords[bin_axis].max(),
                                         num=nbins+1)
             vac_coords_along_bin_axis = \
                 vac_bin_edges[:-1] + np.diff(vac_bin_edges) / 2
 
-            if self.verbose:
+            if self._verbose:
+                print('Ntubes: {}'.format(Ntubes))
                 print('Natoms: {}'.format(Natoms))
                 print('Natoms_per_tube: {}'.format(Natoms_per_tube))
-                print('Nvac: {}'.format(Nvac))
-                print('Ntubes: {}'.format(Ntubes))
-                print('Nvac_per_tube: {}'.format(Nvac_per_tube))
+                print('Nvac_sites: {}'.format(Nvac_sites))
+                print('Nvac_sites_per_tube: {}'.format(Nvac_sites_per_tube))
                 print('extra vacancies: {}'.format(extra))
                 print('nbins: {}'.format(nbins))
                 print('bin_sets:\n{}'.format(bin_sets))
@@ -626,17 +774,17 @@ class NanotubeVacancyGenerator(VacancyGenerator):
 
             for i in xrange(Ntubes):
                 tube_atom_indices = \
-                    np.where((self.atom_ids > (Natoms_per_tube * i)) &
-                             (self.atom_ids <= (Natoms_per_tube * (i + 1))))
+                    np.where((self._atom_ids > (Natoms_per_tube * i)) &
+                             (self._atom_ids <= (Natoms_per_tube * (i + 1))))
 
-                tube_atom_ids = self.atom_ids[tube_atom_indices]
+                tube_atom_ids = self._atom_ids[tube_atom_indices]
 
-                tube_coords = self.atoms.get_filtered_coords(tube_atom_ids,
-                                                             as_dict=True,
-                                                             invert=False)
+                tube_coords = self._atoms.get_filtered_coords(tube_atom_ids,
+                                                              as_dict=True,
+                                                              invert=False)
 
-                if self.verbose:
-                    print('tube n: {:d}'.format(i+1))
+                if self._verbose:
+                    print('tube n: {:d}'.format(i + 1))
                     print('tube_atom_ids:\n{}'.format(tube_atom_ids))
                     print('tube_atom_coords:\n{}'.format(tube_coords))
 
@@ -647,17 +795,16 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                     candidate_vac_atom_ids = \
                         tube_atom_ids[candidate_vac_atom_indices]
 
-                    if self.verbose:
+                    if self._verbose:
                         print(u'vac_pos along {}-axis: {:.2f} \u00c5'.format(
                             bin_axis, vac_pos))
                         print('N candidate_vac_atom_ids: '
                               '{}\n'.format(len(candidate_vac_atom_ids)))
 
-                    self.vac_ids = \
-                        np.r_[self.vac_ids,
+                    self._vac_ids = \
+                        np.r_[self._vac_ids,
                               np.random.choice(candidate_vac_atom_ids)]
         else:
             super(NanotubeVacancyGenerator, self)._random_vacancy_generator()
 
-        super(NanotubeVacancyGenerator, self).generate_vacancy_structure(
-            show_vmd_selection_cmd=show_vmd_selection_cmd)
+        super(NanotubeVacancyGenerator, self)._generate_vacancy_structure()
