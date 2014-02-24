@@ -391,12 +391,11 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
     Now, just because we can, let's make a big ass hexagon bundle with
     :math:`C_{\\mathrm{h}} = (10, 0)`.
 
-    >>> BIGASSHEXABUN = NanotubeBundleGenerator(n=10, m=0, nx=25,
-    ...                                         ny=25, nz=1,
+    >>> BIGASSHEXABUN = NanotubeBundleGenerator(n=10, m=0, nx=25, ny=25, nz=1,
     ...                                         bundle_geometry='hexagon')
+    ... BIGASSHEXABUN.save_data()
 
-    You're looking at 469 :math:`(10, 0)` unit cells! That's
-    :math:`N_{\\mathrm{atoms}} = 18760`.
+    Take a look at the 469 :math:`(10, 0)` unit cells in this big ass bundle!
 
     .. image:: /images/1000_hcp_469tube_hexagon-01.png
 
