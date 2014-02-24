@@ -86,7 +86,8 @@ class Nanotube(object):
     nx, ny, nz : int, optional
         Number of repeat unit cells in the :math:`x, y, z` dimensions
     element1, element2 : {str, int}, optional
-        Element symbol or atomic number of basis atoms 1 and 2
+        Element symbol or atomic number of basis
+        :py:class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         bond length between nearest neighbor atoms.
         Must be in units of **Angstroms**. Default value is
@@ -1328,7 +1329,8 @@ class NanotubeBundle(Nanotube):
     nx, ny, nz : int, optional
         Number of repeat unit cells in the :math:`x, y, z` dimensions
     element1, element2 : {str, int}, optional
-        Element symbol or atomic number of basis atoms 1 and 2
+        Element symbol or atomic number of basis
+        :py:class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         Bond length between nearest neighbor atoms.
         Must be in units of **Angstroms**. Default value is
