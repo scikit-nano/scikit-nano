@@ -59,16 +59,14 @@ class Atoms(MutableSequence):
                  use_kdtree=True):
 
         self._atoms = []
-        self._atomtypes = {}
-
         self._atom_ids = []
         self._molecule_ids = []
-
         self._charges = []
         self._coords = []
-        #self._positions = []
+        self._positions = []
         self._masses = []
         self._velocities = []
+        self._forces = []
         self._symbols = []
         self._coordination_numbers = []
         self._nearest_neighbors = []
@@ -79,11 +77,15 @@ class Atoms(MutableSequence):
              'moleculeID': self._molecule_ids, 'symbol': self._symbols,
              'CN': self._coordination_numbers, 'NN': self._nearest_neighbors}
 
+        self._atomtypes = {}
+
         self._atom_tree = None
 
         if use_kdtree and has_kdtree is False:
             use_kdtree = False
         self._use_kdtree = use_kdtree
+        self._NN_number = 6
+        self._NN_cutoff = np.inf
 
         if atoms is not None:
             if isinstance(atoms, list):
@@ -214,71 +216,62 @@ class Atoms(MutableSequence):
         self._coords = coords[:]
         return np.asarray(self._coords)
 
-    #@property
-    #def positions(self):
-    #    """Return array of `Atom` positions."""
-    #    positions = []
-    #    for atom in self._atoms:
-    #        positions.append(atom.r)
-    #    self._positions = positions[:]
-    #    return np.asarray(self._positions)
+    @property
+    def positions(self):
+        """Return array of `Atom` positions."""
+        positions = []
+        for atom in self._atoms:
+            positions.append(atom.r)
+        self._positions = positions[:]
+        return np.asarray(self._positions)
 
     @property
     def coordination_numbers(self):
         """Return array of `Atom` coordination numbers."""
+        self._update_coordination_numbers()
         coordination_numbers = []
         for atom in self._atoms:
             coordination_numbers.append(atom.CN)
         self._coordination_numbers = coordination_numbers[:]
         return np.asarray(self._coordination_numbers)
 
-    def update_coordination_numbers(self, n=6, rc=np.inf, maxdiff=1):
-        """Update `Atom` coordination numbers.
-
-        Parameters
-        ----------
-        n : int, optional
-        rc : nonnegative float, optional
-        maxdiff : float, optional
-
-        """
+    def _update_coordination_numbers(self):
+        """Update `Atom` coordination numbers."""
         if self._use_kdtree:
-            #if cutoff_intervals is None:
-            #    if cutoff_radius is None:
-            #        cutoff_radius = np.inf
-            #    cutoff_intervals = [cutoff_radius]
-
-            #    if isinstance(cutoff_intervals, list):
-            #        for rc in cutoff_intervals:
-            NN_d, NN_i = self.query_NN(n=n, cutoff_radius=rc)
+            NN_d, NN_i = \
+                self.query_atom_tree(n=self.NN_number,
+                                     cutoff_radius=self.NN_cutoff)
             for i, atom in enumerate(self._atoms):
                 CN = 0
                 for d in NN_d[i]:
-                    if d < rc:
+                    if d < self.NN_cutoff:
                         CN += 1
                 atom.CN = CN
 
     @property
     def nearest_neighbors(self):
         """Return array of nearest-neighbor atoms for each `Atom`."""
+        self._update_nearest_neighbors()
         nearest_neighbors = []
         for atom in self._atoms:
             nearest_neighbors.append(atom.NN)
         self._nearest_neighbors = nearest_neighbors[:]
         return np.asarray(self._nearest_neighbors)
 
-    def update_nearest_neighbors(self, n=6, rc=np.inf):
+    def _update_nearest_neighbors(self):
+        """Update `Atom` nearest-neighbors."""
         if self._use_kdtree:
-            NN_d, NN_i = self.query_NN(n=n, cutoff_radius=rc)
+            NN_d, NN_i = self.query_atom_tree(n=self.NN_number,
+                                              cutoff_radius=self.NN_cutoff)
             for i, atom in enumerate(self._atoms):
                 NN_atoms = []
                 for j, d in enumerate(NN_d[i]):
-                    if d < rc:
+                    if d < self.NN_cutoff:
                         NN_atoms.append(self._atoms[NN_i[i][j]])
                 atom.NN = NN_atoms
 
-    def query_NN(self, n=6, eps=0, p=2, cutoff_radius=np.inf):
-        """Query nearest neighbors.
+    def query_atom_tree(self, n=6, eps=0, p=2, cutoff_radius=np.inf):
+        """Query atom tree for nearest neighbors distances and indices.
 
         Parameters
         ----------
@@ -308,13 +301,59 @@ class Atoms(MutableSequence):
             same shape as NN_d.
 
         """
-        NNtree = self.atom_tree
+        atom_tree = self.atom_tree
         NN_d = NN_i = None
-        if NNtree is not None:
-            d, i = NNtree.query(self.coords, k=n+1, eps=eps, p=p,
-                                distance_upper_bound=cutoff_radius)
+        if atom_tree is not None:
+            d, i = atom_tree.query(self.coords, k=n+1, eps=eps, p=p,
+                                   distance_upper_bound=cutoff_radius)
             NN_d, NN_i = d[:, 1:], i[:, 1:]
         return NN_d, NN_i
+
+    def query_coordination_numbers(self, n=6, rc=np.inf):
+        """Query and update `Atom` coordination numbers.
+
+        Parameters
+        ----------
+        n : int, optional
+        rc : nonnegative float, optional
+
+        """
+        if self._use_kdtree:
+            NN_d, NN_i = self.query_atom_tree(n=n, cutoff_radius=rc)
+            for i, atom in enumerate(self._atoms):
+                CN = 0
+                for d in NN_d[i]:
+                    if d < rc:
+                        CN += 1
+                atom.CN = CN
+        coordination_numbers = []
+        for atom in self._atoms:
+            coordination_numbers.append(atom.CN)
+        self._coordination_numbers = coordination_numbers[:]
+        return np.asarray(self._coordination_numbers)
+
+    def query_nearest_neighbors(self, n=6, rc=np.inf):
+        """Query and update `Atom` nearest neighbors.
+
+        Parameters
+        ----------
+        n : int, optional
+        rc : nonnegative float, optional
+
+        """
+        if self._use_kdtree:
+            NN_d, NN_i = self.query_atom_tree(n=n, cutoff_radius=rc)
+            for i, atom in enumerate(self._atoms):
+                NN_atoms = []
+                for j, d in enumerate(NN_d[i]):
+                    if d < rc:
+                        NN_atoms.append(self._atoms[NN_i[i][j]])
+                atom.NN = NN_atoms
+        nearest_neighbors = []
+        for atom in self._atoms:
+            nearest_neighbors.append(atom.NN)
+        self._nearest_neighbors = nearest_neighbors[:]
+        return np.asarray(self._nearest_neighbors)
 
     @property
     def masses(self):
@@ -353,12 +392,12 @@ class Atoms(MutableSequence):
 
     @property
     def q(self):
-        """Return the total net charge of all atoms."""
+        """Return the total net charge of `Atoms`."""
         return np.asarray(self.charges).sum()
 
     @property
     def r(self):
-        """Alias for :py:meth:`~sknano.chemistry.Atoms.CM`"""
+        """Alias for :py:attr:`~sknano.chemistry.Atoms.CM`"""
         return self.CM
 
     @property
@@ -379,8 +418,24 @@ class Atoms(MutableSequence):
         self._velocities = velocities[:]
         return np.asarray(self._velocities)
 
+    @property
+    def NN_number(self):
+        return self._NN_number
+
+    @NN_number.setter
+    def NN_number(self, value):
+        self._NN_number = int(value)
+
+    @property
+    def NN_cutoff(self):
+        return self._NN_cutoff
+
+    @NN_cutoff.setter
+    def NN_cutoff(self, value):
+        self._NN_cutoff = value
+
     def add_atomtype(self, atom):
-        """Add atom type to atom type dictionary.
+        """Add atom type to :py:attr:`~sknano.chemistry.Atoms.atomtypes` dict.
 
         Parameters
         ----------
@@ -539,7 +594,7 @@ class Atoms(MutableSequence):
         except (TypeError, IndexError):
             try:
                 return self._atoms[index]
-            except (IndexError, TypeError):
+            except (TypeError, IndexError):
                 return None
 
     def get_atoms(self, asarray=False, as_array=False):
