@@ -45,7 +45,8 @@ class Graphene(object):
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
         the `length` of the sheet.
     element1, element2 : {str, int}, optional
-        Element symbol or atomic number of basis atoms 1 and 2.
+        Element symbol or atomic number of basis
+        :py:class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         bond length between nearest-neighbor atoms in **Angstroms**.
     nlayers : int, optional
@@ -171,12 +172,12 @@ class Graphene(object):
 
     @property
     def Natoms(self):
-        """Number of atoms in **graphene unit cell**"""
+        """Number of :py:class:`~sknano.chemistry.Atoms` in **unit cell**"""
         return self._Natoms
 
     @property
     def Natoms_per_layer(self):
-        """Number of atoms in **graphene layer**."""
+        """Number of :py:class:`~sknano.chemistry.Atoms` in **layer**."""
         return self._Natoms_per_layer
 
     @classmethod

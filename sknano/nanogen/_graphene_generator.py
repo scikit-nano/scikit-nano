@@ -42,7 +42,8 @@ class GrapheneGenerator(Graphene, StructureGenerator):
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
         the `length` of the sheet.
     element1, element2 : {str, int}, optional
-        Element symbol or atomic number of basis atoms 1 and 2.
+        Element symbol or atomic number of basis
+        :py:class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         bond length between nearest-neighbor atoms in **Angstroms**.
     nlayers : int, optional
@@ -299,7 +300,8 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
         the `length` of the sheet.
     element1, element2 : {str, int}, optional
-        Element symbol or atomic number of basis atoms 1 and 2.
+        Element symbol or atomic number of basis
+        :py:class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         bond length between nearest-neighbor atoms in **Angstroms**.
     layer_spacing : float, optional

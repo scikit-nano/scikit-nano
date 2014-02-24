@@ -30,12 +30,12 @@ class StructureGenerator(object):
 
     @property
     def unit_cell(self):
-        """Return unit cell `Atoms`."""
+        """Return unit cell :py:class:`~sknano.chemistry.Atoms`."""
         return self._unit_cell
 
     @property
     def structure_atoms(self):
-        """Return structure `Atoms`."""
+        """Return structure :py:class:`~sknano.chemistry.Atoms`."""
         return self._structure_atoms
 
     #def update_structure_atoms_attributes(self, n=3, rc=1.5):

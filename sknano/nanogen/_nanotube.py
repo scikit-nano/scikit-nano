@@ -419,12 +419,12 @@ class Nanotube(object):
 
     @property
     def element1(self):
-        """Element symbol of `Atom` 1."""
+        """Element symbol of :py:class:`~sknano.chemistry.Atom` 1."""
         return self._element1
 
     @property
     def element2(self):
-        """Element symbol of `Atom` 2."""
+        """Element symbol of :py:class:`~sknano.chemistry.Atom` 2."""
         return self._element2
 
     @property
