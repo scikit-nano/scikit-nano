@@ -625,7 +625,11 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
     vdw_spacing : float, optional
         van der Waals distance between nearest neighbor tubes
     bundle_packing : {None, 'hcp', 'hexagonal', 'ccp', 'cubic'}, optional
-        close packing arrangement of bundles
+        Packing arrangement of MWNT bundles.  If `bundle_packing` is `None`,
+        then it will be determined by the `bundle_geometry` parameter if
+        `bundle_geometry` is not `None`.  If both `bundle_packing` and
+        `bundle_geometry` are `None`, then `bundle_packing` defaults to
+        `hexagonal`.
     bundle_geometry : {None, 'triangle', 'hexagon', 'square', 'rectangle',
                        'rhombus', 'rhomboid'}, optional
     Lx, Ly, Lz : float, optional
@@ -650,8 +654,8 @@ class MWNTGenerator(NanotubeGenerator, NanotubeBundle):
         shell chirality type will be added as a constraint.
     autogen : bool, optional
         if `True`, automatically call
-        :py:meth:`~NanotubeGenerator.generate_unit_cell`,
-        followed by :py:meth:`~NanotubeGenerator.generate_structure_data`.
+        :py:meth:`~MWNTGenerator.generate_unit_cell`,
+        followed by :py:meth:`~MWNTGenerator.generate_structure_data`.
     verbose : bool, optional
         if `True`, show verbose output
 
