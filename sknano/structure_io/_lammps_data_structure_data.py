@@ -179,17 +179,17 @@ class DATAReader(StructureReader):
                 #    print('unknown atom keyword: {}'.format(kw))
 
             atom = Atom(**atom_kwargs)
-            self._atoms.append(atom)
+            self._structure_atoms.append(atom)
 
     def _parse_atomtypes(self):
-        Ntypes = self._atoms.Ntypes
-        atomtypes = self._atoms.atomtypes
+        Ntypes = self._structure_atoms.Ntypes
+        atomtypes = self._structure_atoms.atomtypes
         if Ntypes != self._headers['atom types']:
             for atomtype in xrange(1, self._headers['atom types'] + 1):
                 if atomtype not in atomtypes:
                     mass = self._sections['Masses'][atomtype - 1][
                         self._section_properties['Masses']['mass']['index']]
-                    self._atoms.add_atomtype(
+                    self._structure_atoms.add_atomtype(
                         Atom(atomtype=atomtype, mass=mass))
 
     def _parse_boxbounds(self):
@@ -456,7 +456,7 @@ class LAMMPSDATA(DATAReader):
             self._section_properties[section_key][atom_attr]['dtype']
         new_data = np.asarray(new_data, dtype=attr_dtype)
 
-        for i, atom in enumerate(self._atoms):
+        for i, atom in enumerate(self._structure_atoms):
             self._sections[section_key][i][colidx] = \
                 attr_dtype(float(new_data[i]))
             setattr(atom, atom_attr, attr_dtype(float(new_data[i])))
@@ -483,7 +483,7 @@ class LAMMPSDATA(DATAReader):
                     raise ValueError(error_msg)
             else:
                 datafile = self._fname
-            DATAWriter.write(fname=datafile, atoms=self._atoms,
+            DATAWriter.write(fname=datafile, atoms=self._structure_atoms,
                              boxbounds=self._boxbounds,
                              comment_line=self._comment_line)
         except (TypeError, ValueError) as e:

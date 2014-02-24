@@ -40,15 +40,15 @@ class StructureData(object):
 
     """
     def __init__(self, fname=None):
-        self._atoms = Atoms()
+        self._structure_atoms = Atoms()
         self._comment_line = default_comment_line
         self._fname = fname
         self._properties = OrderedDict()
 
     @property
-    def atoms(self):
+    def structure_atoms(self):
         """:py:class:`~sknano.chemistry.Atoms` instance."""
-        return self._atoms
+        return self._structure_atoms
 
     @property
     def comment_line(self):
@@ -90,7 +90,7 @@ class StructureData(object):
     @property
     def Natoms(self):
         """Number of atoms in :py:class:`~sknano.chemistry.Atoms`"""
-        return self._atoms.Natoms
+        return self._structure_atoms.Natoms
 
     @property
     def properties(self):
