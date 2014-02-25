@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 =======================================================================
-Tools for analysis, helper functions, LUTs, etc. (:mod:`sknano.tools`)
+Helper functions, LUTs, reference data, etc. (:mod:`sknano.tools`)
 =======================================================================
 
 .. currentmodule:: sknano.tools
@@ -9,9 +9,8 @@ Tools for analysis, helper functions, LUTs, etc. (:mod:`sknano.tools`)
 Contents
 ========
 
-Helper Functions
------------------
-
+Helper functions for chirality data
+------------------------------------
 .. autosummary::
    :toctree: generated/
 
@@ -21,14 +20,37 @@ Helper Functions
    generate_Ch_list
    get_Ch_indices
    get_Ch_type
+
+Helper functions for file I/O
+------------------------------
+.. autosummary::
+   :toctree: generated/
+
    get_fpath
+
+Helper functions for manipulating strings
+------------------------------------------
+.. autosummary::
+   :toctree: generated/
+
    plural_word_check
-   rotation_matrix
+
+Math helper functions
+----------------------
+.. autosummary::
+   :toctree: generated/
+
    totient_func
+
+Helper functions for linear algebra transforms
+-----------------------------------------------
+.. autosummary::
+   :toctree: generated/
+
+   rotation_matrix
 
 LUTs (Look-up 'tables' - lists and dictionaries)
 -------------------------------------------------
-
 .. autosummary::
    :toctree: generated/
 
@@ -37,7 +59,6 @@ LUTs (Look-up 'tables' - lists and dictionaries)
 
 Sub-packages
 ============
-
 .. autosummary::
    :toctree: generated/
 
@@ -48,7 +69,11 @@ from __future__ import division, print_function, absolute_import
 
 __docformat__ = 'restructuredtext'
 
-from ._funcs import *
+from ._chirality_funcs import *
+from ._fiofuncs import *
 from ._luts import *
+from ._mathfuncs import *
+from ._strfuncs import *
+from ._transforms import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
