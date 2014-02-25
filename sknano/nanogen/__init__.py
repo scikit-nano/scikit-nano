@@ -84,12 +84,14 @@ from __future__ import division, print_function, absolute_import
 
 __docformat__ = 'restructuredtext'
 
-from ._graphene import *
+from ._defect_generator import *
+from ._graphene_defect_generator import *
 from ._graphene_generator import *
-from ._nanotube import *
+from ._graphene import *
+from ._nanotube_defect_generator import *
 from ._nanotube_generator import *
+from ._nanotube import *
 from ._structure_generator import *
 from ._tubegen import *
-from ._vacancy_generator import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
