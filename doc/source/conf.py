@@ -167,7 +167,7 @@ html_theme_options = {
     "sknano_logo": False,
     "rootlinks":
     [("http://github.com/androomerrill/scikit-nano", "scikit-nano"),
-     ("http://projects.geekspin.net/scikit-nano/doc", "Docs")]}
+     ("http://projects.geekcode.io/scikit-nano/doc", "Docs")]}
 html_logo = '_static/sknano_logo.png'
 html_favicon = '_static/favicon.ico'
 html_sidebars = {'index': 'indexsidebar.html'}
