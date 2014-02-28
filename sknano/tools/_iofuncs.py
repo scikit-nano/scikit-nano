@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===================================================
-File I/O functions (:mod:`sknano.tools._iofuncs`)
+I/O functions (:mod:`sknano.tools._iofuncs`)
 ===================================================
 
 .. currentmodule:: sknano.tools._iofuncs
