@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-PDB format (:mod:`sknano.structure_io._pdb_structure_data`)
+PDB format (:mod:`sknano.structure_io._pdb_format`)
 ==============================================================================
 
-.. currentmodule:: sknano.structure_io._pdb_structure_data
+.. currentmodule:: sknano.structure_io._pdb_format
 
 """
 from __future__ import division, print_function, absolute_import

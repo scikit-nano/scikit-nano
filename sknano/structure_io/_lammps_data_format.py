@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-==============================================================================
-LAMMPS data format (:mod:`sknano.structure_io._lammps_data_structure_data`)
-==============================================================================
+====================================================================
+LAMMPS data format (:mod:`sknano.structure_io._lammps_data_format`)
+====================================================================
 
-.. currentmodule:: sknano.structure_io._lammps_data_structure_data
+.. currentmodule:: sknano.structure_io._lammps_data_format
 
 """
 from __future__ import division, print_function, absolute_import
@@ -423,7 +423,7 @@ class DATA2XYZConverter(StructureConverter):
         `XYZReader` (only if `return_reader` is True)
 
         """
-        from ._xyz_structure_data import XYZReader, XYZWriter
+        from ._xyz_format import XYZReader, XYZWriter
 
         datareader = DATAReader(fname=self._datafile)
         atoms = datareader.atoms

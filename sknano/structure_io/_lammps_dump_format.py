@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-==============================================================================
-LAMMPS dump format (:mod:`sknano.structure_io._lammps_dump_structure_data`)
-==============================================================================
+====================================================================
+LAMMPS dump format (:mod:`sknano.structure_io._lammps_dump_format`)
+====================================================================
 
-.. currentmodule:: sknano.structure_io._lammps_dump_structure_data
+.. currentmodule:: sknano.structure_io._lammps_dump_format
 
 """
 from __future__ import division, print_function, absolute_import

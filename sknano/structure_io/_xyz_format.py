@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-==============================================================================
-XYZ format (:mod:`sknano.structure_io._xyz_structure_data`)
-==============================================================================
+====================================================
+XYZ format (:mod:`sknano.structure_io._xyz_format`)
+====================================================
 
-.. currentmodule:: sknano.structure_io._xyz_structure_data
+.. currentmodule:: sknano.structure_io._xyz_format
 
 """
 from __future__ import division, print_function, absolute_import
-
 __docformat__ = 'restructuredtext'
+
+import os
 
 from ..chemistry import Atom, Atoms
 from ..tools import get_fpath
@@ -211,7 +212,7 @@ class XYZ2DATAConverter(StructureConverter):
         `DATAReader` (only if `return_reader` is True)
 
         """
-        from ._lammps_data_structure_data import DATAReader, DATAWriter
+        from ._lammps_data_format import DATAReader, DATAWriter
 
         xyzreader = XYZReader(fname=self._xyzfile)
         atoms = xyzreader.atoms
