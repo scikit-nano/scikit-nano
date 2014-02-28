@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-=========================================================================
-Structure data (:mod:`sknano.structure_io._structure_data`)
-=========================================================================
+=============================================================================
+Base classes for structure data (:mod:`sknano.structure_io._structure_data`)
+=============================================================================
 
 .. currentmodule:: sknano.structure_io._structure_data
 
@@ -19,16 +19,22 @@ from sknano.version import short_version as version
 
 default_comment_line = \
     'Structure data generated using scikit-nano version {}'.format(version)
-supported_structure_formats = ('xyz', 'data')
 default_structure_format = 'xyz'
+supported_structure_formats = ('xyz', 'data')
 
-__all__ = ['StructureData', 'StructureDataError',
-           'StructureReader', 'StructureWriter',
-           'StructureReaderError', 'StructureInputError',
-           'StructureWriterError', 'StructureOutputError',
+__all__ = ['StructureData',
+           'StructureReader',
+           'StructureWriter',
+           'StructureConverter',
+           'StructureSpecs',
+           'StructureDataError',
+           'StructureReaderError',
+           'StructureWriterError',
+           'StructureConverterError',
            'StructureFormatError',
-           'supported_structure_formats', 'default_structure_format',
-           'default_comment_line']
+           'default_comment_line',
+           'default_structure_format',
+           'supported_structure_formats']
 
 
 class StructureData(object):
@@ -119,7 +125,8 @@ class StructureReader(StructureData):
     @abstractmethod
     def read(self):
         """Read structure data from file"""
-        return NotImplemented
+        return NotImplementedError('Subclasses of `StructureReader` need to '
+                                   'implement the `read` method.')
 
 
 class StructureWriter(object):
@@ -129,37 +136,51 @@ class StructureWriter(object):
     @abstractmethod
     def write(self):
         """Write structure data to file"""
-        return NotImplemented
+        return NotImplementedError('Subclasses of `StructureWriter` need to '
+                                   'implement the `write` method.')
 
 
-class StructureFormatError(Exception):
-    """Exception raised for structure format errors.
+class StructureConverter(object):
+    __metaclass__ = ABCMeta
+    """Abstract superclass for converting structure data."""
+    def __init__(self, infile=None, outfile=None):
+        self._infile = infile
+        self._outfile = outfile
 
-    Parameters
-    ----------
-    msg : str
-        Error message.
+    @property
+    def infile(self):
+        return self._infile
 
-    """
-    def __init__(self, msg):
-        self.msg = msg
+    @property
+    def outfile(self):
+        return self._outfile
 
-    def __str__(self):
-        return repr(self.msg)
+    @abstractmethod
+    def convert(self):
+        """Convert structure data from one format to another format."""
+        return NotImplementedError('Subclasses of `StructureConverter` need '
+                                   'to implement the `convert` method.')
+
+
+class StructureSpecs(object):
+    """Base class defining common properties for structure formats."""
+
+    def __init__(self):
+        self._properties = OrderedDict()
+
+    @property
+    def properties(self):
+        """OrderedDict of format properties."""
+        return self._properties
 
 
 class StructureDataError(Exception):
-    """Base class for StructureData exceptions."""
+    """Base class for `StructureData` exceptions."""
     pass
 
 
-class StructureReaderError(Exception):
-    """Base class for StructureReader exceptions."""
-    pass
-
-
-class StructureInputError(StructureReaderError):
-    """Exception raised for input file errors.
+class StructureReaderError(StructureDataError):
+    """Exception raised for `StructureReader` errors.
 
     Parameters
     ----------
@@ -174,13 +195,40 @@ class StructureInputError(StructureReaderError):
         return repr(self.msg)
 
 
-class StructureWriterError(Exception):
-    """Base class for StructureWriter exceptions."""
-    pass
+class StructureWriterError(StructureDataError):
+    """Exception raised for `StructureWriter` errors.
+
+    Parameters
+    ----------
+    msg : str
+        Error message.
+
+    """
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return repr(self.msg)
 
 
-class StructureOutputError(StructureWriterError):
-    """Exception raised for file output errors.
+class StructureConverterError(StructureDataError):
+    """Exception raised for `StructureConverter` errors.
+
+    Parameters
+    ----------
+    msg : str
+        Error message.
+
+    """
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return repr(self.msg)
+
+
+class StructureFormatError(StructureDataError):
+    """Exception raised for structure format errors.
 
     Parameters
     ----------

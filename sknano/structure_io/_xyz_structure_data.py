@@ -15,9 +15,9 @@ from ..chemistry import Atom, Atoms
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureReaderError, \
-    StructureWriter, default_comment_line
+    StructureWriter, StructureConverter, default_comment_line
 
-__all__ = ['XYZDATA', 'XYZReader', 'XYZWriter']
+__all__ = ['XYZDATA', 'XYZReader', 'XYZWriter', 'XYZ2DATAConverter']
 
 
 class XYZReader(StructureReader):
@@ -122,3 +122,121 @@ class XYZDATA(XYZReader):
                             comment_line=self._comment_line)
         except (TypeError, ValueError) as e:
             print(e)
+
+
+class XYZ2DATAConverter(StructureConverter):
+    """
+    Class for converting structure data from `xyz` to LAMMPS `data` format.
+
+    Parameters
+    ----------
+    xyzfile : str
+    boxbounds : {None, dict}, optional
+        dict specifying `min` and `max` box bounds in
+        :math:`x,y,z` dimensions. If None, then determine bounds based
+        atom coordinates.
+    pad_box : bool, optional
+        If True, after determining minimum simulation box bounds,
+        expand :math:`\\pm x,\\pm y,\\pm z` dimensions of simulation box by
+        `xpad`, `ypad`, `zpad` distance.
+    xpad : float, optional
+    ypad : float, optional
+    zpad : float, optional
+
+    """
+    def __init__(self, xyzfile, boxbounds=None, pad_box=True,
+                 xpad=10., ypad=10., zpad=10.):
+
+        self._xyzfile = xyzfile
+        self._datafile = os.path.splitext(self._xyzfile)[0] + '.data'
+
+        super(XYZ2DATAConverter, self).__init__(
+            infile=self._xyzfile, outfile=self._datafile)
+
+        self._boxbounds = boxbounds
+        self._pad_box = pad_box
+        self._xpad = xpad
+        self._ypad = ypad
+        self._zpad = zpad
+
+        self._new_atoms = []
+        self._add_new_atoms = False
+
+        self._new_atomtypes = []
+        self._add_new_atomtypes = False
+
+    @property
+    def xyzfile(self):
+        return self.infile
+
+    @property
+    def datafile(self):
+        """LAMMPS data file name."""
+        return self.outfile
+
+    def add_atom(self, atom=None):
+        """Add new atom to atoms.
+
+        Parameters
+        ----------
+        atom : `Atom`
+
+        """
+        self._new_atoms.append(atom)
+        if not self._add_new_atoms:
+            self._add_new_atoms = True
+
+    def add_atomtype(self, atom=None):
+        """Add new atom type to atom type dictionary.
+
+        Parameters
+        ----------
+        atom : `Atom`
+
+        """
+        self._new_atomtypes.append(atom)
+        if not self._add_new_atomtypes:
+            self._add_new_atomtypes = True
+
+    def convert(self, return_reader=False):
+        """Convert xyz to LAMMPS data chemical file format.
+
+        Parameters
+        ----------
+        return_reader : bool, optional
+            return an instance of :py:class:`~DATAReader`
+
+        Returns
+        -------
+        `DATAReader` (only if `return_reader` is True)
+
+        """
+        from ._lammps_data_structure_data import DATAReader, DATAWriter
+
+        xyzreader = XYZReader(fname=self._xyzfile)
+        atoms = xyzreader.atoms
+        comment_line = xyzreader.comment_line
+        if self._add_new_atoms:
+            atoms.extend(self._new_atoms)
+        if self._add_new_atomtypes:
+            atoms.add_atomtypes(self._new_atomtypes)
+
+        if self._boxbounds is None:
+
+            boxbounds = {'x': {'min': None, 'max': None},
+                         'y': {'min': None, 'max': None},
+                         'z': {'min': None, 'max': None}}
+
+            for i, dim in enumerate(('x', 'y', 'z')):
+                boxbounds[dim]['min'] = atoms.coords[:, i].min()
+                boxbounds[dim]['max'] = atoms.coords[:, i].max()
+        else:
+            boxbounds = self._boxbounds
+
+        DATAWriter.write(fname=self._datafile, atoms=atoms,
+                         boxbounds=boxbounds, comment_line=comment_line,
+                         pad_box=self._pad_box, xpad=self._xpad,
+                         ypad=self._ypad, zpad=self._zpad)
+
+        if return_reader:
+            return DATAReader(fname=self._datafile)
