@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===================================================
-File I/O functions (:mod:`sknano.tools._fiofuncs`)
+File I/O functions (:mod:`sknano.tools._iofuncs`)
 ===================================================
 
-.. currentmodule:: sknano.tools._fiofuncs
+.. currentmodule:: sknano.tools._iofuncs
 
 """
 from __future__ import division, print_function, absolute_import

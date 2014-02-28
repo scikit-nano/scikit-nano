@@ -21,8 +21,8 @@ Helper functions for chirality data
    get_Ch_indices
    get_Ch_type
 
-Helper functions for file I/O
-------------------------------
+Helper functions for I/O
+-------------------------
 .. autosummary::
    :toctree: generated/
 
@@ -70,7 +70,7 @@ from __future__ import division, print_function, absolute_import
 __docformat__ = 'restructuredtext'
 
 from ._chirality_funcs import *
-from ._fiofuncs import *
+from ._iofuncs import *
 from ._luts import *
 from ._mathfuncs import *
 from ._strfuncs import *
