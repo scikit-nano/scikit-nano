@@ -95,8 +95,8 @@ from __future__ import division, print_function, absolute_import
 __docformat__ = 'restructuredtext'
 
 from ._defect_generators import *
-from ._fullerenes import *
 from ._fullerene_generators import *
+from ._fullerenes import *
 from ._graphene_defect_generators import *
 from ._graphene_generators import *
 from ._graphene import *
