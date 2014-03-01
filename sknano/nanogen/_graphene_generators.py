@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==========================================================================
-Graphene structure generators (:mod:`sknano.nanogen._graphene_generator`)
+Graphene structure generators (:mod:`sknano.nanogen._graphene_generators`)
 ==========================================================================
 
-.. currentmodule:: sknano.nanogen._graphene_generator
+.. currentmodule:: sknano.nanogen._graphene_generators
 
 """
 from __future__ import absolute_import, division, print_function

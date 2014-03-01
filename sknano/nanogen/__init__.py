@@ -17,6 +17,13 @@ and bundles of :abbr:`SWNTs` and :abbr:`MWNTs`.
    nano-structures are carbon nano-structures. However,
    you can use any atom in the periodic table of elements as a basis atom.
 
+.. versionadded:: 0.2.20
+   `MWNTBundleGenerator` implemented.
+
+.. versionchanged:: 0.2.20
+   `MWNTGenerator` can only generate single MWNT structure data.
+   Use `MWNTBundleGenerator` to generate bundled MWNT structure data.
+
 .. versionadded:: 0.2.8
    `MWNTGenerator` implemented
 
@@ -26,12 +33,13 @@ and bundles of :abbr:`SWNTs` and :abbr:`MWNTs`.
 .. versionadded:: 0.2.4
    `NanotubeBundleGenerator` implemented
 
+.. seealso:: CLI module :py:mod:`sknano.scripts.nanogen`
+
 Contents
 ========
 
-Abstract nanostructure objects
-------------------------------
-
+Classes for creating interactive abstract representation of nanostructures
+---------------------------------------------------------------------------
 .. autosummary::
    :toctree: generated/
 
@@ -39,34 +47,39 @@ Abstract nanostructure objects
    Nanotube
    NanotubeBundle
 
-Structure generator classes
----------------------------
-
+Classes for generating graphene structure data
+-----------------------------------------------
 .. autosummary::
    :toctree: generated/
-
-   StructureGenerator
 
    GrapheneGenerator
    BiLayerGrapheneGenerator
 
-   NanotubeGenerator
-   NanotubeBundleGenerator
-   MWNTGenerator
-
-   TubeGen
-
-.. seealso:: CLI module :py:mod:`sknano.scripts.nanogen`
-
-Tools for manipulating nano-structures
---------------------------------------
-
+Classes for generating nanotube structure data
+-----------------------------------------------
 .. autosummary::
    :toctree: generated/
 
-   VacancyGenerator
+   NanotubeGenerator
+   NanotubeBundleGenerator
+   MWNTGenerator
+   MWNTBundleGenerator
+
+Tools for manipulating nano-structures
+--------------------------------------
+.. autosummary::
+   :toctree: generated/
+
    GrapheneVacancyGenerator
    NanotubeVacancyGenerator
+
+Base classes for creating new structure data generators
+--------------------------------------------------------
+.. autosummary::
+   :toctree: generated/
+
+   StructureGenerator
+   VacancyGenerator
 
 Custom exception classes for handling errors
 --------------------------------------------
@@ -75,9 +88,6 @@ Custom exception classes for handling errors
    :toctree: generated/
 
    StructureGeneratorError
-   GrapheneGeneratorError
-   NanotubeGeneratorError
-   VacancyGeneratorError
 
 """
 from __future__ import division, print_function, absolute_import
@@ -91,6 +101,7 @@ from ._graphene_defect_generators import *
 from ._graphene_generators import *
 from ._graphene import *
 from ._nanotube_defect_generators import *
+from ._nanotube_bundle_generators import *
 from ._nanotube_generators import *
 from ._nanotube_junction_generators import *
 from ._nanotubes import *

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================
-Fullerene structure tools (:mod:`sknano.nanogen._fullerene`)
+Fullerene structure tools (:mod:`sknano.nanogen._fullerenes`)
 =============================================================
 
-.. currentmodule:: sknano.nanogen._fullerene
+.. currentmodule:: sknano.nanogen._fullerenes
 
 """
 from __future__ import division, print_function, absolute_import

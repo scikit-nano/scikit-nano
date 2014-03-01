@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-Generate SWNT junctions (:mod:`sknano.nanogen._nanotube_junction_generator`)
+Generate SWNT junctions (:mod:`sknano.nanogen._nanotube_junction_generators`)
 =============================================================================
 
-.. currentmodule:: sknano.nanogen._nanotube_junction_generator
+.. currentmodule:: sknano.nanogen._nanotube_junction_generators
 
 """
 from __future__ import division, print_function, absolute_import
@@ -28,7 +28,7 @@ from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
 from ..tools import plural_word_check, rotation_matrix
 from ..tools.refdata import CCbond
 
-from ._nanotube_generator import NanotubeGenerator
+from ._nanotube_generators import NanotubeGenerator
 
 __all__ = ['NanotubeJunctionGenerator']
 

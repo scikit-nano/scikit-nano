@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-Generate defects in structure data (:mod:`sknano.nanogen._defect_generator`)
+Generate defects in structure data (:mod:`sknano.nanogen._defect_generators`)
 =============================================================================
 
-Module for generating defects in nano-structures.
-
-.. currentmodule:: sknano.nanogen._defect_generator
+.. currentmodule:: sknano.nanogen._defect_generators
 
 """
 from __future__ import division, print_function, absolute_import
@@ -240,10 +238,10 @@ class VacancyGenerator(object):
 
 
 class DefectGeneratorError(Exception):
-    """Base class for DefectGenerator exceptions."""
+    """Base class for `DefectGenerator` exceptions."""
     pass
 
 
-class VacancyGeneratorError(Exception):
-    """Base class for VacancyGenerator exceptions."""
+class VacancyGeneratorError(DefectGeneratorError):
+    """Exception raised for `VacancyGenerator` errors."""
     pass

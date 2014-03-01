@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-Nanotube defect generator (:mod:`sknano.nanogen._nanotube_defect_generator`)
+Nanotube defect generator (:mod:`sknano.nanogen._nanotube_defect_generators`)
 =============================================================================
 
-.. currentmodule:: sknano.nanogen._nanotube_defect_generator
+.. currentmodule:: sknano.nanogen._nanotube_defect_generators
 
 """
 from __future__ import absolute_import, division, print_function
@@ -16,10 +16,9 @@ import numpy as np
 
 from ..tools.refdata import CCbond
 
-from ._defect_generator import DefectGenerator, VacancyGenerator, \
+from ._defect_generators import DefectGenerator, VacancyGenerator, \
     VacancyGeneratorError
-from ._nanotube_generator import NanotubeBundleGenerator, \
-    NanotubeGeneratorError
+from ._nanotube_bundle_generators import NanotubeBundleGenerator
 
 __all__ = ['NanotubeDefectGenerator', 'NanotubeVacancyGenerator']
 
@@ -140,23 +139,20 @@ class NanotubeVacancyGenerator(VacancyGenerator):
         self._Natoms_per_tube = None
 
         if fname is None and n is not None and m is not None:
-            try:
-                ntbg = NanotubeBundleGenerator(n=n, m=m, nx=nx, ny=ny, nz=nz,
-                                               element1=element1,
-                                               element2=element2,
-                                               bond=bond,
-                                               vdw_spacing=vdw_spacing,
-                                               bundle_packing=bundle_packing,
-                                               bundle_geometry=bundle_geometry,
-                                               Lx=Lx, Ly=Ly, Lz=Lz,
-                                               fix_Lz=fix_Lz,
-                                               verbose=verbose)
-                ntbg.save_data(structure_format='data')
-                fname = ntbg.fname
-                self._Ntubes = ntbg.Ntubes
-                self._Natoms_per_tube = ntbg.Natoms_per_tube
-            except NanotubeGeneratorError:
-                raise VacancyGeneratorError('invalid parameters')
+            ntbg = NanotubeBundleGenerator(n=n, m=m, nx=nx, ny=ny, nz=nz,
+                                           element1=element1,
+                                           element2=element2,
+                                           bond=bond,
+                                           vdw_spacing=vdw_spacing,
+                                           bundle_packing=bundle_packing,
+                                           bundle_geometry=bundle_geometry,
+                                           Lx=Lx, Ly=Ly, Lz=Lz,
+                                           fix_Lz=fix_Lz,
+                                           verbose=verbose)
+            ntbg.save_data(structure_format='data')
+            fname = ntbg.fname
+            self._Ntubes = ntbg.Ntubes
+            self._Natoms_per_tube = ntbg.Natoms_per_tube
 
         super(NanotubeVacancyGenerator, self).__init__(
             fname=fname, structure_format=structure_format)

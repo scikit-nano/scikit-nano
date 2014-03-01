@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-Graphene defect generator (:mod:`sknano.nanogen._graphene_defect_generator`)
+Graphene defect generator (:mod:`sknano.nanogen._graphene_defect_generators`)
 =============================================================================
 
-.. currentmodule:: sknano.nanogen._graphene_defect_generator
+.. currentmodule:: sknano.nanogen._graphene_defect_generators
 
 """
 from __future__ import absolute_import, division, print_function
@@ -16,9 +16,9 @@ import numpy as np
 
 from ..tools.refdata import CCbond
 
-from ._defect_generator import DefectGenerator, VacancyGenerator, \
+from ._defect_generators import DefectGenerator, VacancyGenerator, \
     VacancyGeneratorError
-from ._graphene_generator import GrapheneGenerator, GrapheneGeneratorError
+from ._graphene_generators import GrapheneGenerator, GrapheneGeneratorError
 
 __all__ = ['GrapheneDefectGenerator', 'GrapheneVacancyGenerator']
 

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Twisted nanotube bundles (:mod:`sknano.nanogen._twisted_bundle_generator`)
+Twisted nanotube bundles (:mod:`sknano.nanogen._twisted_bundle_generators`)
 ==============================================================================
 
-.. currentmodule:: sknano.nanogen._twisted_bundle_generator
+.. currentmodule:: sknano.nanogen._twisted_bundle_generators
 
 """
 from __future__ import division, print_function, absolute_import
@@ -24,7 +24,7 @@ warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
 
 from ..tools.refdata import CCbond
 
-from ._nanotube_generator import NanotubeBundleGenerator
+from ._nanotube_bundle_generators import NanotubeBundleGenerator
 
 __all__ = ['TwistedBundleGenerator']
 

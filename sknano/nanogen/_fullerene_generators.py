@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ============================================================================
-Fullerene structure generators (:mod:`sknano.nanogen._fullerene_generator`)
+Fullerene structure generators (:mod:`sknano.nanogen._fullerene_generators`)
 ============================================================================
 
-.. currentmodule:: sknano.nanogen._fullerene_generator
+.. currentmodule:: sknano.nanogen._fullerene_generators
 
 """
 from __future__ import division, print_function, absolute_import
@@ -28,8 +28,8 @@ from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
 from ..tools import plural_word_check, rotation_matrix
 from ..tools.refdata import CCbond
 
-from ._fullerene import Fullerene
-from ._structure_generator import StructureGenerator, StructureGeneratorError
+from ._fullerenes import Fullerene
+from ._structure_generator import StructureGenerator
 
 __all__ = ['FullereneGenerator']
 

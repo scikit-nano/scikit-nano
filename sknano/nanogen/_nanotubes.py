@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================
-Nanotube structure tools (:mod:`sknano.nanogen._nanotube`)
+Nanotube structure tools (:mod:`sknano.nanogen._nanotubes`)
 =============================================================
 
-.. currentmodule:: sknano.nanogen._nanotube
+.. currentmodule:: sknano.nanogen._nanotubes
 
 """
 from __future__ import division, print_function, absolute_import
@@ -51,28 +51,7 @@ param_strfmt['Ch'] = \
 param_strfmt['bond'] = '{:.3f}'
 
 __all__ = ['param_units', 'param_symbols', 'param_strfmt',
-           'NanotubeError', 'ChiralityError',
-           'Nanotube', 'NanotubeBundle']
-
-
-class NanotubeError(Exception):
-    """Base class for nanotube module exceptions."""
-    pass
-
-
-class ChiralityError(NanotubeError):
-    """Exception raised for errors in the chirality indices (n, m)."""
-    pass
-
-
-class TubeLengthError(NanotubeError):
-    """Exception raised for errors in the length."""
-    pass
-
-
-class CellError(NanotubeError):
-    """Exception raised for errors in the number of unit cells."""
-    pass
+           'Nanotube', 'NanotubeBundle', 'NanotubeError', 'ChiralityError']
 
 
 class Nanotube(object):
@@ -1580,3 +1559,23 @@ class NanotubeBundle(Nanotube):
             # there are 1.6605e-24 grams / Da and 1e-8 cm / angstrom
             bundle_density *= 1.6605e-24 / (1e-8)**3
             return bundle_density
+
+
+class NanotubeError(Exception):
+    """Base class for nanotube module exceptions."""
+    pass
+
+
+class ChiralityError(NanotubeError):
+    """Exception raised for errors in the chirality indices (n, m)."""
+    pass
+
+
+class TubeLengthError(NanotubeError):
+    """Exception raised for errors in the length."""
+    pass
+
+
+class CellError(NanotubeError):
+    """Exception raised for errors in the number of unit cells."""
+    pass
