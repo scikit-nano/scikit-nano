@@ -21,25 +21,26 @@ and bundles of :abbr:`SWNTs` and :abbr:`MWNTs`.
    `MWNTBundleGenerator` implemented.
 
 .. versionchanged:: 0.2.20
-   `MWNTGenerator` can only generate single MWNT structure data.
-   Use `MWNTBundleGenerator` to generate bundled MWNT structure data.
+   `MWNTGenerator` no longer generates MWNT *bundles*, only *single* MWNTs.
+   To generate bundled MWNT structure data, use the `MWNTBundleGenerator`
+   class.
 
 .. versionadded:: 0.2.8
-   `MWNTGenerator` implemented
+   `MWNTGenerator` implemented.
 
 .. versionadded:: 0.2.6
-   `GrapheneVacancyGenerator` and `NanotubeVacancyGenerator` implemented
+   `GrapheneVacancyGenerator` and `NanotubeVacancyGenerator` implemented.
 
 .. versionadded:: 0.2.4
-   `NanotubeBundleGenerator` implemented
+   `NanotubeBundleGenerator` implemented.
 
 .. seealso:: CLI module :py:mod:`sknano.scripts.nanogen`
 
 Contents
 ========
 
-Classes for creating interactive abstract representation of nanostructures
----------------------------------------------------------------------------
+Classes for creating interactive nano-structure objects
+-------------------------------------------------------
 .. autosummary::
    :toctree: generated/
 
@@ -88,6 +89,7 @@ Custom exception classes for handling errors
    :toctree: generated/
 
    StructureGeneratorError
+   VacancyGeneratorError
 
 """
 from __future__ import division, print_function, absolute_import

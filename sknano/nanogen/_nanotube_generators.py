@@ -282,7 +282,13 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
 class MWNTGenerator(NanotubeGenerator):
     u"""Class for generating single, multi-walled nanotubes.
 
-    .. versionadded:: 0.2.7
+    .. versionchanged:: 0.2.20
+
+       `MWNTGenerator` no longer generates MWNT *bundles*, only *single*
+       MWNTs. To generate bundled MWNT structure data, use the
+       `MWNTBundleGenerator` class.
+
+    .. versionadded:: 0.2.8
 
     Parameters
     ----------

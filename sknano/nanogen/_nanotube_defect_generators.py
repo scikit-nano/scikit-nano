@@ -30,6 +30,8 @@ class NanotubeDefectGenerator(DefectGenerator):
 class NanotubeVacancyGenerator(VacancyGenerator):
     """Generate vacancies in nanotubes.
 
+    .. versionadded:: 0.2.6
+
     Parameters
     ----------
     fname : str, optional

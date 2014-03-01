@@ -350,9 +350,9 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
 
 
 class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
-    u"""Class for generating multi-walled nanotubes.
+    u"""Class for generating multi-walled nanotube bundles.
 
-    .. versionadded:: 0.2.7
+    .. versionadded:: 0.2.20
 
     Parameters
     ----------

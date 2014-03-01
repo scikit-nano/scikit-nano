@@ -30,6 +30,8 @@ class GrapheneDefectGenerator(DefectGenerator):
 class GrapheneVacancyGenerator(VacancyGenerator):
     """Generate vacancies in graphene.
 
+    .. versionadded:: 0.2.6
+
     Parameters
     ----------
     fname : str, optional
