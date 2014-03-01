@@ -84,18 +84,18 @@ from __future__ import division, print_function, absolute_import
 
 __docformat__ = 'restructuredtext'
 
-from ._defect_generator import *
-from ._fullerene import *
-from ._fullerene_generator import *
-from ._graphene_defect_generator import *
-from ._graphene_generator import *
+from ._defect_generators import *
+from ._fullerenes import *
+from ._fullerene_generators import *
+from ._graphene_defect_generators import *
+from ._graphene_generators import *
 from ._graphene import *
-from ._nanotube_defect_generator import *
-from ._nanotube_generator import *
-from ._nanotube_junction_generator import *
-from ._nanotube import *
+from ._nanotube_defect_generators import *
+from ._nanotube_generators import *
+from ._nanotube_junction_generators import *
+from ._nanotubes import *
 from ._structure_generator import *
 from ._tubegen import *
-from ._twisted_bundle_generator import *
+from ._twisted_bundle_generators import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
