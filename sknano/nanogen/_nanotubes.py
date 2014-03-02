@@ -51,7 +51,7 @@ param_strfmt['Ch'] = \
 param_strfmt['bond'] = '{:.3f}'
 
 __all__ = ['param_units', 'param_symbols', 'param_strfmt',
-           'Nanotube', 'NanotubeBundle', 'NanotubeError', 'ChiralityError']
+           'Nanotube', 'NanotubeBundle']
 
 
 class Nanotube(object):
@@ -1298,7 +1298,7 @@ class Nanotube(object):
 
 
 class NanotubeBundle(Nanotube):
-    u"""Class for creating interactive Nanotube **Bundles**.
+    u"""Class for creating interactive Nanotube bundles.
 
     Parameters
     ----------
@@ -1448,13 +1448,19 @@ class NanotubeBundle(Nanotube):
 
         Returns
         -------
-        int
+        Natoms_per_bundle : int
+            Number of atoms in a nanotube bundle.
+
+        Raises
+        ------
+        ValueError
+            if `Ntubes` is `None` and `nx` or `ny` are `None`
 
         """
         Natoms_per_tube = \
             Nanotube.compute_Natoms_per_tube(n=n, m=m, nz=nz)
         if Ntubes is None and (nx is None or ny is None):
-            raise NanotubeError("Ntubes or both nx and ny cells must be set")
+            raise ValueError('`Ntubes` or `nx` and `ny` must be specified.')
         elif Ntubes is None and nx is not None and ny is not None:
             Ntubes = nx * ny
         Natoms_per_bundle = Ntubes * Natoms_per_tube
@@ -1559,23 +1565,3 @@ class NanotubeBundle(Nanotube):
             # there are 1.6605e-24 grams / Da and 1e-8 cm / angstrom
             bundle_density *= 1.6605e-24 / (1e-8)**3
             return bundle_density
-
-
-class NanotubeError(Exception):
-    """Base class for nanotube module exceptions."""
-    pass
-
-
-class ChiralityError(NanotubeError):
-    """Exception raised for errors in the chirality indices (n, m)."""
-    pass
-
-
-class TubeLengthError(NanotubeError):
-    """Exception raised for errors in the length."""
-    pass
-
-
-class CellError(NanotubeError):
-    """Exception raised for errors in the number of unit cells."""
-    pass
