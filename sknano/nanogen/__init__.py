@@ -39,14 +39,23 @@ and bundles of :abbr:`SWNTs` and :abbr:`MWNTs`.
 Contents
 ========
 
-Classes for creating interactive nano-structure objects
--------------------------------------------------------
+Classes for creating abstract physical representations of nano-structures
+--------------------------------------------------------------------------
 .. autosummary::
    :toctree: generated/
 
+   Fullerene
    Graphene
    Nanotube
    NanotubeBundle
+
+Classes for generating fullerene structure data
+------------------------------------------------
+.. autosummary::
+   :toctree: generated/
+
+   FullereneGenerator
+   FullereneBravaisLatticeGenerator
 
 Classes for generating graphene structure data
 -----------------------------------------------
@@ -66,8 +75,8 @@ Classes for generating nanotube structure data
    MWNTGenerator
    MWNTBundleGenerator
 
-Tools for manipulating nano-structures
---------------------------------------
+Classes for generating nano-structure data with vacancies
+----------------------------------------------------------
 .. autosummary::
    :toctree: generated/
 
@@ -88,6 +97,7 @@ from __future__ import division, print_function, absolute_import
 __docformat__ = 'restructuredtext'
 
 from ._defect_generators import *
+from ._fullerene_bravais_lattice_generators import *
 from ._fullerene_generators import *
 from ._fullerenes import *
 from ._graphene_defect_generators import *
