@@ -28,8 +28,8 @@ from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
 from ..tools import rotation_matrix
 #from ..tools.refdata import CCbond
 
-from ._fullerene_generator import FullereneGenerator
-#from ._lattice_generator import BravaisLatticeGenerator
+from ._fullerene_generators import FullereneGenerator
+#from ._lattice_generators import BravaisLatticeGenerator
 
 __all__ = ['FullereneBravaisLatticeGenerator']
 
