@@ -16,9 +16,8 @@ import numpy as np
 
 from ..tools.refdata import CCbond
 
-from ._defect_generators import DefectGenerator, VacancyGenerator, \
-    VacancyGeneratorError
-from ._graphene_generators import GrapheneGenerator, GrapheneGeneratorError
+from ._defect_generators import DefectGenerator, VacancyGenerator
+from ._graphene_generators import GrapheneGenerator
 
 __all__ = ['GrapheneDefectGenerator', 'GrapheneVacancyGenerator']
 
@@ -65,10 +64,6 @@ class GrapheneVacancyGenerator(VacancyGenerator):
         Stacking order of graphene layers
     verbose : bool, optional
         Verbose output
-
-    Raises
-    ------
-    :py:class:`VacancyGeneratorError`
 
     Examples
     --------
@@ -185,17 +180,14 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                  rotation_axis=None, verbose=False):
 
         if fname is None and width is not None and length is not None:
-            try:
-                gg = GrapheneGenerator(width=width, length=length, edge=edge,
-                                       element1=element1, element2=element2,
-                                       bond=bond, nlayers=nlayers,
-                                       layer_spacing=layer_spacing,
-                                       stacking_order=stacking_order,
-                                       verbose=verbose)
-                gg.save_data(structure_format='data')
-                fname = gg.fname
-            except GrapheneGeneratorError:
-                raise VacancyGeneratorError('invalid parameters')
+            gg = GrapheneGenerator(width=width, length=length, edge=edge,
+                                   element1=element1, element2=element2,
+                                   bond=bond, nlayers=nlayers,
+                                   layer_spacing=layer_spacing,
+                                   stacking_order=stacking_order,
+                                   verbose=verbose)
+            gg.save_data(structure_format='data')
+            fname = gg.fname
 
         super(GrapheneVacancyGenerator, self).__init__(
             fname=fname, structure_format=structure_format, verbose=verbose)
@@ -222,10 +214,15 @@ class GrapheneVacancyGenerator(VacancyGenerator):
         vmd_selection_radius : float, optional
             Cutoff radius for VMD selection command in units of **Angstroms**.
 
+        Raises
+        ------
+        `TypeError`
+            If `Nvac_sites` is `None` and `Nvac_clusters` is `None`
+
         """
         if Nvac_sites is None and Nvac_clusters is None:
-            raise ValueError('`Nvac_sites` or `Nvac_clusters` must '
-                             'be an integer.')
+            raise TypeError('`Nvac_sites` or `Nvac_clusters` must '
+                            'be an integer.')
         elif Nvac_sites is None and Nvac_clusters is not None:
             Nvac_sites = Nvac_clusters
             if cluster_size is None:

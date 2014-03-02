@@ -12,7 +12,7 @@ __docformat__ = 'restructuredtext'
 
 from ..chemistry import Atoms
 
-__all__ = ['StructureGenerator', 'StructureGeneratorError']
+__all__ = ['StructureGenerator']
 
 
 class StructureGenerator(object):
@@ -37,8 +37,3 @@ class StructureGenerator(object):
     def structure_atoms(self):
         """Return structure :py:class:`~sknano.chemistry.Atoms`."""
         return self._structure_atoms
-
-
-class StructureGeneratorError(Exception):
-    """Base class for StructureGenerator exceptions."""
-    pass

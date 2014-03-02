@@ -1453,14 +1453,15 @@ class NanotubeBundle(Nanotube):
 
         Raises
         ------
-        ValueError
+        `TypeError`
             if `Ntubes` is `None` and `nx` or `ny` are `None`
 
         """
         Natoms_per_tube = \
             Nanotube.compute_Natoms_per_tube(n=n, m=m, nz=nz)
         if Ntubes is None and (nx is None or ny is None):
-            raise ValueError('`Ntubes` or `nx` and `ny` must be specified.')
+            raise TypeError('`Ntubes` or `nx` and `ny` must be specified as '
+                            'integers')
         elif Ntubes is None and nx is not None and ny is not None:
             Ntubes = nx * ny
         Natoms_per_bundle = Ntubes * Natoms_per_tube

@@ -21,15 +21,13 @@ from ..tools import rotation_matrix
 from ..tools.refdata import CCbond
 
 from ._graphene import Graphene
-from ._structure_generator import StructureGenerator, StructureGeneratorError
+from ._structure_generator import StructureGenerator
 
-__all__ = ['GrapheneGenerator',
-           'BiLayerGrapheneGenerator',
-           'GrapheneGeneratorError']
+__all__ = ['GrapheneGenerator', 'BiLayerGrapheneGenerator']
 
 
 class GrapheneGenerator(Graphene, StructureGenerator):
-    """Class for generating `n`-layer graphene nanostructures.
+    """Class for generating `N`-layer graphene nanostructures.
 
     Parameters
     ----------
@@ -407,10 +405,3 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
                     layer.rotate(self._rotation_matrix)
 
                 self._structure_atoms.extend(layer.atoms)
-
-        #self.update_structure_atoms_attributes()
-
-
-class GrapheneGeneratorError(StructureGeneratorError):
-    """Base class for GrapheneGenerator exceptions."""
-    pass

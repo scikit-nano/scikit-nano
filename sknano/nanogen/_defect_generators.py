@@ -20,8 +20,7 @@ from ..structure_io import DATAReader, DATAWriter, XYZWriter, \
 
 vac_type_cluster_size_map = {'double': 2, 'triple': 3}
 
-__all__ = ['DefectGenerator', 'VacancyGenerator',
-           'DefectGeneratorError', 'VacancyGeneratorError']
+__all__ = ['DefectGenerator', 'VacancyGenerator']
 
 
 class DefectGenerator(object):
@@ -235,13 +234,3 @@ class VacancyGenerator(object):
         XYZWriter.write(fname=self._output_fname,
                         atoms=self._remaining_atoms,
                         comment_line=self._structure_data.comment_line)
-
-
-class DefectGeneratorError(Exception):
-    """Base class for `DefectGenerator` exceptions."""
-    pass
-
-
-class VacancyGeneratorError(DefectGeneratorError):
-    """Exception raised for `VacancyGenerator` errors."""
-    pass

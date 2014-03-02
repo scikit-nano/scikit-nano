@@ -82,15 +82,6 @@ Base classes for creating new structure data generators
    StructureGenerator
    VacancyGenerator
 
-Custom exception classes for handling errors
---------------------------------------------
-
-.. autosummary::
-   :toctree: generated/
-
-   StructureGeneratorError
-   VacancyGeneratorError
-
 """
 from __future__ import division, print_function, absolute_import
 

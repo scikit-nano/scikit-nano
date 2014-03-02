@@ -16,8 +16,7 @@ import numpy as np
 
 from ..tools.refdata import CCbond
 
-from ._defect_generators import DefectGenerator, VacancyGenerator, \
-    VacancyGeneratorError
+from ._defect_generators import DefectGenerator, VacancyGenerator
 from ._nanotube_bundle_generators import NanotubeBundleGenerator
 
 __all__ = ['NanotubeDefectGenerator', 'NanotubeVacancyGenerator']
@@ -185,11 +184,18 @@ class NanotubeVacancyGenerator(VacancyGenerator):
         vmd_selection_radius : float, optional
             Cutoff radius for VMD selection command in units of **Angstroms**.
 
+        Raises
+        ------
+        TypeError
+            If `Nvac_sites` is `None` and `Nvac_clusters` is `None` or
+            if `uniform` is `True` and the `structure_data` was read in
+            from a file and `Ntubes` is `None`.
+
         """
 
         if Nvac_sites is None and Nvac_clusters is None:
-            raise ValueError('`Nvac_sites` or `Nvac_clusters` must be an '
-                             'integer.')
+            raise TypeError('`Nvac_sites` or `Nvac_clusters` must be an '
+                            'integer.')
         elif Nvac_sites is None and Nvac_clusters is not None:
             Nvac_sites = Nvac_clusters
             if cluster_size is None:
@@ -203,10 +209,10 @@ class NanotubeVacancyGenerator(VacancyGenerator):
         self._show_vmd_selection_cmd = show_vmd_selection_cmd
 
         if uniform:
-            if Ntubes is None and self._Ntubes is None:
-                raise VacancyGeneratorError('please specify `Ntubes`')
-            elif Ntubes is None:
+            if Ntubes is None:
                 Ntubes = self._Ntubes
+            if not isinstance(Ntubes, int):
+                raise TypeError('`Ntubes` must be specified as an integer.')
 
             Natoms = len(self._atom_ids)
             if self._Natoms_per_tube is not None:
