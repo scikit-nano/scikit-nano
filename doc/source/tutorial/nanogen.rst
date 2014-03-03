@@ -1,23 +1,19 @@
-=============================================
-Generating nanostructures (`sknano.nanogen`)
-=============================================
+==========================
+Generating nanostructures
+==========================
 
 .. sectionauthor:: Andrew Merrill <androomerrill@gmail.com>
 
-.. currentmodule:: sknano.nanogen
-
-.. _nanogen-intro:
-
-This tutorial describes the modules available in the
-:py:mod:`sknano.nanogen` sub-package.
-
 Structure generators
-====================
+=====================
 
 The :py:mod:`~sknano.nanogen` module provides the following
-classes for structure generation:
+classes for generating nanostructures:
 
 * :py:class:`~sknano.nanogen.GrapheneGenerator`
 * :py:class:`~sknano.nanogen.BiLayerGrapheneGenerator`
 * :py:class:`~sknano.nanogen.NanotubeGenerator`
+* :py:class:`~sknano.nanogen.NanotubeBundleGenerator`
+* :py:class:`~sknano.nanogen.MWNTGenerator`
+* :py:class:`~sknano.nanogen.MWNTBundleGenerator`
 * :py:class:`~sknano.nanogen.TubeGen`

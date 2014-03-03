@@ -4,7 +4,7 @@
 Examples
 =========
 
-Most module doc pages under :ref:`reference` include relevant examples.
+Most module doc pages include relevant examples.
 
 .. todo::
 

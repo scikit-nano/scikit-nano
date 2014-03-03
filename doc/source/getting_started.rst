@@ -16,27 +16,11 @@ Introduction
 This package is now featured in the collection of
 `SciKit libraries <http://scikits.appspot.com/scikits>`_
 
-.. _installation:
 
-Installation
-============
+.. _downloading:
 
-Required Dependencies
----------------------
-* `Python 2.7+ <http://python.org/download/>`_
-* `numpy 1.8+ http://sourceforge.net/projects/numpy/files/NumPy/>`_
-
-Optional Dependencies
----------------------
-* `scipy 0.13+ http://sourceforge.net/projects/scipy/files/scipy/>`_ (for
-  nearest-neighbor analysis)
-* `pint 0.4+ <https://pypi.python.org/pypi/Pint/>`_ (for physical units)
-* `VMD <http://www.ks.uiuc.edu/Research/vmd/>`_ (for visualizing structure data)
-* `Tachyon Ray Tracer <http://jedi.ks.uiuc.edu/~johns/raytracer/>`_ (for
-  rendering high quality images)
-
-Downloading/installing scikit-nano
------------------------------------
+Downloading
+===========
 The package source is available from a couple locations:
 
 * `Python Package Index <https://pypi.python.org/pypi/scikit-nano>`_ (latest
@@ -44,6 +28,28 @@ The package source is available from a couple locations:
 * `github repo <https://github.com/androomerrill/scikit-nano>`_ (stable and
   development branches)
 
+
+.. _installation:
+
+Installing
+============
+
+Required Dependencies
+---------------------
+* `Python 2.7+ <http://python.org/download/>`_
+* `numpy 1.8+ <http://sourceforge.net/projects/numpy/files/NumPy/>`_
+
+Optional Dependencies
+---------------------
+* `scipy 0.13+ <http://sourceforge.net/projects/scipy/files/scipy/>`_ (for
+  nearest-neighbor analysis)
+* `pint 0.4+ <https://pypi.python.org/pypi/Pint/>`_ (for physical units)
+* `VMD <http://www.ks.uiuc.edu/Research/vmd/>`_ (for visualizing structure data)
+* `Tachyon Ray Tracer <http://jedi.ks.uiuc.edu/~johns/raytracer/>`_ (for
+  rendering high quality images)
+
+Installing scikit-nano
+-----------------------
 You can install the latest stable release from the
 `Python Package Index <http://pypi.python.org/pypi/scikit-nano>`_
 using :command:`pip`::
