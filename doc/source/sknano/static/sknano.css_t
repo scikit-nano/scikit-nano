@@ -31,11 +31,11 @@ div.container-navbar-bottom {
     margin-top: 0;
 }
 
-div.container-navbar-bottom div.spc-navbar {
+div.container-navbar-bottom div.sknano-navbar {
     margin-top: 0;
 }
 
-div.spc-navbar {
+div.sknano-navbar {
     margin: 0;
 }
 
@@ -142,13 +142,13 @@ div.sphinxsidebarwrapper {
     overflow: hidden;
 }
 
-div.spc-rightsidebar h3 {
+div.sknano-rightsidebar h3 {
     font-size: 120%;
     line-height: inherit;
     border-bottom: none;
 }
 
-div.spc-rightsidebar h4 {
+div.sknano-rightsidebar h4 {
     font-size: 120%;
     line-height: inherit;
     border-bottom: none;
@@ -182,12 +182,12 @@ h4 tt { font: inherit; border-bottom: none; }
 h5 tt { font: inherit; border-bottom: none; }
 h6 tt { font: inherit; border-bottom: none; }
 
-div#spc-section-body h1 { color: rgb(85, 85, 85); }
-div#spc-section-body h2 { color: rgb(85, 85, 85); }
-div#spc-section-body h3 { color: rgb(85, 85, 85); }
-div#spc-section-body h4 { color: rgb(85, 85, 85); border-bottom: none; }
-div#spc-section-body h5 { color: rgb(85, 85, 85); border-bottom: none; }
-div#spc-section-body h6 { color: rgb(85, 85, 85); border-bottom: none; }
+div#sknano-section-body h1 { color: rgb(85, 85, 85); }
+div#sknano-section-body h2 { color: rgb(85, 85, 85); }
+div#sknano-section-body h3 { color: rgb(85, 85, 85); }
+div#sknano-section-body h4 { color: rgb(85, 85, 85); border-bottom: none; }
+div#sknano-section-body h5 { color: rgb(85, 85, 85); border-bottom: none; }
+div#sknano-section-body h6 { color: rgb(85, 85, 85); border-bottom: none; }
 
 p.rubric {
     color: rgb(85, 85, 85);
