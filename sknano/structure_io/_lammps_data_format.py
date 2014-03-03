@@ -23,7 +23,6 @@ from ._structure_data import StructureReader, StructureWriter, \
     StructureConverter, StructureSpecs, StructureDataError, \
     default_comment_line
 
-
 __all__ = ['DATAReader', 'DATAWriter', 'DATA2XYZConverter',
            'LAMMPSDATA', 'LAMMPSDATASpecs', 'LAMMPSDATAError']
 
