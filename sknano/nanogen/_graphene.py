@@ -36,9 +36,12 @@ class Graphene(object):
 
     Parameters
     ----------
-    width : float
+    n, m : int, optional
+        Chiral indices defining the nanotube chiral vector
+        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
+    width : float, optional
         Width of graphene sheet in **nanometers**
-    length : float
+    length : float, optional
         Length of graphene sheet in **nanometers**
     edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
@@ -70,10 +73,10 @@ class Graphene(object):
 
     """
 
-    def __init__(self, n=None, m=None, width=None, length=None,
-                 edge=None, element1='C', element2='C', bond=CCbond,
-                 nlayers=1, layer_spacing=3.35, stacking_order='AB',
-                 with_units=False, verbose=False):
+    def __init__(self, n=None, m=None, width=None, length=None, edge=None,
+                 element1='C', element2='C', bond=CCbond, nlayers=1,
+                 layer_spacing=3.35, stacking_order='AB', with_units=False,
+                 verbose=False):
 
         self._n = n
         self._m = m

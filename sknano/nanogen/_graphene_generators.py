@@ -31,6 +31,9 @@ class GrapheneGenerator(Graphene, StructureGenerator):
 
     Parameters
     ----------
+    n, m : int, optional
+        Chiral indices defining the nanotube chiral vector
+        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
     width : float
         Width of graphene sheet in **nanometers**
     length : float
@@ -284,11 +287,13 @@ class GrapheneGenerator(Graphene, StructureGenerator):
 
 
 class BiLayerGrapheneGenerator(GrapheneGenerator):
-
     """Class for generating bi-layer graphene structures.
 
     Parameters
     ----------
+    n, m : int, optional
+        Chiral indices defining the nanotube chiral vector
+        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
     width : float
         Width of graphene sheet in **nanometers**
     length : float
@@ -363,14 +368,14 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
 
     """
 
-    def __init__(self, width=float, length=float, edge=None,
+    def __init__(self, n=None, m=None, width=None, length=None, edge=None,
                  element1='C', element2='C', bond=CCbond,
                  layer_spacing=3.35, stacking_order='AB',
                  rotation_angle=None, deg2rad=True, autogen=True,
                  verbose=False):
 
         super(BiLayerGrapheneGenerator, self).__init__(
-            width=width, length=length, edge=edge,
+            n=n, m=m, width=width, length=length, edge=edge,
             element1=element1, element2=element2, bond=bond,
             nlayers=2, layer_spacing=layer_spacing, autogen=False,
             verbose=verbose)
