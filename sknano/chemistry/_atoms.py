@@ -563,28 +563,6 @@ class Atoms(MutableSequence):
                     r[i] = 0.0
             atom.x, atom.y, atom.z = r
 
-    def rezero_xyz(self, epsilon=1.0e-10):
-        return self.rezero_coords(epsilon=epsilon)
-
-    def rezero_coords(self, epsilon=1.0e-10):
-        """Set really really small coordinates to zero.
-
-        Set all coordinates with absolute value less than
-        epsilon to zero.
-
-        Parameters
-        ----------
-        epsilon : float
-            smallest allowed absolute value of any :math:`x,y,z` component.
-
-        """
-        for atom in self._atoms:
-            r = atom.r.tolist()
-            for i, ri in enumerate(r[:]):
-                if abs(ri) < epsilon:
-                    r[i] = 0.0
-            atom.x, atom.y, atom.z = r
-
     def getatomsattr(self, asarray=False, as_array=False):
         pass
 
@@ -691,6 +669,28 @@ class Atoms(MutableSequence):
         else:
             filtered_coords
 
+    def rezero_coords(self, epsilon=1.0e-10):
+        """Set really really small coordinates to zero.
+
+        Set all coordinates with absolute value less than
+        epsilon to zero.
+
+        Parameters
+        ----------
+        epsilon : float
+            smallest allowed absolute value of any :math:`x,y,z` component.
+
+        """
+        for atom in self._atoms:
+            r = atom.r.tolist()
+            for i, ri in enumerate(r[:]):
+                if abs(ri) < epsilon:
+                    r[i] = 0.0
+            atom.x, atom.y, atom.z = r
+
+    def rezero_xyz(self, epsilon=1.0e-10):
+        return self.rezero_coords(epsilon=epsilon)
+
     def rotate(self, R_matrix):
         """Rotate atom coordinates using rotation matrix `R_matrix`.
 
@@ -726,7 +726,7 @@ class Atoms(MutableSequence):
     def __delitem__(self, index):
         """Concrete implementation of @abstractmethod.
 
-        delete list element `self.atoms[index]` and delete all elements
+        Delete list element `self.atoms[index]` and delete all elements
         from atom properties lists `self.masses[index]`,
         `self.charges[index]`, and `self.coords[index]`
 
@@ -743,7 +743,7 @@ class Atoms(MutableSequence):
     def __getitem__(self, index):
         """Concrete implementation of @abstractmethod.
 
-        get `Atom` object instance at list element `self.atoms[index]`
+        Get `Atom` object instance at list element `self.atoms[index]`
 
         Parameters
         ----------
@@ -753,7 +753,7 @@ class Atoms(MutableSequence):
         Returns
         -------
         `Atom`
-            `Atom` object instance at target `self.atoms[index]`
+            `Atom` instance at target `self.atoms[index]`
 
         """
         return self._atoms[index]
@@ -778,7 +778,6 @@ class Atoms(MutableSequence):
         `self.charges[index]`, and `self.coords[index]`) to atom instance
         properties (`atom.m`, `atom.q`, `atom.r`), respectively.
 
-
         Parameters
         ----------
         index : int
@@ -801,7 +800,6 @@ class Atoms(MutableSequence):
         for all `Atom` properties in `self._property_lists.keys()`
         into their respective target lists of `Atoms` properties
         `self._property_lists.values()`.
-
 
         Parameters
         ----------
