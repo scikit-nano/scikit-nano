@@ -92,13 +92,6 @@ Base classes for creating new structure data generators
    StructureGenerator
    VacancyGenerator
 
-Sub-packages
-=============
-.. autosummary::
-   :toctree: generated/
-
-   atoms
-
 """
 from __future__ import division, print_function, absolute_import
 

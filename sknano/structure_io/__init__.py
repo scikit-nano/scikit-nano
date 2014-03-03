@@ -53,6 +53,13 @@ Base custom exception classes for handling errors
    StructureConverterError
    StructureFormatError
 
+Sub-packages
+=============
+.. autosummary::
+   :toctree: generated/
+
+   atoms
+
 """
 from __future__ import division, print_function, absolute_import
 
