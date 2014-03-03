@@ -23,14 +23,11 @@ scikit-nano documentation
    :maxdepth: 1
 
    contribute.rst
-   release.rst
    credits.rst
+   release.rst
 
-Package Source
---------------
-* `Python Package Index <https://pypi.python.org/pypi/scikit-nano>`_
-* `github repo <https://github.com/androomerrill/scikit-nano>`_
 
+.. _reference:
 =========
 Reference
 =========

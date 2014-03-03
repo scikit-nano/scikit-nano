@@ -1,10 +1,11 @@
-===========================
-Contributing to scikit-nano
-===========================
+============================
+Contributing to development
+============================
 
 As any non-cave-dwelling developer knows, working on a project alone sucks.
 Collaboration inspires new ideas, leads to better code, and increases the
-longevity of a project. I welcome any and all constructive feedback and
-anyone insterested in contributing code, please email me or consider
-forking the project on github and submitting your contribution with a
-pull request. Thanks!
+longevity of a project. I welcome feedback, suggestions, and contributions from
+other developers. Please submit bug reports, feedback, and suggestions on the
+`github issue tracker <https://github.com/androomerrill/scikit-nano/issues>`_.
+To contribute to development, fork the project on github and send me a pull
+request. Thanks!

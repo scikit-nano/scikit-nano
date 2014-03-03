@@ -1,6 +1,6 @@
-======================
-scikit-nano Tutorial
-======================
+=========
+Tutorial
+=========
 
 .. sectionauthor:: Andrew Merrill <androomerrill@gmail.com>
 
@@ -8,5 +8,4 @@ scikit-nano Tutorial
    :maxdepth: 2
 
    nanogen.rst
-   scripts.rst
    examples.rst
