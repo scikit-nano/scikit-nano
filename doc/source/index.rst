@@ -6,8 +6,8 @@ scikit-nano documentation
 :Date: |today|
 
 .. include:: ../../README.rst
-   :start-line: 5
-   :end-line: 7
+   :start-line: 4
+   :end-line: 6
 
 .. toctree::
    :maxdepth: 1

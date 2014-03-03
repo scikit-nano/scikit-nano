@@ -156,7 +156,7 @@ def setup_package():
         configuration=configuration,
         packages=find_packages(exclude=['doc']),
         include_package_data=True,
-        exclude_package_data={'': ['README.rst', '*.gif', '*.html', '*.ui']},
+        exclude_package_data={'': ['*.gif', '*.html', '*.ui']},
         zip_safe=False,
         install_requires=['numpy>=1.8', 'pint>=0.4'],
         entry_points={
