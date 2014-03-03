@@ -74,6 +74,7 @@ Classes for generating nanotube structure data
    NanotubeBundleGenerator
    MWNTGenerator
    MWNTBundleGenerator
+   TubeGen
 
 Classes for generating nano-structure data with vacancies
 ----------------------------------------------------------
@@ -90,6 +91,13 @@ Base classes for creating new structure data generators
 
    StructureGenerator
    VacancyGenerator
+
+Sub-packages
+=============
+.. autosummary::
+   :toctree: generated/
+
+   atoms
 
 """
 from __future__ import division, print_function, absolute_import
