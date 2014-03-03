@@ -10,7 +10,7 @@ scikit-nano documentation
    :end-line: 6
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    getting_started.rst
 
@@ -28,6 +28,7 @@ scikit-nano documentation
 
 
 .. _reference:
+
 =========
 Reference
 =========

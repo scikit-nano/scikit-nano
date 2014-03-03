@@ -1,46 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Python toolkit for generating and analyzing nanostructure data.
-
-*scikit-nano* is a python toolkit for generating and analyzing
-nanostructure data.
-
-Currently, its primary utility is generating nanostructure data
-(i.e. atomic coordinates) for the following nanostructure materials:
-
-    * Graphene:
-
-        * Single layer graphene
-        * Bi-layer graphene with layers rotated relative to each other
-          by any angle and different layer stacking arrangements
-        * *N*-layer graphene
-
-    * Nanotubes:
-
-        * Single-walled nanotubes (SWNTs)
-        * SWNT *bundles*
-        * Multi-walled nanotubes (MWNTs)
-        * MWNT *bundles*
-
-It currently supports saving structure data in the following formats:
-
-    * `LAMMPS data`
-    * `xyz`
-
-Secondary to its structure generating functions are its
-*structure analysis tools* including:
-
-    * defect/vacancy structure analysis
-    * nearest-neighbor analysis
-    * ...
-
-I welcome feedback and contributions to development!
-
-For documentation, see:
-`scikit-nano documentation <http://projects.geekcode.io/scikit-nano/doc>`_
-
-"""
-
-DOCLINES = __doc__.split("\n")
+"""Python toolkit for generating and analyzing nanostructure data"""
 
 import os
 import sys
@@ -53,6 +12,14 @@ from numpy.distutils.core import setup
 if sys.version_info[:2] < (2, 7):
     raise RuntimeError("Python version 2.7 required.")
 
+DISTNAME = 'scikit-nano'
+DESCRIPTION = 'Python toolkit for generating and analyzing nanostructure data'
+LONG_DESCRIPTION = open('README.rst').read()
+AUTHOR = 'Andrew Merrill'
+AUTHOR_EMAIL = 'androomerrill@gmail.com'
+URL = 'http://projects.geekcode.io/scikit-nano/doc'
+DOWNLOAD_URL = 'https://github.com/androomerrill/scikit-nano'
+KEYWORDS = 'nano nano-structures nanostructures nanotubes graphene LAMMPS XYZ'
 CLASSIFIERS = """\
 Development Status :: 4 - Beta
 Intended Audience :: Science/Research
@@ -173,23 +140,23 @@ def setup_package():
     FULLVERSION, GIT_REVISION = get_version_info()
 
     setup_options = dict(
-        name='scikit-nano',
+        name=DISTNAME,
         version=FULLVERSION,
-        author='Andrew Merrill',
-        author_email='androomerrill@gmail.com',
-        description=DOCLINES[0],
-        long_description="\n".join(DOCLINES[2:]),
-        url='http://projects.geekcode.io/scikit-nano/doc',
-        download_url='http://github.com/androomerrill/scikit-nano',
+        author=AUTHOR,
+        author_email=AUTHOR_EMAIL,
+        description=DESCRIPTION,
+        long_description=LONG_DESCRIPTION,
+        url=URL,
+        download_url=DOWNLOAD_URL,
         license='BSD 2-Clause',
+        keywords=KEYWORDS,
         classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
         platforms=["Linux", "OS-X", "Unix", "Windows"],
         test_suite='nose.collector',
         configuration=configuration,
         packages=find_packages(exclude=['doc']),
         include_package_data=True,
-        exclude_package_data={'':
-            ['README', 'README.rst', '*.gif', '*.html', '*.ui']},
+        exclude_package_data={'': ['README.rst', '*.gif', '*.html', '*.ui']},
         zip_safe=False,
         install_requires=['numpy>=1.8', 'pint>=0.4'],
         entry_points={
