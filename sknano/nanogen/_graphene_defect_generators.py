@@ -33,6 +33,13 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
     Parameters
     ----------
+    width : float, optional
+        Width of graphene sheet in **nanometers**
+    length : float, optional
+        Length of graphene sheet in **nanometers**
+    edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
+        **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
+        the `length` of the sheet.
     fname : str, optional
         Structure data filename. If you don't provide a structure data file,
         the you **must** provide the structure data parameters to
@@ -45,13 +52,6 @@ class GrapheneVacancyGenerator(VacancyGenerator):
             - xyz
             - data
 
-    width : float, optional
-        Width of graphene sheet in **nanometers**
-    length : float, optional
-        Length of graphene sheet in **nanometers**
-    edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
-        **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
-        the `length` of the sheet.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis atoms 1 and 2.
     bond : float, optional
@@ -64,6 +64,12 @@ class GrapheneVacancyGenerator(VacancyGenerator):
         Stacking order of graphene layers
     verbose : bool, optional
         Verbose output
+
+    Raises
+    ------
+    `TypeError`
+        If `fname` is `None` and `n` and `m` are not integers or
+        `width` and `length` are not floats.
 
     Examples
     --------
@@ -172,22 +178,29 @@ class GrapheneVacancyGenerator(VacancyGenerator):
     .. image:: /images/10nmx5nm_1layer_ZZ_CC_graphene+40_vacancies-01.png
 
     """
-    def __init__(self, fname=None, structure_format=None,
-                 width=None, length=None, edge=None,
+    def __init__(self, n=None, m=None, width=None, length=None, edge=None,
+                 fname=None, structure_format=None,
                  element1='C', element2='C', bond=CCbond,
                  nlayers=1, layer_spacing=3.35, stacking_order='AB',
                  rotate_structure=False, rotation_angle=None,
                  rotation_axis=None, verbose=False):
 
-        if fname is None and width is not None and length is not None:
-            gg = GrapheneGenerator(width=width, length=length, edge=edge,
-                                   element1=element1, element2=element2,
-                                   bond=bond, nlayers=nlayers,
+        if fname is None and \
+                ((isinstance(n, int) and isinstance(m, int)) or
+                 (isinstance(width, float) and isinstance(length, float))):
+            gg = GrapheneGenerator(n=n, m=m, width=width, length=length,
+                                   edge=edge, element1=element1,
+                                   element2=element2, bond=bond,
+                                   nlayers=nlayers,
                                    layer_spacing=layer_spacing,
                                    stacking_order=stacking_order,
                                    verbose=verbose)
             gg.save_data(structure_format='data')
             fname = gg.fname
+        else:
+            raise TypeError('Either `fname` must be set or `n` and `m` '
+                            'must be specified as integers or `width` and '
+                            '`length` must be specified as floats.')
 
         super(GrapheneVacancyGenerator, self).__init__(
             fname=fname, structure_format=structure_format, verbose=verbose)

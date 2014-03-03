@@ -33,6 +33,11 @@ class NanotubeVacancyGenerator(VacancyGenerator):
 
     Parameters
     ----------
+    n, m : int, optional
+        Chiral indices defining the nanotube chiral vector
+        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
+    nx, ny, nz : int, optional
+        Number of repeat unit cells in the :math:`x, y, z` dimensions.
     fname : str, optional
         Structure data filename. If you don't provide a structure data file,
         the you **must** provide the structure data parameters to
@@ -45,11 +50,6 @@ class NanotubeVacancyGenerator(VacancyGenerator):
             - xyz
             - data
 
-    n, m : int, optional
-        Chiral indices defining the nanotube chiral vector
-        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
-    nx, ny, nz : int, optional
-        Number of repeat unit cells in the :math:`x, y, z` dimensions.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis atoms 1 and 2
     bond : float, optional
@@ -66,6 +66,11 @@ class NanotubeVacancyGenerator(VacancyGenerator):
         Overrides the :math:`n_x, n_y, n_z` cell values.
     verbose : bool, optional
         Verbose output
+
+    Raises
+    ------
+    `TypeError`
+        If `fname` is `None` and `n` and `m` are not integers.
 
     Examples
     --------
@@ -128,8 +133,8 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     This poor nanotube has taken quite a beating.
 
     """
-    def __init__(self, fname=None, structure_format=None,
-                 n=None, m=None, nx=1, ny=1, nz=1,
+    def __init__(self, n=None, m=None, nx=1, ny=1, nz=1,
+                 fname=None, structure_format=None,
                  element1='C', element2='C', bond=CCbond,
                  vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
                  Lx=None, Ly=None, Lz=None, fix_Lz=False,
@@ -139,7 +144,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
         self._Ntubes = None
         self._Natoms_per_tube = None
 
-        if fname is None and n is not None and m is not None:
+        if fname is None and isinstance(n, int) and isinstance(m, int):
             ntbg = NanotubeBundleGenerator(n=n, m=m, nx=nx, ny=ny, nz=nz,
                                            element1=element1,
                                            element2=element2,
@@ -154,6 +159,9 @@ class NanotubeVacancyGenerator(VacancyGenerator):
             fname = ntbg.fname
             self._Ntubes = ntbg.Ntubes
             self._Natoms_per_tube = ntbg.Natoms_per_tube
+        else:
+            raise TypeError('Either `fname` but be provided or '
+                            '`n` and `m` must be specified as integers')
 
         super(NanotubeVacancyGenerator, self).__init__(
             fname=fname, structure_format=structure_format)
