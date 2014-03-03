@@ -602,7 +602,7 @@ class Atoms(MutableSequence):
 
         Returns
         -------
-        coords : OrderedDict or ndarray
+        coords : :py:class:`python:~collections.OrderedDict` or ndarray
 
         """
         coords = self.coords
@@ -648,7 +648,8 @@ class Atoms(MutableSequence):
 
         Returns
         -------
-        filtered_coords : OrderedDict or ndarray
+        filtered_coords : :py:class:`python:~collections.OrderedDict` or
+        ndarray
 
         """
         atom_ids = self.atom_ids
