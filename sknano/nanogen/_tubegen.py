@@ -15,9 +15,7 @@ import sys
 
 #from collections import OrderedDict
 
-from math import ceil
-
-#import numpy as np
+import numpy as np
 
 from ..structure_io import XYZReader, XYZWriter
 from ..tools import plural_word_check
@@ -73,7 +71,7 @@ class TubeGen(object):
     units : {'angstrom', 'bohr'}, optional
         The unit of length to generate the spatial coordinates in.
     bond : float, optional
-        Bond length between ``element1`` and ``element2``.
+        Bond length between `element1` and `element2`.
     element1, element2 : {int, str}, optional
         Atomic {number, symbol} of two atom basis.
     gutter : sequence, optional
@@ -97,7 +95,7 @@ class TubeGen(object):
     >>> from sknano.nanogen import TubeGen
 
     Generate a single unit cell of a :math:`\\mathbf{C}_{h} = (10, 5)`
-    :abbr:`SWCNT (single-wall carbon nanotube)` in *xyz* format:
+    :abbr:`SWCNT (single-walled carbon nanotube)` in `xyz` format:
 
     .. code-block:: python
 
@@ -234,25 +232,24 @@ class TubeGen(object):
     def __init__(self, fmt='xyz', units='angstrom', bond=CCbond,
                  element1='C', element2='C', gutter=(1.6735, 1.6735, 0),
                  shape='hexagonal', chirality=(10, 10), cell_count=(1, 1, 1),
-                 relax_tube='yes', tube_length=None):
+                 relax_tube='yes', Lz=None, tube_length=None):
 
-        self.n = int(chirality[0])
-        self.m = int(chirality[1])
+        n = int(chirality[0])
+        m = int(chirality[1])
 
-        self.T = Nanotube.compute_T(n=self.n, m=self.m)
+        T = Nanotube.compute_T(n=n, m=m, bond=bond)
 
-        nx, ny, nz = cell_count
-
-        self._tube_length = None
-        if tube_length is not None and tube_length != 'None' \
-           and shape == 'hexagonal' and \
-           isinstance(tube_length, (int, float, str)):
-            self._tube_length = 10 * float(tube_length)
-            nz = int(ceil(self._tube_length / self.T))
+        if Lz is None and tube_length is not None:
+            Lz = tube_length
+        nz = cell_count[-1]
+        if Lz is not None and Lz != 'None' and \
+                isinstance(Lz, (int, float, str)) and shape == 'hexagonal':
+            Lz = 10 * float(Lz)
+            nz = int(np.ceil(Lz / T))
         elif nz is not None and nz != 'None' and \
                 isinstance(nz, (int, float, str)):
             nz = int(nz)
-            self._tube_length = nz * self.T
+            Lz = nz * T
 
         self._fmt = fmt
         self._units = units
@@ -263,9 +260,7 @@ class TubeGen(object):
         self._shape = shape
         self._chirality = ','.join([str(x) for x in chirality])
         self._relax_tube = relax_tube
-        self._cell_count = ','.join([str(x) for x in
-                                     (nx, ny, nz)])
-        self._genfile_name = ''
+        self._cell_count = ','.join([str(x) for x in cell_count])
         self._kwargs = {'format': self._fmt,
                         'units': self._units,
                         'bond': self._bond,
@@ -276,9 +271,11 @@ class TubeGen(object):
                         'chirality': self._chirality,
                         'cell_count': self._cell_count,
                         'relax_tube': self._relax_tube}
+        self._genfile_name = ''
         self._output = ''
 
-        self._dt = Nanotube.compute_dt(n=self.n, m=self.m)
+        self._dt = Nanotube.compute_dt(n=n, m=m, bond=bond)
+        self._Lz = Lz
 
     @property
     def fmt(self):
@@ -294,24 +291,24 @@ class TubeGen(object):
 
     @property
     def cell_count(self):
-        """Cell count.
+        """Cell count in :math:`x, y, z` dimensions.
 
         Returns
         -------
-        (int, int, int)
-            tuple of `nx`, `ny`, `nz`
+        tuple
+            3-tuple of integers: :math:`nx, ny, nz`
 
         """
         return tuple([int(c) for c in self._cell_count.split(',')])
 
     @property
     def chirality(self):
-        """Chirality.
+        """Chirality :math:`\\mathbf{C_h} = (n, m)`
 
         Returns
         -------
-        (int, int)
-            chiral indices (`n`, `m`)
+        tuple
+            2-tuple of integers :math:`(n, m)`
 
         """
         return tuple([int(c) for c in self._chirality.split(',')])
@@ -321,7 +318,8 @@ class TubeGen(object):
         """Tube diameter.
 
         Returns
-        dt : float
+        -------
+        float
             nanotube diameter in Angstroms
 
         """
@@ -329,12 +327,12 @@ class TubeGen(object):
 
     @property
     def gutter(self):
-        """Gutter.
+        """Gutter in :math:`x, y, z` dimensions.
 
         Returns
         -------
-        (float, float, float)
-            tuple of gutter values
+        tuple
+            3-tuple of floats
 
         """
         return tuple([float(c) for c in self._gutter.split(',')])
@@ -345,7 +343,7 @@ class TubeGen(object):
 
         Returns
         -------
-        output : str
+        str
             output file name
 
         """
@@ -357,26 +355,24 @@ class TubeGen(object):
 
         Returns
         -------
-        str : {'hexagonal', 'cubic', 'planar'}
-            structure shape
+        str
+            Structure shape will be one of {'hexagonal', 'cubic', 'planar'}.
 
         """
         return self._shape
 
     def fix_length(self):
         """Crop nanotube ends for correct length."""
-        if self._tube_length is not None:
+        if self._Lz is not None:
             if self._fmt == 'xyz':
                 xyzreader = XYZReader(self._output)
                 atoms = xyzreader.atoms
-                atoms.clip_bounds(abs_limit=self._tube_length / 2 + 0.1,
-                                  r_indices=[2])
+                atoms.clip_bounds(abs_limit=self._Lz / 2 + 0.1, r_indices=[2])
                 XYZWriter.write(fname=self._output, atoms=atoms,
                                 comment_line=xyzreader.comment_line)
 
     def cleanup(self):
         """Cleanup tubegen input file."""
-
         if os.path.isfile(self._genfile_name):
             try:
                 os.remove(self._genfile_name)
@@ -399,7 +395,6 @@ class TubeGen(object):
             self._genfile_name.split('.')[0] + format_ext[self._fmt]
 
     def _name_genfile(self):
-
         genfile = None
         cell_count = self._cell_count
         chirality = self._chirality
@@ -434,13 +429,9 @@ class TubeGen(object):
                                          format_ext[self._fmt]))
         f.close()
 
-        return None
-
     def _tubegen(self):
         retcode = subprocess.call(["tubegen", self._genfile_name])
         if retcode != 0:
             print('tubegen failed')
         else:
             print('tubegen finished with no errors')
-
-        return None
