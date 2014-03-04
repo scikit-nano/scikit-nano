@@ -12,15 +12,11 @@ __docformat__ = 'restructuredtext'
 
 import numpy as np
 
-from ..tools import check_type
+from ..tools import check_type, Vector
 from ..tools.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols
 
 __all__ = ['Atom']
-
-
-class AtomAttributes(object):
-    pass
 
 
 class Atom(object):
@@ -67,17 +63,11 @@ class Atom(object):
         self._Z = None
         self._m = None
 
+        self._r = Vector(x=x, y=y, z=z)
         self._r_units = r_units
-        self._r = np.zeros(3, dtype=float)
-        for i, ri in enumerate((x, y, z)):
-            if ri is not None:
-                self._r[i] = ri
 
-        self._v = np.zeros(3, dtype=float)
+        self._v = Vector(x=vx, y=vy, z=vz)
         self._v_units = v_units
-        for i, vi in enumerate((vx, vy, vz)):
-            if vi is not None:
-                self._v[i] = vi
 
         self._n = np.zeros(3, dtype=int)
         for i, ni in enumerate((nx, ny, nz)):
@@ -119,16 +109,16 @@ class Atom(object):
             else:
                 self._m = 0
 
-        check_type(q, (int, float))
+        check_type(q, allowed_types=(int, float))
         self._q = q
 
-        check_type(atomID, (int, float))
+        check_type(atomID, allowed_types=(int, float))
         self._atomID = int(atomID)
 
-        check_type(moleculeID, (int, float))
+        check_type(moleculeID, allowed_types=(int, float))
         self._moleculeID = int(moleculeID)
 
-        check_type(atomtype, (int, float))
+        check_type(atomtype, allowed_types=(int, float))
         self._atomtype = int(atomtype)
 
         self._CN = CN
@@ -208,7 +198,7 @@ class Atom(object):
             :math:`x`-coordinate in units of **Angstroms**.
 
         """
-        return self._r[0]
+        return self._r.x
 
     @x.setter
     def x(self, value=float):
@@ -220,8 +210,7 @@ class Atom(object):
             :math:`x`-coordinate in units of **Angstroms**.
 
         """
-        check_type(value, (int, float))
-        self._r[0] = float(value)
+        self._r.x = value
 
     @property
     def y(self):
@@ -233,7 +222,7 @@ class Atom(object):
             :math:`y`-coordinate in units of **Angstroms**.
 
         """
-        return self._r[1]
+        return self._r.y
 
     @y.setter
     def y(self, value=float):
@@ -245,8 +234,7 @@ class Atom(object):
             :math:`y`-coordinate in units of **Angstroms**.
 
         """
-        check_type(value, (int, float))
-        self._r[1] = float(value)
+        self._r.y = value
 
     @property
     def z(self):
@@ -258,7 +246,7 @@ class Atom(object):
             :math:`z`-coordinate in units of **Angstroms**.
 
         """
-        return self._r[2]
+        return self._r.z
 
     @z.setter
     def z(self, value=float):
@@ -270,8 +258,7 @@ class Atom(object):
             :math:`z`-coordinate in units of **Angstroms**.
 
         """
-        check_type(value, (int, float))
-        self._r[2] = float(value)
+        self._r.z = value
 
     @property
     def r(self):
@@ -283,7 +270,7 @@ class Atom(object):
             3-element ndarray of [:math:`x, y, z`] coordinates of `Atom`.
 
         """
-        return self._r
+        return self._r.components
 
     @r.setter
     def r(self, value=np.ndarray):
@@ -296,9 +283,7 @@ class Atom(object):
             **Angstroms**.
 
         """
-        check_type(value, np.ndarray)
-        for i, ri in enumerate(value):
-            self._r[i] = ri
+        self._r.components = value
 
     @property
     def q(self):
@@ -318,7 +303,7 @@ class Atom(object):
             :math:`e`.
 
         """
-        check_type(value, (int, float))
+        check_type(value, allowed_types=(int, float))
         self._q = value
 
     @property
@@ -336,7 +321,7 @@ class Atom(object):
             atom ID
 
         """
-        check_type(value, (int, float))
+        check_type(value, allowed_types=(int, float))
         self._atomID = int(value)
 
     @property
@@ -354,7 +339,7 @@ class Atom(object):
             molecule ID
 
         """
-        check_type(value, (int, float))
+        check_type(value, allowed_types=(int, float))
         self._moleculeID = int(value)
 
     @property
@@ -372,7 +357,7 @@ class Atom(object):
             atom type
 
         """
-        check_type(value, (int, float))
+        check_type(value, allowed_types=(int, float))
         self._atomtype = int(value)
 
     @property
@@ -385,7 +370,7 @@ class Atom(object):
             :math:`v_x` component in units of `v_units`.
 
         """
-        return self._v[0]
+        return self._v.x
 
     @vx.setter
     def vx(self, value=float):
@@ -397,8 +382,7 @@ class Atom(object):
             :math:`v_x` component in units of `v_units`.
 
         """
-        check_type(value, (int, float))
-        self._v[0] = float(value)
+        self._v.x = value
 
     @property
     def vy(self):
@@ -410,7 +394,7 @@ class Atom(object):
             :math:`v_y` component in units of `v_units`.
 
         """
-        return self._v[1]
+        return self._v.y
 
     @vy.setter
     def vy(self, value=float):
@@ -422,8 +406,7 @@ class Atom(object):
             :math:`v_y` component in units of `v_units`.
 
         """
-        check_type(value, (int, float))
-        self._v[1] = float(value)
+        self._v.y = value
 
     @property
     def vz(self):
@@ -435,7 +418,7 @@ class Atom(object):
             :math:`v_z` component in units of `v_units`.
 
         """
-        return self._v[2]
+        return self._v.z
 
     @vz.setter
     def vz(self, value=float):
@@ -447,8 +430,7 @@ class Atom(object):
             :math:`v_z` component in units of `v_units`.
 
         """
-        check_type(value, (int, float))
-        self._v[2] = float(value)
+        self._v.z = value
 
     @property
     def v(self):
@@ -461,7 +443,7 @@ class Atom(object):
             velocity components of `Atom`.
 
         """
-        return self._v
+        return self._v.components
 
     @v.setter
     def v(self, value=np.ndarray):
@@ -474,9 +456,7 @@ class Atom(object):
             velocity components of `Atom`.
 
         """
-        check_type(value, np.ndarray)
-        for i, vi in enumerate(value):
-            self._v[i] = vi
+        self._v.components = value
 
     @property
     def nx(self):
@@ -500,7 +480,7 @@ class Atom(object):
             :math:`n_x` image flag.
 
         """
-        check_type(value, (int, float))
+        check_type(value, allowed_types=(int, float))
         self._n[0] = int(value)
 
     @property
@@ -525,7 +505,7 @@ class Atom(object):
             :math:`n_y` image flag.
 
         """
-        check_type(value, (int, float))
+        check_type(value, allowed_types=(int, float))
         self._n[1] = int(value)
 
     @property
@@ -550,7 +530,7 @@ class Atom(object):
             :math:`n_z` image flag.
 
         """
-        check_type(value, (int, float))
+        check_type(value, allowed_types=(int, float))
         self._n[2] = int(value)
 
     @property
@@ -577,7 +557,7 @@ class Atom(object):
             image flags of `Atom`.
 
         """
-        check_type(value, np.ndarray)
+        check_type(value, allowed_types=(np.ndarray,))
         for i, ni in enumerate(value):
             self._n[i] = ni
 
@@ -595,11 +575,7 @@ class Atom(object):
             position
 
         """
-        r = self._r.tolist()
-        for i, ri in enumerate(r[:]):
-            if ri < 0 and abs(ri) < epsilon:
-                r[i] = 0.0
-        self._r[0], self._r[1], self._r[2] = r
+        self._r.fix_minus_zero_components(epsilon=epsilon)
 
     def rezero_coords(self, epsilon=1.0e-10):
         """Set really really small coordinates to zero.
@@ -613,8 +589,4 @@ class Atom(object):
             smallest allowed absolute value of any :math:`x,y,z` component.
 
         """
-        r = self._r.tolist()
-        for i, ri in enumerate(r[:]):
-            if abs(ri) < epsilon:
-                r[i] = 0.0
-        self._r[0], self._r[1], self._r[2] = r
+        self._r.rezero_components(epsilon=epsilon)
