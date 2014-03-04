@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ========================================================================
-Base class for structure atom (:mod:`sknano.structure_io.atoms._atom`)
+Class for LAMMPS atom (:mod:`sknano.structure_io.atoms._lammps_atom`)
 ========================================================================
 
-.. currentmodule:: sknano.structure_io.atoms._atom
+.. currentmodule:: sknano.structure_io.atoms._lammps_atom
 
 """
 from __future__ import division, absolute_import, print_function
@@ -15,15 +15,15 @@ import numpy as np
 from ...tools.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols
 
-__all__ = ['Atom', 'AtomAttributes']
+__all__ = ['LAMMPSAtom', 'LAMMPSAtomAttributes']
 
 
-class AtomAttributes(object):
+class LAMMPSAtomAttributes(object):
     pass
 
 
-class Atom(object):
-    """Base class for structure data atom.
+class LAMMPSAtom(object):
+    """Class for representing `LAMMPS` structure data atom.
 
     Parameters
     ----------
@@ -584,26 +584,6 @@ class Atom(object):
         self._check_type(value, np.ndarray)
         for i, ni in enumerate(value):
             self._n[i] = ni
-
-    def fix_minus_zero_coords(self, epsilon=1.0e-10):
-        """Set really really small negative coordinates to zero.
-
-        Set all coordinates with absolute value less than
-        epsilon zero so we don't end up with -0.00000
-        coordinates in structure data output.
-
-        Parameters
-        ----------
-        epsilon : float
-            smallest allowed absolute value of any component of atom's
-            position
-
-        """
-        r = self._r.tolist()
-        for i, ri in enumerate(r[:]):
-            if ri < 0 and abs(ri) < epsilon:
-                r[i] = 0.0
-        self._r[0], self._r[1], self._r[2] = r
 
     def rezero_coords(self, epsilon=1.0e-10):
         """Set really really small coordinates to zero.

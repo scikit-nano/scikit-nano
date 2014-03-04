@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-===========================================================================
-Base class for structure atoms (:mod:`sknano.structure_io.atoms._atoms`)
-===========================================================================
+========================================================================
+Class for LAMMPS atoms (:mod:`sknano.structure_io.atoms._lammps_atoms`)
+========================================================================
 
-.. currentmodule:: sknano.structure_io.atoms._atoms
+.. currentmodule:: sknano.structure_io.atoms._lammps_atoms
 
 """
 from __future__ import division, absolute_import, print_function
@@ -22,24 +22,24 @@ try:
     has_kdtree = True
 except ImportError:
     print('Install scipy version >= 0.13.0 to allow '
-          'nearest-neighbor queries between `Atoms`.')
+          'nearest-neighbor queries between atoms.')
     has_kdtree = False
 
 from ...tools import xyz_axes
-from ._atom import Atom
+#from ._atoms import Atoms
+from ._lammps_atom import LAMMPSAtom
 
-__all__ = ['Atoms']
+__all__ = ['LAMMPSAtoms']
 
 
-class Atoms(MutableSequence):
-
-    """Class for creating abstract represention of a collection of `Atoms`.
+class LAMMPSAtoms(MutableSequence):
+    """Class for creating atoms for `LAMMPS` structure data formats.
 
     Parameters
     ----------
-    atoms : {None, sequence, `Atoms`}, optional
-        if not `None`, then a list of `Atom` instance objects or an
-        existing `Atoms` instance object.
+    atoms : {None, sequence, `LAMMPSAtoms`}, optional
+        if not `None`, then a list of `LAMMPSAtom` instance objects or an
+        existing `LAMMPSAtoms` instance object.
     copylist : bool, optional
         perform shallow copy of atoms list
     deepcopy : bool, optional
@@ -83,7 +83,14 @@ class Atoms(MutableSequence):
         self._NN_cutoff = np.inf
 
         if atoms is not None:
-            if isinstance(atoms, list):
+            if isinstance(atoms, LAMMPSAtoms):
+                if copylist and not deepcopy:
+                    self._atoms.extend(atoms.atoms[:])
+                elif deepcopy:
+                    self._atoms.extend(copy.deepcopy(atoms.atoms))
+                else:
+                    self._atoms.extend(atoms.atoms)
+            elif isinstance(atoms, list):
                 if copylist and not deepcopy:
                     self._atoms = atoms[:]
                 elif deepcopy:
@@ -95,42 +102,35 @@ class Atoms(MutableSequence):
                     self._check_type(atom)
                     for p, plist in self._property_lists.iteritems():
                         plist.append(getattr(atom, p))
-            elif isinstance(atoms, Atoms):
-                if copylist and not deepcopy:
-                    self._atoms.extend(atoms.atoms[:])
-                elif deepcopy:
-                    self._atoms.extend(copy.deepcopy(atoms.atoms))
-                else:
-                    self._atoms.extend(atoms.atoms)
             else:
-                raise TypeError('`Atoms(atoms={!r})` '.format(atoms) +
-                                'is not a valid `Atoms` constructor '
+                raise TypeError('`LAMMPSAtoms(atoms={!r})` '.format(atoms) +
+                                'is not a valid `LAMMPSAtoms` constructor '
                                 'argument.\n atoms must be `None`, a list '
-                                'of `Atom` objects, or an `Atoms` object '
-                                'instance.')
+                                'of `LAMMPSAtom` objects, or a '
+                                '`LAMMPSAtoms` object instance.')
 
             if use_kdtree:
                 self._atom_tree = self.atom_tree
 
     def _check_type(self, value):
-        """Check that value is instance of `Atom` class.
+        """Check that value is instance of `LAMMPSAtom` class.
 
         Parameters
         ----------
-        value : `Atom`
+        value : `LAMMPSAtom`
             value to type check
 
         Raises
         ------
         TypeError
-            if `value` is not instance of `Atom`
+            if `value` is not instance of `LAMMPSAtom`
 
         """
-        if not isinstance(value, Atom):
-            raise TypeError('{} is not an Atom.'.format(value))
+        if not isinstance(value, LAMMPSAtom):
+            raise TypeError('{} is not an LAMMPSAtom.'.format(value))
 
     def __str__(self):
-        """Return string representation of `Atoms`."""
+        """Return string representation of `LAMMPSAtoms`."""
         atoms_str = ''
         for atom in self._atoms:
             atoms_str += str(atom)
@@ -138,18 +138,8 @@ class Atoms(MutableSequence):
 
     @property
     def atoms(self):
-        """Return the list of `Atom` objects"""
+        """Return the list of `LAMMPSAtom` objects"""
         return self._atoms
-
-    @property
-    def atomlist(self):
-        """Return the list of `Atom` objects
-
-        .. deprecated:: 0.1.0
-           Use :py:attr:`atoms` attribute.
-
-        """
-        return self.atoms
 
     @property
     def atomtypes(self):
@@ -163,7 +153,7 @@ class Atoms(MutableSequence):
 
     @property
     def atom_ids(self):
-        """Return array of `Atom` IDs."""
+        """Return array of `LAMMPSAtom` IDs."""
         atom_ids = []
         for atom in self._atoms:
             atom_ids.append(atom.atomID)
@@ -179,7 +169,7 @@ class Atoms(MutableSequence):
 
     @property
     def charges(self):
-        """Return list of `Atom` charges."""
+        """Return list of `LAMMPSAtom` charges."""
         #self._charges_array = np.asarray(self._charges)
         charges = []
         for atom in self._atoms:
@@ -189,12 +179,13 @@ class Atoms(MutableSequence):
 
     @property
     def CM(self):
-        """Center-of-Mass coordinates of `Atoms`.
+        """Center-of-Mass coordinates of `LAMMPSAtoms`.
 
         Returns
         -------
         ndarray
-            3-element ndarray specifying center-of-mass coordinates of `Atoms`.
+            3-element ndarray specifying center-of-mass coordinates of
+            `LAMMPSAtoms`.
 
         """
         masses = np.asarray([self.masses])
@@ -204,7 +195,7 @@ class Atoms(MutableSequence):
 
     @property
     def coords(self):
-        """Return array of `Atom` coordinates."""
+        """Return array of `LAMMPSAtom` coordinates."""
         coords = []
         for atom in self._atoms:
             coords.append(atom.r)
@@ -213,7 +204,7 @@ class Atoms(MutableSequence):
 
     @property
     def positions(self):
-        """Return array of `Atom` positions."""
+        """Return array of `LAMMPSAtom` positions."""
         positions = []
         for atom in self._atoms:
             positions.append(atom.r)
@@ -222,7 +213,7 @@ class Atoms(MutableSequence):
 
     @property
     def coordination_numbers(self):
-        """Return array of `Atom` coordination numbers."""
+        """Return array of `LAMMPSAtom` coordination numbers."""
         self.update_coordination_numbers()
         coordination_numbers = []
         for atom in self._atoms:
@@ -231,7 +222,7 @@ class Atoms(MutableSequence):
         return np.asarray(self._coordination_numbers)
 
     def update_coordination_numbers(self):
-        """Update `Atom` coordination numbers."""
+        """Update `LAMMPSAtom` coordination numbers."""
         if self._use_kdtree:
             NN_d, NN_i = \
                 self.query_atom_tree(n=self.NN_number,
@@ -245,7 +236,7 @@ class Atoms(MutableSequence):
 
     @property
     def nearest_neighbors(self):
-        """Return array of nearest-neighbor atoms for each `Atom`."""
+        """Return array of nearest-neighbor atoms for each `LAMMPSAtom`."""
         self.update_nearest_neighbors()
         nearest_neighbors = []
         for atom in self._atoms:
@@ -254,7 +245,7 @@ class Atoms(MutableSequence):
         return np.asarray(self._nearest_neighbors)
 
     def update_nearest_neighbors(self):
-        """Update `Atom` nearest-neighbors."""
+        """Update `LAMMPSAtom` nearest-neighbors."""
         if self._use_kdtree:
             NN_d, NN_i = self.query_atom_tree(n=self.NN_number,
                                               cutoff_radius=self.NN_cutoff)
@@ -305,7 +296,7 @@ class Atoms(MutableSequence):
         return NN_d, NN_i
 
     def query_coordination_numbers(self, n=6, rc=np.inf):
-        """Query and update `Atom` coordination numbers.
+        """Query and update `LAMMPSAtom` coordination numbers.
 
         Parameters
         ----------
@@ -328,7 +319,7 @@ class Atoms(MutableSequence):
         return np.asarray(self._coordination_numbers)
 
     def query_nearest_neighbors(self, n=6, rc=np.inf):
-        """Query and update `Atom` nearest neighbors.
+        """Query and update `LAMMPSAtom` nearest neighbors.
 
         Parameters
         ----------
@@ -352,7 +343,7 @@ class Atoms(MutableSequence):
 
     @property
     def masses(self):
-        """Return the list of `Atom` masses."""
+        """Return the list of `LAMMPSAtom` masses."""
         #self._masses_array = np.asarray(self._masses)
         masses = []
         for atom in self._atoms:
@@ -361,43 +352,28 @@ class Atoms(MutableSequence):
         return self._masses
 
     @property
-    def m(self):
-        """Total mass of `Atoms`.
-
-        .. deprecated:: 0.1.0
-           Use :py:attr:`M` attribute instead.
-
-        """
-        return self.M
-
-    @property
     def M(self):
-        """Total mass of `Atoms`."""
+        """Total mass of `LAMMPSAtoms`."""
         return math.fsum(self.masses)
 
     @property
     def Natoms(self):
-        """Number of atoms in `Atoms`."""
+        """Number of atoms in `LAMMPSAtoms`."""
         return len(self._atoms)
 
     @property
     def Ntypes(self):
-        """Number of atom types in `Atoms`."""
+        """Number of atom types in `LAMMPSAtoms`."""
         return len(self.atomtypes.keys())
 
     @property
     def q(self):
-        """Return the total net charge of `Atoms`."""
+        """Return the total net charge of `LAMMPSAtoms`."""
         return np.asarray(self.charges).sum()
 
     @property
-    def r(self):
-        """Alias for :py:attr:`~sknano.chemistry.Atoms.CM`"""
-        return self.CM
-
-    @property
     def symbols(self):
-        """Return array of `Atom` symbols."""
+        """Return array of `LAMMPSAtom` symbols."""
         symbols = []
         for atom in self._atoms:
             symbols.append(atom.symbol)
@@ -406,7 +382,7 @@ class Atoms(MutableSequence):
 
     @property
     def velocities(self):
-        """Return array of `Atom` velocities."""
+        """Return array of `LAMMPSAtom` velocities."""
         velocities = []
         for atom in self._atoms:
             velocities.append(atom.v)
@@ -430,12 +406,12 @@ class Atoms(MutableSequence):
         self._NN_cutoff = value
 
     def add_atomtype(self, atom):
-        """Add atom type to :py:attr:`~sknano.chemistry.Atoms.atomtypes` dict.
+        """Add atom type to :py:attr:`~sknano.chemistry.LAMMPSAtoms.atomtypes`.
 
         Parameters
         ----------
-        atom : `Atom`
-            an intance of an `Atom` object
+        atom : `LAMMPSAtom`
+            an intance of a `LAMMPSAtom` object
 
         """
         if atom.atomtype not in self._atomtypes:
@@ -448,14 +424,14 @@ class Atoms(MutableSequence):
         Parameters
         ----------
         atomtypes : sequence
-            a list of `Atom` object instances
+            a list of `LAMMPSAtom` object instances
 
         """
         for atom in atomtypes:
             self.add_atomtype(atom)
 
     def assign_unique_ids(self, starting_id=1):
-        """Assign unique ID to each `Atom` in `Atoms`."""
+        """Assign unique ID to each `LAMMPSAtom` in `Atoms`."""
         for i, atom in enumerate(self._atoms, start=starting_id):
             atom.atomID = i
 
@@ -509,7 +485,7 @@ class Atoms(MutableSequence):
                                 break
 
     def filter_atoms(self, filter_atom_ids, invert=False):
-        """Filter `Atoms`.
+        """Filter `LAMMPSAtoms`.
 
         Parameters
         ----------
@@ -518,45 +494,24 @@ class Atoms(MutableSequence):
 
         Returns
         -------
-        filtered_atoms : `Atoms`
+        filtered_atoms : `LAMMPSAtoms`
 
         """
         #if invert:
         #    filtered_atoms = \
-        #        Atoms([atom for atom in self.atoms if
+        #        LAMMPSAtoms([atom for atom in self.atoms if
         #               atom.atomID not in filter_atom_ids])
 
         #else:
         #    filtered_atoms = \
-        #        Atoms([atom for atom in self.atoms if
+        #        LAMMPSAtoms([atom for atom in self.atoms if
         #               atom.atomID in filter_atom_ids])
 
         filter_indices = \
             np.in1d(self.atom_ids, filter_atom_ids, invert=invert).nonzero()
         filtered_atoms = \
-            Atoms(np.asarray(self._atoms)[filter_indices].tolist())
+            LAMMPSAtoms(np.asarray(self._atoms)[filter_indices].tolist())
         return filtered_atoms
-
-    def fix_minus_zero_coords(self, epsilon=1.0e-10):
-        """Set really really small negative coordinates to zero.
-
-        Set all coordinates with absolute value less than
-        epsilon zero so we don't end up with -0.00000
-        coordinates in structure data output.
-
-        Parameters
-        ----------
-        epsilon : float
-            smallest allowed absolute value of any component of an
-            atom's position
-
-        """
-        for atom in self._atoms:
-            r = atom.r.tolist()
-            for i, ri in enumerate(r[:]):
-                if ri < 0 and abs(ri) < epsilon:
-                    r[i] = 0.0
-            atom.x, atom.y, atom.z = r
 
     def getatomsattr(self, asarray=False, as_array=False):
         pass
@@ -571,7 +526,7 @@ class Atoms(MutableSequence):
                 return None
 
     def get_atoms(self, asarray=False, as_array=False):
-        """Return list of `Atoms`.
+        """Return list of `LAMMPSAtoms`.
 
         Parameters
         ----------
@@ -739,7 +694,7 @@ class Atoms(MutableSequence):
     def __getitem__(self, index):
         """Concrete implementation of @abstractmethod.
 
-        Get `Atom` object instance at list element `self.atoms[index]`
+        Get `LAMMPSAtom` object instance at list element `self.atoms[index]`
 
         Parameters
         ----------
@@ -748,8 +703,8 @@ class Atoms(MutableSequence):
 
         Returns
         -------
-        `Atom`
-            `Atom` instance at target `self.atoms[index]`
+        `LAMMPSAtom`
+            `LAMMPSAtom` instance at target `self.atoms[index]`
 
         """
         return self._atoms[index]
@@ -778,8 +733,8 @@ class Atoms(MutableSequence):
         ----------
         index : int
             index of target list element
-        atom : `Atom`
-            `Atom` instance object to set target list element to.
+        atom : `LAMMPSAtom`
+            `LAMMPSAtom` instance object to set target list element to.
 
         """
         self._check_type(atom)
@@ -790,19 +745,19 @@ class Atoms(MutableSequence):
     def insert(self, index, atom):
         """Concrete implementation of @abstractmethod.
 
-        insert `Atom` instance at target list `index`
+        insert `LAMMPSAtom` instance at target list `index`
 
-        Also insert `Atom` instance properties at the given target list index
-        for all `Atom` properties in `self._property_lists.keys()`
-        into their respective target lists of `Atoms` properties
+        Also insert `LAMMPSAtom` instance properties at the given target list
+        index for all `LAMMPSAtom` properties in `self._property_lists.keys()`
+        into their respective target lists of `LAMMPSAtoms` properties
         `self._property_lists.values()`.
 
         Parameters
         ----------
         index : int
             index of target list element
-        atom : `Atom`
-            `Atom` object instance to set target list element to
+        atom : `LAMMPSAtom`
+            `LAMMPSAtom` object instance to set target list element to
 
         """
         self._check_type(atom)
