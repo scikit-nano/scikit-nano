@@ -265,7 +265,13 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
 
         if self._L0 is not None and self._fix_Lz:
             self._structure_atoms.clip_bounds(
-                abs_limit=(10 * self._L0 + 0.5) / 2, r_indices=[2])
+                min_limit=-(10 * self._L0 + 0.2) / 2, r_indices=[2])
+            if center_CM:
+                self._structure_atoms.center_CM()
+            self._structure_atoms.clip_bounds(
+                max_limit=(10 * self._L0 + 0.2) / 2, r_indices=[2])
+            if center_CM:
+                self._structure_atoms.center_CM()
 
         if rotation_angle is not None:
             R_matrix = rotation_matrix(rotation_angle,
@@ -521,10 +527,10 @@ class MWNTGenerator(NanotubeGenerator):
 
         if self._L0 is not None and self._fix_Lz:
             self._structure_atoms.clip_bounds(
-                abs_limit=(10 * self._L0 + 0.5) / 2, r_indices=[2])
+                abs_limit=(10 * self._L0 + 1) / 2, r_indices=[2])
         else:
             self._structure_atoms.clip_bounds(
-                abs_limit=(10 * Lzmin + 0.5) / 2, r_indices=[2])
+                abs_limit=(10 * Lzmin + 1) / 2, r_indices=[2])
 
         self._Natoms_per_tube = self._structure_atoms.Natoms
 
