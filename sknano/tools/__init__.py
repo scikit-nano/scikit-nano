@@ -9,6 +9,15 @@ Helper functions, LUTs, reference data, etc. (:mod:`sknano.tools`)
 Contents
 ========
 
+Abstract data structures
+-------------------------
+.. autosummary::
+   :toctree: generated/
+
+   Point
+   Vector
+   Quaternion
+
 Helper functions for chirality data
 ------------------------------------
 .. autosummary::
@@ -20,6 +29,13 @@ Helper functions for chirality data
    generate_Ch_list
    get_Ch_indices
    get_Ch_type
+
+'Core' functions that don't fit under any specific category
+------------------------------------------------------------
+.. autosummary::
+   :toctree: generated/
+
+   check_type
 
 Helper functions for I/O
 -------------------------
@@ -35,8 +51,8 @@ Helper functions for manipulating strings
 
    plural_word_check
 
-Math helper functions
-----------------------
+Math functions
+---------------
 .. autosummary::
    :toctree: generated/
 
@@ -70,6 +86,8 @@ from __future__ import division, print_function, absolute_import
 __docformat__ = 'restructuredtext'
 
 from ._chirality_funcs import *
+from ._corefuncs import *
+from ._coremath import *
 from ._iofuncs import *
 from ._luts import *
 from ._mathfuncs import *
