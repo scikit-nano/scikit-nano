@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===========================================
-Preset structure data (:mod:`sknano.data`)
+Structure data files (:mod:`sknano.data`)
 ===========================================
 
 .. currentmodule:: sknano.data
