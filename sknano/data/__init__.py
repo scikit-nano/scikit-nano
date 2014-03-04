@@ -9,6 +9,8 @@ Structure data files (:mod:`sknano.data`)
 Contents
 ========
 
+fullerenes
+
 """
 from __future__ import division, print_function, absolute_import
 __docformat__ = 'restructuredtext'
