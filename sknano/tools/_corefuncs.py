@@ -12,20 +12,21 @@ from __future__ import division, print_function, absolute_import
 __all__ = ['check_type']
 
 
-def check_type(self, value, valid_type):
-    """Check value type against `valid_type` tuple.
+def check_type(value, allowed_types=()):
+    """Check object `value` type against tuple of `allowed_types`.
 
     Parameters
     ----------
     value : `object`
-    valid_type : class or type or tuple of classes and/or types
+    allowed_types : tuple
+        tuple of allowed classes and/or types
 
     Raises
     ------
     `TypeError`
-        If `value` fails `isinstance` check against `valid_type`.
+        If `value` fails `isinstance` check against `allowed_types`.
 
     """
-    if not isinstance(value, valid_type):
-        raise TypeError('{} not valid type.\n'.format(value) +
-                        '(Valid Type: {})'.format(valid_type))
+    if not isinstance(value, allowed_types):
+        raise TypeError('{} does not have an allowed type.\n'.format(value) +
+                        '(Allowed Type(s): {})'.format(allowed_types))
