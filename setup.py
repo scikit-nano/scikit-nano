@@ -92,6 +92,9 @@ Or from source::
     > python setup.py install --user
 
 """
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext'
+
 DOCLINES = __doc__.split('\n')
 
 import os
@@ -126,8 +129,8 @@ Operating System :: POSIX
 Operating System :: Unix
 Programming Language :: Python
 Programming Language :: Python :: 2.7
-Topic :: Software Development
 Topic :: Scientific/Engineering
+Topic :: Software Development
 
 """
 
@@ -189,7 +192,7 @@ def get_version_info():
 
 def write_version_py(filename='sknano/version.py'):
     cnt = """
-# THIS FILE IS GENERATED FROM SKNANO SETUP.PY
+# THIS FILE IS GENERATED FROM SCIKIT-NANO SETUP.PY
 short_version = '%(version)s'
 version = '%(version)s'
 full_version = '%(full_version)s'
