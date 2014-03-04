@@ -30,7 +30,7 @@ except ImportError:
           'nearest-neighbor queries between `Atoms`.')
     has_kdtree = False
 
-from ..tools import xyz_axes
+from ..tools import check_type, xyz_axes
 from ._atom import Atom
 
 __all__ = ['Atoms']
@@ -88,7 +88,14 @@ class Atoms(MutableSequence):
         self._NN_cutoff = np.inf
 
         if atoms is not None:
-            if isinstance(atoms, list):
+            if isinstance(atoms, Atoms):
+                if copylist and not deepcopy:
+                    self._atoms.extend(atoms.atoms[:])
+                elif deepcopy:
+                    self._atoms.extend(copy.deepcopy(atoms.atoms))
+                else:
+                    self._atoms.extend(atoms.atoms)
+            elif isinstance(atoms, list):
                 if copylist and not deepcopy:
                     self._atoms = atoms[:]
                 elif deepcopy:
@@ -100,13 +107,6 @@ class Atoms(MutableSequence):
                     self._check_type(atom)
                     for p, plist in self._property_lists.iteritems():
                         plist.append(getattr(atom, p))
-            elif isinstance(atoms, Atoms):
-                if copylist and not deepcopy:
-                    self._atoms.extend(atoms.atoms[:])
-                elif deepcopy:
-                    self._atoms.extend(copy.deepcopy(atoms.atoms))
-                else:
-                    self._atoms.extend(atoms.atoms)
             else:
                 raise TypeError('`Atoms(atoms={!r})` '.format(atoms) +
                                 'is not a valid `Atoms` constructor '
@@ -127,11 +127,13 @@ class Atoms(MutableSequence):
 
         Raises
         ------
-        TypeError
+        `TypeError`
             if `value` is not instance of `Atom`
 
         """
-        if not isinstance(value, Atom):
+        try:
+            check_type(value, Atom)
+        except TypeError:
             raise TypeError('{} is not an Atom.'.format(value))
 
     def __str__(self):
