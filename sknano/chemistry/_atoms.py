@@ -132,7 +132,7 @@ class Atoms(MutableSequence):
 
         """
         try:
-            check_type(value, Atom)
+            check_type(value, allowed_types=(Atom,))
         except TypeError:
             raise TypeError('{} is not an Atom.'.format(value))
 
