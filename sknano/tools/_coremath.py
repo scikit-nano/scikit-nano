@@ -160,7 +160,10 @@ class Point(object):
             print(e)
 
     def rezero_coords(self, epsilon=1.0e-10):
-        """Set `Point` coordinates less than `epsilon` to zero.
+        """Re-zero `Point` coordinates near zero.
+
+        Set `Point` coordinates with absolute value less than `epsilon` to
+        zero.
 
         Parameters
         ----------
