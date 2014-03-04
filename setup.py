@@ -136,8 +136,8 @@ Topic :: Software Development
 
 MAJOR = 0
 MINOR = 2
-MICRO = 22
-ISRELEASED = True
+MICRO = 23
+ISRELEASED = False
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 
