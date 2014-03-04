@@ -241,15 +241,21 @@ class TubeGen(object):
 
         if Lz is None and tube_length is not None:
             Lz = tube_length
-        nz = cell_count[-1]
+
+        nx, ny, nz = cell_count
+
         if Lz is not None and Lz != 'None' and \
-                isinstance(Lz, (int, float, str)) and shape == 'hexagonal':
+                isinstance(Lz, (int, float, str)) and \
+                shape in ('hexagonal', 'cubic'):
             Lz = 10 * float(Lz)
             nz = int(np.ceil(Lz / T))
         elif nz is not None and nz != 'None' and \
                 isinstance(nz, (int, float, str)):
             nz = int(nz)
             Lz = nz * T
+
+        self._Lz = Lz
+        self._dt = Nanotube.compute_dt(n=n, m=m, bond=bond)
 
         self._fmt = fmt
         self._units = units
@@ -260,7 +266,7 @@ class TubeGen(object):
         self._shape = shape
         self._chirality = ','.join([str(x) for x in chirality])
         self._relax_tube = relax_tube
-        self._cell_count = ','.join([str(x) for x in cell_count])
+        self._cell_count = ','.join([str(x) for x in (nx, ny, nz)])
         self._kwargs = {'format': self._fmt,
                         'units': self._units,
                         'bond': self._bond,
@@ -273,9 +279,6 @@ class TubeGen(object):
                         'relax_tube': self._relax_tube}
         self._genfile_name = ''
         self._output = ''
-
-        self._dt = Nanotube.compute_dt(n=n, m=m, bond=bond)
-        self._Lz = Lz
 
     @property
     def fmt(self):
