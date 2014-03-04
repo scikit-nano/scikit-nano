@@ -195,6 +195,14 @@ class Vector(object):
     units : {None, str}, optional
         Units of vector.
 
+
+    Notes
+    -----
+    .. todo::
+
+       add new methods for coordinate transformations
+
+
     """
     def __init__(self, x=None, y=None, z=None, x0=None, y0=None, z0=None,
                  p=None, p0=None, units=None):
