@@ -12,14 +12,11 @@ __docformat__ = 'restructuredtext'
 
 import numpy as np
 
+from ...tools import Point  # ,Vector
 from ...tools.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols
 
-__all__ = ['Atom', 'AtomAttributes']
-
-
-class AtomAttributes(object):
-    pass
+__all__ = ['Atom']
 
 
 class Atom(object):
@@ -31,8 +28,7 @@ class Atom(object):
         A string representation of the element symbol or an integer specifying
         an element atomic number.
     x, y, z : float, optional
-        :math:`x, y, z` components of `Atom` position vector relative to
-        origin.
+        :math:`x, y, z` coordinates of `Atom`.
 
     """
 
@@ -42,10 +38,7 @@ class Atom(object):
         self._Z = None
         self._m = None
 
-        self._r = np.zeros(3, dtype=float)
-        for i, ri in enumerate((x, y, z)):
-            if ri is not None:
-                self._r[i] = ri
+        self._r = Point(x=x, y=y, z=z)
 
         if isinstance(element, (int, float)):
             self._Z = int(element)
@@ -135,7 +128,7 @@ class Atom(object):
             :math:`x`-coordinate in units of **Angstroms**.
 
         """
-        return self._r[0]
+        return self._r.x
 
     @x.setter
     def x(self, value=float):
@@ -147,8 +140,7 @@ class Atom(object):
             :math:`x`-coordinate in units of **Angstroms**.
 
         """
-        self._check_type(value, (int, float))
-        self._r[0] = float(value)
+        self._r.x = value
 
     @property
     def y(self):
@@ -160,7 +152,7 @@ class Atom(object):
             :math:`y`-coordinate in units of **Angstroms**.
 
         """
-        return self._r[1]
+        return self._r.y
 
     @y.setter
     def y(self, value=float):
@@ -172,8 +164,7 @@ class Atom(object):
             :math:`y`-coordinate in units of **Angstroms**.
 
         """
-        self._check_type(value, (int, float))
-        self._r[1] = float(value)
+        self._r.y = value
 
     @property
     def z(self):
@@ -185,7 +176,7 @@ class Atom(object):
             :math:`z`-coordinate in units of **Angstroms**.
 
         """
-        return self._r[2]
+        return self._r.z
 
     @z.setter
     def z(self, value=float):
@@ -197,21 +188,19 @@ class Atom(object):
             :math:`z`-coordinate in units of **Angstroms**.
 
         """
-        self._check_type(value, (int, float))
-        self._r[2] = float(value)
+        self._r.z = value
 
     @property
     def r(self):
-        """:math:`x, y, z` position in units of **Angstroms**.
+        """:math:`x, y, z` coordinates of `Atom` in units of **Angstroms**.
 
         Returns
         -------
         ndarray
-            3-element ndarray of [:math:`x, y, z`] coordinates
-            of `Atom`.
+            3-element ndarray of [:math:`x, y, z`] coordinates of `Atom`.
 
         """
-        return self._r
+        return self._r.coords
 
     @r.setter
     def r(self, value=np.ndarray):
@@ -224,15 +213,13 @@ class Atom(object):
             **Angstroms**.
 
         """
-        self._check_type(value, np.ndarray)
-        for i, ri in enumerate(value):
-            self._r[i] = ri
+        self._r.coords = value
 
     def rezero_coords(self, epsilon=1.0e-10):
-        """Set really really small coordinates to zero.
+        """Re-zero position coordinates near zero.
 
-        Set all coordinates with absolute value less than
-        epsilon to zero.
+        Set position coordinates with absolute value less than `epsilon` to
+        zero.
 
         Parameters
         ----------
@@ -240,8 +227,4 @@ class Atom(object):
             smallest allowed absolute value of any :math:`x,y,z` component.
 
         """
-        r = self._r.tolist()
-        for i, ri in enumerate(r[:]):
-            if abs(ri) < epsilon:
-                r[i] = 0.0
-        self._r[0], self._r[1], self._r[2] = r
+        self._r.rezero_coords()
