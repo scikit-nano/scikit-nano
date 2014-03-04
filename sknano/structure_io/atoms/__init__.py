@@ -12,11 +12,10 @@ Structure data atoms (:mod:`sknano.structure_io.atoms`)
    :py:mod:`~sknano.structure_io` classes and are still in development.
    Currently, the :py:mod:`~sknano.structure_io` classes use the
    :py:class:`~sknano.chemistry.Atom` and :py:class:`~sknano.chemistry.Atoms`
-   classes provided by the :py:mod:`~sknano.chemistry` module.
+   classes provided by the :py:mod:`~sknano.chemistry` package.
 
 Contents
 ========
-
 .. autosummary::
    :toctree: generated/
 

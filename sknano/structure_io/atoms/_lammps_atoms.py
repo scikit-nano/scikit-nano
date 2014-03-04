@@ -33,7 +33,7 @@ __all__ = ['LAMMPSAtoms']
 
 
 class LAMMPSAtoms(MutableSequence):
-    """Class for creating atoms for `LAMMPS` structure data formats.
+    """Class for creating collection of `LAMMPSAtom` objects.
 
     Parameters
     ----------
