@@ -27,7 +27,7 @@ class Point(object):
         Units of coordinates.
 
     """
-    def __init__(self, x=None, y=None, z=None, units=None):
+    def __init__(self, x=None, y=None, z=None, units=None, dtype=None):
         self._p = np.zeros(3, dtype=float)
         self._units = units
         for i, pi in enumerate((x, y, z)):
@@ -158,6 +158,24 @@ class Point(object):
                     print(e)
         except TypeError as e:
             print(e)
+
+    def fix_minus_zero_coords(self, epsilon=1.0e-10):
+        """Set `Point` coordinates that are small, negative numbers to zero.
+
+        Set `Point` coordinates that are negative and have absolute value
+        less than `epsilon` to zero.
+
+        Parameters
+        ----------
+        epsilon : float, optional
+            Smallest allowed absolute value of any :math:`x,y,z` coordinate.
+
+        """
+        p = self._p.tolist()
+        for i, pi in enumerate(p[:]):
+            if pi < 0 and abs(pi) < epsilon:
+                p[i] = 0.0
+        self._p[0], self._p[1], self._p[2] = p
 
     def rezero_coords(self, epsilon=1.0e-10):
         """Re-zero `Point` coordinates near zero.
@@ -351,13 +369,34 @@ class Vector(object):
         except TypeError as e:
             print(e)
 
-    def rezero_components(self, epsilon=1.0e-10):
-        """Set `Vector` components less than `epsilon` to zero.
+    def fix_minus_zero_components(self, epsilon=1.0e-10):
+        """Set `Vector` components that are small, negative numbers to zero.
+
+        Set `Vector` components that are negative and have absolute value
+        less than `epsilon` to zero.
 
         Parameters
         ----------
         epsilon : float, optional
-            Smallest allowed absolute value of any :math:`x,y,z` coordinate.
+            Smallest allowed absolute value of any :math:`x,y,z` component.
+
+        """
+        v = self._v.tolist()
+        for i, vi in enumerate(v[:]):
+            if vi < 0 and abs(vi) < epsilon:
+                v[i] = 0.0
+        self._v[0], self._v[1], self._v[2] = v
+
+    def rezero_components(self, epsilon=1.0e-10):
+        """Re-zero `Vector` components near zero.
+
+        Set `Vector` components with absolute value less than `epsilon` to
+        zero.
+
+        Parameters
+        ----------
+        epsilon : float, optional
+            Smallest allowed absolute value of any :math:`x,y,z` component.
 
         """
         v = self._v.tolist()
