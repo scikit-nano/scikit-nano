@@ -63,7 +63,7 @@ class Point(object):
 
         """
         try:
-            check_type(value, (int, float))
+            check_type(value, allowed_types=(int, float))
             self._p[0] = float(value)
         except TypeError as e:
             print(e)
@@ -91,7 +91,7 @@ class Point(object):
 
         """
         try:
-            check_type(value, (int, float))
+            check_type(value, allowed_types=(int, float))
             self._p[1] = float(value)
         except TypeError as e:
             print(e)
@@ -119,7 +119,7 @@ class Point(object):
 
         """
         try:
-            check_type(value, (int, float))
+            check_type(value, allowed_types=(int, float))
             self._p[2] = float(value)
         except TypeError as e:
             print(e)
@@ -149,10 +149,10 @@ class Point(object):
 
         """
         try:
-            check_type(value, np.ndarray)
+            check_type(value, allowed_types=(np.ndarray,))
             for i, pi in enumerate(value):
                 try:
-                    check_type(pi, (int, float))
+                    check_type(pi, allowed_types=(int, float))
                     self._p[i] = pi
                 except TypeError as e:
                     print(e)
@@ -255,7 +255,7 @@ class Vector(object):
 
         """
         try:
-            check_type(value, (int, float))
+            check_type(value, allowed_types=(int, float))
             self._v[0] = float(value)
         except TypeError as e:
             print(e)
@@ -283,7 +283,7 @@ class Vector(object):
 
         """
         try:
-            check_type(value, (int, float))
+            check_type(value, allowed_types=(int, float))
             self._v[1] = float(value)
         except TypeError as e:
             print(e)
@@ -311,7 +311,7 @@ class Vector(object):
 
         """
         try:
-            check_type(value, (int, float))
+            check_type(value, allowed_types=(int, float))
             self._v[2] = float(value)
         except TypeError as e:
             print(e)
@@ -341,10 +341,10 @@ class Vector(object):
 
         """
         try:
-            check_type(value, np.ndarray)
+            check_type(value, allowed_types=(np.ndarray,))
             for i, vi in enumerate(value):
                 try:
-                    check_type(vi, (int, float))
+                    check_type(vi, allowed_types=(int, float))
                     self._v[i] = vi
                 except TypeError as e:
                     print(e)
