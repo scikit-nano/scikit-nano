@@ -26,8 +26,7 @@ try:
 except ImportError:
     Qty = None
 
-from ..chemistry import Atom
-from ..tools.refdata import CCbond
+#from ..chemistry import Atom
 
 #param_units = {}
 
@@ -37,6 +36,8 @@ __all__ = ['Fullerene']
 class Fullerene(object):
     u"""Class for creating interactive Fullerene objects.
 
+    Fullerene isomer data downloaded from [MSU]_.
+
     Parameters
     ----------
     verbose : bool, optional
@@ -44,6 +45,11 @@ class Fullerene(object):
 
     Examples
     --------
+
+    Referenes
+    ---------
+    .. [MSU] Carbon fullerenes
+             (http://www.nanotube.msu.edu/fullerene/fullerene-isomers.html)
 
     """
     def __init__(self, N=None, with_units=False, verbose=False):
