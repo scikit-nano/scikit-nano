@@ -20,10 +20,19 @@ from ..structure_io import DATAReader, DATAWriter, XYZWriter, \
 
 vac_type_cluster_size_map = {'double': 2, 'triple': 3}
 
-__all__ = ['DefectGenerator', 'VacancyGenerator']
+__all__ = ['DefectGenerator', 'CrossLinkedDefectGenerator',
+           'StoneWalesDefectGenerator', 'VacancyGenerator']
 
 
 class DefectGenerator(object):
+    pass
+
+
+class CrossLinkedDefectGenerator(object):
+    pass
+
+
+class StoneWalesDefectGenerator(object):
     pass
 
 

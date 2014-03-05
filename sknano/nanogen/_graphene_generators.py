@@ -212,7 +212,8 @@ class GrapheneGenerator(Graphene, StructureGenerator):
 
             self._structure_atoms.extend(layer.atoms)
 
-        #self.update_structure_atoms_attributes()
+    def generate_unrolled_nanotube_unit_cell(self):
+        pass
 
     def save_data(self, fname=None, structure_format=None, rotation_angle=-90,
                   rot_axis='x', deg2rad=True, center_CM=True):
