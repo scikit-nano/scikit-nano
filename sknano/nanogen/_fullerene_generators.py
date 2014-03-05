@@ -10,7 +10,7 @@ Fullerene structure generators (:mod:`sknano.nanogen._fullerene_generators`)
 from __future__ import division, print_function, absolute_import
 __docformat__ = 'restructuredtext'
 
-import copy
+#import copy
 #import itertools
 #import sys
 import warnings
@@ -20,13 +20,13 @@ warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
 #ureg = UnitRegistry()
 #Qty = ureg.Quantity
 
-import numpy as np
+#import numpy as np
 
-from ..chemistry import Atom, Atoms
+from ..chemistry import Atoms
 from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
     supported_structure_formats
-from ..tools import plural_word_check, rotation_matrix
-from ..tools.refdata import CCbond
+from ..tools import rotation_matrix
+#from ..tools.refdata import CCbond
 
 from ._fullerenes import Fullerene
 from ._structure_generator import StructureGenerator
@@ -36,6 +36,11 @@ __all__ = ['FullereneGenerator']
 
 class FullereneGenerator(Fullerene, StructureGenerator):
     u"""Class for generating fullerene structures.
+
+    .. note::
+
+       This class is under development and not functional! Attempting
+       to use it raises a `RuntimeError`.
 
     Parameters
     ----------
@@ -48,6 +53,11 @@ class FullereneGenerator(Fullerene, StructureGenerator):
         followed by :py:meth:`~NanotubeGenerator.generate_structure_data`.
     verbose : bool, optional
         if `True`, show verbose output
+
+    Raises
+    ------
+    `RuntimeError`
+        If called. This class is under development and not yet functional.
 
     Examples
     --------

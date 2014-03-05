@@ -36,6 +36,11 @@ __all__ = ['Fullerene']
 class Fullerene(object):
     u"""Class for creating interactive Fullerene objects.
 
+    .. note::
+
+       This class is under development and not functional! Attempting
+       to use it raises a `RuntimeError`.
+
     The `fullerene isomer data
     <http://www.nanotube.msu.edu/fullerene/fullerene-isomers.html>`_
     were downloaded from the

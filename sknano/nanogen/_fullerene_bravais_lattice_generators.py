@@ -37,6 +37,11 @@ __all__ = ['FullereneBravaisLatticeGenerator']
 class FullereneBravaisLatticeGenerator(FullereneGenerator):
     u"""Class for generating fullerene bravais lattice structures.
 
+    .. note::
+
+       This class is under development and not functional! Attempting
+       to use it raises a `RuntimeError`.
+
     """
 
     def __init__(self, n=int, autogen=True, verbose=False):
