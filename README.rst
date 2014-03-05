@@ -45,7 +45,7 @@ Important links
 * PyPI page: https://pypi.python.org/pypi/scikit-nano
 
 Dependencies
-=============
+============
 
 Required Dependencies
 ---------------------
@@ -66,24 +66,24 @@ Installation
 
 You can install the latest stable release from the
 `Python Package Index <http://pypi.python.org/pypi/scikit-nano>`_
-using :command:`pip`::
+using **pip**::
 
     > pip install scikit-nano
 
 Alternatively you can download a source code tarball from
 http://pypi.python.org/pypi/scikit-nano or clone the source code
 from the `github repo <http://github.com/androomerrill/scikit-nano>`_
-using :command:`git`::
+using **git**::
 
     > git clone https://github.com/androomerrill/scikit-nano.git
 
-:command:`cd` into the source code directory and run::
+**cd** into the source code directory and run::
 
     > python setup.py install
 
 These commands will probabily fail if you don't have *admin privileges*.
 In that case, try installing to the user base directory.
-Using :command:`pip`::
+Using **pip**::
 
     > pip install --user scikit-nano
 

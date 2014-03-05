@@ -1,101 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Python toolkit for generating and analyzing nanostructure data
+"""Python toolkit for generating and analyzing nanostructure data"""
 
-*scikit-nano* is a python toolkit for generating and analyzing
-nanostructure data.
-
-Currently, its primary utility is generating nanostructure data
-(i.e. atomic coordinates) for the following nanostructure materials:
-
-    * Graphene:
-
-        * Single layer graphene
-        * Bi-layer graphene with layers rotated relative to each other
-          by any angle and different layer stacking arrangements
-        * *N*-layer graphene
-
-    * Nanotubes:
-
-        * Single-walled nanotubes (SWNTs)
-        * SWNT *bundles*
-        * Multi-walled nanotubes (MWNTs)
-        * MWNT *bundles*
-
-It currently supports saving structure data in the following formats:
-
-    * `LAMMPS data`
-    * `xyz`
-
-Secondary to its structure generating functions are its
-*structure analysis tools* including:
-
-    * defect/vacancy structure analysis
-    * nearest-neighbor analysis
-    * ...
-
-
-Important links
-===============
-
-* Source code repo: https://github.com/androomerrill/scikit-nano
-* Documentation: http://projects.geekcode.io/scikit-nano/doc
-* Download releases: https://github.com/androomerrill/scikit-nano/releases
-* Issue tracker: https://github.com/androomerrill/scikit-nano/issues
-* PyPI page: https://pypi.python.org/pypi/scikit-nano
-
-Dependencies
-=============
-
-Required Dependencies
----------------------
-* `Python 2.7+ <http://python.org/download/>`_
-* `numpy 1.8+ <http://sourceforge.net/projects/numpy/files/NumPy/>`_
-
-Optional Dependencies
----------------------
-* `scipy 0.13+ <http://sourceforge.net/projects/scipy/files/scipy/>`_ (for
-  nearest-neighbor analysis)
-* `pint 0.4+ <https://pypi.python.org/pypi/Pint/>`_ (for physical units)
-* `VMD <http://www.ks.uiuc.edu/Research/vmd/>`_ (for visualizing structure
-  data)
-* `Tachyon Ray Tracer <http://jedi.ks.uiuc.edu/~johns/raytracer/>`_ (for
-  rendering high quality images)
-
-Installation
-=============
-
-You can install the latest stable release from the
-`Python Package Index <http://pypi.python.org/pypi/scikit-nano>`_
-using :command:`pip`::
-
-    > pip install scikit-nano
-
-Alternatively you can download a source code tarball from
-http://pypi.python.org/pypi/scikit-nano or clone the source code
-from the `github repo <http://github.com/androomerrill/scikit-nano>`_
-using :command:`git`::
-
-    > git clone https://github.com/androomerrill/scikit-nano.git
-
-:command:`cd` into the source code directory and run::
-
-    > python setup.py install
-
-These commands will probabily fail if you don't have *admin privileges*.
-In that case, try installing to the user base directory.
-Using :command:`pip`::
-
-    > pip install --user scikit-nano
-
-Or from source::
-
-    > python setup.py install --user
-
-"""
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext'
-
-DOCLINES = __doc__.split('\n')
 
 import os
 import sys
@@ -109,8 +16,8 @@ if sys.version_info[:2] < (2, 7):
     raise RuntimeError("Python version 2.7 required.")
 
 DISTNAME = 'scikit-nano'
-DESCRIPTION = DOCLINES[0]
-LONG_DESCRIPTION = '\n'.join(DOCLINES[2:])
+DESCRIPTION = __doc__
+LONG_DESCRIPTION = open('README.rst').read()
 AUTHOR = 'Andrew Merrill'
 AUTHOR_EMAIL = 'androomerrill@gmail.com'
 MAINTAINER = AUTHOR
