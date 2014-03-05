@@ -37,7 +37,11 @@ Operating System :: Unix
 Programming Language :: Python
 Programming Language :: Python :: 2.7
 Topic :: Scientific/Engineering
+Topic :: Scientific/Engineering :: Chemistry
+Topic :: Scientific/Engineering :: Physics
+Topic :: Scientific/Engineering :: Visualization
 Topic :: Software Development
+Topic :: Software Development :: Libraries :: Python Modules
 
 """
 
