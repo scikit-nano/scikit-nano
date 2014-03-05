@@ -11,4 +11,4 @@ prune doc/source/sknano
 prune doc/source/images
 prune doc/source/_static
 prune doc/source/_templates
-global-exclude *.pyc *~ *.bak *.swp *.pyo
+global-exclude *.pyc
