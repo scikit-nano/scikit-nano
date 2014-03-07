@@ -178,6 +178,9 @@ def nanogen(fmt='xyz', units='angstrom', element1='C', element2='C',
 
     """
     if generator == 'tubegen':
+        if shape == 'planar':
+            gutter = (0.0, gutter[1], gutter[2])
+
         tubegen = TubeGen(fmt=fmt, units=units, element1=element1,
                           element2=element2, bond=bond, gutter=gutter,
                           shape=shape, chirality=chirality,
