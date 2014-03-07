@@ -169,11 +169,11 @@ class Nanotube(object):
         self._params['M'] = {}
         self._params['R'] = {}
         self._params['bond'] = {}
+        self._params['chiral_angle'] = {}
         self._params['Ch'] = {}
         self._params['T'] = {}
         self._params['dt'] = {}
         self._params['rt'] = {}
-        self._params['chiral_angle'] = {}
         self._params['electronic_type'] = {}
 
         self._n = int(n)
@@ -214,8 +214,6 @@ class Nanotube(object):
         self._t2 = None
         self._Ch = None
         self._T = None
-        self._dt = None
-        self._rt = None
         self._chiral_angle = None
         self._N = None
         self._M = None
@@ -225,6 +223,8 @@ class Nanotube(object):
         self._Natoms = None
         self._Lz = None
         self._Natoms_per_tube = None
+        self._dt = None
+        self._rt = None
         self._electronic_type = None
 
         self._Ntubes = 1
