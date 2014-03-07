@@ -93,7 +93,7 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
 
     Examples
     --------
-    First, load the :py:class:`~sknano.nanogen.NanoGenerator` class.
+    First, load the :py:class:`~sknano.nanogen.NanotubeGenerator` class.
 
     >>> from sknano.nanogen import NanotubeGenerator
 
@@ -115,8 +115,9 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
 
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
                  element1='C', element2='C', bond=CCbond, tube_length=None,
-                 Lx=None, Ly=None, Lz=None, fix_Lz=False, autogen=True,
-                 with_units=False, units=None, verbose=False):
+                 Lx=None, Ly=None, Lz=None, fix_Lz=False,
+                 with_units=False, units=None,
+                 autogen=True, verbose=False):
 
         if tube_length is not None and Lz is None:
             Lz = tube_length
@@ -235,6 +236,230 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
 
         if fname is None:
             chirality = '{}{}r'.format('{}'.format(self._n).zfill(2),
+                                       '{}'.format(self._m).zfill(2))
+            if self._assume_integer_unit_cells:
+                nz = ''.join(('{}'.format(self._nz),
+                              plural_word_check('cell', self._nz)))
+            else:
+                nz = ''.join(('{:.2f}'.format(self._nz),
+                              plural_word_check('cell', self._nz)))
+            fname_wordlist = (chirality, nz)
+            fname = '_'.join(fname_wordlist)
+            fname += '.' + structure_format
+        else:
+            if fname.endswith(supported_structure_formats) and \
+                    structure_format is None:
+                for ext in supported_structure_formats:
+                    if fname.endswith(ext):
+                        structure_format = ext
+                        break
+            else:
+                if structure_format is None or \
+                        structure_format not in supported_structure_formats:
+                    structure_format = default_structure_format
+
+        self._fname = fname
+
+        if center_CM:
+            self._structure_atoms.center_CM()
+
+        if self._L0 is not None and self._fix_Lz:
+            self._structure_atoms.clip_bounds(
+                min_limit=-(10 * self._L0 + 0.2) / 2, r_indices=[2])
+            if center_CM:
+                self._structure_atoms.center_CM()
+            self._structure_atoms.clip_bounds(
+                max_limit=(10 * self._L0 + 0.2) / 2, r_indices=[2])
+            if center_CM:
+                self._structure_atoms.center_CM()
+
+        if rotation_angle is not None:
+            R_matrix = rotation_matrix(rotation_angle,
+                                       rot_axis=rot_axis,
+                                       deg2rad=deg2rad)
+            self._structure_atoms.rotate(R_matrix)
+
+        if structure_format == 'data':
+            DATAWriter.write(fname=self._fname, atoms=self._structure_atoms)
+        else:
+            XYZWriter.write(fname=self._fname, atoms=self._structure_atoms)
+
+
+class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
+    u"""Class for generating unrolled nanotube structures.
+
+    Parameters
+    ----------
+    n, m : int
+        Chiral indices defining the nanotube chiral vector
+        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
+    nz : int, optional
+        Number of repeat unit cells in the :math:`z` direction, along
+        the *length* of the nanotube.
+    element1, element2 : {str, int}, optional
+        Element symbol or atomic number of basis
+        :py:class:`~sknano.chemistry.Atoms` 1 and 2
+    bond : float, optional
+        :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
+        nearest neighbor atoms. Must be in units of **Angstroms**.
+    Lz : float, optional
+        Length of nanotube in units of **nanometers**.
+        Overrides the `nz` value.
+    fix_Lz : bool, optional
+        Generate the nanotube with length as close to the specified
+        :math:`L_z` as possible. If `True`, then
+        non integer :math:`n_z` cells are permitted.
+    autogen : bool, optional
+        if `True`, automatically call
+        :py:meth:`~NanotubeGenerator.generate_unit_cell`,
+        followed by :py:meth:`~NanotubeGenerator.generate_structure_data`.
+    with_units : bool, optional
+        Attach `units` to physical quantities
+    units : None, optional
+        System of units to use.
+    verbose : bool, optional
+        if `True`, show verbose output
+
+    Examples
+    --------
+    First, load the :py:class:`~sknano.nanogen.UnrolledNanotubeGenerator`
+    class.
+
+    >>> from sknano.nanogen import UnrolledNanotubeGenerator
+
+    Now let's generate a :math:`\\mathbf{C}_{\\mathrm{h}} = (10, 5)`
+    SWCNT unit cell.
+
+    >>> flatnt = UnrolledNanotubeGenerator(n=10, m=5)
+    >>> flatnt.save_data()
+
+    The rendered structure looks like (orhographic view):
+
+    .. image:: /images/10,5_unit_cell_orthographic_view.png
+
+    and the perspective view:
+
+    .. image:: /images/10,5_unit_cell_perspective_view.png
+
+    """
+
+    def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
+                 element1='C', element2='C', bond=CCbond,
+                 Lx=None, Ly=None, Lz=None, fix_Lz=False,
+                 with_units=False, units=None,
+                 autogen=True, verbose=False):
+
+        super(NanotubeGenerator, self).__init__(
+            n=n, m=m, nx=nx, ny=ny, nz=nz,
+            element1=element1, element2=element2,
+            bond=bond, Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz,
+            with_units=False, units=units, verbose=verbose)
+
+        if autogen:
+            self.generate_unit_cell()
+            self.generate_structure_data()
+
+    def generate_unit_cell(self):
+        """Generate the nanotube unit cell."""
+        eps = 0.01
+        n = self._n
+        m = self._m
+        bond = self._bond
+        M = self._M
+        T = self._T
+        Ch = self._Ch
+        N = self._N
+        e1 = self._element1
+        e2 = self._element2
+        verbose = self._verbose
+
+        aCh = Nanotube.compute_chiral_angle(n=n, m=m, rad2deg=False)
+        aR = Nanotube.compute_symmetry_chiral_angle(n=n, m=m, rad2deg=False)
+        lenR = Nanotube.compute_R(n=n, m=m, bond=bond,
+                                  length=True, magnitude=True)
+
+        tau = M * T / N
+        dtau = bond * np.sin(np.pi / 6 - aCh)
+
+        if verbose:
+            print('dtau: {}\n'.format(dtau))
+
+        self._unit_cell = Atoms()
+
+        for i in xrange(1, N + 1):
+            x1 = i * lenR / Ch * np.cos(aR - aCh)
+            z1 = i * tau
+
+            while z1 > T - eps:
+                z1 -= T
+
+            atom1 = Atom(e1, x=x1, z=z1)
+            atom1.rezero_coords()
+
+            if verbose:
+                print('Basis Atom 1:\n{}'.format(atom1))
+
+            self._unit_cell.append(atom1)
+
+            x2 = (i * lenR + bond * np.sin(aR - aCh)) * np.cos(aCh)
+            z2 = i * tau - dtau
+            while z2 > T - eps:
+                z2 -= T
+
+            atom2 = Atom(e2, x=x2, z=z2)
+            atom2.rezero_coords()
+
+            if verbose:
+                print('Basis Atom 2:\n{}'.format(atom2))
+
+            self._unit_cell.append(atom2)
+
+    def generate_structure_data(self):
+        """Generate structure data."""
+        self._structure_atoms = Atoms()
+        for nz in xrange(int(np.ceil(self._nz))):
+            dr = np.array([0.0, 0.0, nz * self.T])
+            for uc_atom in self._unit_cell:
+                nt_atom = Atom(uc_atom.symbol)
+                nt_atom.r = uc_atom.r + dr
+                self._structure_atoms.append(nt_atom)
+
+    def save_data(self, fname=None, structure_format=None,
+                  rotation_angle=-90, rot_axis='x', deg2rad=True,
+                  center_CM=True):
+        """Save structure data.
+
+        Parameters
+        ----------
+        fname : {None, str}, optional
+            file name string
+        structure_format : {None, str}, optional
+            chemical file format of saved structure data. Must be one of:
+
+                - xyz
+                - data
+
+            If `None`, then guess based on `fname` file extension or
+            default to `xyz` format.
+        rotation_angle : {None, float}, optional
+            Angle of rotation
+        rot_axis : {'x', 'y', 'z'}, optional
+            Rotation axis
+        deg2rad : bool, optional
+            Convert `rotation_angle` from degrees to radians.
+        center_CM : bool, optional
+            Center center-of-mass on origin.
+
+        """
+        if (fname is None and structure_format not in
+                supported_structure_formats) or \
+                (fname is not None and not
+                    fname.endswith(supported_structure_formats) and
+                    structure_format not in supported_structure_formats):
+            structure_format = default_structure_format
+
+        if fname is None:
+            chirality = '{}{}f'.format('{}'.format(self._n).zfill(2),
                                        '{}'.format(self._m).zfill(2))
             if self._assume_integer_unit_cells:
                 nz = ''.join(('{}'.format(self._nz),
