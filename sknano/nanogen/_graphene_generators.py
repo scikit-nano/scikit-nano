@@ -195,8 +195,8 @@ class GrapheneGenerator(Graphene, StructureGenerator):
             layer = Atoms()
             for nx in xrange(self._Nx):
                 for ny in xrange(self._Ny):
-                    dr = np.array([nx * self._lx,
-                                   ny * self._ly,
+                    dr = np.array([nx * self._cell.x,
+                                   ny * self._cell.y,
                                    nlayer * self._layer_spacing])
                     for atom in self._unit_cell:
                         layer_atom = Atom(atom.symbol)
@@ -209,12 +209,9 @@ class GrapheneGenerator(Graphene, StructureGenerator):
             # translate layer to put its center of mass at the origin
             layer.center_CM(r_indices=[0, 1])
             if (nlayer % 2) != 0:
-                layer.translate(self._layer_shift)
+                layer.translate(self._layer_shift.components)
 
             self._structure_atoms.extend(layer.atoms)
-
-    def generate_unrolled_nanotube_unit_cell(self):
-        pass
 
     def save_data(self, fname=None, structure_format=None, rotation_angle=-90,
                   rot_axis='x', deg2rad=True, center_CM=True):
@@ -250,7 +247,7 @@ class GrapheneGenerator(Graphene, StructureGenerator):
             structure_format = default_structure_format
 
         if fname is None:
-            dimensions = '{}nmx{}nm'.format(self._Lx, self._Ly)
+            dimensions = '{}nmx{}nm'.format(self._width, self._length)
             nlayer = '{}layer'.format(self._nlayers)
             edge = 'AC' if self._edge in ('AC', 'armchair') else 'ZZ'
             atombond = '{}{}'.format(self._element1, self._element2)
