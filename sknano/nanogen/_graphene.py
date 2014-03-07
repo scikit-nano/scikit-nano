@@ -37,7 +37,9 @@ __all__ = ['GraphenePrimitiveCell', 'Graphene']
 
 
 class GraphenePrimitiveCell(object):
-    """Class for generating interactive Graphene unit cell.
+    """Class for generating interactive Graphene primitive unit cell.
+
+    .. versionadded:: 0.2.23
 
     Parameters
     ----------

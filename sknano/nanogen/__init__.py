@@ -17,6 +17,9 @@ and bundles of :abbr:`SWNTs` and :abbr:`MWNTs`.
    nano-structures are carbon nano-structures. However,
    you can use any atom in the periodic table of elements as a basis atom.
 
+.. versionadded:: 0.2.23
+   `UnrolledNanotubeGenerator` implemented.
+
 .. versionadded:: 0.2.20
    `MWNTBundleGenerator` implemented.
 
@@ -46,6 +49,7 @@ Classes for creating abstract physical representations of nano-structures
 
    Fullerene
    Graphene
+   GraphenePrimitiveCell
    Nanotube
    NanotubeBundle
 
@@ -64,6 +68,7 @@ Classes for generating graphene structure data
 
    GrapheneGenerator
    BiLayerGrapheneGenerator
+   UnrolledNanotubeGenerator
 
 Classes for generating nanotube structure data
 -----------------------------------------------
@@ -72,6 +77,7 @@ Classes for generating nanotube structure data
 
    NanotubeGenerator
    NanotubeBundleGenerator
+   UnrolledNanotubeGenerator
    MWNTGenerator
    MWNTBundleGenerator
    TubeGen
