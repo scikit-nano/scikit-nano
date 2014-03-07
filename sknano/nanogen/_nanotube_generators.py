@@ -288,23 +288,24 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
 class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
     u"""Class for generating unrolled nanotube structures.
 
+    .. versionadded:: 0.2.23
+
     Parameters
     ----------
     n, m : int
         Chiral indices defining the nanotube chiral vector
         :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
-    nz : int, optional
-        Number of repeat unit cells in the :math:`z` direction, along
-        the *length* of the nanotube.
+    nx, ny, nz : int, optional
+        Number of repeat unit cells in the :math:`x, y, z` dimensions
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
         :py:class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
-    Lz : float, optional
-        Length of nanotube in units of **nanometers**.
-        Overrides the `nz` value.
+    Lx, Ly, Lz : float, optional
+        Length of bundle in :math:`x, y, z` dimensions in **nanometers**.
+        Overrides the :math:`n_x, n_y, n_z` cell values.
     fix_Lz : bool, optional
         Generate the nanotube with length as close to the specified
         :math:`L_z` as possible. If `True`, then
@@ -327,19 +328,13 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
 
     >>> from sknano.nanogen import UnrolledNanotubeGenerator
 
-    Now let's generate a :math:`\\mathbf{C}_{\\mathrm{h}} = (10, 5)`
+    Now let's generate an unrolled :math:`\\mathbf{C}_{\\mathrm{h}} = (10, 5)`
     SWCNT unit cell.
 
-    >>> flatnt = UnrolledNanotubeGenerator(n=10, m=5)
-    >>> flatnt.save_data()
+    >>> flatswcnt = UnrolledNanotubeGenerator(n=10, m=5)
+    >>> flatswcnt.save_data()
 
-    The rendered structure looks like (orhographic view):
-
-    .. image:: /images/10,5_unit_cell_orthographic_view.png
-
-    and the perspective view:
-
-    .. image:: /images/10,5_unit_cell_perspective_view.png
+    The rendered structure looks like:
 
     """
 
