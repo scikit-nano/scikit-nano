@@ -186,11 +186,14 @@ class Nanotube(object):
 
         if with_units and Qty is None:
             with_units = False
-
         self._with_units = with_units
 
+        if with_units and units is None:
+            units = 'angstroms'
+        self._units = units
+
         if with_units and isinstance(bond, float):
-            self._bond = Qty(bond, 'angstroms')
+            self._bond = Qty(bond, units)
         else:
             self._bond = bond
 
@@ -223,33 +226,6 @@ class Nanotube(object):
         self._Lz = None
         self._Natoms_per_tube = None
         self._electronic_type = None
-
-        try:
-            self._a = np.sqrt(3) * self._bond.magnitude
-        except AttributeError:
-            self._a = np.sqrt(3) * self._bond
-
-        self._a1 = np.zeros(2, dtype=float)
-        self._a2 = np.zeros(2, dtype=float)
-
-        self._a1[0] = self._a2[0] = np.sqrt(3) / 2 * self._a
-        self._a1[1] = 1 / 2 * self._a
-        self._a2[1] = -self._a1[1]
-
-        self._b1 = np.zeros(2, dtype=float)
-        self._b2 = np.zeros(2, dtype=float)
-
-        self._b1[0] = self._b2[0] = \
-            1 / np.sqrt(3) * 2 * np.pi / self._a
-        self._b1[1] = 2 * np.pi / self._a
-        self._b2[1] = -self._b1[1]
-
-        if with_units:
-            self._a1 = Qty(self._a1, 'angstrom')
-            self._a2 = Qty(self._a2, 'angstrom')
-
-            self._b1 = Qty(self._b1, '1/angstrom')
-            self._b2 = Qty(self._b2, '1/angstrom')
 
         self._Ntubes = 1
         self._nx = int(nx)
@@ -390,31 +366,6 @@ class Nanotube(object):
     def element2(self):
         """Element symbol of :py:class:`~sknano.chemistry.Atom` 2."""
         return self._element2
-
-    @property
-    def a(self):
-        """Length of graphene unit cell vector."""
-        return self._a
-
-    @property
-    def a1(self):
-        """:math:`a_1` unit vector."""
-        return self._a1
-
-    @property
-    def a2(self):
-        """:math:`a_2` unit vector."""
-        return self._a2
-
-    @property
-    def b1(self):
-        """:math:`b_1` reciprocal lattice vector."""
-        return self._b1
-
-    @property
-    def b2(self):
-        """:math:`b_2` reciprocal lattice vector."""
-        return self._b2
 
     @property
     def t1(self):
