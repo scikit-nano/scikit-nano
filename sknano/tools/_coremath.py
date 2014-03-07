@@ -407,4 +407,28 @@ class Vector(object):
 
 
 class Quaternion(object):
-    pass
+    """Create a quaternion in :math:`R^3`
+
+    Parameters
+    ----------
+    w, x, y, z : float, optional
+        :math:`x, y, z` components of terminating point of vector in
+        :math:`R^3` space relative to origin.
+
+    Notes
+    -----
+    .. todo::
+
+       add new methods for coordinate transformations
+
+
+    """
+    def __init__(self, w=None, x=None, y=None, z=None):
+
+        raise RuntimeError('This class is in development and not '
+                           'completely implemented or ready for use.')
+
+        self._w = w
+        self._x = x
+        self._y = y
+        self._z = z
