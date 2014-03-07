@@ -40,7 +40,7 @@ from ..tools.refdata import CCbond
 from ._nanotubes import Nanotube
 from ._structure_generator import StructureGenerator
 
-__all__ = ['NanotubeGenerator', 'MWNTGenerator']
+__all__ = ['NanotubeGenerator', 'UnrolledNanotubeGenerator', 'MWNTGenerator']
 
 
 class NanotubeGenerator(Nanotube, StructureGenerator):
@@ -349,7 +349,7 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
                  with_units=False, units=None,
                  autogen=True, verbose=False):
 
-        super(NanotubeGenerator, self).__init__(
+        super(UnrolledNanotubeGenerator, self).__init__(
             n=n, m=m, nx=nx, ny=ny, nz=nz,
             element1=element1, element2=element2,
             bond=bond, Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz,
@@ -367,27 +367,28 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
         bond = self._bond
         M = self._M
         T = self._T
-        Ch = self._Ch
         N = self._N
+        rt = self._rt
         e1 = self._element1
         e2 = self._element2
         verbose = self._verbose
 
         aCh = Nanotube.compute_chiral_angle(n=n, m=m, rad2deg=False)
-        aR = Nanotube.compute_symmetry_chiral_angle(n=n, m=m, rad2deg=False)
-        lenR = Nanotube.compute_R(n=n, m=m, bond=bond,
-                                  length=True, magnitude=True)
 
         tau = M * T / N
         dtau = bond * np.sin(np.pi / 6 - aCh)
 
+        psi = 2 * np.pi / N
+        dpsi = bond * np.cos(np.pi / 6 - aCh) / rt
+
         if verbose:
+            print('dpsi: {}'.format(dpsi))
             print('dtau: {}\n'.format(dtau))
 
         self._unit_cell = Atoms()
 
-        for i in xrange(1, N + 1):
-            x1 = i * lenR / Ch * np.cos(aR - aCh)
+        for i in xrange(N):
+            x1 = rt * i * psi
             z1 = i * tau
 
             while z1 > T - eps:
@@ -401,7 +402,7 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
 
             self._unit_cell.append(atom1)
 
-            x2 = (i * lenR + bond * np.sin(aR - aCh)) * np.cos(aCh)
+            x2 = rt * (i * psi + dpsi)
             z2 = i * tau - dtau
             while z2 > T - eps:
                 z2 -= T
@@ -417,15 +418,16 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
     def generate_structure_data(self):
         """Generate structure data."""
         self._structure_atoms = Atoms()
-        for nz in xrange(int(np.ceil(self._nz))):
-            dr = np.array([0.0, 0.0, nz * self.T])
-            for uc_atom in self._unit_cell:
-                nt_atom = Atom(uc_atom.symbol)
-                nt_atom.r = uc_atom.r + dr
-                self._structure_atoms.append(nt_atom)
+        for nx in xrange(self.nx):
+            for nz in xrange(int(np.ceil(self.nz))):
+                dr = np.array([nx * self.Ch, 0.0, nz * self.T])
+                for uc_atom in self._unit_cell:
+                    nt_atom = Atom(uc_atom.symbol)
+                    nt_atom.r = uc_atom.r + dr
+                    self._structure_atoms.append(nt_atom)
 
     def save_data(self, fname=None, structure_format=None,
-                  rotation_angle=-90, rot_axis='x', deg2rad=True,
+                  rotation_angle=None, rot_axis=None, deg2rad=True,
                   center_CM=True):
         """Save structure data.
 
@@ -461,13 +463,35 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
         if fname is None:
             chirality = '{}{}f'.format('{}'.format(self._n).zfill(2),
                                        '{}'.format(self._m).zfill(2))
-            if self._assume_integer_unit_cells:
-                nz = ''.join(('{}'.format(self._nz),
-                              plural_word_check('cell', self._nz)))
+
+            nx = self.nx
+            ny = self.ny
+            fname_wordlist = None
+            if nx != 1 or ny != 1:
+                nx = ''.join(('{}'.format(self.nx),
+                              plural_word_check('cell', self.nx)))
+                ny = ''.join(('{}'.format(self.ny),
+                              plural_word_check('cell', self.ny)))
+
+                if self._assume_integer_unit_cells:
+                    nz = ''.join(('{}'.format(self.nz),
+                                  plural_word_check('cell', self.nz)))
+                else:
+                    nz = ''.join(('{:.2f}'.format(self.nz),
+                                  plural_word_check('cell', self.nz)))
+
+                cells = 'x'.join((nx, ny, nz))
+                fname_wordlist = (chirality, cells)
             else:
-                nz = ''.join(('{:.2f}'.format(self._nz),
-                              plural_word_check('cell', self._nz)))
-            fname_wordlist = (chirality, nz)
+                if self._assume_integer_unit_cells:
+                    nz = ''.join(('{}'.format(self.nz),
+                                  plural_word_check('cell', self.nz)))
+                else:
+                    nz = ''.join(('{:.2f}'.format(self.nz),
+                                  plural_word_check('cell', self.nz)))
+
+                fname_wordlist = (chirality, nz)
+
             fname = '_'.join(fname_wordlist)
             fname += '.' + structure_format
         else:
