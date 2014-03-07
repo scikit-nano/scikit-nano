@@ -226,13 +226,13 @@ class GrapheneGenerator(Graphene, StructureGenerator):
         structure_format : {None, str}, optional
             chemical file format of saved structure data. Must be one of:
 
-                - xyz
-                - data
+                - `xyz`
+                - `data`
 
             If `None`, then guess based on `fname` file extension or
             default to `xyz` format.
         rotation_angle : {None, float}, optional
-            Angle of rotation
+            Angle of rotation.
         rot_axis : {'x', 'y', 'z'}, optional
             Rotation axis
         deg2rad : bool, optional

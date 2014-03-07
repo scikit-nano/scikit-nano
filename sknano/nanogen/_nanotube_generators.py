@@ -13,11 +13,7 @@ Nanotube structure generators (:mod:`sknano.nanogen._nanotube_generators`)
 
 .. todo::
 
-   Handle different units and perform unit conversions for output coordinates.
-
-.. todo::
-
-   Replace arrays with class attributes for readability.
+   Handle different units in output coordinates.
 
 """
 from __future__ import division, print_function, absolute_import
