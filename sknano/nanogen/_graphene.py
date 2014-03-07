@@ -11,8 +11,8 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext'
 
 #import itertools
-import warnings
-warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
+#import warnings
+#warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
 
 try:
     from pint import UnitRegistry
@@ -24,11 +24,84 @@ except ImportError:
 import numpy as np
 
 from ..chemistry import Atom
+from ..tools import Vector2D
 from ..tools.refdata import CCbond
 
 edge_types = {'armchair': 'AC', 'zigzag': 'ZZ'}
 
-__all__ = ['Graphene']
+__all__ = ['GraphenePrimitiveCell', 'Graphene']
+
+
+class GraphenePrimitiveCell(object):
+    """Class for generating interactive Graphene unit cell.
+
+    Parameters
+    ----------
+    bond : float, optional
+        bond length between nearest-neighbor atoms in **Angstroms**.
+
+    """
+    def __init__(self, bond=CCbond, with_units=False, units=None):
+
+        if bond is None:
+            bond = CCbond
+
+        if with_units and Qty is None:
+            with_units = False
+        self._with_units = with_units
+
+        if with_units and units is None:
+            units = 'angstroms'
+        self._units = units
+
+        if with_units and isinstance(bond, float):
+            self._bond = Qty(bond, units)
+        else:
+            self._bond = bond
+
+        try:
+            self._a = np.sqrt(3) * self._bond.magnitude
+        except AttributeError:
+            self._a = np.sqrt(3) * self._bond
+
+        self._a1 = Vector2D(with_units=with_units, units=units)
+        self._a2 = Vector2D(with_units=with_units, units=units)
+
+        self._a1.x = self._a2.x = np.sqrt(3) / 2 * self._a
+        self._a1.y = 1 / 2 * self._a
+        self._a2.y = -self._a1.y
+
+        self._b1 = Vector2D(with_units=with_units, units='1/{}'.format(units))
+        self._b2 = Vector2D(with_units=with_units, units='1/{}'.format(units))
+
+        self._b1.x = self._b2.x = 1 / np.sqrt(3) * 2 * np.pi / self._a
+        self._b1.y = 2 * np.pi / self._a
+        self._b2.y = -self._b1.y
+
+    @property
+    def a(self):
+        """Length of graphene unit cell vector."""
+        return self._a
+
+    @property
+    def a1(self):
+        """:math:`a_1` unit vector."""
+        return self._a1
+
+    @property
+    def a2(self):
+        """:math:`a_2` unit vector."""
+        return self._a2
+
+    @property
+    def b1(self):
+        """:math:`b_1` reciprocal lattice vector."""
+        return self._b1
+
+    @property
+    def b2(self):
+        """:math:`b_2` reciprocal lattice vector."""
+        return self._b2
 
 
 class Graphene(object):
@@ -100,42 +173,18 @@ class Graphene(object):
 
         if with_units and Qty is None:
             with_units = False
-
         self._with_units = with_units
 
+        if with_units and units is None:
+            units = 'angstroms'
+        self._units = units
+
         if with_units and isinstance(bond, float):
-            self._bond = Qty(bond, 'angstroms')
+            self._bond = Qty(bond, units)
         else:
             self._bond = bond
 
         self._verbose = verbose
-
-        try:
-            self._a = np.sqrt(3) * self._bond.magnitude
-        except AttributeError:
-            self._a = np.sqrt(3) * self._bond
-
-        self._a1 = np.zeros(2, dtype=float)
-        self._a2 = np.zeros(2, dtype=float)
-
-        self._a1[0] = self._a2[0] = np.sqrt(3) / 2 * self._a
-        self._a1[1] = 1 / 2 * self._a
-        self._a2[1] = -self._a1[1]
-
-        self._b1 = np.zeros(2, dtype=float)
-        self._b2 = np.zeros(2, dtype=float)
-
-        self._b1[0] = self._b2[0] = \
-            1 / np.sqrt(3) * 2 * np.pi / self._a
-        self._b1[1] = 2 * np.pi / self._a
-        self._b2[1] = -self._b1[1]
-
-        if with_units:
-            self._a1 = Qty(self._a1, 'angstrom')
-            self._a2 = Qty(self._a2, 'angstrom')
-
-            self._b1 = Qty(self._b1, '1/angstrom')
-            self._b2 = Qty(self._b2, '1/angstrom')
 
         self._lx = 0.
         self._ly = 0.
