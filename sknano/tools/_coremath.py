@@ -56,10 +56,16 @@ class Point(object):
             self._p = Qty(self._p, units)
 
     def __str__(self):
-        return '({}, {}, {})'.format(self.x, self.y, self.z)
+        if self._with_units:
+            return str(self._p)
+        else:
+            return '({}, {}, {})'.format(self.x, self.y, self.z)
 
     def __repr__(self):
-        return '({}, {}, {})'.format(self.x, self.y, self.z)
+        if self._with_units:
+            return repr(self._p)
+        else:
+            return '({}, {}, {})'.format(self.x, self.y, self.z)
 
     @property
     def x(self):
@@ -83,6 +89,11 @@ class Point(object):
             :math:`x`-coordinate of `Point`.
 
         """
+        try:
+            value = value.magnitude
+        except AttributeError:
+            pass
+
         try:
             check_type(value, allowed_types=(int, float))
             try:
@@ -115,6 +126,11 @@ class Point(object):
 
         """
         try:
+            value = value.magnitude
+        except AttributeError:
+            pass
+
+        try:
             check_type(value, allowed_types=(int, float))
             try:
                 self._p[1] = value
@@ -145,6 +161,11 @@ class Point(object):
             :math:`z`-coordinate of `Point`.
 
         """
+        try:
+            value = value.magnitude
+        except AttributeError:
+            pass
+
         try:
             check_type(value, allowed_types=(int, float))
             try:
@@ -178,6 +199,11 @@ class Point(object):
             coordinates of `Point`.
 
         """
+        try:
+            value = value.magnitude
+        except AttributeError:
+            pass
+
         try:
             check_type(value, allowed_types=(np.ndarray,))
             for i, pi in enumerate(value):
@@ -264,10 +290,16 @@ class Point2D(object):
             self._p = Qty(self._p, units)
 
     def __str__(self):
-        return '({}, {})'.format(self.x, self.y)
+        if self._with_units:
+            return str(self._p)
+        else:
+            return '({}, {})'.format(self.x, self.y)
 
     def __repr__(self):
-        return '({}, {})'.format(self.x, self.y)
+        if self._with_units:
+            return repr(self._p)
+        else:
+            return '({}, {})'.format(self.x, self.y)
 
     @property
     def x(self):
@@ -291,6 +323,11 @@ class Point2D(object):
             :math:`x`-coordinate of `Point2D`.
 
         """
+        try:
+            value = value.magnitude
+        except AttributeError:
+            pass
+
         try:
             check_type(value, allowed_types=(int, float))
             try:
@@ -322,6 +359,11 @@ class Point2D(object):
             :math:`y`-coordinate of `Point2D`.
 
         """
+        try:
+            value = value.magnitude
+        except AttributeError:
+            pass
+
         try:
             check_type(value, allowed_types=(int, float))
             try:
@@ -355,6 +397,11 @@ class Point2D(object):
             coordinates of `Point2D`.
 
         """
+        try:
+            value = value.magnitude
+        except AttributeError:
+            pass
+
         try:
             check_type(value, allowed_types=(np.ndarray,))
             for i, pi in enumerate(value):
@@ -477,10 +524,16 @@ class Vector(object):
             self._v = Qty(self._v, units)
 
     def __str__(self):
-        return '({}, {}, {})'.format(self.x, self.y, self.z)
+        if self._with_units:
+            return str(self._v)
+        else:
+            return '({}, {}, {})'.format(self.x, self.y, self.z)
 
     def __repr__(self):
-        return '({}, {}, {})'.format(self.x, self.y, self.z)
+        if self._with_units:
+            return repr(self._v)
+        else:
+            return '({}, {}, {})'.format(self.x, self.y, self.z)
 
     @property
     def x(self):
@@ -504,6 +557,11 @@ class Vector(object):
             :math:`x`-coordinate of `Vector`.
 
         """
+        try:
+            value = value.magnitude
+        except AttributeError:
+            pass
+
         try:
             check_type(value, allowed_types=(int, float))
             try:
@@ -536,6 +594,11 @@ class Vector(object):
 
         """
         try:
+            value = value.magnitude
+        except AttributeError:
+            pass
+
+        try:
             check_type(value, allowed_types=(int, float))
             try:
                 self._v[1] = value
@@ -566,6 +629,11 @@ class Vector(object):
             :math:`z`-coordinate of `Vector`.
 
         """
+        try:
+            value = value.magnitude
+        except AttributeError:
+            pass
+
         try:
             check_type(value, allowed_types=(int, float))
             try:
@@ -599,6 +667,11 @@ class Vector(object):
             components of `Vector`.
 
         """
+        try:
+            value = value.magnitude
+        except AttributeError:
+            pass
+
         try:
             check_type(value, allowed_types=(np.ndarray,))
             for i, vi in enumerate(value):
@@ -706,10 +779,16 @@ class Vector2D(object):
             self._v = Qty(self._v, units)
 
     def __str__(self):
-        return '({}, {})'.format(self.x, self.y)
+        if self._with_units:
+            return str(self._v)
+        else:
+            return '({}, {})'.format(self.x, self.y)
 
     def __repr__(self):
-        return '({}, {})'.format(self.x, self.y)
+        if self._with_units:
+            return repr(self._v)
+        else:
+            return '({}, {})'.format(self.x, self.y)
 
     @property
     def x(self):
@@ -733,6 +812,11 @@ class Vector2D(object):
             :math:`x`-coordinate of `Vector2D`.
 
         """
+        try:
+            value = value.magnitude
+        except AttributeError:
+            pass
+
         try:
             check_type(value, allowed_types=(int, float))
             try:
@@ -764,6 +848,11 @@ class Vector2D(object):
             :math:`y`-coordinate of `Vector2D`.
 
         """
+        try:
+            value = value.magnitude
+        except AttributeError:
+            pass
+
         try:
             check_type(value, allowed_types=(int, float))
             try:
@@ -797,6 +886,11 @@ class Vector2D(object):
             components of `Vector2D`.
 
         """
+        try:
+            value = value.magnitude
+        except AttributeError:
+            pass
+
         try:
             check_type(value, allowed_types=(np.ndarray,))
             for i, vi in enumerate(value):
