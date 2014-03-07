@@ -170,12 +170,13 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
                  element1='C', element2='C', bond=CCbond, vdw_spacing=3.4,
                  bundle_packing=None, bundle_geometry=None, Lx=None, Ly=None,
-                 Lz=None, fix_Lz=False, autogen=True, verbose=False):
+                 Lz=None, fix_Lz=False, with_units=False, units=None,
+                 autogen=True, verbose=False):
 
         super(NanotubeBundleGenerator, self).__init__(
             n=n, m=m, nx=nx, ny=ny, nz=nz, element1=element1,
             element2=element2, Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz, bond=bond,
-            autogen=False, verbose=verbose)
+            with_units=with_units, units=units, autogen=False, verbose=verbose)
 
         self.compute_bundle_params()
 
@@ -421,7 +422,8 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
                  bundle_packing=None, bundle_geometry=None, Lx=None, Ly=None,
                  Lz=None, fix_Lz=False, max_shells=None,
                  min_shell_diameter=0.0, shell_spacing=3.4,
-                 inner_shell_Ch_type=None, autogen=True, verbose=False):
+                 inner_shell_Ch_type=None, with_units=False,
+                 units=None, autogen=True, verbose=False):
 
         super(MWNTBundleGenerator, self).__init__(
             n=n, m=m, nx=nx, ny=ny, nz=nz, bond=bond, element1=element1,
@@ -429,6 +431,7 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
             max_shells=max_shells, min_shell_diameter=min_shell_diameter,
             shell_spacing=shell_spacing,
             inner_shell_Ch_type=inner_shell_Ch_type,
+            with_units=with_units, units=units,
             autogen=False, verbose=verbose)
 
         self.compute_bundle_params()

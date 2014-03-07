@@ -349,13 +349,14 @@ class MWNTGenerator(NanotubeGenerator):
                  element1='C', element2='C', bond=CCbond,
                  Lx=None, Ly=None, Lz=None, fix_Lz=False, max_shells=None,
                  min_shell_diameter=0.0, shell_spacing=3.4,
-                 inner_shell_Ch_type=None, autogen=True, with_units=False,
-                 units=None, verbose=False):
+                 inner_shell_Ch_type=None, with_units=False, units=None,
+                 autogen=True, verbose=False):
 
         super(MWNTGenerator, self).__init__(
             n=n, m=m, nx=nx, ny=ny, nz=nz,
             element1=element1, element2=element2, bond=bond,
             Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz,
+            with_units=with_units, units=units,
             autogen=False, verbose=verbose)
 
         self._max_shells = max_shells

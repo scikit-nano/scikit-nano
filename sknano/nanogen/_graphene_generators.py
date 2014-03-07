@@ -132,13 +132,14 @@ class GrapheneGenerator(Graphene, StructureGenerator):
     def __init__(self, n=None, m=None, width=None, length=None,
                  edge=None, element1='C', element2='C', bond=CCbond,
                  nlayers=1, layer_spacing=3.35, stacking_order='AB',
-                 autogen=True, with_units=False, verbose=False):
+                 autogen=True, with_units=False, units=None,
+                 verbose=False):
 
         super(GrapheneGenerator, self).__init__(
             n=n, m=m, width=width, length=length, edge=edge,
             element1=element1, element2=element2, bond=bond,
             nlayers=nlayers, layer_spacing=layer_spacing,
-            stacking_order=stacking_order, with_units=with_units,
+            stacking_order=stacking_order, with_units=with_units, units=units,
             verbose=verbose)
 
         if autogen:

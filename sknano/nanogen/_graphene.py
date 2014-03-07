@@ -76,7 +76,7 @@ class Graphene(object):
     def __init__(self, n=None, m=None, width=None, length=None, edge=None,
                  element1='C', element2='C', bond=CCbond, nlayers=1,
                  layer_spacing=3.35, stacking_order='AB', with_units=False,
-                 verbose=False):
+                 units=None, verbose=False):
 
         self._n = n
         self._m = m

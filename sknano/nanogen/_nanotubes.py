@@ -1326,7 +1326,7 @@ class NanotubeBundle(Nanotube):
                  element1='C', element2='C', bond=CCbond, tube_length=None,
                  vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
                  Lx=None, Ly=None, Lz=None, fix_Lz=False, with_units=False,
-                 verbose=False):
+                 units=None, verbose=False):
 
         if tube_length is not None and Lz is None:
             Lz = tube_length
@@ -1335,7 +1335,7 @@ class NanotubeBundle(Nanotube):
             n=n, m=m, nx=nx, ny=ny, nz=nz,
             element1=element1, element2=element2,
             bond=bond, Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz,
-            with_units=with_units, verbose=verbose)
+            with_units=with_units, units=units, verbose=verbose)
 
         self._vdw_spacing = vdw_spacing
         self._bundle_packing = bundle_packing
