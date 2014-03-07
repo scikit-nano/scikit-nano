@@ -10,6 +10,8 @@ Graphene structure tools (:mod:`sknano.nanogen._graphene`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext'
 
+from collections import OrderedDict
+
 #import itertools
 #import warnings
 #warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
@@ -24,8 +26,10 @@ except ImportError:
 import numpy as np
 
 from ..chemistry import Atom
-from ..tools import Vector2D
+from ..tools import Vector2D, Vector3D
 from ..tools.refdata import CCbond
+
+from ._parameter_luts import param_units, param_symbols, param_strfmt
 
 edge_types = {'armchair': 'AC', 'zigzag': 'ZZ'}
 
@@ -151,14 +155,36 @@ class Graphene(object):
                  layer_spacing=3.35, stacking_order='AB', with_units=False,
                  units=None, verbose=False):
 
-        self._n = n
-        self._m = m
+        self._params = OrderedDict()
+
+        # add each parameter in the order I want them to appear in
+        # verbose output mode
+        self._params['n'] = {}
+        self._params['m'] = {}
+        self._params['t1'] = {}
+        self._params['t2'] = {}
+        self._params['d'] = {}
+        self._params['dR'] = {}
+        self._params['N'] = {}
+        self._params['M'] = {}
+        self._params['R'] = {}
+        self._params['bond'] = {}
+        self._params['chiral_angle'] = {}
+        self._params['Ch'] = {}
+        self._params['T'] = {}
+
+        try:
+            self._n = int(n)
+            self._m = int(m)
+        except TypeError:
+            self._n = n
+            self._m = m
 
         self._element1 = element1
         self._element2 = element2
 
-        self._Lx = width
-        self._Ly = length
+        self._width = width
+        self._length = length
         if edge in ('armchair', 'zigzag'):
             edge = edge_types[edge]
         elif edge not in ('AC', 'ZZ'):
@@ -186,8 +212,20 @@ class Graphene(object):
 
         self._verbose = verbose
 
-        self._lx = 0.
-        self._ly = 0.
+        self._t1 = None
+        self._t2 = None
+        self._d = None
+        self._dR = None
+        self._Ch = None
+        self._T = None
+        self._chiral_angle = None
+        self._N = None
+        self._M = None
+        self._R = None
+        self._p = None
+        self._q = None
+
+        self._cell = Vector2D(with_units=with_units, units=units)
 
         self._Nx = 0
         self._Ny = 0
@@ -196,13 +234,13 @@ class Graphene(object):
         self._layer_spacing = layer_spacing
         self._stacking_order = stacking_order
 
-        self._layer_shift = np.zeros(3)
+        self._layer_shift = Vector3D(with_units=with_units, units=units)
 
         if nlayers > 1 and stacking_order == 'AB':
             if edge == 'AC':
-                self._layer_shift[1] = self._bond
+                self._layer_shift.y = self._bond
             else:
-                self._layer_shift[0] = self._bond
+                self._layer_shift.x = self._bond
 
         self._Natoms = 0
         self._Natoms_per_layer = None
@@ -210,16 +248,31 @@ class Graphene(object):
         if edge == 'AC':
             # Set up the unit cell with the armchair edge aligned
             # along the `y`-axis.
-            self._lx = np.sqrt(3) * bond
-            self._ly = 3 * bond
+            self._cell.x = np.sqrt(3) * bond
+            self._cell.y = 3 * bond
         else:
             # Set up the unit cell with the zigzag edge aligned
             # along the `y`-axis.
-            self._lx = 3 * bond
-            self._ly = np.sqrt(3) * bond
+            self._cell.x = 3 * bond
+            self._cell.y = np.sqrt(3) * bond
 
-        self._Nx = int(np.ceil(10 * self._Lx / self._lx))
-        self._Ny = int(np.ceil(10 * self._Ly / self._ly))
+        self._Nx = int(np.ceil(10 * self._width / self._cell.x))
+        self._Ny = int(np.ceil(10 * self._length / self._cell.y))
+
+        for k, v in self.__dict__.iteritems():
+            p = k.strip('_')
+            if p in self._params.keys():
+                self._params[p]['units'] = param_units.get(p)
+                self._params[p]['strfmt'] = param_strfmt.get(p)
+                if param_symbols.get(p) is not None:
+                    self._params[p]['var'] = param_symbols[p]
+                else:
+                    self._params[p]['var'] = p
+
+        self.compute_layer_params()
+
+    def compute_layer_params(self):
+        pass
 
     @property
     def Natoms(self):
