@@ -13,7 +13,9 @@ import numpy as np
 
 from ._corefuncs import check_type
 
-__all__ = ['Point', 'Vector', 'Quaternion']
+__all__ = ['Point', 'Point2D', 'Point3D',
+           'Vector', 'Vector2D', 'Vector3D',
+           'Quaternion']
 
 
 class Point(object):
@@ -174,8 +176,7 @@ class Point(object):
         p = self._p.tolist()
         for i, pi in enumerate(p[:]):
             if pi < 0 and abs(pi) < epsilon:
-                p[i] = 0.0
-        self._p[0], self._p[1], self._p[2] = p
+                self._p[i] = 0.0
 
     def rezero_coords(self, epsilon=1.0e-10):
         """Re-zero `Point` coordinates near zero.
@@ -192,8 +193,10 @@ class Point(object):
         p = self._p.tolist()
         for i, pi in enumerate(p[:]):
             if abs(pi) < epsilon:
-                p[i] = 0.0
-        self._p[0], self._p[1], self._p[2] = p
+                self._p[i] = 0.0
+
+
+Point3D = Point
 
 
 class Vector(object):
@@ -384,8 +387,7 @@ class Vector(object):
         v = self._v.tolist()
         for i, vi in enumerate(v[:]):
             if vi < 0 and abs(vi) < epsilon:
-                v[i] = 0.0
-        self._v[0], self._v[1], self._v[2] = v
+                self._v[i] = 0.0
 
     def rezero_components(self, epsilon=1.0e-10):
         """Re-zero `Vector` components near zero.
@@ -402,8 +404,332 @@ class Vector(object):
         v = self._v.tolist()
         for i, vi in enumerate(v[:]):
             if abs(vi) < epsilon:
-                v[i] = 0.0
-        self._v[0], self._v[1], self._v[2] = v
+                self._v[i] = 0.0
+
+
+Vector3D = Vector
+
+
+class Point2D(object):
+    """Create a point in :math:`R^2`
+
+    Parameters
+    ----------
+    x, y : float, optional
+        :math:`x, y` coordinates of point in :math:`R^2` space.
+    units : {None, str}, optional
+        Units of coordinates.
+
+    """
+    def __init__(self, x=None, y=None, units=None, dtype=None):
+        self._p = np.zeros(2, dtype=float)
+        self._units = units
+        for i, pi in enumerate((x, y)):
+            if pi is not None:
+                self._p[i] = pi
+
+    def __str__(self):
+        return '({}, {})'.format(self.x, self.y)
+
+    def __repr__(self):
+        return '({}, {})'.format(self.x, self.y)
+
+    @property
+    def x(self):
+        """:math:`x`-coordinate of `Point2D`.
+
+        Returns
+        -------
+        float
+            :math:`x`-coordinate of `Point2D`.
+
+        """
+        return self._p[0]
+
+    @x.setter
+    def x(self, value=float):
+        """Set :math:`x`-coordinate of `Point2D`.
+
+        Parameters
+        ----------
+        value : float
+            :math:`x`-coordinate of `Point2D`.
+
+        """
+        try:
+            check_type(value, allowed_types=(int, float))
+            self._p[0] = float(value)
+        except TypeError as e:
+            print(e)
+
+    @property
+    def y(self):
+        """:math:`y`-coordinate of `Point2D`.
+
+        Returns
+        -------
+        float
+            :math:`y`-coordinate of `Point2D`.
+
+        """
+        return self._p[1]
+
+    @y.setter
+    def y(self, value=float):
+        """Set :math:`y`-coordinate of `Point2D`.
+
+        Parameters
+        ----------
+        value : float
+            :math:`y`-coordinate of `Point2D`.
+
+        """
+        try:
+            check_type(value, allowed_types=(int, float))
+            self._p[1] = float(value)
+        except TypeError as e:
+            print(e)
+
+    @property
+    def coords(self):
+        """:math:`x, y` coordinates of `Point2D`.
+
+        Returns
+        -------
+        :py:class:`~numpy:numpy.ndarray`
+            2-element :py:class:`~numpy:numpy.ndarray` of [:math:`x, y`]
+            coordinates of `Point2D`.
+
+        """
+        return self._p
+
+    @coords.setter
+    def coords(self, value=np.ndarray):
+        """Set :math:`x, y` coordinates of `Point2D`
+
+        Parameters
+        ----------
+        value : :py:class:`~numpy:numpy.ndarray`
+            2-element :py:class:`~numpy:numpy.ndarray` of [:math:`x, y`]
+            coordinates of `Point2D`.
+
+        """
+        try:
+            check_type(value, allowed_types=(np.ndarray,))
+            for i, pi in enumerate(value):
+                try:
+                    check_type(pi, allowed_types=(int, float))
+                    self._p[i] = pi
+                except TypeError as e:
+                    print(e)
+        except TypeError as e:
+            print(e)
+
+    def fix_minus_zero_coords(self, epsilon=1.0e-10):
+        """Set `Point2D` coordinates that are small, negative numbers to zero.
+
+        Set `Point2D` coordinates that are negative and have absolute value
+        less than `epsilon` to zero.
+
+        Parameters
+        ----------
+        epsilon : float, optional
+            Smallest allowed absolute value of any :math:`x,y` coordinate.
+
+        """
+        p = self._p.tolist()
+        for i, pi in enumerate(p[:]):
+            if pi < 0 and abs(pi) < epsilon:
+                self._p[i] = 0.0
+
+    def rezero_coords(self, epsilon=1.0e-10):
+        """Re-zero `Point2D` coordinates near zero.
+
+        Set `Point2D` coordinates with absolute value less than `epsilon` to
+        zero.
+
+        Parameters
+        ----------
+        epsilon : float, optional
+            Smallest allowed absolute value of any :math:`x,y` coordinate.
+
+        """
+        p = self._p.tolist()
+        for i, pi in enumerate(p[:]):
+            if abs(pi) < epsilon:
+                self._p[i] = 0.0
+
+
+class Vector2D(object):
+    """Create a vector in :math:`R^2`
+
+    Parameters
+    ----------
+    x, y : float, optional
+        :math:`x, y` components of terminating point of vector in
+        :math:`R^2` space relative to origin.
+    x0, y0 : float, optional
+        :math:`x_0, y_0` components of starting point of vector in
+        :math:`R^2` space relative to origin.
+    p, p0 : `Point2D`, optional
+        Terminating and starting `Point2D` of vector in :math:`R^2` space
+        relative to origin. If `p` is not `None` it will always override the
+        `Point2D` defined by the `x`, `y` parameters. Similarly, if `p0` is
+        not `None`, it will always override the `Point2D` defined by the
+        `x0`, `y0` parameters.
+    units : {None, str}, optional
+        Units of vector.
+
+    """
+    def __init__(self, x=None, y=None, x0=None, y0=None, p=None, p0=None,
+                 units=None):
+
+        self._p = None
+        if p is None:
+            self._p = Point2D(x=x, y=y)
+        elif isinstance(p, Point2D):
+            self._p = p
+
+        self._p0 = None
+        if p0 is None:
+            self._p0 = Point2D(x=x0, y=y0)
+        elif isinstance(p0, Point2D):
+            self._p0 = p0
+
+        self._v = np.zeros(2, dtype=float)
+        for i, (pi, pi0) in enumerate(zip(self._p.coords, self._p0.coords)):
+            self._v[i] = pi - pi0
+
+    def __str__(self):
+        return '({}, {})'.format(self.x, self.y)
+
+    def __repr__(self):
+        return '({}, {})'.format(self.x, self.y)
+
+    @property
+    def x(self):
+        """:math:`x`-coordinate of `Vector2D`.
+
+        Returns
+        -------
+        float
+            :math:`x`-coordinate of `Vector2D`.
+
+        """
+        return self._v[0]
+
+    @x.setter
+    def x(self, value=float):
+        """Set :math:`x`-coordinate of `Vector2D`.
+
+        Parameters
+        ----------
+        value : float
+            :math:`x`-coordinate of `Vector2D`.
+
+        """
+        try:
+            check_type(value, allowed_types=(int, float))
+            self._v[0] = float(value)
+        except TypeError as e:
+            print(e)
+
+    @property
+    def y(self):
+        """:math:`y`-coordinate of `Vector2D`.
+
+        Returns
+        -------
+        float
+            :math:`y`-coordinate of `Vector2D`.
+
+        """
+        return self._v[1]
+
+    @y.setter
+    def y(self, value=float):
+        """Set :math:`y`-coordinate of `Vector2D`.
+
+        Parameters
+        ----------
+        value : float
+            :math:`y`-coordinate of `Vector2D`.
+
+        """
+        try:
+            check_type(value, allowed_types=(int, float))
+            self._v[1] = float(value)
+        except TypeError as e:
+            print(e)
+
+    @property
+    def components(self):
+        """:math:`x, y` components of `Vector2D`.
+
+        Returns
+        -------
+        :py:class:`~numpy:numpy.ndarray`
+            2-element :py:class:`~numpy:numpy.ndarray` of [:math:`x, y`]
+            components of `Vector2D`.
+
+        """
+        return self._v
+
+    @components.setter
+    def components(self, value=np.ndarray):
+        """Set :math:`x, y` components of `Vector2D`
+
+        Parameters
+        ----------
+        value : :py:class:`~numpy:numpy.ndarray`
+            2-element :py:class:`~numpy:numpy.ndarray` of [:math:`x, y`]
+            components of `Vector2D`.
+
+        """
+        try:
+            check_type(value, allowed_types=(np.ndarray,))
+            for i, vi in enumerate(value):
+                try:
+                    check_type(vi, allowed_types=(int, float))
+                    self._v[i] = vi
+                except TypeError as e:
+                    print(e)
+        except TypeError as e:
+            print(e)
+
+    def fix_minus_zero_components(self, epsilon=1.0e-10):
+        """Set `Vector2D` components that are small, negative numbers to zero.
+
+        Set `Vector2D` components that are negative and have absolute value
+        less than `epsilon` to zero.
+
+        Parameters
+        ----------
+        epsilon : float, optional
+            Smallest allowed absolute value of any :math:`x,y` component.
+
+        """
+        v = self._v.tolist()
+        for i, vi in enumerate(v[:]):
+            if vi < 0 and abs(vi) < epsilon:
+                self._v[i] = 0.0
+
+    def rezero_components(self, epsilon=1.0e-10):
+        """Re-zero `Vector2D` components near zero.
+
+        Set `Vector2D` components with absolute value less than `epsilon` to
+        zero.
+
+        Parameters
+        ----------
+        epsilon : float, optional
+            Smallest allowed absolute value of any :math:`x,y` component.
+
+        """
+        v = self._v.tolist()
+        for i, vi in enumerate(v[:]):
+            if abs(vi) < epsilon:
+                self._v[i] = 0.0
 
 
 class Quaternion(object):
