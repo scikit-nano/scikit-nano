@@ -38,8 +38,8 @@ Secondary to its structure generating functions are its
 Important links
 ===============
 
-* Source code repo: https://github.com/androomerrill/scikit-nano
 * Documentation: http://projects.geekcode.io/scikit-nano/doc
+* Source code repo: https://github.com/androomerrill/scikit-nano
 * Download releases: https://github.com/androomerrill/scikit-nano/releases
 * Issue tracker: https://github.com/androomerrill/scikit-nano/issues
 * PyPI page: https://pypi.python.org/pypi/scikit-nano
