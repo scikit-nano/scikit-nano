@@ -29,29 +29,9 @@ except ImportError:
 from ..chemistry import Atom
 from ..tools.refdata import CCbond
 
-param_units = {}
-param_units['dt'] = \
-    param_units['rt'] = \
-    param_units['Ch'] = \
-    param_units['T'] = \
-    param_units['bond'] = u' \u212B'
-param_units['chiral_angle'] = u'\u00b0'
+from ._parameter_luts import param_units, param_symbols, param_strfmt
 
-param_symbols = {}
-param_symbols['t1'] = u't\u2081'
-param_symbols['t2'] = u't\u2082'
-param_symbols['chiral_angle'] = u'\u03b8c'
-
-param_strfmt = {}
-param_strfmt['Ch'] = \
-    param_strfmt['T'] = \
-    param_strfmt['dt'] = \
-    param_strfmt['rt'] = \
-    param_strfmt['chiral_angle'] = '{:.2f}'
-param_strfmt['bond'] = '{:.3f}'
-
-__all__ = ['param_units', 'param_symbols', 'param_strfmt',
-           'Nanotube', 'NanotubeBundle']
+__all__ = ['Nanotube', 'NanotubeBundle']
 
 
 class Nanotube(object):
@@ -92,6 +72,10 @@ class Nanotube(object):
 
         .. versionadded:: 0.2.6
 
+    with_units : bool, optional
+        Attach `units` to physical quantities
+    units : None, optional
+        System of units to use.
     verbose : bool, optional
         verbose output
 
@@ -166,7 +150,7 @@ class Nanotube(object):
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1, element1='C',
                  element2='C', bond=CCbond, tube_length=None,
                  Lx=None, Ly=None, Lz=None, fix_Lz=False,
-                 with_units=False, verbose=False):
+                 with_units=False, units=None, verbose=False):
 
         if tube_length is not None and Lz is None:
             Lz = tube_length
