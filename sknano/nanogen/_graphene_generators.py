@@ -56,12 +56,12 @@ class GrapheneGenerator(Graphene, StructureGenerator):
 
     Notes
     -----
-    For now, the graphene structure is generated using a
-    conventional unit cell, not the primitive unit cell.
+    The `GrapheneGenerator` class and its subclasses generate graphene with
+    either an armchair or zigzag edge using a 4-atom conventional unit cell.
+    If you want to generate graphene as an *unrolled nanotube*, see the
+    :py:class:`~sknano.nanogen.UnrolledNanotubeGenerator` class.
 
-    .. todo::
-
-       Add notes on unit cell calculation.
+    .. seealso:: :py:class:`~sknano.nanogen.UnrolledNanotubeGenerator`
 
     Examples
     --------
