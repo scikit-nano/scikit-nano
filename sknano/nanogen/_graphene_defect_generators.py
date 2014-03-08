@@ -18,6 +18,7 @@ from ..tools.refdata import CCbond
 
 from ._defect_generators import DefectGenerator, VacancyGenerator
 from ._graphene_generators import GrapheneGenerator
+from ._nanotube_generators import UnrolledNanotubeGenerator
 
 __all__ = ['GrapheneDefectGenerator', 'GrapheneVacancyGenerator']
 
@@ -49,8 +50,8 @@ class GrapheneVacancyGenerator(VacancyGenerator):
         If `None`, then guess based on `fname` file extension.
         Otherwise, must be one of:
 
-            - xyz
-            - data
+            - `xyz`
+            - `data`
 
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis atoms 1 and 2.
@@ -178,29 +179,34 @@ class GrapheneVacancyGenerator(VacancyGenerator):
     .. image:: /images/10nmx5nm_1layer_ZZ_CC_graphene+40_vacancies-01.png
 
     """
-    def __init__(self, n=None, m=None, width=None, length=None, edge=None,
-                 fname=None, structure_format=None,
+    def __init__(self, n=None, m=None, nx=1, ny=1, nz=1,
+                 width=None, length=None, edge=None,
                  element1='C', element2='C', bond=CCbond,
                  nlayers=1, layer_spacing=3.35, stacking_order='AB',
+                 fname=None, structure_format=None,
                  rotate_structure=False, rotation_angle=None,
                  rotation_axis=None, verbose=False):
 
-        if fname is None and \
-                ((isinstance(n, int) and isinstance(m, int)) or
-                 (isinstance(width, float) and isinstance(length, float))):
-            gg = GrapheneGenerator(n=n, m=m, width=width, length=length,
-                                   edge=edge, element1=element1,
-                                   element2=element2, bond=bond,
-                                   nlayers=nlayers,
-                                   layer_spacing=layer_spacing,
-                                   stacking_order=stacking_order,
-                                   verbose=verbose)
+        if fname is None:
+            if isinstance(n, int) and isinstance(m, int):
+                gg = UnrolledNanotubeGenerator(
+                    n=n, m=m, nx=nx, ny=ny, nz=nz,
+                    element1=element1, element2=element2, bond=bond,
+                    nlayers=nlayers, layer_spacing=layer_spacing,
+                    stacking_order=stacking_order, verbose=verbose)
+            elif isinstance(width, (int, float)) and \
+                    isinstance(length, (int, float)):
+                gg = GrapheneGenerator(
+                    width=width, length=length, edge=edge, element1=element1,
+                    element2=element2, bond=bond, nlayers=nlayers,
+                    layer_spacing=layer_spacing, stacking_order=stacking_order,
+                    verbose=verbose)
+            else:
+                raise TypeError('Either `fname` must be set or `n` and `m` '
+                                'must be specified as integers or `width` and '
+                                '`length` must be specified as floats.')
             gg.save_data(structure_format='data')
             fname = gg.fname
-        else:
-            raise TypeError('Either `fname` must be set or `n` and `m` '
-                            'must be specified as integers or `width` and '
-                            '`length` must be specified as floats.')
 
         super(GrapheneVacancyGenerator, self).__init__(
             fname=fname, structure_format=structure_format, verbose=verbose)
