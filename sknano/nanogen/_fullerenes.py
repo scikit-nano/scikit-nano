@@ -11,8 +11,6 @@ from __future__ import division, print_function, absolute_import
 __docformat__ = 'restructuredtext'
 
 #import itertools
-import warnings
-warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
 
 #from fractions import gcd
 #from collections import OrderedDict

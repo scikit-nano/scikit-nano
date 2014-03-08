@@ -13,8 +13,6 @@ __docformat__ = 'restructuredtext'
 #import copy
 #import itertools
 #import sys
-import warnings
-warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
 
 #from pint import UnitRegistry
 #ureg = UnitRegistry()
@@ -64,10 +62,11 @@ class FullereneGenerator(Fullerene, StructureGenerator):
     First, load the :py:class:`~sknano.nanogen.FullereneGenerator` class.
 
     >>> from sknano.nanogen import FullereneGenerator
+    >>> fg = FullereneGenerator(N=60)
 
     """
 
-    def __init__(self, n=int, autogen=True, verbose=False):
+    def __init__(self, N=int, PG=None, autogen=True, verbose=False):
 
         raise RuntimeError('This class is not yet implemented.')
 

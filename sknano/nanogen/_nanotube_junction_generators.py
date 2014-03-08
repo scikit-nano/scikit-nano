@@ -13,8 +13,6 @@ __docformat__ = 'restructuredtext'
 import copy
 #import itertools
 #import sys
-import warnings
-warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
 
 #from pint import UnitRegistry
 #ureg = UnitRegistry()

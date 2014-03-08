@@ -10,10 +10,6 @@ Nanotube structure tools (:mod:`sknano.nanogen._nanotubes`)
 from __future__ import division, print_function, absolute_import
 __docformat__ = 'restructuredtext'
 
-#import itertools
-import warnings
-warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
-
 from fractions import gcd
 from collections import OrderedDict
 
@@ -1220,7 +1216,7 @@ class Nanotube(object):
     @classmethod
     def compute_tau(cls, n=int, m=int, bond=None, with_units=False,
                     units='angstrom', magnitude=True):
-        """Compute symmetry operation translation: :math:`\\tau`
+        """Compute symmetry operation translation :math:`\\tau`
 
         .. math::
 
@@ -1241,7 +1237,7 @@ class Nanotube(object):
         Returns
         -------
         float
-            Symmetry operation translation: :math:`\\tau`
+            Symmetry operation translation :math:`\\tau`
 
         """
         M = Nanotube.compute_M(n=n, m=m)
@@ -1252,7 +1248,7 @@ class Nanotube(object):
 
     @classmethod
     def compute_psi(cls, n=int, m=int):
-        """Compute symmetry operation rotation: :math:`\\psi`
+        """Compute symmetry operation rotation :math:`\\psi`
 
         .. math::
 
@@ -1268,7 +1264,7 @@ class Nanotube(object):
         Returns
         -------
         float
-            Symmetry operation rotation: :math:`\\psi`
+            Symmetry operation rotation :math:`\\psi`
 
         """
         N = Nanotube.compute_N(n=n, m=m)

@@ -9,9 +9,6 @@ Abstract data structures for math (:mod:`sknano.tools._coremath`)
 """
 from __future__ import division, print_function, absolute_import
 
-import warnings
-warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
-
 try:
     from pint import UnitRegistry
     ureg = UnitRegistry()

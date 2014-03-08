@@ -11,8 +11,6 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext'
 
 #import itertools
-#import warnings
-#warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
 
 try:
     from pint import UnitRegistry
