@@ -189,6 +189,10 @@ class Graphene(object):
         self._Nx = 0
         self._Ny = 0
 
+        self._layer_mass = None
+        self._Natoms = 0
+        self._Natoms_per_layer = None
+
         self._nlayers = nlayers
         self._layer_spacing = layer_spacing
         self._stacking_order = stacking_order
@@ -200,9 +204,6 @@ class Graphene(object):
                 self._layer_shift.y = self._bond
             else:
                 self._layer_shift.x = self._bond
-
-        self._Natoms = 0
-        self._Natoms_per_layer = None
 
         if edge == 'AC':
             # Set up the unit cell with the armchair edge aligned
