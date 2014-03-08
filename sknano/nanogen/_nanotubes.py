@@ -1220,6 +1220,30 @@ class Nanotube(object):
     @classmethod
     def compute_tau(cls, n=int, m=int, bond=None, with_units=False,
                     units='angstrom', magnitude=True):
+        """Compute symmetry operation translation: :math:`\\tau`
+
+        .. math::
+
+           \\tau = \\frac{M|\\mathbf{T}|}{N}
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} +
+            m\\mathbf{a}_{2} = (n, m)`.
+        bond : float, optional
+            distance between nearest neighbor atoms.
+            Must be in units of **Angstroms**.
+        rad2deg : bool, optional
+            If `True`, return angle in degrees
+
+        Returns
+        -------
+        float
+            Symmetry operation translation: :math:`\\tau`
+
+        """
         M = Nanotube.compute_M(n=n, m=m)
         N = Nanotube.compute_N(n=n, m=m)
         T = Nanotube.compute_T(n=n, m=m, bond=bond, with_units=with_units,
@@ -1228,6 +1252,25 @@ class Nanotube(object):
 
     @classmethod
     def compute_psi(cls, n=int, m=int):
+        """Compute symmetry operation rotation: :math:`\\psi`
+
+        .. math::
+
+           \\psi = \\frac{2\\pi}{N}
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} +
+            m\\mathbf{a}_{2} = (n, m)`.
+
+        Returns
+        -------
+        float
+            Symmetry operation rotation: :math:`\\psi`
+
+        """
         N = Nanotube.compute_N(n=n, m=m)
         return 2 * np.pi / N
 
