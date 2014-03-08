@@ -576,10 +576,73 @@ class LAMMPSDATASpecs(StructureSpecs):
         self._section_properties = OrderedDict()
 
         atoms_section_syntax = {}
-        atoms_section_syntax['full'] = ['atomID', 'moleculeID', 'atomtype',
-                                        'q', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-        atoms_section_syntax['atomic'] = ['atomID', 'moleculeID', 'atomtype',
-                                          'x', 'y', 'z', 'nx', 'ny', 'nz']
+        atoms_section_syntax['angle'] = \
+            ['atomID', 'moleculeID', 'atomtype',
+             'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+        atoms_section_syntax['atomic'] = \
+            ['atomID', 'atomtype', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+        atoms_section_syntax['body'] = \
+            ['atomID', 'atomtype', 'bodyflag', 'mass',
+             'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+        atoms_section_syntax['bond'] = \
+            ['atomID', 'moleculeID', 'atomtype',
+             'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+        atoms_section_syntax['charge'] = \
+            ['atomID', 'atomtype', 'q',
+             'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+        atoms_section_syntax['dipole'] = \
+            ['atomID', 'atomtype', 'q', 'x', 'y', 'z',
+             'mux', 'muy', 'muz', 'nx', 'ny', 'nz']
+
+        atoms_section_syntax['electron'] = \
+            ['atomID', 'atomtype', 'q', 'spin', 'eradius', 'x', 'y', 'z',
+             'nx', 'ny', 'nz']
+
+        atoms_section_syntax['ellipsoid'] = \
+            ['atomID', 'atomtype', 'ellipsoidflag', 'density',
+             'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+        atoms_section_syntax['full'] = \
+            ['atomID', 'moleculeID', 'atomtype', 'q',
+             'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+        atoms_section_syntax['line'] = \
+            ['atomID', 'moleculeID', 'atomtype', 'lineflag', 'density',
+             'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+        atoms_section_syntax['meso'] = \
+            ['atomID', 'atomtype', 'rho', 'e', 'cv',
+             'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+        atoms_section_syntax['molecular'] = \
+            ['atomID', 'moleculeID', 'atomtype',
+             'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+        atoms_section_syntax['peri'] = \
+            ['atomID', 'atomtype', 'volume', 'density',
+             'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+        atoms_section_syntax['sphere'] = \
+            ['atomID', 'atomtype', 'diameter', 'density',
+             'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+        atoms_section_syntax['template'] = \
+            ['atomID', 'moleculeID', 'template-index', 'template-atom',
+             'atomtype', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+        atoms_section_syntax['tri'] = \
+            ['atomID', 'moleculeID', 'atomtype', 'triangleflag', 'density',
+             'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+        atoms_section_syntax['wavepacket'] = \
+            ['atomID', 'atomtype', 'charge', 'spin', 'eradius', 'etag',
+             'cs_re', 'cs_im', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
         velocities_section_syntax = {}
         velocities_section_syntax['full'] = ['atomID', 'vx', 'vy', 'vz']
 
