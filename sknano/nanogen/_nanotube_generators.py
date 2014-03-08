@@ -321,6 +321,18 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
     verbose : bool, optional
         if `True`, show verbose output
 
+    Notes
+    -----
+    The `UnrolledNanotubeGenerator` class generates graphene using the
+    nanotube unit cell defined by the chiral vector
+    :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
+    If you want to generate graphene with an armchair or zigzag edge using
+    `length` and `width` parameters, see the
+    :py:class:`~sknano.nanogen.GrapheneGenerator` class.
+
+    .. seealso:: :py:class:`~sknano.nanogen.GrapheneGenerator`
+
+
     Examples
     --------
     First, load the :py:class:`~sknano.nanogen.UnrolledNanotubeGenerator`
@@ -341,8 +353,8 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
                  element1='C', element2='C', bond=CCbond,
                  Lx=None, Ly=None, Lz=None, fix_Lz=False,
-                 with_units=False, units=None,
-                 autogen=True, verbose=False):
+                 nlayers=None, layer_spacing=None, stacking_order=None,
+                 with_units=False, units=None, autogen=True, verbose=False):
 
         super(UnrolledNanotubeGenerator, self).__init__(
             n=n, m=m, nx=nx, ny=ny, nz=nz,
