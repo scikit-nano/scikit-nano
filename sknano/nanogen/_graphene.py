@@ -10,8 +10,6 @@ Graphene structure tools (:mod:`sknano.nanogen._graphene`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext'
 
-from collections import OrderedDict
-
 #import itertools
 #import warnings
 #warnings.filterwarnings('ignore')  # to suppress the Pint UnicodeWarning
@@ -28,8 +26,6 @@ import numpy as np
 from ..chemistry import Atom
 from ..tools import Vector2D, Vector3D
 from ..tools.refdata import CCbond
-
-from ._parameter_luts import param_units, param_symbols, param_strfmt
 
 edge_types = {'armchair': 'AC', 'zigzag': 'ZZ'}
 
@@ -115,9 +111,6 @@ class Graphene(object):
 
     Parameters
     ----------
-    n, m : int, optional
-        Chiral indices defining the nanotube chiral vector
-        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
     width : float, optional
         Width of graphene sheet in **nanometers**
     length : float, optional
@@ -152,36 +145,13 @@ class Graphene(object):
 
     """
 
-    def __init__(self, n=None, m=None, width=None, length=None, edge=None,
+    def __init__(self, width=None, length=None, edge=None,
                  element1='C', element2='C', bond=CCbond, nlayers=1,
                  layer_spacing=3.35, stacking_order='AB', with_units=False,
                  units=None, verbose=False):
 
-        self._params = OrderedDict()
-
         # add each parameter in the order I want them to appear in
         # verbose output mode
-        self._params['n'] = {}
-        self._params['m'] = {}
-        self._params['t1'] = {}
-        self._params['t2'] = {}
-        self._params['d'] = {}
-        self._params['dR'] = {}
-        self._params['N'] = {}
-        self._params['M'] = {}
-        self._params['R'] = {}
-        self._params['bond'] = {}
-        self._params['chiral_angle'] = {}
-        self._params['Ch'] = {}
-        self._params['T'] = {}
-
-        try:
-            self._n = int(n)
-            self._m = int(m)
-        except TypeError:
-            self._n = n
-            self._m = m
-
         self._element1 = element1
         self._element2 = element2
 
@@ -213,19 +183,6 @@ class Graphene(object):
             self._bond = bond
 
         self._verbose = verbose
-
-        self._t1 = None
-        self._t2 = None
-        self._d = None
-        self._dR = None
-        self._Ch = None
-        self._T = None
-        self._chiral_angle = None
-        self._N = None
-        self._M = None
-        self._R = None
-        self._p = None
-        self._q = None
 
         self._cell = Vector2D(with_units=with_units, units=units)
 
@@ -260,18 +217,6 @@ class Graphene(object):
 
         self._Nx = int(np.ceil(10 * self._width / self._cell.x))
         self._Ny = int(np.ceil(10 * self._length / self._cell.y))
-
-        for k, v in self.__dict__.iteritems():
-            p = k.strip('_')
-            if p in self._params.keys():
-                self._params[p]['units'] = param_units.get(p)
-                self._params[p]['strfmt'] = param_strfmt.get(p)
-                if param_symbols.get(p) is not None:
-                    self._params[p]['var'] = param_symbols[p]
-                else:
-                    self._params[p]['var'] = p
-
-        self.compute_layer_params()
 
     def compute_layer_params(self):
         pass

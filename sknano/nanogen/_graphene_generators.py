@@ -31,9 +31,6 @@ class GrapheneGenerator(Graphene, StructureGenerator):
 
     Parameters
     ----------
-    n, m : int, optional
-        Chiral indices defining the nanotube chiral vector
-        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
     width : float
         Width of graphene sheet in **nanometers**
     length : float
@@ -129,14 +126,14 @@ class GrapheneGenerator(Graphene, StructureGenerator):
 
     """
 
-    def __init__(self, n=None, m=None, width=None, length=None,
-                 edge=None, element1='C', element2='C', bond=CCbond,
+    def __init__(self, width=None, length=None, edge=None,
+                 element1='C', element2='C', bond=CCbond,
                  nlayers=1, layer_spacing=3.35, stacking_order='AB',
                  autogen=True, with_units=False, units=None,
                  verbose=False):
 
         super(GrapheneGenerator, self).__init__(
-            n=n, m=m, width=width, length=length, edge=edge,
+            width=width, length=length, edge=edge,
             element1=element1, element2=element2, bond=bond,
             nlayers=nlayers, layer_spacing=layer_spacing,
             stacking_order=stacking_order, with_units=with_units, units=units,
@@ -290,9 +287,6 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
 
     Parameters
     ----------
-    n, m : int, optional
-        Chiral indices defining the nanotube chiral vector
-        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
     width : float
         Width of graphene sheet in **nanometers**
     length : float
@@ -367,14 +361,14 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
 
     """
 
-    def __init__(self, n=None, m=None, width=None, length=None, edge=None,
+    def __init__(self, width=None, length=None, edge=None,
                  element1='C', element2='C', bond=CCbond,
                  layer_spacing=3.35, stacking_order='AB',
                  rotation_angle=None, deg2rad=True, autogen=True,
                  verbose=False):
 
         super(BiLayerGrapheneGenerator, self).__init__(
-            n=n, m=m, width=width, length=length, edge=edge,
+            width=width, length=length, edge=edge,
             element1=element1, element2=element2, bond=bond,
             nlayers=2, layer_spacing=layer_spacing, autogen=False,
             verbose=verbose)
