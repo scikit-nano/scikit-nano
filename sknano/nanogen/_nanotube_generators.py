@@ -569,19 +569,32 @@ class MWNTGenerator(NanotubeGenerator):
         Generate the nanotube with length as close to the specified
         :math:`L_z` as possible. If `True`, then
         non integer :math:`n_z` cells are permitted.
+    add_outer_shells : bool, optional
+        Build the MWNT by adding outer shells
+
+        .. versionadded:: 0.2.23
+
+    add_inner_shells : bool, optional
+        Build the MWNT by adding inner shells
+
+        .. versionadded:: 0.2.23
+
     max_shells : int, optional
         Maximum number of shells per MWNT.
+    max_shell_diameter : float, optional
+        Maximum shell diameter, in units of **Angstroms**.
+    min_shells : int, optional
+        Minimum number of shells per MWNT.
     min_shell_diameter : float, optional
         Minimum shell diameter, in units of **Angstroms**.
+    new_shell_type : {None, 'AC', 'ZZ', 'achiral', 'chiral'}, optional
+        If `None`, the chiralities of the new shells are constrained only
+        by their diameter and will be chosen randomly if more than one
+        candidate chirality exists. If not `None`, then the
+        `new_shell_type` will be added as a constraint.
     shell_spacing : float, optional
         Shell spacing in units of **Angstroms**. Default
         value is the van der Waals interaction distance of 3.4 Angstroms.
-    inner_shell_Ch_type : {None, 'armchair', AC', 'zigzag', 'ZZ', 'achiral',
-                           'chiral'}, optional
-        If `None`, the chiralities of the inner shells are constrained only
-        by their diameter and will be chosen randomly if more than one
-        candidate chirality exists. If not `None`, then the inner
-        shell chirality type will be added as a constraint.
     autogen : bool, optional
         if `True`, automatically call
         :py:meth:`~MWNTGenerator.generate_unit_cell`,
@@ -601,10 +614,12 @@ class MWNTGenerator(NanotubeGenerator):
     """
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
                  element1='C', element2='C', bond=CCbond,
-                 Lx=None, Ly=None, Lz=None, fix_Lz=False, max_shells=None,
-                 min_shell_diameter=0.0, shell_spacing=3.4,
-                 inner_shell_Ch_type=None, with_units=False, units=None,
-                 autogen=True, verbose=False):
+                 Lx=None, Ly=None, Lz=None, fix_Lz=False,
+                 add_inner_shells=True, add_outer_shells=False,
+                 max_shells=None, max_shell_diameter=np.inf,
+                 min_shells=None, min_shell_diameter=0.0,
+                 new_shell_type=None, shell_spacing=3.4,
+                 with_units=False, units=None, autogen=True, verbose=False):
 
         super(MWNTGenerator, self).__init__(
             n=n, m=m, nx=nx, ny=ny, nz=nz,
@@ -613,13 +628,21 @@ class MWNTGenerator(NanotubeGenerator):
             with_units=with_units, units=units,
             autogen=False, verbose=verbose)
 
+        self._add_inner_shells = add_inner_shells
+        self._add_outer_shells = add_outer_shells
+
         self._max_shells = max_shells
         if max_shells is None:
             self._max_shells = np.inf
+        self._max_shell_diameter = max_shell_diameter
 
+        self._min_shells = min_shells
+        if min_shells is None:
+            self._min_shells = 1
         self._min_shell_diameter = min_shell_diameter
+
+        self._new_shell_type = new_shell_type
         self._shell_spacing = shell_spacing
-        self._inner_shell_Ch_type = inner_shell_Ch_type
 
         self._Nshells_per_tube = 1
         self._Natoms_per_tube = 0
@@ -696,6 +719,7 @@ class MWNTGenerator(NanotubeGenerator):
         Ch = np.asarray(Ch)
 
         self._min_shell_diameter = max(self._min_shell_diameter, dt.min())
+        self._max_shell_diameter = min(self._max_shell_diameter, dt.max())
 
         super(MWNTGenerator, self).generate_structure_data()
 
@@ -713,18 +737,18 @@ class MWNTGenerator(NanotubeGenerator):
             delta_dt = 0.05
             while len(next_Ch_candidates) == 0 and \
                     next_dt >= self._min_shell_diameter:
-                if self._inner_shell_Ch_type in ('AC', 'armchair'):
+                if self._new_shell_type in ('AC', 'armchair'):
                     next_Ch_candidates = \
                         Ch[np.where(
                             np.logical_and(np.abs(dt - next_dt) <= delta_dt,
                                            Ch[:,0] == Ch[:,1]))]
-                elif self._inner_shell_Ch_type in ('ZZ', 'zigzag'):
+                elif self._new_shell_type in ('ZZ', 'zigzag'):
                     next_Ch_candidates = \
                         Ch[np.where(
                             np.logical_and(np.abs(dt - next_dt) <= delta_dt,
                                            np.logical_or(Ch[:,0] == 0,
                                                          Ch[:,1] == 0)))]
-                elif self._inner_shell_Ch_type == 'achiral':
+                elif self._new_shell_type == 'achiral':
                     next_Ch_candidates = \
                         Ch[np.where(
                             np.logical_and(np.abs(dt - next_dt) <= delta_dt,
@@ -733,7 +757,7 @@ class MWNTGenerator(NanotubeGenerator):
                                                np.logical_or(
                                                    Ch[:,0] == 0,
                                                    Ch[:,1] == 0))))]
-                elif self._inner_shell_Ch_type == 'chiral':
+                elif self._new_shell_type == 'chiral':
                     next_Ch_candidates = \
                         Ch[np.where(
                             np.logical_and(np.abs(dt - next_dt) <= delta_dt,

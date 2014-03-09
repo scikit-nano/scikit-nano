@@ -366,6 +366,39 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
+    Lx, Ly, Lz : float, optional
+        length of bundle in :math:`x, y, z` dimensions in **nanometers**.
+        Overrides the :math:`n_x, n_y, n_z` cell values.
+    fix_Lz : bool, optional
+        Generate the nanotube with length as close to the specified
+        :math:`L_z` as possible. If `True`, then
+        non integer :math:`n_z` cells are permitted.
+    add_outer_shells : bool, optional
+        Build the MWNT by adding outer shells
+
+        .. versionadded:: 0.2.23
+
+    add_inner_shells : bool, optional
+        Build the MWNT by adding inner shells
+
+        .. versionadded:: 0.2.23
+
+    max_shells : int, optional
+        Maximum number of shells per MWNT.
+    max_shell_diameter : float, optional
+        Maximum shell diameter, in units of **Angstroms**.
+    min_shells : int, optional
+        Minimum number of shells per MWNT.
+    min_shell_diameter : float, optional
+        Minimum shell diameter, in units of **Angstroms**.
+    new_shell_type : {None, 'AC', 'ZZ', 'achiral', 'chiral'}, optional
+        If `None`, the chiralities of the new shells are constrained only
+        by their diameter and will be chosen randomly if more than one
+        candidate chirality exists. If not `None`, then the
+        `new_shell_type` will be added as a constraint.
+    shell_spacing : float, optional
+        Shell spacing in units of **Angstroms**. Default
+        value is the van der Waals interaction distance of 3.4 Angstroms.
     vdw_spacing : float, optional
         van der Waals distance between nearest neighbor tubes
     bundle_packing : {None, 'hcp', 'hexagonal', 'ccp', 'cubic'}, optional
@@ -376,26 +409,6 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
         `hexagonal`.
     bundle_geometry : {None, 'triangle', 'hexagon', 'square', 'rectangle',
                        'rhombus', 'rhomboid'}, optional
-    Lx, Ly, Lz : float, optional
-        length of bundle in :math:`x, y, z` dimensions in **nanometers**.
-        Overrides the :math:`n_x, n_y, n_z` cell values.
-    fix_Lz : bool, optional
-        Generate the nanotube with length as close to the specified
-        :math:`L_z` as possible. If `True`, then
-        non integer :math:`n_z` cells are permitted.
-    max_shells : int, optional
-        Maximum number of shells per MWNT.
-    min_shell_diameter : float, optional
-        Minimum shell diameter, in units of **Angstroms**.
-    shell_spacing : float, optional
-        Shell spacing in units of **Angstroms**. Default
-        value is the van der Waals interaction distance of 3.4 Angstroms.
-    inner_shell_Ch_type : {None, 'armchair', AC', 'zigzag', 'ZZ', 'achiral',
-                           'chiral'}, optional
-        If `None`, the chiralities of the inner shells are constrained only
-        by their diameter and will be chosen randomly if more than one
-        candidate chirality exists. If not `None`, then the inner
-        shell chirality type will be added as a constraint.
     autogen : bool, optional
         if `True`, automatically call
         :py:meth:`~MWNTGenerator.generate_unit_cell`,
@@ -416,21 +429,25 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
 
     """
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
-                 element1='C', element2='C', bond=CCbond, vdw_spacing=3.4,
-                 bundle_packing=None, bundle_geometry=None, Lx=None, Ly=None,
-                 Lz=None, fix_Lz=False, max_shells=None,
-                 min_shell_diameter=0.0, shell_spacing=3.4,
-                 inner_shell_Ch_type=None, with_units=False,
-                 units=None, autogen=True, verbose=False):
+                 element1='C', element2='C', bond=CCbond,
+                 Lx=None, Ly=None, Lz=None, fix_Lz=False,
+                 add_inner_shells=True, add_outer_shells=False,
+                 max_shells=None, max_shell_diameter=np.inf,
+                 min_shells=None, min_shell_diameter=0.0,
+                 new_shell_type=None, shell_spacing=3.4,
+                 vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
+                 with_units=False, units=None, autogen=True, verbose=False):
 
         super(MWNTBundleGenerator, self).__init__(
-            n=n, m=m, nx=nx, ny=ny, nz=nz, bond=bond, element1=element1,
-            element2=element2, Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz,
-            max_shells=max_shells, min_shell_diameter=min_shell_diameter,
-            shell_spacing=shell_spacing,
-            inner_shell_Ch_type=inner_shell_Ch_type,
-            with_units=with_units, units=units,
-            autogen=False, verbose=verbose)
+            n=n, m=m, nx=nx, ny=ny, nz=nz,
+            element1=element1, element2=element2, bond=bond,
+            Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz,
+            add_inner_shells=add_inner_shells,
+            add_outer_shells=add_outer_shells,
+            max_shells=max_shells, max_shell_diameter=max_shell_diameter,
+            min_shells=min_shells, min_shell_diameter=min_shell_diameter,
+            new_shell_type=new_shell_type, shell_spacing=shell_spacing,
+            with_units=with_units, units=units, autogen=False, verbose=verbose)
 
         self.compute_bundle_params()
 
