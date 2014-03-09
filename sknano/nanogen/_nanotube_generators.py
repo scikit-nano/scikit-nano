@@ -630,15 +630,16 @@ class MWNTGenerator(NanotubeGenerator):
 
         self._add_inner_shells = add_inner_shells
         self._add_outer_shells = add_outer_shells
+        self._starting_shell_position = 'outer'
 
         self._max_shells = max_shells
         if max_shells is None:
-            self._max_shells = np.inf
+            self._max_shells = 10
         self._max_shell_diameter = max_shell_diameter
 
         self._min_shells = min_shells
         if min_shells is None:
-            self._min_shells = 1
+            self._min_shells = 2
         self._min_shell_diameter = min_shell_diameter
 
         self._new_shell_type = new_shell_type
@@ -706,20 +707,17 @@ class MWNTGenerator(NanotubeGenerator):
            generating it every time.
 
         """
-        dt = []
         Ch = []
+        dt = []
         for n in xrange(0, 201):
             for m in xrange(0, 201):
                 if (n <= 2 and m <= 2):
                     continue
                 else:
-                    dt.append(Nanotube.compute_dt(n=n, m=m, bond=self._bond))
                     Ch.append((n, m))
-        dt = np.asarray(dt)
+                    dt.append(Nanotube.compute_dt(n=n, m=m, bond=self._bond))
         Ch = np.asarray(Ch)
-
-        self._min_shell_diameter = max(self._min_shell_diameter, dt.min())
-        self._max_shell_diameter = min(self._max_shell_diameter, dt.max())
+        dt = np.asarray(dt)
 
         super(MWNTGenerator, self).generate_structure_data()
 
@@ -727,31 +725,44 @@ class MWNTGenerator(NanotubeGenerator):
         self._structure_atoms = Atoms(atoms=swnt0, deepcopy=True)
         self._structure_atoms.center_CM()
 
-        Lzmin = self._Lz
-        next_dt = self._dt - 2 * self._shell_spacing
+        self._max_shell_diameter = min(self._max_shell_diameter, dt.max())
+        self._min_shell_diameter = max(self._min_shell_diameter, dt.min())
+
+        Lzmin = self.Lz
+
+        delta_dt = -2 * self._shell_spacing
+        max_dt_diff = 0.05
+
+        if self._add_outer_shells:
+            delta_dt = -delta_dt
+            self._starting_shell_position = 'inner'
+
+        next_dt = self.dt + delta_dt
         while self._Nshells_per_tube < self._max_shells and \
+                next_dt <= self._max_shell_diameter and \
                 next_dt >= self._min_shell_diameter:
 
             # get chiral indices for next_dt
             next_Ch_candidates = []
-            delta_dt = 0.05
             while len(next_Ch_candidates) == 0 and \
+                    next_dt <= self._max_shell_diameter and \
                     next_dt >= self._min_shell_diameter:
+
                 if self._new_shell_type in ('AC', 'armchair'):
                     next_Ch_candidates = \
                         Ch[np.where(
-                            np.logical_and(np.abs(dt - next_dt) <= delta_dt,
+                            np.logical_and(np.abs(dt - next_dt) <= max_dt_diff,
                                            Ch[:,0] == Ch[:,1]))]
                 elif self._new_shell_type in ('ZZ', 'zigzag'):
                     next_Ch_candidates = \
                         Ch[np.where(
-                            np.logical_and(np.abs(dt - next_dt) <= delta_dt,
+                            np.logical_and(np.abs(dt - next_dt) <= max_dt_diff,
                                            np.logical_or(Ch[:,0] == 0,
                                                          Ch[:,1] == 0)))]
                 elif self._new_shell_type == 'achiral':
                     next_Ch_candidates = \
                         Ch[np.where(
-                            np.logical_and(np.abs(dt - next_dt) <= delta_dt,
+                            np.logical_and(np.abs(dt - next_dt) <= max_dt_diff,
                                            np.logical_or(
                                                Ch[:,0] == Ch[:,1],
                                                np.logical_or(
@@ -760,7 +771,7 @@ class MWNTGenerator(NanotubeGenerator):
                 elif self._new_shell_type == 'chiral':
                     next_Ch_candidates = \
                         Ch[np.where(
-                            np.logical_and(np.abs(dt - next_dt) <= delta_dt,
+                            np.logical_and(np.abs(dt - next_dt) <= max_dt_diff,
                                            np.logical_and(
                                                Ch[:,0] != Ch[:,1],
                                                np.logical_and(
@@ -768,10 +779,12 @@ class MWNTGenerator(NanotubeGenerator):
                                                    Ch[:,1] != 1))))]
                 else:
                     next_Ch_candidates = \
-                        Ch[np.where(np.abs(dt - next_dt) <= delta_dt)]
+                        Ch[np.where(np.abs(dt - next_dt) <= max_dt_diff)]
 
-                next_dt -= delta_dt
-                #delta_dt += 0.05
+                if self._add_outer_shells:
+                    next_dt += max_dt_diff
+                else:
+                    next_dt -= max_dt_diff
 
             if len(next_Ch_candidates) > 0:
                 n, m = next_Ch_candidates[
@@ -801,7 +814,7 @@ class MWNTGenerator(NanotubeGenerator):
                 shell.center_CM()
                 self._structure_atoms.extend(shell.atoms)
                 self._Nshells_per_tube += 1
-                next_dt -= 2 * self._shell_spacing
+                next_dt += delta_dt
             else:
                 break
 
@@ -830,8 +843,8 @@ class MWNTGenerator(NanotubeGenerator):
         structure_format : {None, str}, optional
             chemical file format of saved structure data. Must be one of:
 
-                - xyz
-                - data
+                - `xyz`
+                - `data`
 
             If `None`, then guess based on `fname` file extension or
             default to `xyz` format.
@@ -854,8 +867,9 @@ class MWNTGenerator(NanotubeGenerator):
 
         if fname is None:
             Nshells = '{}shell_mwnt'.format(self._Nshells_per_tube)
-            chirality = '{}{}_outer_Ch'.format('{}'.format(self._n).zfill(2),
-                                               '{}'.format(self._m).zfill(2))
+            chirality = '{}{}_{}_Ch'.format('{}'.format(self._n).zfill(2),
+                                            '{}'.format(self._m).zfill(2),
+                                            self._starting_shell_position)
 
             fname_wordlist = None
             if self._assume_integer_unit_cells:
