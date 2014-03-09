@@ -621,8 +621,9 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
 
             Nshells = '{}shell_mwnt'.format(self._Nshells_per_tube)
 
-            chirality = '{}{}_outer_Ch'.format('{}'.format(self._n).zfill(2),
-                                               '{}'.format(self._m).zfill(2))
+            chirality = '{}{}_{}_Ch'.format('{}'.format(self._n).zfill(2),
+                                            '{}'.format(self._m).zfill(2),
+                                            self._starting_shell_position)
             packing = '{}cp'.format(self._bundle_packing[0])
 
             Ntubes = '{}tube'.format(self._Ntubes)
