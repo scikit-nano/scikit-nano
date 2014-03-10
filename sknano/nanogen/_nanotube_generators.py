@@ -283,6 +283,11 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
             XYZWriter.write(fname=self._fname, atoms=self._structure_atoms)
 
 
+class CappedNanotubeGenerator(Nanotube, StructureGenerator):
+    u"""Class for generating capped nanotube structures."""
+    pass
+
+
 class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
     u"""Class for generating unrolled nanotube structures.
 
