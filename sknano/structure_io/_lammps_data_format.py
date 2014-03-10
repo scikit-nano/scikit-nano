@@ -24,7 +24,73 @@ from ._structure_data import StructureReader, StructureWriter, \
     default_comment_line
 
 __all__ = ['DATAReader', 'DATAWriter', 'DATA2XYZConverter',
-           'LAMMPSDATA', 'LAMMPSDATASpecs', 'LAMMPSDATAError']
+           'LAMMPSDATA', 'LAMMPSDATASpecs', 'LAMMPSDATAError',
+           'atom_style_map']
+
+
+atom_style_map = {}
+atom_style_map['angle'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+atom_style_map['atomic'] = \
+    ['atom-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+atom_style_map['body'] = \
+    ['atom-ID', 'atom-type', 'bodyflag', 'mass',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+atom_style_map['bond'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+atom_style_map['charge'] = \
+    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+atom_style_map['dipole'] = \
+    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z',
+     'mux', 'muy', 'muz', 'nx', 'ny', 'nz']
+
+atom_style_map['electron'] = \
+    ['atom-ID', 'atom-type', 'q', 'spin', 'eradius',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+atom_style_map['ellipsoid'] = \
+    ['atom-ID', 'atom-type', 'ellipsoidflag', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+atom_style_map['full'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'q',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+atom_style_map['line'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'lineflag', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+atom_style_map['meso'] = \
+    ['atom-ID', 'atom-type', 'rho', 'e', 'cv',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+atom_style_map['molecular'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+atom_style_map['peri'] = \
+    ['atom-ID', 'atom-type', 'volume', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+atom_style_map['sphere'] = \
+    ['atom-ID', 'atom-type', 'diameter', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+atom_style_map['template'] = \
+    ['atom-ID', 'molecule-ID', 'template-index', 'template-atom',
+     'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+atom_style_map['tri'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'triangleflag', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+atom_style_map['wavepacket'] = \
+    ['atom-ID', 'atom-type', 'charge', 'spin', 'eradius', 'etag',
+     'cs_re', 'cs_im', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
 
 class DATAReader(StructureReader):
