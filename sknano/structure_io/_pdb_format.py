@@ -26,16 +26,22 @@ class PDBReader(StructureReader):
 
     Parameters
     ----------
-    pdbfile : str
+    fname : str
         pdb structure file
 
     """
     def __init__(self, fname=None):
         super(PDBReader, self).__init__(fname=fname)
-        self.read()
+
+        if fname is not None:
+            self.read()
 
     def read(self):
-        pass
+        """Read PDB file."""
+        with open(self._fname, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                print(line)
 
 
 class PDBWriter(StructureWriter):
