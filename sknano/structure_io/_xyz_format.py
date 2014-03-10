@@ -26,7 +26,7 @@ class XYZReader(StructureReader):
 
     Parameters
     ----------
-    xyzfile : str
+    fname : str
         xyz structure file
 
     """
@@ -37,6 +37,7 @@ class XYZReader(StructureReader):
             self.read()
 
     def read(self):
+        """Read XYZ file."""
         with open(self._fname, 'r') as f:
             Natoms = int(f.readline().strip())
             self._comment_line = f.readline().strip()
