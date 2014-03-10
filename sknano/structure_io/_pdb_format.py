@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-==============================================================================
+====================================================
 PDB format (:mod:`sknano.structure_io._pdb_format`)
-==============================================================================
+====================================================
 
 .. currentmodule:: sknano.structure_io._pdb_format
 
@@ -15,10 +15,10 @@ from ..chemistry import Atoms
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureReaderError, \
-    StructureWriter, default_comment_line
+    StructureWriter, StructureSpecs, default_comment_line
 
 
-__all__ = ['PDBDATA', 'PDBReader', 'PDBWriter']
+__all__ = ['PDBDATA', 'PDBReader', 'PDBWriter', 'PDBSpecs']
 
 
 class PDBReader(StructureReader):
@@ -87,3 +87,14 @@ class PDBDATA(PDBReader):
 
     def write(self, pdbfile=None):
         pass
+
+
+class PDBSpecs(StructureSpecs):
+    """Class defining the structure file format for PDB data.
+
+    Parameters
+    ----------
+
+    """
+    def __init__(self):
+        super(PDBSpecs, self).__init__()
