@@ -11,12 +11,13 @@ from __future__ import division, print_function, absolute_import
 
 __docformat__ = 'restructuredtext'
 
+#from collections import OrderedDict
+
 from ..chemistry import Atoms
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureReaderError, \
     StructureWriter, StructureSpecs, default_comment_line
-
 
 __all__ = ['PDBDATA', 'PDBReader', 'PDBWriter', 'PDBSpecs']
 
@@ -104,3 +105,26 @@ class PDBSpecs(StructureSpecs):
     """
     def __init__(self):
         super(PDBSpecs, self).__init__()
+
+        self._record_types = ['HEADER',
+                              'TITLE',
+                              'SPLIT',
+                              'COMPND',
+                              'SOURCE',
+                              'KEYWDS',
+                              'EXPDTA',
+                              'AUTHOR',
+                              'REVDAT',
+                              'REMARK 0',
+                              'REMARK 1',
+                              'REMARK 2',
+                              'REMARK 3',
+                              'MASTER',
+                              'END']
+
+        #self._record_types = OrderedDict()
+        #self._record_types['HEADER'] = []
+
+    @property
+    def record_types(self):
+        return self._record_types
