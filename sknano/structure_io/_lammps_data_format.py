@@ -611,6 +611,10 @@ class LAMMPSDATA(DATAReader):
         except (TypeError, ValueError) as e:
             print(e)
 
+    @classmethod
+    def format_spec(cls, atom_style='full'):
+        return LAMMPSDATAFormatter(atom_style=atom_style)
+
 
 class LAMMPSDATAError(StructureDataError):
     """Exception raised for failed method calls.
