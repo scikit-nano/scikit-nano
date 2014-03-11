@@ -17,11 +17,10 @@ from ..chemistry import Atom, Atoms
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureWriter, \
-    StructureSpecs, StructureDataError
+    StructureFormatter, StructureDataError
 
 
-__all__ = ['DUMPReader', 'DUMPWriter', 'LAMMPSDUMP',
-           'LAMMPSDUMPError']
+__all__ = ['DUMPReader', 'DUMPWriter', 'LAMMPSDUMP', 'LAMMPSDUMPError']
 
 
 class DUMPReader(StructureReader):
@@ -37,11 +36,11 @@ class DUMPReader(StructureReader):
     def __init__(self, fname=None, atom_style='full'):
         super(DUMPReader, self).__init__(fname=fname)
 
-        dump_specs = LAMMPSDUMPSpecs(atom_style=atom_style)
-        self._dump_headers = dump_specs.properties['headers']
-        self._dump_sections = dump_specs.properties['sections']
-        self._section_properties = dump_specs.section_properties
-        self._section_syntax_dict = dump_specs.section_syntax_dict
+        dump_format = LAMMPSDUMPFormatter(atom_style=atom_style)
+        self._dump_headers = dump_format.properties['headers']
+        self._dump_sections = dump_format.properties['sections']
+        self._section_properties = dump_format.section_properties
+        self._section_syntax_dict = dump_format.section_syntax_dict
 
         self._headers = {}
         self._sections = {}
@@ -554,8 +553,6 @@ class LAMMPSDUMPError(StructureDataError):
         return repr(self.msg)
 
 
-class LAMMPSDUMPSpecs(StructureSpecs):
+class LAMMPSDUMPFormatter(StructureFormatter):
     """Class defining the structure file format for LAMMPS dump."""
-
-    def __init__(self):
-        pass
+    pass

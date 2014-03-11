@@ -19,7 +19,7 @@ from ..tools import get_fpath
 from ._structure_data import StructureReader, StructureReaderError, \
     StructureWriter, StructureFormatter, default_comment_line
 
-__all__ = ['PDBDATA', 'PDBReader', 'PDBWriter', 'PDBFormat']
+__all__ = ['PDBDATA', 'PDBReader', 'PDBWriter', 'PDBFormatter']
 
 
 class PDBReader(StructureReader):
@@ -96,7 +96,7 @@ class PDBDATA(PDBReader):
         pass
 
 
-class PDBFormat(StructureFormatter):
+class PDBFormatter(StructureFormatter):
     """Class defining the structure file format for PDB data.
 
     Parameters
@@ -104,7 +104,7 @@ class PDBFormat(StructureFormatter):
 
     """
     def __init__(self):
-        super(PDBFormat, self).__init__()
+        super(PDBFormatter, self).__init__()
 
         self._records = OrderedDict()
         #self._records['HEADER'] = header = {}

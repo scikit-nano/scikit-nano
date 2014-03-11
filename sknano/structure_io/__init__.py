@@ -18,7 +18,7 @@ Classes for handling `LAMMPS data` structure data format
    DATAWriter
    DATA2XYZConverter
    LAMMPSDATA
-   LAMMPSDATASpecs
+   LAMMPSDATAFormatter
    LAMMPSDATAError
 
 Classes for handling `xyz` structure data format
@@ -40,7 +40,7 @@ Base classes for creating new structure data readers/writers/converters
    StructureReader
    StructureWriter
    StructureConverter
-   StructureSpecs
+   StructureFormatter
 
 Base custom exception classes for handling errors
 --------------------------------------------------
@@ -67,7 +67,6 @@ __docformat__ = 'restructuredtext'
 
 from ._lammps_data_format import *
 from ._xyz_format import *
-
 from ._structure_data import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
