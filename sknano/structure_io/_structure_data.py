@@ -173,6 +173,13 @@ class StructureFormat(object):
         return self._properties
 
 
+class StructureFormatter(object):
+    """Base class for wrapping `Atom` attributes into a formatted string."""
+
+    def format(self):
+        pass
+
+
 class StructureDataError(Exception):
     """Base class for `StructureData` exceptions."""
     pass
