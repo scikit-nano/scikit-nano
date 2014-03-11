@@ -20,7 +20,7 @@ from ._structure_data import StructureReader, StructureWriter, \
     StructureFormat, StructureDataError
 
 
-__all__ = ['DUMPReader', 'DUMPWriter', 'LAMMPSDUMP', 'LAMMPSDUMPError']
+__all__ = ['DUMPReader', 'DUMPWriter', 'DUMPData', 'DUMPError']
 
 
 class DUMPReader(StructureReader):
@@ -36,7 +36,7 @@ class DUMPReader(StructureReader):
     def __init__(self, fname=None, atom_style='full'):
         super(DUMPReader, self).__init__(fname=fname)
 
-        dump_format = LAMMPSDUMPFormat(atom_style=atom_style)
+        dump_format = DUMPFormat(atom_style=atom_style)
         self._dump_headers = dump_format.properties['headers']
         self._dump_sections = dump_format.properties['sections']
         self._section_properties = dump_format.section_properties
@@ -353,7 +353,7 @@ class tselect(object):
     pass
 
 
-class LAMMPSDUMP(DUMPReader):
+class DUMPData(DUMPReader):
     """Class for reading and writing structure data in LAMMPS dump format.
 
     Parameters
@@ -362,7 +362,7 @@ class LAMMPSDUMP(DUMPReader):
 
     """
     def __init__(self, fname=None):
-        super(LAMMPSDUMP, self).__init__(fname=fname)
+        super(DUMPData, self).__init__(fname=fname)
         self._snaps = []
         self._nsnaps = self._nselect = 0
         self._names = {}
@@ -501,7 +501,7 @@ class LAMMPSDUMP(DUMPReader):
                     colidx = int(colindex)
             except (KeyError, TypeError, ValueError) as e:
                 print(e)
-                raise LAMMPSDUMPError('replace called with invalid arguments')
+                raise DUMPError('replace called with invalid arguments')
         atom_attr = self._section_syntax_dict[section_key][colidx]
         attr_dtype = \
             self._section_properties[section_key][atom_attr]['dtype']
@@ -537,7 +537,7 @@ class LAMMPSDUMP(DUMPReader):
             print(e)
 
 
-class LAMMPSDUMPError(StructureDataError):
+class DUMPError(StructureDataError):
     """Exception raised for failed method calls.
 
     Parameters
@@ -553,6 +553,6 @@ class LAMMPSDUMPError(StructureDataError):
         return repr(self.msg)
 
 
-class LAMMPSDUMPFormat(StructureFormat):
+class DUMPFormat(StructureFormat):
     """Class defining the structure file format for LAMMPS dump."""
     pass

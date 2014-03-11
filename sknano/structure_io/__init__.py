@@ -14,12 +14,12 @@ Classes for handling `LAMMPS data` structure data format
 .. autosummary::
    :toctree: generated/
 
+   DATAData
    DATAReader
    DATAWriter
    DATA2XYZConverter
-   LAMMPSDATA
-   LAMMPSDATAFormat
-   LAMMPSDATAError
+   DATAFormat
+   DATAError
 
 Classes for handling `xyz` structure data format
 -------------------------------------------------

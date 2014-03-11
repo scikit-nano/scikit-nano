@@ -23,9 +23,8 @@ from ._structure_data import StructureReader, StructureWriter, \
     StructureConverter, StructureFormat, StructureDataError, \
     default_comment_line
 
-__all__ = ['DATAReader', 'DATAWriter', 'DATA2XYZConverter',
-           'LAMMPSDATA', 'LAMMPSDATAFormat', 'LAMMPSDATAError',
-           'atom_style_map']
+__all__ = ['DATAData', 'DATAReader', 'DATAWriter', 'DATA2XYZConverter',
+           'DATAFormat', 'DATAError', 'atom_style_map']
 
 
 atom_style_map = {}
@@ -106,7 +105,7 @@ class DATAReader(StructureReader):
     def __init__(self, fname=None, atom_style='full'):
         super(DATAReader, self).__init__(fname=fname)
 
-        data_format = LAMMPSDATAFormat(atom_style=atom_style)
+        data_format = DATAFormat(atom_style=atom_style)
         self._data_headers = data_format.properties['headers']
         self._data_sections = data_format.properties['sections']
         self._section_properties = data_format.section_properties
@@ -121,12 +120,12 @@ class DATAReader(StructureReader):
 
     @property
     def headers(self):
-        """DATA file headers."""
+        """LAMMPS DATA file headers."""
         return self._headers
 
     @property
     def sections(self):
-        """DATA file sections."""
+        """LAMMPS DATA file sections."""
         return self._sections
 
     @property
@@ -501,7 +500,7 @@ class DATA2XYZConverter(StructureConverter):
             return XYZReader(fname=self._xyzfile)
 
 
-class LAMMPSDATA(DATAReader):
+class DATAData(DATAReader):
     """Class for reading and writing structure data in LAMMPS data format.
 
     Parameters
@@ -510,7 +509,7 @@ class LAMMPSDATA(DATAReader):
 
     """
     def __init__(self, fname=None):
-        super(LAMMPSDATA, self).__init__(fname=fname)
+        super(DATAData, self).__init__(fname=fname)
 
     def delete(self, key):
         pass
@@ -572,7 +571,7 @@ class LAMMPSDATA(DATAReader):
                     colidx = int(colindex)
             except (KeyError, TypeError, ValueError) as e:
                 print(e)
-                raise LAMMPSDATAError('replace called with invalid arguments')
+                raise DATAError('replace called with invalid arguments')
         atom_attr = self._section_syntax_dict[section_key][colidx]
         attr_dtype = \
             self._section_properties[section_key][atom_attr]['dtype']
@@ -613,10 +612,10 @@ class LAMMPSDATA(DATAReader):
 
     @classmethod
     def format_spec(cls, atom_style='full'):
-        return LAMMPSDATAFormat(atom_style=atom_style)
+        return DATAFormat(atom_style=atom_style)
 
 
-class LAMMPSDATAError(StructureDataError):
+class DATAError(StructureDataError):
     """Exception raised for failed method calls.
 
     Parameters
@@ -632,7 +631,7 @@ class LAMMPSDATAError(StructureDataError):
         return repr(self.msg)
 
 
-class LAMMPSDATAFormat(StructureFormat):
+class DATAFormat(StructureFormat):
     """Class defining the structure file format for LAMMPS data.
 
     Parameters
@@ -642,7 +641,7 @@ class LAMMPSDATAFormat(StructureFormat):
 
     """
     def __init__(self, atom_style='full'):
-        super(LAMMPSDATAFormat, self).__init__()
+        super(DATAFormat, self).__init__()
         self._section_properties = OrderedDict()
 
         atoms_section_syntax = {}

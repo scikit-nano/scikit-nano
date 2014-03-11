@@ -19,7 +19,7 @@ from ..tools import get_fpath
 from ._structure_data import StructureReader, StructureReaderError, \
     StructureWriter, StructureFormat, default_comment_line
 
-__all__ = ['PDBDATA', 'PDBReader', 'PDBWriter', 'PDBFormat']
+__all__ = ['PDBData', 'PDBReader', 'PDBWriter', 'PDBFormat']
 
 
 class PDBReader(StructureReader):
@@ -78,7 +78,7 @@ class PDBWriter(StructureWriter):
                         atom.symbol, atom.x, atom.y, atom.z))
 
 
-class PDBDATA(PDBReader):
+class PDBData(PDBReader):
     """Class for reading and writing structure data in PDB data format.
 
     Parameters
@@ -88,7 +88,7 @@ class PDBDATA(PDBReader):
     """
     def __init__(self, fname=None):
         try:
-            super(PDBDATA, self).__init__(fname=fname)
+            super(PDBData, self).__init__(fname=fname)
         except StructureReaderError:
             pass
 
