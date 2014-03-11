@@ -24,7 +24,7 @@ from ._structure_data import StructureReader, StructureWriter, \
     default_comment_line
 
 __all__ = ['DATAData', 'DATAReader', 'DATAWriter', 'DATA2XYZConverter',
-           'DATAFormat', 'DATAError', 'atom_style_map']
+           'DATAFormat', 'DATAError', 'LAMMPSDATA', 'atom_style_map']
 
 
 atom_style_map = {}
@@ -613,6 +613,8 @@ class DATAData(DATAReader):
     @classmethod
     def format_spec(cls, atom_style='full'):
         return DATAFormat(atom_style=atom_style)
+
+LAMMPSDATA = DATAData
 
 
 class DATAError(StructureDataError):
