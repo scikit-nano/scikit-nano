@@ -110,6 +110,14 @@ class PDBFormat(StructureFormat):
         #self._records['HEADER'] = header = {}
         #self._records['TITLE'] = title = {}
         #self._records['MASTER'] = {}
+        self._records['ATOM'] = atom = {}
+        atom['format'] = \
+            '{:6}{:>5} {:>4}{:1}{:>3} {:1}{:>4}{:1}' + \
+            '{:3}'.format('') + \
+            '{:>8.3f}{:>8.3f}{:>8.3f}' + \
+            '{:>6.2f}{:>6.2f}' + \
+            '{:10}'.format('') + \
+            '{:2}{:2}'
         self._records['CONECT'] = {}
         self._records['END'] = None
 
