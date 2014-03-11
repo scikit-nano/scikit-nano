@@ -26,10 +26,11 @@ Classes for handling `xyz` structure data format
 .. autosummary::
    :toctree: generated/
 
+   XYZData
    XYZReader
    XYZWriter
    XYZ2DATAConverter
-   XYZDATA
+   XYZFormat
 
 Base classes for creating new structure data readers/writers/converters
 ------------------------------------------------------------------------
