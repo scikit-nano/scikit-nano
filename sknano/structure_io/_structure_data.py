@@ -26,6 +26,7 @@ __all__ = ['StructureData',
            'StructureReader',
            'StructureWriter',
            'StructureConverter',
+           'StructureFormatter',
            'StructureSpecs',
            'StructureDataError',
            'StructureReaderError',
@@ -160,6 +161,17 @@ class StructureConverter(object):
         """Convert structure data from one format to another format."""
         return NotImplementedError('Subclasses of `StructureConverter` need '
                                    'to implement the `convert` method.')
+
+
+class StructureFormatter(object):
+    """Base class for containing structure format properties"""
+    def __init__(self):
+        self._properties = OrderedDict()
+
+    @property
+    def properties(self):
+        """OrderedDict of format properties."""
+        return self._properties
 
 
 class StructureSpecs(object):

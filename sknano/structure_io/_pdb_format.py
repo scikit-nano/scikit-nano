@@ -17,9 +17,9 @@ from ..chemistry import Atom, Atoms
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureReaderError, \
-    StructureWriter, StructureSpecs, default_comment_line
+    StructureWriter, StructureFormatter, default_comment_line
 
-__all__ = ['PDBDATA', 'PDBReader', 'PDBWriter', 'PDBSpecs']
+__all__ = ['PDBDATA', 'PDBReader', 'PDBWriter', 'PDBFormat']
 
 
 class PDBReader(StructureReader):
@@ -96,7 +96,7 @@ class PDBDATA(PDBReader):
         pass
 
 
-class PDBSpecs(StructureSpecs):
+class PDBFormat(StructureFormatter):
     """Class defining the structure file format for PDB data.
 
     Parameters
@@ -104,11 +104,14 @@ class PDBSpecs(StructureSpecs):
 
     """
     def __init__(self):
-        super(PDBSpecs, self).__init__()
+        super(PDBFormat, self).__init__()
 
         self._records = OrderedDict()
         #self._records['HEADER'] = header = {}
         #self._records['TITLE'] = title = {}
+        #self._records['MASTER'] = {}
+        self._records['CONECT'] = {}
+        self._records['END'] = None
 
         self._properties['RECORDS'] = self._records
 
