@@ -16,9 +16,10 @@ from ..chemistry import Atom, Atoms
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureReaderError, \
-    StructureWriter, StructureConverter, default_comment_line
+    StructureWriter, StructureConverter, StructureFormat, default_comment_line
 
-__all__ = ['XYZDATA', 'XYZReader', 'XYZWriter', 'XYZ2DATAConverter']
+__all__ = ['XYZData', 'XYZReader', 'XYZWriter',
+           'XYZ2DATAConverter', 'XYZFormat']
 
 
 class XYZReader(StructureReader):
@@ -90,7 +91,7 @@ class XYZWriter(StructureWriter):
                         atom.symbol, atom.x, atom.y, atom.z))
 
 
-class XYZDATA(XYZReader):
+class XYZData(XYZReader):
     """Class for reading and writing structure data in XYZ data format.
 
     Parameters
@@ -99,7 +100,7 @@ class XYZDATA(XYZReader):
 
     """
     def __init__(self, fname=None):
-        super(XYZDATA, self).__init__(fname=fname)
+        super(XYZData, self).__init__(fname=fname)
 
     def write(self, xyzfile=None):
         """Write xyz file.
@@ -242,3 +243,7 @@ class XYZ2DATAConverter(StructureConverter):
 
         if return_reader:
             return DATAReader(fname=self._datafile)
+
+
+class XYZFormat(StructureFormat):
+    pass
