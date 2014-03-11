@@ -26,7 +26,7 @@ __all__ = ['StructureData',
            'StructureReader',
            'StructureWriter',
            'StructureConverter',
-           'StructureFormatter',
+           'StructureFormat',
            'StructureDataError',
            'StructureReaderError',
            'StructureWriterError',
@@ -162,7 +162,7 @@ class StructureConverter(object):
                                    'to implement the `convert` method.')
 
 
-class StructureFormatter(object):
+class StructureFormat(object):
     """Base class for containing structure format properties"""
     def __init__(self):
         self._properties = OrderedDict()

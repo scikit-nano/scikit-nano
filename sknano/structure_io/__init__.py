@@ -18,7 +18,7 @@ Classes for handling `LAMMPS data` structure data format
    DATAWriter
    DATA2XYZConverter
    LAMMPSDATA
-   LAMMPSDATAFormatter
+   LAMMPSDATAFormat
    LAMMPSDATAError
 
 Classes for handling `xyz` structure data format
@@ -40,7 +40,7 @@ Base classes for creating new structure data readers/writers/converters
    StructureReader
    StructureWriter
    StructureConverter
-   StructureFormatter
+   StructureFormat
 
 Base custom exception classes for handling errors
 --------------------------------------------------

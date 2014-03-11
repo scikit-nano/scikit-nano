@@ -17,7 +17,7 @@ from ..chemistry import Atom, Atoms
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureWriter, \
-    StructureFormatter, StructureDataError
+    StructureFormat, StructureDataError
 
 
 __all__ = ['DUMPReader', 'DUMPWriter', 'LAMMPSDUMP', 'LAMMPSDUMPError']
@@ -36,7 +36,7 @@ class DUMPReader(StructureReader):
     def __init__(self, fname=None, atom_style='full'):
         super(DUMPReader, self).__init__(fname=fname)
 
-        dump_format = LAMMPSDUMPFormatter(atom_style=atom_style)
+        dump_format = LAMMPSDUMPFormat(atom_style=atom_style)
         self._dump_headers = dump_format.properties['headers']
         self._dump_sections = dump_format.properties['sections']
         self._section_properties = dump_format.section_properties
@@ -553,6 +553,6 @@ class LAMMPSDUMPError(StructureDataError):
         return repr(self.msg)
 
 
-class LAMMPSDUMPFormatter(StructureFormatter):
+class LAMMPSDUMPFormat(StructureFormat):
     """Class defining the structure file format for LAMMPS dump."""
     pass

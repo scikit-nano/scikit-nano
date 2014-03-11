@@ -20,11 +20,11 @@ from ..chemistry import Atom, Atoms
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureWriter, \
-    StructureConverter, StructureFormatter, StructureDataError, \
+    StructureConverter, StructureFormat, StructureDataError, \
     default_comment_line
 
 __all__ = ['DATAReader', 'DATAWriter', 'DATA2XYZConverter',
-           'LAMMPSDATA', 'LAMMPSDATAFormatter', 'LAMMPSDATAError',
+           'LAMMPSDATA', 'LAMMPSDATAFormat', 'LAMMPSDATAError',
            'atom_style_map']
 
 
@@ -106,7 +106,7 @@ class DATAReader(StructureReader):
     def __init__(self, fname=None, atom_style='full'):
         super(DATAReader, self).__init__(fname=fname)
 
-        data_format = LAMMPSDATAFormatter(atom_style=atom_style)
+        data_format = LAMMPSDATAFormat(atom_style=atom_style)
         self._data_headers = data_format.properties['headers']
         self._data_sections = data_format.properties['sections']
         self._section_properties = data_format.section_properties
@@ -613,7 +613,7 @@ class LAMMPSDATA(DATAReader):
 
     @classmethod
     def format_spec(cls, atom_style='full'):
-        return LAMMPSDATAFormatter(atom_style=atom_style)
+        return LAMMPSDATAFormat(atom_style=atom_style)
 
 
 class LAMMPSDATAError(StructureDataError):
@@ -632,7 +632,7 @@ class LAMMPSDATAError(StructureDataError):
         return repr(self.msg)
 
 
-class LAMMPSDATAFormatter(StructureFormatter):
+class LAMMPSDATAFormat(StructureFormat):
     """Class defining the structure file format for LAMMPS data.
 
     Parameters
@@ -642,7 +642,7 @@ class LAMMPSDATAFormatter(StructureFormatter):
 
     """
     def __init__(self, atom_style='full'):
-        super(LAMMPSDATAFormatter, self).__init__()
+        super(LAMMPSDATAFormat, self).__init__()
         self._section_properties = OrderedDict()
 
         atoms_section_syntax = {}
