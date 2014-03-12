@@ -23,6 +23,7 @@ class StructureGenerator(object):
 
     def __init__(self):
         self._fname = None
+        self._structure_format = None
         self._unit_cell = Atoms()
         self._structure_atoms = Atoms()
 
@@ -30,6 +31,11 @@ class StructureGenerator(object):
     def fname(self):
         """Structure file name."""
         return self._fname
+
+    @property
+    def structure_format(self):
+        """Structure file format."""
+        return self._structure_format
 
     @property
     def unit_cell(self):
@@ -80,18 +86,22 @@ class StructureGenerator(object):
              structure_format not in supported_structure_formats):
             structure_format = default_structure_format
 
+        if not fname.endswith(structure_format):
+            fname += '.' + structure_format
+
         self._fname = fname
+        self._structure_format = structure_format
 
         if center_CM:
-            self._structure_atoms.center_CM()
+            self.structure_atoms.center_CM()
 
         if rotation_angle is not None:
             R_matrix = rotation_matrix(rotation_angle,
                                        rot_axis=rot_axis,
                                        deg2rad=deg2rad)
-            self._structure_atoms.rotate(R_matrix)
+            self.structure_atoms.rotate(R_matrix)
 
         if structure_format == 'data':
-            DATAWriter.write(fname=self._fname, atoms=self._structure_atoms)
+            DATAWriter.write(fname=fname, atoms=self.structure_atoms)
         else:
-            XYZWriter.write(fname=self._fname, atoms=self._structure_atoms)
+            XYZWriter.write(fname=fname, atoms=self.structure_atoms)
