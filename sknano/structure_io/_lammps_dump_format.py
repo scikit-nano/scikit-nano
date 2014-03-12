@@ -20,7 +20,7 @@ from ._structure_data import StructureReader, StructureWriter, \
     StructureFormat, StructureDataError
 
 
-__all__ = ['DUMPReader', 'DUMPWriter', 'DUMPData', 'DUMPError']
+__all__ = ['DUMPReader', 'DUMPWriter', 'DUMPData', 'DUMPError', 'DUMPFormat']
 
 
 class DUMPReader(StructureReader):
