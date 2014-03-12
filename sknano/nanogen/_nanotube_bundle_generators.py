@@ -20,8 +20,6 @@ import copy
 import numpy as np
 
 from ..chemistry import Atom, Atoms
-from ..structure_io import default_structure_format, \
-    supported_structure_formats
 from ..tools import plural_word_check
 from ..tools.refdata import CCbond
 
@@ -271,37 +269,11 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
                   center_CM=True):
         """Save structure data.
 
-        Parameters
-        ----------
-        fname : {None, str}, optional
-            file name string
-        structure_format : {None, str}, optional
-            chemical file format of saved structure data. Must be one of:
-
-                - xyz
-                - data
-
-            If `None`, then guess based on `fname` file extension or
-            default to `xyz` format.
-        rotation_angle : {None, float}, optional
-            Angle of rotation
-        rot_axis : {'x', 'y', 'z'}, optional
-            Rotation axis
-        deg2rad : bool, optional
-            Convert `rotation_angle` from degrees to radians.
-        center_CM : bool, optional
-            Center center-of-mass on origin.
+        See :py:meth:`~sknano.nanogen.StructureGenerator.save_data` method
+        for documentation.
 
         """
-        if (fname is None and structure_format not in
-                supported_structure_formats) or \
-                (fname is not None and not
-                    fname.endswith(supported_structure_formats) and
-                    structure_format not in supported_structure_formats):
-            structure_format = default_structure_format
-
         if fname is None:
-
             chirality = '{}{}'.format('{}'.format(self._n).zfill(2),
                                       '{}'.format(self._m).zfill(2))
             packing = '{}cp'.format(self._bundle_packing[0])
@@ -328,19 +300,6 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
                     (chirality, packing, Ntube, self._bundle_geometry)
 
             fname = '_'.join(fname_wordlist)
-            fname += '.' + structure_format
-
-        else:
-            if fname.endswith(supported_structure_formats) and \
-                    structure_format is None:
-                for ext in supported_structure_formats:
-                    if fname.endswith(ext):
-                        structure_format = ext
-                        break
-            else:
-                if structure_format is None or \
-                        structure_format not in supported_structure_formats:
-                    structure_format = default_structure_format
 
         super(NanotubeBundleGenerator, self).save_data(
             fname=fname, structure_format=structure_format,
@@ -588,44 +547,16 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
                   center_CM=True):
         """Save structure data.
 
-        Parameters
-        ----------
-        fname : {None, str}, optional
-            file name string
-        structure_format : {None, str}, optional
-            chemical file format of saved structure data. Must be one of:
-
-                - xyz
-                - data
-
-            If `None`, then guess based on `fname` file extension or
-            default to `xyz` format.
-        rotation_angle : {None, float}, optional
-            Angle of rotation
-        rot_axis : {'x', 'y', 'z'}, optional
-            Rotation axis
-        deg2rad : bool, optional
-            Convert `rotation_angle` from degrees to radians.
-        center_CM : bool, optional
-            Center center-of-mass on origin.
+        See :py:meth:`~sknano.nanogen.StructureGenerator.save_data` method
+        for documentation.
 
         """
-        if (fname is None and structure_format not in
-                supported_structure_formats) or \
-                (fname is not None and not
-                    fname.endswith(supported_structure_formats) and
-                    structure_format not in supported_structure_formats):
-            structure_format = default_structure_format
-
         if fname is None:
-
             Nshells = '{}shell_mwnt'.format(self._Nshells_per_tube)
-
             chirality = '{}{}_{}_Ch'.format('{}'.format(self._n).zfill(2),
                                             '{}'.format(self._m).zfill(2),
                                             self._starting_shell_position)
             packing = '{}cp'.format(self._bundle_packing[0])
-
             Ntubes = '{}tube'.format(self._Ntubes)
 
             fname_wordlist = None
@@ -652,19 +583,6 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
                      self._bundle_geometry)
 
             fname = '_'.join(fname_wordlist)
-            fname += '.' + structure_format
-
-        else:
-            if fname.endswith(supported_structure_formats) and \
-                    structure_format is None:
-                for ext in supported_structure_formats:
-                    if fname.endswith(ext):
-                        structure_format = ext
-                        break
-            else:
-                if structure_format is None or \
-                        structure_format not in supported_structure_formats:
-                    structure_format = default_structure_format
 
         super(MWNTBundleGenerator, self).save_data(
             fname=fname, structure_format=structure_format,

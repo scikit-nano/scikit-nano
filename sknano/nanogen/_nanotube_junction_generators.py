@@ -10,7 +10,7 @@ Generate SWNT junctions (:mod:`sknano.nanogen._nanotube_junction_generators`)
 from __future__ import division, print_function, absolute_import
 __docformat__ = 'restructuredtext'
 
-import copy
+#import copy
 #import itertools
 #import sys
 
@@ -18,12 +18,10 @@ import copy
 #ureg = UnitRegistry()
 #Qty = ureg.Quantity
 
-import numpy as np
+#import numpy as np
 
-from ..chemistry import Atom, Atoms
-from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
-    supported_structure_formats
-from ..tools import plural_word_check, rotation_matrix
+#from ..chemistry import Atom, Atoms
+#from ..tools import plural_word_check
 from ..tools.refdata import CCbond
 
 from ._nanotube_generators import NanotubeGenerator

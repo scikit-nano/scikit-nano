@@ -21,9 +21,6 @@ __docformat__ = 'restructuredtext'
 #import numpy as np
 
 from ..chemistry import Atoms
-from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
-    supported_structure_formats
-from ..tools import rotation_matrix
 #from ..tools.refdata import CCbond
 
 from ._fullerenes import Fullerene
@@ -85,61 +82,14 @@ class FullereneGenerator(Fullerene, StructureGenerator):
                   center_CM=True):
         """Save structure data.
 
-        Parameters
-        ----------
-        fname : {None, str}, optional
-            file name string
-        structure_format : {None, str}, optional
-            chemical file format of saved structure data. Must be one of:
-
-                - xyz
-                - data
-
-            If `None`, then guess based on `fname` file extension or
-            default to `xyz` format.
-        rotation_angle : {None, float}, optional
-            Angle of rotation
-        rot_axis : {'x', 'y', 'z'}, optional
-            Rotation axis
-        deg2rad : bool, optional
-            Convert `rotation_angle` from degrees to radians.
-        center_CM : bool, optional
-            Center center-of-mass on origin.
+        See :py:meth:`~sknano.nanogen.StructureGenerator.save_data` method
+        for documentation.
 
         """
-        if (fname is None and structure_format not in
-                supported_structure_formats) or \
-                (fname is not None and not
-                    fname.endswith(supported_structure_formats) and
-                    structure_format not in supported_structure_formats):
-            structure_format = default_structure_format
-
         if fname is None:
-            fname = 'C{}'.format(self.Natoms) + '.' + structure_format
-        else:
-            if fname.endswith(supported_structure_formats) and \
-                    structure_format is None:
-                for ext in supported_structure_formats:
-                    if fname.endswith(ext):
-                        structure_format = ext
-                        break
-            else:
-                if structure_format is None or \
-                        structure_format not in supported_structure_formats:
-                    structure_format = default_structure_format
+            fname = 'C{}'.format(self.Natoms)
 
-        self._fname = fname
-
-        if center_CM:
-            self._structure_atoms.center_CM()
-
-        if rotation_angle is not None:
-            R_matrix = rotation_matrix(rotation_angle,
-                                       rot_axis=rot_axis,
-                                       deg2rad=deg2rad)
-            self._structure_atoms.rotate(R_matrix)
-
-        if structure_format == 'data':
-            DATAWriter.write(fname=self._fname, atoms=self._structure_atoms)
-        else:
-            XYZWriter.write(fname=self._fname, atoms=self._structure_atoms)
+        super(FullereneGenerator, self).save_data(
+            fname=fname, structure_format=structure_format,
+            rotation_angle=rotation_angle, rot_axis=rot_axis,
+            deg2rad=deg2rad, center_CM=center_CM)
