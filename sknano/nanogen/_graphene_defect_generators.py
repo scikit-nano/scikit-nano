@@ -207,6 +207,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                                 '`length` must be specified as floats.')
             gg.save_data(structure_format='data')
             fname = gg.fname
+            structure_format = gg.structure_format
 
         super(GrapheneVacancyGenerator, self).__init__(
             fname=fname, structure_format=structure_format, verbose=verbose)

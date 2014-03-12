@@ -163,6 +163,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                                            verbose=verbose)
             ntbg.save_data(structure_format='data')
             fname = ntbg.fname
+            structure_format = ntbg.structure_format
             self._Ntubes = ntbg.Ntubes
             self._Natoms_per_tube = ntbg.Natoms_per_tube
         else:
