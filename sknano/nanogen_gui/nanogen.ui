@@ -43,7 +43,7 @@
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_2">
                 <item>
-                 <widget class="QRadioButton" name="nanotube_generator_radio_button">
+                 <widget class="QRadioButton" name="nanotube_generator_radioButton">
                   <property name="font">
                    <font>
                     <pointsize>16</pointsize>
@@ -56,12 +56,12 @@
                    <bool>true</bool>
                   </property>
                   <attribute name="buttonGroup">
-                   <string notr="true">nanotube_generator_button_group</string>
+                   <string notr="true">nanotube_generator_buttonGroup</string>
                   </attribute>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QRadioButton" name="mwnt_generator_radio_button">
+                 <widget class="QRadioButton" name="mwnt_generator_radioButton">
                   <property name="font">
                    <font>
                     <pointsize>16</pointsize>
@@ -71,12 +71,12 @@
                    <string>Multi-walled Nanotube Generator</string>
                   </property>
                   <attribute name="buttonGroup">
-                   <string notr="true">nanotube_generator_button_group</string>
+                   <string notr="true">nanotube_generator_buttonGroup</string>
                   </attribute>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QRadioButton" name="unrolled_nanotube_generator_radio_button">
+                 <widget class="QRadioButton" name="unrolled_nanotube_generator_radioButton">
                   <property name="font">
                    <font>
                     <pointsize>16</pointsize>
@@ -86,12 +86,12 @@
                    <string>Unrolled Nanotube Generator</string>
                   </property>
                   <attribute name="buttonGroup">
-                   <string notr="true">nanotube_generator_button_group</string>
+                   <string notr="true">nanotube_generator_buttonGroup</string>
                   </attribute>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="bundle_generator_check_box">
+                 <widget class="QCheckBox" name="bundle_generator_checkBox">
                   <property name="font">
                    <font>
                     <pointsize>16</pointsize>
@@ -136,7 +136,7 @@
                        </widget>
                       </item>
                       <item>
-                       <widget class="QSpinBox" name="n_spin_box">
+                       <widget class="QSpinBox" name="n_spinBox">
                         <property name="minimumSize">
                          <size>
                           <width>90</width>
@@ -175,7 +175,7 @@
                        </widget>
                       </item>
                       <item>
-                       <widget class="QSpinBox" name="m_spin_box">
+                       <widget class="QSpinBox" name="m_spinBox">
                         <property name="minimumSize">
                          <size>
                           <width>90</width>
@@ -241,7 +241,7 @@
                        </widget>
                       </item>
                       <item>
-                       <widget class="QSpinBox" name="nx_spin_box">
+                       <widget class="QSpinBox" name="nx_spinBox">
                         <property name="font">
                          <font>
                           <pointsize>20</pointsize>
@@ -269,7 +269,7 @@
                        </widget>
                       </item>
                       <item>
-                       <widget class="QDoubleSpinBox" name="Lx_double_spin_box">
+                       <widget class="QDoubleSpinBox" name="Lx_doubleSpinBox">
                         <property name="font">
                          <font>
                           <pointsize>20</pointsize>
@@ -311,7 +311,7 @@
                        </widget>
                       </item>
                       <item>
-                       <widget class="QSpinBox" name="ny_spin_box">
+                       <widget class="QSpinBox" name="ny_spinBox">
                         <property name="font">
                          <font>
                           <pointsize>20</pointsize>
@@ -339,7 +339,7 @@
                        </widget>
                       </item>
                       <item>
-                       <widget class="QDoubleSpinBox" name="Ly_double_spin_box">
+                       <widget class="QDoubleSpinBox" name="Ly_doubleSpinBox">
                         <property name="font">
                          <font>
                           <pointsize>20</pointsize>
@@ -381,7 +381,7 @@
                        </widget>
                       </item>
                       <item>
-                       <widget class="QSpinBox" name="nz_spin_box">
+                       <widget class="QSpinBox" name="nz_spinBox">
                         <property name="font">
                          <font>
                           <pointsize>20</pointsize>
@@ -409,7 +409,7 @@
                        </widget>
                       </item>
                       <item>
-                       <widget class="QDoubleSpinBox" name="Lz_double_spin_box">
+                       <widget class="QDoubleSpinBox" name="Lz_doubleSpinBox">
                         <property name="font">
                          <font>
                           <pointsize>20</pointsize>
@@ -480,7 +480,7 @@
                        </widget>
                       </item>
                       <item>
-                       <widget class="QDoubleSpinBox" name="width_double_spin_box">
+                       <widget class="QDoubleSpinBox" name="width_doubleSpinBox">
                         <property name="minimumSize">
                          <size>
                           <width>150</width>
@@ -491,6 +491,12 @@
                          <font>
                           <pointsize>20</pointsize>
                          </font>
+                        </property>
+                        <property name="decimals">
+                         <number>4</number>
+                        </property>
+                        <property name="value">
+                         <double>1.000000000000000</double>
                         </property>
                        </widget>
                       </item>
@@ -511,7 +517,7 @@
                        </widget>
                       </item>
                       <item>
-                       <widget class="QDoubleSpinBox" name="length_double_spin_box">
+                       <widget class="QDoubleSpinBox" name="length_doubleSpinBox">
                         <property name="minimumSize">
                          <size>
                           <width>150</width>
@@ -522,6 +528,12 @@
                          <font>
                           <pointsize>20</pointsize>
                          </font>
+                        </property>
+                        <property name="decimals">
+                         <number>4</number>
+                        </property>
+                        <property name="value">
+                         <double>10.000000000000000</double>
                         </property>
                        </widget>
                       </item>
@@ -548,22 +560,25 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QRadioButton" name="AC_edge_type_radio_button">
+                   <widget class="QRadioButton" name="AC_edge_radioButton">
                     <property name="text">
                      <string>armchair</string>
                     </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
                     <attribute name="buttonGroup">
-                     <string notr="true">edge_type_button_group</string>
+                     <string notr="true">Ly_edge_buttonGroup</string>
                     </attribute>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QRadioButton" name="ZZ_edge_type_radio_button">
+                   <widget class="QRadioButton" name="ZZ_edge_radioButton">
                     <property name="text">
                      <string>zigzag</string>
                     </property>
                     <attribute name="buttonGroup">
-                     <string notr="true">edge_type_button_group</string>
+                     <string notr="true">Ly_edge_buttonGroup</string>
                     </attribute>
                    </widget>
                   </item>
@@ -597,7 +612,7 @@
                      </widget>
                     </item>
                     <item>
-                     <widget class="QSpinBox" name="nlayers_spin_box">
+                     <widget class="QSpinBox" name="nlayers_spinBox">
                       <property name="font">
                        <font>
                         <pointsize>20</pointsize>
@@ -632,7 +647,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QRadioButton" name="AA_stacking_radio_button">
+                   <widget class="QRadioButton" name="AA_stacking_radioButton">
                     <property name="font">
                      <font>
                       <pointsize>20</pointsize>
@@ -641,13 +656,19 @@
                     <property name="text">
                      <string>AA</string>
                     </property>
+                    <property name="checkable">
+                     <bool>false</bool>
+                    </property>
+                    <property name="checked">
+                     <bool>false</bool>
+                    </property>
                     <attribute name="buttonGroup">
-                     <string notr="true">stacking_arrangement_button_group</string>
+                     <string notr="true">stacking_order_buttonGroup</string>
                     </attribute>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QRadioButton" name="AB_stacking_radio_button">
+                   <widget class="QRadioButton" name="AB_stacking_radioButton">
                     <property name="font">
                      <font>
                       <pointsize>20</pointsize>
@@ -656,8 +677,11 @@
                     <property name="text">
                      <string>AB</string>
                     </property>
+                    <property name="checkable">
+                     <bool>false</bool>
+                    </property>
                     <attribute name="buttonGroup">
-                     <string notr="true">stacking_arrangement_button_group</string>
+                     <string notr="true">stacking_order_buttonGroup</string>
                     </attribute>
                    </widget>
                   </item>
@@ -715,7 +739,7 @@
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <item>
-               <widget class="QRadioButton" name="cif_radio_button">
+               <widget class="QRadioButton" name="cif_radioButton">
                 <property name="font">
                  <font>
                   <family>Arial</family>
@@ -729,12 +753,12 @@
                  <bool>false</bool>
                 </property>
                 <attribute name="buttonGroup">
-                 <string notr="true">structure_format_button_group</string>
+                 <string notr="true">structure_format_buttonGroup</string>
                 </attribute>
                </widget>
               </item>
               <item>
-               <widget class="QRadioButton" name="DATA_radio_button">
+               <widget class="QRadioButton" name="DATA_radioButton">
                 <property name="font">
                  <font>
                   <family>Arial</family>
@@ -745,12 +769,12 @@
                  <string>LAMMPS data</string>
                 </property>
                 <attribute name="buttonGroup">
-                 <string notr="true">structure_format_button_group</string>
+                 <string notr="true">structure_format_buttonGroup</string>
                 </attribute>
                </widget>
               </item>
               <item>
-               <widget class="QRadioButton" name="pdb_radio_button">
+               <widget class="QRadioButton" name="pdb_radioButton">
                 <property name="font">
                  <font>
                   <family>Arial</family>
@@ -764,12 +788,12 @@
                  <bool>false</bool>
                 </property>
                 <attribute name="buttonGroup">
-                 <string notr="true">structure_format_button_group</string>
+                 <string notr="true">structure_format_buttonGroup</string>
                 </attribute>
                </widget>
               </item>
               <item>
-               <widget class="QRadioButton" name="xyz_radio_button">
+               <widget class="QRadioButton" name="xyz_radioButton">
                 <property name="font">
                  <font>
                   <family>Arial</family>
@@ -779,13 +803,16 @@
                 <property name="text">
                  <string>xyz</string>
                 </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
                 <attribute name="buttonGroup">
-                 <string notr="true">structure_format_button_group</string>
+                 <string notr="true">structure_format_buttonGroup</string>
                 </attribute>
                </widget>
               </item>
               <item>
-               <widget class="QRadioButton" name="Z_matrix_radio_button">
+               <widget class="QRadioButton" name="Z_matrix_radioButton">
                 <property name="font">
                  <font>
                   <family>Arial</family>
@@ -799,14 +826,14 @@
                  <bool>false</bool>
                 </property>
                 <attribute name="buttonGroup">
-                 <string notr="true">structure_format_button_group</string>
+                 <string notr="true">structure_format_buttonGroup</string>
                 </attribute>
                </widget>
               </item>
              </layout>
             </item>
             <item>
-             <widget class="QPushButton" name="generate_button">
+             <widget class="QPushButton" name="generate_pushButton">
               <property name="font">
                <font>
                 <family>Arial</family>
@@ -854,14 +881,14 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="nanogen_statusbar"/>
+  <widget class="QStatusBar" name="nanogen_statusBar"/>
  </widget>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="nanotube_generator_button_group"/>
-  <buttongroup name="edge_type_button_group"/>
-  <buttongroup name="stacking_arrangement_button_group"/>
-  <buttongroup name="structure_format_button_group"/>
+  <buttongroup name="stacking_order_buttonGroup"/>
+  <buttongroup name="nanotube_generator_buttonGroup"/>
+  <buttongroup name="Ly_edge_buttonGroup"/>
+  <buttongroup name="structure_format_buttonGroup"/>
  </buttongroups>
 </ui>
