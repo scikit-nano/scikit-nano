@@ -37,8 +37,8 @@ class NGView(QMainWindow, Ui_NanoGen):
         super(NGView, self).__init__()
         self.setupUi(self)
 
-    def init(self):
-        self.show()
+    #def init(self):
+    #    self.show()
 
     @pyqtSlot(int)
     def on_n_spinBox_valueChanged(self, value):
