@@ -18,17 +18,11 @@ Contents
    :toctree: generated/
 
    NanoGen
-   NGModel
-   NGView
-   NGController
 
 """
 from __future__ import division, print_function, absolute_import
 __docformat__ = 'restructuredtext en'
 
-from .nanogenui import *
-from ._ng_model import *
-from ._ng_view import *
-from ._ng_controller import *
+from .nanogenui import NanoGen
 
 __all__ = [s for s in dir() if not s.startswith('_')]
