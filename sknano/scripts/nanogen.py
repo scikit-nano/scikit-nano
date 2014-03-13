@@ -84,7 +84,7 @@ from ..tools.refdata import CCbond
 __all__ = ['nanogen']
 
 
-def _argparser():
+def argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--format', default='xyz', dest='fmt',
                         choices=tuple([fmt for fmt in format_ext.iterkeys()]),
@@ -223,7 +223,7 @@ def nanogen(fmt='xyz', units='angstrom', element1='C', element2='C',
 
 def main():
 
-    args = _argparser().parse_args()
+    args = argparser().parse_args()
     nanogen(**vars(args))
 
 if __name__ == '__main__':
