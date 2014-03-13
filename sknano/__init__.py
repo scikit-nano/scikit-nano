@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-=====================================
-scikit-nano: Toolkit for nano-science
-=====================================
+============================================================================
+scikit-nano: Python toolkit for generating and analyzing nanostructure data
+============================================================================
 
 Contents
 ========
@@ -31,11 +31,3 @@ from __future__ import print_function, absolute_import
 __all__ = ['chemistry', 'nanogen', 'scripts', 'structure_io', 'tools']
 
 from sknano.version import version as __version__
-
-
-def get_path():
-    try:
-        from pkthemes import get_path
-        return get_path()
-    except ImportError:
-        return None
