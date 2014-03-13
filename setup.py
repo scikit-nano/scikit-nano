@@ -164,7 +164,7 @@ def setup_package():
         keywords=KEYWORDS,
         classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
         platforms=["Linux", "OS-X", "Unix", "Windows"],
-        test_suite='nose.collector',
+        #test_suite='nose.collector',
         configuration=configuration,
         packages=find_packages(exclude=['doc']),
         include_package_data=True,
@@ -174,6 +174,7 @@ def setup_package():
         entry_points={
             'console_scripts': [
                 'nanogen = sknano.scripts.nanogen:main',
+                'nanogenui = sknano.nanogen_gui.nanogenui:main',
             ]
         }
     )
