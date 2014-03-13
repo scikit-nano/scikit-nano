@@ -38,6 +38,7 @@ Reference
 
    chemistry.rst
    nanogen.rst
+   nanogen_gui.rst
    scripts.rst
    structure_io.rst
    tools.rst
