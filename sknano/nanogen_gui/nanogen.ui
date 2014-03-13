@@ -1,83 +1,431 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>NanoGenerator</class>
- <widget class="QMainWindow" name="NanoGenerator">
+ <class>NanoGen</class>
+ <widget class="QMainWindow" name="NanoGen">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>775</width>
-    <height>485</height>
+    <width>524</width>
+    <height>584</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Lucida Sans Unicode</family>
+    <pointsize>14</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>NanoGen</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QToolBox" name="toolBox">
+   <widget class="QStackedWidget" name="stackedWidget">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>20</y>
-      <width>161</width>
-      <height>221</height>
+      <x>19</x>
+      <y>24</y>
+      <width>485</width>
+      <height>422</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
-    <widget class="QWidget" name="page">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>161</width>
-       <height>159</height>
-      </rect>
-     </property>
-     <attribute name="label">
-      <string>Page 1</string>
-     </attribute>
+    <widget class="QWidget" name="graphene_generators">
+     <widget class="QLineEdit" name="width_line_edit">
+      <property name="geometry">
+       <rect>
+        <x>26</x>
+        <y>52</y>
+        <width>113</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="length_line_edit">
+      <property name="geometry">
+       <rect>
+        <x>226</x>
+        <y>50</y>
+        <width>113</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_9">
+      <property name="geometry">
+       <rect>
+        <x>33</x>
+        <y>16</y>
+        <width>62</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>width</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>234</x>
+        <y>20</y>
+        <width>62</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>length</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="nlayers_spin_box">
+      <property name="geometry">
+       <rect>
+        <x>106</x>
+        <y>132</y>
+        <width>57</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>50</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_11">
+      <property name="geometry">
+       <rect>
+        <x>31</x>
+        <y>135</y>
+        <width>62</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>nlayers</string>
+      </property>
+     </widget>
     </widget>
-    <widget class="QWidget" name="page_2">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>73</width>
-       <height>73</height>
-      </rect>
-     </property>
-     <attribute name="label">
-      <string>Page 2</string>
-     </attribute>
+    <widget class="QWidget" name="nanotube_generators">
+     <widget class="QSpinBox" name="n_spin_box">
+      <property name="geometry">
+       <rect>
+        <x>39</x>
+        <y>59</y>
+        <width>57</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="value">
+       <number>10</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="m_spin_box">
+      <property name="geometry">
+       <rect>
+        <x>167</x>
+        <y>54</y>
+        <width>57</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="value">
+       <number>10</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="nx_spin_box">
+      <property name="geometry">
+       <rect>
+        <x>48</x>
+        <y>148</y>
+        <width>57</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="ny_spin_box">
+      <property name="geometry">
+       <rect>
+        <x>48</x>
+        <y>187</y>
+        <width>57</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="nz_spin_box">
+      <property name="geometry">
+       <rect>
+        <x>55</x>
+        <y>225</y>
+        <width>57</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="Lx_spin_box">
+      <property name="geometry">
+       <rect>
+        <x>166</x>
+        <y>150</y>
+        <width>113</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="Ly_spin_box">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>189</y>
+        <width>113</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="Lz_spin_box">
+      <property name="geometry">
+       <rect>
+        <x>172</x>
+        <y>231</y>
+        <width>113</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>12</x>
+        <y>149</y>
+        <width>25</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>nx</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>134</x>
+        <y>148</y>
+        <width>62</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Lx</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>132</x>
+        <y>187</y>
+        <width>62</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Ly</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>137</x>
+        <y>229</y>
+        <width>62</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Lz</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>8</x>
+        <y>186</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>ny</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>17</x>
+        <y>229</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>nz</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>21</x>
+        <y>62</y>
+        <width>25</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>n</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_8">
+      <property name="geometry">
+       <rect>
+        <x>139</x>
+        <y>59</y>
+        <width>25</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>m</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line">
+      <property name="geometry">
+       <rect>
+        <x>176</x>
+        <y>343</y>
+        <width>118</width>
+        <height>3</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="nanotube_generator_radio_button">
+      <property name="geometry">
+       <rect>
+        <x>234</x>
+        <y>40</y>
+        <width>178</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Nanotube Generator</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="mwnt_generator_radio_button">
+      <property name="geometry">
+       <rect>
+        <x>234</x>
+        <y>65</y>
+        <width>258</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Multi-walled Nanotube Generator</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="bundle_generator_check_box">
+      <property name="geometry">
+       <rect>
+        <x>331</x>
+        <y>197</y>
+        <width>149</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Bundle Generator</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="unrolled_nanotube_generator_radio_button">
+      <property name="geometry">
+       <rect>
+        <x>233</x>
+        <y>93</y>
+        <width>230</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Unrolled Nanotube Generator</string>
+      </property>
+     </widget>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="groupBox">
+   <widget class="QPushButton" name="generate_button">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>20</y>
-      <width>120</width>
-      <height>80</height>
+      <x>389</x>
+      <y>514</y>
+      <width>114</width>
+      <height>32</height>
      </rect>
     </property>
-    <property name="title">
-     <string>GroupBox</string>
+    <property name="text">
+     <string>Generate</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="xyz_radio_button">
+    <property name="geometry">
+     <rect>
+      <x>29</x>
+      <y>524</y>
+      <width>102</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>xyz</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="DATA_radio_button">
+    <property name="geometry">
+     <rect>
+      <x>34</x>
+      <y>496</y>
+      <width>139</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>LAMMPS data</string>
     </property>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>775</width>
-     <height>25</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="nanogen_statusbar"/>
  </widget>
  <resources/>
  <connections/>
