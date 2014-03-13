@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'nanogen.ui'
 #
-# Created: Thu Mar 13 14:20:52 2014
+# Created: Thu Mar 13 14:34:11 2014
 #      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -37,13 +37,14 @@ class Ui_NanoGen(object):
         self.verticalLayout_13.setObjectName(_fromUtf8("verticalLayout_13"))
         self.verticalLayout_12 = QtGui.QVBoxLayout()
         self.verticalLayout_12.setObjectName(_fromUtf8("verticalLayout_12"))
-        self.stackedWidget = QtGui.QStackedWidget(self.centralwidget)
-        self.stackedWidget.setMinimumSize(QtCore.QSize(500, 0))
+        self.nanogen_stackedWidget = QtGui.QStackedWidget(self.centralwidget)
+        self.nanogen_stackedWidget.setMinimumSize(QtCore.QSize(500, 0))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Arial"))
         font.setPointSize(20)
-        self.stackedWidget.setFont(font)
-        self.stackedWidget.setObjectName(_fromUtf8("stackedWidget"))
+        self.nanogen_stackedWidget.setFont(font)
+        self.nanogen_stackedWidget.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.nanogen_stackedWidget.setObjectName(_fromUtf8("nanogen_stackedWidget"))
         self.nanotube_generators = QtGui.QWidget()
         self.nanotube_generators.setObjectName(_fromUtf8("nanotube_generators"))
         self.horizontalLayout_14 = QtGui.QHBoxLayout(self.nanotube_generators)
@@ -264,7 +265,7 @@ class Ui_NanoGen(object):
         self.horizontalLayout_14.addLayout(self.verticalLayout_7)
         spacerItem4 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_14.addItem(spacerItem4)
-        self.stackedWidget.addWidget(self.nanotube_generators)
+        self.nanogen_stackedWidget.addWidget(self.nanotube_generators)
         self.graphene_generators = QtGui.QWidget()
         self.graphene_generators.setObjectName(_fromUtf8("graphene_generators"))
         self.horizontalLayout_24 = QtGui.QHBoxLayout(self.graphene_generators)
@@ -403,8 +404,8 @@ class Ui_NanoGen(object):
         self.horizontalLayout_24.addLayout(self.verticalLayout_8)
         spacerItem7 = QtGui.QSpacerItem(92, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_24.addItem(spacerItem7)
-        self.stackedWidget.addWidget(self.graphene_generators)
-        self.verticalLayout_12.addWidget(self.stackedWidget)
+        self.nanogen_stackedWidget.addWidget(self.graphene_generators)
+        self.verticalLayout_12.addWidget(self.nanogen_stackedWidget)
         self.verticalLayout_11 = QtGui.QVBoxLayout()
         self.verticalLayout_11.setObjectName(_fromUtf8("verticalLayout_11"))
         self.verticalLayout_10 = QtGui.QVBoxLayout()
@@ -494,7 +495,7 @@ class Ui_NanoGen(object):
         NanoGen.setStatusBar(self.nanogen_statusBar)
 
         self.retranslateUi(NanoGen)
-        self.stackedWidget.setCurrentIndex(0)
+        self.nanogen_stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(NanoGen)
 
     def retranslateUi(self, NanoGen):

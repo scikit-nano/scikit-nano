@@ -24,7 +24,7 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_12">
       <item>
-       <widget class="QStackedWidget" name="stackedWidget">
+       <widget class="QStackedWidget" name="nanogen_stackedWidget">
         <property name="minimumSize">
          <size>
           <width>500</width>
@@ -36,6 +36,9 @@
           <family>Arial</family>
           <pointsize>20</pointsize>
          </font>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
         </property>
         <property name="currentIndex">
          <number>0</number>
