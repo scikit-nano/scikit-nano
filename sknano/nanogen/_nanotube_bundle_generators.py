@@ -13,10 +13,6 @@ __docformat__ = 'restructuredtext'
 import copy
 #import itertools
 
-#from pint import UnitRegistry
-#ureg = UnitRegistry()
-#Qty = ureg.Quantity
-
 import numpy as np
 
 from ..chemistry import Atom, Atoms

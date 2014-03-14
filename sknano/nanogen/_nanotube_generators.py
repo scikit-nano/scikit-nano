@@ -23,10 +23,6 @@ import copy
 #import itertools
 #import sys
 
-#from pint import UnitRegistry
-#ureg = UnitRegistry()
-#Qty = ureg.Quantity
-
 import numpy as np
 
 from ..chemistry import Atom, Atoms
