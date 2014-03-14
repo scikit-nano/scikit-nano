@@ -215,6 +215,27 @@ class Atoms(MutableSequence):
                                 del self._atoms[self._atoms.index(atom)]
                                 break
 
+    def fix_minus_zero_coords(self, epsilon=1.0e-10):
+        """Set really really small negative coordinates to zero.
+
+        Set all coordinates with absolute value less than
+        epsilon zero so we don't end up with -0.00000
+        coordinates in structure data output.
+
+        Parameters
+        ----------
+        epsilon : float
+            smallest allowed absolute value of any component of an
+            atom's position
+
+        """
+        for atom in self._atoms:
+            r = atom.r.tolist()
+            for i, ri in enumerate(r[:]):
+                if ri < 0 and abs(ri) < epsilon:
+                    r[i] = 0.0
+            atom.x, atom.y, atom.z = r
+
     def getatomsattr(self, asarray=False, as_array=False):
         pass
 

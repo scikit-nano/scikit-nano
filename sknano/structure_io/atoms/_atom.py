@@ -215,6 +215,21 @@ class Atom(object):
         """
         self._r.coords = value
 
+    def fix_minus_zero_coords(self, epsilon=1.0e-10):
+        """Set really really small negative coordinates to zero.
+
+        Set all coordinates with absolute value less than
+        epsilon zero so we don't end up with -0.00000
+        coordinates in structure data output.
+
+        Parameters
+        ----------
+        epsilon : float
+            smallest allowed absolute value of any :math:`x,y,z` component.
+
+        """
+        self._r.fix_minus_zero_coords(epsilon=epsilon)
+
     def rezero_coords(self, epsilon=1.0e-10):
         """Re-zero position coordinates near zero.
 
@@ -227,4 +242,4 @@ class Atom(object):
             smallest allowed absolute value of any :math:`x,y,z` component.
 
         """
-        self._r.rezero_coords()
+        self._r.rezero_coords(epsilon=epsilon)
