@@ -41,10 +41,18 @@ class Atom(object):
         origin.
     vx, vy, vz : float, optional
         :math:`v_x, v_y, v_z` components of `Atom` velocity.
+    with_units : bool, optional
+        Attach physical units to position and velocity components.
+        **Units are not fully implemented and should not be used at this
+        time. This option may be removed in a future version.**
     r_units : str, optional
         Units of position components.
+        **Units are not fully implemented and should not be used at this
+        time. This option may be removed in a future version.**
     v_units : str, optional
         Units of velocity components.
+        **Units are not fully implemented and should not be used at this
+        time. This option may be removed in a future version.**
     nx, ny, nz : int, optional
         :math:`n_x, n_y, n_z` image flags, a LAMMPS atom attribute.
     CN : int, optional
@@ -56,18 +64,18 @@ class Atom(object):
 
     def __init__(self, element=None, atomID=0, moleculeID=0, atomtype=1, q=0.,
                  mass=None, x=None, y=None, z=None, vx=None, vy=None, vz=None,
-                 r_units=None, v_units=None, nx=None, ny=None, nz=None,
-                 CN=None, NN=None):
+                 with_units=False, r_units=None, v_units=None,
+                 nx=None, ny=None, nz=None, CN=None, NN=None):
 
         self._symbol = None
         self._Z = None
         self._m = None
 
-        self._r = Vector(x=x, y=y, z=z)
-        self._r_units = r_units
+        self._r = \
+            Vector(x=x, y=y, z=z, with_units=with_units, units=r_units)
 
-        self._v = Vector(x=vx, y=vy, z=vz)
-        self._v_units = v_units
+        self._v = \
+            Vector(x=vx, y=vy, z=vz, with_units=with_units, units=v_units)
 
         self._n = np.zeros(3, dtype=int)
         for i, ni in enumerate((nx, ny, nz)):
