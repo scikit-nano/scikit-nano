@@ -7,9 +7,8 @@ LAMMPS dump format (:mod:`sknano.structure_io._lammps_dump_format`)
 .. currentmodule:: sknano.structure_io._lammps_dump_format
 
 """
-from __future__ import division, print_function, absolute_import
-
-__docformat__ = 'restructuredtext'
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 import numpy as np
 

@@ -7,9 +7,8 @@ PDB format (:mod:`sknano.structure_io._pdb_format`)
 .. currentmodule:: sknano.structure_io._pdb_format
 
 """
-from __future__ import division, print_function, absolute_import
-
-__docformat__ = 'restructuredtext'
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
 

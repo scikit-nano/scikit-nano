@@ -8,6 +8,7 @@ Abstract data structures for math (:mod:`sknano.tools._coremath`)
 
 """
 from __future__ import division, print_function, absolute_import
+__docformat__ = 'restructuredtext en'
 
 try:
     from pint import UnitRegistry

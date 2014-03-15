@@ -8,7 +8,7 @@ Generate defects in structure data (:mod:`sknano.nanogen._defect_generators`)
 
 """
 from __future__ import division, print_function, absolute_import
-__docformat__ = 'restructuredtext'
+__docformat__ = 'restructuredtext en'
 
 import os
 

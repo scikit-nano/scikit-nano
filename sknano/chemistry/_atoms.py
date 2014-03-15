@@ -13,7 +13,7 @@ Abstract representation of Atoms (:mod:`sknano.chemistry._atoms`)
 
 """
 from __future__ import division, absolute_import, print_function
-__docformat__ = 'restructuredtext'
+__docformat__ = 'restructuredtext en'
 
 import copy
 import math

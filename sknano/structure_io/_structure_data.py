@@ -7,9 +7,8 @@ Base classes for structure data (:mod:`sknano.structure_io._structure_data`)
 .. currentmodule:: sknano.structure_io._structure_data
 
 """
-from __future__ import division, print_function, absolute_import
-
-__docformat__ = 'restructuredtext'
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict

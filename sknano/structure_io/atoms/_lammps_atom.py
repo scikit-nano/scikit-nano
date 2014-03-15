@@ -8,7 +8,7 @@ Class for LAMMPS atom (:mod:`sknano.structure_io.atoms._lammps_atom`)
 
 """
 from __future__ import division, absolute_import, print_function
-__docformat__ = 'restructuredtext'
+__docformat__ = 'restructuredtext en'
 
 import numpy as np
 

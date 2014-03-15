@@ -7,8 +7,8 @@ JSON format (:mod:`sknano.structure_io._json_format`)
 .. currentmodule:: sknano.structure_io._json_format
 
 """
-from __future__ import division, print_function, absolute_import
-__docformat__ = 'restructuredtext'
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 from ..chemistry import Atom, Atoms
 from ..tools import get_fpath

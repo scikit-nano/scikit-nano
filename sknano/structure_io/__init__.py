@@ -62,9 +62,8 @@ Sub-packages
    atoms
 
 """
-from __future__ import division, print_function, absolute_import
-
-__docformat__ = 'restructuredtext'
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 from ._lammps_data_format import *
 from ._xyz_format import *

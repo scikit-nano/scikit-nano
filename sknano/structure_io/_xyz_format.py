@@ -8,7 +8,7 @@ XYZ format (:mod:`sknano.structure_io._xyz_format`)
 
 """
 from __future__ import division, print_function, absolute_import
-__docformat__ = 'restructuredtext'
+__docformat__ = 'restructuredtext en'
 
 import os
 

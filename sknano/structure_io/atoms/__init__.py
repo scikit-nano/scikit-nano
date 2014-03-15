@@ -26,8 +26,7 @@ Contents
 
 """
 from __future__ import division, print_function, absolute_import
-
-__docformat__ = 'restructuredtext'
+__docformat__ = 'restructuredtext en'
 
 from ._atom import *
 from ._atoms import *
