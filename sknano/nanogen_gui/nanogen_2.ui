@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>649</width>
-    <height>718</height>
+    <width>509</width>
+    <height>701</height>
    </rect>
   </property>
   <property name="font">
@@ -20,13 +20,13 @@
    <string>NanoGen</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_13">
+   <layout class="QVBoxLayout" name="verticalLayout_14">
     <item>
      <widget class="QTabWidget" name="nanogen_tabWidget">
       <property name="minimumSize">
        <size>
-        <width>500</width>
-        <height>450</height>
+        <width>0</width>
+        <height>0</height>
        </size>
       </property>
       <property name="font">
@@ -38,9 +38,9 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="nanogen_tabWidgetPage1" native="true">
+      <widget class="QWidget" name="nanotube_generator_tabWidget" native="true">
        <attribute name="title">
-        <string/>
+        <string>Nanotubes</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_12">
         <item>
@@ -290,6 +290,12 @@
                     </item>
                     <item>
                      <widget class="QDoubleSpinBox" name="Lx_doubleSpinBox">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="font">
                        <font>
                         <pointsize>20</pointsize>
@@ -369,6 +375,12 @@
                     </item>
                     <item>
                      <widget class="QDoubleSpinBox" name="Ly_doubleSpinBox">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="font">
                        <font>
                         <pointsize>20</pointsize>
@@ -448,6 +460,12 @@
                     </item>
                     <item>
                      <widget class="QDoubleSpinBox" name="Lz_doubleSpinBox">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="font">
                        <font>
                         <pointsize>20</pointsize>
@@ -501,308 +519,308 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="nanogen_tabWidgetPage2" native="true">
+      <widget class="QWidget" name="graphene_generator_tabWidget" native="true">
        <attribute name="title">
-        <string/>
+        <string>Graphene</string>
        </attribute>
-       <widget class="QWidget" name="">
-        <property name="geometry">
-         <rect>
-          <x>21</x>
-          <y>11</y>
-          <width>527</width>
-          <height>349</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_24">
-         <item>
-          <spacer name="horizontalSpacer_9">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_8">
-           <item>
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_20">
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_19">
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_9">
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_16">
-                   <item>
-                    <widget class="QLabel" name="label_9">
-                     <property name="font">
-                      <font>
-                       <pointsize>20</pointsize>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;L&lt;/span&gt;&lt;span style=&quot; vertical-align:sub;&quot;&gt;x&lt;/span&gt; =&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QDoubleSpinBox" name="width_doubleSpinBox">
-                     <property name="minimumSize">
-                      <size>
-                       <width>150</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="font">
-                      <font>
-                       <pointsize>20</pointsize>
-                      </font>
-                     </property>
-                     <property name="decimals">
-                      <number>4</number>
-                     </property>
-                     <property name="value">
-                      <double>1.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_17">
-                   <item>
-                    <widget class="QLabel" name="label_10">
-                     <property name="font">
-                      <font>
-                       <pointsize>20</pointsize>
-                      </font>
-                     </property>
-                     <property name="text">
-                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;L&lt;/span&gt;&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; =&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QDoubleSpinBox" name="length_doubleSpinBox">
-                     <property name="minimumSize">
-                      <size>
-                       <width>150</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                     <property name="font">
-                      <font>
-                       <pointsize>20</pointsize>
-                      </font>
-                     </property>
-                     <property name="decimals">
-                      <number>4</number>
-                     </property>
-                     <property name="value">
-                      <double>10.000000000000000</double>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <widget class="Line" name="line_5">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QVBoxLayout" name="verticalLayout_3">
-               <item>
-                <widget class="QLabel" name="label_5">
-                 <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;L&lt;/span&gt;&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; edge&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="AC_edge_radioButton">
-                 <property name="text">
-                  <string>armchair</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                 <attribute name="buttonGroup">
-                  <string notr="true">Ly_edge_buttonGroup</string>
-                 </attribute>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="ZZ_edge_radioButton">
-                 <property name="text">
-                  <string>zigzag</string>
-                 </property>
-                 <attribute name="buttonGroup">
-                  <string notr="true">Ly_edge_buttonGroup</string>
-                 </attribute>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="Line" name="line_4">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_22">
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_21">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_18">
-                 <item>
-                  <widget class="QLabel" name="label_11">
-                   <property name="font">
-                    <font>
-                     <pointsize>20</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;n&lt;/span&gt;&lt;span style=&quot; vertical-align:sub;&quot;&gt;layers&lt;/span&gt; =&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="nlayers_spinBox">
-                   <property name="font">
-                    <font>
-                     <pointsize>20</pointsize>
-                    </font>
-                   </property>
-                   <property name="minimum">
-                    <number>1</number>
-                   </property>
-                   <property name="maximum">
-                    <number>50</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <widget class="Line" name="line_6">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QVBoxLayout" name="verticalLayout_4">
-               <item>
-                <widget class="QLabel" name="label_6">
-                 <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stacking Order&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="AA_stacking_radioButton">
-                 <property name="font">
-                  <font>
-                   <pointsize>20</pointsize>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>AA</string>
-                 </property>
-                 <property name="checkable">
-                  <bool>false</bool>
-                 </property>
-                 <property name="checked">
-                  <bool>false</bool>
-                 </property>
-                 <attribute name="buttonGroup">
-                  <string notr="true">stacking_order_buttonGroup</string>
-                 </attribute>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="AB_stacking_radioButton">
-                 <property name="font">
-                  <font>
-                   <pointsize>20</pointsize>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>AB</string>
-                 </property>
-                 <property name="checkable">
-                  <bool>false</bool>
-                 </property>
-                 <attribute name="buttonGroup">
-                  <string notr="true">stacking_order_buttonGroup</string>
-                 </attribute>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <spacer name="verticalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_7">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>92</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_13">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_24">
+          <item>
+           <spacer name="horizontalSpacer_9">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_20">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_19">
+                <item>
+                 <layout class="QVBoxLayout" name="verticalLayout_9">
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_16">
+                    <item>
+                     <widget class="QLabel" name="label_9">
+                      <property name="font">
+                       <font>
+                        <pointsize>20</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;L&lt;/span&gt;&lt;span style=&quot; vertical-align:sub;&quot;&gt;x&lt;/span&gt; =&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QDoubleSpinBox" name="width_doubleSpinBox">
+                      <property name="minimumSize">
+                       <size>
+                        <width>150</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <pointsize>20</pointsize>
+                       </font>
+                      </property>
+                      <property name="suffix">
+                       <string> nm</string>
+                      </property>
+                      <property name="decimals">
+                       <number>4</number>
+                      </property>
+                      <property name="value">
+                       <double>1.000000000000000</double>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_17">
+                    <item>
+                     <widget class="QLabel" name="label_10">
+                      <property name="font">
+                       <font>
+                        <pointsize>20</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;L&lt;/span&gt;&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; =&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QDoubleSpinBox" name="length_doubleSpinBox">
+                      <property name="minimumSize">
+                       <size>
+                        <width>150</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <pointsize>20</pointsize>
+                       </font>
+                      </property>
+                      <property name="suffix">
+                       <string> nm</string>
+                      </property>
+                      <property name="decimals">
+                       <number>4</number>
+                      </property>
+                      <property name="value">
+                       <double>10.000000000000000</double>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="Line" name="line_5">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_3">
+                <item>
+                 <widget class="QLabel" name="label_5">
+                  <property name="text">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;L&lt;/span&gt;&lt;span style=&quot; vertical-align:sub;&quot;&gt;y&lt;/span&gt; edge&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="AC_edge_radioButton">
+                  <property name="text">
+                   <string>armchair</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">Ly_edge_buttonGroup</string>
+                  </attribute>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="ZZ_edge_radioButton">
+                  <property name="text">
+                   <string>zigzag</string>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">Ly_edge_buttonGroup</string>
+                  </attribute>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="Line" name="line_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_22">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_21">
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_18">
+                  <item>
+                   <widget class="QLabel" name="label_11">
+                    <property name="font">
+                     <font>
+                      <pointsize>20</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;n&lt;/span&gt;&lt;span style=&quot; vertical-align:sub;&quot;&gt;layers&lt;/span&gt; =&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="nlayers_spinBox">
+                    <property name="font">
+                     <font>
+                      <pointsize>20</pointsize>
+                     </font>
+                    </property>
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>50</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="Line" name="line_6">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QVBoxLayout" name="verticalLayout_4">
+                <item>
+                 <widget class="QLabel" name="label_6">
+                  <property name="text">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stacking Order&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="AA_stacking_radioButton">
+                  <property name="font">
+                   <font>
+                    <pointsize>20</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>AA</string>
+                  </property>
+                  <property name="checkable">
+                   <bool>false</bool>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">stacking_order_buttonGroup</string>
+                  </attribute>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QRadioButton" name="AB_stacking_radioButton">
+                  <property name="font">
+                   <font>
+                    <pointsize>20</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>AB</string>
+                  </property>
+                  <property name="checkable">
+                   <bool>false</bool>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">stacking_order_buttonGroup</string>
+                  </attribute>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>92</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
