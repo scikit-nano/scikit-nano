@@ -18,21 +18,20 @@ __all__ = ['NGController']
 
 
 class NGController(object):
-    """:py:mod:`~sknano.nanogen_gui` MVC controller class.
+    """:mod:`~sknano.nanogen_gui` MVC controller class.
 
     Parameters
     ----------
-    args : `<python:sys.argv>`
-    model : :py:class:`~sknano.nanogen_gui._ng_model.NGModel`
-        An instance of :py:class:`~sknano.nanogen_gui._ng_model.NGModel`.
+    args : :attr:`python:sys.argv`
+    model : :class:`~sknano.nanogen_gui._ng_model.NGModel`
+        An instance of :class:`~sknano.nanogen_gui._ng_model.NGModel`.
 
     """
     def __init__(self, args, model=None):
         app = QApplication(args)
         self.model = model
-
         self.view = NGView(self, self.model)
-        self.model.init()
+        self.model.notify_observers()
         self.view.show()
         app.exec_()
 
