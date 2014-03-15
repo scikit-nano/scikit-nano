@@ -110,7 +110,7 @@ class StructureData(object):
 
 
 class StructureReader(StructureData):
-    """Abstract superclass for reading structure data.
+    """Abstract base class for reading structure data.
 
     Parameters
     ----------
@@ -131,7 +131,7 @@ class StructureReader(StructureData):
 
 
 class StructureWriter(object):
-    """Abstract superclass for writing structure data."""
+    """Abstract base class for writing structure data."""
     __metaclass__ = ABCMeta
 
     @abstractmethod
@@ -142,7 +142,7 @@ class StructureWriter(object):
 
 
 class StructureConverter(object):
-    """Abstract superclass for converting structure data.
+    """Abstract base class for converting structure data.
 
     Parameters
     ----------
@@ -185,9 +185,10 @@ class StructureFormat(object):
 
 
 class StructureFormatter(object):
-    """Base class for wrapping `Atom` attributes into a formatted string."""
+    """Abstract base class for formatting `Atom` attributes."""
 
     def format(self):
+        """Convert `Atom` attributes based on `StructureFormat`"""
         pass
 
 
