@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-===================================================
+=============================================
 I/O functions (:mod:`sknano.tools._iofuncs`)
-===================================================
+=============================================
 
 .. currentmodule:: sknano.tools._iofuncs
 
@@ -34,18 +34,18 @@ def get_fpath(fname=None, ext=None, outpath=os.getcwd(), overwrite=False,
         Otherwise, `ext` will be set to an empty string `''`.
         If `ext` is not None and is a valid string,
         then `fname` is analyzed to see if it already ends with `ext`.
-        If `fname.endswith(ext)` is True from the start, then `ext` will
+        If `fname.endswith(ext)` is `True` from the start, then `ext` will
         not be duplicately appended.
     outpath : str, optional
         Absolute or relative path for generated output file.
         Default is the absolute path returned by `os.getcwd()`.
     overwrite : bool, optional
-        If True, overwrite an existing file if it has the same generated
+        If `True`, overwrite an existing file if it has the same generated
         file path.
     add_fnum : bool, optional
         Append integer number to output file name, starting with **1**.
     fnum : {None, int}, optional
-        Starting file number to append if `add_fnum` is True.
+        Starting file number to append if `add_fnum` is `True`.
 
         .. note::
 
@@ -53,9 +53,9 @@ def get_fpath(fname=None, ext=None, outpath=os.getcwd(), overwrite=False,
         setting this parameter has no effect.
 
     include_fname : bool, optional
-        If True, return `(fpath, fname)` tuple.
+        If `True`, return `(fpath, fname)` tuple.
     fname_only : bool, optional
-        If True, return only `fname`.
+        If `True`, return only `fname`.
     verbose : bool, optional
         Show verbose output.
 
@@ -63,9 +63,9 @@ def get_fpath(fname=None, ext=None, outpath=os.getcwd(), overwrite=False,
     -------
     fpath : str
         The concatenation of `outpath` followed by the updated `fname`.
-    (fpath, fname) : tuple (only if `include_fname` is True)
+    (fpath, fname) : tuple (only if `include_fname` is `True`)
         2-tuple of strings `(fpath, fname)`.
-    fname : str (only if `fname_only` is True)
+    fname : str (only if `fname_only` is `True`)
         Updated `fname`.
 
     """
@@ -100,6 +100,9 @@ def get_fpath(fname=None, ext=None, outpath=os.getcwd(), overwrite=False,
             f = fname + '-1' + ext
 
     fpath = None
+
+    if outpath is None:
+        outpath = os.getcwd()
 
     try:
         os.makedirs(outpath)
