@@ -23,7 +23,7 @@ except ImportError:
     Qty = None
 
 from ..chemistry import Atom
-from ..tools.refdata import CCbond
+from ..tools.refdata import CCbond, dVDW
 
 from ._parameter_luts import param_units, param_symbols, param_strfmt
 
@@ -281,6 +281,14 @@ class Nanotube(object):
 
         self._M = self.compute_M(n=self._n, m=self._m)
 
+        self._Lx = \
+            self.compute_Lx(n=self._n, m=self._m, nx=self._nx, bond=self._bond,
+                            with_units=self._with_units)
+
+        self._Ly = \
+            self.compute_Ly(n=self._n, m=self._m, ny=self._ny, bond=self._bond,
+                            with_units=self._with_units)
+
         self._Lz = \
             self.compute_Lz(n=self._n, m=self._m, nz=self._nz, bond=self._bond,
                             with_units=self._with_units)
@@ -353,15 +361,33 @@ class Nanotube(object):
         """Bond length in **Angstroms**."""
         return self._bond
 
+    @bond.setter
+    def bond(self, value):
+        """Set bond length in **Angstroms**."""
+        self._bond = float(value)
+        self.compute_tube_params()
+
     @property
     def element1(self):
         """Element symbol of :py:class:`~sknano.chemistry.Atom` 1."""
         return self._element1
 
+    @element1.setter
+    def element1(self, value):
+        """Set element symbol of :py:class:`~sknano.chemistry.Atom` 1."""
+        self._element1 = value
+        self.compute_tube_params()
+
     @property
     def element2(self):
         """Element symbol of :py:class:`~sknano.chemistry.Atom` 2."""
         return self._element2
+
+    @element2.setter
+    def element2(self, value):
+        """Set element symbol of :py:class:`~sknano.chemistry.Atom` 2."""
+        self._element2 = value
+        self.compute_tube_params()
 
     @property
     def t1(self):
@@ -665,13 +691,6 @@ class Nanotube(object):
         return self._dt
 
     @classmethod
-    def compute_tube_diameter(cls, n=int, m=int, bond=None, with_units=False,
-                              units='angstrom', magnitude=True):
-        """Alias for :meth:`Nanotube.compute_dt`"""
-        return Nanotube.compute_dt(n=n, m=m, bond=bond, with_units=with_units,
-                                   units=units, magnitude=magnitude)
-
-    @classmethod
     def compute_dt(cls, n=int, m=int, bond=None, with_units=False,
                    units='angstrom', magnitude=True):
         """Compute nanotube diameter :math:`d_{t}`
@@ -700,17 +719,17 @@ class Nanotube(object):
                                  units=units, magnitude=magnitude)
         return Ch / np.pi
 
+    @classmethod
+    def compute_tube_diameter(cls, n=int, m=int, bond=None, with_units=False,
+                              units='angstrom', magnitude=True):
+        """Alias for :meth:`Nanotube.compute_dt`"""
+        return Nanotube.compute_dt(n=n, m=m, bond=bond, with_units=with_units,
+                                   units=units, magnitude=magnitude)
+
     @property
     def rt(self):
         """Nanotube radius :math:`r_{t} = \\frac{|\\mathbf{C}_{h}|}{2\\pi}`"""
         return self._rt
-
-    @classmethod
-    def compute_tube_radius(cls, n=int, m=int, bond=None, with_units=False,
-                            units='angstrom', magnitude=True):
-        """Alias for :meth:`Nanotube.compute_rt`"""
-        return Nanotube.compute_rt(n, m, bond=bond, with_units=with_units,
-                                   units=units, magnitude=magnitude)
 
     @classmethod
     def compute_rt(cls, n=int, m=int, bond=None, with_units=False,
@@ -741,6 +760,13 @@ class Nanotube(object):
         Ch = Nanotube.compute_Ch(n=n, m=m, bond=bond, with_units=with_units,
                                  units=units, magnitude=magnitude)
         return Ch / (2 * np.pi)
+
+    @classmethod
+    def compute_tube_radius(cls, n=int, m=int, bond=None, with_units=False,
+                            units='angstrom', magnitude=True):
+        """Alias for :meth:`Nanotube.compute_rt`"""
+        return Nanotube.compute_rt(n, m, bond=bond, with_units=with_units,
+                                   units=units, magnitude=magnitude)
 
     @property
     def d(self):
@@ -975,10 +1001,86 @@ class Nanotube(object):
         """Nanotube :math:`L_{\\mathrm{x}}` in **nanometers**."""
         return self._Lx
 
+    @classmethod
+    def compute_Lx(cls, n=int, m=int, nx=int, bond=None, with_units=False,
+                   units='angstrom', magnitude=True):
+        """Compute :math:`L_x`.
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
+            = (n, m)`.
+        nx : int
+            Number of nanotubes along :math:`x`
+        bond : float, optional
+            bond length
+
+        Returns
+        -------
+        float
+            :math:`L_x` in **nanometers**
+
+        """
+        dt = Nanotube.compute_dt(n=n, m=m, bond=bond, with_units=with_units,
+                                 units=units, magnitude=magnitude)
+        Lx = nx * (dt + dVDW)
+        if with_units:
+            Lx.ito('nanometer')
+        else:
+            Lx = Lx / 10
+
+        if magnitude and with_units:
+            try:
+                return Lx.magnitude
+            except AttributeError:
+                return Lx
+        else:
+            return Lx
+
     @property
     def Ly(self):
         """Nanotube :math:`L_{\\mathrm{y}}` in **nanometers**."""
         return self._Ly
+
+    @classmethod
+    def compute_Ly(cls, n=int, m=int, ny=int, bond=None, with_units=False,
+                   units='angstrom', magnitude=True):
+        """Compute :math:`L_y`.
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
+            = (n, m)`.
+        ny : int
+            Number of nanotubes along :math:`y`
+        bond : float, optional
+            bond length
+
+        Returns
+        -------
+        float
+            :math:`L_y` in **nanometers**
+
+        """
+        dt = Nanotube.compute_dt(n=n, m=m, bond=bond, with_units=with_units,
+                                 units=units, magnitude=magnitude)
+        Ly = ny * (dt + dVDW)
+        if with_units:
+            Ly.ito('nanometer')
+        else:
+            Ly = Ly / 10
+
+        if magnitude and with_units:
+            try:
+                return Ly.magnitude
+            except AttributeError:
+                return Ly
+        else:
+            return Ly
 
     @property
     def Lz(self):
@@ -1314,7 +1416,7 @@ class NanotubeBundle(Nanotube):
     """
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
                  element1='C', element2='C', bond=CCbond, tube_length=None,
-                 vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
+                 vdw_spacing=dVDW, bundle_packing=None, bundle_geometry=None,
                  Lx=None, Ly=None, Lz=None, fix_Lz=False, with_units=False,
                  units=None, verbose=False):
 
