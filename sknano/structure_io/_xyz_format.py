@@ -246,4 +246,5 @@ class XYZ2DATAConverter(StructureConverter):
 
 
 class XYZFormat(StructureFormat):
+    """Class specifying `StructureFormat` properties for `xyz` format."""
     pass
