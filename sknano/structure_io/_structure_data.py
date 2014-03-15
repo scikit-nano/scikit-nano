@@ -53,12 +53,12 @@ class StructureData(object):
 
     @property
     def structure_atoms(self):
-        """:py:class:`~sknano.chemistry.Atoms` instance."""
+        """:class:`~sknano.chemistry.Atoms` instance."""
         return self._structure_atoms
 
     @property
     def atoms(self):
-        """Alias for :py:attr:`~StructureData.structure_atoms`."""
+        """Alias for :attr:`~StructureData.structure_atoms`."""
         return self.structure_atoms
 
     @property
@@ -100,17 +100,16 @@ class StructureData(object):
 
     @property
     def Natoms(self):
-        """Number of atoms in :py:class:`~sknano.chemistry.Atoms`"""
+        """Number of atoms in :class:`~sknano.chemistry.Atoms`"""
         return self._structure_atoms.Natoms
 
     @property
     def properties(self):
-        """OrderedDict of format properties."""
+        """:class:`~python:collections.OrderedDict` of structure properties."""
         return self._properties
 
 
 class StructureReader(StructureData):
-    __metaclass__ = ABCMeta
     """Abstract superclass for reading structure data.
 
     Parameters
@@ -119,6 +118,8 @@ class StructureReader(StructureData):
         structure file
 
     """
+    __metaclass__ = ABCMeta
+
     def __init__(self, fname=None):
         super(StructureReader, self).__init__(fname=fname)
 
@@ -130,8 +131,8 @@ class StructureReader(StructureData):
 
 
 class StructureWriter(object):
-    __metaclass__ = ABCMeta
     """Abstract superclass for writing structure data."""
+    __metaclass__ = ABCMeta
 
     @abstractmethod
     def write(self):
@@ -141,18 +142,28 @@ class StructureWriter(object):
 
 
 class StructureConverter(object):
+    """Abstract superclass for converting structure data.
+
+    Parameters
+    ----------
+    infile : str
+    outfile : str
+
+    """
     __metaclass__ = ABCMeta
-    """Abstract superclass for converting structure data."""
+
     def __init__(self, infile=None, outfile=None):
         self._infile = infile
         self._outfile = outfile
 
     @property
     def infile(self):
+        """Return `infile`"""
         return self._infile
 
     @property
     def outfile(self):
+        """Return `outfile`"""
         return self._outfile
 
     @abstractmethod
@@ -169,7 +180,7 @@ class StructureFormat(object):
 
     @property
     def properties(self):
-        """OrderedDict of format properties."""
+        """:class:`~python:collections.OrderedDict` of format properties."""
         return self._properties
 
 
@@ -234,7 +245,7 @@ class StructureConverterError(StructureDataError):
 
 
 class StructureFormatError(StructureDataError):
-    """Exception raised for structure format errors.
+    """Exception raised for `StructureFormat` errors.
 
     Parameters
     ----------
