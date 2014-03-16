@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'nanogen_3.ui'
 #
-# Created: Sat Mar 15 20:31:10 2014
+# Created: Sat Mar 15 22:36:16 2014
 #      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -679,7 +679,7 @@ class Ui_NanoGen(object):
         self.nanotube_element2_comboBox.setCurrentIndex(3)
         self.graphene_element1_comboBox.setCurrentIndex(3)
         self.graphene_element2_comboBox.setCurrentIndex(3)
-        self.structure_format_comboBox.setCurrentIndex(0)
+        self.structure_format_comboBox.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(NanoGen)
 
     def retranslateUi(self, NanoGen):

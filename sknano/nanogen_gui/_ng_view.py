@@ -14,9 +14,8 @@ from PyQt4.QtCore import pyqtSlot
 from PyQt4.QtGui import QMainWindow
 
 from ..nanogen import NanotubeGenerator, NanotubeBundleGenerator, \
-    UnrolledNanotubeGenerator, GrapheneGenerator, BiLayerGrapheneGenerator, \
-    MWNTGenerator, MWNTBundleGenerator
-
+    MWNTGenerator, MWNTBundleGenerator, UnrolledNanotubeGenerator, \
+    GrapheneGenerator  # , BiLayerGrapheneGenerator
 from ._ui_nanogen import Ui_NanoGen
 
 __all__ = ['NGView']
@@ -40,6 +39,7 @@ class NGView(QMainWindow, Ui_NanoGen):
         model.register_observer(self)
         super(NGView, self).__init__()
         self.setupUi(self)
+        self.nanogen_statusBar.showMessage('Ready')
 
     # Nanotube Generator slots/signals
 

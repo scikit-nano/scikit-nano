@@ -20,7 +20,7 @@ class NGModel(object):
     def __init__(self):
         self._observers = []
         self._swntbundle = NanotubeBundle(n=10, m=10)
-        self._graphene = Graphene(width=1, length=10, edge='AC')
+        self._graphene = Graphene(length=10, width=1, edge='AC')
 
     @property
     def n(self):
