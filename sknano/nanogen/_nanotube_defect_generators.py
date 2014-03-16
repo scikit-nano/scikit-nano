@@ -8,7 +8,7 @@ Nanotube defect generator (:mod:`sknano.nanogen._nanotube_defect_generators`)
 
 """
 from __future__ import absolute_import, division, print_function
-__docformat__ = 'restructuredtext'
+__docformat__ = 'restructuredtext en'
 
 import itertools
 
@@ -20,7 +20,8 @@ from ._defect_generators import DefectGenerator, CrossLinkedDefectGenerator, \
     StoneWalesDefectGenerator, VacancyGenerator
 from ._nanotube_bundle_generators import NanotubeBundleGenerator
 
-__all__ = ['NanotubeDefectGenerator', 'NanotubeVacancyGenerator',
+__all__ = ['NanotubeDefectGenerator',
+           'NanotubeVacancyGenerator',
            'CrossLinkedNanotubeBundleGenerator']
 
 
@@ -140,12 +141,13 @@ class NanotubeVacancyGenerator(VacancyGenerator):
 
     """
     def __init__(self, n=None, m=None, nx=1, ny=1, nz=1,
-                 fname=None, structure_format=None,
-                 element1='C', element2='C', bond=CCbond,
-                 vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
+                 element1='C', element2='C', bond=CCbond, vdw_spacing=3.4,
+                 bundle_packing=None, bundle_geometry=None,
                  Lx=None, Ly=None, Lz=None, fix_Lz=False,
                  rotate_structure=False, rotation_angle=None,
-                 rotation_axis=None, verbose=False):
+                 rotation_axis=None,
+                 fname=None, outpath=None, structure_format=None,
+                 verbose=False):
 
         self._Ntubes = None
         self._Natoms_per_tube = None
@@ -171,7 +173,8 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                             '`n` and `m` must be specified as integers')
 
         super(NanotubeVacancyGenerator, self).__init__(
-            fname=fname, structure_format=structure_format)
+            fname=fname, outpath=outpath, structure_format=structure_format,
+            verbose=verbose)
 
     def generate_vacancy_structure(self, Nvac_sites=None, Nvac_clusters=None,
                                    cluster_size=None, vac_type='single',

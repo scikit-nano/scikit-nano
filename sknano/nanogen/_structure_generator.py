@@ -10,6 +10,8 @@ Structure generator (:mod:`sknano.nanogen._structure_generator`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext'
 
+import os
+
 from ..chemistry import Atoms
 from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
     supported_structure_formats
@@ -23,14 +25,25 @@ class StructureGenerator(object):
 
     def __init__(self):
         self._fname = None
+        self._fpath = None
+        self._structure_atoms = Atoms()
         self._structure_format = None
         self._unit_cell = Atoms()
-        self._structure_atoms = Atoms()
 
     @property
     def fname(self):
         """Structure file name."""
         return self._fname
+
+    @property
+    def fpath(self):
+        """Structure file path."""
+        return self._fpath
+
+    @property
+    def structure_atoms(self):
+        """Return structure :class:`~sknano.chemistry.Atoms`."""
+        return self._structure_atoms
 
     @property
     def structure_format(self):
@@ -39,15 +52,10 @@ class StructureGenerator(object):
 
     @property
     def unit_cell(self):
-        """Return unit cell :py:class:`~sknano.chemistry.Atoms`."""
+        """Return unit cell :class:`~sknano.chemistry.Atoms`."""
         return self._unit_cell
 
-    @property
-    def structure_atoms(self):
-        """Return structure :py:class:`~sknano.chemistry.Atoms`."""
-        return self._structure_atoms
-
-    def save_data(self, fname=None, structure_format=None,
+    def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
                   center_CM=True):
         """Save structure data.
@@ -56,6 +64,8 @@ class StructureGenerator(object):
         ----------
         fname : {None, str}, optional
             file name string
+        outpath : str, optional
+            Output path for structure data file.
         structure_format : {None, str}, optional
             chemical file format of saved structure data. Must be one of:
 
@@ -88,8 +98,11 @@ class StructureGenerator(object):
 
         if not fname.endswith(structure_format):
             fname += '.' + structure_format
-
         self._fname = fname
+
+        if outpath is not None:
+            self._fpath = os.path.join(outpath, fname)
+
         self._structure_format = structure_format
 
         if center_CM:
@@ -102,6 +115,8 @@ class StructureGenerator(object):
             self.structure_atoms.rotate(R_matrix)
 
         if structure_format == 'data':
-            DATAWriter.write(fname=fname, atoms=self.structure_atoms)
+            DATAWriter.write(fname=fname, outpath=outpath,
+                             atoms=self.structure_atoms)
         else:
-            XYZWriter.write(fname=fname, atoms=self.structure_atoms)
+            XYZWriter.write(fname=fname, outpath=outpath,
+                            atoms=self.structure_atoms)

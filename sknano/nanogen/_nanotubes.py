@@ -8,7 +8,7 @@ Nanotube structure tools (:mod:`sknano.nanogen._nanotubes`)
 
 """
 from __future__ import division, print_function, absolute_import
-__docformat__ = 'restructuredtext'
+__docformat__ = 'restructuredtext en'
 
 from fractions import gcd
 from collections import OrderedDict
@@ -42,7 +42,7 @@ class Nanotube(object):
         Number of repeat unit cells in the :math:`x, y, z` dimensions
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :py:class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         bond length between nearest neighbor atoms.
         Must be in units of **Angstroms**. Default value is
@@ -369,23 +369,23 @@ class Nanotube(object):
 
     @property
     def element1(self):
-        """Element symbol of :py:class:`~sknano.chemistry.Atom` 1."""
+        """Element symbol of :class:`~sknano.chemistry.Atom` 1."""
         return self._element1
 
     @element1.setter
     def element1(self, value):
-        """Set element symbol of :py:class:`~sknano.chemistry.Atom` 1."""
+        """Set element symbol of :class:`~sknano.chemistry.Atom` 1."""
         self._element1 = value
         self.compute_tube_params()
 
     @property
     def element2(self):
-        """Element symbol of :py:class:`~sknano.chemistry.Atom` 2."""
+        """Element symbol of :class:`~sknano.chemistry.Atom` 2."""
         return self._element2
 
     @element2.setter
     def element2(self, value):
-        """Set element symbol of :py:class:`~sknano.chemistry.Atom` 2."""
+        """Set element symbol of :class:`~sknano.chemistry.Atom` 2."""
         self._element2 = value
         self.compute_tube_params()
 
@@ -1385,7 +1385,7 @@ class NanotubeBundle(Nanotube):
         Number of repeat unit cells in the :math:`x, y, z` dimensions
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :py:class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         Bond length between nearest neighbor atoms.
         Must be in units of **Angstroms**. Default value is

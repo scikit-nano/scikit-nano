@@ -48,7 +48,7 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
         the *length* of the nanotube.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :py:class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
@@ -74,8 +74,8 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
 
     autogen : bool, optional
         if `True`, automatically call
-        :py:meth:`~NanotubeGenerator.generate_unit_cell`,
-        followed by :py:meth:`~NanotubeGenerator.generate_structure_data`.
+        :meth:`~NanotubeGenerator.generate_unit_cell`,
+        followed by :meth:`~NanotubeGenerator.generate_structure_data`.
     with_units : bool, optional
         Attach `units` to physical quantities
     units : None, optional
@@ -85,7 +85,7 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
 
     Examples
     --------
-    First, load the :py:class:`~sknano.nanogen.NanotubeGenerator` class.
+    First, load the :class:`~sknano.nanogen.NanotubeGenerator` class.
 
     >>> from sknano.nanogen import NanotubeGenerator
 
@@ -192,12 +192,12 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
                 nt_atom.r = uc_atom.r + dr
                 self._structure_atoms.append(nt_atom)
 
-    def save_data(self, fname=None, structure_format=None,
+    def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
                   center_CM=True):
         """Save structure data.
 
-        See :py:meth:`~sknano.nanogen.StructureGenerator.save_data` method
+        See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
         for documentation.
 
         """
@@ -227,7 +227,7 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
                 self._structure_atoms.center_CM()
 
         super(NanotubeGenerator, self).save_data(
-            fname=fname, structure_format=structure_format,
+            fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
             deg2rad=deg2rad, center_CM=False)
 
@@ -251,7 +251,7 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
         Number of repeat unit cells in the :math:`x, y, z` dimensions
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :py:class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
@@ -264,8 +264,8 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
         non integer :math:`n_z` cells are permitted.
     autogen : bool, optional
         if `True`, automatically call
-        :py:meth:`~NanotubeGenerator.generate_unit_cell`,
-        followed by :py:meth:`~NanotubeGenerator.generate_structure_data`.
+        :meth:`~NanotubeGenerator.generate_unit_cell`,
+        followed by :meth:`~NanotubeGenerator.generate_structure_data`.
     with_units : bool, optional
         Attach `units` to physical quantities
     units : None, optional
@@ -280,14 +280,14 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
     :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
     If you want to generate graphene with an armchair or zigzag edge using
     `length` and `width` parameters, see the
-    :py:class:`~sknano.nanogen.GrapheneGenerator` class.
+    :class:`~sknano.nanogen.GrapheneGenerator` class.
 
-    .. seealso:: :py:class:`~sknano.nanogen.GrapheneGenerator`
+    .. seealso:: :class:`~sknano.nanogen.GrapheneGenerator`
 
 
     Examples
     --------
-    First, load the :py:class:`~sknano.nanogen.UnrolledNanotubeGenerator`
+    First, load the :class:`~sknano.nanogen.UnrolledNanotubeGenerator`
     class.
 
     >>> from sknano.nanogen import UnrolledNanotubeGenerator
@@ -385,12 +385,12 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
                     nt_atom.r = uc_atom.r + dr
                     self._structure_atoms.append(nt_atom)
 
-    def save_data(self, fname=None, structure_format=None,
+    def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
                   center_CM=True):
         """Save structure data.
 
-        See :py:meth:`~sknano.nanogen.StructureGenerator.save_data` method
+        See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
         for documentation.
 
         """
@@ -441,7 +441,7 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
                 self._structure_atoms.center_CM()
 
         super(UnrolledNanotubeGenerator, self).save_data(
-            fname=fname, structure_format=structure_format,
+            fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
             deg2rad=deg2rad, center_CM=False)
 
@@ -466,7 +466,7 @@ class MWNTGenerator(NanotubeGenerator):
         Number of repeat unit cells in the :math:`x, y, z` dimensions.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :py:class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
@@ -505,8 +505,8 @@ class MWNTGenerator(NanotubeGenerator):
         value is the van der Waals interaction distance of 3.4 Angstroms.
     autogen : bool, optional
         if `True`, automatically call
-        :py:meth:`~MWNTGenerator.generate_unit_cell`,
-        followed by :py:meth:`~MWNTGenerator.generate_structure_data`.
+        :meth:`~MWNTGenerator.generate_unit_cell`,
+        followed by :meth:`~MWNTGenerator.generate_structure_data`.
     verbose : bool, optional
         if `True`, show verbose output
 
@@ -739,12 +739,12 @@ class MWNTGenerator(NanotubeGenerator):
             print('Nshells_per_tube: {}'.format(self._Nshells_per_tube))
             print('Natoms_per_tube: {}'.format(self._Natoms_per_tube))
 
-    def save_data(self, fname=None, structure_format=None,
+    def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
                   center_CM=True):
         """Save structure data.
 
-        See :py:meth:`~sknano.nanogen.StructureGenerator.save_data` method
+        See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
         for documentation.
 
         """
@@ -764,6 +764,6 @@ class MWNTGenerator(NanotubeGenerator):
             fname = '_'.join(fname_wordlist)
 
         super(MWNTGenerator, self).save_data(
-            fname=fname, structure_format=structure_format,
+            fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
             deg2rad=deg2rad, center_CM=center_CM)

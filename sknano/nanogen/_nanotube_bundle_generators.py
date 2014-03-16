@@ -39,7 +39,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
         Number of repeat unit cells in the :math:`x, y, z` dimensions.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :py:class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
@@ -78,8 +78,8 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
 
     autogen : bool, optional
         if `True`, automatically call
-        :py:meth:`~NanotubeGenerator.generate_unit_cell`,
-        followed by :py:meth:`~NanotubeGenerator.generate_structure_data`.
+        :meth:`~NanotubeGenerator.generate_unit_cell`,
+        followed by :meth:`~NanotubeGenerator.generate_structure_data`.
     verbose : bool, optional
         if `True`, show verbose output
 
@@ -127,7 +127,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
 
     .. image:: /images/0605_hcp_7tube_hexagon-01.png
 
-    Remember, all of the :py:meth:`~NanotubeBundleGenerator.save_data`
+    Remember, all of the :meth:`~NanotubeBundleGenerator.save_data`
     methods allow you to rotate the structure data before saving:
 
     >>> SWCNTbundle.save_data(fname='0605_hcp_7tube_hexagon_rot-30deg.xyz',
@@ -260,12 +260,12 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
                                            Ntubes=self._Ntubes)
         #self.update_structure_atoms_attributes()
 
-    def save_data(self, fname=None, structure_format=None,
+    def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
                   center_CM=True):
         """Save structure data.
 
-        See :py:meth:`~sknano.nanogen.StructureGenerator.save_data` method
+        See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
         for documentation.
 
         """
@@ -298,7 +298,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
             fname = '_'.join(fname_wordlist)
 
         super(NanotubeBundleGenerator, self).save_data(
-            fname=fname, structure_format=structure_format,
+            fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
             deg2rad=deg2rad, center_CM=center_CM)
 
@@ -317,7 +317,7 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
         Number of repeat unit cells in the :math:`x, y, z` dimensions.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :py:class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
@@ -366,8 +366,8 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
                        'rhombus', 'rhomboid'}, optional
     autogen : bool, optional
         if `True`, automatically call
-        :py:meth:`~MWNTGenerator.generate_unit_cell`,
-        followed by :py:meth:`~MWNTGenerator.generate_structure_data`.
+        :meth:`~MWNTGenerator.generate_unit_cell`,
+        followed by :meth:`~MWNTGenerator.generate_structure_data`.
     verbose : bool, optional
         if `True`, show verbose output
 
@@ -538,12 +538,12 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
             print('Ntubes: {}'.format(self._Ntubes))
             print('Natoms_per_bundle: {}'.format(self._Natoms_per_bundle))
 
-    def save_data(self, fname=None, structure_format=None,
+    def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
                   center_CM=True):
         """Save structure data.
 
-        See :py:meth:`~sknano.nanogen.StructureGenerator.save_data` method
+        See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
         for documentation.
 
         """
@@ -581,6 +581,6 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
             fname = '_'.join(fname_wordlist)
 
         super(MWNTBundleGenerator, self).save_data(
-            fname=fname, structure_format=structure_format,
+            fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
             deg2rad=deg2rad, center_CM=center_CM)

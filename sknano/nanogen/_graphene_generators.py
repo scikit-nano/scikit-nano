@@ -29,16 +29,16 @@ class GrapheneGenerator(Graphene, StructureGenerator):
 
     Parameters
     ----------
-    width : float
-        Width of graphene sheet in **nanometers**
     length : float
         Length of graphene sheet in **nanometers**
+    width : float
+        Width of graphene sheet in **nanometers**
     edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
         the `length` of the sheet.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :py:class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         bond length between nearest-neighbor atoms in **Angstroms**.
     nlayers : int, optional
@@ -57,9 +57,9 @@ class GrapheneGenerator(Graphene, StructureGenerator):
     The `GrapheneGenerator` class and its subclasses generate graphene with
     either an armchair or zigzag edge using a 4-atom conventional unit cell.
     If you want to generate graphene as an *unrolled nanotube*, see the
-    :py:class:`~sknano.nanogen.UnrolledNanotubeGenerator` class.
+    :class:`~sknano.nanogen.UnrolledNanotubeGenerator` class.
 
-    .. seealso:: :py:class:`~sknano.nanogen.UnrolledNanotubeGenerator`
+    .. seealso:: :class:`~sknano.nanogen.UnrolledNanotubeGenerator`
 
     Examples
     --------
@@ -69,43 +69,43 @@ class GrapheneGenerator(Graphene, StructureGenerator):
 
     >>> from sknano.nanogen import GrapheneGenerator
 
-    Now generate a **1 nm x 20 nm** armchair edge graphene nano-ribbon.
+    Now generate a **20 nm x 1 nm** armchair edge graphene nano-ribbon.
 
-    >>> ACG = GrapheneGenerator(width=1, length=20, edge='armchair')
+    >>> ACG = GrapheneGenerator(length=20, width=1, edge='AC')
 
     Save structure data in `xyz` format:
 
-    >>> ACG.save_data(fname='1nmx20nm_AC_edge.xyz')
+    >>> ACG.save_data()
 
     The rendered structure look like:
 
-    .. image:: /images/1nmx20nm_AC_edge.png
+    .. image:: /images/20nmx1nm_AC_edge.png
 
-    Now let's generate a **1 nm x 20 nm** zigzag edge graphene nano-ribbon.
+    Now let's generate a **20 nm x 1 nm** zigzag edge graphene nano-ribbon.
 
-    >>> ZZG = GrapheneGenerator(width=1, length=20, edge='zigzag')
-    >>> ZZG.save_data(fname='1nmx20nm_ZZ_edge.xyz')
+    >>> ZZG = GrapheneGenerator(length=20, width=1, edge='ZZ')
+    >>> ZZG.save_data()
 
     The rendered structure looks like:
 
-    .. image:: /images/1nmx20nm_ZZ_edge.png
+    .. image:: /images/20nmx1nm_ZZ_edge.png
 
-    Now generate **5 nm x 25 nm**, `armchair` edge,
+    Now generate **25 nm x 5 nm**, `armchair` edge,
     5 layer, `AB`-stacked graphene.
 
-    >>> ACG_5layers = GrapheneGenerator(width=5, length=25,
-    ...                                 edge='armchair', nlayers=5)
-    >>> ACG_5layers.save_data(fname='5nmx25nm_5layer_AC_graphene.xyz')
+    >>> ACG_5layers = GrapheneGenerator(length=25, width=5, edge='AC',
+    ...                                 nlayers=5)
+    >>> ACG_5layers.save_data()
 
     The rendered structure looks like:
 
-    .. image:: /images/5nmx25nm_5layer_AC_graphene.png
+    .. image:: /images/25nmx5nm_5layer_AC_graphene.png
 
     Now generate single layer, **10 nm x 10 nm** sheet of BN Graphene.
 
-    >>> BN_graphene = GrapheneGenerator(width=10, length=10, edge='AC',
+    >>> BN_graphene = GrapheneGenerator(length=10, width=10, edge='AC',
     ...                                 element1='B', element2='N')
-    >>> BN_graphene.save_data(fname='10nmx10nm_1_layer_BN_graphene.xyz')
+    >>> BN_graphene.save_data()
 
     The rendered structure looks like:
 
@@ -116,7 +116,7 @@ class GrapheneGenerator(Graphene, StructureGenerator):
 
     >>> UEs_graphene = GrapheneGenerator(width=5, length=5, edge='zigzag',
     ...                                  element1='U', element2='Es')
-    >>> UEs_graphene.save_data(fname='5nmx5nm_1_layer_UEs_graphene.xyz')
+    >>> UEs_graphene.save_data()
 
     The rendered structure looks like:
 
@@ -124,14 +124,14 @@ class GrapheneGenerator(Graphene, StructureGenerator):
 
     """
 
-    def __init__(self, width=None, length=None, edge=None,
+    def __init__(self, length=None, width=None, edge=None,
                  element1='C', element2='C', bond=CCbond,
                  nlayers=1, layer_spacing=3.35, stacking_order='AB',
                  autogen=True, with_units=False, units=None,
                  verbose=False):
 
         super(GrapheneGenerator, self).__init__(
-            width=width, length=length, edge=edge,
+            length=length, width=width, edge=edge,
             element1=element1, element2=element2, bond=bond,
             nlayers=nlayers, layer_spacing=layer_spacing,
             stacking_order=stacking_order, with_units=with_units, units=units,
@@ -208,16 +208,17 @@ class GrapheneGenerator(Graphene, StructureGenerator):
 
             self._structure_atoms.extend(layer.atoms)
 
-    def save_data(self, fname=None, structure_format=None, rotation_angle=-90,
-                  rot_axis='x', deg2rad=True, center_CM=True):
+    def save_data(self, fname=None, outpath=None, structure_format=None,
+                  rotation_angle=-90, rot_axis='x', deg2rad=True,
+                  center_CM=True):
         """Save structure data.
 
-        See :py:meth:`~sknano.nanogen.StructureGenerator.save_data` method
+        See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
         for documentation.
 
         """
         if fname is None:
-            dimensions = '{}nmx{}nm'.format(self._width, self._length)
+            dimensions = '{}nmx{}nm'.format(self._length, self._width)
             nlayer = '{}layer'.format(self._nlayers)
             edge = 'AC' if self._edge in ('AC', 'armchair') else 'ZZ'
             atombond = '{}{}'.format(self._element1, self._element2)
@@ -230,7 +231,7 @@ class GrapheneGenerator(Graphene, StructureGenerator):
             self._structure_atoms.center_CM()
 
         super(GrapheneGenerator, self).save_data(
-            fname=fname, structure_format=structure_format,
+            fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
             deg2rad=deg2rad, center_CM=False)
 
@@ -240,16 +241,16 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
 
     Parameters
     ----------
-    width : float
-        Width of graphene sheet in **nanometers**
     length : float
         Length of graphene sheet in **nanometers**
+    width : float
+        Width of graphene sheet in **nanometers**
     edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
         the `length` of the sheet.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :py:class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         bond length between nearest-neighbor atoms in **Angstroms**.
     layer_spacing : float, optional
@@ -274,26 +275,26 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
 
     >>> from sknano.nanogen import BiLayerGrapheneGenerator
 
-    Generate **1 nm** wide by **10 nm** long `AB` stacked
+    Generate **10 nm** wide by **1 nm** long `AB` stacked
     bilayer-graphene with a `ZZ` edge:
 
-    >>> bi_graphene = BiLayerGrapheneGenerator(width=1, length=10, edge='ZZ')
+    >>> bi_graphene = BiLayerGrapheneGenerator(length=10, width=1, edge='ZZ')
 
     Save structure data in `xyz` format:
 
-    >>> bi_graphene.save_data(fname='1nmx10nm_bilayer.xyz')
+    >>> bi_graphene.save_data()
 
     The rendered structure looks like (after rotating 90 degrees so that
     it better fits the page):
 
-    .. image:: /images/1nmx10nm_bilayer.png
+    .. image:: /images/10nmx1nm_bilayer.png
 
     Now generate bilayer-graphene with top layer rotated by 45 degrees.
 
-    >>> rotated_bilayer = BiLayerGrapheneGenerator(width=10, length=10,
+    >>> rotated_bilayer = BiLayerGrapheneGenerator(length=10, width=10,
     ...                                            edge='armchair',
     ...                                            rotation_angle=45)
-    >>> rotated_bilayer.save_data(fname='bilayer_rotation=45deg.xyz')
+    >>> rotated_bilayer.save_data(fname='rotated_bilayer.xyz')
 
     The rendered structure looks like:
 
@@ -301,7 +302,7 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
 
     Now generate BN bilayer-graphene with top layer rotated 45 degrees.
 
-    >>> rotated_BN_bilayer = BiLayerGrapheneGenerator(width=10, length=10,
+    >>> rotated_BN_bilayer = BiLayerGrapheneGenerator(length=10, width=10,
     ...                                               edge='zigzag',
     ...                                               element1='B',
     ...                                               element2='N',
@@ -314,14 +315,14 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
 
     """
 
-    def __init__(self, width=None, length=None, edge=None,
+    def __init__(self, length=None, width=None, edge=None,
                  element1='C', element2='C', bond=CCbond,
                  layer_spacing=3.35, stacking_order='AB',
                  rotation_angle=None, deg2rad=True, autogen=True,
                  verbose=False):
 
         super(BiLayerGrapheneGenerator, self).__init__(
-            width=width, length=length, edge=edge,
+            length=length, width=width, edge=edge,
             element1=element1, element2=element2, bond=bond,
             nlayers=2, layer_spacing=layer_spacing, autogen=False,
             verbose=verbose)

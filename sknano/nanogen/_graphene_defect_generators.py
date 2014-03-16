@@ -8,7 +8,7 @@ Graphene defect generator (:mod:`sknano.nanogen._graphene_defect_generators`)
 
 """
 from __future__ import absolute_import, division, print_function
-__docformat__ = 'restructuredtext'
+__docformat__ = 'restructuredtext en'
 
 import itertools
 
@@ -34,10 +34,10 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
     Parameters
     ----------
-    width : float, optional
-        Width of graphene sheet in **nanometers**
     length : float, optional
         Length of graphene sheet in **nanometers**
+    width : float, optional
+        Width of graphene sheet in **nanometers**
     edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
         the `length` of the sheet.
@@ -45,6 +45,8 @@ class GrapheneVacancyGenerator(VacancyGenerator):
         Structure data filename. If you don't provide a structure data file,
         the you **must** provide the structure data parameters to
         generate the structure data file.
+    outpath : str, optional
+        Output path for structure data file.
     structure_format : {None, str}, optional
         Chemical file format of saved structure data.
         If `None`, then guess based on `fname` file extension.
@@ -70,7 +72,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
     ------
     `TypeError`
         If `fname` is `None` and `n` and `m` are not integers or
-        `width` and `length` are not floats.
+        `length` and `width` are not floats.
 
     Examples
     --------
@@ -87,13 +89,13 @@ class GrapheneVacancyGenerator(VacancyGenerator):
     *5nmx10nm_ZZ_1layer.data*, you could load that into your
     vacancy generator by typing:
 
-    >>> gvacgen = GrapheneVacancyGenerator(fname='5nmx10nm_ZZ_1layer.data')
+    >>> gvacgen = GrapheneVacancyGenerator(fname='10nmx5nm_ZZ_1layer.data')
 
     If say, you had your LAMMPS data file saved with a `.lammps`
     extension, then you would need to specify the `structure_format`
     keyword argument as well:
 
-    >>> gvacgen = GrapheneVacancyGenerator(fname='5nmx10nm_ZZ_1layer.lammps',
+    >>> gvacgen = GrapheneVacancyGenerator(fname='10nmx5nm_ZZ_1layer.lammps',
     ...                                    structure_format='data')
 
     If you don't have an existing structure data file and want to generate
@@ -101,14 +103,14 @@ class GrapheneVacancyGenerator(VacancyGenerator):
     structure parameters to the `GrapheneVacancyGenerator`
     constructor. These arguments are passed to an instance of
     `GrapheneGenerator` "under the hood" (see the `GrapheneGenerator` docs
-    for examples and more detailed documentation). The `width` and `length`
+    for examples and more detailed documentation). The `length` and `width`
     parameters are required.
 
     In the following example, we'll use the `GrapheneVacancyGenerator` class
     to generate a *10nm x 2nm*, single layer graphene with `armchair` edges,
     and then poke some holes in it.
 
-    >>> gvacgen = GrapheneVacancyGenerator(width=10, length=2, edge='AC')
+    >>> gvacgen = GrapheneVacancyGenerator(length=10, width=2, edge='AC')
 
     Now let's add 20 *random* vacancies to the graphene layer by
     calling the `~GrapheneVacancyGenerator.generate_vacancy_structure`
@@ -167,7 +169,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
     Here's an example of generating single layer graphene with a
     `di-vacancy` at each of the 20 `Nvac_sites`.
 
-    >>> gvacgen = GrapheneVacancyGenerator(width=10, length=5, edge='ZZ')
+    >>> gvacgen = GrapheneVacancyGenerator(length=10, width=5, edge='ZZ')
     >>> gvacgen.generate_vacancy_structure(Nvac_sites=20, vac_type='double')
 
     I'm not going to show the VMD selection command since it will not
@@ -180,37 +182,38 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
     """
     def __init__(self, n=None, m=None, nx=1, ny=1, nz=1,
-                 width=None, length=None, edge=None,
+                 length=None, width=None, edge=None,
                  element1='C', element2='C', bond=CCbond,
                  nlayers=1, layer_spacing=3.35, stacking_order='AB',
-                 fname=None, structure_format=None,
+                 fname=None, outpath=None, structure_format=None,
                  rotate_structure=False, rotation_angle=None,
                  rotation_axis=None, verbose=False):
 
         if fname is None:
-            if isinstance(n, int) and isinstance(m, int):
+            if isinstance(length, (int, float)) and \
+                    isinstance(width, (int, float)):
+                gg = GrapheneGenerator(
+                    length=length, width=width, edge=edge, element1=element1,
+                    element2=element2, bond=bond, nlayers=nlayers,
+                    layer_spacing=layer_spacing, stacking_order=stacking_order,
+                    verbose=verbose)
+            elif isinstance(n, int) and isinstance(m, int):
                 gg = UnrolledNanotubeGenerator(
                     n=n, m=m, nx=nx, ny=ny, nz=nz,
                     element1=element1, element2=element2, bond=bond,
                     nlayers=nlayers, layer_spacing=layer_spacing,
                     stacking_order=stacking_order, verbose=verbose)
-            elif isinstance(width, (int, float)) and \
-                    isinstance(length, (int, float)):
-                gg = GrapheneGenerator(
-                    width=width, length=length, edge=edge, element1=element1,
-                    element2=element2, bond=bond, nlayers=nlayers,
-                    layer_spacing=layer_spacing, stacking_order=stacking_order,
-                    verbose=verbose)
             else:
                 raise TypeError('Either `fname` must be set or `n` and `m` '
-                                'must be specified as integers or `width` and '
-                                '`length` must be specified as floats.')
-            gg.save_data(structure_format='data')
+                                'must be specified as integers or `length` '
+                                'and `width` must be specified as floats.')
+            gg.save_data(outpath=outpath, structure_format='data')
             fname = gg.fname
             structure_format = gg.structure_format
 
         super(GrapheneVacancyGenerator, self).__init__(
-            fname=fname, structure_format=structure_format, verbose=verbose)
+            fname=fname, outpath=outpath,
+            structure_format=structure_format, verbose=verbose)
 
     def generate_vacancy_structure(self, Nvac_sites=None, Nvac_clusters=None,
                                    cluster_size=None, vac_type='single',
