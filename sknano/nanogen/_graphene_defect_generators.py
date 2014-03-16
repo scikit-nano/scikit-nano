@@ -219,7 +219,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                                    cluster_size=None, vac_type='single',
                                    uniform=False, bin_axis='z',
                                    distribute_evenly=False,
-                                   vmd_selection_radius=np.sqrt(12),
+                                   vmd_selection_radius=np.sqrt(10.5),
                                    show_vmd_selection_cmd=True):
         """Generate vacancy structure.
 

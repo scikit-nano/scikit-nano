@@ -99,7 +99,7 @@ class VacancyGenerator(object):
         self._vac_type = 'single'
         self._cluster_size = 1
 
-        self._vmd_selection_radius = np.sqrt(12)
+        self._vmd_selection_radius = np.sqrt(10.5)
         self._show_vmd_selection_cmd = True
 
     @property

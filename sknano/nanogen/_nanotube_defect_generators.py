@@ -179,7 +179,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     def generate_vacancy_structure(self, Nvac_sites=None, Nvac_clusters=None,
                                    cluster_size=None, vac_type='single',
                                    uniform=False, bin_axis='z', Ntubes=None,
-                                   vmd_selection_radius=np.sqrt(12),
+                                   vmd_selection_radius=np.sqrt(10.5),
                                    show_vmd_selection_cmd=True):
         """Generate vacancy structure.
 
