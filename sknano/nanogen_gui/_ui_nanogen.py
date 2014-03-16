@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'nanogen_3.ui'
+# Form implementation generated from reading ui file 'nanogen.ui'
 #
-# Created: Sat Mar 15 22:36:16 2014
+# Created: Sun Mar 16 13:07:48 2014
 #      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
