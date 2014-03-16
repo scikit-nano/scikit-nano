@@ -43,19 +43,22 @@ class VacancyGenerator(object):
     ----------
     fname : str
         structure data filename
+    outpath : str, optional
+        Output path for structure data file.
     structure_format : {None, str}, optional
         chemical file format of saved structure data.
         If `None`, then guess based on `fname` file extension.
         Otherwise, must be one of:
 
-            - xyz
-            - data
+            - `xyz`
+            - `data`
 
     verbose : bool, optional
         Verbose output
 
     """
-    def __init__(self, fname=str, structure_format=None, verbose=False):
+    def __init__(self, fname=str, outpath=None, structure_format=None,
+                 verbose=False):
 
         if fname.endswith(supported_structure_formats) and \
                 structure_format is None:
@@ -73,6 +76,7 @@ class VacancyGenerator(object):
                         structure_format))
 
         self._fname = fname
+        self._outpath = outpath
         self._structure_format = structure_format
         self._verbose = verbose
 
@@ -236,10 +240,10 @@ class VacancyGenerator(object):
 
     def _save_vacancy_structure_data(self):
         self._generate_output_fname()
-        DATAWriter.write(fname=self._output_fname,
+        DATAWriter.write(fname=self._output_fname, outpath=self._outpath,
                          atoms=self._remaining_atoms,
                          boxbounds=self._structure_data.boxbounds,
                          comment_line=self._structure_data.comment_line)
-        XYZWriter.write(fname=self._output_fname,
+        XYZWriter.write(fname=self._output_fname, outpath=self._outpath,
                         atoms=self._remaining_atoms,
                         comment_line=self._structure_data.comment_line)
