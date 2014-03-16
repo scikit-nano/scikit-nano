@@ -26,19 +26,19 @@ class PDBReader(StructureReader):
 
     Parameters
     ----------
-    fname : str
+    fpath : str
         pdb structure file
 
     """
-    def __init__(self, fname=None):
-        super(PDBReader, self).__init__(fname=fname)
+    def __init__(self, fpath=None):
+        super(PDBReader, self).__init__(fpath=fpath)
 
-        if fname is not None:
+        if fpath is not None:
             self.read()
 
     def read(self):
         """Read PDB file."""
-        with open(self._fname, 'r') as f:
+        with open(self.fpath, 'r') as f:
             lines = f.readlines()
             for line in lines:
                 print(line)
@@ -48,12 +48,14 @@ class PDBWriter(StructureWriter):
     """Class for writing pdb chemical file format."""
 
     @classmethod
-    def write(cls, fname=None, atoms=None, comment_line=None):
+    def write(cls, fname=None, outpath=None, atoms=None, comment_line=None):
         """Write structure data to file.
 
         Parameters
         ----------
         fname : str
+        outpath : str, optional
+            Output path for structure data file.
         atoms : :py:class:`~sknano.chemistry.Atoms`
             An :py:class:`~sknano.chemistry.Atoms` instance.
         comment_line : str, optional
@@ -62,14 +64,14 @@ class PDBWriter(StructureWriter):
         if not isinstance(atoms, Atoms):
             raise TypeError('atoms argument must be an `Atoms` instance')
         else:
-            fname = get_fpath(fname=fname, ext='pdb', overwrite=True,
-                              add_fnum=False)
+            fpath = get_fpath(fname=fname, ext='pdb', outpath=outpath,
+                              overwrite=True, add_fnum=False)
             if comment_line is None:
                 comment_line = default_comment_line
 
             atoms.rezero_coords()
 
-            with open(fname, 'w') as f:
+            with open(fpath, 'w') as f:
                 f.write('{:d}\n'.format(atoms.Natoms))
                 f.write('{}\n'.format(comment_line))
                 for atom in atoms:
@@ -82,12 +84,12 @@ class PDBData(PDBReader):
 
     Parameters
     ----------
-    fname : str, optional
+    fpath : str, optional
 
     """
-    def __init__(self, fname=None):
+    def __init__(self, fpath=None):
         try:
-            super(PDBData, self).__init__(fname=fname)
+            super(PDBData, self).__init__(fpath=fpath)
         except StructureReaderError:
             pass
 

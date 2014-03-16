@@ -16,24 +16,24 @@ from ..chemistry import Atom, Atoms
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureWriter, \
-    StructureFormat, StructureDataError
+    StructureFormat, StructureDataError, default_comment_line
 
 
 __all__ = ['DUMPReader', 'DUMPWriter', 'DUMPData', 'DUMPError', 'DUMPFormat']
 
 
 class DUMPReader(StructureReader):
-    """Class for reading ``LAMMPS dump`` file format.
+    """Class for reading `LAMMPS dump` file format.
 
     Parameters
     ----------
-    fname : str
-        LAMMPS dump file
+    fpath : str
+        LAMMPS dump file path
     atom_style : {'full', 'atomic'}, optional
 
     """
-    def __init__(self, fname=None, atom_style='full'):
-        super(DUMPReader, self).__init__(fname=fname)
+    def __init__(self, fpath=None, atom_style='full'):
+        super(DUMPReader, self).__init__(fpath=fpath)
 
         dump_format = DUMPFormat(atom_style=atom_style)
         self._dump_headers = dump_format.properties['headers']
@@ -45,7 +45,7 @@ class DUMPReader(StructureReader):
         self._sections = {}
         self._boxbounds = {}
 
-        if fname is not None:
+        if fpath is not None:
             self.read()
 
     @property
@@ -65,7 +65,7 @@ class DUMPReader(StructureReader):
 
     def read(self):
         """Read dump file."""
-        with open(self._fname, 'r') as f:
+        with open(self.fpath, 'r') as f:
             self._comment_line = f.readline().strip()
 
             while True:
@@ -183,7 +183,7 @@ class DUMPReader(StructureReader):
             self._boxbounds[dim] = {'min': bounds[0], 'max': bounds[-1]}
 
     def get(self, section_key, colnum=None, colname=None, colindex=None):
-        """Return section with ``section key``.
+        """Return section with `section_key`.
 
         Parameters
         ----------
@@ -233,36 +233,38 @@ class DUMPWriter(StructureWriter):
     """Class for writing LAMMPS dump chemical file format."""
 
     @classmethod
-    def write(cls, fname=None, atoms=None, boxbounds=None, comment_line=None,
-              assume_unique_atoms=False, verbose=False):
+    def write(cls, fname=None, outpath=None, atoms=None, boxbounds=None,
+              comment_line=None, assume_unique_atoms=False, verbose=False):
         """Write structure dump to file.
 
         Parameters
         ----------
         fname : str
+        outpath : str, optional
+            Output path for structure data file.
         atoms : `Atoms`
             An :py:class:`Atoms` instance.
         boxbounds : dict, optional
-            If ``None``, determined automatically from atom coordinates.
+            If `None`, determined automatically from atom coordinates.
         comment_line : str, optional
-            A string written to the first line of ``dump`` file. If ``None``,
-            then it is set to the full path of the output ``dump`` file.
+            A string written to the first line of `dump` file. If `None`,
+            then it is set to the full path of the output `dump` file.
         assume_unique_atoms : bool, optional
             Check that each Atom in Atoms has a unique atomID. If the check
             fails, then assign a unique atomID to each Atom.
-            If ``assume_unique_atoms`` is True, but the atomID's are not
+            If `assume_unique_atoms` is True, but the atomID's are not
             unique, LAMMPS will not be able to read the dump file.
         verbose : bool, optional
             verbose output
 
         """
         if not isinstance(atoms, Atoms):
-            raise TypeError('atoms argument must be an ``Atoms`` instance')
+            raise TypeError('atoms argument must be an `Atoms` instance')
         else:
-            fname = get_fpath(fname=fname, ext='dump', overwrite=True,
-                              add_fnum=False)
+            fpath = get_fpath(fname=fname, ext='dump', outpath=outpath,
+                              overwrite=True, add_fnum=False)
             if comment_line is None:
-                comment_line = fname
+                comment_line = default_comment_line
 
             atoms.rezero_coords()
 
@@ -297,7 +299,7 @@ class DUMPWriter(StructureWriter):
                     max(lohi_width, len('{:.6f} {:.6f}'.format(
                         boxbounds[dim]['min'], boxbounds[dim]['max'])) + 4)
 
-            with open(fname, 'w') as f:
+            with open(fpath, 'w') as f:
                 f.write('# {}\n\n'.format(comment_line.lstrip('#').strip()))
                 f.write('{}atoms\n'.format(
                     '{:d}'.format(Natoms).ljust(Natoms_width)))
@@ -357,11 +359,11 @@ class DUMPData(DUMPReader):
 
     Parameters
     ----------
-    fname : str, optional
+    fpath : str, optional
 
     """
-    def __init__(self, fname=None):
-        super(DUMPData, self).__init__(fname=fname)
+    def __init__(self, fpath=None):
+        super(DUMPData, self).__init__(fpath=fpath)
         self._snaps = []
         self._nsnaps = self._nselect = 0
         self._names = {}
@@ -520,7 +522,7 @@ class DUMPData(DUMPReader):
         """
         try:
             if (dumpfile is None or dumpfile == '') and \
-                    (self.fname is None or self.fname == ''):
+                    (self.fpath is None or self.fpath == ''):
                 error_msg = '`dumpfile` must be a string at least 1 ' + \
                     'character long.'
                 if dumpfile is None:
@@ -528,7 +530,7 @@ class DUMPData(DUMPReader):
                 else:
                     raise ValueError(error_msg)
             else:
-                dumpfile = self._fname
+                dumpfile = self.fpath
             DUMPWriter.write(fname=dumpfile, atoms=self._structure_atoms,
                              boxbounds=self._boxbounds,
                              comment_line=self._comment_line)

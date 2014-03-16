@@ -31,14 +31,14 @@ class ZMATRIXReader(StructureReader):
         zmatrix structure file
 
     """
-    def __init__(self, fname=None):
-        super(ZMATRIXReader, self).__init__(fname=fname)
+    def __init__(self, fpath=None):
+        super(ZMATRIXReader, self).__init__(fpath=fpath)
 
-        if fname is not None:
+        if fpath is not None:
             self.read()
 
     def read(self):
-        with open(self._fname, 'r') as f:
+        with open(self.fpath, 'r') as f:
             Natoms = int(f.readline().strip())
             self._comment_line = f.readline().strip()
             lines = f.readlines()
@@ -59,12 +59,14 @@ class ZMATRIXWriter(StructureWriter):
     """Class for writing zmatrix chemical file format."""
 
     @classmethod
-    def write(cls, fname=None, atoms=None, comment_line=None):
+    def write(cls, fname=None, outpath=None, atoms=None, comment_line=None):
         """Write structure data to file.
 
         Parameters
         ----------
         fname : str
+        outpath : str, optional
+            Output path for structure data file.
         atoms : :py:class:`~sknano.chemistry.Atoms`
             An :py:class:`~sknano.chemistry.Atoms` instance.
         comment_line : str, optional
@@ -75,14 +77,14 @@ class ZMATRIXWriter(StructureWriter):
         if not isinstance(atoms, Atoms):
             raise TypeError('atoms argument must be an `Atoms` instance')
         else:
-            fname = get_fpath(fname=fname, ext='zmatrix', overwrite=True,
-                              add_fnum=False)
+            fpath = get_fpath(fname=fname, ext='zmatrix', outpath=outpath,
+                              overwrite=True, add_fnum=False)
             if comment_line is None:
                 comment_line = default_comment_line
 
             atoms.rezero_coords()
 
-            with open(fname, 'w') as f:
+            with open(fpath, 'w') as f:
                 f.write('{:d}\n'.format(atoms.Natoms))
                 f.write('{}\n'.format(comment_line))
                 for atom in atoms:
@@ -95,11 +97,11 @@ class ZMATRIXDATA(ZMATRIXReader):
 
     Parameters
     ----------
-    fname : str, optional
+    fpath : str, optional
 
     """
-    def __init__(self, fname=None):
-        super(ZMATRIXDATA, self).__init__(fname=fname)
+    def __init__(self, fpath=None):
+        super(ZMATRIXDATA, self).__init__(fpath=fpath)
 
     def write(self, zmatrixfile=None):
         """Write zmatrix file.
@@ -111,7 +113,7 @@ class ZMATRIXDATA(ZMATRIXReader):
         """
         try:
             if (zmatrixfile is None or zmatrixfile == '') and \
-                    (self.fname is None or self.fname == ''):
+                    (self.fpath is None or self.fpath == ''):
                 error_msg = '`zmatrixfile` must be a string at least 1 ' + \
                     'character long.'
                 if zmatrixfile is None:
@@ -119,7 +121,7 @@ class ZMATRIXDATA(ZMATRIXReader):
                 else:
                     raise ValueError(error_msg)
             else:
-                zmatrixfile = self._fname
+                zmatrixfile = self.fpath
             ZMATRIXWriter.write(fname=zmatrixfile,
                                 atoms=self._structure_atoms,
                                 comment_line=self._comment_line)
@@ -205,7 +207,7 @@ class ZMATRIX2DATAConverter(StructureConverter):
         """
         from ._lammps_data_format import DATAReader, DATAWriter
 
-        zmatrixreader = ZMATRIXReader(fname=self._zmatrixfile)
+        zmatrixreader = ZMATRIXReader(fpath=self.infile)
         atoms = zmatrixreader.atoms
         comment_line = zmatrixreader.comment_line
         if self._add_new_atoms:
@@ -225,10 +227,10 @@ class ZMATRIX2DATAConverter(StructureConverter):
         else:
             boxbounds = self._boxbounds
 
-        DATAWriter.write(fname=self._datafile, atoms=atoms,
+        DATAWriter.write(fname=self.outfile, atoms=atoms,
                          boxbounds=boxbounds, comment_line=comment_line,
                          pad_box=self._pad_box, xpad=self._xpad,
                          ypad=self._ypad, zpad=self._zpad)
 
         if return_reader:
-            return DATAReader(fname=self._datafile)
+            return DATAReader(fpath=self.outfile)

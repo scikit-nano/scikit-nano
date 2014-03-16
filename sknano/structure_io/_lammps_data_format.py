@@ -97,13 +97,13 @@ class DATAReader(StructureReader):
 
     Parameters
     ----------
-    fname : str
-        LAMMPS data file
+    fpath : str
+        LAMMPS data file path
     atom_style : {'full', 'atomic'}, optional
 
     """
-    def __init__(self, fname=None, atom_style='full'):
-        super(DATAReader, self).__init__(fname=fname)
+    def __init__(self, fpath=None, atom_style='full'):
+        super(DATAReader, self).__init__(fpath=fpath)
 
         data_format = DATAFormat(atom_style=atom_style)
         self._data_headers = data_format.properties['headers']
@@ -115,7 +115,7 @@ class DATAReader(StructureReader):
         self._sections = {}
         self._boxbounds = {}
 
-        if fname is not None:
+        if fpath is not None:
             self.read()
 
     @property
@@ -135,7 +135,7 @@ class DATAReader(StructureReader):
 
     def read(self):
         """Read data file."""
-        with open(self._fname, 'r') as f:
+        with open(self.fpath, 'r') as f:
             self._comment_line = f.readline().strip()
 
             while True:
@@ -313,17 +313,20 @@ class DATAReader(StructureReader):
 
 
 class DATAWriter(StructureWriter):
-    """Class for writing LAMMPS data chemical file format."""
+    """Class for writing `LAMMPS data` chemical file format."""
 
     @classmethod
-    def write(cls, fname=None, atoms=None, boxbounds=None, comment_line=None,
-              assume_unique_atoms=False, enforce_consecutive_atomIDs=True,
+    def write(cls, fname=None, outpath=None, atoms=None, boxbounds=None,
+              comment_line=None, assume_unique_atoms=False,
+              enforce_consecutive_atomIDs=True,
               pad_box=True, xpad=10., ypad=10., zpad=10., verbose=False):
         """Write structure data to file.
 
         Parameters
         ----------
         fname : str
+        outpath : str, optional
+            Output path for structure data file.
         atoms : :py:class:`~sknano.chemistry.Atoms`
             An :py:class:`~sknano.chemistry.Atoms` instance.
         boxbounds : dict, optional
@@ -346,10 +349,9 @@ class DATAWriter(StructureWriter):
         if not isinstance(atoms, Atoms):
             raise TypeError('atoms argument must be an `Atoms` instance')
         else:
-            fname = get_fpath(fname=fname, ext='data', overwrite=True,
-                              add_fnum=False)
+            fpath = get_fpath(fname=fname, ext='data', outpath=outpath,
+                              overwrite=True, add_fnum=False)
             if comment_line is None:
-                #comment_line = fname
                 comment_line = default_comment_line
 
             atoms.rezero_coords()
@@ -399,7 +401,7 @@ class DATAWriter(StructureWriter):
                     max(lohi_width, len('{:.6f} {:.6f}'.format(
                         boxbounds[dim]['min'], boxbounds[dim]['max'])) + 4)
 
-            with open(fname, 'w') as f:
+            with open(fpath, 'w') as f:
                 f.write('# {}\n\n'.format(comment_line.lstrip('#').strip()))
                 f.write('{}atoms\n'.format(
                     '{:d}'.format(Natoms).ljust(Natoms_width)))
@@ -431,7 +433,8 @@ class DATAWriter(StructureWriter):
                     line += "{:>{}}".format('{:f}'.format(atom.z), 14)
                     line += "{:>{}}".format('{:d}'.format(atom.nx), 3)
                     line += "{:>{}}".format('{:d}'.format(atom.ny), 3)
-                    line += "{:>{}}\n".format('{:d}'.format(atom.nz), 3)
+                    line += "{:>{}}".format('{:d}'.format(atom.nz), 3)
+                    line += '\n'
 
                     f.write(line)
 
@@ -441,7 +444,8 @@ class DATAWriter(StructureWriter):
                     line += "{:>{}}".format(atom.atomID, atomID_width)
                     line += "{:>{}}".format('{:f}'.format(atom.vx), 14)
                     line += "{:>{}}".format('{:f}'.format(atom.vy), 14)
-                    line += "{:>{}}\n".format('{:f}'.format(atom.vz), 14)
+                    line += "{:>{}}".format('{:f}'.format(atom.vz), 14)
+                    line += '\n'
 
                     f.write(line)
 
@@ -466,21 +470,21 @@ class DATA2XYZConverter(StructureConverter):
 
     @property
     def datafile(self):
-        """LAMMPS data file"""
+        """`LAMMPS data` file."""
         return self.infile
 
     @property
     def xyzfile(self):
-        """xyz file name."""
+        """`xyz` file name."""
         return self.outfile
 
     def convert(self, return_reader=False):
-        """Convert LAMMPS `data` to `xyz` chemical file format.
+        """Convert `LAMMPS data` to `xyz` chemical file format.
 
         Parameters
         ----------
         return_reader : bool, optional
-            return an instance of `XYZReader`
+            Return an instance of `XYZReader`
 
         Returns
         -------
@@ -489,15 +493,15 @@ class DATA2XYZConverter(StructureConverter):
         """
         from ._xyz_format import XYZReader, XYZWriter
 
-        datareader = DATAReader(fname=self._datafile)
+        datareader = DATAReader(fpath=self.infile)
         atoms = datareader.atoms
         comment_line = datareader.comment_line
 
-        XYZWriter.write(fname=self._xyzfile, atoms=atoms,
+        XYZWriter.write(fname=self.outfile, atoms=atoms,
                         comment_line=comment_line)
 
         if return_reader:
-            return XYZReader(fname=self._xyzfile)
+            return XYZReader(fpath=self.outfile)
 
 
 class DATAData(DATAReader):
@@ -505,11 +509,11 @@ class DATAData(DATAReader):
 
     Parameters
     ----------
-    fname : str, optional
+    fpath : str, optional
 
     """
-    def __init__(self, fname=None):
-        super(DATAData, self).__init__(fname=fname)
+    def __init__(self, fpath=None):
+        super(DATAData, self).__init__(fpath=fpath)
 
     def delete(self, key):
         pass
@@ -595,16 +599,18 @@ class DATAData(DATAReader):
         """
         try:
             if (datafile is None or datafile == '') and \
-                    (self.fname is None or self.fname == ''):
-                error_msg = '`datafile` must be a string at least 1 ' + \
-                    'character long.'
+                    (self.fpath is None or self.fpath == ''):
+                error_msg = \
+                    '`datafile` must be a string at least 1 character long.'
                 if datafile is None:
                     raise TypeError(error_msg)
                 else:
                     raise ValueError(error_msg)
             else:
-                datafile = self._fname
-            DATAWriter.write(fname=datafile, atoms=self._structure_atoms,
+                datafile = self.fpath
+
+            DATAWriter.write(fname=datafile,
+                             atoms=self._structure_atoms,
                              boxbounds=self._boxbounds,
                              comment_line=self._comment_line)
         except (TypeError, ValueError) as e:

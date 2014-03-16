@@ -41,13 +41,13 @@ class StructureData(object):
 
     Parameters
     ----------
-    fname : {None, str}, optional
+    fpath : {None, str}, optional
 
     """
-    def __init__(self, fname=None):
-        self._structure_atoms = Atoms()
+    def __init__(self, fpath=None):
         self._comment_line = default_comment_line
-        self._fname = fname
+        self._fpath = fpath
+        self._structure_atoms = Atoms()
         self._properties = OrderedDict()
 
     @property
@@ -77,25 +77,25 @@ class StructureData(object):
         self._comment_line = value
 
     @property
-    def fname(self):
-        """File name"""
-        return self._fname
+    def fpath(self):
+        """File path"""
+        return self._fpath
 
-    @fname.setter
-    def fname(self, value=str):
-        """Set the file name string.
+    @fpath.setter
+    def fpath(self, value=str):
+        """Set the file path string.
 
         Parameters
         ----------
         value : str
 
         """
-        self._fname = value
+        self._fpath = value
 
-    @fname.deleter
-    def fname(self):
-        """Delete file name string"""
-        del self._fname
+    @fpath.deleter
+    def fpath(self):
+        """Delete file path string"""
+        del self._fpath
 
     @property
     def Natoms(self):
@@ -113,14 +113,14 @@ class StructureReader(StructureData):
 
     Parameters
     ----------
-    fname : str
+    fpath : str
         structure file
 
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, fname=None):
-        super(StructureReader, self).__init__(fname=fname)
+    def __init__(self, fpath=None):
+        super(StructureReader, self).__init__(fpath=fpath)
 
     @abstractmethod
     def read(self):
