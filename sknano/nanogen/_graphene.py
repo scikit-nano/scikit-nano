@@ -8,7 +8,7 @@ Graphene structure tools (:mod:`sknano.nanogen._graphene`)
 
 """
 from __future__ import absolute_import, division, print_function
-__docformat__ = 'restructuredtext'
+__docformat__ = 'restructuredtext en'
 
 #import itertools
 
@@ -109,16 +109,16 @@ class Graphene(object):
 
     Parameters
     ----------
-    width : float, optional
-        Width of graphene sheet in **nanometers**
     length : float, optional
         Length of graphene sheet in **nanometers**
+    width : float, optional
+        Width of graphene sheet in **nanometers**
     edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
         the `length` of the sheet.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :py:class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         bond length between nearest-neighbor atoms in **Angstroms**.
     nlayers : int, optional
@@ -143,7 +143,7 @@ class Graphene(object):
 
     """
 
-    def __init__(self, width=None, length=None, edge=None,
+    def __init__(self, length=None, width=None, edge=None,
                  element1='C', element2='C', bond=CCbond, nlayers=1,
                  layer_spacing=3.35, stacking_order='AB', with_units=False,
                  units=None, verbose=False):
@@ -153,8 +153,8 @@ class Graphene(object):
         self._element1 = element1
         self._element2 = element2
 
-        self._width = width
         self._length = length
+        self._width = width
         if edge in ('armchair', 'zigzag'):
             edge = edge_types[edge]
         elif edge not in ('AC', 'ZZ'):
@@ -222,18 +222,84 @@ class Graphene(object):
 
     @property
     def Natoms(self):
-        """Number of :py:class:`~sknano.chemistry.Atoms` in **unit cell**"""
+        """Number of :class:`~sknano.chemistry.Atoms` in **unit cell**"""
         return self._Natoms
 
     @property
     def Natoms_per_layer(self):
-        """Number of :py:class:`~sknano.chemistry.Atoms` in **layer**."""
+        """Number of :class:`~sknano.chemistry.Atoms` in **layer**."""
         return self._Natoms_per_layer
 
     @classmethod
     def compute_Natoms_per_layer(cls, n=None, m=None, element1=None,
                                  element2=None, **kwargs):
         return 0
+
+    @property
+    def length(self):
+        """Graphene layer length in **nanometers**."""
+        return self._length
+
+    @length.setter
+    def length(self, value):
+        """Set graphene layer length in **nanometers**."""
+        self._length = value
+        self.compute_layer_params()
+
+    @property
+    def width(self):
+        """Graphene layer width in **nanometers**."""
+        return self._width
+
+    @width.setter
+    def width(self, value):
+        """Set graphene layer width in **nanometers**."""
+        self._width = value
+        self.compute_layer_params()
+
+    @property
+    def bond(self):
+        """Bond length in **Angstroms**."""
+        return self._bond
+
+    @bond.setter
+    def bond(self, value):
+        """Set bond length in **Angstroms**."""
+        self._bond = float(value)
+        self.compute_layer_params()
+
+    @property
+    def edge(self):
+        """Graphene edge type along length."""
+        return self._edge
+
+    @edge.setter
+    def edge(self, value):
+        """Set Graphene edge type along length."""
+        self._edge = value
+        self.compute_layer_params()
+
+    @property
+    def element1(self):
+        """Element symbol of :class:`~sknano.chemistry.Atom` 1."""
+        return self._element1
+
+    @element1.setter
+    def element1(self, value):
+        """Set element symbol of :class:`~sknano.chemistry.Atom` 1."""
+        self._element1 = value
+        self.compute_layer_params()
+
+    @property
+    def element2(self):
+        """Element symbol of :class:`~sknano.chemistry.Atom` 2."""
+        return self._element2
+
+    @element2.setter
+    def element2(self, value):
+        """Set element symbol of :class:`~sknano.chemistry.Atom` 2."""
+        self._element2 = value
+        self.compute_layer_params()
 
     @property
     def layer_mass(self):
@@ -280,6 +346,14 @@ class Graphene(object):
     def nlayers(self):
         return self._nlayers
 
+    @nlayers.setter
+    def nlayers(self, value):
+        self._nlayers = value
+
     @property
     def layer_spacing(self):
         return self._layer_spacing
+
+    @layer_spacing.setter
+    def layer_spacing(self, value):
+        self._layer_spacing = value
