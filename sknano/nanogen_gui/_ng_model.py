@@ -19,8 +19,8 @@ class NGModel(object):
     """:mod:`~sknano.nanogen_gui` MVC model class."""
     def __init__(self):
         self._observers = []
-        self._swntbundle = NanotubeBundle(n=10, m=10)
-        self._graphene = Graphene(length=10, width=1, edge='AC')
+        self._swntbundle = NanotubeBundle(n=10, m=10, bond=1.42)
+        self._graphene = Graphene(length=10, width=1, bond=1.42, edge='AC')
 
     @property
     def n(self):
@@ -114,21 +114,21 @@ class NGModel(object):
         self.notify_observers()
 
     @property
-    def width(self):
-        return self._graphene.width
-
-    @width.setter
-    def width(self, value):
-        self._graphene.width = value
-        self.notify_observers()
-
-    @property
     def length(self):
         return self._graphene.length
 
     @length.setter
     def length(self, value):
         self._graphene.length = value
+        self.notify_observers()
+
+    @property
+    def width(self):
+        return self._graphene.width
+
+    @width.setter
+    def width(self, value):
+        self._graphene.width = value
         self.notify_observers()
 
     @property
