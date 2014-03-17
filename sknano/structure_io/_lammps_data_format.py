@@ -98,7 +98,7 @@ class DATAReader(StructureReader):
     Parameters
     ----------
     fpath : str
-        LAMMPS data file path
+        `LAMMPS data` file path
     atom_style : {'full', 'atomic'}, optional
 
     """
@@ -120,12 +120,12 @@ class DATAReader(StructureReader):
 
     @property
     def headers(self):
-        """LAMMPS DATA file headers."""
+        """LAMMPS data file headers."""
         return self._headers
 
     @property
     def sections(self):
-        """LAMMPS DATA file sections."""
+        """LAMMPS data file sections."""
         return self._sections
 
     @property
@@ -327,19 +327,19 @@ class DATAWriter(StructureWriter):
         fname : str
         outpath : str, optional
             Output path for structure data file.
-        atoms : :py:class:`~sknano.chemistry.Atoms`
-            An :py:class:`~sknano.chemistry.Atoms` instance.
+        atoms : :class:`~sknano.chemistry.Atoms`
+            An :class:`~sknano.chemistry.Atoms` instance.
         boxbounds : dict, optional
             If `None`, determined automatically from the `atoms` coordinates.
         comment_line : str, optional
             A string written to the first line of `data` file. If `None`,
             then it is set to the full path of the output `data` file.
         assume_unique_atoms : bool, optional
-            Check that each :py:class:`~sknano.chemistry.Atom` in `atoms`
-            has a unique :py:attr:`~sknano.chemistry.Atom.atomID`.
+            Check that each :class:`~sknano.chemistry.Atom` in `atoms`
+            has a unique :attr:`~sknano.chemistry.Atom.atomID`.
             If the check fails, then assign a unique
-            :py:attr:`~sknano.chemistry.Atom.atomID` to each
-            :py:class:`~sknano.chemistry.Atom`.
+            :attr:`~sknano.chemistry.Atom.atomID` to each
+            :class:`~sknano.chemistry.Atom`.
             If `assume_unique_atoms` is True, but the atomID's are not unique,
             LAMMPS will not be able to read the data file.
         verbose : bool, optional
@@ -640,7 +640,7 @@ class DATAError(StructureDataError):
 
 
 class DATAFormat(StructureFormat):
-    """Class defining the structure file format for `LAMMPS data`.
+    """Class defining the `StructureFormat` properties for `LAMMPS data`.
 
     Parameters
     ----------

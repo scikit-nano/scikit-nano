@@ -77,16 +77,16 @@ class GrapheneVacancyGenerator(VacancyGenerator):
     Examples
     --------
 
-    Import the :py:class:`GrapheneVacancyGenerator` class.
+    Import the `GrapheneVacancyGenerator` class.
 
     >>> from sknano.nanogen import GrapheneVacancyGenerator
 
     You can supply any existing structure data file
     (as long as its a supported format) to
-    :py:class:`GrapheneVacancyGenerator` using the
+    `GrapheneVacancyGenerator` using the
     `fname` keyword argument. For example, if you have an existing
     LAMMPS structure data file for graphene named
-    *5nmx10nm_ZZ_1layer.data*, you could load that into your
+    *10nmx5nm_ZZ_1layer.data*, you could load that into your
     vacancy generator by typing:
 
     >>> gvacgen = GrapheneVacancyGenerator(fname='10nmx5nm_ZZ_1layer.data')
@@ -144,7 +144,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
        (((x - 39.9952)^2 + (y - 0.0000)^2 + (z - -9.9470)^2) <= 12.00)
 
     This will save the vacancy structure data in both
-    LAMMPS `data` and `xyz` formats. You can load the `xyz` file
+    `LAMMPS data` and `xyz` formats. You can load the `xyz` file
     into VMD and then copy the VMD selection command from the output above
     and paste it into VMD to highlight the atoms surrounding the vacancies.
 
@@ -154,7 +154,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
     to compute the new forces on the atoms and move them to a minimum energy
     configuration. Currently this is not supported within this toolkit and
     requires using an external molecular dynamics package.  This toolkit
-    outputs the structure data in the native LAMMPS `data` file format and is
+    outputs the structure data in the native `LAMMPS data` file format and is
     the molecular dynamics engine I used to relax the structure data after
     adding the vacancies.
 

@@ -89,7 +89,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     in real-time. The `NanotubeVacancyGenerator` uses
     the `NanotubeBundleGenerator` class to generate
     nanotubes. See the structure generator classes provided by the
-    :py:mod:`~sknano.nanogen` module for more detailed docs.
+    :mod:`~sknano.nanogen` module for more detailed docs.
 
     In the next example, we'll generate a nanotube bundle and then
     poke some holes in it.

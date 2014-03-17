@@ -23,12 +23,12 @@ __all__ = ['XYZData', 'XYZReader', 'XYZWriter',
 
 
 class XYZReader(StructureReader):
-    """Class for reading xyz chemical file format.
+    """Class for reading `xyz` chemical file format.
 
     Parameters
     ----------
     fpath : str
-        xyz structure file
+        `xyz` structure file path.
 
     """
     def __init__(self, fpath=None):
@@ -38,7 +38,7 @@ class XYZReader(StructureReader):
             self.read()
 
     def read(self):
-        """Read XYZ file."""
+        """Read `xyz` file."""
         with open(self.fpath, 'r') as f:
             Natoms = int(f.readline().strip())
             self._comment_line = f.readline().strip()
@@ -50,14 +50,14 @@ class XYZReader(StructureReader):
                         Atom(s[0], x=float(s[1]), y=float(s[2]), z=float(s[3]))
                     self._structure_atoms.append(atom)
             if self._structure_atoms.Natoms != Natoms:
-                error_msg = '`xyzfile` contained {} atoms '.format(
+                error_msg = '`xyz` data contained {} atoms '.format(
                     self._structure_atoms.Natoms) + 'but should contain ' + \
                     '{}'.format(Natoms)
                 raise StructureReaderError(error_msg)
 
 
 class XYZWriter(StructureWriter):
-    """Class for writing xyz chemical file format."""
+    """Class for writing `xyz` chemical file format."""
 
     @classmethod
     def write(cls, fname=None, outpath=None, atoms=None, comment_line=None):
@@ -68,8 +68,8 @@ class XYZWriter(StructureWriter):
         fname : str
         outpath : str, optional
             Output path for structure data file.
-        atoms : :py:class:`~sknano.chemistry.Atoms`
-            An :py:class:`~sknano.chemistry.Atoms` instance.
+        atoms : :class:`~sknano.chemistry.Atoms`
+            An :class:`~sknano.chemistry.Atoms` instance.
         comment_line : str, optional
             A string written to the first line of `xyz` file. If `None`,
             then it is set to the full path of the output `xyz` file.
@@ -94,7 +94,7 @@ class XYZWriter(StructureWriter):
 
 
 class XYZData(XYZReader):
-    """Class for reading and writing structure data in XYZ data format.
+    """Class for reading and writing structure data in `xyz` format.
 
     Parameters
     ----------
@@ -131,7 +131,7 @@ class XYZData(XYZReader):
 
 class XYZ2DATAConverter(StructureConverter):
     """
-    Class for converting structure data from `xyz` to LAMMPS `data` format.
+    Class for converting structure data from `xyz` to `LAMMPS data` format.
 
     Parameters
     ----------
@@ -172,15 +172,16 @@ class XYZ2DATAConverter(StructureConverter):
 
     @property
     def xyzfile(self):
+        """`xyz` file name."""
         return self.infile
 
     @property
     def datafile(self):
-        """LAMMPS data file name."""
+        """`LAMMPS data` file name."""
         return self.outfile
 
     def add_atom(self, atom=None):
-        """Add new atom to atoms.
+        """Add new `Atom` to `Atoms`.
 
         Parameters
         ----------
@@ -246,5 +247,5 @@ class XYZ2DATAConverter(StructureConverter):
 
 
 class XYZFormat(StructureFormat):
-    """Class specifying `StructureFormat` properties for `xyz` format."""
+    """Class defining `StructureFormat` properties for `xyz` format."""
     pass
