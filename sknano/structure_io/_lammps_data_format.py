@@ -8,7 +8,6 @@ LAMMPS data format (:mod:`sknano.structure_io._lammps_data_format`)
 
 """
 from __future__ import division, print_function, absolute_import
-
 __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
@@ -93,7 +92,7 @@ atom_style_map['wavepacket'] = \
 
 
 class DATAReader(StructureReader):
-    """Class for reading `LAMMPS data` file format.
+    """`StructureReader` class for reading `LAMMPS data` file format.
 
     Parameters
     ----------
@@ -313,7 +312,7 @@ class DATAReader(StructureReader):
 
 
 class DATAWriter(StructureWriter):
-    """Class for writing `LAMMPS data` chemical file format."""
+    """`StructureWriter` class for writing `LAMMPS data` file format."""
 
     @classmethod
     def write(cls, fname=None, outpath=None, atoms=None, boxbounds=None,
@@ -452,7 +451,7 @@ class DATAWriter(StructureWriter):
 
 class DATA2XYZConverter(StructureConverter):
     """
-    Class for converting structure data from `LAMMPS data` to `xyz` format.
+    `StructureConverter` class for converting `LAMMPS data` to `xyz` format.
 
     .. versionadded:: 0.2.9
 
@@ -505,7 +504,7 @@ class DATA2XYZConverter(StructureConverter):
 
 
 class DATAData(DATAReader):
-    """Class for reading and writing structure data in `LAMMPS data` format.
+    """Class for reading and writing `StructureData` in `LAMMPS data` format.
 
     Parameters
     ----------
@@ -624,7 +623,7 @@ LAMMPSDATA = DATAData
 
 
 class DATAError(StructureDataError):
-    """Exception raised for failed method calls.
+    """`StructureDataError` `Exception` for `LAMMPS data` file format.
 
     Parameters
     ----------
@@ -640,7 +639,7 @@ class DATAError(StructureDataError):
 
 
 class DATAFormat(StructureFormat):
-    """Class defining the `StructureFormat` properties for `LAMMPS data`.
+    """`StructureFormat` class defining properties for `LAMMPS data` format.
 
     Parameters
     ----------

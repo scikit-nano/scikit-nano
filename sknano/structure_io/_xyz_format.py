@@ -23,7 +23,7 @@ __all__ = ['XYZData', 'XYZReader', 'XYZWriter',
 
 
 class XYZReader(StructureReader):
-    """Class for reading `xyz` chemical file format.
+    """`StructureReader` class for reading `xyz` chemical file format.
 
     Parameters
     ----------
@@ -57,7 +57,7 @@ class XYZReader(StructureReader):
 
 
 class XYZWriter(StructureWriter):
-    """Class for writing `xyz` chemical file format."""
+    """`StructureWriter` class for writing `xyz` chemical file format."""
 
     @classmethod
     def write(cls, fname=None, outpath=None, atoms=None, comment_line=None):
@@ -94,7 +94,7 @@ class XYZWriter(StructureWriter):
 
 
 class XYZData(XYZReader):
-    """Class for reading and writing structure data in `xyz` format.
+    """Class for reading and writing `StructureData` in `xyz` format.
 
     Parameters
     ----------
@@ -131,7 +131,7 @@ class XYZData(XYZReader):
 
 class XYZ2DATAConverter(StructureConverter):
     """
-    Class for converting structure data from `xyz` to `LAMMPS data` format.
+    `StructureConverter` class for converting `xyz` to `LAMMPS data` format.
 
     Parameters
     ----------
@@ -247,5 +247,5 @@ class XYZ2DATAConverter(StructureConverter):
 
 
 class XYZFormat(StructureFormat):
-    """Class defining `StructureFormat` properties for `xyz` format."""
+    """`StructureFormat` class defining properties for `xyz` format."""
     pass
