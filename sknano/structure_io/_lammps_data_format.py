@@ -452,7 +452,7 @@ class DATAWriter(StructureWriter):
 
 class DATA2XYZConverter(StructureConverter):
     """
-    Class for converting structure data from LAMMPS `data` to `xyz` format.
+    Class for converting structure data from `LAMMPS data` to `xyz` format.
 
     .. versionadded:: 0.2.9
 
@@ -505,7 +505,7 @@ class DATA2XYZConverter(StructureConverter):
 
 
 class DATAData(DATAReader):
-    """Class for reading and writing structure data in LAMMPS data format.
+    """Class for reading and writing structure data in `LAMMPS data` format.
 
     Parameters
     ----------
@@ -640,7 +640,7 @@ class DATAError(StructureDataError):
 
 
 class DATAFormat(StructureFormat):
-    """Class defining the structure file format for LAMMPS data.
+    """Class defining the structure file format for `LAMMPS data`.
 
     Parameters
     ----------
