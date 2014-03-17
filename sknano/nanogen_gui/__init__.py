@@ -8,16 +8,6 @@ NanoGen GUI front-ends (:mod:`sknano.nanogen_gui`)
 
 .. versionadded:: 0.2.24
 
-Contents
-========
-
-.. autosummary::
-   :toctree: generated/
-
-   NGModel
-   NGView
-   NGController
-
 """
 from __future__ import division, print_function, absolute_import
 __docformat__ = 'restructuredtext en'
