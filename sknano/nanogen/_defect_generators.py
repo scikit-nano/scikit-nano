@@ -111,15 +111,23 @@ class VacancyGenerator(object):
         return self._atom_ids
 
     @property
+    def atom_coords(self):
+        return self._atom_coords
+
+    @property
     def Nvacs(self):
         return self._Nvacs
+
+    @Nvacs.setter
+    def Nvacs(self, value=int):
+        self._Nvacs = value
 
     @property
     def Nvac_clusters(self):
         return self._Nvac_clusters
 
     @Nvac_clusters.setter
-    def Nvac_clusters(self, value):
+    def Nvac_clusters(self, value=int):
         self._Nvac_clusters = value
 
     @property
@@ -127,7 +135,7 @@ class VacancyGenerator(object):
         return self._Nvac_sites
 
     @Nvac_sites.setter
-    def Nvac_sites(self, value):
+    def Nvac_sites(self, value=int):
         self._Nvac_sites = value
 
     @property
@@ -137,6 +145,10 @@ class VacancyGenerator(object):
     @cluster_size.setter
     def cluster_size(self, value):
         self._cluster_size = value
+
+    @property
+    def vac_ids(self):
+        return self._vac_ids
 
     @property
     def vac_type(self):
@@ -159,7 +171,7 @@ class VacancyGenerator(object):
         return self._show_vmd_selection_cmd
 
     @show_vmd_selection_cmd.setter
-    def show_vmd_selection_cmd(self, value):
+    def show_vmd_selection_cmd(self, value=bool):
         self._show_vmd_selection_cmd = value
 
     def _random_vacancy_generator(self):
