@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, division, print_function
 #
 # scikit-nano documentation build configuration file, created by
 # sphinx-quickstart on Wed Oct 30 00:26:16 2013.
