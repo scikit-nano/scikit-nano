@@ -17,8 +17,7 @@ from collections import OrderedDict, MutableSequence
 
 import numpy as np
 
-from ...tools import check_type, xyz_axes
-from ._atom import Atom
+from ...tools import xyz_axes
 
 __all__ = ['Atoms']
 
@@ -66,7 +65,6 @@ class Atoms(MutableSequence):
                         self._atoms = atoms
 
                     for atom in self._atoms:
-                        self._check_type(atom)
                         for p, plist in self._property_lists.iteritems():
                             plist.append(getattr(atom, p))
                 else:
@@ -75,25 +73,6 @@ class Atoms(MutableSequence):
                                     'argument.\n atoms must be `None`, a list '
                                     'of `Atom` objects, or an `Atoms` object '
                                     'instance.')
-
-    def _check_type(self, value):
-        """Check that value is instance of `Atom` class.
-
-        Parameters
-        ----------
-        value : `Atom`
-            value to type check
-
-        Raises
-        ------
-        TypeError
-            if `value` is not instance of `Atom`
-
-        """
-        try:
-            check_type(value, allowed_types=(Atom,))
-        except TypeError:
-            raise TypeError('{} is not an Atom.'.format(value))
 
     def __str__(self):
         """Return string representation of `Atoms`."""
