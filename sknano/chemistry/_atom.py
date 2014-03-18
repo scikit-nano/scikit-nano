@@ -7,7 +7,7 @@ Abstract representation of an Atom (:mod:`sknano.chemistry._atom`)
 .. currentmodule:: sknano.chemistry._atom
 
 """
-from __future__ import division, absolute_import, print_function
+from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 import numpy as np

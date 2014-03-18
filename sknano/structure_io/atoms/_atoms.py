@@ -7,7 +7,7 @@ Base class for structure data atoms (:mod:`sknano.structure_io.atoms._atoms`)
 .. currentmodule:: sknano.structure_io.atoms._atoms
 
 """
-from __future__ import division, absolute_import, print_function
+from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 import copy
