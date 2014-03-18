@@ -46,16 +46,14 @@ class Atom(object):
             try:
                 self._symbol = element_symbols[idx]
                 self._m = atomic_masses[self._symbol]
-            except KeyError as e:
-                print(e)
+            except KeyError:
                 print('unrecognized element number: {}'.format(element))
         elif isinstance(element, str):
             self._symbol = element
             try:
                 self._Z = atomic_numbers[self._symbol]
                 self._m = atomic_masses[self._symbol]
-            except KeyError as e:
-                print(e)
+            except KeyError:
                 print('Unrecognized atomic symbol: {}'.format(element))
         else:
             self._symbol = None
@@ -68,7 +66,7 @@ class Atom(object):
                         self._symbol = atomic_number_symbol_map[int(mass / 2)]
                     self._Z = atomic_numbers[self._symbol]
                     self._m = atomic_masses[self._symbol]
-                except KeyError as e:
+                except KeyError:
                     self._symbol = None
                     self._Z = None
                     self._m = mass
