@@ -15,7 +15,8 @@ import os
 
 import numpy as np
 
-from ..chemistry import Atom
+#from ..chemistry import Atom
+from .atoms import LAMMPSAtom as Atom
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureWriter, \
@@ -103,6 +104,8 @@ class DATAReader(StructureReader):
     """
     def __init__(self, fpath=None, atom_style='full'):
         super(DATAReader, self).__init__(fpath=fpath)
+
+        #self._structure_atoms = LAMMPSAtoms()
 
         data_format = DATAFormat(atom_style=atom_style)
         self._data_headers = data_format.properties['headers']
