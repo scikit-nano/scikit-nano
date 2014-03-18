@@ -759,7 +759,6 @@ class Atoms(MutableSequence):
             `Atom` instance object to set target list element to.
 
         """
-        self._check_type(atom)
         self._atoms[index] = atom
         for p, plist in self._property_lists.iteritems():
             plist[index] = getattr(atom, p)
@@ -782,7 +781,6 @@ class Atoms(MutableSequence):
             `Atom` object instance to set target list element to
 
         """
-        self._check_type(atom)
         self._atoms.insert(index, atom)
         for p, plist in self._property_lists.iteritems():
             plist.insert(index, getattr(atom, p))
