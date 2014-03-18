@@ -87,31 +87,32 @@ class Atoms(MutableSequence):
         self._NN_cutoff = np.inf
 
         if atoms is not None:
-            if isinstance(atoms, Atoms):
+            try:
                 if copylist and not deepcopy:
                     self._atoms.extend(atoms.atoms[:])
                 elif deepcopy:
                     self._atoms.extend(copy.deepcopy(atoms.atoms))
                 else:
                     self._atoms.extend(atoms.atoms)
-            elif isinstance(atoms, list):
-                if copylist and not deepcopy:
-                    self._atoms = atoms[:]
-                elif deepcopy:
-                    self._atoms = copy.deepcopy(atoms)
-                else:
-                    self._atoms = atoms
+            except AttributeError:
+                if isinstance(atoms, list):
+                    if copylist and not deepcopy:
+                        self._atoms = atoms[:]
+                    elif deepcopy:
+                        self._atoms = copy.deepcopy(atoms)
+                    else:
+                        self._atoms = atoms
 
-                for atom in self._atoms:
-                    self._check_type(atom)
-                    for p, plist in self._property_lists.iteritems():
-                        plist.append(getattr(atom, p))
-            else:
-                raise TypeError('`Atoms(atoms={!r})` '.format(atoms) +
-                                'is not a valid `Atoms` constructor '
-                                'argument.\n atoms must be `None`, a list '
-                                'of `Atom` objects, or an `Atoms` object '
-                                'instance.')
+                    for atom in self._atoms:
+                        self._check_type(atom)
+                        for p, plist in self._property_lists.iteritems():
+                            plist.append(getattr(atom, p))
+                else:
+                    raise TypeError('`Atoms(atoms={!r})` '.format(atoms) +
+                                    'is not a valid `Atoms` constructor '
+                                    'argument.\n atoms must be `None`, a list '
+                                    'of `Atom` objects, or an `Atoms` object '
+                                    'instance.')
 
             if use_kdtree:
                 self._atom_tree = self.atom_tree
