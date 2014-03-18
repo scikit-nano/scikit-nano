@@ -7,13 +7,14 @@ Class for LAMMPS atom (:mod:`sknano.structure_io.atoms._lammps_atom`)
 .. currentmodule:: sknano.structure_io.atoms._lammps_atom
 
 """
-from __future__ import division, absolute_import, print_function
+from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-from ...tools.refdata import atomic_masses, atomic_mass_symbol_map, \
-    atomic_numbers, atomic_number_symbol_map, element_symbols
+from ...tools import check_type, Vector
+
+from ._atom import Atom
 
 __all__ = ['LAMMPSAtom', 'LAMMPSAtomAttributes']
 
@@ -22,14 +23,17 @@ class LAMMPSAtomAttributes(object):
     pass
 
 
-class LAMMPSAtom(object):
-    """Class for representing `LAMMPS` structure data atom.
+class LAMMPSAtom(Atom):
+    """`Atom` class for `LAMMPS data`.
 
     Parameters
     ----------
     element : {str, int}, optional
         A string representation of the element symbol or an integer specifying
         an element atomic number.
+    x, y, z : float, optional
+        :math:`x, y, z` components of `Atom` position vector relative to
+        origin.
     atomID : int, optional
         atom ID, a LAMMPS atom attribute.
     moleculeID : int, optional
@@ -38,9 +42,6 @@ class LAMMPSAtom(object):
         atom type, a LAMMPS atom attribute.
     q : {int, float}, optional
         Net charge of `Atom`.
-    x, y, z : float, optional
-        :math:`x, y, z` components of `Atom` position vector relative to
-        origin.
     vx, vy, vz : float, optional
         :math:`v_x, v_y, v_z` components of `Atom` velocity.
     r_units : str, optional
@@ -58,95 +59,36 @@ class LAMMPSAtom(object):
 
     def __init__(self, element=None, atomID=0, moleculeID=0, atomtype=1, q=0.,
                  mass=None, x=None, y=None, z=None, vx=None, vy=None, vz=None,
-                 r_units=None, v_units=None, nx=None, ny=None, nz=None,
-                 CN=None, NN=None):
+                 with_units=False, r_units=None, v_units=None,
+                 nx=None, ny=None, nz=None, CN=None, NN=None):
 
-        self._symbol = None
-        self._Z = None
-        self._m = None
+        super(LAMMPSAtom, self).__init__(element=element, mass=mass,
+                                         x=x, y=y, z=z)
 
-        self._r_units = r_units
-        self._r = np.zeros(3, dtype=float)
-        for i, ri in enumerate((x, y, z)):
-            if ri is not None:
-                self._r[i] = ri
-
-        self._v = np.zeros(3, dtype=float)
-        self._v_units = v_units
-        for i, vi in enumerate((vx, vy, vz)):
-            if vi is not None:
-                self._v[i] = vi
+        self._v = Vector(x=vx, y=vy, z=vz)
 
         self._n = np.zeros(3, dtype=int)
         for i, ni in enumerate((nx, ny, nz)):
             if ni is not None:
                 self._n[i] = ni
 
-        if isinstance(element, (int, float)):
-            self._Z = int(element)
-            idx = self._Z - 1
-            try:
-                self._symbol = element_symbols[idx]
-                self._m = atomic_masses[self._symbol]
-            except KeyError as e:
-                print(e)
-                print('unrecognized element number: {}'.format(element))
-        elif isinstance(element, str):
-            self._symbol = element
-            try:
-                self._Z = atomic_numbers[self._symbol]
-                self._m = atomic_masses[self._symbol]
-            except KeyError as e:
-                print(e)
-                print('Unrecognized atomic symbol: {}'.format(element))
-        else:
-            self._symbol = None
-            self._Z = None
-            if mass is not None and isinstance(mass, (int, float)):
-                try:
-                    if isinstance(mass, float):
-                        self._symbol = atomic_mass_symbol_map[mass]
-                    elif isinstance(mass, int):
-                        self._symbol = atomic_number_symbol_map[int(mass / 2)]
-                    self._Z = atomic_numbers[self._symbol]
-                    self._m = atomic_masses[self._symbol]
-                except KeyError as e:
-                    self._symbol = None
-                    self._Z = None
-                    self._m = mass
-            else:
-                self._m = 0
-
-        self._check_type(q, (int, float))
+        check_type(q, allowed_types=(int, float))
         self._q = q
 
-        self._check_type(atomID, (int, float))
+        check_type(atomID, allowed_types=(int, float))
         self._atomID = int(atomID)
 
-        self._check_type(moleculeID, (int, float))
+        check_type(moleculeID, allowed_types=(int, float))
         self._moleculeID = int(moleculeID)
 
-        self._check_type(atomtype, (int, float))
+        check_type(atomtype, allowed_types=(int, float))
         self._atomtype = int(atomtype)
 
         self._CN = CN
         self._NN = NN
 
-        self._attributes = ['symbol', 'Z', 'm', 'q', 'r', 'v', 'atomID',
-                            'moleculeID', 'atomtype', 'CN', 'NN']
-
-    def __str__(self):
-        """Return string representation of atom."""
-        atom_str = ''
-        for attr in self._attributes:
-            atom_str += \
-                'Atom {}: {}\n'.format(attr, getattr(self, '_' + attr))
-        return atom_str
-
-    def _check_type(self, value, valid_types):
-        if not isinstance(value, valid_types):
-            raise TypeError('{} not valid type.\n'.format(value) +
-                            '(Valid Types: {})'.format(valid_types))
+        self._attributes.extend(['q','v', 'atomID', 'moleculeID', 'atomtype',
+                                 'CN', 'NN'])
 
     @property
     def CN(self):
@@ -169,142 +111,6 @@ class LAMMPSAtom(object):
         self._NN = value
 
     @property
-    def Z(self):
-        """Atomic number :math:`Z`.
-
-        Returns
-        -------
-        int
-            Atomic number :math:`Z`.
-        """
-        return self._Z
-
-    @property
-    def symbol(self):
-        """Element symbol.
-
-        Returns
-        -------
-        str
-            Element symbol.
-        """
-        return self._symbol
-
-    @property
-    def m(self):
-        """Atomic mass :math:`m_a` in atomic mass units.
-
-        Returns
-        -------
-        float
-            Atomic mass :math:`m_a` in atomic mass units.
-        """
-        return self._m
-
-    @property
-    def x(self):
-        """:math:`x`-coordinate in units of **Angstroms**.
-
-        Returns
-        -------
-        float
-            :math:`x`-coordinate in units of **Angstroms**.
-
-        """
-        return self._r[0]
-
-    @x.setter
-    def x(self, value=float):
-        """Set `Atom` :math:`x`-coordinate in units of **Angstroms**.
-
-        Parameters
-        ----------
-        value : float
-            :math:`x`-coordinate in units of **Angstroms**.
-
-        """
-        self._check_type(value, (int, float))
-        self._r[0] = float(value)
-
-    @property
-    def y(self):
-        """:math:`y`-coordinate in units of **Angstroms**.
-
-        Returns
-        -------
-        float
-            :math:`y`-coordinate in units of **Angstroms**.
-
-        """
-        return self._r[1]
-
-    @y.setter
-    def y(self, value=float):
-        """Set `Atom` :math:`y`-coordinate in units of **Angstroms**.
-
-        Parameters
-        ----------
-        value : float
-            :math:`y`-coordinate in units of **Angstroms**.
-
-        """
-        self._check_type(value, (int, float))
-        self._r[1] = float(value)
-
-    @property
-    def z(self):
-        """:math:`z`-coordinate in units of **Angstroms**.
-
-        Returns
-        -------
-        float
-            :math:`z`-coordinate in units of **Angstroms**.
-
-        """
-        return self._r[2]
-
-    @z.setter
-    def z(self, value=float):
-        """Set `Atom` :math:`z`-coordinate in units of **Angstroms**.
-
-        Parameters
-        ----------
-        value : float
-            :math:`z`-coordinate in units of **Angstroms**.
-
-        """
-        self._check_type(value, (int, float))
-        self._r[2] = float(value)
-
-    @property
-    def r(self):
-        """:math:`x, y, z` position in units of **Angstroms**.
-
-        Returns
-        -------
-        ndarray
-            3-element ndarray of [:math:`x, y, z`] coordinates
-            of `Atom`.
-
-        """
-        return self._r
-
-    @r.setter
-    def r(self, value=np.ndarray):
-        """Set :math:`x, y, z` coordinates of atom.
-
-        Parameters
-        ----------
-        value : array_like
-            3-element array of :math:`x, y, z`-coordinates in units of
-            **Angstroms**.
-
-        """
-        self._check_type(value, np.ndarray)
-        for i, ri in enumerate(value):
-            self._r[i] = ri
-
-    @property
     def q(self):
         """Charge :math:`q` as multiple of elementary charge :math:`e`.
 
@@ -322,7 +128,7 @@ class LAMMPSAtom(object):
             :math:`e`.
 
         """
-        self._check_type(value, (int, float))
+        check_type(value, allowed_types=(int, float))
         self._q = value
 
     @property
@@ -340,7 +146,7 @@ class LAMMPSAtom(object):
             atom ID
 
         """
-        self._check_type(value, (int, float))
+        check_type(value, allowed_types=(int, float))
         self._atomID = int(value)
 
     @property
@@ -358,7 +164,7 @@ class LAMMPSAtom(object):
             molecule ID
 
         """
-        self._check_type(value, (int, float))
+        check_type(value, allowed_types=(int, float))
         self._moleculeID = int(value)
 
     @property
@@ -376,111 +182,8 @@ class LAMMPSAtom(object):
             atom type
 
         """
-        self._check_type(value, (int, float))
+        check_type(value, allowed_types=(int, float))
         self._atomtype = int(value)
-
-    @property
-    def vx(self):
-        """:math:`v_x` component in units of `v_units`.
-
-        Returns
-        -------
-        float
-            :math:`v_x` component in units of `v_units`.
-
-        """
-        return self._v[0]
-
-    @vx.setter
-    def vx(self, value=float):
-        """Set `Atom` :math:`v_x` component.
-
-        Parameters
-        ----------
-        value : float
-            :math:`v_x` component in units of `v_units`.
-
-        """
-        self._check_type(value, (int, float))
-        self._v[0] = float(value)
-
-    @property
-    def vy(self):
-        """:math:`v_y` component in units of `v_units`.
-
-        Returns
-        -------
-        float
-            :math:`v_y` component in units of `v_units`.
-
-        """
-        return self._v[1]
-
-    @vy.setter
-    def vy(self, value=float):
-        """Set `Atom` :math:`v_y` component.
-
-        Parameters
-        ----------
-        value : float
-            :math:`v_y` component in units of `v_units`.
-
-        """
-        self._check_type(value, (int, float))
-        self._v[1] = float(value)
-
-    @property
-    def vz(self):
-        """:math:`v_z` component in units of `v_units`.
-
-        Returns
-        -------
-        float
-            :math:`v_z` component in units of `v_units`.
-
-        """
-        return self._v[2]
-
-    @vz.setter
-    def vz(self, value=float):
-        """Set `Atom` :math:`v_z` component.
-
-        Parameters
-        ----------
-        value : float
-            :math:`v_z` component in units of `v_units`.
-
-        """
-        self._check_type(value, (int, float))
-        self._v[2] = float(value)
-
-    @property
-    def v(self):
-        """:math:`v_x, v_y, v_z` velocity components in default units.
-
-        Returns
-        -------
-        ndarray
-            3-element ndarray of [:math:`v_x`, :math:`v_y`, :math:`v_z`]
-            velocity components of `Atom`.
-
-        """
-        return self._v
-
-    @v.setter
-    def v(self, value=np.ndarray):
-        """Set :math:`x, y, z` components of `Atom` velocity.
-
-        Parameters
-        ----------
-        value : array_like
-            3-element ndarray of [:math:`v_x`, :math:`v_y`, :math:`v_z`]
-            velocity components of `Atom`.
-
-        """
-        self._check_type(value, np.ndarray)
-        for i, vi in enumerate(value):
-            self._v[i] = vi
 
     @property
     def nx(self):
@@ -504,7 +207,7 @@ class LAMMPSAtom(object):
             :math:`n_x` image flag.
 
         """
-        self._check_type(value, (int, float))
+        check_type(value, allowed_types=(int, float))
         self._n[0] = int(value)
 
     @property
@@ -529,7 +232,7 @@ class LAMMPSAtom(object):
             :math:`n_y` image flag.
 
         """
-        self._check_type(value, (int, float))
+        check_type(value, allowed_types=(int, float))
         self._n[1] = int(value)
 
     @property
@@ -554,7 +257,7 @@ class LAMMPSAtom(object):
             :math:`n_z` image flag.
 
         """
-        self._check_type(value, (int, float))
+        check_type(value, allowed_types=(int, float))
         self._n[2] = int(value)
 
     @property
@@ -581,24 +284,104 @@ class LAMMPSAtom(object):
             image flags of `Atom`.
 
         """
-        self._check_type(value, np.ndarray)
+        check_type(value, allowed_types=(np.ndarray,))
         for i, ni in enumerate(value):
             self._n[i] = ni
 
-    def rezero_coords(self, epsilon=1.0e-10):
-        """Set really really small coordinates to zero.
+    @property
+    def vx(self):
+        """:math:`v_x` component in units of `v_units`.
 
-        Set all coordinates with absolute value less than
-        epsilon to zero.
+        Returns
+        -------
+        float
+            :math:`v_x` component in units of `v_units`.
+
+        """
+        return self._v.x
+
+    @vx.setter
+    def vx(self, value=float):
+        """Set `Atom` :math:`v_x` component.
 
         Parameters
         ----------
-        epsilon : float
-            smallest allowed absolute value of any :math:`x,y,z` component.
+        value : float
+            :math:`v_x` component in units of `v_units`.
 
         """
-        r = self._r.tolist()
-        for i, ri in enumerate(r[:]):
-            if abs(ri) < epsilon:
-                r[i] = 0.0
-        self._r[0], self._r[1], self._r[2] = r
+        self._v.x = value
+
+    @property
+    def vy(self):
+        """:math:`v_y` component in units of `v_units`.
+
+        Returns
+        -------
+        float
+            :math:`v_y` component in units of `v_units`.
+
+        """
+        return self._v.y
+
+    @vy.setter
+    def vy(self, value=float):
+        """Set `Atom` :math:`v_y` component.
+
+        Parameters
+        ----------
+        value : float
+            :math:`v_y` component in units of `v_units`.
+
+        """
+        self._v.y = value
+
+    @property
+    def vz(self):
+        """:math:`v_z` component in units of `v_units`.
+
+        Returns
+        -------
+        float
+            :math:`v_z` component in units of `v_units`.
+
+        """
+        return self._v.z
+
+    @vz.setter
+    def vz(self, value=float):
+        """Set `Atom` :math:`v_z` component.
+
+        Parameters
+        ----------
+        value : float
+            :math:`v_z` component in units of `v_units`.
+
+        """
+        self._v.z = value
+
+    @property
+    def v(self):
+        """:math:`v_x, v_y, v_z` velocity components in default units.
+
+        Returns
+        -------
+        ndarray
+            3-element ndarray of [:math:`v_x`, :math:`v_y`, :math:`v_z`]
+            velocity components of `Atom`.
+
+        """
+        return self._v.components
+
+    @v.setter
+    def v(self, value=np.ndarray):
+        """Set :math:`x, y, z` components of `Atom` velocity.
+
+        Parameters
+        ----------
+        value : array_like
+            3-element ndarray of [:math:`v_x`, :math:`v_y`, :math:`v_z`]
+            velocity components of `Atom`.
+
+        """
+        self._v.components = value
