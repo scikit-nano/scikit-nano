@@ -37,7 +37,8 @@ class Atoms(MutableSequence):
 
     """
 
-    def __init__(self, atoms=None, copylist=True, deepcopy=False):
+    def __init__(self, atoms=None, copylist=True, deepcopy=False,
+                 update_property_lists=True):
         self._atoms = []
 
         self._coords = []
@@ -64,9 +65,10 @@ class Atoms(MutableSequence):
                     else:
                         self._atoms = atoms
 
-                    for atom in self._atoms:
-                        for p, plist in self._property_lists.iteritems():
-                            plist.append(getattr(atom, p))
+                    if update_property_lists:
+                        for atom in self._atoms:
+                            for p, plist in self._property_lists.iteritems():
+                                plist.append(getattr(atom, p))
                 else:
                     raise TypeError('`Atoms(atoms={!r})` '.format(atoms) +
                                     'is not a valid `Atoms` constructor '
