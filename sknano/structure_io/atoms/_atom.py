@@ -12,7 +12,7 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-from ...tools import Point  # ,Vector
+from ...tools import Vector
 from ...tools.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols
 
@@ -38,7 +38,7 @@ class Atom(object):
         self._Z = None
         self._m = None
 
-        self._r = Point(x=x, y=y, z=z)
+        self._r = Vector(x=x, y=y, z=z)
 
         if isinstance(element, (int, float)):
             self._Z = int(element)
@@ -200,11 +200,11 @@ class Atom(object):
             3-element ndarray of [:math:`x, y, z`] coordinates of `Atom`.
 
         """
-        return self._r.coords
+        return self._r.components
 
     @r.setter
     def r(self, value=np.ndarray):
-        """Set :math:`x, y, z` coordinates of atom.
+        """Set :math:`x, y, z` coordinates of `Atom`.
 
         Parameters
         ----------
@@ -213,7 +213,7 @@ class Atom(object):
             **Angstroms**.
 
         """
-        self._r.coords = value
+        self._r.components = value
 
     def fix_minus_zero_coords(self, epsilon=1.0e-10):
         """Set really really small negative coordinates to zero.
@@ -228,7 +228,7 @@ class Atom(object):
             smallest allowed absolute value of any :math:`x,y,z` component.
 
         """
-        self._r.fix_minus_zero_coords(epsilon=epsilon)
+        self._r.fix_minus_zero_components(epsilon=epsilon)
 
     def rezero_coords(self, epsilon=1.0e-10):
         """Re-zero position coordinates near zero.
@@ -242,4 +242,4 @@ class Atom(object):
             smallest allowed absolute value of any :math:`x,y,z` component.
 
         """
-        self._r.rezero_coords(epsilon=epsilon)
+        self._r.rezero_components(epsilon=epsilon)
