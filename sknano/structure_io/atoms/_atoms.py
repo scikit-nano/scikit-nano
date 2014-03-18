@@ -17,14 +17,14 @@ from collections import OrderedDict, MutableSequence
 
 import numpy as np
 
-from ...tools import xyz_axes
+from ...tools import check_type, xyz_axes
 from ._atom import Atom
 
 __all__ = ['Atoms']
 
 
 class Atoms(MutableSequence):
-    """Base class for collection of structure data `Atom` objects.
+    """Base class for collection of `Atom` objects.
 
     Parameters
     ----------
@@ -40,8 +40,8 @@ class Atoms(MutableSequence):
 
     def __init__(self, atoms=None, copylist=True, deepcopy=False):
         self._atoms = []
+
         self._coords = []
-        self._positions = []
         self._masses = []
         self._symbols = []
 
@@ -89,7 +89,9 @@ class Atoms(MutableSequence):
             if `value` is not instance of `Atom`
 
         """
-        if not isinstance(value, Atom):
+        try:
+            check_type(value, allowed_types=(Atom,))
+        except TypeError:
             raise TypeError('{} is not an Atom.'.format(value))
 
     def __str__(self):
@@ -137,15 +139,6 @@ class Atoms(MutableSequence):
             coords.append(atom.r)
         self._coords = coords[:]
         return np.asarray(self._coords)
-
-    @property
-    def positions(self):
-        """Return array of `Atom` positions."""
-        positions = []
-        for atom in self._atoms:
-            positions.append(atom.r)
-        self._positions = positions[:]
-        return np.asarray(self._positions)
 
     @property
     def masses(self):
