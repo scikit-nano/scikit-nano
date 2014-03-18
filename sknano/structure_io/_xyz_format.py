@@ -12,7 +12,7 @@ __docformat__ = 'restructuredtext en'
 
 import os
 
-from ..chemistry import Atom, Atoms
+from ..chemistry import Atom
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureReaderError, \
@@ -75,22 +75,19 @@ class XYZWriter(StructureWriter):
             then it is set to the full path of the output `xyz` file.
 
         """
-        if not isinstance(atoms, Atoms):
-            raise TypeError('atoms argument must be an `Atoms` instance')
-        else:
-            fpath = get_fpath(fname=fname, ext='xyz', outpath=outpath,
-                              overwrite=True, add_fnum=False)
-            if comment_line is None:
-                comment_line = default_comment_line
+        fpath = get_fpath(fname=fname, ext='xyz', outpath=outpath,
+                          overwrite=True, add_fnum=False)
+        if comment_line is None:
+            comment_line = default_comment_line
 
-            atoms.rezero_coords()
+        atoms.rezero_coords()
 
-            with open(fpath, 'w') as f:
-                f.write('{:d}\n'.format(atoms.Natoms))
-                f.write('{}\n'.format(comment_line))
-                for atom in atoms:
-                    f.write('{:>3s}{:15.8f}{:15.8f}{:15.8f}\n'.format(
-                        atom.symbol, atom.x, atom.y, atom.z))
+        with open(fpath, 'w') as f:
+            f.write('{:d}\n'.format(atoms.Natoms))
+            f.write('{}\n'.format(comment_line))
+            for atom in atoms:
+                f.write('{:>3s}{:15.8f}{:15.8f}{:15.8f}\n'.format(
+                    atom.symbol, atom.x, atom.y, atom.z))
 
 
 class XYZData(XYZReader):

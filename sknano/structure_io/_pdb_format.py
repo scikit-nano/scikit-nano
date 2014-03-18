@@ -12,7 +12,7 @@ __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
 
-from ..chemistry import Atom, Atoms
+#from .atoms import PDBAtom, PDBAtoms
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureReaderError, \
@@ -56,27 +56,21 @@ class PDBWriter(StructureWriter):
         fname : str
         outpath : str, optional
             Output path for structure data file.
-        atoms : :py:class:`~sknano.chemistry.Atoms`
-            An :py:class:`~sknano.chemistry.Atoms` instance.
+        atoms : :py:class:`~sknano.structure_io.atoms.Atoms`
+            An :py:class:`~sknano.structure_io.atoms.Atoms` instance.
         comment_line : str, optional
 
         """
-        if not isinstance(atoms, Atoms):
-            raise TypeError('atoms argument must be an `Atoms` instance')
-        else:
-            fpath = get_fpath(fname=fname, ext='pdb', outpath=outpath,
-                              overwrite=True, add_fnum=False)
-            if comment_line is None:
-                comment_line = default_comment_line
+        fpath = get_fpath(fname=fname, ext='pdb', outpath=outpath,
+                          overwrite=True, add_fnum=False)
+        if comment_line is None:
+            comment_line = default_comment_line
 
-            atoms.rezero_coords()
+        atoms.rezero_coords()
 
-            with open(fpath, 'w') as f:
-                f.write('{:d}\n'.format(atoms.Natoms))
-                f.write('{}\n'.format(comment_line))
-                for atom in atoms:
-                    f.write('{:>3s}{:15.8f}{:15.8f}{:15.8f}\n'.format(
-                        atom.symbol, atom.x, atom.y, atom.z))
+        with open(fpath, 'w') as f:
+            for atom in atoms:
+                f.write(PDBFormatter.format(atom))
 
 
 class PDBData(PDBReader):
@@ -108,9 +102,13 @@ class PDBFormat(StructureFormat):
         super(PDBFormat, self).__init__()
 
         self._records = OrderedDict()
-        #self._records['HEADER'] = header = {}
-        #self._records['TITLE'] = title = {}
-        #self._records['MASTER'] = {}
+
+        self._records['HEADER'] = header = {}
+        header['format'] = ''
+
+        self._records['TITLE'] = title = {}
+        title['format'] = ''
+
         self._records['ATOM'] = atom = {}
         atom['format'] = \
             '{:6}{:>5} {:>4}{:1}{:>3} {:1}{:>4}{:1}' + \
@@ -119,7 +117,11 @@ class PDBFormat(StructureFormat):
             '{:>6.2f}{:>6.2f}' + \
             '{:10}'.format('') + \
             '{:2}{:2}'
+
         self._records['CONECT'] = {}
+
+        self._records['MASTER'] = {}
+
         self._records['END'] = None
 
         self._properties['RECORDS'] = self._records
@@ -127,3 +129,11 @@ class PDBFormat(StructureFormat):
     @property
     def records(self):
         return self._records
+
+
+class PDBFormatter(object):
+    """Formatter class to convert a `PDBAtom` to a formatted string."""
+
+    @classmethod
+    def format(cls):
+        pass
