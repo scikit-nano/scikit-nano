@@ -586,10 +586,10 @@ class Atom(object):
         self._r.fix_minus_zero_components(epsilon=epsilon)
 
     def rezero_coords(self, epsilon=1.0e-10):
-        """Set really really small coordinates to zero.
+        """Re-zero position coordinates near zero.
 
         Set all coordinates with absolute value less than
-        epsilon to zero.
+        `epsilon` to zero.
 
         Parameters
         ----------
