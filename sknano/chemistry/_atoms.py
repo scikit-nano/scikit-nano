@@ -63,7 +63,6 @@ class Atoms(MutableSequence):
         self._molecule_ids = []
         self._charges = []
         self._coords = []
-        self._positions = []
         self._masses = []
         self._velocities = []
         self._forces = []
@@ -185,16 +184,6 @@ class Atoms(MutableSequence):
         return self._atom_tree
 
     @property
-    def charges(self):
-        """Return list of `Atom` charges."""
-        #self._charges_array = np.asarray(self._charges)
-        charges = []
-        for atom in self._atoms:
-            charges.append(atom.q)
-        self._charges = charges[:]
-        return np.asarray(self._charges)
-
-    @property
     def CM(self):
         """Center-of-Mass coordinates of `Atoms`.
 
@@ -210,6 +199,47 @@ class Atoms(MutableSequence):
         return np.sum(MxR, axis=0) / np.sum(masses)
 
     @property
+    def M(self):
+        """Total mass of `Atoms`."""
+        return math.fsum(self.masses)
+
+    @property
+    def Natoms(self):
+        """Number of atoms in `Atoms`."""
+        return len(self._atoms)
+
+    @property
+    def NN_cutoff(self):
+        return self._NN_cutoff
+
+    @NN_cutoff.setter
+    def NN_cutoff(self, value):
+        self._NN_cutoff = value
+
+    @property
+    def NN_number(self):
+        return self._NN_number
+
+    @NN_number.setter
+    def NN_number(self, value):
+        self._NN_number = int(value)
+
+    @property
+    def Ntypes(self):
+        """Number of atom types in `Atoms`."""
+        return len(self.atomtypes.keys())
+
+    @property
+    def charges(self):
+        """Return list of `Atom` charges."""
+        #self._charges_array = np.asarray(self._charges)
+        charges = []
+        for atom in self._atoms:
+            charges.append(atom.q)
+        self._charges = charges[:]
+        return np.asarray(self._charges)
+
+    @property
     def coords(self):
         """Return array of `Atom` coordinates."""
         coords = []
@@ -217,15 +247,6 @@ class Atoms(MutableSequence):
             coords.append(atom.r)
         self._coords = coords[:]
         return np.asarray(self._coords)
-
-    @property
-    def positions(self):
-        """Return array of `Atom` positions."""
-        positions = []
-        for atom in self._atoms:
-            positions.append(atom.r)
-        self._positions = positions[:]
-        return np.asarray(self._positions)
 
     @property
     def coordination_numbers(self):
@@ -378,21 +399,6 @@ class Atoms(MutableSequence):
         return self.M
 
     @property
-    def M(self):
-        """Total mass of `Atoms`."""
-        return math.fsum(self.masses)
-
-    @property
-    def Natoms(self):
-        """Number of atoms in `Atoms`."""
-        return len(self._atoms)
-
-    @property
-    def Ntypes(self):
-        """Number of atom types in `Atoms`."""
-        return len(self.atomtypes.keys())
-
-    @property
     def q(self):
         """Return the total net charge of `Atoms`."""
         return np.asarray(self.charges).sum()
@@ -419,22 +425,6 @@ class Atoms(MutableSequence):
             velocities.append(atom.v)
         self._velocities = velocities[:]
         return np.asarray(self._velocities)
-
-    @property
-    def NN_number(self):
-        return self._NN_number
-
-    @NN_number.setter
-    def NN_number(self, value):
-        self._NN_number = int(value)
-
-    @property
-    def NN_cutoff(self):
-        return self._NN_cutoff
-
-    @NN_cutoff.setter
-    def NN_cutoff(self, value):
-        self._NN_cutoff = value
 
     def add_atomtype(self, atom):
         """Add atom type to :py:attr:`~sknano.chemistry.Atoms.atomtypes` dict.
