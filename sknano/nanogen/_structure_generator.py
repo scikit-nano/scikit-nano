@@ -8,7 +8,7 @@ Structure generator (:mod:`sknano.nanogen._structure_generator`)
 
 """
 from __future__ import absolute_import, division, print_function
-__docformat__ = 'restructuredtext'
+__docformat__ = 'restructuredtext en'
 
 import os
 

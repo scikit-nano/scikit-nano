@@ -7,8 +7,8 @@ Fullerene structure generators (:mod:`sknano.nanogen._fullerene_generators`)
 .. currentmodule:: sknano.nanogen._fullerene_generators
 
 """
-from __future__ import division, print_function, absolute_import
-__docformat__ = 'restructuredtext'
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 #import copy
 #import itertools

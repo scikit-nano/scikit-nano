@@ -7,7 +7,8 @@ TubeGen wrapper class (:mod:`sknano.nanogen._tubegen`)
 .. currentmodule:: sknano.nanogen._tubegen
 
 """
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 import os
 import subprocess
