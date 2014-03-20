@@ -7,7 +7,7 @@ Nanotube structure tools (:mod:`sknano.nanogen._nanotubes`)
 .. currentmodule:: sknano.nanogen._nanotubes
 
 """
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 from fractions import gcd
@@ -37,26 +37,29 @@ class Nanotube(object):
     ----------
     n, m : int
         Chiral indices defining the nanotube chiral vector
-        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
+        :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     nx, ny, nz : int, optional
         Number of repeat unit cells in the :math:`x, y, z` dimensions
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
         :class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
-        bond length between nearest neighbor atoms.
-        Must be in units of **Angstroms**. Default value is
+        Distance between nearest neighbor atoms (i.e., bond length).
+        Must be in units of **\u212b**. Default value is
         the carbon-carbon bond length in graphite:
         :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.421` \u212b ([SoFaCNTs]_)
     Lx, Ly, Lz : float, optional
-        Length of bundle in :math:`x, y, z` dimensions in **nanometers**.
+        Spatial extent of nanotube(s) in :math:`x, y, z` dimensions
+        in units of **nanometers**. By construction, the nanotube is oriented
+        with its principle axis along the :math:`z`-axis. Therefore,
+        :math:`L_z` represents the length of the nanotube(s).
         Overrides the :math:`n_x, n_y, n_z` cell values.
 
         .. versionadded:: 0.2.5
 
     tube_length : float, optional
         Length of nanotube in units of **nanometers**.
-        Overrides the `nz` value.
+        Overrides `nz` value.
 
         .. deprecated:: 0.2.5
            Use `Lz` instead
@@ -68,10 +71,14 @@ class Nanotube(object):
 
         .. versionadded:: 0.2.6
 
-    with_units : bool, optional
-        Attach `units` to physical quantities
     units : None, optional
-        System of units to use.
+        System of physical units to attach to quantities.
+        **This parameter is not yet fully implemented or supported.
+        Use at your own risk!**
+    with_units : bool, optional
+        Attach `units` to physical quantities.
+        **This parameter is not yet fully implemented or supported.
+        Use at your own risk!**
     verbose : bool, optional
         verbose output
 
@@ -208,20 +215,20 @@ class Nanotube(object):
         self._dR = None
         self._t1 = None
         self._t2 = None
+        self._N = None
         self._Ch = None
         self._T = None
         self._chiral_angle = None
-        self._N = None
+        self._dt = None
+        self._rt = None
         self._M = None
         self._R = None
         self._p = None
         self._q = None
-        self._Natoms = None
         self._Lz = None
-        self._Natoms_per_tube = None
-        self._dt = None
-        self._rt = None
         self._electronic_type = None
+        self._Natoms = None
+        self._Natoms_per_tube = None
 
         self._Ntubes = 1
         self._nx = int(nx)
@@ -262,7 +269,7 @@ class Nanotube(object):
         self.compute_tube_params()
 
     def compute_tube_params(self):
-        """Compute nanotube parameters."""
+        """Compute/update nanotube parameters."""
         self._d = self.compute_d(n=self._n, m=self._m)
         self._dR = self.compute_dR(n=self._n, m=self._m)
         self._t1 = self.compute_t1(n=self._n, m=self._m)
@@ -335,35 +342,13 @@ class Nanotube(object):
             print()
 
     @property
-    def n(self):
-        """Chiral index :math:`n`"""
-        return self._n
-
-    @n.setter
-    def n(self, value):
-        """Set chiral index :math:`n`"""
-        self._n = int(value)
-        self.compute_tube_params()
-
-    @property
-    def m(self):
-        """Chiral index :math:`m`"""
-        return self._m
-
-    @m.setter
-    def m(self, value):
-        """Set chiral index :math:`m`"""
-        self._m = int(value)
-        self.compute_tube_params()
-
-    @property
     def bond(self):
-        """Bond length in **Angstroms**."""
+        u"""Bond length in **\u212b**."""
         return self._bond
 
     @bond.setter
     def bond(self, value):
-        """Set bond length in **Angstroms**."""
+        u"""Set bond length in **\u212b**."""
         self._bond = float(value)
         self.compute_tube_params()
 
@@ -390,45 +375,180 @@ class Nanotube(object):
         self.compute_tube_params()
 
     @property
-    def t1(self):
-        """:math:`t_{1} = \\frac{2m + n}{d_{R}}`
+    def n(self):
+        """Chiral index :math:`n`.
 
-        where :math:`d_{R} = \\gcd{(2n + m, 2m + n)}`.
-
-        The component of the translation vector :math:`\\mathbf{T}`
-        along :math:`\\mathbf{a}_{1}`:
+        The component of the chiral vector :math:`\\mathbf{C}_h`
+        along :math:`\\mathbf{a}_1`:
 
         .. math::
 
-           \\mathbf{T} = t_{1}\\mathbf{a}_{1} + t_{2}\\mathbf{a}_{2}
+           \\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)
+
+        """
+        return self._n
+
+    @n.setter
+    def n(self, value):
+        """Set chiral index :math:`n`"""
+        self._n = int(value)
+        self.compute_tube_params()
+
+    @property
+    def m(self):
+        """Chiral index :math:`m`.
+
+        The component of the chiral vector :math:`\\mathbf{C}_h`
+        along :math:`\\mathbf{a}_2`:
+
+        .. math::
+
+           \\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)
+
+        """
+        return self._m
+
+    @m.setter
+    def m(self, value):
+        """Set chiral index :math:`m`"""
+        self._m = int(value)
+        self.compute_tube_params()
+
+    @property
+    def d(self):
+        """:math:`d=\\gcd{(n, m)}`
+
+        :math:`d` is the **G**\ reatest **C**\ ommon **D**\ ivisor of
+        :math:`n` and :math:`m`.
+
+        """
+        return self._d
+
+    @classmethod
+    def compute_d(cls, n=int, m=int):
+        """Compute :math:`d=\\gcd{(n, m)}`
+
+        :math:`d` is the **G**\ reatest **C**\ ommon **D**\ ivisor of
+        :math:`n` and :math:`m`.
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+
+        Returns
+        -------
+        int
+            Greatest Common Divisor of :math:`n` and :math:`m`
+
+        """
+        return gcd(n, m)
+
+    @property
+    def dR(self):
+        """:math:`d_R=\\gcd{(2n + m, 2m + n)}`
+
+        :math:`d_R` is the **G**\ reatest **C**\ ommon **D**\ ivisor of
+        :math:`2n + m` and :math:`2m + n`.
+
+        """
+        return self._dR
+
+    @classmethod
+    def compute_dR(cls, n=int, m=int):
+        """Compute :math:`d_R=\\gcd{(2n + m, 2m + n)}`
+
+        :math:`d_R` is the **G**\ reatest **C**\ ommon **D**\ ivisor of
+        :math:`2n + m` and :math:`2m + n`.
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+
+        Returns
+        -------
+        int
+            greatest common divisor of :math:`2n+m` and :math:`2m+n`
+
+        """
+        return gcd(2 * m + n, 2 * n + m)
+
+    @property
+    def N(self):
+        """Number of graphene hexagons in nanotube *unit cell*.
+
+        .. math::
+
+           N = \\frac{4(n^2 + m^2 + nm)}{d_R}
+
+        """
+        return self._N
+
+    @classmethod
+    def compute_N(cls, n=int, m=int):
+        """Compute :math:`N = \\frac{2(n^2+m^2+nm)}{d_R}`.
+
+        :math:`N` is the number of graphene hexagons mapped to a nanotube
+        *unit cell*.
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+
+        Returns
+        -------
+        int
+            Number of hexagons per nanotube unit cell:
+            :math:`N = \\frac{2(n^2+m^2+nm)}{d_R}`.
+
+        """
+        dR = Nanotube.compute_dR(n=n, m=m)
+        return int(2 * (n**2 + m**2 + n * m) / dR)
+
+    @property
+    def t1(self):
+        """:math:`t_{1} = \\frac{2m + n}{d_{R}}`
+
+        where :math:`d_R = \\gcd{(2n + m, 2m + n)}`.
+
+        The component of the translation vector :math:`\\mathbf{T}`
+        along :math:`\\mathbf{a}_1`:
+
+        .. math::
+
+           \\mathbf{T} = t_1\\mathbf{a}_{1} + t_2\\mathbf{a}_2
 
         """
         return self._t1
 
     @classmethod
     def compute_t1(cls, n=int, m=int):
-        """Compute :math:`t_{1} = \\frac{2m + n}{d_{R}}`
+        """Compute :math:`t_1 = \\frac{2m + n}{d_R}`
 
-        where :math:`d_{R} = \\gcd{(2n + m, 2m + n)}`.
+        where :math:`d_R = \\gcd{(2n + m, 2m + n)}`.
 
         The component of the translation vector :math:`\\mathbf{T}`
-        along :math:`\\mathbf{a}_{1}`:
+        along :math:`\\mathbf{a}_1`:
 
         .. math::
 
-           \\mathbf{T} = t_{1}\\mathbf{a}_{1} + t_{2}\\mathbf{a}_{2}
+           \\mathbf{T} = t_1\\mathbf{a}_{1} + t_2\\mathbf{a}_2
 
         Parameters
         ----------
         n, m : int
             Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
 
         Returns
         -------
         int
-            :math:`t_{1}`
+            :math:`t_1`
 
         """
         dR = Nanotube.compute_dR(n=n, m=m)
@@ -436,117 +556,303 @@ class Nanotube(object):
 
     @property
     def t2(self):
-        """:math:`t_{2} = -\\frac{2n + m}{d_{R}}`
+        """:math:`t_2 = -\\frac{2n + m}{d_R}`
 
-        where :math:`d_{R} = \\gcd{(2n + m, 2m + n)}`.
+        where :math:`d_R = \\gcd{(2n + m, 2m + n)}`.
 
         The component of the translation vector :math:`\\mathbf{T}`
-        along :math:`\\mathbf{a}_{2}`:
+        along :math:`\\mathbf{a}_2`:
 
         .. math::
 
-           \\mathbf{T} = t_{1}\\mathbf{a}_{1} + t_{2}\\mathbf{a}_{2}
+           \\mathbf{T} = t_1\\mathbf{a}_1 + t_2\\mathbf{a}_2
 
         """
         return self._t2
 
     @classmethod
     def compute_t2(cls, n=int, m=int):
-        """Compute :math:`t_{2} = -\\frac{2n + m}{d_{R}}`
+        """Compute :math:`t_2 = -\\frac{2n + m}{d_R}`
 
-        where :math:`d_{R} = \\gcd{(2n + m, 2m + n)}`.
+        where :math:`d_R = \\gcd{(2n + m, 2m + n)}`.
 
         The component of the translation vector :math:`\\mathbf{T}`
-        along :math:`\\mathbf{a}_{2}`:
+        along :math:`\\mathbf{a}_2`:
 
         .. math::
 
-           \\mathbf{T} = t_{1}\\mathbf{a}_{1} + t_{2}\\mathbf{a}_{2}
+           \\mathbf{T} = t_1\\mathbf{a}_1 + t_2\\mathbf{a}_2
 
         Parameters
         ----------
         n, m : int
             Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
 
         Returns
         -------
         int
-            :math:`t_{2}`
+            :math:`t_2`
 
         """
         dR = Nanotube.compute_dR(n=n, m=m)
         return -int((2 * n + m) / dR)
 
     @property
-    def N(self):
-        """Number of hexagons per nanotube unit cell :math:`N`:
+    def Ch(self):
+        u"""Nanotube circumference :math:`|\\mathbf{C}_h|` in **\u212b**"""
+        return self._Ch
+
+    @classmethod
+    def compute_Ch(cls, n=int, m=int, bond=None, with_units=False,
+                   units='angstrom', magnitude=True):
+        u"""Compute nanotube circumference :math:`|\\mathbf{C}_{h}|` in
+        **\u212b**.
 
         .. math::
 
-           N = \\frac{4(n^2 + m^2 + nm)}{d_{R}}
-
-        """
-        return self._N
-
-    @classmethod
-    def compute_N(cls, n=int, m=int):
-        """Compute :math:`N = \\frac{2(n^2+m^2+nm)}{d_{R}}`.
+           |\\mathbf{C}_h| = a\\sqrt{n^2 + m^2 + nm} =
+           \\sqrt{3}a_{\\mathrm{CC}}\\sqrt{n^2 + m^2 + nm}
 
         Parameters
         ----------
         n, m : int
             Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        bond : float, optional
+            Distance between nearest neighbor atoms.
+            Must be in units of **\u212b**.
 
         Returns
         -------
-        int
-            Number of hexagons per nanotube unit cell:
-            :math:`N = \\frac{2(n^2+m^2+nm)}{d_{R}}`.
+        float
+            Nanotube circumference :math:`|\\mathbf{C}_h|` in \u212b.
 
         """
-        dR = Nanotube.compute_dR(n=n, m=m)
-        return int(2 * (n**2 + m**2 + n * m) / dR)
+        if bond is None:
+            bond = CCbond
+
+        if with_units and isinstance(bond, float) and Qty is not None:
+            bond = Qty(bond, units)
+
+        if magnitude and with_units:
+            try:
+                return bond.magnitude * np.sqrt(3 * (n**2 + m**2 + n * m))
+            except AttributeError:
+                return bond * np.sqrt(3 * (n**2 + m**2 + n * m))
+        else:
+            return bond * np.sqrt(3 * (n**2 + m**2 + n * m))
 
     @property
-    def Natoms(self):
-        """Number of atoms per nanotube **unit cell** :math:`2N`.
+    def chiral_angle(self):
+        """Chiral angle :math:`\\theta_c` in **degrees**.
 
         .. math::
 
-           N_{\\mathrm{atoms}} = 2N = \\frac{4(n^2 + m^2 + nm)}{d_{R}}
+           \\theta_c = \\tan^{-1}\\left(\\frac{\\sqrt{3} m}{2n + m}\\right)
 
         """
-        return self._Natoms
+        return self._chiral_angle
 
     @classmethod
-    def compute_Natoms(cls, n=int, m=int):
-        """Compute :math:`N_{\mathrm{atoms/cell}} = 2N`.
+    def compute_chiral_angle(cls, n=int, m=int, rad2deg=True):
+        """Compute chiral angle :math:`\\theta_c`.
 
         .. math::
 
-           N_{\\mathrm{atoms}} = 2N = \\frac{4(n^2 + m^2 + nm)}{d_{R}}
+           \\theta_c = \\tan^{-1}\\left(\\frac{\\sqrt{3} m}{2n + m}\\right)
 
         Parameters
         ----------
         n, m : int
             Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        rad2deg : bool, optional
+            If `True`, return angle in degrees.
+
+        Returns
+        -------
+        float
+            Chiral angle :math:`\\theta_{c}` in
+            degrees (default) or radians (if `rad2deg=False`).
+
+        """
+        theta = np.arctan(np.sqrt(3) * m / (2 * n + m))
+        #return np.arccos((2*n + m) / (2 * np.sqrt(n**2 + m**2 + n*m)))
+        if rad2deg:
+            return np.degrees(theta)
+        else:
+            return theta
+
+    @property
+    def T(self):
+        u"""Length of nanotube unit cell :math:`|\\mathbf{T}|` in \u212b.
+
+        .. math::
+
+           |\\mathbf{T}| = \\frac{\\sqrt{3} |\\mathbf{C}_{h}|}{d_{R}}
+
+        """
+        return self._T
+
+    @classmethod
+    def compute_T(cls, n=None, m=None, bond=None, with_units=False,
+                  units='angstrom', length=True, magnitude=True):
+        u"""Compute length of nanotube unit cell :math:`|\\mathbf{T}|` in
+        \u212b.
+
+        .. math::
+
+           |\\mathbf{T}| = \\frac{\\sqrt{3} |\\mathbf{C}_{h}|}{d_{R}}
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        bond : float, optional
+            Distance between nearest neighbor atoms.
+            Must be in units of **\u212b**.
+        units : str, optional
+        with_units : bool, optional
+        length : bool, optional
+        magnitude : bool, optional
+
+        Returns
+        -------
+        float or Qty or 2-tuple of ints
+            If `length` is `True` and `with_units` is `False`, then
+            return the length of unit cell in \u212b.
+            If `length` is `True` and `with_units` is `True` and
+            magnitude is `True`, then return the length of unit cell
+            as a float, but with units in `units`.
+            If `length` is `True` and `with_units` is `True` and
+            magnitude is `False`, then return the length of unit cell
+            as a `Quantity` instance and with units in `units`.
+            If `length` is `False`, return the componets of the
+            translation vector as a 2-tuple of ints (:math:`t_1`, :math:`t_2`).
+
+        """
+
+        if length:
+            if bond is None:
+                bond = CCbond
+
+            if with_units and isinstance(bond, float) and Qty is not None:
+                bond = Qty(bond, units)
+
+            Ch = Nanotube.compute_Ch(n=n, m=m, bond=bond,
+                                     with_units=with_units, units=units,
+                                     magnitude=magnitude)
+            dR = Nanotube.compute_dR(n=n, m=m)
+
+            return np.sqrt(3) * Ch / dR
+        else:
+            t1 = Nanotube.compute_t1(n=n, m=m)
+            t2 = Nanotube.compute_t2(n=n, m=m)
+
+            return (t1, t2)
+
+    @property
+    def dt(self):
+        u"""Nanotube diameter :math:`d_t = \\frac{|\\mathbf{C}_h|}{\\pi}`
+        in \u212b."""
+        return self._dt
+
+    @classmethod
+    def compute_dt(cls, n=int, m=int, bond=None, with_units=False,
+                   units='angstrom', magnitude=True):
+        u"""Compute nanotube diameter :math:`d_t` in \u212b.
+
+        .. math::
+
+           d_t = \\frac{|\\mathbf{C}_h|}{\\pi}
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        bond : float, optional
+            Distance between nearest neighbor atoms.
+            Must be in units of **\u212b**.
+
+        Returns
+        -------
+        float
+            Nanotube diameter :math:`d_t` in \u212b.
+
+        """
+        Ch = Nanotube.compute_Ch(n, m, bond=bond, with_units=with_units,
+                                 units=units, magnitude=magnitude)
+        return Ch / np.pi
+
+    @property
+    def rt(self):
+        u"""Nanotube radius :math:`r_t = \\frac{|\\mathbf{C}_h|}{2\\pi}`
+        in \u212b."""
+        return self._rt
+
+    @classmethod
+    def compute_rt(cls, n=int, m=int, bond=None, with_units=False,
+                   units='angstrom', magnitude=True):
+        u"""Compute nanotube radius :math:`r_t` in \u212b.
+
+        .. math::
+
+           r_t = \\frac{|\\mathbf{C}_h|}{2\\pi}
+
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        bond : float, optional
+            Distance between nearest neighbor atoms.
+            Must be in units of **\u212b**.
+
+        Returns
+        -------
+        float
+            Nanotube radius :math:`r_t` in \u212b.
+
+        """
+        Ch = Nanotube.compute_Ch(n=n, m=m, bond=bond, with_units=with_units,
+                                 units=units, magnitude=magnitude)
+        return Ch / (2 * np.pi)
+
+    @property
+    def M(self):
+        """:math:`M = np - nq`
+
+        :math:`M` is the number of multiples of the translation vector
+        :math:`\\mathbf{T}` in the vector :math:`N\\mathbf{R}`.
+
+        """
+        return self._M
+
+    @classmethod
+    def compute_M(cls, n=int, m=int):
+        """Compute :math:`M = mp - nq`
+
+        :math:`M` is the number of multiples of the translation vector
+        :math:`\\mathbf{T}` in the vector :math:`N\\mathbf{R}`.
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
 
         Returns
         -------
         int
-            Number of atoms per nanotube *unit cell*:
-            N_{\\mathrm{atoms}} = 2N = \\frac{4(n^2 + m^2 + nm)}{d_{R}}
-
+            :math:`M = mp - nq`
 
         """
-        N = Nanotube.compute_N(n=n, m=m)
-        return 2 * N
+        p, q = Nanotube.compute_R(n=n, m=m)
+        return m * p - n * q
 
     @property
     def R(self):
@@ -554,37 +860,51 @@ class Nanotube(object):
 
         .. math::
 
-           \\mathbf{R} = p\\mathbf{a}_{1} + q\\mathbf{a}_{2}
+           \\mathbf{R} = p\\mathbf{a}_1 + q\\mathbf{a}_2
 
         """
         return self._R
 
     @classmethod
-    def compute_R(cls, n=int, m=int, bond=None, units='angstrom',
-                  with_units=False, length=False, magnitude=True):
-        """Compute symmetry vector :math:`\\mathbf{R} = (p, q)`
+    def compute_R(cls, n=int, m=int, bond=None, with_units=False,
+                  units='angstrom', length=False, magnitude=True):
+        u"""Compute symmetry vector :math:`\\mathbf{R} = (p, q)`.
+
+        The *symmetry vector* is any lattice vector of the unfolded graphene
+        layer that represents a *symmetry operation* of the nanotube. The
+        symmetry vector :math:`\\mathbf{R}` can be written as:
 
         .. math::
 
-           \\mathbf{R} = p\\mathbf{a}_{1} + q\\mathbf{a}_{2}
+           \\mathbf{R} = p\\mathbf{a}_1 + q\\mathbf{a}_2
+
+        where :math:`p` and :math:`q` are integers.  The *symmetry vector*
+        represents a *symmetry operation* of the nanotube which arises as
+        a *screw translation*, which is a combination of a rotation :math:`psi`
+        and translation :math:`tau`. The symmetry operation of the nanotube can
+        be written as:
+
+        .. math::
+
+           R = (\\psi|\\tau)
 
         Parameters
         ----------
         n, m : int
             Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         length : bool, optional
-            if `True`, return the length of R
+            If `True`, return :math:`|\\mathbf{R}|`.
         magnitude : bool, optional
-            if `True`, return the length of R without units
+            If `True`, return :math:`|\\mathbf{R}|` in units of **\u212b**.
 
         Returns
         -------
         (p, q) : tuple
-            2-tuple of ints which are the components of R vector
+            2-tuple of ints -- components of :math:`\\mathbf{R}`.
         float
-            length of R if `length` is `True`
+            Length of :math:`\\mathbf{R}` (:math:`|\\mathbf{R}|`) if `length`
+            is `True` in units of **\u212b**.
 
         """
         t1 = Nanotube.compute_t1(n=n, m=m)
@@ -620,346 +940,99 @@ class Nanotube(object):
         else:
             return (p, q)
 
-    @property
-    def M(self):
-        """The number of :math:`\\mathbf{T}` in :math:`N\\mathbf{R}`"""
-        return self._M
-
     @classmethod
-    def compute_M(cls, n=int, m=int):
-        """Compute :math:`M = mp - nq`
-
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
-
-        Returns
-        -------
-        int
-            :math:`M = mp - nq`
-
-        """
-        p, q = Nanotube.compute_R(n=n, m=m)
-        return m * p - n * q
-
-    @property
-    def Ch(self):
-        """Nanotube circumference :math:`\\mathbf{C}_{h} = (n, m)`"""
-        return self._Ch
-
-    @classmethod
-    def compute_Ch(cls, n=int, m=int, bond=None, with_units=False,
-                   units='angstrom', magnitude=True):
-        """Compute the nanotube circumference.
-
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
-        bond : float, optional
-            distance between nearest neighbor atoms.
-            Must be in units of **Angstroms**.
-
-        Returns
-        -------
-        float
-            nanotube circumference in Angstroms
-
-        """
-        if bond is None:
-            bond = CCbond
-
-        if with_units and isinstance(bond, float) and Qty is not None:
-            bond = Qty(bond, units)
-
-        if magnitude and with_units:
-            try:
-                return bond.magnitude * np.sqrt(3 * (n**2 + m**2 + n * m))
-            except AttributeError:
-                return bond * np.sqrt(3 * (n**2 + m**2 + n * m))
-        else:
-            return bond * np.sqrt(3 * (n**2 + m**2 + n * m))
-
-    @property
-    def dt(self):
-        """Nanotube diameter :math:`d_{t} = \\frac{|\\mathbf{C}_{h}|}{\\pi}`"""
-        return self._dt
-
-    @classmethod
-    def compute_dt(cls, n=int, m=int, bond=None, with_units=False,
-                   units='angstrom', magnitude=True):
-        """Compute nanotube diameter :math:`d_{t}`
+    def compute_R_chiral_angle(cls, n=int, m=int, rad2deg=True):
+        """Compute "chiral angle" of symmetry vector :math:`\\theta_R`.
 
         .. math::
 
-           d_{t} = \\frac{|\\mathbf{C}_{h}|}{\\pi}
+           \\theta_R = \\tan^{-1}\\left(\\frac{\\sqrt{3}q}{2p + q}\\right)
 
         Parameters
         ----------
         n, m : int
             Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} =
-            (n, m)`.
-        bond : float, optional
-            distance between nearest neighbor atoms.
-            Must be in units of **Angstroms**.
-
-        Returns
-        -------
-        float
-            nanotube diameter in Angstroms
-
-        """
-        Ch = Nanotube.compute_Ch(n, m, bond=bond, with_units=with_units,
-                                 units=units, magnitude=magnitude)
-        return Ch / np.pi
-
-    @classmethod
-    def compute_tube_diameter(cls, n=int, m=int, bond=None, with_units=False,
-                              units='angstrom', magnitude=True):
-        """Alias for :meth:`Nanotube.compute_dt`"""
-        return Nanotube.compute_dt(n=n, m=m, bond=bond, with_units=with_units,
-                                   units=units, magnitude=magnitude)
-
-    @property
-    def rt(self):
-        """Nanotube radius :math:`r_{t} = \\frac{|\\mathbf{C}_{h}|}{2\\pi}`"""
-        return self._rt
-
-    @classmethod
-    def compute_rt(cls, n=int, m=int, bond=None, with_units=False,
-                   units='angstrom', magnitude=True):
-        """Compute nanotube radius :math:`r_{t}`
-
-        .. math::
-
-           r_{t} = \\frac{|\\mathbf{C}_{h}|}{2\\pi}
-
-
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
-        bond : float, optional
-            distance between nearest neighbor atoms.
-            Must be in units of **Angstroms**.
-
-        Returns
-        -------
-        float
-            nanotube radius in Angstroms
-
-        """
-        Ch = Nanotube.compute_Ch(n=n, m=m, bond=bond, with_units=with_units,
-                                 units=units, magnitude=magnitude)
-        return Ch / (2 * np.pi)
-
-    @classmethod
-    def compute_tube_radius(cls, n=int, m=int, bond=None, with_units=False,
-                            units='angstrom', magnitude=True):
-        """Alias for :meth:`Nanotube.compute_rt`"""
-        return Nanotube.compute_rt(n, m, bond=bond, with_units=with_units,
-                                   units=units, magnitude=magnitude)
-
-    @property
-    def d(self):
-        """:math:`d=\\gcd{(n, m)}`"""
-        return self._d
-
-    @classmethod
-    def compute_d(cls, n=int, m=int):
-        """Compute :math:`d=\\gcd{(n, m)}`
-
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} +
-            m\\mathbf{a}_{2} = (n, m)`.
-
-        Returns
-        -------
-        int
-            greatest common divisor of :math:`n` and :math:`m`
-
-        """
-        return gcd(n, m)
-
-    @property
-    def dR(self):
-        """:math:`d_R=\\gcd{(2n + m, 2m + n)}`"""
-        return self._dR
-
-    @classmethod
-    def compute_dR(cls, n=int, m=int):
-        """Compute :math:`d_R=\\gcd{(2n + m, 2m + n)}`
-
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} +
-            m\\mathbf{a}_{2} = (n, m)`.
-
-        Returns
-        -------
-        int
-            greatest common divisor of :math:`2n+m` and :math:`2m+n`
-
-        """
-        return gcd(2 * m + n, 2 * n + m)
-
-    @property
-    def chiral_angle(self):
-        """Chiral angle :math:`\\theta_{c}`.
-
-        .. math::
-
-           \\theta_{c} = \\tan^{-1}\\left({\\frac{\\sqrt{3} m}{2n + m}}\\right)
-
-        """
-        return self._chiral_angle
-
-    @classmethod
-    def compute_chiral_angle(cls, n=int, m=int, rad2deg=True):
-        """Compute chiral angle :math:`\\theta_{c}`
-
-        .. math::
-
-           \\theta_{c} = \\tan^{-1}\\left({\\frac{\\sqrt{3} m}{2n + m}}\\right)
-
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} +
-            m\\mathbf{a}_{2} = (n, m)`.
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         rad2deg : bool, optional
             If `True`, return angle in degrees
 
         Returns
         -------
         float
-            chiral angle :math:`\\theta_{c}` in degrees.
+            Chiral angle of *symmetry vector* :math:`\\theta_R` in
+            degrees (default) or radians (if `rad2deg=False`).
+
 
         """
-        theta = np.arctan(np.sqrt(3) * m / (2 * n + m))
-        #return np.arccos((2*n + m) / (2 * np.sqrt(n**2 + m**2 + n*m)))
+        p, q = Nanotube.compute_R(n=n, m=m)
+        theta = np.arctan((np.sqrt(3) * q) / (2 * p + q))
         if rad2deg:
             return np.degrees(theta)
         else:
             return theta
 
-    @property
-    def T(self):
-        """Unit cell length :math:`|\\mathbf{T}|`.
-
-        .. math::
-
-           |\\mathbf{T}| = \\frac{\\sqrt{3} |\\mathbf{C}_{h}|}{d_{R}}
-
-        """
-        return self._T
-
     @classmethod
-    def compute_T(cls, n=None, m=None, bond=None, with_units=False,
-                  units='angstrom', length=True, magnitude=True):
-        """Compute unit cell length :math:`|\\mathbf{T}|`
+    def compute_psi(cls, n=int, m=int):
+        """Compute rotation component of symmetry operation
+        :math:`\\psi` in **radians**.
 
         .. math::
 
-           |\\mathbf{T}| = \\frac{\\sqrt{3} |\\mathbf{C}_{h}|}{d_{R}}
+           \\psi = \\frac{2\\pi}{N}
 
         Parameters
         ----------
         n, m : int
             Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} +
-            m\\mathbf{a}_{2} = (n, m)`.
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+
+        Returns
+        -------
+        float
+            Rotation component of symmetry operation :math:`\\psi`
+            in **radians**.
+
+        """
+        N = Nanotube.compute_N(n=n, m=m)
+        return 2 * np.pi / N
+
+    @classmethod
+    def compute_tau(cls, n=int, m=int, bond=None, with_units=False,
+                    units='angstrom', magnitude=True):
+        u"""Compute translation component of symmetry operation
+        :math:`\\tau` in **\u212b**.
+
+        .. math::
+
+           \\tau = \\frac{M|\\mathbf{T}|}{N}
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         bond : float, optional
-            distance between nearest neighbor atoms.
-            Must be in units of **Angstroms**.
-        with_units : bool, optional
-        units : str, optional
-        length : bool, optional
-        magnitude : bool, optional
+            Distance between nearest neighbor atoms.
+            Must be in units of **\u212b**.
+        rad2deg : bool, optional
+            If `True`, return angle in degrees.
 
         Returns
         -------
-        float or Qty or 2-tuple of ints
-            If `length` is `True` and `with_units` is `False`, then
-            return the length of unit cell in Angstroms.
-            If `length` is `True` and `with_units` is `True` and
-            magnitude is `True`, then return the length of unit cell
-            as a float, but with units in `units`.
-            If `length` is `True` and `with_units` is `True` and
-            magnitude is `False`, then return the length of unit cell
-            as a `Quantity` instance and with units in `units`.
-            If `length` is `False`, return the componets of the
-            translation vector as a 2-tuple of ints (:math:`t_1`, :math:`t_2`).
+        float
+            Translation component of symmetry operation :math:`\\tau`
+            in **\u212b**.
 
         """
-
-        if length:
-            if bond is None:
-                bond = CCbond
-
-            if with_units and isinstance(bond, float) and Qty is not None:
-                bond = Qty(bond, units)
-
-            Ch = Nanotube.compute_Ch(n=n, m=m, bond=bond,
-                                     with_units=with_units, units=units,
-                                     magnitude=magnitude)
-            dR = Nanotube.compute_dR(n=n, m=m)
-
-            return np.sqrt(3) * Ch / dR
-        else:
-            t1 = Nanotube.compute_t1(n=n, m=m)
-            t2 = Nanotube.compute_t2(n=n, m=m)
-
-            return (t1, t2)
-
-    @property
-    def Natoms_per_tube(self):
-        """Number of atoms per nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
-        return self._Natoms_per_tube
-
-    @classmethod
-    def compute_Natoms_per_tube(cls, n=int, m=int, nz=float):
-        """Compute :math:`N_{\\mathrm{atoms/tube}}`
-
-        .. math::
-
-           N_{\\mathrm{atoms/tube}} = N_{\\mathrm{atoms/cell}} \\times
-           n_{z-\\mathrm{cells}}
-
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
-        nz : {int, float}
-            Number of nanotube unit cells
-
-        Returns
-        -------
-        int
-            :math:`N_{\\mathrm{atoms/tube}}`
-        """
-        Natoms = Nanotube.compute_Natoms(n=n, m=m)
-        return int(Natoms * nz)
+        M = Nanotube.compute_M(n=n, m=m)
+        N = Nanotube.compute_N(n=n, m=m)
+        T = Nanotube.compute_T(n=n, m=m, bond=bond, with_units=with_units,
+                               units=units, length=True, magnitude=magnitude)
+        return M * T / N
 
     @property
     def nx(self):
-        """Number of nanotube unit cells along the :math:`x`-axis."""
+        """Number of nanotubes along the :math:`x`-axis."""
         return int(self._nx)
 
     @nx.setter
@@ -969,7 +1042,7 @@ class Nanotube(object):
 
     @property
     def ny(self):
-        """Number of nanotube unit cells along the :math:`y`-axis."""
+        """Number of nanotubes along the :math:`y`-axis."""
         return int(self._ny)
 
     @ny.setter
@@ -983,8 +1056,8 @@ class Nanotube(object):
         return self._nz
 
     @nz.setter
-    def nz(self, value=float):
-        """Set number of unit cells along the :math:`z`-axis."""
+    def nz(self, value):
+        """Set number of nanotube unit cells along the :math:`z`-axis."""
         if self._assume_integer_unit_cells:
             self._nz = int(value)
         else:
@@ -992,30 +1065,28 @@ class Nanotube(object):
         self.compute_tube_params()
 
     @property
-    def Ntubes(self):
-        """Number of nanotubes."""
-        return int(self._Ntubes)
-
-    @property
     def Lx(self):
-        """Nanotube :math:`L_{\\mathrm{x}}` in **nanometers**."""
+        """Spatial extent of nanotubes along :math:`x`-axis in **nm**."""
         return self._Lx
 
     @classmethod
     def compute_Lx(cls, n=int, m=int, nx=int, bond=None, with_units=False,
-                   units='angstrom', magnitude=True):
-        """Compute :math:`L_x`.
+                   units='nanometer', magnitude=True):
+        u"""Compute :math:`L_x` in **nanometers**.
+
+        .. math::
+
+           L_x = n_x (d_t + d_{\\mathrm{vdW}})
 
         Parameters
         ----------
         n, m : int
             Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         nx : int
-            Number of nanotubes along :math:`x`
+            Number of nanotubes along :math:`x`-axis.
         bond : float, optional
-            bond length
+            Bond length in **\u212b**.
 
         Returns
         -------
@@ -1027,7 +1098,10 @@ class Nanotube(object):
                                  units=units, magnitude=magnitude)
         Lx = nx * (dt + dVDW)
         if with_units:
-            Lx.ito('nanometer')
+            try:
+                Lx.ito(units)
+            except Exception:
+                Lx.ito('nanometer')
         else:
             Lx = Lx / 10
 
@@ -1041,24 +1115,27 @@ class Nanotube(object):
 
     @property
     def Ly(self):
-        """Nanotube :math:`L_{\\mathrm{y}}` in **nanometers**."""
+        """Spatial extent of nanotubes along :math:`y`-axis in **nm**."""
         return self._Ly
 
     @classmethod
     def compute_Ly(cls, n=int, m=int, ny=int, bond=None, with_units=False,
-                   units='angstrom', magnitude=True):
-        """Compute :math:`L_y`.
+                   units='nanometer', magnitude=True):
+        """Compute :math:`L_y` in **nanometers**.
+
+        .. math::
+
+           L_y = n_y (d_t + d_{\\mathrm{vdW}})
 
         Parameters
         ----------
         n, m : int
             Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         ny : int
-            Number of nanotubes along :math:`y`
+            Number of nanotubes along :math:`y`-axis.
         bond : float, optional
-            bond length
+            Bond length in **\u212b**.
 
         Returns
         -------
@@ -1070,7 +1147,10 @@ class Nanotube(object):
                                  units=units, magnitude=magnitude)
         Ly = ny * (dt + dVDW)
         if with_units:
-            Ly.ito('nanometer')
+            try:
+                Ly.ito(units)
+            except Exception:
+                Ly.ito('nanometer')
         else:
             Ly = Ly / 10
 
@@ -1084,7 +1164,8 @@ class Nanotube(object):
 
     @property
     def Lz(self):
-        """Nanotube length :math:`L_{\\mathrm{tube}}` in **nanometers**."""
+        """Nanotube length :math:`L_z = L_{\\mathrm{tube}}` in
+        **nanometers**."""
         return self._Lz
 
     @Lz.setter
@@ -1094,19 +1175,23 @@ class Nanotube(object):
 
     @classmethod
     def compute_Lz(cls, n=int, m=int, nz=float, bond=None, with_units=False,
-                   units='angstrom', magnitude=True):
-        """Compute :math:`L_{\\mathrm{tube}}`.
+                   units='nanometer', magnitude=True):
+        """Compute :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**.
+
+        .. math::
+
+           L_z = n_z |\\mathbf{T}|
+
 
         Parameters
         ----------
         n, m : int
             Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         nz : {int, float}
             Number of nanotube unit cells
         bond : float, optional
-            bond length
+            bond length in **\u212b**.
 
         Returns
         -------
@@ -1118,7 +1203,10 @@ class Nanotube(object):
                                units=units, length=True, magnitude=False)
         Lz = nz * T
         if with_units:
-            Lz.ito('nanometer')
+            try:
+                Lz.ito(units)
+            except Exception:
+                Lz.ito('nanometer')
         else:
             Lz = Lz / 10
 
@@ -1131,99 +1219,46 @@ class Nanotube(object):
             return Lz
 
     @property
-    def tube_length(self):
-        """Nanotube length :math:`L_{\\mathrm{tube}}` in **nanometers**."""
-        return self.Lz
-
-    @classmethod
-    def compute_tube_length(cls, n=int, m=int, nz=float, bond=None,
-                            with_units=False, units='angstrom',
-                            magnitude=True):
-        """Compute :math:`L_{\\mathrm{tube}}`.
-
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
-        nz : {int, float}
-            Number of nanotube unit cells
-        bond : float, optional
-            bond length
-
-        Returns
-        -------
-        float
-            :math:`L_{\\mathrm{tube}}` in **nanometers**
-
-        """
-        return Nanotube.compute_Lz(n=n, m=m, nz=nz, bond=bond,
-                                   with_units=with_units, units=units,
-                                   magnitude=magnitude)
-
-    @property
-    def tube_mass(self):
-        """Nanotube mass in grams."""
-        return self._tube_mass
-
-    @classmethod
-    def compute_tube_mass(cls, n=int, m=int, nz=float, element1=None,
-                          element2=None, with_units=False, units='grams',
-                          magnitude=True):
-        """Compute nanotube mass in **grams**.
-
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
-        nz : {int, float}
-            Number of nanotube unit cells
-
-        Returns
-        -------
-        float
-
-        Notes
-        -----
-
-        .. todo::
-
-           handle different elements and perform accurate calculation by
-           determining number of atoms of each element.
-
-        """
-        Natoms_per_tube = \
-            Nanotube.compute_Natoms_per_tube(n=n, m=m, nz=nz)
-
-        if element1 is None:
-            element1 = 'C'
-        if element2 is None:
-            element2 = 'C'
-
-        atom1 = Atom(element1)
-        atom2 = Atom(element2)
-
-        mass = Natoms_per_tube * (atom1.m + atom2.m) / 2
-        if with_units and Qty is not None:
-            mass = Qty(mass, 'Da')
-            mass.ito(units)
-
-        if magnitude and with_units:
-            try:
-                return mass.magnitude
-            except AttributeError:
-                return mass
-        else:
-            return mass
-
-    @property
     def electronic_type(self):
         """Nanotube electronic type.
 
         .. versionadded:: 0.2.7
+
+        The electronic type is determined as follows:
+
+        if :math:`(2n + m)\\,\\mathrm{mod}\\,3=0`, the nanotube is
+        **metallic**.
+
+        if :math:`(2n + m)\\,\\mathrm{mod}\\,3=1`, the nanotube is
+        **semiconducting, type 1**.
+
+        if :math:`(2n + m)\\,\\mathrm{mod}\\,3=2`, the nanotube is
+        **semiconducting, type 2**.
+
+        The :math:`x\\,\\mathrm{mod}\\,y` notation is mathematical
+        shorthand for the *modulo* operation, which computes the
+        **remainder** of the division of :math:`x` by :math:`y`.
+        So, for example, all *armchair* nanotubes must be metallic
+        since the chiral indices satisfy: :math:`2n + m = 2n + n = 3n` and
+        therefore :math:`3n\\,\\mathrm{mod}\\,3` i.e. the remainder of the
+        division of :math:`3n/3=n` is always zero.
+
+        .. note::
+           Mathematically, :math:`(2n + m)\\,\\mathrm{mod}\\,3` is equivalent
+           to :math:`(n - m)\\,\\mathrm{mod}\\,3` when distinguishing
+           between metallic and semiconducting. However, when
+           distinguishing between semiconducting types,
+           one must be careful to observe the following convention:
+
+           * Semiconducting, **type 1** means:
+
+             * :math:`(2n + m)\\,\\mathrm{mod}\\,3=1`
+             * :math:`(n - m)\\,\\mathrm{mod}\\,3=2`
+
+           * Semiconducting, **type 2** means:
+
+             * :math:`(2n + m)\\,\\mathrm{mod}\\,3=2`
+             * :math:`(n - m)\\,\\mathrm{mod}\\,3=1`
 
         """
         return self._electronic_type
@@ -1274,8 +1309,7 @@ class Nanotube(object):
         ----------
         n, m : int
             Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
 
         Returns
         -------
@@ -1289,98 +1323,181 @@ class Nanotube(object):
         else:
             return 'metallic'
 
+    @property
+    def Natoms(self):
+        """Number of atoms in nanotube *unit cell*.
+
+        .. math::
+
+           N_{\\mathrm{atoms}} = 2N = \\frac{4(n^2 + m^2 + nm)}{d_R}
+
+        where :math:`N` is the number of graphene hexagons mapped to the
+        nanotube unit cell.
+
+        """
+        return self._Natoms
+
+    @classmethod
+    def compute_Natoms(cls, n=int, m=int):
+        """Compute :math:`N_{\mathrm{atoms/cell}} = 2N`.
+
+        .. math::
+
+           N_{\\mathrm{atoms}} = 2N = \\frac{4(n^2 + m^2 + nm)}{d_R}
+
+        where :math:`N` is the number of graphene hexagons mapped to the
+        nanotube unit cell.
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+
+        Returns
+        -------
+        `2N` : int
+            Number of atoms in nanotube *unit cell*:
+            N_{\\mathrm{atoms}} = 2N = \\frac{4(n^2 + m^2 + nm)}{d_R}
+
+
+        """
+        N = Nanotube.compute_N(n=n, m=m)
+        return 2 * N
+
+    @property
+    def Natoms_per_tube(self):
+        """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
+        return self._Natoms_per_tube
+
+    @classmethod
+    def compute_Natoms_per_tube(cls, n=int, m=int, nz=float):
+        """Compute :math:`N_{\\mathrm{atoms/tube}}`
+
+        .. math::
+
+           N_{\\mathrm{atoms/tube}} = N_{\\mathrm{atoms/cell}} \\times
+           n_{z-\\mathrm{cells}}
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        nz : {int, float}
+            Number of nanotube unit cells
+
+        Returns
+        -------
+        int
+            :math:`N_{\\mathrm{atoms/tube}}`
+        """
+        Natoms = Nanotube.compute_Natoms(n=n, m=m)
+        return int(Natoms * nz)
+
+    @property
+    def Ntubes(self):
+        """Number of nanotubes."""
+        return int(self._Ntubes)
+
     @classmethod
     def compute_symmetry_chiral_angle(cls, n=int, m=int, rad2deg=True):
-        """Compute "chiral angle" of symmetry vector :math:`\\mathbf{R}`
+        """Alias for :meth:`Nanotube.compute_R_chiral_angle`."""
+        return Nanotube.compute_R_chiral_angle(n=n, m=m, rad2deg=rad2deg)
+
+    @classmethod
+    def compute_tube_diameter(cls, n=int, m=int, bond=None, with_units=False,
+                              units='angstrom', magnitude=True):
+        """Alias for :meth:`Nanotube.compute_dt`"""
+        return Nanotube.compute_dt(n=n, m=m, bond=bond, with_units=with_units,
+                                   units=units, magnitude=magnitude)
+
+    @classmethod
+    def compute_tube_radius(cls, n=int, m=int, bond=None, with_units=False,
+                            units='angstrom', magnitude=True):
+        """Alias for :meth:`Nanotube.compute_rt`"""
+        return Nanotube.compute_rt(n, m, bond=bond, with_units=with_units,
+                                   units=units, magnitude=magnitude)
+
+    @property
+    def tube_length(self):
+        """Alias for :attr:`Nanotube.Lz`"""
+        return self.Lz
+
+    @classmethod
+    def compute_tube_length(cls, n=int, m=int, nz=float, bond=None,
+                            with_units=False, units='nanometer',
+                            magnitude=True):
+        """Alias for :meth:`Nanotube.compute_Lz`"""
+        return Nanotube.compute_Lz(n=n, m=m, nz=nz, bond=bond,
+                                   with_units=with_units, units=units,
+                                   magnitude=magnitude)
+
+    @property
+    def tube_mass(self):
+        """Nanotube mass in **grams**."""
+        return self._tube_mass
+
+    @classmethod
+    def compute_tube_mass(cls, n=int, m=int, nz=float, element1=None,
+                          element2=None, with_units=False, units='grams',
+                          magnitude=True):
+        """Compute nanotube mass in **grams**.
 
         Parameters
         ----------
         n, m : int
             Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} +
-            m\\mathbf{a}_{2} = (n, m)`.
-        rad2deg : bool, optional
-            If `True`, return angle in degrees
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        nz : {int, float}
+            Number of nanotube unit cells
 
         Returns
         -------
         float
-            chiral angle :math:`\\theta_{R}`
+
+        Notes
+        -----
+
+        .. todo::
+
+           Handle different elements and perform accurate calculation by
+           determining number of atoms of each element.
 
         """
-        p, q = Nanotube.compute_R(n=n, m=m)
-        theta = np.arctan((np.sqrt(3) * q) / (2 * p + q))
-        if rad2deg:
-            return np.degrees(theta)
+        Natoms_per_tube = \
+            Nanotube.compute_Natoms_per_tube(n=n, m=m, nz=nz)
+
+        if element1 is None:
+            element1 = 'C'
+        if element2 is None:
+            element2 = 'C'
+
+        atom1 = Atom(element1)
+        atom2 = Atom(element2)
+
+        mass = Natoms_per_tube * (atom1.m + atom2.m) / 2
+        if with_units and Qty is not None:
+            mass = Qty(mass, 'Da')
+            mass.ito(units)
+
+        if magnitude and with_units:
+            try:
+                return mass.magnitude
+            except AttributeError:
+                return mass
         else:
-            return theta
-
-    @classmethod
-    def compute_tau(cls, n=int, m=int, bond=None, with_units=False,
-                    units='angstrom', magnitude=True):
-        """Compute symmetry operation translation :math:`\\tau`
-
-        .. math::
-
-           \\tau = \\frac{M|\\mathbf{T}|}{N}
-
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} +
-            m\\mathbf{a}_{2} = (n, m)`.
-        bond : float, optional
-            distance between nearest neighbor atoms.
-            Must be in units of **Angstroms**.
-        rad2deg : bool, optional
-            If `True`, return angle in degrees
-
-        Returns
-        -------
-        float
-            Symmetry operation translation :math:`\\tau`
-
-        """
-        M = Nanotube.compute_M(n=n, m=m)
-        N = Nanotube.compute_N(n=n, m=m)
-        T = Nanotube.compute_T(n=n, m=m, bond=bond, with_units=with_units,
-                               units=units, length=True, magnitude=magnitude)
-        return M * T / N
-
-    @classmethod
-    def compute_psi(cls, n=int, m=int):
-        """Compute symmetry operation rotation :math:`\\psi`
-
-        .. math::
-
-           \\psi = \\frac{2\\pi}{N}
-
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} +
-            m\\mathbf{a}_{2} = (n, m)`.
-
-        Returns
-        -------
-        float
-            Symmetry operation rotation :math:`\\psi`
-
-        """
-        N = Nanotube.compute_N(n=n, m=m)
-        return 2 * np.pi / N
+            return mass
 
 
 class NanotubeBundle(Nanotube):
-    u"""Class for creating interactive Nanotube bundles.
+    u"""Class for creating interactive Nanotube bundle objects.
 
     Parameters
     ----------
     n, m : int
         Chiral indices defining the nanotube chiral vector
-        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
+        :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     nx, ny, nz : int, optional
         Number of repeat unit cells in the :math:`x, y, z` dimensions
     element1, element2 : {str, int}, optional
@@ -1388,7 +1505,7 @@ class NanotubeBundle(Nanotube):
         :class:`~sknano.chemistry.Atoms` 1 and 2
     bond : float, optional
         Bond length between nearest neighbor atoms.
-        Must be in units of **Angstroms**. Default value is
+        Must be in units of **\u212b**. Default value is
         the carbon-carbon bond length in graphite:
         :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.421` \u212b ([SoFaCNTs]_)
     Lx, Ly, Lz : float, optional
@@ -1441,7 +1558,7 @@ class NanotubeBundle(Nanotube):
         self.compute_bundle_params()
 
     def compute_bundle_params(self, d_vdw=None):
-        """Compute bundle params."""
+        """Compute/update nanotube bundle parameters."""
         super(NanotubeBundle, self).compute_tube_params()
         self._Ntubes = self.compute_Ntubes(nx=self._nx, ny=self._ny)
         self._bundle_mass = \
@@ -1462,37 +1579,8 @@ class NanotubeBundle(Nanotube):
                                         with_units=self._with_units)
 
     @property
-    def Ntubes(self):
-        """Number of nanotubes."""
-        return int(self._Ntubes)
-
-    @Ntubes.setter
-    def Ntubes(self, value=int):
-        """Set Ntubes."""
-        self._Ntubes = value
-        self._nx = value
-        self._ny = 1
-        self.compute_bundle_params()
-
-    @classmethod
-    def compute_Ntubes(cls, nx=int, ny=int):
-        """Compute number of nanotubes.
-
-        Parameters
-        ----------
-        nx, ny : int, optional
-            Number of repeat unit cells in the x,y directions
-
-        Returns
-        -------
-        int
-
-        """
-        return int(nx * ny)
-
-    @property
     def Natoms_per_bundle(self):
-        """Number of atoms in bundle.
+        """Number of atoms in nanotube bundle.
 
         .. versionadded:: 0.2.5
 
@@ -1511,13 +1599,20 @@ class NanotubeBundle(Nanotube):
     @classmethod
     def compute_Natoms_per_bundle(cls, n=int, m=int, nz=float, Ntubes=None,
                                   nx=None, ny=None):
-        """Compute number of atoms per bundle.
+        """Compute number of atoms in nanotube bundle.
 
         .. versionadded:: 0.2.5
+
+        .. math::
+
+           N_{\\mathrm{atoms/bundle}} = N_{\\mathrm{tubes}}\\times
+           N_{\\mathrm{atoms/tube}}
 
         Parameters
         ----------
         n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         nz : {int, float}
         Ntubes : {None, int}, optional
         nx, ny : {None, int}, optional
@@ -1529,8 +1624,8 @@ class NanotubeBundle(Nanotube):
 
         Raises
         ------
-        `TypeError`
-            if `Ntubes` is `None` and `nx` or `ny` are `None`
+        TypeError
+            If `Ntubes` is `None` and `nx` or `ny` are `None`
 
         """
         Natoms_per_tube = \
@@ -1545,28 +1640,39 @@ class NanotubeBundle(Nanotube):
         return Natoms_per_bundle
 
     @property
-    def bundle_mass(self):
-        """Bundle mass in grams."""
-        return self._bundle_mass
+    def Ntubes(self):
+        """Number of nanotubes in nanotube bundle: :math:`n_x\\times n_y`."""
+        return int(self._Ntubes)
+
+    @Ntubes.setter
+    def Ntubes(self, value=int):
+        """Set Ntubes."""
+        self._Ntubes = value
+        self._nx = value
+        self._ny = 1
+        self.compute_bundle_params()
 
     @classmethod
-    def compute_bundle_mass(cls, n=int, m=int, nx=int, ny=int, nz=float,
-                            element1=None, element2=None, with_units=False,
-                            units='grams', magnitude=True):
-        """Bundle mass in grams."""
-        Ntubes = \
-            NanotubeBundle.compute_Ntubes(nx=nx, ny=ny)
-        tube_mass = Nanotube.compute_tube_mass(n=n, m=m, nz=nz,
-                                               element1=element1,
-                                               element2=element2,
-                                               with_units=with_units,
-                                               units=units,
-                                               magnitude=magnitude)
-        return Ntubes * tube_mass
+    def compute_Ntubes(cls, nx=int, ny=int):
+        """Compute number of nanotubes in nanotube bundle.
+
+        Parameters
+        ----------
+        nx, ny : int, optional
+            Number of repeat unit cells along :math:`x, y`-axes.
+
+        Returns
+        -------
+        int
+            Number of nanotubes in nanotube bundle: :math:`n_x\\times n_y`
+
+        """
+        return int(nx * ny)
 
     @property
     def bundle_density(self):
-        """Bundle density in :math:`g/cm^3`."""
+        """Nanotube bundle mass density :math:`\\rho_{\\mathrm{bundle}}` in
+        :math:`\\mathrm{g/cm^3}`."""
         return self._bundle_density
 
     @classmethod
@@ -1574,14 +1680,21 @@ class NanotubeBundle(Nanotube):
                                element1=None, element2=None,
                                with_units=False, units='g/cm**3',
                                magnitude=True):
-        """Compute bundle mass.
+        u"""Compute nanotube bundle mass density
+        :math:`\\rho_{\\mathrm{bundle}}(n, m)` in :math:`\\mathrm{g/cm^3}`.
+
+        .. math::
+
+           \\rho_{\\mathrm{bundle}}(n, m) = \\frac{8\\pi^2 m_{\\mathrm{C}}
+           \\sqrt{n^2 + m^2 + nm}}{9\\sqrt{3}a_{\\mathrm{CC}}^3 \\times
+           \\left(\\sqrt{n^2 + m^2 + nm} +
+           \\frac{\\pi d_{\\mathrm{vdW}}}{\\sqrt{3}a_{\\mathrm{CC}}}\\right)^2}
 
         Parameters
         ----------
         n, m : int
             Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2}
-            = (n, m)`.
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         d_vdw : int
             van der Waals distance between nearest-neighbor tubes
         bond : float, optional
@@ -1590,7 +1703,8 @@ class NanotubeBundle(Nanotube):
         Returns
         -------
         float
-            :math:`\\rho_{\\mathrm{bundle}}` in :math:`\\frac{g}{cm^3}`
+            :math:`\\rho_{\\mathrm{bundle}}` in units of
+            :math:`\\mathrm{\\frac{g}{cm^3}}`
 
         """
         if bond is None:
@@ -1642,3 +1756,46 @@ class NanotubeBundle(Nanotube):
             # there are 1.6605e-24 grams / Da and 1e-8 cm / angstrom
             bundle_density *= 1.6605e-24 / (1e-8)**3
             return bundle_density
+
+    @property
+    def bundle_mass(self):
+        """Nanotube bundle mass :math:`M_{\\mathrm{bundle}}` in **grams**."""
+        return self._bundle_mass
+
+    @classmethod
+    def compute_bundle_mass(cls, n=int, m=int, nx=int, ny=int, nz=float,
+                            element1=None, element2=None, with_units=False,
+                            units='grams', magnitude=True):
+        """Compute nanotube bundle mass :math:`M_{\\mathrm{bundle}}`
+        in **grams**.
+
+        .. math::
+
+           M_{\\mathrm{bundle}} = N_{\\mathrm{tubes}} M_{\\mathrm{tube}}
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        nx, ny, nz : int, optional
+            Number of repeat unit cells in the :math:`x, y, z` dimensions
+        element1, element2 : {str, int}, optional
+            Element symbol or atomic number of basis
+            :class:`~sknano.chemistry.Atoms` 1 and 2
+
+        Returns
+        -------
+        float
+            Nanotube bundle mass :math:`M_{\\mathrm{bundle}}` in **grams**.
+
+        """
+        Ntubes = \
+            NanotubeBundle.compute_Ntubes(nx=nx, ny=ny)
+        tube_mass = Nanotube.compute_tube_mass(n=n, m=m, nz=nz,
+                                               element1=element1,
+                                               element2=element2,
+                                               with_units=with_units,
+                                               units=units,
+                                               magnitude=magnitude)
+        return Ntubes * tube_mass
