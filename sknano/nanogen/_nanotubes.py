@@ -879,11 +879,10 @@ class Nanotube(object):
            \\mathbf{R} = p\\mathbf{a}_1 + q\\mathbf{a}_2
 
         where :math:`p` and :math:`q` are integers.
-        The *symmetry vector*
-        represents a *symmetry operation* of the nanotube which arises as
-        a *screw translation*, which is a combination of a rotation :math:`psi`
-        and translation :math:`tau`. The symmetry operation of the nanotube can
-        be written as:
+        The *symmetry vector* represents a *symmetry operation* of the nanotube
+        which arises as a *screw translation*, which is a combination of
+        a rotation :math:`\\psi` and translation :math:`\\tau`. The symmetry
+        operation of the nanotube can be written as:
 
         .. math::
 
@@ -979,7 +978,8 @@ class Nanotube(object):
 
         The *symmetry vector* `R` represents a *symmetry
         operation* of the nanotube which arises as a *screw translation*, which
-        is a combination of a rotation :math:`psi` and translation :math:`tau`.
+        is a combination of a rotation :math:`\\psi` and translation
+        :math:`\\tau`.
         The symmetry operation of the nanotube can be written as:
 
         .. math::
