@@ -878,7 +878,8 @@ class Nanotube(object):
 
            \\mathbf{R} = p\\mathbf{a}_1 + q\\mathbf{a}_2
 
-        where :math:`p` and :math:`q` are integers.  The *symmetry vector*
+        where :math:`p` and :math:`q` are integers.
+        The *symmetry vector*
         represents a *symmetry operation* of the nanotube which arises as
         a *screw translation*, which is a combination of a rotation :math:`psi`
         and translation :math:`tau`. The symmetry operation of the nanotube can
@@ -970,6 +971,43 @@ class Nanotube(object):
             return np.degrees(theta)
         else:
             return theta
+
+    @classmethod
+    def compute_so(cls, n=int, m=int, bond=None, with_units=False,
+                   units='angstrom', magnitude=True):
+        u"""Compute symmetry operation :math:`(\\psi|\\tau)`.
+
+        The *symmetry vector* `R` represents a *symmetry
+        operation* of the nanotube which arises as a *screw translation*, which
+        is a combination of a rotation :math:`psi` and translation :math:`tau`.
+        The symmetry operation of the nanotube can be written as:
+
+        .. math::
+
+           R = (\\psi|\\tau)
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        bond : float, optional
+            Distance between nearest neighbor atoms.
+            Must be in units of **\u212b**.
+        rad2deg : bool, optional
+            If `True`, return angle in degrees.
+
+        Returns
+        -------
+        (psi, tau) : tuple
+            2-tuple of floats -- :math:`\\psi` in radians and
+            :math:`\\tau` in \u212b.
+
+        """
+        psi = Nanotube.compute_psi(n=n, m=m)
+        tau = Nanotube.compute_tau(n=n, m=m, bond=bond, with_units=with_units,
+                                   units=units, magnitude=magnitude)
+        return (psi, tau)
 
     @classmethod
     def compute_psi(cls, n=int, m=int):
