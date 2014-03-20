@@ -99,9 +99,8 @@ Base classes for creating new structure data generators
    VacancyGenerator
 
 """
-from __future__ import division, print_function, absolute_import
-
-__docformat__ = 'restructuredtext'
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 from ._defect_generators import *
 from ._fullerene_bravais_lattice_generators import *
