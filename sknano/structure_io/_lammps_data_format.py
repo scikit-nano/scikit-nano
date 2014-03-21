@@ -7,7 +7,7 @@ LAMMPS data format (:mod:`sknano.structure_io._lammps_data_format`)
 .. currentmodule:: sknano.structure_io._lammps_data_format
 
 """
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
