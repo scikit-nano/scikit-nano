@@ -72,23 +72,15 @@ class LAMMPSAtom(Atom):
             if ni is not None:
                 self._n[i] = ni
 
-        check_type(q, allowed_types=(int, float))
         self._q = q
-
-        check_type(atomID, allowed_types=(int, float))
         self._atomID = int(atomID)
-
-        check_type(moleculeID, allowed_types=(int, float))
         self._moleculeID = int(moleculeID)
-
-        check_type(atomtype, allowed_types=(int, float))
         self._atomtype = int(atomtype)
-
         self._CN = CN
         self._NN = NN
 
-        self._attributes.extend(['q','v', 'atomID', 'moleculeID', 'atomtype',
-                                 'CN', 'NN'])
+        self._attributes.extend(
+            ['q','v', 'atomID', 'moleculeID', 'atomtype', 'CN', 'NN'])
 
     @property
     def CN(self):
