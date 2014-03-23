@@ -7,7 +7,8 @@ Helper functions for chirality data (:mod:`sknano.tools._chirality_funcs`)
 .. currentmodule:: sknano.tools._chirality_funcs
 
 """
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 import re
 

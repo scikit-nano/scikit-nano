@@ -7,7 +7,7 @@ Abstract data structures for math (:mod:`sknano.tools._coremath`)
 .. currentmodule:: sknano.tools._coremath
 
 """
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 try:

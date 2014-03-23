@@ -7,13 +7,14 @@ Custom NumPy data structures (:mod:`sknano.tools._npcoremath`)
 .. currentmodule:: sknano.tools._npcoremath
 
 """
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 import numpy as np
 
 #from ._corefuncs import check_type
 
-__all__ = ['NPPoint'] #, 'NPVector', 'NPQuaternion']
+__all__ = ['NPPoint']  # , 'NPVector', 'NPQuaternion']
 
 
 class NPPoint(np.ndarray):
@@ -28,9 +29,9 @@ class NPPoint(np.ndarray):
 
     """
     def __new__(cls, x=None, y=None, z=None, units=None):
-        self._p = np.zeros(3, dtype=float)
-        self._units = units
-        for i, pi in enumerate((x, y, z)):
-            if pi is not None:
-                self._p[i] = pi
-
+        pass
+        #self._p = np.zeros(3, dtype=float)
+        #self._units = units
+        #for i, pi in enumerate((x, y, z)):
+        #    if pi is not None:
+        #        self._p[i] = pi

@@ -7,8 +7,8 @@ Preset data structures (:mod:`sknano.tools._luts`)
 .. currentmodule:: sknano.tools._luts
 
 """
-from __future__ import division, absolute_import, print_function
-__docformat__ = 'restructuredtext'
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 __all__ = ['chiral_type_name_mappings',
            'components', 'dimensions',

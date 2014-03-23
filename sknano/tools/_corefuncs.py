@@ -7,7 +7,8 @@ Core functions (:mod:`sknano.tools._corefuncs`)
 .. currentmodule:: sknano.tools._corefuncs
 
 """
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 __all__ = ['check_type']
 

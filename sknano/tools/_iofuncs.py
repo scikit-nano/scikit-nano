@@ -7,7 +7,8 @@ I/O functions (:mod:`sknano.tools._iofuncs`)
 .. currentmodule:: sknano.tools._iofuncs
 
 """
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 import os
 import re

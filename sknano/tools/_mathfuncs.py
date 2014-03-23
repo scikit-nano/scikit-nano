@@ -7,7 +7,8 @@ Math helper functions (:mod:`sknano.tools._mathfuncs`)
 .. currentmodule:: sknano.tools._mathfuncs
 
 """
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 from fractions import gcd
 

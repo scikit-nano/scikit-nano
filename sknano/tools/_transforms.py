@@ -7,7 +7,8 @@ Linear algebra functions for transformations (:mod:`sknano.tools._transforms`)
 .. currentmodule:: sknano.tools._transforms
 
 """
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 import numpy as np
 
