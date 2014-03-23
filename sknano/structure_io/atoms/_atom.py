@@ -10,6 +10,8 @@ Base class for structure data atom (:mod:`sknano.structure_io.atoms._atom`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
+from collections import OrderedDict
+
 import numpy as np
 
 from ...tools import Vector
@@ -75,6 +77,14 @@ class Atom(object):
 
         self._attributes = ['symbol', 'Z', 'm', 'r']
 
+        self._atomdict = OrderedDict()
+        self._atomdict['symbol'] = self._symbol
+        self._atomdict['Z'] = self._Z
+        self._atomdict['m'] = self._m
+        self._atomdict['x'] = self._r.x
+        self._atomdict['y'] = self._r.y
+        self._atomdict['z'] = self._r.z
+
     def __str__(self):
         """Return string representation of atom."""
         atom_str = ''
@@ -82,6 +92,11 @@ class Atom(object):
             atom_str += \
                 'Atom {}: {}\n'.format(attr, getattr(self, '_' + attr))
         return atom_str
+
+    @property
+    def atomdict(self):
+        """Return dictionary of atom attributes."""
+        return self._atomdict
 
     @property
     def Z(self):
@@ -138,7 +153,7 @@ class Atom(object):
             :math:`x`-coordinate in units of **Angstroms**.
 
         """
-        self._r.x = value
+        self._r.x = self._atomdict['x'] = value
 
     @property
     def y(self):
@@ -162,7 +177,7 @@ class Atom(object):
             :math:`y`-coordinate in units of **Angstroms**.
 
         """
-        self._r.y = value
+        self._r.y = self._atomdict['y'] = value
 
     @property
     def z(self):
@@ -186,7 +201,7 @@ class Atom(object):
             :math:`z`-coordinate in units of **Angstroms**.
 
         """
-        self._r.z = value
+        self._r.z = self._atomdict['z'] = value
 
     @property
     def r(self):
@@ -211,7 +226,7 @@ class Atom(object):
             **Angstroms**.
 
         """
-        self._r.components = value
+        self.x, self.y, self.z = value[0], value[1], value[2]
 
     def fix_minus_zero_coords(self, epsilon=1.0e-10):
         """Set really really small negative coordinates to zero.
