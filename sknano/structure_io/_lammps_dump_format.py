@@ -12,7 +12,7 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-from ..chemistry import Atom, Atoms
+from .atoms import LAMMPSAtom as Atom
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureWriter, \
@@ -233,15 +233,19 @@ class DUMPWriter(StructureWriter):
     """Class for writing LAMMPS dump chemical file format."""
 
     @classmethod
-    def write(cls, fname=None, outpath=None, atoms=None, boxbounds=None,
-              comment_line=None, assume_unique_atoms=False, verbose=False):
+    def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
+              boxbounds=None, comment_line=None, assume_unique_atoms=False,
+              verbose=False):
         """Write structure dump to file.
 
         Parameters
         ----------
-        fname : str
+        fname : str, optional
+            Output file name.
         outpath : str, optional
-            Output path for structure data file.
+            Output file path.
+        fpath : str, optional
+            Full path (directory path + file name) to output data file.
         atoms : `Atoms`
             An :py:class:`Atoms` instance.
         boxbounds : dict, optional
@@ -258,92 +262,91 @@ class DUMPWriter(StructureWriter):
             verbose output
 
         """
-        if not isinstance(atoms, Atoms):
-            raise TypeError('atoms argument must be an `Atoms` instance')
-        else:
+        if fpath is None:
             fpath = get_fpath(fname=fname, ext='dump', outpath=outpath,
                               overwrite=True, add_fnum=False)
-            if comment_line is None:
-                comment_line = default_comment_line
 
-            atoms.rezero_coords()
+        if comment_line is None:
+            comment_line = default_comment_line
 
-            atomtypes = atoms.atomtypes
+        atoms.rezero_coords()
 
-            Natoms = atoms.Natoms
-            Natoms_width = \
-                8 if len(str(Natoms)) <= 12 else len(str(Natoms)) + 4
-            Ntypes = atoms.Ntypes
-            Ntypes_width = Natoms_width
+        atomtypes = atoms.atomtypes
 
-            atomID_width = len(str(Natoms)) + 1
-            atomtype_width = len(str(Ntypes)) + 1
+        Natoms = atoms.Natoms
+        Natoms_width = \
+            8 if len(str(Natoms)) <= 12 else len(str(Natoms)) + 4
+        Ntypes = atoms.Ntypes
+        Ntypes_width = Natoms_width
 
-            if not assume_unique_atoms and \
-                    len(set(atoms.atom_ids)) != atoms.Natoms:
-                for atomID, atom in enumerate(atoms, start=1):
-                    atom.atomID = atomID
+        atomID_width = len(str(Natoms)) + 1
+        atomtype_width = len(str(Ntypes)) + 1
 
-            if boxbounds is None:
-                boxbounds = {'x': {'min': None, 'max': None},
-                             'y': {'min': None, 'max': None},
-                             'z': {'min': None, 'max': None}}
+        if not assume_unique_atoms and \
+                len(set(atoms.atom_ids)) != atoms.Natoms:
+            for atomID, atom in enumerate(atoms, start=1):
+                atom.atomID = atomID
 
-                for i, dim in enumerate(('x', 'y', 'z')):
-                    boxbounds[dim]['min'] = atoms.coords[:, i].min()
-                    boxbounds[dim]['max'] = atoms.coords[:, i].max()
+        if boxbounds is None:
+            boxbounds = {'x': {'min': None, 'max': None},
+                         'y': {'min': None, 'max': None},
+                         'z': {'min': None, 'max': None}}
 
-            lohi_width = 0
+            for i, dim in enumerate(('x', 'y', 'z')):
+                boxbounds[dim]['min'] = atoms.coords[:, i].min()
+                boxbounds[dim]['max'] = atoms.coords[:, i].max()
+
+        lohi_width = 0
+        for dim in ('x', 'y', 'z'):
+            lohi_width = \
+                max(lohi_width, len('{:.6f} {:.6f}'.format(
+                    boxbounds[dim]['min'], boxbounds[dim]['max'])) + 4)
+
+        with open(fpath, 'w') as f:
+            f.write('# {}\n\n'.format(comment_line.lstrip('#').strip()))
+            f.write('{}atoms\n'.format(
+                '{:d}'.format(Natoms).ljust(Natoms_width)))
+            f.write('{}atom types\n\n'.format(
+                '{:d}'.format(Ntypes).ljust(Ntypes_width)))
+
             for dim in ('x', 'y', 'z'):
-                lohi_width = \
-                    max(lohi_width, len('{:.6f} {:.6f}'.format(
-                        boxbounds[dim]['min'], boxbounds[dim]['max'])) + 4)
+                f.write('{}{dim}lo {dim}hi\n'.format(
+                    '{:.6f} {:.6f}'.format(
+                        boxbounds[dim]['min'],
+                        boxbounds[dim]['max']).ljust(lohi_width),
+                    dim=dim))
 
-            with open(fpath, 'w') as f:
-                f.write('# {}\n\n'.format(comment_line.lstrip('#').strip()))
-                f.write('{}atoms\n'.format(
-                    '{:d}'.format(Natoms).ljust(Natoms_width)))
-                f.write('{}atom types\n\n'.format(
-                    '{:d}'.format(Ntypes).ljust(Ntypes_width)))
+            f.write('\nMasses\n\n')
+            for atomtype, properties in atomtypes.iteritems():
+                f.write('{}{:.4f}\n'.format(
+                    '{:d}'.format(atomtype).ljust(Natoms_width),
+                    properties['mass']))
 
-                for dim in ('x', 'y', 'z'):
-                    f.write('{}{dim}lo {dim}hi\n'.format(
-                        '{:.6f} {:.6f}'.format(
-                            boxbounds[dim]['min'],
-                            boxbounds[dim]['max']).ljust(lohi_width),
-                        dim=dim))
+            f.write('\nAtoms\n\n')
+            for atom in atoms:
+                line = ''
+                line += "{:>{}}".format(atom.atomID, atomID_width)
+                line += "{:>{}}".format(atom.moleculeID, 3)
+                line += "{:>{}}".format(atom.atomtype, atomtype_width)
+                line += "{:>{}}".format('{:.1f}'.format(atom.q), 4)
+                line += "{:>{}}".format('{:f}'.format(atom.x), 14)
+                line += "{:>{}}".format('{:f}'.format(atom.y), 14)
+                line += "{:>{}}".format('{:f}'.format(atom.z), 14)
+                line += "{:>{}}".format('{:d}'.format(atom.nx), 3)
+                line += "{:>{}}".format('{:d}'.format(atom.ny), 3)
+                line += "{:>{}}\n".format('{:d}'.format(atom.nz), 3)
 
-                f.write('\nMasses\n\n')
-                for atomtype, properties in atomtypes.iteritems():
-                    f.write('{}{:.4f}\n'.format(
-                        '{:d}'.format(atomtype).ljust(Natoms_width),
-                        properties['mass']))
+                f.write(line)
 
-                f.write('\nAtoms\n\n')
-                for atom in atoms:
-                    line = ''
-                    line += "{:>{}}".format(atom.atomID, atomID_width)
-                    line += "{:>{}}".format(atom.moleculeID, 3)
-                    line += "{:>{}}".format(atom.atomtype, atomtype_width)
-                    line += "{:>{}}".format('{:.1f}'.format(atom.q), 4)
-                    line += "{:>{}}".format('{:f}'.format(atom.x), 14)
-                    line += "{:>{}}".format('{:f}'.format(atom.y), 14)
-                    line += "{:>{}}".format('{:f}'.format(atom.z), 14)
-                    line += "{:>{}}".format('{:d}'.format(atom.nx), 3)
-                    line += "{:>{}}".format('{:d}'.format(atom.ny), 3)
-                    line += "{:>{}}\n".format('{:d}'.format(atom.nz), 3)
+            f.write('\nVelocities\n\n')
+            for atom in atoms:
+                line = ''
+                line += "{:>{}}".format(atom.atomID, atomID_width)
+                line += "{:>{}}".format('{:f}'.format(atom.vx), 14)
+                line += "{:>{}}".format('{:f}'.format(atom.vy), 14)
+                line += "{:>{}}\n".format('{:f}'.format(atom.vz), 14)
 
-                    f.write(line)
-
-                f.write('\nVelocities\n\n')
-                for atom in atoms:
-                    line = ''
-                    line += "{:>{}}".format(atom.atomID, atomID_width)
-                    line += "{:>{}}".format('{:f}'.format(atom.vx), 14)
-                    line += "{:>{}}".format('{:f}'.format(atom.vy), 14)
-                    line += "{:>{}}\n".format('{:f}'.format(atom.vz), 14)
-
-                    f.write(line)
+                f.write(line)
 
 
 class aselect(object):
