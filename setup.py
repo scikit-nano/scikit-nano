@@ -174,7 +174,7 @@ def setup_package():
         entry_points={
             'console_scripts': [
                 'nanogen = sknano.scripts.nanogen:main',
-                'nanogenui = sknano.nanogen_gui.nanogenui:main',
+                'nanogenui = sknano.scripts.nanogenui:main',
             ]
         }
     )
