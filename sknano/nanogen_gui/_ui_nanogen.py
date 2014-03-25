@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'nanogen.ui'
 #
-# Created: Tue Mar 25 11:43:59 2014
+# Created: Tue Mar 25 11:47:02 2014
 #      by: PyQt4 UI code generator 4.10.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_NanoGen(object):
     def setupUi(self, NanoGen):
         NanoGen.setObjectName(_fromUtf8("NanoGen"))
-        NanoGen.resize(478, 697)
+        NanoGen.resize(508, 750)
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Lucida Sans Unicode"))
         font.setPointSize(14)
