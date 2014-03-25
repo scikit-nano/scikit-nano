@@ -16,11 +16,7 @@ from ...tools import check_type, Vector
 
 from ._atom import Atom
 
-__all__ = ['LAMMPSAtom', 'LAMMPSAtomAttributes']
-
-
-class LAMMPSAtomAttributes(object):
-    pass
+__all__ = ['LAMMPSAtom']
 
 
 class LAMMPSAtom(Atom):
@@ -62,7 +58,7 @@ class LAMMPSAtom(Atom):
                  with_units=False, r_units=None, v_units=None,
                  nx=None, ny=None, nz=None, CN=None, NN=None):
 
-        super(LAMMPSAtom, self).__init__(element=element, mass=mass,
+        super(LAMMPSAtom, self).__init__(element=element, m=mass,
                                          x=x, y=y, z=z)
 
         self._v = Vector(x=vx, y=vy, z=vz)
@@ -72,10 +68,10 @@ class LAMMPSAtom(Atom):
             if ni is not None:
                 self._n[i] = ni
 
-        self._q = q
         self._atomID = int(atomID)
         self._moleculeID = int(moleculeID)
         self._atomtype = int(atomtype)
+        self._q = q
         self._CN = CN
         self._NN = NN
 
