@@ -53,8 +53,11 @@ class XYZAtoms(Atoms):
             atoms=atoms, copylist=copylist, deepcopy=deepcopy,
             update_property_lists=False)
 
-        self._atom_tree = None
+        #self._property_lists['atomID'] = self._atom_ids = []
+        #self._property_lists['CN'] = self._coordination_numbers = []
+        #self._property_lists['NN'] = self._nearest_neighbors = []
 
+        self._atom_tree = None
         if use_kdtree and has_kdtree is False:
             use_kdtree = False
         self._use_kdtree = use_kdtree
