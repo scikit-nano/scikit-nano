@@ -318,17 +318,20 @@ class DATAWriter(StructureWriter):
     """`StructureWriter` class for writing `LAMMPS data` file format."""
 
     @classmethod
-    def write(cls, fname=None, outpath=None, atoms=None, boxbounds=None,
-              comment_line=None, assume_unique_atoms=False,
-              enforce_consecutive_atomIDs=True,
-              pad_box=True, xpad=10., ypad=10., zpad=10., verbose=False):
+    def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
+              boxbounds=None, comment_line=None, assume_unique_atoms=False,
+              enforce_consecutive_atomIDs=True, pad_box=True, xpad=10.,
+              ypad=10., zpad=10., verbose=False):
         """Write structure data to file.
 
         Parameters
         ----------
-        fname : str
+        fname : str, optional
+            Output file name.
         outpath : str, optional
-            Output path for structure data file.
+            Output file path.
+        fpath : str, optional
+            Full path (directory path + file name) to output data file.
         atoms : :class:`~sknano.chemistry.Atoms`
             An :class:`~sknano.chemistry.Atoms` instance.
         boxbounds : dict, optional
@@ -348,8 +351,9 @@ class DATAWriter(StructureWriter):
             verbose output
 
         """
-        fpath = get_fpath(fname=fname, ext='data', outpath=outpath,
-                          overwrite=True, add_fnum=False)
+        if fpath is None:
+            fpath = get_fpath(fname=fname, ext='data', outpath=outpath,
+                              overwrite=True, add_fnum=False)
         if comment_line is None:
             comment_line = default_comment_line
 

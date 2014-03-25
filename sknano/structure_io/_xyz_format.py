@@ -60,14 +60,18 @@ class XYZWriter(StructureWriter):
     """`StructureWriter` class for writing `xyz` chemical file format."""
 
     @classmethod
-    def write(cls, fname=None, outpath=None, atoms=None, comment_line=None):
+    def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
+              comment_line=None):
         """Write structure data to file.
 
         Parameters
         ----------
-        fname : str
+        fname : str, optional
+            Output file name.
         outpath : str, optional
-            Output path for structure data file.
+            Output file path.
+        fpath : str, optional
+            Full path (directory path + file name) to output data file.
         atoms : :class:`~sknano.chemistry.Atoms`
             An :class:`~sknano.chemistry.Atoms` instance.
         comment_line : str, optional
@@ -75,8 +79,9 @@ class XYZWriter(StructureWriter):
             then it is set to the full path of the output `xyz` file.
 
         """
-        fpath = get_fpath(fname=fname, ext='xyz', outpath=outpath,
-                          overwrite=True, add_fnum=False)
+        if fpath is None:
+            fpath = get_fpath(fname=fname, ext='xyz', outpath=outpath,
+                              overwrite=True, add_fnum=False)
         if comment_line is None:
             comment_line = default_comment_line
 
