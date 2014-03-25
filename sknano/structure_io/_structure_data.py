@@ -13,7 +13,7 @@ __docformat__ = 'restructuredtext en'
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
 
-from ..chemistry import Atoms
+#from ..chemistry import Atoms
 from sknano.version import short_version as version
 
 default_comment_line = \
@@ -47,12 +47,12 @@ class StructureData(object):
     def __init__(self, fpath=None):
         self._comment_line = default_comment_line
         self._fpath = fpath
-        self._structure_atoms = Atoms()
+        self._structure_atoms = None
         self._properties = OrderedDict()
 
     @property
     def structure_atoms(self):
-        """:class:`~sknano.chemistry.Atoms` instance."""
+        """Return structure_atoms attribute"""
         return self._structure_atoms
 
     @property
@@ -99,8 +99,11 @@ class StructureData(object):
 
     @property
     def Natoms(self):
-        """Number of atoms in :class:`~sknano.chemistry.Atoms`"""
-        return self._structure_atoms.Natoms
+        """Number of atoms in :attr:`~StructureData.structure_atoms`"""
+        try:
+            return self._structure_atoms.Natoms
+        except AttributeError:
+            return 0
 
     @property
     def properties(self):
