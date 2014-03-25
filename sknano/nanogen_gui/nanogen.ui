@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>478</width>
-    <height>753</height>
+    <height>721</height>
    </rect>
   </property>
   <property name="font">
@@ -165,7 +165,7 @@
                       <property name="minimumSize">
                        <size>
                         <width>90</width>
-                        <height>45</height>
+                        <height>40</height>
                        </size>
                       </property>
                       <property name="font">
@@ -204,7 +204,7 @@
                       <property name="minimumSize">
                        <size>
                         <width>90</width>
-                        <height>45</height>
+                        <height>40</height>
                        </size>
                       </property>
                       <property name="font">
@@ -270,7 +270,7 @@
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
-                        <height>45</height>
+                        <height>40</height>
                        </size>
                       </property>
                       <property name="currentIndex">
@@ -324,7 +324,7 @@
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
-                        <height>45</height>
+                        <height>40</height>
                        </size>
                       </property>
                       <property name="currentIndex">
@@ -403,7 +403,7 @@
                     <property name="minimumSize">
                      <size>
                       <width>150</width>
-                      <height>45</height>
+                      <height>40</height>
                      </size>
                     </property>
                     <property name="font">
@@ -488,7 +488,7 @@
                     <property name="minimumSize">
                      <size>
                       <width>100</width>
-                      <height>45</height>
+                      <height>40</height>
                      </size>
                     </property>
                     <property name="font">
@@ -528,7 +528,7 @@
                     <property name="minimumSize">
                      <size>
                       <width>175</width>
-                      <height>45</height>
+                      <height>40</height>
                      </size>
                     </property>
                     <property name="maximumSize">
@@ -586,7 +586,7 @@
                     <property name="minimumSize">
                      <size>
                       <width>100</width>
-                      <height>45</height>
+                      <height>40</height>
                      </size>
                     </property>
                     <property name="font">
@@ -626,7 +626,7 @@
                     <property name="minimumSize">
                      <size>
                       <width>175</width>
-                      <height>45</height>
+                      <height>40</height>
                      </size>
                     </property>
                     <property name="maximumSize">
@@ -684,7 +684,7 @@
                     <property name="minimumSize">
                      <size>
                       <width>100</width>
-                      <height>45</height>
+                      <height>40</height>
                      </size>
                     </property>
                     <property name="font">
@@ -730,7 +730,7 @@
                     <property name="minimumSize">
                      <size>
                       <width>200</width>
-                      <height>45</height>
+                      <height>40</height>
                      </size>
                     </property>
                     <property name="font">
@@ -841,7 +841,7 @@
                           <property name="minimumSize">
                            <size>
                             <width>200</width>
-                            <height>45</height>
+                            <height>40</height>
                            </size>
                           </property>
                           <property name="font">
@@ -884,7 +884,7 @@
                           <property name="minimumSize">
                            <size>
                             <width>200</width>
-                            <height>45</height>
+                            <height>40</height>
                            </size>
                           </property>
                           <property name="font">
@@ -985,7 +985,7 @@
                         <property name="minimumSize">
                          <size>
                           <width>0</width>
-                          <height>45</height>
+                          <height>40</height>
                          </size>
                         </property>
                         <property name="currentIndex">
@@ -1039,7 +1039,7 @@
                         <property name="minimumSize">
                          <size>
                           <width>0</width>
-                          <height>45</height>
+                          <height>40</height>
                          </size>
                         </property>
                         <property name="currentIndex">
@@ -1118,7 +1118,7 @@
                       <property name="minimumSize">
                        <size>
                         <width>150</width>
-                        <height>45</height>
+                        <height>40</height>
                        </size>
                       </property>
                       <property name="font">
@@ -1199,7 +1199,7 @@
                         <property name="minimumSize">
                          <size>
                           <width>0</width>
-                          <height>45</height>
+                          <height>40</height>
                          </size>
                         </property>
                         <property name="font">
@@ -1297,7 +1297,7 @@
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
-                      <height>45</height>
+                      <height>40</height>
                      </size>
                     </property>
                    </widget>
@@ -1338,7 +1338,7 @@
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>38</height>
+              <height>29</height>
              </size>
             </property>
            </spacer>
@@ -1406,7 +1406,7 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>40</height>
+              <height>38</height>
              </size>
             </property>
             <property name="font">
