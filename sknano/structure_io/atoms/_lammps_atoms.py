@@ -53,6 +53,8 @@ class LAMMPSAtoms(Atoms):
             atoms=atoms, copylist=copylist, deepcopy=deepcopy,
             update_property_lists=False)
 
+        self._atomtypes = {}
+
         self._property_lists['q'] = self._charges = []
         self._property_lists['v'] = self._velocities = []
         self._property_lists['atomID'] = self._atom_ids = []
@@ -61,10 +63,7 @@ class LAMMPSAtoms(Atoms):
         self._property_lists['NN'] = self._nearest_neighbors = []
         #self._forces = []
 
-        self._atomtypes = {}
-
         self._atom_tree = None
-
         if use_kdtree and has_kdtree is False:
             use_kdtree = False
         self._use_kdtree = use_kdtree
