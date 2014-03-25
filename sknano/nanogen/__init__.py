@@ -6,11 +6,14 @@ Package for generating nano-structures (:mod:`sknano.nanogen`)
 
 .. currentmodule:: sknano.nanogen
 
-sknano package for generating nano-structures including graphene,
+Collection of modules for generating nano-structures including graphene,
 bi-layer graphene, :math:`N`-layer graphene,
 single-walled nanotubes (:abbr:`SWNTs (single-walled nanotubes)`),
 multi-walled nanotubes (:abbr:`MWNTs (multi-walled nanotubes)`),
 and bundles of :abbr:`SWNTs` and :abbr:`MWNTs`.
+
+See the individual class doc pages for detailed documentation and
+examples on how to use them.
 
 .. note::
    The default basis atoms are both carbon and therefore the default
@@ -37,7 +40,17 @@ and bundles of :abbr:`SWNTs` and :abbr:`MWNTs`.
 .. versionadded:: 0.2.4
    `NanotubeBundleGenerator` implemented.
 
-.. seealso:: CLI module :py:mod:`sknano.scripts.nanogen`
+.. seealso::
+
+   CLI script: :mod:`sknano.scripts.nanogen`
+      The :mod:`~sknano.scripts.nanogen` script provides a
+      :abbr:`CLI (command-line interface)` to the `nanogen` structure
+      generator classes.
+
+   GUI front-end: :mod:`sknano.scripts.nanogenui`
+      The :mod:`~sknano.scripts.nanogenui` script launches a
+      :abbr:`GUI (graphical user interface)` front-end to the
+      `nanogen` structure generator classes.
 
 Contents
 ========
