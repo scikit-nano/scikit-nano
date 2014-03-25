@@ -34,13 +34,13 @@ class Atom(object):
 
     """
 
-    def __init__(self, element=None, mass=None, x=None, y=None, z=None):
-
-        self._symbol = None
-        self._Z = None
-        self._m = None
+    def __init__(self, element=None, m=None, x=None, y=None, z=None):
 
         self._r = Vector(x=x, y=y, z=z)
+
+        self._m = None
+        self._symbol = None
+        self._Z = None
 
         if isinstance(element, (int, float)):
             self._Z = int(element)
@@ -60,30 +60,28 @@ class Atom(object):
         else:
             self._symbol = None
             self._Z = None
-            if mass is not None and isinstance(mass, (int, float)):
+            if m is not None and isinstance(m, (int, float)):
                 try:
-                    if isinstance(mass, float):
-                        self._symbol = atomic_mass_symbol_map[mass]
-                    elif isinstance(mass, int):
-                        self._symbol = atomic_number_symbol_map[int(mass / 2)]
+                    if isinstance(m, float):
+                        self._symbol = atomic_mass_symbol_map[m]
+                    elif isinstance(m, int):
+                        self._symbol = atomic_number_symbol_map[int(m / 2)]
                     self._Z = atomic_numbers[self._symbol]
                     self._m = atomic_masses[self._symbol]
                 except KeyError:
                     self._symbol = None
                     self._Z = None
-                    self._m = mass
+                    self._m = m
             else:
                 self._m = 0
 
-        self._attributes = ['symbol', 'Z', 'm', 'r']
-
         self._atomdict = OrderedDict()
-        self._atomdict['symbol'] = self._symbol
-        self._atomdict['Z'] = self._Z
-        self._atomdict['m'] = self._m
+        self._atomdict['element'] = self._symbol
         self._atomdict['x'] = self._r.x
         self._atomdict['y'] = self._r.y
         self._atomdict['z'] = self._r.z
+
+        self._attributes = ['symbol', 'Z', 'm', 'r']
 
     def __str__(self):
         """Return string representation of atom."""
@@ -108,6 +106,17 @@ class Atom(object):
             Atomic number :math:`Z`.
         """
         return self._Z
+
+    @property
+    def element(self):
+        """Element symbol.
+
+        Returns
+        -------
+        str
+            Element symbol.
+        """
+        return self.symbol
 
     @property
     def symbol(self):
