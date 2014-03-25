@@ -16,7 +16,7 @@ import os
 import numpy as np
 
 #from ..chemistry import Atom
-from .atoms import LAMMPSAtom as Atom
+from .atoms import LAMMPSAtom as Atom, LAMMPSAtoms
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureWriter, \
@@ -105,7 +105,7 @@ class DATAReader(StructureReader):
     def __init__(self, fpath=None, atom_style='full'):
         super(DATAReader, self).__init__(fpath=fpath)
 
-        #self._structure_atoms = LAMMPSAtoms()
+        self._structure_atoms = LAMMPSAtoms()
 
         data_format = DATAFormat(atom_style=atom_style)
         self._data_headers = data_format.properties['headers']
@@ -494,10 +494,11 @@ class DATA2XYZConverter(StructureConverter):
         `XYZReader` (only if `return_reader` is True)
 
         """
+        from .atoms import AtomsConverter
         from ._xyz_format import XYZReader, XYZWriter
 
         datareader = DATAReader(fpath=self.infile)
-        atoms = datareader.atoms
+        atoms = AtomsConverter(atoms=datareader.atoms, to='xyz').atoms
         comment_line = datareader.comment_line
 
         XYZWriter.write(fname=self.outfile, atoms=atoms,

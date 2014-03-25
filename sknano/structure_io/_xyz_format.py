@@ -12,7 +12,8 @@ __docformat__ = 'restructuredtext en'
 
 import os
 
-from ..chemistry import Atom
+#from ..chemistry import Atom
+from .atoms import XYZAtom as Atom, XYZAtoms
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureReaderError, \
@@ -33,6 +34,8 @@ class XYZReader(StructureReader):
     """
     def __init__(self, fpath=None):
         super(XYZReader, self).__init__(fpath=fpath)
+
+        self._structure_atoms = XYZAtoms()
 
         if fpath is not None:
             self.read()
@@ -219,11 +222,13 @@ class XYZ2DATAConverter(StructureConverter):
         `DATAReader` (only if `return_reader` is True)
 
         """
+        from .atoms import AtomsConverter
         from ._lammps_data_format import DATAReader, DATAWriter
 
         xyzreader = XYZReader(fpath=self.infile)
-        atoms = xyzreader.atoms
+        atoms = AtomsConverter(atoms=xyzreader.atoms, to='lammps').atoms
         comment_line = xyzreader.comment_line
+
         if self._add_new_atoms:
             atoms.extend(self._new_atoms)
         if self._add_new_atomtypes:
