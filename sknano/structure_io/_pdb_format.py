@@ -48,21 +48,26 @@ class PDBWriter(StructureWriter):
     """Class for writing pdb chemical file format."""
 
     @classmethod
-    def write(cls, fname=None, outpath=None, atoms=None, comment_line=None):
+    def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
+              comment_line=None):
         """Write structure data to file.
 
         Parameters
         ----------
-        fname : str
+        fname : str, optional
+            Output file name.
         outpath : str, optional
-            Output path for structure data file.
+            Output file path.
+        fpath : str, optional
+            Full path (directory path + file name) to output data file.
         atoms : :py:class:`~sknano.structure_io.atoms.Atoms`
             An :py:class:`~sknano.structure_io.atoms.Atoms` instance.
         comment_line : str, optional
 
         """
-        fpath = get_fpath(fname=fname, ext='pdb', outpath=outpath,
-                          overwrite=True, add_fnum=False)
+        if fpath is None:
+            fpath = get_fpath(fname=fname, ext='pdb', outpath=outpath,
+                              overwrite=True, add_fnum=False)
         if comment_line is None:
             comment_line = default_comment_line
 
