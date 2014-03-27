@@ -16,7 +16,72 @@ from ...tools import check_type, Vector
 
 from ._atom import Atom
 
-__all__ = ['LAMMPSAtom']
+__all__ = ['LAMMPSAtom', 'lammps_atom_styles']
+
+
+lammps_atom_styles = {}
+lammps_atom_styles['angle'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['atomic'] = \
+    ['atom-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['body'] = \
+    ['atom-ID', 'atom-type', 'bodyflag', 'mass',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['bond'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['charge'] = \
+    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['dipole'] = \
+    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z',
+     'mux', 'muy', 'muz', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['electron'] = \
+    ['atom-ID', 'atom-type', 'q', 'spin', 'eradius',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['ellipsoid'] = \
+    ['atom-ID', 'atom-type', 'ellipsoidflag', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['full'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'q',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['line'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'lineflag', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['meso'] = \
+    ['atom-ID', 'atom-type', 'rho', 'e', 'cv',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['molecular'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['peri'] = \
+    ['atom-ID', 'atom-type', 'volume', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['sphere'] = \
+    ['atom-ID', 'atom-type', 'diameter', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['template'] = \
+    ['atom-ID', 'molecule-ID', 'template-index', 'template-atom',
+     'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['tri'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'triangleflag', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['wavepacket'] = \
+    ['atom-ID', 'atom-type', 'charge', 'spin', 'eradius', 'etag',
+     'cs_re', 'cs_im', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
 
 class LAMMPSAtom(Atom):
