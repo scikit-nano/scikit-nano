@@ -15,8 +15,7 @@ import os
 
 import numpy as np
 
-#from ..chemistry import Atom
-from .atoms import LAMMPSAtom as Atom, LAMMPSAtoms
+from .atoms import LAMMPSAtom as Atom, LAMMPSAtoms, lammps_atom_styles
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureWriter, \
@@ -24,72 +23,7 @@ from ._structure_data import StructureReader, StructureWriter, \
     default_comment_line
 
 __all__ = ['DATAData', 'DATAReader', 'DATAWriter', 'DATA2XYZConverter',
-           'DATAFormat', 'DATAError', 'LAMMPSDATA', 'atom_style_map']
-
-
-atom_style_map = {}
-atom_style_map['angle'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_style_map['atomic'] = \
-    ['atom-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_style_map['body'] = \
-    ['atom-ID', 'atom-type', 'bodyflag', 'mass',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_style_map['bond'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_style_map['charge'] = \
-    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_style_map['dipole'] = \
-    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z',
-     'mux', 'muy', 'muz', 'nx', 'ny', 'nz']
-
-atom_style_map['electron'] = \
-    ['atom-ID', 'atom-type', 'q', 'spin', 'eradius',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_style_map['ellipsoid'] = \
-    ['atom-ID', 'atom-type', 'ellipsoidflag', 'density',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_style_map['full'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'q',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_style_map['line'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'lineflag', 'density',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_style_map['meso'] = \
-    ['atom-ID', 'atom-type', 'rho', 'e', 'cv',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_style_map['molecular'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_style_map['peri'] = \
-    ['atom-ID', 'atom-type', 'volume', 'density',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_style_map['sphere'] = \
-    ['atom-ID', 'atom-type', 'diameter', 'density',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_style_map['template'] = \
-    ['atom-ID', 'molecule-ID', 'template-index', 'template-atom',
-     'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_style_map['tri'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'triangleflag', 'density',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_style_map['wavepacket'] = \
-    ['atom-ID', 'atom-type', 'charge', 'spin', 'eradius', 'etag',
-     'cs_re', 'cs_im', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+           'DATAFormat', 'DATAError', 'LAMMPSDATA']
 
 
 class DATAReader(StructureReader):
@@ -657,72 +591,10 @@ class DATAFormat(StructureFormat):
         self._section_properties = OrderedDict()
 
         atoms_section_syntax = {}
-        atoms_section_syntax['angle'] = \
-            ['atomID', 'moleculeID', 'atomtype',
-             'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-        atoms_section_syntax['atomic'] = \
-            ['atomID', 'atomtype', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-        atoms_section_syntax['body'] = \
-            ['atomID', 'atomtype', 'bodyflag', 'mass',
-             'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-        atoms_section_syntax['bond'] = \
-            ['atomID', 'moleculeID', 'atomtype',
-             'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-        atoms_section_syntax['charge'] = \
-            ['atomID', 'atomtype', 'q',
-             'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-        atoms_section_syntax['dipole'] = \
-            ['atomID', 'atomtype', 'q', 'x', 'y', 'z',
-             'mux', 'muy', 'muz', 'nx', 'ny', 'nz']
-
-        atoms_section_syntax['electron'] = \
-            ['atomID', 'atomtype', 'q', 'spin', 'eradius', 'x', 'y', 'z',
-             'nx', 'ny', 'nz']
-
-        atoms_section_syntax['ellipsoid'] = \
-            ['atomID', 'atomtype', 'ellipsoidflag', 'density',
-             'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-        atoms_section_syntax['full'] = \
-            ['atomID', 'moleculeID', 'atomtype', 'q',
-             'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-        atoms_section_syntax['line'] = \
-            ['atomID', 'moleculeID', 'atomtype', 'lineflag', 'density',
-             'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-        atoms_section_syntax['meso'] = \
-            ['atomID', 'atomtype', 'rho', 'e', 'cv',
-             'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-        atoms_section_syntax['molecular'] = \
-            ['atomID', 'moleculeID', 'atomtype',
-             'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-        atoms_section_syntax['peri'] = \
-            ['atomID', 'atomtype', 'volume', 'density',
-             'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-        atoms_section_syntax['sphere'] = \
-            ['atomID', 'atomtype', 'diameter', 'density',
-             'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-        atoms_section_syntax['template'] = \
-            ['atomID', 'moleculeID', 'template-index', 'template-atom',
-             'atomtype', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-        atoms_section_syntax['tri'] = \
-            ['atomID', 'moleculeID', 'atomtype', 'triangleflag', 'density',
-             'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-        atoms_section_syntax['wavepacket'] = \
-            ['atomID', 'atomtype', 'charge', 'spin', 'eradius', 'etag',
-             'cs_re', 'cs_im', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+        for atom_style, var_list in lammps_atom_styles.iteritems():
+            atoms_section_syntax[atom_style] = []
+            for var in var_list:
+                atoms_section_syntax[atom_style].append(var.replace('-', ''))
 
         velocities_section_syntax = {}
         velocities_section_syntax['full'] = ['atomID', 'vx', 'vy', 'vz']
@@ -748,39 +620,47 @@ class DATAFormat(StructureFormat):
                      'colnum': i+1,
                      'index': i}
 
-        self._header_keys = ["atoms",
-                             "atom types",
-                             "bonds",
-                             "bond types",
-                             "angles",
-                             "angle types",
-                             "dihedrals",
-                             "dihedral types",
-                             "impropers",
-                             "improper types",
-                             "bodies",
-                             "ellipsoids",
-                             "lines",
-                             "triangles",
-                             "xlo xhi",
-                             "ylo yhi",
-                             "zlo zhi",
-                             "xy xz yz"]
+        self._header_keys = ['atoms',
+                             'bonds',
+                             'angles',
+                             'dihedrals',
+                             'impropers',
+                             'atom types',
+                             'bond types',
+                             'angle types',
+                             'dihedral types',
+                             'improper types',
+                             'extra bond per atom',
+                             'extra angle per atom',
+                             'extra dihedral per atom',
+                             'extra improper per atom',
+                             'ellipsoids',
+                             'lines',
+                             'triangles',
+                             'bodies',
+                             'xlo xhi',
+                             'ylo yhi',
+                             'zlo zhi',
+                             'xy xz yz']
 
         self._headers = {'atoms': {'dtype': int, 'items': 1},
-                         'atom types': {'dtype': int, 'items': 1},
                          'bonds': {'dtype': int, 'items': 1},
-                         'bond types': {'dtype': int, 'items': 1},
                          'angles': {'dtype': int, 'items': 1},
-                         'angle types': {'dtype': int, 'items': 1},
                          'dihedrals': {'dtype': int, 'items': 1},
-                         'dihedral types': {'dtype': int, 'items': 1},
                          'impropers': {'dtype': int, 'items': 1},
+                         'atom types': {'dtype': int, 'items': 1},
+                         'bond types': {'dtype': int, 'items': 1},
+                         'angle types': {'dtype': int, 'items': 1},
+                         'dihedral types': {'dtype': int, 'items': 1},
                          'improper types': {'dtype': int, 'items': 1},
-                         'bodies': {'dtype': int, 'items': 1},
+                         'extra bond per atom': {'dtype': int, 'items': 1},
+                         'extra angle per atom': {'dtype': int, 'items': 1},
+                         'extra dihedral per atom': {'dtype': int, 'items': 1},
+                         'extra improper per atom': {'dtype': int, 'items': 1},
                          'ellipsoids': {'dtype': int, 'items': 1},
                          'lines': {'dtype': int, 'items': 1},
                          'triangles': {'dtype': int, 'items': 1},
+                         'bodies': {'dtype': int, 'items': 1},
                          'xlo xhi': {'dtype': float, 'items': 2},
                          'ylo yhi': {'dtype': float, 'items': 2},
                          'zlo zhi': {'dtype': float, 'items': 2},
