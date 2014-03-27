@@ -244,7 +244,7 @@ class XYZ2DATAConverter(StructureConverter):
         else:
             boxbounds = self._boxbounds
 
-        DATAWriter.write(fname=self.outfile, atoms=atoms,
+        DATAWriter.write(fpath=self.outfile, atoms=atoms,
                          boxbounds=boxbounds, comment_line=comment_line,
                          pad_box=self._pad_box, xpad=self._xpad,
                          ypad=self._ypad, zpad=self._zpad)

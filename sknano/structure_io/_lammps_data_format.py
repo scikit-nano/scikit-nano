@@ -501,7 +501,7 @@ class DATA2XYZConverter(StructureConverter):
         atoms = AtomsConverter(atoms=datareader.atoms, to='xyz').atoms
         comment_line = datareader.comment_line
 
-        XYZWriter.write(fname=self.outfile, atoms=atoms,
+        XYZWriter.write(fpath=self.outfile, atoms=atoms,
                         comment_line=comment_line)
 
         if return_reader:
