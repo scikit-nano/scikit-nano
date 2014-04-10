@@ -23,7 +23,7 @@ except ImportError:
     Qty = None
 
 from ..chemistry import Atom
-from ..tools.refdata import CCbond, dVDW
+from ..tools.refdata import CCbond, dVDW, grams_per_Da
 
 from ._parameter_luts import param_units, param_symbols, param_strfmt
 
@@ -102,14 +102,12 @@ class Nanotube(object):
     d: 10
     dR: 30
     N: 20
-    M: 10
     R: (1, 0)
-    bond: 1.421 Å
+    θc: 30.00°
     Ch: 42.63 Å
     T: 2.46 Å
     dt: 13.57 Å
     rt: 6.78 Å
-    θc: 30.00°
 
     Change the chirality to :math:`\\mathbf{C}_{h} = (20, 10)`.
 
@@ -121,14 +119,12 @@ class Nanotube(object):
     d: 10
     dR: 10
     N: 140
-    M: 30
     R: (1, -1)
-    bond: 1.421 Å
+    θc: 19.11°
     Ch: 65.12 Å
     T: 11.28 Å
     dt: 20.73 Å
     rt: 10.36 Å
-    θc: 19.11°
 
     Change the chirality to :math:`\\mathbf{C}_{h} = (20, 0)`.
 
@@ -140,14 +136,12 @@ class Nanotube(object):
     d: 20
     dR: 20
     N: 40
-    M: 20
     R: (1, -1)
-    bond: 1.421 Å
+    θc: 0.00°
     Ch: 49.22 Å
     T: 4.26 Å
     dt: 15.67 Å
     rt: 7.83 Å
-    θc: 0.00°
 
     """
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1, element1='C',
@@ -169,9 +163,9 @@ class Nanotube(object):
         self._params['d'] = {}
         self._params['dR'] = {}
         self._params['N'] = {}
-        self._params['M'] = {}
+        #self._params['M'] = {}
         self._params['R'] = {}
-        self._params['bond'] = {}
+        #self._params['bond'] = {}
         self._params['chiral_angle'] = {}
         self._params['Ch'] = {}
         self._params['T'] = {}
@@ -216,9 +210,9 @@ class Nanotube(object):
         self._t1 = None
         self._t2 = None
         self._N = None
+        self._chiral_angle = None
         self._Ch = None
         self._T = None
-        self._chiral_angle = None
         self._dt = None
         self._rt = None
         self._M = None
@@ -229,6 +223,7 @@ class Nanotube(object):
         self._electronic_type = None
         self._Natoms = None
         self._Natoms_per_tube = None
+        self._linear_mass_density = None
 
         self._Ntubes = 1
         self._nx = int(nx)
@@ -276,17 +271,27 @@ class Nanotube(object):
         self._t2 = self.compute_t2(n=self._n, m=self._m)
 
         # Compute geometric/physical properties
-        self._chiral_angle = self.compute_chiral_angle(n=self._n, m=self._m)
-        self._Ch = self.compute_Ch(n=self._n, m=self._m, bond=self._bond,
-                                   with_units=self._with_units)
-        self._T = self.compute_T(n=self._n, m=self._m, bond=self._bond,
-                                 with_units=self._with_units)
-        self._dt = self.compute_dt(n=self._n, m=self._m, bond=self._bond,
-                                   with_units=self._with_units)
-        self._rt = self.compute_rt(n=self._n, m=self._m, bond=self._bond,
-                                   with_units=self._with_units)
+        self._chiral_angle = \
+            self.compute_chiral_angle(n=self._n, m=self._m)
 
-        self._M = self.compute_M(n=self._n, m=self._m)
+        self._Ch = \
+            self.compute_Ch(n=self._n, m=self._m, bond=self._bond,
+                            with_units=self._with_units)
+
+        self._T = \
+            self.compute_T(n=self._n, m=self._m, bond=self._bond,
+                           with_units=self._with_units)
+
+        self._dt = \
+            self.compute_dt(n=self._n, m=self._m, bond=self._bond,
+                            with_units=self._with_units)
+
+        self._rt = \
+            self.compute_rt(n=self._n, m=self._m, bond=self._bond,
+                            with_units=self._with_units)
+
+        self._M = \
+            self.compute_M(n=self._n, m=self._m)
 
         self._Lx = \
             self.compute_Lx(n=self._n, m=self._m, nx=self._nx, bond=self._bond,
@@ -299,6 +304,7 @@ class Nanotube(object):
         self._Lz = \
             self.compute_Lz(n=self._n, m=self._m, nz=self._nz, bond=self._bond,
                             with_units=self._with_units)
+
         self._tube_mass = \
             self.compute_tube_mass(n=self._n, m=self._m, nz=self._nz,
                                    element1=self._element1,
@@ -308,13 +314,24 @@ class Nanotube(object):
             self.compute_electronic_type(n=self._n, m=self._m)
 
         # Compute symmetry properties
-        self._R = self.compute_R(n=self._n, m=self._m)
+        self._R = \
+            self.compute_R(n=self._n, m=self._m)
 
         # Compute atomistic properties
-        self._N = self.compute_N(n=self._n, m=self._m)
-        self._Natoms = self.compute_Natoms(n=self._n, m=self._m)
+        self._N = \
+            self.compute_N(n=self._n, m=self._m)
+
+        self._Natoms = \
+            self.compute_Natoms(n=self._n, m=self._m)
+
         self._Natoms_per_tube = \
             self.compute_Natoms_per_tube(n=self._n, m=self._m, nz=self._nz)
+
+        self._linear_mass_density = \
+            self.compute_linear_mass_density(n=self._n, m=self._m, nz=self._nz,
+                                             element1=self._element1,
+                                             element2=self._element2,
+                                             with_units=self._with_units)
 
         for k, v in self.__dict__.iteritems():
             p = k.strip('_')
@@ -1434,6 +1451,50 @@ class Nanotube(object):
         return int(Natoms * nz)
 
     @property
+    def linear_mass_density(self):
+        """Linear mass density of nanotube in g/nm."""
+        return self._linear_mass_density
+
+    @classmethod
+    def compute_linear_mass_density(cls, n=int, m=int, nz=float,
+                                    element1=None, element2=None,
+                                    with_units=False, units='grams/nm',
+                                    magnitude=True):
+        """Compute nanotube linear mass density (mass per unit length) in
+        **grams/nm**.
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        nz : {int, float}
+            Number of nanotube unit cells
+        element1, element2 : {str, int}, optional
+            Element symbol or atomic number of basis
+            :class:`~sknano.chemistry.Atoms` 1 and 2
+        bond : float, optional
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite:
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.421` \u212b ([SoFaCNTs]_)
+        with_units : bool, optional
+            Attach `units` to physical quantities.
+            **This parameter is not yet fully implemented or supported.
+            Use at your own risk!**
+        units : None, optional
+            System of physical units to attach to quantities.
+            **This parameter is not yet fully implemented or supported.
+            Use at your own risk!**
+
+        Returns
+        -------
+        float
+
+        """
+        pass
+
+    @property
     def Ntubes(self):
         """Number of nanotubes."""
         return int(self._Ntubes)
@@ -1489,6 +1550,22 @@ class Nanotube(object):
             :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         nz : {int, float}
             Number of nanotube unit cells
+        element1, element2 : {str, int}, optional
+            Element symbol or atomic number of basis
+            :class:`~sknano.chemistry.Atoms` 1 and 2
+        bond : float, optional
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite:
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.421` \u212b ([SoFaCNTs]_)
+        with_units : bool, optional
+            Attach `units` to physical quantities.
+            **This parameter is not yet fully implemented or supported.
+            Use at your own risk!**
+        units : None, optional
+            System of physical units to attach to quantities.
+            **This parameter is not yet fully implemented or supported.
+            Use at your own risk!**
 
         Returns
         -------
@@ -1518,13 +1595,16 @@ class Nanotube(object):
         if with_units and Qty is not None:
             mass = Qty(mass, 'Da')
             mass.ito(units)
-
-        if magnitude and with_units:
-            try:
-                return mass.magnitude
-            except AttributeError:
+            if magnitude:
+                try:
+                    return mass.magnitude
+                except AttributeError:
+                    return mass
+            else:
                 return mass
         else:
+            # there are 1.6605e-24 grams / Da
+            mass *= grams_per_Da
             return mass
 
 
@@ -1792,7 +1872,7 @@ class NanotubeBundle(Nanotube):
                 return bundle_density
         else:
             # there are 1.6605e-24 grams / Da and 1e-8 cm / angstrom
-            bundle_density *= 1.6605e-24 / (1e-8)**3
+            bundle_density *= grams_per_Da / (1e-8)**3
             return bundle_density
 
     @property
