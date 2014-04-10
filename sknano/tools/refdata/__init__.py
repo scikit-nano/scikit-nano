@@ -28,12 +28,17 @@ Periodic table of elements data
 
 .. autodata:: C_H
 
-"""
-from __future__ import division, absolute_import, print_function
+.. autodata:: grams_per_amu
 
-__docformat__ = 'restructuredtext'
+.. autodata:: grams_per_Da
+
+"""
+from __future__ import absolute_import, division, print_function
+
+__docformat__ = 'restructuredtext en'
 
 from ._constants import *
+from ._conversion_factors import *
 from ._periodic_table import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
