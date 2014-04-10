@@ -11,8 +11,32 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 from fractions import gcd
+import operator
 
-__all__ = ['totient_func']
+__all__ = ['comparison_symbol_operator_mappings',
+           'math_symbol_operator_mappings',
+           'symbol_operator_mappings',
+           'totient_func']
+
+symbol_operator_mappings = {}
+
+comparison_symbol_operator_mappings = \
+    {'==': operator.eq,
+     '!=': operator.ne,
+     '<': operator.lt,
+     '<=': operator.le,
+     '>': operator.gt,
+     '>=': operator.ge,
+     'is': operator.is_,
+     'is not': operator.is_not}
+symbol_operator_mappings.update(comparison_symbol_operator_mappings)
+
+math_symbol_operator_mappings = \
+    {'+': operator.add,
+     '-': operator.sub,
+     '*': operator.mul,
+     '/': operator.div}
+symbol_operator_mappings.update(math_symbol_operator_mappings)
 
 
 def totient_func(n=int):
