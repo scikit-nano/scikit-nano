@@ -46,8 +46,8 @@ class Nanotube(object):
     bond : float, optional
         Distance between nearest neighbor atoms (i.e., bond length).
         Must be in units of **\u212b**. Default value is
-        the carbon-carbon bond length in graphite:
-        :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.421` \u212b ([SoFaCNTs]_)
+        the carbon-carbon bond length in graphite, approximately
+        :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
     Lx, Ly, Lz : float, optional
         Spatial extent of nanotube(s) in :math:`x, y, z` dimensions
         in units of **nanometers**. By construction, the nanotube is oriented
@@ -81,11 +81,6 @@ class Nanotube(object):
         Use at your own risk!**
     verbose : bool, optional
         verbose output
-
-    References
-    ----------
-    .. [SoFaCNTs] Science of Fullerenes and Carbon Nanotubes,
-       M. Dresselhaus, G. Dresselhaus, P. Eklund, 1996, p. 760.
 
     Examples
     --------
@@ -1476,8 +1471,8 @@ class Nanotube(object):
         bond : float, optional
             Distance between nearest neighbor atoms (i.e., bond length).
             Must be in units of **\u212b**. Default value is
-            the carbon-carbon bond length in graphite:
-            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.421` \u212b ([SoFaCNTs]_)
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
         with_units : bool, optional
             Attach `units` to physical quantities.
             **This parameter is not yet fully implemented or supported.
@@ -1556,8 +1551,8 @@ class Nanotube(object):
         bond : float, optional
             Distance between nearest neighbor atoms (i.e., bond length).
             Must be in units of **\u212b**. Default value is
-            the carbon-carbon bond length in graphite:
-            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.421` \u212b ([SoFaCNTs]_)
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
         with_units : bool, optional
             Attach `units` to physical quantities.
             **This parameter is not yet fully implemented or supported.
@@ -1624,8 +1619,8 @@ class NanotubeBundle(Nanotube):
     bond : float, optional
         Bond length between nearest neighbor atoms.
         Must be in units of **\u212b**. Default value is
-        the carbon-carbon bond length in graphite:
-        :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.421` \u212b ([SoFaCNTs]_)
+        the carbon-carbon bond length in graphite, approximately
+        :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
     Lx, Ly, Lz : float, optional
         Length of bundle in :math:`x, y, z` dimensions in **nanometers**.
         Overrides the :math:`n_x, n_y, n_z` cell values.
