@@ -218,7 +218,10 @@ class Nanotube(object):
         self._electronic_type = None
         self._Natoms = None
         self._Natoms_per_tube = None
+
+        self._unit_cell_mass = None
         self._linear_mass_density = None
+        self._tube_mass = None
 
         self._Ntubes = 1
         self._nx = int(nx)
@@ -300,6 +303,12 @@ class Nanotube(object):
             self.compute_Lz(n=self._n, m=self._m, nz=self._nz, bond=self._bond,
                             with_units=self._with_units)
 
+        self._unit_cell_mass = \
+            self.compute_unit_cell_mass(n=self._n, m=self._m,
+                                        element1=self._element1,
+                                        element2=self._element2,
+                                        with_units=self._with_units)
+
         self._tube_mass = \
             self.compute_tube_mass(n=self._n, m=self._m, nz=self._nz,
                                    element1=self._element1,
@@ -323,7 +332,7 @@ class Nanotube(object):
             self.compute_Natoms_per_tube(n=self._n, m=self._m, nz=self._nz)
 
         self._linear_mass_density = \
-            self.compute_linear_mass_density(n=self._n, m=self._m, nz=self._nz,
+            self.compute_linear_mass_density(n=self._n, m=self._m,
                                              element1=self._element1,
                                              element2=self._element2,
                                              with_units=self._with_units)
@@ -725,10 +734,12 @@ class Nanotube(object):
         bond : float, optional
             Distance between nearest neighbor atoms.
             Must be in units of **\u212b**.
-        units : str, optional
         with_units : bool, optional
+        units : str, optional
         length : bool, optional
+            Compute the magnitude (i.e., length) of the translation vector.
         magnitude : bool, optional
+            Return the length of the translation vector **without** units.
 
         Returns
         -------
@@ -1446,12 +1457,74 @@ class Nanotube(object):
         return int(Natoms * nz)
 
     @property
+    def unit_cell_mass(self):
+        """Unit cell mass in atomic mass units."""
+        return self._unit_cell_mass
+
+    @classmethod
+    def compute_unit_cell_mass(cls, n=int, m=int, element1=None, element2=None,
+                               with_units=False, units='Da', magnitude=True):
+        """Compute nanotube unit cell mass in atomic mass units.
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        element1, element2 : {str, int}, optional
+            Element symbol or atomic number of basis
+            :class:`~sknano.chemistry.Atoms` 1 and 2
+        with_units : bool, optional
+            Attach `units` to physical quantities.
+            **This parameter is not yet fully implemented or supported.
+            Use at your own risk!**
+        units : None, optional
+            System of physical units to attach to quantities.
+            **This parameter is not yet fully implemented or supported.
+            Use at your own risk!**
+
+        Returns
+        -------
+        float
+
+        Notes
+        -----
+
+        .. todo::
+
+           Handle different elements and perform accurate calculation by
+           determining number of atoms of each element.
+
+        """
+        N = Nanotube.compute_N(n=n, m=m)
+
+        if element1 is None:
+            element1 = 'C'
+        if element2 is None:
+            element2 = 'C'
+
+        mass = N * (Atom(element1).m + Atom(element2).m)
+        if with_units and Qty is not None:
+            mass = Qty(mass, 'Da')
+            if units is not None and units not in ('Da', 'amu'):
+                mass.ito(units)
+            if magnitude:
+                try:
+                    return mass.magnitude
+                except AttributeError:
+                    return mass
+            else:
+                return mass
+        else:
+            return mass
+
+    @property
     def linear_mass_density(self):
         """Linear mass density of nanotube in g/nm."""
         return self._linear_mass_density
 
     @classmethod
-    def compute_linear_mass_density(cls, n=int, m=int, nz=float,
+    def compute_linear_mass_density(cls, n=int, m=int, bond=None,
                                     element1=None, element2=None,
                                     with_units=False, units='grams/nm',
                                     magnitude=True):
@@ -1463,8 +1536,6 @@ class Nanotube(object):
         n, m : int
             Chiral indices defining the nanotube chiral vector
             :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-        nz : {int, float}
-            Number of nanotube unit cells
         element1, element2 : {str, int}, optional
             Element symbol or atomic number of basis
             :class:`~sknano.chemistry.Atoms` 1 and 2
@@ -1484,10 +1555,34 @@ class Nanotube(object):
 
         Returns
         -------
-        float
+        linear_mass_density : float
 
         """
-        pass
+        mass = Nanotube.compute_unit_cell_mass(n=n, m=m,
+                                               element1=element1,
+                                               element2=element2,
+                                               with_units=False)
+        T = Nanotube.compute_T(n=n, m=m, bond=bond,
+                               with_units=False, length=True)
+
+        linear_mass_density = mass / T
+
+        if with_units and Qty is not None:
+            linear_mass_density = Qty(linear_mass_density, 'Da/angstrom')
+            if units is not None:
+                linear_mass_density.ito(units)
+
+            if magnitude:
+                try:
+                    return linear_mass_density.magnitude
+                except AttributeError:
+                    return linear_mass_density
+            else:
+                return linear_mass_density
+        else:
+            # there are 1.6605e-24 grams / Da and 10 angstroms / nm
+            linear_mass_density *= 10 * grams_per_Da
+            return linear_mass_density
 
     @property
     def Ntubes(self):
@@ -1548,11 +1643,6 @@ class Nanotube(object):
         element1, element2 : {str, int}, optional
             Element symbol or atomic number of basis
             :class:`~sknano.chemistry.Atoms` 1 and 2
-        bond : float, optional
-            Distance between nearest neighbor atoms (i.e., bond length).
-            Must be in units of **\u212b**. Default value is
-            the carbon-carbon bond length in graphite, approximately
-            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
         with_units : bool, optional
             Attach `units` to physical quantities.
             **This parameter is not yet fully implemented or supported.
@@ -1589,7 +1679,8 @@ class Nanotube(object):
         mass = Natoms_per_tube * (atom1.m + atom2.m) / 2
         if with_units and Qty is not None:
             mass = Qty(mass, 'Da')
-            mass.ito(units)
+            if units is not None and units not in ('Da', 'amu'):
+                mass.ito(units)
             if magnitude:
                 try:
                     return mass.magnitude
@@ -1857,7 +1948,9 @@ class NanotubeBundle(Nanotube):
 
         if with_units and Qty is not None:
             bundle_density = Qty(bundle_density, 'Da/angstroms**3')
-            bundle_density.ito(units)
+            if units is not None:
+                bundle_density.ito(units)
+
             if magnitude:
                 try:
                     return bundle_density.magnitude
