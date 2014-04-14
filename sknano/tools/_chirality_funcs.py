@@ -227,8 +227,8 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
         list of n and m chiral indices
     ni, nf, dn : int
     mi, mf, dm : int
-    chiral_type : {None, 'all', 'achiral', 'chiral', 'armchair', 'zigzag'}
-    handedness : {None, 'all', 'left', 'right'}
+    chiral_type : {'all', 'achiral', 'chiral', 'armchair', 'zigzag'}, optional
+    handedness : {'all', 'left', 'right'}, optional
     echo_zsh_str : bool, optional
 
     Returns
@@ -383,4 +383,5 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
     finally:
         if echo_zsh_str and Ch_list is not None:
             print(' '.join([repr(str(Ch)) for Ch in Ch_list]))
+
         return Ch_list
