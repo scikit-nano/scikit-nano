@@ -23,6 +23,7 @@ except ImportError:
     Qty = None
 
 from ..chemistry import Atom
+from ..tools import comparison_symbol_operator_mappings
 from ..tools.refdata import CCbond, dVDW, grams_per_Da
 
 from ._parameter_luts import param_units, param_symbols, param_strfmt
@@ -641,8 +642,10 @@ class Nanotube(object):
             Chiral indices defining the nanotube chiral vector
             :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         bond : float, optional
-            Distance between nearest neighbor atoms.
-            Must be in units of **\u212b**.
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
 
         Returns
         -------
@@ -725,6 +728,8 @@ class Nanotube(object):
         .. math::
 
            |\\mathbf{T}| = \\frac{\\sqrt{3} |\\mathbf{C}_{h}|}{d_{R}}
+           = \\frac{\\sqrt{3}a\\sqrt{n^2 + m^2 + nm}}{d_{R}}
+           = \\frac{3a_{\\mathrm{CC}}\\sqrt{n^2 + m^2 + nm}}{d_{R}}
 
         Parameters
         ----------
@@ -732,28 +737,34 @@ class Nanotube(object):
             Chiral indices defining the nanotube chiral vector
             :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         bond : float, optional
-            Distance between nearest neighbor atoms.
-            Must be in units of **\u212b**.
-        with_units : bool, optional
-        units : str, optional
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
         length : bool, optional
             Compute the magnitude (i.e., length) of the translation vector.
         magnitude : bool, optional
             Return the length of the translation vector **without** units.
+        with_units : bool, optional
+        units : str, optional
 
         Returns
         -------
         float or Qty or 2-tuple of ints
             If `length` is `True` and `with_units` is `False`, then
             return the length of unit cell in \u212b.
+
             If `length` is `True` and `with_units` is `True` and
             magnitude is `True`, then return the length of unit cell
             as a float, but with units in `units`.
+
             If `length` is `True` and `with_units` is `True` and
             magnitude is `False`, then return the length of unit cell
             as a `Quantity` instance and with units in `units`.
+
             If `length` is `False`, return the componets of the
-            translation vector as a 2-tuple of ints (:math:`t_1`, :math:`t_2`).
+            translation vector as a 2-tuple of ints
+            (:math:`t_1`, :math:`t_2`).
 
         """
 
@@ -797,8 +808,10 @@ class Nanotube(object):
             Chiral indices defining the nanotube chiral vector
             :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         bond : float, optional
-            Distance between nearest neighbor atoms.
-            Must be in units of **\u212b**.
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
 
         Returns
         -------
@@ -832,8 +845,10 @@ class Nanotube(object):
             Chiral indices defining the nanotube chiral vector
             :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         bond : float, optional
-            Distance between nearest neighbor atoms.
-            Must be in units of **\u212b**.
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
 
         Returns
         -------
@@ -916,6 +931,11 @@ class Nanotube(object):
         n, m : int
             Chiral indices defining the nanotube chiral vector
             :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        bond : float, optional
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
         length : bool, optional
             If `True`, return :math:`|\\mathbf{R}|`.
         magnitude : bool, optional
@@ -995,8 +1015,7 @@ class Nanotube(object):
             return theta
 
     @classmethod
-    def compute_so(cls, n=int, m=int, bond=None, with_units=False,
-                   units='angstrom', magnitude=True):
+    def compute_so(cls, n=int, m=int, bond=None):
         u"""Compute symmetry operation :math:`(\\psi|\\tau)`.
 
         The *symmetry vector* `R` represents a *symmetry
@@ -1015,10 +1034,10 @@ class Nanotube(object):
             Chiral indices defining the nanotube chiral vector
             :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         bond : float, optional
-            Distance between nearest neighbor atoms.
-            Must be in units of **\u212b**.
-        rad2deg : bool, optional
-            If `True`, return angle in degrees.
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
 
         Returns
         -------
@@ -1028,8 +1047,7 @@ class Nanotube(object):
 
         """
         psi = Nanotube.compute_psi(n=n, m=m)
-        tau = Nanotube.compute_tau(n=n, m=m, bond=bond, with_units=with_units,
-                                   units=units, magnitude=magnitude)
+        tau = Nanotube.compute_tau(n=n, m=m, bond=bond)
         return (psi, tau)
 
     @classmethod
@@ -1073,10 +1091,10 @@ class Nanotube(object):
             Chiral indices defining the nanotube chiral vector
             :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         bond : float, optional
-            Distance between nearest neighbor atoms.
-            Must be in units of **\u212b**.
-        rad2deg : bool, optional
-            If `True`, return angle in degrees.
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
 
         Returns
         -------
@@ -1147,7 +1165,10 @@ class Nanotube(object):
         nx : int
             Number of nanotubes along :math:`x`-axis.
         bond : float, optional
-            Bond length in **\u212b**.
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
 
         Returns
         -------
@@ -1196,7 +1217,10 @@ class Nanotube(object):
         ny : int
             Number of nanotubes along :math:`y`-axis.
         bond : float, optional
-            Bond length in **\u212b**.
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
 
         Returns
         -------
@@ -1252,7 +1276,10 @@ class Nanotube(object):
         nz : {int, float}
             Number of nanotube unit cells
         bond : float, optional
-            bond length in **\u212b**.
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
 
         Returns
         -------
@@ -1692,6 +1719,40 @@ class Nanotube(object):
             # there are 1.6605e-24 grams / Da
             mass *= grams_per_Da
             return mass
+
+    @classmethod
+    def filter_Ch_list(cls, Ch_list=None, property_filters=None):
+        """Filter list of chiralities by list of properties.
+
+        Parameters
+        ----------
+        Ch_list : sequence
+            List of chiralities
+        property_filters : sequence
+
+        """
+        if Ch_list is not None and property_filters is not None:
+            filtered_list = Ch_list[:]
+            try:
+                for filter_index, (prop, cmp_symbol, value) in \
+                        enumerate(property_filters, start=1):
+                    cmp_op = comparison_symbol_operator_mappings[cmp_symbol]
+                    tmp_list = []
+                    for Ch in filtered_list:
+                        n, m = Ch
+                        nanotube = Nanotube(n=n, m=m)
+                        try:
+                            if cmp_op(getattr(nanotube, prop), value):
+                                tmp_list.append(Ch)
+                        except AttributeError:
+                            break
+                    filtered_list = tmp_list[:]
+            except ValueError as e:
+                print(e)
+            finally:
+                return filtered_list
+        else:
+            return None
 
 
 class NanotubeBundle(Nanotube):
