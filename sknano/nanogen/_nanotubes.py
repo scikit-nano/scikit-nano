@@ -530,7 +530,10 @@ class Nanotube(object):
 
         """
         dR = Nanotube.compute_dR(n=n, m=m)
-        return int(2 * (n**2 + m**2 + n * m) / dR)
+        try:
+            return int(2 * (n**2 + m**2 + n * m) / dR)
+        except ZeroDivisionError:
+            return 0
 
     @property
     def t1(self):
@@ -574,7 +577,10 @@ class Nanotube(object):
 
         """
         dR = Nanotube.compute_dR(n=n, m=m)
-        return int((2 * m + n) / dR)
+        try:
+            return int((2 * m + n) / dR)
+        except ZeroDivisionError:
+            return 0
 
     @property
     def t2(self):
@@ -618,7 +624,10 @@ class Nanotube(object):
 
         """
         dR = Nanotube.compute_dR(n=n, m=m)
-        return -int((2 * n + m) / dR)
+        try:
+            return -int((2 * n + m) / dR)
+        except ZeroDivisionError:
+            return 0
 
     @property
     def Ch(self):
@@ -780,7 +789,10 @@ class Nanotube(object):
                                      magnitude=magnitude)
             dR = Nanotube.compute_dR(n=n, m=m)
 
-            return np.sqrt(3) * Ch / dR
+            try:
+                return np.sqrt(3) * Ch / dR
+            except ZeroDivisionError:
+                return 0
         else:
             t1 = Nanotube.compute_t1(n=n, m=m)
             t2 = Nanotube.compute_t2(n=n, m=m)
@@ -1073,7 +1085,10 @@ class Nanotube(object):
 
         """
         N = Nanotube.compute_N(n=n, m=m)
-        return 2 * np.pi / N
+        try:
+            return 2 * np.pi / N
+        except ZeroDivisionError:
+            return 0
 
     @classmethod
     def compute_tau(cls, n=int, m=int, bond=None, with_units=False,
@@ -1107,7 +1122,10 @@ class Nanotube(object):
         N = Nanotube.compute_N(n=n, m=m)
         T = Nanotube.compute_T(n=n, m=m, bond=bond, with_units=with_units,
                                units=units, length=True, magnitude=magnitude)
-        return M * T / N
+        try:
+            return M * T / N
+        except ZeroDivisionError:
+            return 0
 
     @property
     def nx(self):
@@ -1592,24 +1610,27 @@ class Nanotube(object):
         T = Nanotube.compute_T(n=n, m=m, bond=bond,
                                with_units=False, length=True)
 
-        linear_mass_density = mass / T
+        try:
+            linear_mass_density = mass / T
 
-        if with_units and Qty is not None:
-            linear_mass_density = Qty(linear_mass_density, 'Da/angstrom')
-            if units is not None:
-                linear_mass_density.ito(units)
+            if with_units and Qty is not None:
+                linear_mass_density = Qty(linear_mass_density, 'Da/angstrom')
+                if units is not None:
+                    linear_mass_density.ito(units)
 
-            if magnitude:
-                try:
-                    return linear_mass_density.magnitude
-                except AttributeError:
+                if magnitude:
+                    try:
+                        return linear_mass_density.magnitude
+                    except AttributeError:
+                        return linear_mass_density
+                else:
                     return linear_mass_density
             else:
+                # there are 1.6605e-24 grams / Da and 10 angstroms / nm
+                linear_mass_density *= 10 * grams_per_Da
                 return linear_mass_density
-        else:
-            # there are 1.6605e-24 grams / Da and 10 angstroms / nm
-            linear_mass_density *= 10 * grams_per_Da
-            return linear_mass_density
+        except ZeroDivisionError:
+            return 0
 
     @property
     def Ntubes(self):
