@@ -12,9 +12,10 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
+from ._nanotubes import Nanotube
 from ..tools import chiral_type_name_mappings as Ch_types
 
-__all__ = ['generate_Ch_list']
+__all__ = ['generate_Ch_list', 'generate_Ch_property_grid']
 
 
 def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
@@ -187,3 +188,19 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
             print(' '.join([repr(str(Ch)) for Ch in Ch_list]))
 
         return Ch_list
+
+
+def generate_Ch_property_grid(compute_property=None, imax=10):
+    if compute_property is not None:
+        try:
+            grid = np.zeros((imax + 1, imax + 1)) - 1
+            for ni in xrange(imax + 1):
+                for mi in xrange(imax + 1):
+                    compute_method = 'compute_' + compute_property
+                    grid[ni, mi] = \
+                        getattr(Nanotube, compute_method)(n=ni, m=mi)
+
+            return grid
+        except AttributeError as e:
+            print(e)
+            return None
