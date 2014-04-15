@@ -101,6 +101,12 @@ class DATAReader(StructureReader):
                         found = True
                         f.readline()
                         Nitems = self._headers[header_key]
+                        #self._sections[section_key] = \
+                        #    [[props['dtype'](s) for props in
+                        #        self._section_properties[
+                        #            section_key].itervalues() for
+                        #        s in f.readline().strip().split()] for n in
+                        #        xrange(Nitems)]
                         data = []
                         for n in xrange(Nitems):
                             tmp = []
@@ -114,12 +120,6 @@ class DATAReader(StructureReader):
                                     break
                             data.append(tmp)
                         self._sections[section_key] = data[:]
-                        #self._sections[section_key] = \
-                        #    [[props['dtype'](s) for props in
-                        #        self._section_properties[
-                        #            section_key].itervalues() for
-                        #        s in f.readline().strip().split()] for n in
-                        #        xrange(Nitems)]
                         break
                 f.readline()
                 line = f.readline().strip()
@@ -253,9 +253,9 @@ class DATAWriter(StructureWriter):
 
     @classmethod
     def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
-              boxbounds=None, comment_line=None, assume_unique_atoms=False,
-              enforce_consecutive_atomIDs=True, pad_box=True, xpad=10.,
-              ypad=10., zpad=10., verbose=False):
+              atom_style='full', boxbounds=None, comment_line=None,
+              assume_unique_atoms=False, enforce_consecutive_atomIDs=True,
+              pad_box=True, xpad=10., ypad=10., zpad=10., verbose=False):
         """Write structure data to file.
 
         Parameters
@@ -340,6 +340,7 @@ class DATAWriter(StructureWriter):
 
         with open(fpath, 'w') as f:
             f.write('# {}\n\n'.format(comment_line.lstrip('#').strip()))
+
             f.write('{}atoms\n'.format(
                 '{:d}'.format(Natoms).ljust(Natoms_width)))
             f.write('{}atom types\n\n'.format(
@@ -454,13 +455,12 @@ class DATAData(DATAReader):
         super(DATAData, self).__init__(fpath=fpath)
 
     def delete(self, key):
-        pass
-
-    def findtime(self, n):
-        pass
-
-    def iterator(self, n):
-        pass
+        if key in self.headers:
+            del self._headers[key]
+        elif key in self.sections:
+            del self._sections[key]
+        else:
+            raise DATAError('{} not in DATA object'.format(key))
 
     def map(self, *pairs):
         pass
@@ -588,6 +588,7 @@ class DATAFormat(StructureFormat):
     """
     def __init__(self, atom_style='full'):
         super(DATAFormat, self).__init__()
+        self._atom_style = atom_style
         self._section_properties = OrderedDict()
 
         atoms_section_syntax = {}
@@ -607,9 +608,9 @@ class DATAFormat(StructureFormat):
 
         section_keys = ['Atoms', 'Masses', 'Velocities']
         self._section_syntax_dict = \
-            {'Atoms': atoms_section_syntax[atom_style],
+            {'Atoms': atoms_section_syntax[self.atom_style],
              'Masses': ['atomtype', 'mass'],
-             'Velocities': velocities_section_syntax[atom_style]}
+             'Velocities': velocities_section_syntax[self.atom_style]}
 
         for section_key in section_keys:
             self._section_properties[section_key] = OrderedDict()
@@ -667,6 +668,11 @@ class DATAFormat(StructureFormat):
                          'xy xz yz': {'dtype': float, 'items': 3}}
 
         self._properties['headers'] = self._headers
+
+        # A LAMMPS data file is partitioned into sections identified
+        # by a keyword string. The header data are used by one or
+        # more sections. The `section_header_map` maps each
+        # section keyword to a specific header key.
 
         self._section_header_map = {}
 
@@ -732,6 +738,11 @@ class DATAFormat(StructureFormat):
             dict.fromkeys(dihedral_types_sections, 'dihedral types'))
 
         self._properties['sections'] = self._section_header_map
+
+    @property
+    def atom_style(self):
+        """Atom style."""
+        return self._atom_style
 
     @property
     def header_keys(self):
