@@ -115,6 +115,7 @@ Base classes for creating new structure data generators
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
+from ._nanogen_funcs import *
 from ._defect_generators import *
 from ._fullerene_bravais_lattice_generators import *
 from ._fullerene_generators import *
