@@ -14,6 +14,7 @@ from fractions import gcd
 from collections import OrderedDict
 
 import numpy as np
+np.seterr(all='raise')
 
 try:
     from pint import UnitRegistry
@@ -791,7 +792,7 @@ class Nanotube(object):
 
             try:
                 return np.sqrt(3) * Ch / dR
-            except ZeroDivisionError:
+            except (FloatingPointError, ZeroDivisionError):
                 return 0
         else:
             t1 = Nanotube.compute_t1(n=n, m=m)
@@ -1087,7 +1088,7 @@ class Nanotube(object):
         N = Nanotube.compute_N(n=n, m=m)
         try:
             return 2 * np.pi / N
-        except ZeroDivisionError:
+        except (FloatingPointError, ZeroDivisionError):
             return 0
 
     @classmethod
@@ -1302,7 +1303,7 @@ class Nanotube(object):
         Returns
         -------
         float
-            :math:`L_{\\mathrm{tube}}` in **nanometers**
+            :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**
 
         """
         T = Nanotube.compute_T(n=n, m=m, bond=bond, with_units=with_units,
@@ -1531,6 +1532,7 @@ class Nanotube(object):
         Returns
         -------
         float
+            Unit cell mass in **Daltons**.
 
         Notes
         -----
@@ -1600,7 +1602,8 @@ class Nanotube(object):
 
         Returns
         -------
-        linear_mass_density : float
+        float
+            Linear mass density in units of **g/nm**.
 
         """
         mass = Nanotube.compute_unit_cell_mass(n=n, m=m,
@@ -1703,6 +1706,7 @@ class Nanotube(object):
         Returns
         -------
         float
+            Nanotube mass in **grams**.
 
         Notes
         -----
