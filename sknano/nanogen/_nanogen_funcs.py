@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-===========================================================================
+=================================================================
 nanogen helper functions (:mod:`sknano.nanogen._nanogen_funcs`)
-===========================================================================
+=================================================================
 
 .. currentmodule:: sknano.nanogen._nanogen_funcs
 
@@ -22,14 +22,20 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
                      ms=None, mi=None, mf=None, dm=None,
                      chiral_type=None, handedness=None,
                      echo_zsh_str=False):
-    """Generate a list of chiralities.
+    """Generate a list of :math:`(n, m)` chiralities.
 
     Parameters
     ----------
-    ns, ms : sequence
-        list of n and m chiral indices
-    ni, nf, dn : int
+    ns, ms : sequence, optional
+        list of :math:`n` and :math:`m` chiral indices
+    ni, nf, dn : int, optional
+        :math:`(n_i, n_f, \\Delta n)` denote the `start`, `stop`, and
+        `step` parameters passed to the numpy function `np.arange`,
+        to generate an array of evenly spaced :math:`n` chiral indices.
     mi, mf, dm : int
+        :math:`(m_i, m_f, \\Delta m)` denote the `start`, `stop`, and
+        `step` parameters passed to the numpy function `np.arange`,
+        to generate an array of evenly spaced :math:`m` chiral indices.
     chiral_type : {'all', 'achiral', 'chiral', 'armchair', 'zigzag'}, optional
     handedness : {'all', 'left', 'right'}, optional
     echo_zsh_str : bool, optional
@@ -192,11 +198,11 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
 
 def generate_Ch_property_grid(compute_property=None, imax=10):
     if compute_property is not None:
+        compute_method = 'compute_' + compute_property
         try:
             grid = np.zeros((imax + 1, imax + 1)) - 1
             for ni in xrange(imax + 1):
                 for mi in xrange(imax + 1):
-                    compute_method = 'compute_' + compute_property
                     grid[ni, mi] = \
                         getattr(Nanotube, compute_method)(n=ni, m=mi)
 
