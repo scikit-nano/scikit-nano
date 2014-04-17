@@ -196,17 +196,30 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
         return Ch_list
 
 
-def generate_Ch_property_grid(compute_property=None, imax=10):
-    if compute_property is not None:
-        compute_method = 'compute_' + compute_property
-        try:
-            grid = np.zeros((imax + 1, imax + 1)) - 1
-            for ni in xrange(imax + 1):
-                for mi in xrange(imax + 1):
-                    grid[ni, mi] = \
-                        getattr(Nanotube, compute_method)(n=ni, m=mi)
+def generate_Ch_property_grid(compute_method=str, imax=10, **kwargs):
+    """Generate a 2-dimensional,
+    :math:`i_{\\mathrm{max}}\\times i_{\\mathrm{max}}` grid of
+    nanotube properties indexed by :math:`(n, m)` chiralities
+    for :math:`0\\le n\\le i_{\\mathrm{max}}` and
+    :math:`0\\le m\\le i_{\\mathrm{max}}`.
 
-            return grid
-        except AttributeError as e:
-            print(e)
-            return None
+    Parameters
+    ----------
+    compute_method : str
+    imax : int
+
+    Returns
+    -------
+    grid : ndarray
+
+    """
+    try:
+        nanotube_compute = getattr(Nanotube, compute_method)
+        grid = np.zeros((imax + 1, imax + 1)) - 1
+        for ni in xrange(imax + 1):
+            for mi in xrange(imax + 1):
+                grid[ni, mi] = nanotube_compute(n=ni, m=mi, **kwargs)
+        return grid
+    except AttributeError as e:
+        print(e)
+        return None
