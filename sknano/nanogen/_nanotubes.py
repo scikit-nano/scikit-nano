@@ -963,13 +963,11 @@ class Nanotube(object):
             is `True` in units of **\u212b**.
 
         """
+        N = Nanotube.compute_N(n=n, m=m)
         t1 = Nanotube.compute_t1(n=n, m=m)
         t2 = Nanotube.compute_t2(n=n, m=m)
-        N = Nanotube.compute_N(n=n, m=m)
 
-        p = None
-        q = None
-
+        p = q = 0
         for i in xrange(0, t1 + n + 1):
             for j in xrange(t2, m + 1):
                 R = t1 * j - t2 * i
