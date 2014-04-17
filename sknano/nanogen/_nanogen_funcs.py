@@ -199,7 +199,9 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
 def generate_Ch_property_grid(compute_method=str, imax=10, **kwargs):
     """Generate a 2-dimensional,
     :math:`i_{\\mathrm{max}}\\times i_{\\mathrm{max}}` grid of
-    nanotube properties indexed by :math:`(n, m)` chiralities
+    nanotube properties.
+
+    The property grid is indexed by :math:`(n, m)` chiralities
     for :math:`0\\le n\\le i_{\\mathrm{max}}` and
     :math:`0\\le m\\le i_{\\mathrm{max}}`.
 
