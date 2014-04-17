@@ -111,11 +111,18 @@ Base classes for creating new structure data generators
    StructureGenerator
    VacancyGenerator
 
+Helper functions
+----------------
+.. autosummary::
+   :toctree: generated/
+
+   generate_Ch_list
+   generate_Ch_property_grid
+
 """
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from ._nanogen_funcs import *
 from ._defect_generators import *
 from ._fullerene_bravais_lattice_generators import *
 from ._fullerene_generators import *
@@ -131,5 +138,6 @@ from ._nanotubes import *
 from ._structure_generator import *
 from ._tubegen import *
 from ._twisted_bundle_generators import *
+from ._nanogen_funcs import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
