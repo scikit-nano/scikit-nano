@@ -2080,8 +2080,7 @@ class NanotubeBundle(Nanotube):
             Nanotube bundle mass :math:`M_{\\mathrm{bundle}}` in **grams**.
 
         """
-        Ntubes = \
-            NanotubeBundle.compute_Ntubes(nx=nx, ny=ny)
+        Ntubes = NanotubeBundle.compute_Ntubes(nx=nx, ny=ny)
         tube_mass = Nanotube.compute_tube_mass(n=n, m=m, nz=nz,
                                                element1=element1,
                                                element2=element2,
