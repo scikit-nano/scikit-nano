@@ -48,7 +48,7 @@ Topic :: Software Development :: Libraries :: Python Modules
 MAJOR = 0
 MINOR = 2
 MICRO = 25
-ISRELEASED = False
+ISRELEASED = True
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 
@@ -170,7 +170,7 @@ def setup_package():
         include_package_data=True,
         exclude_package_data={'': ['*.gif', '*.html', '*.ui']},
         zip_safe=False,
-        install_requires=['numpy>=1.8', 'pint>=0.4'],
+        install_requires=['numpy>=1.8', 'scipy>=0.14', 'pint>=0.5'],
         entry_points={
             'console_scripts': [
                 'nanogen = sknano.scripts.nanogen:main',
