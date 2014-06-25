@@ -14,7 +14,7 @@ from collections import OrderedDict
 
 import numpy as np
 
-from ...tools import Vector
+from ...tools import Vector, xyz_axes
 from ...tools.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols
 
@@ -251,6 +251,32 @@ class Atom(object):
 
         """
         self._r.fix_minus_zero_components(epsilon=epsilon)
+
+    def get_coords(self, components=None, as_dict=False):
+        """Return atom coords.
+
+        Parameters
+        ----------
+        components : {None, sequence}, optional
+        as_dict : bool, optional
+
+        Returns
+        -------
+        coords : :py:class:`python:~collections.OrderedDict` or ndarray
+
+        """
+        coords = self.r
+        if as_dict:
+            if components is None or components == 'r':
+                components = ('x', 'y', 'z')
+            elif isinstance(components, str):
+                components = (components,)
+
+            return OrderedDict(zip(
+                components, [coords[xyz_axes.index(component)] for
+                             component in components]))
+        else:
+            return coords
 
     def rezero_coords(self, epsilon=1.0e-10):
         """Re-zero position coordinates near zero.
