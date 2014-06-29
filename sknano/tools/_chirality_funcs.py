@@ -393,7 +393,3 @@ def get_Ch_type(Ch):
         return 'ZZ'
     else:
         return 'Ch'
-
-
-def map_Ch(Ch_list, to=None):
-    pass
