@@ -172,61 +172,24 @@ def filter_Ch_list(Ch_list, **kwargs):
     return [Ch for Ch in Ch_list if filter_Ch(Ch, **kwargs)]
 
 
-def get_Ch_indices(Ch):
-    """Return the chiral indicies `n` and `m`.
-
-    Parameters
-    ----------
-    Ch : str
-
-    Returns
-    -------
-    sequence
-        list of chiral indices `n` and `m`
-
-    """
-    return [int(c) for c in re.split('[\(\),\s*]+', Ch)[1:-1]]
-
-
-def get_Ch_type(Ch):
-    """Identify the type of nanotube based on its chirality
-
-    Parameters
-    ----------
-    Ch : {str, tuple}
-
-    Returns
-    -------
-    str
-        `AC` for armchair tubes,
-        `ZZ` for zigzag tubes,
-        `Ch` for chiral tubes,
-
-    """
-    if isinstance(Ch, tuple):
-        n, m = Ch
-    else:
-        n, m = get_Ch_indices(Ch)
-    if n == m:
-        return 'AC'
-    elif n != m and (n == 0 or m == 0):
-        return 'ZZ'
-    else:
-        return 'Ch'
-
-
 def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
                      ms=None, mi=None, mf=None, dm=None,
                      chiral_type=None, handedness=None,
                      echo_zsh_str=False):
-    """Generate a list of chiralities.
+    """Generate a list of :math:`(n, m)` chiralities.
 
     Parameters
     ----------
-    ns, ms : sequence
-        list of n and m chiral indices
-    ni, nf, dn : int
+    ns, ms : sequence, optional
+        list of :math:`n` and :math:`m` chiral indices
+    ni, nf, dn : int, optional
+        :math:`(n_i, n_f, \\Delta n)` denote the `start`, `stop`, and
+        `step` parameters passed to the numpy function `np.arange`,
+        to generate an array of evenly spaced :math:`n` chiral indices.
     mi, mf, dm : int
+        :math:`(m_i, m_f, \\Delta m)` denote the `start`, `stop`, and
+        `step` parameters passed to the numpy function `np.arange`,
+        to generate an array of evenly spaced :math:`m` chiral indices.
     chiral_type : {'all', 'achiral', 'chiral', 'armchair', 'zigzag'}, optional
     handedness : {'all', 'left', 'right'}, optional
     echo_zsh_str : bool, optional
@@ -385,3 +348,50 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
             print(' '.join([repr(str(Ch)) for Ch in Ch_list]))
 
         return Ch_list
+
+
+def get_Ch_indices(Ch):
+    """Return the chiral indicies `n` and `m`.
+
+    Parameters
+    ----------
+    Ch : str
+
+    Returns
+    -------
+    sequence
+        list of chiral indices `n` and `m`
+
+    """
+    return [int(c) for c in re.split('[\(\),\s*]+', Ch)[1:-1]]
+
+
+def get_Ch_type(Ch):
+    """Identify the type of nanotube based on its chirality
+
+    Parameters
+    ----------
+    Ch : {str, tuple}
+
+    Returns
+    -------
+    str
+        `AC` for armchair tubes,
+        `ZZ` for zigzag tubes,
+        `Ch` for chiral tubes,
+
+    """
+    if isinstance(Ch, tuple):
+        n, m = Ch
+    else:
+        n, m = get_Ch_indices(Ch)
+    if n == m:
+        return 'AC'
+    elif n != m and (n == 0 or m == 0):
+        return 'ZZ'
+    else:
+        return 'Ch'
+
+
+def map_Ch(Ch_list, to=None):
+    pass
