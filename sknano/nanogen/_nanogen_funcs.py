@@ -17,7 +17,8 @@ from ._nanotubes import Nanotube
 from ..tools import chiral_type_name_mappings as Ch_types
 
 __all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'generate_Ch_list',
-           'generate_Ch_property_grid', 'get_Ch_indices', 'get_Ch_type']
+           'generate_Ch_property_grid', 'get_Ch_indices', 'get_Ch_type',
+           'map_Ch']
 
 
 def cmp_Ch(Ch1, Ch2):
@@ -413,3 +414,17 @@ def get_Ch_type(Ch):
         return 'ZZ'
     else:
         return 'Ch'
+
+
+def map_Ch(Ch, compute_method=None, **kwargs):
+    try:
+        nanotube_compute = getattr(Nanotube, compute_method)
+        if isinstance(Ch, tuple):
+            n, m = Ch
+        else:
+            n, m = get_Ch_indices(Ch)
+
+        return nanotube_compute(n=n, m=m, **kwargs)
+    except AttributeError as e:
+        print(e)
+        return None
