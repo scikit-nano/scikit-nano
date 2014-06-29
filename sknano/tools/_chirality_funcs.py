@@ -180,16 +180,18 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
 
     Parameters
     ----------
-    ns, ms : sequence, optional
-        list of :math:`n` and :math:`m` chiral indices
+    ns, ms : sequence
+        list of :math:`n` and :math:`m` chiral indices.
     ni, nf, dn : int, optional
         :math:`(n_i, n_f, \\Delta n)` denote the `start`, `stop`, and
         `step` parameters passed to the numpy function `np.arange`,
         to generate an array of evenly spaced :math:`n` chiral indices.
-    mi, mf, dm : int
+        `ni` only required if `ns` sequence kwarg is `None`.
+    mi, mf, dm : int, optional
         :math:`(m_i, m_f, \\Delta m)` denote the `start`, `stop`, and
         `step` parameters passed to the numpy function `np.arange`,
         to generate an array of evenly spaced :math:`m` chiral indices.
+        `mi` only required if `ms` sequence kwarg is `None`.
     chiral_type : {'all', 'achiral', 'chiral', 'armchair', 'zigzag'}, optional
     handedness : {'all', 'left', 'right'}, optional
     echo_zsh_str : bool, optional
