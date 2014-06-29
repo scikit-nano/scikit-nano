@@ -10,12 +10,155 @@ nanogen helper functions (:mod:`sknano.nanogen._nanogen_funcs`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
+import re
 import numpy as np
 
 from ._nanotubes import Nanotube
 from ..tools import chiral_type_name_mappings as Ch_types
 
-__all__ = ['generate_Ch_list', 'generate_Ch_property_grid']
+__all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'generate_Ch_list',
+           'generate_Ch_property_grid', 'get_Ch_indices', 'get_Ch_type']
+
+
+def cmp_Ch(Ch1, Ch2):
+    """Custom comparator function for sorting chirality lists.
+
+    Parameters
+    ----------
+    Ch1, Ch2 : {str, tuple}
+        2-tuple or 2-tuple string of integers
+
+    Returns
+    -------
+    int
+
+    """
+
+    if isinstance(Ch1, tuple) and isinstance(Ch2, tuple):
+        n1, m1 = Ch1
+        Ch1_type = get_Ch_type(Ch1)
+        n2, m2 = Ch2
+        Ch2_type = get_Ch_type(Ch2)
+    elif isinstance(Ch1, str) and isinstance(Ch2, str):
+        n1, m1 = get_Ch_indices(Ch1)
+        Ch1_type = get_Ch_type(Ch1)
+        n2, m2 = get_Ch_indices(Ch2)
+        Ch2_type = get_Ch_type(Ch2)
+
+    if Ch1_type == 'AC' and Ch2_type == 'ZZ':
+        return 1
+    elif Ch1_type == 'ZZ' and Ch2_type == 'AC':
+        return -1
+    #if dt1 > dt2:
+    #    return 1
+    #elif dt1 < dt2:
+    #    return -1
+    else:
+        if n1 > n2:
+            return 1
+        elif n1 < n2:
+            return -1
+        else:
+            if m1 > m2:
+                return 1
+            elif m1 < m2:
+                return -1
+            else:
+                return 0
+
+
+def filter_Ch(Ch, even_only=False, odd_only=False, Ch_type=None,
+              min_index=None, max_index=None, min_n=None, max_n=None,
+              min_m=None, max_m=None, **kwargs):
+    """Filter for testing if chirality satisfies given constraint parameters.
+
+    Parameters
+    ----------
+    even_only, odd_only : bool, optional
+    Ch_type : {None, 'armchair', 'zigzag', 'achiral', 'chiral'}, optional
+    min_index, max_index : int, optional
+    min_n, max_n : int, optional
+    min_m, max_m : int, optional
+
+    Returns
+    -------
+    bool
+
+    """
+
+    if isinstance(Ch, tuple):
+        this_Ch_type = get_Ch_type(Ch)
+        n, m = Ch
+    else:
+        n, m = get_Ch_indices(Ch)
+        this_Ch_type = get_Ch_type(Ch)
+
+    if even_only:
+        if n % 2 == 0 and m % 2 == 0:
+            return True
+        else:
+            return False
+
+    elif odd_only:
+        if this_Ch_type != 'ZZ':
+            if n % 2 != 0 and m % 2 != 0:
+                return True
+            else:
+                return False
+        else:
+            if max(n, m) % 2 != 0:
+                return True
+            else:
+                return False
+
+    elif Ch_type is not None:
+        if Ch_type in Ch_types:
+            Ch_type = Ch_types[Ch_type]
+
+        if this_Ch_type == Ch_type:
+            return True
+        else:
+            return False
+
+    elif min_index is not None and isinstance(min_index, int):
+        if this_Ch_type != 'ZZ':
+            if n >= min_index and m >= min_index:
+                return True
+            else:
+                return False
+        else:
+            if max(n, m) >= min_index:
+                return True
+            else:
+                return False
+
+    elif max_index is not None and isinstance(max_index, int):
+        if n <= max_index and m <= max_index:
+            return True
+        else:
+            return False
+
+    else:
+        return True
+
+
+def filter_Ch_list(Ch_list, **kwargs):
+    """Filter for filtering list of chiralities against set of conditions.
+
+    Parameters
+    ----------
+    Ch_list : sequence
+        list of chiralities
+    kwargs : dict, optional
+        dictionary of conditions to test each chirality against.
+
+    Returns
+    -------
+    sequence
+        list of chiralities which passed conditions
+
+    """
+    return [Ch for Ch in Ch_list if filter_Ch(Ch, **kwargs)]
 
 
 def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
@@ -227,3 +370,46 @@ def generate_Ch_property_grid(compute_method=str, imax=10, **kwargs):
     except AttributeError as e:
         print(e)
         return None
+
+
+def get_Ch_indices(Ch):
+    """Return the chiral indicies `n` and `m`.
+
+    Parameters
+    ----------
+    Ch : str
+
+    Returns
+    -------
+    sequence
+        list of chiral indices `n` and `m`
+
+    """
+    return [int(c) for c in re.split('[\(\),\s*]+', Ch)[1:-1]]
+
+
+def get_Ch_type(Ch):
+    """Identify the type of nanotube based on its chirality
+
+    Parameters
+    ----------
+    Ch : {str, tuple}
+
+    Returns
+    -------
+    str
+        `AC` for armchair tubes,
+        `ZZ` for zigzag tubes,
+        `Ch` for chiral tubes,
+
+    """
+    if isinstance(Ch, tuple):
+        n, m = Ch
+    else:
+        n, m = get_Ch_indices(Ch)
+    if n == m:
+        return 'AC'
+    elif n != m and (n == 0 or m == 0):
+        return 'ZZ'
+    else:
+        return 'Ch'
