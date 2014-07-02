@@ -116,7 +116,12 @@ def filter_Ch(Ch, even_only=False, odd_only=False, Ch_type=None,
         if Ch_type in Ch_types:
             Ch_type = Ch_types[Ch_type]
 
-        if this_Ch_type == Ch_type:
+        if this_Ch_type in ('AC', 'ZZ'):
+            if Ch_type == 'aCh' or this_Ch_type == Ch_type:
+                return True
+            else:
+                return False
+        elif Ch_type == 'Ch' and this_Ch_type == Ch_type:
             return True
         else:
             return False
