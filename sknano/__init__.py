@@ -12,12 +12,13 @@ Subpackages
 
 ::
 
+ analysis       --- functions and classes for structure analysis
  chemistry      --- abstract data structures for chemistry
- nanogen        --- modules for structure analysis and structure generation
+ nanogen        --- classes for generating nanostructures
  nanogen_gui    --- NanoGen GUI front-end
  scripts        --- command-line scripts
  structure_io   --- classes for structure data I/O
- tools          --- tools for analysis, helper funcs, LUTs, etc.
+ tools          --- helper funcs, LUTs, etc.
 
 Utilitiy tools
 --------------
@@ -29,7 +30,8 @@ Utilitiy tools
 """
 from __future__ import print_function, absolute_import
 
-__all__ = ['chemistry',
+__all__ = ['analysis',
+           'chemistry',
            'nanogen',
            'nanogen_gui',
            'scripts',

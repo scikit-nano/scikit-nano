@@ -1,48 +1,50 @@
 # -*- coding: utf-8 -*-
 """
-=================================================
-Helper functions (:mod:`sknano.analysis._funcs`)
-=================================================
+========================================================================
+Helper functions for structure analysis (:mod:`sknano.analysis._funcs`)
+========================================================================
 
 .. currentmodule:: sknano.analysis._funcs
 
 """
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
 
-__all__ = ['get_nearest_neighbor_counts']
+import numpy as np
 
-
-def get_nearest_neighbor_counts(adata=None, datafile=None,
-                                filter_elements=None, invert=False):
-    pass
-#    if adata is not None:
-#        atom_data = adata
-#    elif datafile is not None and isinstance(datafile, str):
-#        atom_data = get_atom_data_asarray(datafile)
-#
-#    #atom_ids = get_atom_ids_asarray(adata=atom_data)
-#
-#    filtered_coords = \
-#        get_filtered_coords(adata=atom_data, filter_elements=vacIDs)
-#    NNtree = spatial.KDTree(filtered_coords)
-#    print(NNtree.data)
-#
-#    # compute things like the distance for which 50% of vacancies
-#    # lie within a distance r of each other, etc.
-#
-#    #return None
+__all__ = ['find_target_atom']
 
 
-def get_nearest_neighbor_comp_array_dict(atom_ids):
-    pass
-#    nearest_neighbor_comp_dict = OrderedDict()
-#    vac_coords = \
-#         get_filtered_coords(adata=self.atom_data, filter_elements=vacIDs)
-#    #vac_coords = self.get_filtered_coords(vacIDs)
-#    for comp in self.position_components:
-#        vac_distances = self.get_vac_distances(vac_coords, comp)
-#        nearest_neighbor_array = vac_distances[np.where(vac_distances == \
-#                                                        vac_distances.min())]
-#        nearest_neighbor_comp_dict[comp] = nearest_neighbor_array
-#
-#    return nearest_neighbor_comp_dict
+def find_target_atom(atoms, target_coords=None, search_radius=float,
+                     nearest_target=False):
+    """Search for atom closest to target location.
+
+    Parameters
+    ----------
+    atoms : :class:`~sknano.structure_io.atoms.Atoms`
+        An :class:`~sknano.structure_io.atoms.Atoms` instance.
+    target_coords : array_like
+        An array or list of :math:`x,y,z` coordinates
+    search_radius : float
+        Cutoff distance to search within in units of
+        :class:`~sknano.structure_io.atoms.Atoms` style.
+    nearest_target : bool, optional
+
+    Returns
+    -------
+    :class:`~sknano.structure_io.atoms.Atom`
+        An :class:`~sknano.structure_io.atoms.Atom` instance.
+
+    """
+    atom_tree = atoms.atom_tree
+    target_index = None
+
+    if nearest_target:
+        target_index = \
+            atom_tree.query(target_coords,
+                            distance_upper_bound=search_radius)[-1]
+    else:
+        target_index = \
+            np.random.choice(
+                atom_tree.query_ball_point(target_coords, search_radius))
+
+    return atoms[target_index]
