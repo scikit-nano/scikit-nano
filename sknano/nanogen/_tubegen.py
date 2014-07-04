@@ -24,15 +24,15 @@ from ..tools.refdata import CCbond
 
 from ._nanotubes import Nanotube
 
-format_ext = {'gaussian': '.com',
-              'gaussian-pbc': '.com',
-              'wien': '.struct',
-              'xyz': '.xyz',
-              'pdb': '.pdb',
-              'pdb-pbc': '.pdb',
-              'pov': '.pov',
-              'bgf': '.bgf',
-              'cif': '.cif'}
+tubegen_format_ext_map = {'gaussian': '.com',
+                          'gaussian-pbc': '.com',
+                          'wien': '.struct',
+                          'xyz': '.xyz',
+                          'pdb': '.pdb',
+                          'pdb-pbc': '.pdb',
+                          'pov': '.pov',
+                          'bgf': '.bgf',
+                          'cif': '.cif'}
 
 shape_structure_dict = {'nanotube': 'hexagonal',
                         'graphene': 'planar',
@@ -40,7 +40,8 @@ shape_structure_dict = {'nanotube': 'hexagonal',
                         'cubic-bundle': 'cubic',
                         'custom': None}
 
-__all__ = ['TubeGen', 'TubeGenArgs', 'format_ext', 'shape_structure_dict']
+__all__ = ['TubeGen', 'TubeGenArgs', 'tubegen_format_ext_map',
+           'shape_structure_dict']
 
 
 class TubeGenArgs(object):
@@ -49,7 +50,6 @@ class TubeGenArgs(object):
 
 
 class TubeGen(object):
-
     """Wrapper class around the TubeGen binary.
 
     TubeGen ([TG]_) is developed by Jeffrey T. Frey.
@@ -396,7 +396,8 @@ class TubeGen(object):
 
         self._tubegen()
         self._output = \
-            self._genfile_name.split('.')[0] + format_ext[self._fmt]
+            self._genfile_name.split('.')[0] + \
+            tubegen_format_ext_map[self._fmt]
 
     def _name_genfile(self):
         genfile = None
@@ -430,7 +431,7 @@ class TubeGen(object):
             f.write('set {!s} {!s}\n'.format(k, v))
         f.write('generate\n')
         f.write('save {!s}{!s}\n'.format(self._genfile_name.split('.')[0],
-                                         format_ext[self._fmt]))
+                                         tubegen_format_ext_map[self._fmt]))
         f.close()
 
     def _tubegen(self):
