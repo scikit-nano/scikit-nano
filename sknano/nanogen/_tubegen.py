@@ -87,7 +87,7 @@ class TubeGen(object):
         :math:`(x, y, z)` axes.
     relax_tube : {'yes', 'no'}, optional
         Selects whether or not to apply energy minimization of the structure.
-    tube_length : float, optional
+    Lz : float, optional
         length of the nanotube in **nanometers**.
 
     Examples
