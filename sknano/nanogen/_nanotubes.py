@@ -44,7 +44,7 @@ class Nanotube(object):
         Number of repeat unit cells in the :math:`x, y, z` dimensions
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.chemistry.Atom` 1 and 2
     bond : float, optional
         Distance between nearest neighbor atoms (i.e., bond length).
         Must be in units of **\u212b**. Default value is
@@ -1517,7 +1517,7 @@ class Nanotube(object):
             :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         element1, element2 : {str, int}, optional
             Element symbol or atomic number of basis
-            :class:`~sknano.chemistry.Atoms` 1 and 2
+            :class:`~sknano.chemistry.Atom` 1 and 2
         with_units : bool, optional
             Attach `units` to physical quantities.
             **This parameter is not yet fully implemented or supported.
@@ -1583,7 +1583,7 @@ class Nanotube(object):
             :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         element1, element2 : {str, int}, optional
             Element symbol or atomic number of basis
-            :class:`~sknano.chemistry.Atoms` 1 and 2
+            :class:`~sknano.chemistry.Atom` 1 and 2
         bond : float, optional
             Distance between nearest neighbor atoms (i.e., bond length).
             Must be in units of **\u212b**. Default value is
@@ -1691,7 +1691,7 @@ class Nanotube(object):
             Number of nanotube unit cells
         element1, element2 : {str, int}, optional
             Element symbol or atomic number of basis
-            :class:`~sknano.chemistry.Atoms` 1 and 2
+            :class:`~sknano.chemistry.Atom` 1 and 2
         with_units : bool, optional
             Attach `units` to physical quantities.
             **This parameter is not yet fully implemented or supported.
@@ -1790,7 +1790,7 @@ class NanotubeBundle(Nanotube):
         Number of repeat unit cells in the :math:`x, y, z` dimensions
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.chemistry.Atom` 1 and 2
     bond : float, optional
         Bond length between nearest neighbor atoms.
         Must be in units of **\u212b**. Default value is
@@ -2072,7 +2072,7 @@ class NanotubeBundle(Nanotube):
             Number of repeat unit cells in the :math:`x, y, z` dimensions
         element1, element2 : {str, int}, optional
             Element symbol or atomic number of basis
-            :class:`~sknano.chemistry.Atoms` 1 and 2
+            :class:`~sknano.chemistry.Atom` 1 and 2
 
         Returns
         -------
