@@ -17,7 +17,7 @@ import numpy as np
 
 from ..chemistry import Atom, Atoms
 from ..tools import plural_word_check
-from ..tools.refdata import CCbond
+from ..tools.refdata import CCbond, dVDW
 
 from ._nanotubes import Nanotube, NanotubeBundle
 from ._nanotube_generators import NanotubeGenerator, MWNTGenerator
@@ -48,17 +48,16 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
 
         .. versionadded:: 0.2.5
 
-    bundle_packing : {None, 'hcp', 'hexagonal', 'ccp', 'cubic'}, optional
+    bundle_packing : {'hcp', 'ccp'}, optional
         Packing arrangement of nanotubes bundles.
         If `bundle_packing` is `None`, then it will be determined by the
         `bundle_geometry` parameter if `bundle_geometry` is not `None`.
         If both `bundle_packing` and `bundle_geometry` are `None`, then
-        `bundle_packing` defaults to `hexagonal`.
+        `bundle_packing` defaults to `hcp`.
 
         .. versionadded:: 0.2.5
 
-    bundle_geometry : {None, 'triangle', 'hexagon', 'square', 'rectangle',
-                       'rhombus', 'rhomboid'}, optional
+    bundle_geometry : {'triangle', 'hexagon', 'square', 'rectangle'}, optional
         Force a specific geometry on the nanotube bundle boundaries.
 
         .. versionadded:: 0.2.5
@@ -97,12 +96,6 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
     This allows you to generate **hcp** bundles that are trianglar,
     hexagonal, or rectangular in shape, as some of the examples below
     illustrate.
-
-    In general, setting `cubic` bundling will
-    generate rectangular bundles (square bundles if :math:`n_x = n_y`)
-    and specifying `hcp` bundling will generate *rhomboidal* bundles
-    (*i.e.* bundles arranged within a rhomboid) (rhombuses if
-    :math:`n_x = n_y`).
 
     To start, let's generate an hcp bundle of
     :math:`C_{\\mathrm{h}} = (10, 5)` SWCNTs and cell count
@@ -150,7 +143,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
     bundle arrangement:
 
     >>> SWCNTbundle = NanotubeBundleGenerator(10, 10, nx=3, ny=3, nz=5,
-    ...                                       bundle_packing='cubic')
+    ...                                       bundle_packing='ccp')
     >>> SWCNTbundle.save_data()
 
     The rendered `ccp` structure looks like:
@@ -160,7 +153,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
     """
 
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
-                 element1='C', element2='C', bond=CCbond, vdw_spacing=3.4,
+                 element1='C', element2='C', bond=CCbond, vdw_spacing=dVDW,
                  bundle_packing=None, bundle_geometry=None, Lx=None, Ly=None,
                  Lz=None, fix_Lz=False, with_units=False, units=None,
                  autogen=True, verbose=False):
@@ -181,14 +174,10 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
 
         if bundle_packing is None and \
                 bundle_geometry in ('square', 'rectangle'):
-            bundle_packing = 'cubic'
-        elif bundle_packing is None:
-            bundle_packing = 'hexagonal'
-        elif (bundle_packing in ('cubic', 'ccp') and bundle_geometry not in
-                (None, 'square', 'rectangle')) or \
-                (bundle_packing in ('hexagonal', 'hcp') and bundle_geometry
-                 not in (None, 'triangle', 'hexagon', 'rhombus', 'rhomboid')):
-            bundle_geometry = None
+            bundle_packing = 'ccp'
+        elif bundle_packing is None and \
+                bundle_geometry in ('triangle', 'hexagon'):
+            bundle_packing = 'hcp'
 
         if bundle_packing in ('cubic', 'ccp'):
             self._r2[1] = self._r1[0]
@@ -196,14 +185,94 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
             self._r2[0] = self._r1[0] * np.cos(2 * np.pi / 3)
             self._r2[1] = self._r1[0] * np.sin(2 * np.pi / 3)
 
-        #self._r1[2] = self._r2[2] = self.T
-
         self._bundle_packing = bundle_packing
         self._bundle_geometry = bundle_geometry
 
         if autogen:
             super(NanotubeBundleGenerator, self).generate_unit_cell()
             self.generate_structure_data()
+
+    @property
+    def r1(self):
+        """Bundle lattice vector :math:`\\mathbf{r}_1`."""
+        return self._r1
+
+    @property
+    def r2(self):
+        """Bundle lattice vector :math:`\\mathbf{r}_2`."""
+        return self._r2
+
+    @property
+    def bundle_geometry(self):
+        """Bundle geometry."""
+        return self._bundle_geometry
+
+    @property
+    def bundle_packing(self):
+        """Bundle packing arrangement."""
+        return self._bundle_packing
+
+    def _generate_hexagonal_bundle(self, atomsobj0):
+        nrows = max(self._nx, self._ny, 3)
+        if nrows % 2 != 1:
+            nrows += 1
+
+        ntubes_per_end_rows = int((nrows + 1) / 2)
+
+        row = 0
+        ntubes_per_row = nrows
+        while ntubes_per_row >= ntubes_per_end_rows:
+            if row == 0:
+                for n in xrange(ntubes_per_row):
+                    atomsobj = Atoms(atoms=atomsobj0, deepcopy=True)
+                    atomsobj.center_CM()
+                    dr = n * self._r1
+                    atomsobj.translate(dr)
+                    self._structure_atoms.extend(atomsobj.atoms)
+                    self._Ntubes += 1
+            else:
+                for nx in xrange(ntubes_per_row):
+                    for ny in (-row, row):
+                        atomsobj = Atoms(atoms=atomsobj0, deepcopy=True)
+                        atomsobj.center_CM()
+                        dr = np.zeros(3)
+                        dr[0] = abs(ny * self._r2[0])
+                        dr[1] = ny * self._r2[1]
+                        dr = nx * self._r1 + dr
+                        atomsobj.translate(dr)
+                        self._structure_atoms.extend(atomsobj.atoms)
+                        self._Ntubes += 1
+            row += 1
+            ntubes_per_row = nrows - row
+
+    def _generate_rectangular_bundle(self, atomsobj0):
+        Lx = 10 * self._Lx
+        for nx in xrange(self._nx):
+            for ny in xrange(self._ny):
+                atomsobj = Atoms(atoms=atomsobj0, deepcopy=True)
+                atomsobj.center_CM()
+                dr = nx * self._r1 + ny * self._r2
+                while dr[0] < 0:
+                    dr[0] += Lx
+                atomsobj.translate(dr)
+                self._structure_atoms.extend(atomsobj.atoms)
+                self._Ntubes += 1
+
+    def _generate_square_bundle(self):
+        pass
+
+    def _generate_triangular_bundle(self):
+        pass
+
+    def _generate_bundle(self, atomsobj0):
+        for nx in xrange(self._nx):
+            for ny in xrange(self._ny):
+                atomsobj = Atoms(atoms=atomsobj0, deepcopy=True)
+                atomsobj.center_CM()
+                dr = nx * self._r1 + ny * self._r2
+                atomsobj.translate(dr)
+                self._structure_atoms.extend(atomsobj.atoms)
+                self._Ntubes += 1
 
     def generate_structure_data(self):
         """Generate structure data."""
@@ -213,47 +282,18 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
 
         swnt0 = copy.deepcopy(self._structure_atoms)
         self._structure_atoms = Atoms()
+
         if self._bundle_geometry == 'hexagon':
-            nrows = max(self._nx, self._ny, 3)
-            if nrows % 2 != 1:
-                nrows += 1
-
-            ntubes_per_end_rows = int((nrows + 1) / 2)
-
-            row = 0
-            ntubes_per_row = nrows
-            while ntubes_per_row >= ntubes_per_end_rows:
-                if row == 0:
-                    for n in xrange(ntubes_per_row):
-                        swnt = Atoms(atoms=swnt0, deepcopy=True)
-                        swnt.center_CM()
-                        dr = n * self._r1
-                        swnt.translate(dr)
-                        self._structure_atoms.extend(swnt.atoms)
-                        self._Ntubes += 1
-                else:
-                    for nx in xrange(ntubes_per_row):
-                        for ny in (-row, row):
-                            swnt = Atoms(atoms=swnt0, deepcopy=True)
-                            swnt.center_CM()
-                            dr = np.zeros(3)
-                            dr[0] = abs(ny * self._r2[0])
-                            dr[1] = ny * self._r2[1]
-                            dr = nx * self._r1 + dr
-                            swnt.translate(dr)
-                            self._structure_atoms.extend(swnt.atoms)
-                            self._Ntubes += 1
-                row += 1
-                ntubes_per_row = nrows - row
+            self._generate_hexagonal_bundle(swnt0)
+        elif self._bundle_geometry == 'rectangle':
+            self._generate_rectangular_bundle(swnt0)
+        elif self._bundle_geometry == 'square':
+            self._generate_square_bundle(swnt0)
+        elif self._bundle_geometry == 'triangle':
+            self._generate_triangular_bundle(swnt0)
         else:
-            for nx in xrange(self._nx):
-                for ny in xrange(self._ny):
-                    swnt = Atoms(atoms=swnt0, deepcopy=True)
-                    swnt.center_CM()
-                    dr = nx * self._r1 + ny * self._r2
-                    swnt.translate(dr)
-                    self._structure_atoms.extend(swnt.atoms)
-                    self._Ntubes += 1
+            self._generate_bundle(swnt0)
+
         self._Natoms_per_bundle = \
             self.compute_Natoms_per_bundle(n=self._n, m=self._m,
                                            nz=self._nz,
@@ -356,14 +396,12 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
         value is the van der Waals interaction distance of 3.4 Angstroms.
     vdw_spacing : float, optional
         van der Waals distance between nearest neighbor tubes
-    bundle_packing : {None, 'hcp', 'hexagonal', 'ccp', 'cubic'}, optional
+    bundle_packing : {'hcp', 'ccp'}, optional
         Packing arrangement of MWNT bundles.  If `bundle_packing` is `None`,
         then it will be determined by the `bundle_geometry` parameter if
         `bundle_geometry` is not `None`.  If both `bundle_packing` and
-        `bundle_geometry` are `None`, then `bundle_packing` defaults to
-        `hexagonal`.
-    bundle_geometry : {None, 'triangle', 'hexagon', 'square', 'rectangle',
-                       'rhombus', 'rhomboid'}, optional
+        `bundle_geometry` are `None`, then `bundle_packing` defaults to `hcp`.
+    bundle_geometry : {'triangle', 'hexagon', 'square', 'rectangle'}, optional
     autogen : bool, optional
         if `True`, automatically call
         :meth:`~MWNTGenerator.generate_unit_cell`,
@@ -389,8 +427,8 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
                  add_inner_shells=True, add_outer_shells=False,
                  max_shells=None, max_shell_diameter=np.inf,
                  min_shells=None, min_shell_diameter=0.0,
-                 new_shell_type=None, shell_spacing=3.4,
-                 vdw_spacing=3.4, bundle_packing=None, bundle_geometry=None,
+                 new_shell_type=None, shell_spacing=dVDW,
+                 vdw_spacing=dVDW, bundle_packing=None, bundle_geometry=None,
                  with_units=False, units=None, autogen=True, verbose=False):
 
         super(MWNTBundleGenerator, self).__init__(
@@ -414,14 +452,10 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
 
         if bundle_packing is None and \
                 bundle_geometry in ('square', 'rectangle'):
-            bundle_packing = 'cubic'
-        elif bundle_packing is None:
-            bundle_packing = 'hexagonal'
-        elif (bundle_packing in ('cubic', 'ccp') and bundle_geometry not in
-                (None, 'square', 'rectangle')) or \
-                (bundle_packing in ('hexagonal', 'hcp') and bundle_geometry
-                 not in (None, 'triangle', 'hexagon', 'rhombus', 'rhomboid')):
-            bundle_geometry = None
+            bundle_packing = 'ccp'
+        elif bundle_packing is None and \
+                bundle_geometry in ('triangle', 'hexagon'):
+            bundle_packing = 'hcp'
 
         if bundle_packing in ('cubic', 'ccp'):
             self._r2[1] = self._r1[0]
@@ -435,6 +469,26 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
         if autogen:
             super(MWNTBundleGenerator, self).generate_unit_cell()
             self.generate_structure_data()
+
+    @property
+    def r1(self):
+        """Bundle lattice vector :math:`\\mathbf{r}_1`."""
+        return self._r1
+
+    @property
+    def r2(self):
+        """Bundle lattice vector :math:`\\mathbf{r}_2`."""
+        return self._r2
+
+    @property
+    def bundle_geometry(self):
+        """Bundle geometry."""
+        return self._bundle_geometry
+
+    @property
+    def bundle_packing(self):
+        """Bundle packing arrangement."""
+        return self._bundle_packing
 
     def _generate_unit_cell(self, n=int, m=int):
         """Generate the unit cell of a MWNT shell"""
@@ -482,6 +536,62 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
 
         return unit_cell
 
+    def _generate_hexagonal_bundle(self, atomsobj0):
+        nrows = max(self._nx, self._ny, 3)
+        if nrows % 2 != 1:
+            nrows += 1
+
+        ntubes_per_end_rows = int((nrows + 1) / 2)
+
+        row = 0
+        ntubes_per_row = nrows
+        while ntubes_per_row >= ntubes_per_end_rows:
+            if row == 0:
+                for n in xrange(ntubes_per_row):
+                    atomsobj = Atoms(atoms=atomsobj0, deepcopy=True)
+                    atomsobj.center_CM()
+                    dr = n * self._r1
+                    atomsobj.translate(dr)
+                    self._structure_atoms.extend(atomsobj.atoms)
+                    self._Ntubes += 1
+            else:
+                for nx in xrange(ntubes_per_row):
+                    for ny in (-row, row):
+                        atomsobj = Atoms(atoms=atomsobj0, deepcopy=True)
+                        atomsobj.center_CM()
+                        dr = np.zeros(3)
+                        dr[0] = abs(ny * self._r2[0])
+                        dr[1] = ny * self._r2[1]
+                        dr = nx * self._r1 + dr
+                        atomsobj.translate(dr)
+                        self._structure_atoms.extend(atomsobj.atoms)
+                        self._Ntubes += 1
+            row += 1
+            ntubes_per_row = nrows - row
+
+    def _generate_rectangular_bundle(self, atomsobj0):
+        Lx = 10 * self._Lx
+        for nx in xrange(self._nx):
+            for ny in xrange(self._ny):
+                atomsobj = Atoms(atoms=atomsobj0, deepcopy=True)
+                atomsobj.center_CM()
+                dr = nx * self._r1 + ny * self._r2
+                while dr[0] < 0:
+                    dr[0] += Lx
+                atomsobj.translate(dr)
+                self._structure_atoms.extend(atomsobj.atoms)
+                self._Ntubes += 1
+
+    def _generate_bundle(self, atomsobj0):
+        for nx in xrange(self._nx):
+            for ny in xrange(self._ny):
+                atomsobj = Atoms(atoms=atomsobj0, deepcopy=True)
+                atomsobj.center_CM()
+                dr = nx * self._r1 + ny * self._r2
+                atomsobj.translate(dr)
+                self._structure_atoms.extend(atomsobj.atoms)
+                self._Ntubes += 1
+
     def generate_structure_data(self):
         """Generate structure data."""
         super(MWNTBundleGenerator, self).generate_structure_data()
@@ -492,46 +602,12 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
         self._structure_atoms = Atoms()
 
         if self._bundle_geometry == 'hexagon':
-            nrows = max(self._nx, self._ny, 3)
-            if nrows % 2 != 1:
-                nrows += 1
-
-            ntubes_per_end_rows = int((nrows + 1) / 2)
-
-            row = 0
-            ntubes_per_row = nrows
-            while ntubes_per_row >= ntubes_per_end_rows:
-                if row == 0:
-                    for n in xrange(ntubes_per_row):
-                        mwnt = Atoms(atoms=mwnt0.atoms, deepcopy=True)
-                        mwnt.center_CM()
-                        dr = n * self._r1
-                        mwnt.translate(dr)
-                        self._structure_atoms.extend(mwnt.atoms)
-                        self._Ntubes += 1
-                else:
-                    for nx in xrange(ntubes_per_row):
-                        for ny in (-row, row):
-                            mwnt = Atoms(atoms=mwnt0.atoms, deepcopy=True)
-                            mwnt.center_CM()
-                            dr = np.zeros(3)
-                            dr[0] = abs(ny * self._r2[0])
-                            dr[1] = ny * self._r2[1]
-                            dr = nx * self._r1 + dr
-                            mwnt.translate(dr)
-                            self._structure_atoms.extend(mwnt.atoms)
-                            self._Ntubes += 1
-                row += 1
-                ntubes_per_row = nrows - row
+            self._generate_hexagonal_bundle(mwnt0)
+        elif self._bundle_geometry == 'rectangle':
+            self._generate_rectangular_bundle(mwnt0)
         else:
-            for nx in xrange(self._nx):
-                for ny in xrange(self._ny):
-                    mwnt = Atoms(atoms=mwnt0.atoms, deepcopy=True)
-                    mwnt.center_CM()
-                    dr = nx * self._r1 + ny * self._r2
-                    mwnt.translate(dr)
-                    self._structure_atoms.extend(mwnt.atoms)
-                    self._Ntubes += 1
+            self._generate_bundle(mwnt0)
+
         self._Natoms_per_bundle = self._Ntubes * self._Natoms_per_tube
 
         if self._verbose:
