@@ -10,8 +10,8 @@ Nanotube structure tools (:mod:`sknano.nanogen._nanotubes`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from fractions import gcd
 from collections import OrderedDict
+from fractions import gcd
 
 import numpy as np
 np.seterr(all='raise')
