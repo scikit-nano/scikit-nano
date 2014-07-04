@@ -147,7 +147,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                  rotate_structure=False, rotation_angle=None,
                  rotation_axis=None,
                  fname=None, outpath=None, structure_format=None,
-                 verbose=False):
+                 verbose=False, **kwargs):
 
         self._Ntubes = None
         self._Natoms_per_tube = None
@@ -163,7 +163,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                                            Lx=Lx, Ly=Ly, Lz=Lz,
                                            fix_Lz=fix_Lz,
                                            verbose=verbose)
-            ntbg.save_data(structure_format='data')
+            ntbg.save_data(structure_format='data', **kwargs)
             fname = ntbg.fname
             structure_format = ntbg.structure_format
             self._Ntubes = ntbg.Ntubes

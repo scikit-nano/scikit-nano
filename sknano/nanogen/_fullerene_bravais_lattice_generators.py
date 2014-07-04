@@ -51,7 +51,7 @@ class FullereneBravaisLatticeGenerator(FullereneGenerator):
 
     def save_data(self, fname=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
-                  center_CM=True):
+                  center_CM=True, **kwargs):
         """Save structure data.
 
         See :py:meth:`~sknano.nanogen.StructureGenerator.save_data` method
@@ -64,4 +64,4 @@ class FullereneBravaisLatticeGenerator(FullereneGenerator):
         super(FullereneBravaisLatticeGenerator, self).save_data(
             fname=fname, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
-            deg2rad=deg2rad, center_CM=center_CM)
+            deg2rad=deg2rad, center_CM=center_CM, **kwargs)

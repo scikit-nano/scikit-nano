@@ -194,7 +194,7 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
-                  center_CM=True):
+                  center_CM=True, **kwargs):
         """Save structure data.
 
         See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
@@ -229,7 +229,7 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
         super(NanotubeGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
-            deg2rad=deg2rad, center_CM=False)
+            deg2rad=deg2rad, center_CM=False, **kwargs)
 
 
 class CappedNanotubeGenerator(Nanotube, StructureGenerator):
@@ -387,7 +387,7 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
-                  center_CM=True):
+                  center_CM=True, **kwargs):
         """Save structure data.
 
         See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
@@ -443,7 +443,7 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
         super(UnrolledNanotubeGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
-            deg2rad=deg2rad, center_CM=False)
+            deg2rad=deg2rad, center_CM=False, **kwargs)
 
 
 class MWNTGenerator(NanotubeGenerator):
@@ -741,7 +741,7 @@ class MWNTGenerator(NanotubeGenerator):
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
-                  center_CM=True):
+                  center_CM=True, **kwargs):
         """Save structure data.
 
         See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
@@ -766,4 +766,4 @@ class MWNTGenerator(NanotubeGenerator):
         super(MWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
-            deg2rad=deg2rad, center_CM=center_CM)
+            deg2rad=deg2rad, center_CM=center_CM, **kwargs)

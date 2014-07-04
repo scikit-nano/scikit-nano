@@ -210,7 +210,7 @@ class GrapheneGenerator(Graphene, StructureGenerator):
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=-90, rot_axis='x', deg2rad=True,
-                  center_CM=True):
+                  center_CM=True, **kwargs):
         """Save structure data.
 
         See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
@@ -233,7 +233,7 @@ class GrapheneGenerator(Graphene, StructureGenerator):
         super(GrapheneGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
-            deg2rad=deg2rad, center_CM=False)
+            deg2rad=deg2rad, center_CM=False, **kwargs)
 
 
 class BiLayerGrapheneGenerator(GrapheneGenerator):

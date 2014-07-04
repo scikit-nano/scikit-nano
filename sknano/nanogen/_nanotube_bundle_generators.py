@@ -302,7 +302,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
-                  center_CM=True):
+                  center_CM=True, **kwargs):
         """Save structure data.
 
         See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
@@ -340,7 +340,7 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
         super(NanotubeBundleGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
-            deg2rad=deg2rad, center_CM=center_CM)
+            deg2rad=deg2rad, center_CM=center_CM, **kwargs)
 
 
 class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
@@ -616,7 +616,7 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
-                  center_CM=True):
+                  center_CM=True, **kwargs):
         """Save structure data.
 
         See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
@@ -659,4 +659,4 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
         super(MWNTBundleGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
-            deg2rad=deg2rad, center_CM=center_CM)
+            deg2rad=deg2rad, center_CM=center_CM, **kwargs)

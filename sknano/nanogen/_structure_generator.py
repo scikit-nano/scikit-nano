@@ -57,7 +57,7 @@ class StructureGenerator(object):
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
-                  center_CM=True):
+                  center_CM=True, **kwargs):
         """Save structure data.
 
         Parameters
@@ -116,7 +116,7 @@ class StructureGenerator(object):
 
         if structure_format == 'data':
             DATAWriter.write(fname=fname, outpath=outpath,
-                             atoms=self.structure_atoms)
+                             atoms=self.structure_atoms, **kwargs)
         else:
             XYZWriter.write(fname=fname, outpath=outpath,
-                            atoms=self.structure_atoms)
+                            atoms=self.structure_atoms, **kwargs)

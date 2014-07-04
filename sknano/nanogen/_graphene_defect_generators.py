@@ -187,7 +187,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                  nlayers=1, layer_spacing=3.35, stacking_order='AB',
                  fname=None, outpath=None, structure_format=None,
                  rotate_structure=False, rotation_angle=None,
-                 rotation_axis=None, verbose=False):
+                 rotation_axis=None, verbose=False, **kwargs):
 
         if fname is None:
             if isinstance(length, (int, float)) and \
@@ -207,7 +207,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                 raise TypeError('Either `fname` must be set or `n` and `m` '
                                 'must be specified as integers or `length` '
                                 'and `width` must be specified as floats.')
-            gg.save_data(outpath=outpath, structure_format='data')
+            gg.save_data(outpath=outpath, structure_format='data', **kwargs)
             fname = gg.fname
             structure_format = gg.structure_format
 
