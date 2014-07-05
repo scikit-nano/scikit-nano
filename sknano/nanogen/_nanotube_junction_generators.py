@@ -16,7 +16,7 @@ __docformat__ = 'restructuredtext en'
 
 #import numpy as np
 
-#from ..chemistry import Atom, Atoms
+from ..structure_io.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 #from ..tools import plural_word_check
 from ..tools.refdata import CCbond
 
@@ -38,7 +38,7 @@ class NanotubeJunctionGenerator(NanotubeGenerator):
         the *length* of the nanotube.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :py:class:`~sknano.chemistry.Atoms` 1 and 2
+        :py:class:`~sknano.structure_io.atoms.Atom` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.

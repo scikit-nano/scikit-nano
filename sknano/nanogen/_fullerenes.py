@@ -24,8 +24,6 @@ try:
 except ImportError:
     Qty = None
 
-#from ..chemistry import Atom
-
 #param_units = {}
 
 __all__ = ['Fullerene']

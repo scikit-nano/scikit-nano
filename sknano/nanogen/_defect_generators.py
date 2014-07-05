@@ -14,9 +14,9 @@ import os
 
 import numpy as np
 
-from ..chemistry import Atoms
 from ..structure_io import DATAReader, DATAWriter, XYZWriter, \
     XYZ2DATAConverter, StructureFormatError, supported_structure_formats
+from ..structure_io.atoms import LAMMPSAtoms as Atoms
 
 vac_type_cluster_size_map = {'double': 2, 'triple': 3}
 

@@ -21,7 +21,7 @@ except ImportError:
 
 import numpy as np
 
-from ..chemistry import Atom
+from ..structure_io.atoms import Atom
 from ..tools import Vector2D, Vector3D
 from ..tools.refdata import CCbond
 
@@ -118,7 +118,7 @@ class Graphene(object):
         the `length` of the sheet.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.structure_io.atoms.Atom` 1 and 2
     bond : float, optional
         bond length between nearest-neighbor atoms in **Angstroms**.
     nlayers : int, optional
@@ -222,12 +222,14 @@ class Graphene(object):
 
     @property
     def Natoms(self):
-        """Number of :class:`~sknano.chemistry.Atoms` in **unit cell**"""
+        """Number of :class:`~sknano.structure_io.atoms.Atom`\ s in
+        **unit cell**."""
         return self._Natoms
 
     @property
     def Natoms_per_layer(self):
-        """Number of :class:`~sknano.chemistry.Atoms` in **layer**."""
+        """Number of :class:`~sknano.structure_io.atoms.Atom`\ s in
+        **layer**."""
         return self._Natoms_per_layer
 
     @classmethod
@@ -281,23 +283,23 @@ class Graphene(object):
 
     @property
     def element1(self):
-        """Element symbol of :class:`~sknano.chemistry.Atom` 1."""
+        """Element symbol of :class:`~sknano.structure_io.atoms.Atom` 1."""
         return self._element1
 
     @element1.setter
     def element1(self, value):
-        """Set element symbol of :class:`~sknano.chemistry.Atom` 1."""
+        """Set element symbol of :class:`~sknano.structure_io.atoms.Atom` 1."""
         self._element1 = value
         self.compute_layer_params()
 
     @property
     def element2(self):
-        """Element symbol of :class:`~sknano.chemistry.Atom` 2."""
+        """Element symbol of :class:`~sknano.structure_io.atoms.Atom` 2."""
         return self._element2
 
     @element2.setter
     def element2(self, value):
-        """Set element symbol of :class:`~sknano.chemistry.Atom` 2."""
+        """Set element symbol of :class:`~sknano.structure_io.atoms.Atom` 2."""
         self._element2 = value
         self.compute_layer_params()
 

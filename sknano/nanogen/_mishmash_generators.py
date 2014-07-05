@@ -16,7 +16,7 @@ __docformat__ = 'restructuredtext en'
 
 #import numpy as np
 
-from ..chemistry import Atoms
+from ..structure_io.atoms import StructureAtoms as Atoms
 
 from ._structure_generator import StructureGenerator
 

@@ -14,7 +14,7 @@ import copy
 
 import numpy as np
 
-from ..chemistry import Atom, Atoms
+from ..structure_io.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from ..tools import rotation_matrix
 from ..tools.refdata import CCbond
 
@@ -38,7 +38,7 @@ class GrapheneGenerator(Graphene, StructureGenerator):
         the `length` of the sheet.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.structure_io.atoms.Atom` 1 and 2
     bond : float, optional
         bond length between nearest-neighbor atoms in **Angstroms**.
     nlayers : int, optional
@@ -250,7 +250,7 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
         the `length` of the sheet.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.structure_io.atoms.Atom` 1 and 2
     bond : float, optional
         bond length between nearest-neighbor atoms in **Angstroms**.
     layer_spacing : float, optional

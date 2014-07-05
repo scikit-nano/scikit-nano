@@ -16,7 +16,7 @@ __docformat__ = 'restructuredtext en'
 
 #import numpy as np
 
-from ..chemistry import Atoms
+from ..structure_io.atoms import Atoms
 #from ..tools.refdata import CCbond
 
 from ._fullerene_generators import FullereneGenerator

@@ -35,7 +35,7 @@ class TwistedBundleGenerator(NanotubeBundleGenerator):
         Number of repeat unit cells in the :math:`x, y, z` dimensions.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :py:class:`~sknano.chemistry.Atoms` 1 and 2
+        :py:class:`~sknano.structure_io.atoms.Atom` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.

@@ -77,7 +77,7 @@ import argparse
 import importlib
 import sys
 
-from ..chemistry import Atom
+from ..structure_io.atoms import StructureAtom as Atom
 from ..nanogen import TubeGen, tubegen_format_ext_map
 from ..structure_io import XYZ2DATAConverter
 from ..tools.refdata import CCbond, dVDW

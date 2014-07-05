@@ -12,9 +12,9 @@ __docformat__ = 'restructuredtext en'
 
 import os
 
-from ..chemistry import Atoms
 from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
     supported_structure_formats
+from ..structure_io.atoms import StructureAtoms as Atoms
 from ..tools import rotation_matrix
 
 __all__ = ['StructureGenerator']
@@ -42,7 +42,7 @@ class StructureGenerator(object):
 
     @property
     def structure_atoms(self):
-        """Return structure :class:`~sknano.chemistry.Atoms`."""
+        """Return structure :class:`~sknano.structure_io.atoms.Atoms`."""
         return self._structure_atoms
 
     @property
@@ -52,7 +52,7 @@ class StructureGenerator(object):
 
     @property
     def unit_cell(self):
-        """Return unit cell :class:`~sknano.chemistry.Atoms`."""
+        """Return unit cell :class:`~sknano.structure_io.atoms.Atoms`."""
         return self._unit_cell
 
     def save_data(self, fname=None, outpath=None, structure_format=None,

@@ -25,7 +25,7 @@ import copy
 
 import numpy as np
 
-from ..chemistry import Atom, Atoms
+from ..structure_io.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from ..tools import plural_word_check
 from ..tools.refdata import CCbond
 
@@ -48,7 +48,7 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
         the *length* of the nanotube.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.structure_io.atoms.Atom` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
@@ -251,7 +251,7 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
         Number of repeat unit cells in the :math:`x, y, z` dimensions
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.structure_io.atoms.Atom` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
@@ -466,7 +466,7 @@ class MWNTGenerator(NanotubeGenerator):
         Number of repeat unit cells in the :math:`x, y, z` dimensions.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.chemistry.Atoms` 1 and 2
+        :class:`~sknano.structure_io.atoms.Atom` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
