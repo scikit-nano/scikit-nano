@@ -12,7 +12,7 @@ __docformat__ = 'restructuredtext en'
 
 import os
 
-from ..chemistry import Atom
+from .atoms import Atom
 from ..tools import get_fpath
 
 from ._structure_data import StructureReader, StructureReaderError, \
@@ -71,8 +71,8 @@ class ZMATRIXWriter(StructureWriter):
             Output file path.
         fpath : str, optional
             Full path (directory path + file name) to output data file.
-        atoms : :py:class:`~sknano.chemistry.Atoms`
-            An :py:class:`~sknano.chemistry.Atoms` instance.
+        atoms : :class:`~sknano.structure_io.atoms.Atoms`
+            An :class:`~sknano.structure_io.atoms.Atoms` instance.
         comment_line : str, optional
             A string written to the first line of `zmatrix` file. If `None`,
             then it is set to the full path of the output `zmatrix` file.
@@ -175,7 +175,7 @@ class ZMATRIX2DATAConverter(StructureConverter):
 
         Parameters
         ----------
-        atom : `Atom`
+        atom : :class:`~sknano.structure_io.atoms.Atom`
 
         """
         self._new_atoms.append(atom)
@@ -187,7 +187,7 @@ class ZMATRIX2DATAConverter(StructureConverter):
 
         Parameters
         ----------
-        atom : `Atom`
+        atom : :class:`~sknano.structure_io.atoms.Atom`
 
         """
         self._new_atomtypes.append(atom)

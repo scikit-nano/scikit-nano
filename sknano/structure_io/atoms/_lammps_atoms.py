@@ -281,12 +281,12 @@ class LAMMPSAtoms(Atoms):
         self._NN_cutoff = value
 
     def add_atomtype(self, atom):
-        """Add atom type to :py:attr:`~sknano.chemistry.LAMMPSAtoms.atomtypes`.
+        """Add atom type to :attr:`~LAMMPSAtoms.atomtypes`.
 
         Parameters
         ----------
-        atom : `LAMMPSAtom`
-            an intance of a `LAMMPSAtom` object
+        atom : :class:`~sknano.structure_io.atoms.LAMMPSAtom`
+            A :class:`~sknano.structure_io.atoms.LAMMPSAtom` instance.
 
         """
         if atom.atomtype not in self._atomtypes:

@@ -266,19 +266,19 @@ class DATAWriter(StructureWriter):
             Output file path.
         fpath : str, optional
             Full path (directory path + file name) to output data file.
-        atoms : :class:`~sknano.chemistry.Atoms`
-            An :class:`~sknano.chemistry.Atoms` instance.
+        atoms : :class:`~sknano.structure_io.atoms.Atoms`
+            An :class:`~sknano.structure_io.atoms.Atoms` instance.
         boxbounds : dict, optional
             If `None`, determined automatically from the `atoms` coordinates.
         comment_line : str, optional
             A string written to the first line of `data` file. If `None`,
             then it is set to the full path of the output `data` file.
         assume_unique_atoms : bool, optional
-            Check that each :class:`~sknano.chemistry.Atom` in `atoms`
-            has a unique :attr:`~sknano.chemistry.Atom.atomID`.
+            Check that each :class:`~sknano.structure_io.atoms.Atom` in `atoms`
+            has a unique :attr:`~sknano.structure_io.atoms.Atom.atomID`.
             If the check fails, then assign a unique
-            :attr:`~sknano.chemistry.Atom.atomID` to each
-            :class:`~sknano.chemistry.Atom`.
+            :attr:`~sknano.structure_io.atoms.Atom.atomID`.
+            to each :class:`~sknano.structure_io.atoms.Atom`.
             If `assume_unique_atoms` is True, but the atomID's are not unique,
             LAMMPS will not be able to read the data file.
         verbose : bool, optional

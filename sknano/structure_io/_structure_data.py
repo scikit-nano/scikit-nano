@@ -13,7 +13,6 @@ __docformat__ = 'restructuredtext en'
 from abc import ABCMeta, abstractmethod
 from collections import OrderedDict
 
-#from ..chemistry import Atoms
 from sknano.version import short_version as version
 
 default_comment_line = \

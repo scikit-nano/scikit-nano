@@ -6,14 +6,6 @@ Structure data atoms (:mod:`sknano.structure_io.atoms`)
 
 .. currentmodule:: sknano.structure_io.atoms
 
-.. note::
-
-   These classes have **NOT** yet been implemented in any of the
-   :py:mod:`~sknano.structure_io` classes and are still in development.
-   Currently, the :py:mod:`~sknano.structure_io` classes use the
-   :py:class:`~sknano.chemistry.Atom` and :py:class:`~sknano.chemistry.Atoms`
-   classes provided by the :py:mod:`~sknano.chemistry` package.
-
 Contents
 ========
 .. autosummary::

@@ -12,7 +12,6 @@ __docformat__ = 'restructuredtext en'
 
 import os
 
-#from ..chemistry import Atom
 from .atoms import XYZAtom as Atom, XYZAtoms
 from ..tools import get_fpath
 
@@ -75,8 +74,8 @@ class XYZWriter(StructureWriter):
             Output file path.
         fpath : str, optional
             Full path (directory path + file name) to output data file.
-        atoms : :class:`~sknano.chemistry.Atoms`
-            An :class:`~sknano.chemistry.Atoms` instance.
+        atoms : :class:`~sknano.structure_io.atoms.Atoms`
+            An :class:`~sknano.structure_io.atoms.Atoms` instance.
         comment_line : str, optional
             A string written to the first line of `xyz` file. If `None`,
             then it is set to the full path of the output `xyz` file.
