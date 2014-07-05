@@ -184,6 +184,8 @@ class NanotubeBundleGenerator(NanotubeGenerator, NanotubeBundle):
         else:
             self._r2[0] = self._r1[0] * np.cos(2 * np.pi / 3)
             self._r2[1] = self._r1[0] * np.sin(2 * np.pi / 3)
+            if bundle_packing is None:
+                bundle_packing = 'hcp'
 
         self._bundle_packing = bundle_packing
         self._bundle_geometry = bundle_geometry
@@ -462,6 +464,8 @@ class MWNTBundleGenerator(MWNTGenerator, NanotubeBundle):
         else:
             self._r2[0] = self._r1[0] * np.cos(2 * np.pi / 3)
             self._r2[1] = self._r1[0] * np.sin(2 * np.pi / 3)
+            if bundle_packing is None:
+                bundle_packing = 'hcp'
 
         self._bundle_packing = bundle_packing
         self._bundle_geometry = bundle_geometry
