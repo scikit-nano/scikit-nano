@@ -16,7 +16,7 @@ __docformat__ = 'restructuredtext en'
 
 #import numpy as np
 
-from ..tools.refdata import CCbond
+from ..tools.refdata import CCbond, dVDW
 
 from ._nanotube_bundle_generators import NanotubeBundleGenerator
 
@@ -68,11 +68,9 @@ class TwistedBundleGenerator(NanotubeBundleGenerator):
     """
 
     def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
-                 element1='C', element2='C', bond=CCbond, vdw_spacing=3.4,
+                 element1='C', element2='C', bond=CCbond, vdw_spacing=dVDW,
                  bundle_packing=None, bundle_geometry=None, Lx=None, Ly=None,
                  Lz=None, fix_Lz=False, autogen=True, verbose=False):
-
-        raise RuntimeError('This class is not yet implemented.')
 
         super(TwistedBundleGenerator, self).__init__(
             n=n, m=m, nx=nx, ny=ny, nz=nz, element1=element1,
