@@ -268,18 +268,24 @@ class StructureAtoms(Atoms):
 
     @property
     def NN_number(self):
+        """Number of nearest neighbors to return when querying the kd-tree."""
         return self._NN_number
 
     @NN_number.setter
     def NN_number(self, value):
+        """Set maximum number of nearest neighbors to return when querying
+        the kd-tree."""
         self._NN_number = int(value)
 
     @property
     def NN_cutoff(self):
+        """Only return neighbors within this distance when querying the
+        kd-tree."""
         return self._NN_cutoff
 
     @NN_cutoff.setter
     def NN_cutoff(self, value):
+        """Set the cutoff distance to check for neighest neighbors."""
         self._NN_cutoff = value
 
     def add_atomtype(self, atom):
