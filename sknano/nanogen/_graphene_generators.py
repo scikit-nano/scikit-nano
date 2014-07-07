@@ -329,7 +329,7 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
 
         self._rotation_matrix = None
         if rotation_angle is not None:
-            self._rotation_matrix = rotation_matrix(rotation_angle,
+            self._rotation_matrix = rotation_matrix(angle=rotation_angle,
                                                     rot_axis='z',
                                                     deg2rad=deg2rad)
 
