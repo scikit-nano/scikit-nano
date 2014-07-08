@@ -13,7 +13,6 @@ Subpackages
 ::
 
  analysis       --- functions and classes for structure analysis
- chemistry      --- abstract data structures for chemistry
  nanogen        --- classes for generating nanostructures
  nanogen_gui    --- NanoGen GUI front-end
  scripts        --- command-line scripts
@@ -28,10 +27,9 @@ Utilitiy tools
  __version__    --- sknano version string
 
 """
-from __future__ import print_function, absolute_import
+from __future__ import absolute_import, print_function
 
 __all__ = ['analysis',
-           'chemistry',
            'nanogen',
            'nanogen_gui',
            'scripts',

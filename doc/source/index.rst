@@ -36,7 +36,6 @@ Reference
 .. toctree::
    :maxdepth: 1
 
-   chemistry.rst
    nanogen.rst
    nanogen_gui.rst
    scripts.rst
