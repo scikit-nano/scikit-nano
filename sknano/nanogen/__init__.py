@@ -60,19 +60,10 @@ Classes for creating abstract physical representations of nano-structures
 .. autosummary::
    :toctree: generated/
 
-   Fullerene
    Graphene
    GraphenePrimitiveCell
    Nanotube
    NanotubeBundle
-
-Classes for generating fullerene structure data
-------------------------------------------------
-.. autosummary::
-   :toctree: generated/
-
-   FullereneGenerator
-   FullereneBravaisLatticeGenerator
 
 Classes for generating graphene structure data
 -----------------------------------------------
@@ -116,8 +107,14 @@ Helper functions
 .. autosummary::
    :toctree: generated/
 
+   cmp_Ch
+   filter_Ch
+   filter_Ch_list
    generate_Ch_list
    generate_Ch_property_grid
+   get_Ch_indices
+   get_Ch_type
+   map_Ch
 
 """
 from __future__ import absolute_import, division, print_function
