@@ -19,6 +19,7 @@ from ..structure_io import DATAReader, DATAWriter, XYZWriter, \
     XYZ2DATAConverter, StructureFormatError, supported_structure_formats
 from ..structure_io.atoms import LAMMPSAtoms as Atoms
 
+xyz_tuple = ('x', 'y', 'z')
 vac_type_cluster_size_map = {'double': 2, 'triple': 3}
 
 __all__ = ['DefectGenerator', 'CrossLinkedDefectGenerator',
@@ -132,7 +133,7 @@ class VacancyGenerator(DefectGenerator):
         self._Nvac_clusters = 0
         self._Nvac_sites = 0
 
-        self._vac_bounds = OrderedDict()
+        self._vac_bounds = OrderedDict(zip(xyz_tuple, 3 * [2 * [None]]))
 
         self._vac_ids = np.empty(0, dtype=int)
         self._vac_type = 'single'
@@ -172,6 +173,14 @@ class VacancyGenerator(DefectGenerator):
     @cluster_size.setter
     def cluster_size(self, value):
         self._cluster_size = value
+
+    @property
+    def vac_bounds(self):
+        return self._vac_bounds
+
+    @vac_bounds.setter
+    def vac_bounds(self, value):
+        self._vac_bounds = value
 
     @property
     def vac_ids(self):
