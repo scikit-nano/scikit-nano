@@ -263,6 +263,18 @@ class Nanotube(object):
 
         self.compute_tube_params()
 
+    def __repr__(self):
+        if self._fix_Lz:
+            return("Nanotube(n={!r}, m={!r}, element1={!r}, element2={!r}, "
+                   "bond={!r}, Lz={!r}, fix_Lz={!r})".format(
+                       self._n, self._m, self._element1, self._element2,
+                       self._bond, self._Lz, self._fix_Lz))
+        else:
+            return("Nanotube(n={!r}, m={!r}, nz={!r}, element1={!r}, "
+                   "element2={!r}, bond={!r})".format(
+                       self._n, self._m, self._nz, self._element1,
+                       self._element2, self._bond))
+
     def compute_tube_params(self):
         """Compute/update nanotube parameters."""
         self._d = self.compute_d(n=self._n, m=self._m)
