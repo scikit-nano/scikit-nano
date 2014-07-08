@@ -50,7 +50,7 @@ def cmp_Ch(Ch1, Ch2):
         Ch1_type = get_Ch_type(Ch1)
         n2, m2 = Ch2
         Ch2_type = get_Ch_type(Ch2)
-    elif isinstance(Ch1, str) and isinstance(Ch2, str):
+    elif isinstance(Ch1, (str, unicode)) and isinstance(Ch2, (str, unicode)):
         n1, m1 = get_Ch_indices(Ch1)
         Ch1_type = get_Ch_type(Ch1)
         n2, m2 = get_Ch_indices(Ch2)

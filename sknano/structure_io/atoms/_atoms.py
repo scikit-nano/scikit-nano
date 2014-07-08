@@ -248,7 +248,7 @@ class Atoms(MutableSequence):
         if as_dict:
             if components is None or components == 'r':
                 components = ('x', 'y', 'z')
-            elif isinstance(components, str):
+            elif isinstance(components, (str, unicode)):
                 components = (components,)
 
             return OrderedDict(zip(

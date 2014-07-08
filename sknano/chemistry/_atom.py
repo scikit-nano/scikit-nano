@@ -90,7 +90,7 @@ class Atom(object):
                 self._m = atomic_masses[self._symbol]
             except KeyError:
                 print('unrecognized element number: {}'.format(element))
-        elif isinstance(element, str):
+        elif isinstance(element, (str, unicode)):
             self._symbol = element
             try:
                 self._Z = atomic_numbers[self._symbol]

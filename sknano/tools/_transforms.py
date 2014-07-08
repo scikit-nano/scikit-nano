@@ -61,7 +61,7 @@ def rotation_matrix(angle=None, rot_axis=None, deg2rad=False, R4x4=False):
     """
     if angle is None or rot_axis is None:
         raise TypeError('`angle` and `rot_axis` are required')
-    if isinstance(rot_axis, str):
+    if isinstance(rot_axis, (str, unicode)):
         try:
             rot_axis = _str2array[rot_axis]
         except KeyError:
@@ -184,7 +184,7 @@ def transformation_matrix(angle=None, rot_axis=None, rvec=None,
     """
     if angle is None or P0 is None or (rot_axis is None and P1 is None):
         raise TypeError('`angle`, `P0`, and `rot_axis` or `P1` are required')
-    if isinstance(rot_axis, str):
+    if isinstance(rot_axis, (str, unicode)):
         try:
             rot_axis = _str2array[rot_axis]
         except KeyError:

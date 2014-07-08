@@ -50,7 +50,7 @@ class Atom(object):
                 self._m = atomic_masses[self._symbol]
             except KeyError:
                 print('unrecognized element number: {}'.format(element))
-        elif isinstance(element, str):
+        elif isinstance(element, (str, unicode)):
             self._symbol = element
             try:
                 self._Z = atomic_numbers[self._symbol]
@@ -83,13 +83,10 @@ class Atom(object):
 
         self._attributes = ['symbol', 'Z', 'm', 'r']
 
-    def __str__(self):
+    def __repr__(self):
         """Return string representation of atom."""
-        atom_str = ''
-        for attr in self._attributes:
-            atom_str += \
-                'Atom {}: {}\n'.format(attr, getattr(self, '_' + attr))
-        return atom_str
+        return("Atom(element={!r}, m={!r}, x={!r}, y={!r}, z={!r})".format(
+            self.element, self.m, self.x, self.y, self.z))
 
     @property
     def atomdict(self):
@@ -116,7 +113,7 @@ class Atom(object):
         str
             Element symbol.
         """
-        return self.symbol
+        return self._symbol
 
     @property
     def symbol(self):
@@ -269,7 +266,7 @@ class Atom(object):
         if as_dict:
             if components is None or components == 'r':
                 components = ('x', 'y', 'z')
-            elif isinstance(components, str):
+            elif isinstance(components, (str, unicode)):
                 components = (components,)
 
             return OrderedDict(zip(

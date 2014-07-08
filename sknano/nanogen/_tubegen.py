@@ -246,12 +246,12 @@ class TubeGen(object):
         nx, ny, nz = cell_count
 
         if Lz is not None and Lz != 'None' and \
-                isinstance(Lz, (int, float, str)) and \
+                isinstance(Lz, (int, float, str, unicode)) and \
                 shape in ('hexagonal', 'cubic'):
             Lz = 10 * float(Lz)
             nz = int(np.ceil(Lz / T))
         elif nz is not None and nz != 'None' and \
-                isinstance(nz, (int, float, str)):
+                isinstance(nz, (int, float, str, unicode)):
             nz = int(nz)
             Lz = nz * T
 
