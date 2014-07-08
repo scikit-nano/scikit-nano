@@ -20,6 +20,7 @@ except ImportError:
 import numpy as np
 
 from ._corefuncs import check_type
+from ._luts import xyz
 
 __all__ = ['Point', 'Point2D', 'Point3D',
            'Vector', 'Vector2D', 'Vector3D',
@@ -57,13 +58,16 @@ class Point(object):
         if self._with_units:
             return str(self._p)
         else:
-            return '({}, {}, {})'.format(self.x, self.y, self.z)
+            return repr(self)
 
     def __repr__(self):
         if self._with_units:
-            return repr(self._p)
+            return("Point(x={!r}, y={!r}, z={!r}, with_units={!r}, "
+                   "units={!r})".format(self.x.magnitude, self.y.magnitude,
+                                        self.z.magnitude, True, self._units))
         else:
-            return '({}, {}, {})'.format(self.x, self.y, self.z)
+            return("Point(x={!r}, y={!r}, z={!r})".format(
+                self.x, self.y, self.z))
 
     @property
     def x(self):
@@ -291,13 +295,15 @@ class Point2D(object):
         if self._with_units:
             return str(self._p)
         else:
-            return '({}, {})'.format(self.x, self.y)
+            return repr(self)
 
     def __repr__(self):
         if self._with_units:
-            return repr(self._p)
+            return("Point(x={!r}, y={!r}, with_units={!r}, "
+                   "units={!r})".format(self.x.magnitude, self.y.magnitude,
+                                        True, self._units))
         else:
-            return '({}, {})'.format(self.x, self.y)
+            return("Point(x={!r}, y={!r})".format(self.x, self.y))
 
     @property
     def x(self):
@@ -525,34 +531,36 @@ class Vector(object):
         if self._with_units:
             return str(self._v)
         else:
-            return '({}, {}, {})'.format(self.x, self.y, self.z)
+            return repr(self)
 
     def __repr__(self):
         if self._with_units:
-            return repr(self._v)
+            return("Vector(p={!r}, p0={!r}, "
+                   "with_units={!r}, units={!r})".format(
+                       self._p, self._p0, True, self._units))
         else:
-            return '({}, {}, {})'.format(self.x, self.y, self.z)
+            return("Vector(p={!r}, p0={!r})".format(self._p, self._p0))
 
     @property
     def x(self):
-        """:math:`x`-coordinate of `Vector`.
+        """:math:`x`-component of `Vector`.
 
         Returns
         -------
         float
-            :math:`x`-coordinate of `Vector`.
+            :math:`x`-component of `Vector`.
 
         """
         return self._v[0]
 
     @x.setter
     def x(self, value=float):
-        """Set :math:`x`-coordinate of `Vector`.
+        """Set :math:`x`-component of `Vector`.
 
         Parameters
         ----------
         value : float
-            :math:`x`-coordinate of `Vector`.
+            :math:`x`-component of `Vector`.
 
         """
         try:
@@ -568,27 +576,29 @@ class Vector(object):
                 self._v[0] = Qty(value, self._units)
         except TypeError as e:
             print(e)
+        else:
+            self._p.x = self._p0.x + value
 
     @property
     def y(self):
-        """:math:`y`-coordinate of `Vector`.
+        """:math:`y`-component of `Vector`.
 
         Returns
         -------
         float
-            :math:`y`-coordinate of `Vector`.
+            :math:`y`-component of `Vector`.
 
         """
         return self._v[1]
 
     @y.setter
     def y(self, value=float):
-        """Set :math:`y`-coordinate of `Vector`.
+        """Set :math:`y`-component of `Vector`.
 
         Parameters
         ----------
         value : float
-            :math:`y`-coordinate of `Vector`.
+            :math:`y`-component of `Vector`.
 
         """
         try:
@@ -604,27 +614,29 @@ class Vector(object):
                 self._v[1] = Qty(value, self._units)
         except TypeError as e:
             print(e)
+        else:
+            self._p.y = self._p0.y + value
 
     @property
     def z(self):
-        """:math:`z`-coordinate of `Vector`.
+        """:math:`z`-component of `Vector`.
 
         Returns
         -------
         float
-            :math:`z`-coordinate of `Vector`.
+            :math:`z`-component of `Vector`.
 
         """
         return self._v[2]
 
     @z.setter
     def z(self, value=float):
-        """Set :math:`z`-coordinate of `Vector`.
+        """Set :math:`z`-component of `Vector`.
 
         Parameters
         ----------
         value : float
-            :math:`z`-coordinate of `Vector`.
+            :math:`z`-component of `Vector`.
 
         """
         try:
@@ -640,6 +652,8 @@ class Vector(object):
                 self._v[2] = Qty(value, self._units)
         except TypeError as e:
             print(e)
+        else:
+            self._p.z = self._p0.z + value
 
     @property
     def components(self):
@@ -683,6 +697,18 @@ class Vector(object):
                     print(e)
         except TypeError as e:
             print(e)
+        else:
+            self._p.coords = self._p0.coords + value
+
+    @property
+    def p(self):
+        """Terminating :class:`Point` class of vector."""
+        return self._p
+
+    @property
+    def p0(self):
+        """Starting :class:`Point` class of vector."""
+        return self._p0
 
     def fix_minus_zero_components(self, epsilon=1.0e-10):
         """Set `Vector` components that are small, negative numbers to zero.
@@ -703,6 +729,8 @@ class Vector(object):
                     self._v[i] = 0.0
                 except ValueError:
                     self._v[i] = Qty(0.0, self._units)
+                else:
+                    setattr(self._p, xyz[i], getattr(self._p0, xyz[i]))
 
     def rezero_components(self, epsilon=1.0e-10):
         """Re-zero `Vector` components near zero.
@@ -723,6 +751,8 @@ class Vector(object):
                     self._v[i] = 0.0
                 except ValueError:
                     self._v[i] = Qty(0.0, self._units)
+                else:
+                    setattr(self._p, xyz[i], getattr(self._p0, xyz[i]))
 
 
 Vector3D = Vector
@@ -780,34 +810,36 @@ class Vector2D(object):
         if self._with_units:
             return str(self._v)
         else:
-            return '({}, {})'.format(self.x, self.y)
+            return repr(self)
 
     def __repr__(self):
         if self._with_units:
-            return repr(self._v)
+            return("Vector2D(p={!r}, p0={!r}, "
+                   "with_units={!r}, units={!r})".format(
+                       self._p, self._p0, True, self._units))
         else:
-            return '({}, {})'.format(self.x, self.y)
+            return("Vector2D(p={!r}, p0={!r})".format(self._p, self._p0))
 
     @property
     def x(self):
-        """:math:`x`-coordinate of `Vector2D`.
+        """:math:`x`-component of `Vector2D`.
 
         Returns
         -------
         float
-            :math:`x`-coordinate of `Vector2D`.
+            :math:`x`-component of `Vector2D`.
 
         """
         return self._v[0]
 
     @x.setter
     def x(self, value=float):
-        """Set :math:`x`-coordinate of `Vector2D`.
+        """Set :math:`x`-component of `Vector2D`.
 
         Parameters
         ----------
         value : float
-            :math:`x`-coordinate of `Vector2D`.
+            :math:`x`-component of `Vector2D`.
 
         """
         try:
@@ -823,27 +855,29 @@ class Vector2D(object):
                 self._v[0] = Qty(value, self._units)
         except TypeError as e:
             print(e)
+        else:
+            self._p.x = self._p0.x + value
 
     @property
     def y(self):
-        """:math:`y`-coordinate of `Vector2D`.
+        """:math:`y`-component of `Vector2D`.
 
         Returns
         -------
         float
-            :math:`y`-coordinate of `Vector2D`.
+            :math:`y`-component of `Vector2D`.
 
         """
         return self._v[1]
 
     @y.setter
     def y(self, value=float):
-        """Set :math:`y`-coordinate of `Vector2D`.
+        """Set :math:`y`-component of `Vector2D`.
 
         Parameters
         ----------
         value : float
-            :math:`y`-coordinate of `Vector2D`.
+            :math:`y`-component of `Vector2D`.
 
         """
         try:
@@ -859,6 +893,8 @@ class Vector2D(object):
                 self._v[1] = Qty(value, self._units)
         except TypeError as e:
             print(e)
+        else:
+            self._p.y = self._p0.y + value
 
     @property
     def components(self):
@@ -902,6 +938,8 @@ class Vector2D(object):
                     print(e)
         except TypeError as e:
             print(e)
+        else:
+            self._p.coords = self._p0.coords + value
 
     def fix_minus_zero_components(self, epsilon=1.0e-10):
         """Set `Vector2D` components that are small, negative numbers to zero.
@@ -922,6 +960,8 @@ class Vector2D(object):
                     self._v[i] = 0.0
                 except ValueError:
                     self._v[i] = Qty(0.0, self._units)
+                else:
+                    setattr(self._p, xyz[i], getattr(self._p0, xyz[i]))
 
     def rezero_components(self, epsilon=1.0e-10):
         """Re-zero `Vector2D` components near zero.
@@ -942,6 +982,8 @@ class Vector2D(object):
                     self._v[i] = 0.0
                 except ValueError:
                     self._v[i] = Qty(0.0, self._units)
+                else:
+                    setattr(self._p, xyz[i], getattr(self._p0, xyz[i]))
 
 
 class Quaternion(object):
