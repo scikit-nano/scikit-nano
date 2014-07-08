@@ -10,6 +10,7 @@ Generate defects in structure data (:mod:`sknano.nanogen._defect_generators`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
+from collections import OrderedDict
 import os
 
 import numpy as np
@@ -25,19 +26,7 @@ __all__ = ['DefectGenerator', 'CrossLinkedDefectGenerator',
 
 
 class DefectGenerator(object):
-    pass
-
-
-class CrossLinkedDefectGenerator(object):
-    pass
-
-
-class StoneWalesDefectGenerator(object):
-    pass
-
-
-class VacancyGenerator(object):
-    """Base class for generating vacancies in structure data.
+    """Base class for generating defects in structure data.
 
     Parameters
     ----------
@@ -91,17 +80,6 @@ class VacancyGenerator(object):
         self._atom_ids = self._atoms.atom_ids
         self._atom_coords = self._atoms.get_coords(as_dict=True)
 
-        self._Nvacs = 0
-        self._Nvac_clusters = 0
-        self._Nvac_sites = 0
-
-        self._vac_ids = np.empty(0, dtype=int)
-        self._vac_type = 'single'
-        self._cluster_size = 1
-
-        self._vmd_selection_radius = np.sqrt(10.5)
-        self._show_vmd_selection_cmd = True
-
     @property
     def atoms(self):
         return self._atoms
@@ -113,6 +91,55 @@ class VacancyGenerator(object):
     @property
     def atom_coords(self):
         return self._atom_coords
+
+
+class CrossLinkedDefectGenerator(DefectGenerator):
+    pass
+
+
+class StoneWalesDefectGenerator(DefectGenerator):
+    pass
+
+
+class VacancyGenerator(DefectGenerator):
+    """Class for generating vacancies in structure data.
+
+    Parameters
+    ----------
+    fname : str
+        structure data filename
+    outpath : str, optional
+        Output path for structure data file.
+    structure_format : {None, str}, optional
+        chemical file format of saved structure data.
+        If `None`, then guess based on `fname` file extension.
+        Otherwise, must be one of:
+
+            - `xyz`
+            - `data`
+
+    verbose : bool, optional
+        Verbose output
+
+    """
+    def __init__(self, fname=str, outpath=None, structure_format=None,
+                 verbose=False):
+        super(VacancyGenerator, self).__init__(
+            fname=fname, outpath=outpath, structure_format=structure_format,
+            verbose=verbose)
+
+        self._Nvacs = 0
+        self._Nvac_clusters = 0
+        self._Nvac_sites = 0
+
+        self._vac_bounds = OrderedDict()
+
+        self._vac_ids = np.empty(0, dtype=int)
+        self._vac_type = 'single'
+        self._cluster_size = 1
+
+        self._vmd_selection_radius = np.sqrt(10.5)
+        self._show_vmd_selection_cmd = True
 
     @property
     def Nvacs(self):
@@ -222,15 +249,10 @@ class VacancyGenerator(object):
         self._removed_atoms = \
             self._atoms.filter_atoms(vac_atoms.atom_ids, invert=False)
 
-    def _generate_stone_wales_vacancies(self):
-        pass
-
     def _generate_vacancy_structure(self):
         """Generate vacancy structure."""
         if self._vac_type in ('double', 'triple'):
             self._generate_multi_vacancies()
-        elif self._vac_type in ('stone-wales', 'SW'):
-            self._generate_stone_wales_vacancies()
         else:
             self._generate_single_vacancies()
 
