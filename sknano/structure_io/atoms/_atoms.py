@@ -76,12 +76,9 @@ class Atoms(MutableSequence):
                                     'of `Atom` objects, or an `Atoms` object '
                                     'instance.')
 
-    def __str__(self):
-        """Return string representation of `Atoms`."""
-        atoms_str = ''
-        for atom in self._atoms:
-            atoms_str += str(atom)
-        return atoms_str
+    def __repr__(self):
+        """Return `repr` string of `Atoms`."""
+        return("Atoms(atoms={!r})".format(self._atoms))
 
     @property
     def atoms(self):
