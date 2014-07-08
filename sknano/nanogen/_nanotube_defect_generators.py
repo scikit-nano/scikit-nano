@@ -16,16 +16,16 @@ import numpy as np
 
 from ..tools.refdata import CCbond
 
-from ._defect_generators import DefectGenerator, CrossLinkedDefectGenerator, \
+from ._defect_generators import CrossLinkedDefectGenerator, \
     StoneWalesDefectGenerator, VacancyGenerator
 from ._nanotube_bundle_generators import NanotubeBundleGenerator
 
-__all__ = ['NanotubeDefectGenerator',
+__all__ = ['NanotubeStoneWalesDefectGenerator',
            'NanotubeVacancyGenerator',
            'CrossLinkedNanotubeBundleGenerator']
 
 
-class NanotubeDefectGenerator(DefectGenerator, StoneWalesDefectGenerator):
+class NanotubeStoneWalesDefectGenerator(StoneWalesDefectGenerator):
     pass
 
 
