@@ -28,10 +28,10 @@ __docformat__ = 'restructuredtext en'
 from ._atom import *
 from ._atoms import *
 from ._atoms_converter import *
+from ._structure_atom import *
+from ._structure_atoms import *
 from ._lammps_atom import *
 from ._lammps_atoms import *
-from ._structure_generator_atom import *
-from ._structure_generator_atoms import *
 from ._xyz_atom import *
 from ._xyz_atoms import *
 
