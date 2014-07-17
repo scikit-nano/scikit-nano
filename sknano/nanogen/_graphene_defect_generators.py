@@ -232,6 +232,9 @@ class GrapheneVacancyGenerator(VacancyGenerator):
         vac_type : {'single', 'double', 'triple'}, optional
         uniform : bool, optional
             Generate vacancies uniformly distributed along `bin_axis`.
+        bin_axis : {'x', 'y', 'z'}, optional
+            axis along which to generate uniform vacancies
+        distribute_evenly : bool, optional
         show_vmd_selection_cmd : bool, optional
             Generate a VMD selection string that can be used to
             select the atoms surrounding the vacancies.

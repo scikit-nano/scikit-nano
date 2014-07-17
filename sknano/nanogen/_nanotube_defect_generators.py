@@ -190,8 +190,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
             total number of vacancy sites to "add" to structure data.
         Nvac_clusters : int, optional
             total number of vacancy cluster sites to "add" to structure data.
-        random : bool, optional
-            Generate random vacancies in structure data.
+        vac_type : {'single', 'double', 'triple'}, optional
         uniform : bool, optional
             Generate uniform vacancies in structure data.
         bin_axis : {'x', 'y', 'z'}, optional
