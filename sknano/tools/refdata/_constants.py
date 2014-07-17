@@ -11,6 +11,6 @@ from __future__ import absolute_import, division, print_function
 
 C_C = CCbond = 1.42  # angstroms
 C_H = CHbond = 1.09  # angstroms
-dVDW = 3.4  # angstroms
+dVDW = 3.35  # angstroms
 
 __all__ = ['C_C', 'CCbond', 'C_H', 'CHbond', 'dVDW']

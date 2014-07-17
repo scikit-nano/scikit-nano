@@ -229,6 +229,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
             total number of vacancy sites to "add" to structure data.
         Nvac_clusters : int, optional
             total number of vacancy cluster sites to "add" to structure data.
+        vac_type : {'single', 'double', 'triple'}, optional
         uniform : bool, optional
             Generate vacancies uniformly distributed along `bin_axis`.
         show_vmd_selection_cmd : bool, optional
