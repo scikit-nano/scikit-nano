@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Structure Atoms (:mod:`sknano.structure_io.atoms._structure_generator_atoms`)
+Structure Atoms (:mod:`sknano.structure_io.atoms._structure_atoms`)
 ==============================================================================
 
 `Atoms` class for the :class:`~sknano.nanogen.StructureGenerator` classes.
 
-.. currentmodule:: sknano.structure_io.atoms._structure_generator_atoms
+.. currentmodule:: sknano.structure_io.atoms._structure_atoms
 
 """
 from __future__ import absolute_import, division, print_function
