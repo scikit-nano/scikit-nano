@@ -77,10 +77,12 @@ class Cuboid(object):
         except (IndexError, TypeError):
             pt = Point
 
+        x, y, z = pt
+
         try:
-            if (pt.x > self.xmin) and (pt.x < self.xmax) and \
-                    (pt.y > self.ymin) and (pt.y < self.ymax) and \
-                    (pt.z > self.zmin) and (pt.z < self.zmax):
+            if (x > self.xmin) and (x < self.xmax) and \
+                    (y > self.ymin) and (y < self.ymax) and \
+                    (z > self.zmin) and (z < self.zmax):
                 return True
             else:
                 return False
@@ -117,13 +119,10 @@ class Cube(Cuboid):
         elif isinstance(center, Point):
             self._center = center
 
-        c0 = self._center
-        cuboid_kwargs = {'xmin': c0.x - a / 2,
-                         'ymin': c0.y - a / 2,
-                         'zmin': c0.z - a / 2,
-                         'xmax': c0.x + a / 2,
-                         'ymax': c0.y + a / 2,
-                         'zmax': c0.z + a / 2}
+        x0, y0, z0 = self._center
+        cuboid_kwargs = \
+            {'xmin': x0 - a / 2, 'ymin': y0 - a / 2, 'zmin': z0 - a / 2,
+             'xmax': x0 + a / 2, 'ymax': y0 + a / 2, 'zmax': z0 + a / 2}
 
         super(Cube, self).__init__(**cuboid_kwargs)
 
