@@ -72,6 +72,9 @@ class Point(object):
     def __iter__(self):
         return iter(self._p)
 
+    def __len__(self):
+        return len(self._p)
+
     @property
     def x(self):
         """:math:`x`-coordinate of `Point`.
@@ -311,6 +314,9 @@ class Point2D(object):
     def __iter__(self):
         return iter(self._p)
 
+    def __len__(self):
+        return len(self._p)
+
     @property
     def x(self):
         """:math:`x`-coordinate of `Point2D`.
@@ -549,6 +555,9 @@ class Vector(object):
 
     def __iter__(self):
         return iter(self._v)
+
+    def __len__(self):
+        return len(self._v)
 
     @property
     def x(self):
@@ -831,6 +840,9 @@ class Vector2D(object):
 
     def __iter__(self):
         return iter(self._v)
+
+    def __len__(self):
+        return len(self._v)
 
     @property
     def x(self):
