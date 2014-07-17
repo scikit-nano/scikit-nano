@@ -15,7 +15,7 @@ import numpy as np
 from ._coremath import Point, Vector
 from ._luts import xyz_axes
 
-__all__ = ['rotation_matrix', 'transformation_matrix', 'rotate_point']
+__all__ = ['rotate_point', 'rotation_matrix', 'transformation_matrix']
 
 I = np.identity(4)
 
@@ -34,42 +34,6 @@ def Ry(angle=None, deg2rad=False):
 
 def Rz(angle=None, deg2rad=False):
     pass
-
-
-def rotation_matrix(angle=None, rot_axis=None, deg2rad=False, R4x4=False):
-    """Generate a :math:`3\\times 3` or :math:`4\\times 4` rotation matrix.
-
-    Parameters
-    ----------
-    angle : float
-        Rotation angle in **radians** unless `deg2rad` is `True`.
-        The *sense* of the rotation is defined by the *right hand rule*:
-        If your right-hand's thumb points along the `rot_axis`,
-        then your fingers wrap around the axis in the *positive sense* of
-        the rotation angle.
-    rot_axis : {array_like, str, :class:`~sknano.tools.Vector`}
-        3-element list or ndarray or :class:`~sknano.tools.Vector` defining
-        the 3 components, :math:`u, v, w`, of the vector defining the axis
-        of rotation.
-    deg2rad : bool, optional
-        Angle is in degrees and needs to be converted to radians
-    R4x4 : bool, optional
-        If `True`, return a :math:`4\\times 4` matrix.
-        If `False`, return a :math:`3\\times 3` matrix.
-
-    Returns
-    -------
-    Rmat : ndarray
-        rotation matrix
-
-    """
-    Rmat = transformation_matrix(angle=angle, rot_axis=rot_axis,
-                                 deg2rad=deg2rad)
-
-    if not R4x4:
-        Rmat = Rmat[:3,:3]
-
-    return Rmat
 
 
 def rotate_point(point=None, angle=None, rot_axis=None, axis_origin=None,
@@ -120,6 +84,42 @@ def rotate_point(point=None, angle=None, rot_axis=None, axis_origin=None,
     rotated_point = rotated_transformation[:3]
 
     return rotated_point
+
+
+def rotation_matrix(angle=None, rot_axis=None, deg2rad=False, R4x4=False):
+    """Generate a :math:`3\\times 3` or :math:`4\\times 4` rotation matrix.
+
+    Parameters
+    ----------
+    angle : float
+        Rotation angle in **radians** unless `deg2rad` is `True`.
+        The *sense* of the rotation is defined by the *right hand rule*:
+        If your right-hand's thumb points along the `rot_axis`,
+        then your fingers wrap around the axis in the *positive sense* of
+        the rotation angle.
+    rot_axis : {array_like, str, :class:`~sknano.tools.Vector`}
+        3-element list or ndarray or :class:`~sknano.tools.Vector` defining
+        the 3 components, :math:`u, v, w`, of the vector defining the axis
+        of rotation.
+    deg2rad : bool, optional
+        Angle is in degrees and needs to be converted to radians
+    R4x4 : bool, optional
+        If `True`, return a :math:`4\\times 4` matrix.
+        If `False`, return a :math:`3\\times 3` matrix.
+
+    Returns
+    -------
+    Rmat : ndarray
+        rotation matrix
+
+    """
+    Rmat = transformation_matrix(angle=angle, rot_axis=rot_axis,
+                                 deg2rad=deg2rad)
+
+    if not R4x4:
+        Rmat = Rmat[:3,:3]
+
+    return Rmat
 
 
 def transformation_matrix(angle=None, rot_axis=None, axis_origin=None,
