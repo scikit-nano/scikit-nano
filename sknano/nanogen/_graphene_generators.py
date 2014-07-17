@@ -257,12 +257,12 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
         Distance between layers in **Angstroms**.
     stacking_order : {'AA', 'AB'}, optional
         Stacking order of graphene layers
-    rotation_angle : {None, float}, optional
+    layer_rotation_angle : {None, float}, optional
         Rotation angle of second layer specified in degrees.
         If specified in radians, then you must set `deg2rad=False`
     deg2rad : bool, optional
-        The rotation angle is specified in degrees and needs to be converted
-        to radians.
+        The `layer_rotation_angle` is specified in degrees and needs to be
+        converted to radians.
     autogen : bool, optional
         if `True`, automatically generate unit cell and full structure
     verbose : bool, optional
@@ -293,7 +293,7 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
 
     >>> rotated_bilayer = BiLayerGrapheneGenerator(length=10, width=10,
     ...                                            edge='armchair',
-    ...                                            rotation_angle=45)
+    ...                                            layer_rotation_angle=45)
     >>> rotated_bilayer.save_data(fname='rotated_bilayer.xyz')
 
     The rendered structure looks like:
@@ -306,7 +306,7 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
     ...                                               edge='zigzag',
     ...                                               element1='B',
     ...                                               element2='N',
-    ...                                               rotation_angle=45)
+    ...                                               layer_rotation_angle=45)
     >>> rotated_BN_bilayer.save_data(fname='BN_bilayer_rotated_45deg.xyz')
 
     The rendered structure looks like:
@@ -318,8 +318,8 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
     def __init__(self, length=None, width=None, edge=None,
                  element1='C', element2='C', bond=CCbond,
                  layer_spacing=3.35, stacking_order='AB',
-                 rotation_angle=None, deg2rad=True, autogen=True,
-                 verbose=False):
+                 layer_rotation_angle=None, rotation_angle=None,
+                 deg2rad=True, autogen=True, verbose=False):
 
         super(BiLayerGrapheneGenerator, self).__init__(
             length=length, width=width, edge=edge,
@@ -327,9 +327,12 @@ class BiLayerGrapheneGenerator(GrapheneGenerator):
             nlayers=2, layer_spacing=layer_spacing, autogen=False,
             verbose=verbose)
 
+        if rotation_angle is not None and layer_rotation_angle is None:
+            layer_rotation_angle = rotation_angle
+
         self._rotation_matrix = None
-        if rotation_angle is not None:
-            self._rotation_matrix = rotation_matrix(angle=rotation_angle,
+        if layer_rotation_angle is not None:
+            self._rotation_matrix = rotation_matrix(angle=layer_rotation_angle,
                                                     rot_axis='z',
                                                     deg2rad=deg2rad)
 
