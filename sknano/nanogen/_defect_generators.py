@@ -125,7 +125,7 @@ class StoneWalesDefectGenerator(DefectGenerator):
             fname=fname, outpath=outpath, structure_format=structure_format,
             verbose=verbose)
 
-        self._defect_bounds = OrderedDict(zip(xyz_tuple, 3 * [2 * [None]]))
+        self._defect_bounds = None
 
         self._vmd_selection_radius = np.sqrt(10.5)
         self._show_vmd_selection_cmd = True
@@ -162,7 +162,7 @@ class VacancyGenerator(DefectGenerator):
         self._Nvac_clusters = 0
         self._Nvac_sites = 0
 
-        self._vac_bounds = OrderedDict(zip(xyz_tuple, 3 * [2 * [None]]))
+        self._vac_bounds = None
 
         self._vac_ids = np.empty(0, dtype=int)
         self._vac_type = 'single'
