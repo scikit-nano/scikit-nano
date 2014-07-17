@@ -10,14 +10,14 @@ Generate defects in structure data (:mod:`sknano.nanogen._defect_generators`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from collections import OrderedDict
+#from collections import OrderedDict
 import os
 
 import numpy as np
 
 from ..structure_io import DATAReader, DATAWriter, XYZWriter, \
     XYZ2DATAConverter, StructureFormatError, supported_structure_formats
-from ..structure_io.atoms import LAMMPSAtoms as Atoms
+from ..structure_io.atoms import StructureAtoms as Atoms
 
 xyz_tuple = ('x', 'y', 'z')
 vac_type_cluster_size_map = {'double': 2, 'triple': 3}
