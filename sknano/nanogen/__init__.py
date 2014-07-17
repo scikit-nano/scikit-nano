@@ -102,13 +102,10 @@ Base classes for creating new vacancy structure data generators
    StructureGenerator
    VacancyGenerator
 
-Helper classes and functions
-----------------------------
+Helper functions
+----------------
 .. autosummary::
    :toctree: generated/
-
-   Cube
-   Cuboid
 
    cmp_Ch
    filter_Ch
@@ -146,6 +143,5 @@ from ._graphene_defect_generators import *
 from ._nanotube_defect_generators import *
 
 from ._nanogen_funcs import *
-from ._polyhedra import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]

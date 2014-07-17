@@ -9,14 +9,17 @@ Helper functions, LUTs, reference data, etc. (:mod:`sknano.tools`)
 Contents
 ========
 
-Abstract data structures
--------------------------
+Abstract mathematical data structures
+-------------------------------------
 .. autosummary::
    :toctree: generated/
 
    Point
    Vector
    Quaternion
+
+   Cuboid
+   Cube
 
 Helper functions for chirality data
 ------------------------------------
@@ -88,6 +91,7 @@ __docformat__ = 'restructuredtext'
 from ._chirality_funcs import *
 from ._corefuncs import *
 from ._coremath import *
+from ._geometric_shapes import *
 from ._iofuncs import *
 from ._luts import *
 from ._mathfuncs import *

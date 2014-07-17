@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-========================================================================
-Classes to desribe 3D volume bounds (:mod:`sknano.nanogen._polyhedra`)
-========================================================================
+=============================================================================
+Data structures for geometric shapes (:mod:`sknano.tools._geometric_shapes`)
+=============================================================================
 
-.. currentmodule:: sknano.structure_io.atoms._atom
+.. currentmodule:: sknano.tools._geometric_shapes
 
 """
 from __future__ import absolute_import, division, print_function
@@ -14,7 +14,7 @@ __docformat__ = 'restructuredtext en'
 
 #import numpy as np
 
-from ..tools import Point
+from sknano.tools import Point
 
 __all__ = ['Cube', 'Cuboid']
 
