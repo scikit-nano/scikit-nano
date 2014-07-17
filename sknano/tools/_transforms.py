@@ -12,6 +12,7 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
+from ._coremath import Point, Vector
 from ._luts import xyz_axes
 
 __all__ = ['rotation_matrix', 'transformation_matrix', 'rotate_point']
@@ -42,11 +43,14 @@ def rotation_matrix(angle=None, rot_axis=None, deg2rad=False, R4x4=False):
     ----------
     angle : float
         Rotation angle in **radians** unless `deg2rad` is `True`.
-        The sense of the rotation is defined by the *right hand rule*:
-        If you point your thumb alo
-    rot_axis : {array_like, str}
-        A 3-element list or ndarray defining the 3 components,
-        :math:`u, v, w`, of the vector defining the axis of rotation.
+        The *sense* of the rotation is defined by the *right hand rule*:
+        If your right-hand's thumb points along the `rot_axis`,
+        then your fingers wrap around the axis in the *positive sense* of
+        the rotation angle.
+    rot_axis : {array_like, str, :class:`~sknano.tools.Vector`}
+        3-element list or ndarray or :class:`~sknano.tools.Vector` defining
+        the 3 components, :math:`u, v, w`, of the vector defining the axis
+        of rotation.
     deg2rad : bool, optional
         Angle is in degrees and needs to be converted to radians
     R4x4 : bool, optional
@@ -59,6 +63,93 @@ def rotation_matrix(angle=None, rot_axis=None, deg2rad=False, R4x4=False):
         rotation matrix
 
     """
+    Rmat = transformation_matrix(angle=angle, rot_axis=rot_axis,
+                                 deg2rad=deg2rad)
+
+    if not R4x4:
+        Rmat = Rmat[:3,:3]
+
+    return Rmat
+
+
+def rotate_point(point=None, angle=None, rot_axis=None, axis_origin=None,
+                 deg2rad=False):
+    """Rotate point about arbitrary axis.
+
+    Parameters
+    ----------
+    point : array_like or :class:`~sknano.tools.Point`
+        3-element list or ndarray or :class:`~sknano.tools.Point`
+        defining the :math:`x, y, z` coordinates of point to rotate.
+    angle : float
+        Rotation angle in **radians** unless `deg2rad` is `True`.
+        The *sense* of the rotation is defined by the *right hand rule*:
+        If your right-hand's thumb points along the `rot_axis`,
+        then your fingers wrap around the axis in the *positive sense* of
+        the rotation angle.
+    rot_axis : {array_like, str, :class:`~sknano.tools.Vector`}
+        3-element list or ndarray or :class:`~sknano.tools.Vector` defining
+        the 3 components, :math:`u, v, w`, of the vector defining the axis
+        of rotation.
+    axis_origin : {array_like, :class:`~sknano.tools.Point`}
+        3-element list or ndarray or :class:`~sknano.tools.Point` defining
+        origin point of rotation axis.
+    deg2rad : bool, optional
+        Angle is in degrees and needs to be converted to radians
+
+    Returns
+    -------
+    rotated_point : ndarray
+        3-element ndarray of (:math:`x,y,z`) coordinates of rotated
+        point.
+
+    """
+    if deg2rad:
+        angle = np.radians(angle)
+
+    Tmat = transformation_matrix(angle=angle, rot_axis=rot_axis,
+                                 axis_origin=axis_origin,
+                                 deg2rad=deg2rad)
+
+    if point is None:
+        point = Point()
+
+    x, y, z = point
+    point = np.array([x, y, z, 1])
+    rotated_transformation = np.dot(Tmat, point)
+    rotated_point = rotated_transformation[:3]
+
+    return rotated_point
+
+
+def transformation_matrix(angle=None, rot_axis=None, axis_origin=None,
+                          deg2rad=False):
+    """Generate a :math:`4\\times 4` transformation matrix.
+
+    Parameters
+    ----------
+    angle : float
+        Rotation angle in **radians** unless `deg2rad` is `True`.
+        The *sense* of the rotation is defined by the *right hand rule*:
+        If your right-hand's thumb points along the `rot_axis`,
+        then your fingers wrap around the axis in the *positive sense* of
+        the rotation angle.
+    rot_axis : {array_like, str, :class:`~sknano.tools.Vector`}
+        3-element list or ndarray or :class:`~sknano.tools.Vector` defining
+        the 3 components, :math:`u, v, w`, of the vector defining the axis
+        of rotation.
+    axis_origin : {array_like, :class:`~sknano.tools.Point`}
+        3-element list or ndarray or :class:`~sknano.tools.Point` defining
+        origin point of axis of rotation
+    deg2rad : bool, optional
+        Angle is in degrees and needs to be converted to radians
+
+    Returns
+    -------
+    Tmat : ndarray
+        :math:`4\\times 4` transformation matrix
+
+    """
     if angle is None or rot_axis is None:
         raise TypeError('`angle` and `rot_axis` are required')
     if isinstance(rot_axis, (str, unicode)):
@@ -66,8 +157,21 @@ def rotation_matrix(angle=None, rot_axis=None, deg2rad=False, R4x4=False):
             rot_axis = _str2array[rot_axis]
         except KeyError:
             raise ValueError('Invalid `rot_axis` string: {}'.format(rot_axis))
-    elif isinstance(rot_axis, (list, np.ndarray)) and len(rot_axis) != 3:
-        raise ValueError('`rot_axis` must be a 3-element list or ndarray')
+    elif isinstance(rot_axis, Vector):
+        rot_axis = rot_axis.components
+    elif not (isinstance(rot_axis, (list, np.ndarray)) and
+              len(rot_axis) == 3) and not isinstance(rot_axis, Vector):
+        raise ValueError('`rot_axis` must be a 3-element list or ndarray or '
+                         '`Vector`')
+
+    if axis_origin is None:
+        axis_origin = np.zeros(3, dtype=float)
+    elif isinstance(axis_origin, Point):
+        axis_origin = axis_origin.coords
+    elif not (isinstance(axis_origin, (list, np.ndarray)) and
+              len(axis_origin) == 3) and not isinstance(axis_origin, Point):
+        raise ValueError('`axis_origin` must be a 3-element list or ndarray '
+                         'or `Point`')
 
     if deg2rad:
         angle = np.radians(angle)
@@ -75,20 +179,20 @@ def rotation_matrix(angle=None, rot_axis=None, deg2rad=False, R4x4=False):
     cosa = np.cos(angle)
     sina = np.sin(angle)
 
-    Rmat = None
+    Tmat = None
 
     if np.allclose(rot_axis, I[:3, 0]):
-        Rmat = np.array([[1, 0, 0, 0],
+        Tmat = np.array([[1, 0, 0, 0],
                          [0, cosa, -sina, 0],
                          [0, sina, cosa, 0],
                          [0, 0, 0, 1]])
     elif np.allclose(rot_axis, I[:3, 1]):
-        Rmat = np.array([[cosa, 0, sina, 0],
+        Tmat = np.array([[cosa, 0, sina, 0],
                          [0, 1, 0, 0],
                          [-sina, 0, cosa, 0],
                          [0, 0, 0, 1]])
     elif np.allclose(rot_axis, I[:3, 2]):
-        Rmat = np.array([[cosa, -sina, 0, 0],
+        Tmat = np.array([[cosa, -sina, 0, 0],
                          [sina, cosa, 0, 0],
                          [0, 0, 1, 0],
                          [0, 0, 0, 1]])
@@ -112,122 +216,30 @@ def rotation_matrix(angle=None, rot_axis=None, deg2rad=False, R4x4=False):
         r23 = (vw * (1 - cosa) - u * l * sina) / ll
         r32 = (vw * (1 - cosa) + u * l * sina) / ll
 
-        Rmat = np.array([[r11, r12, r13, 0],
+        Tmat = np.array([[r11, r12, r13, 0],
                          [r21, r22, r23, 0],
                          [r31, r32, r33, 0],
                          [0, 0, 0, 1]])
 
-        Rmat[np.where(np.abs(Rmat) <= np.finfo(float).eps)] = 0.0
+    if not np.allclose(axis_origin, np.zeros(3)):
+        a, b, c = axis_origin
+        u, v, w = rot_axis
+        uu, vv, ww = u**2, v**2, w**2
+        au, bu, cu = a * u, b * u, c * u
+        av, bv, cv = a * v, b * v, c * v
+        aw, bw, cw = a * w, b * w, c * w
+        l = np.sqrt(uu + vv + ww)
+        ll = l**2
 
-    if not R4x4:
-        Rmat = Rmat[:3,:3]
+        t14 = ((a * (vv + ww) - u * (bv + cw)) * (1 - cosa) +
+               (bw - cv) * l * sina) / ll
+        t24 = ((b * (uu + ww) - v * (au + cw)) * (1 - cosa) +
+               (cu - aw) * l * sina) / ll
+        t34 = ((c * (uu + vv) - w * (au + bv)) * (1 - cosa) +
+               (av - bu) * l * sina) / ll
 
-    return Rmat
-
-
-def rotate_point(r0=None, angle=None, p0=None, p1=None, deg2rad=False):
-    """Rotate point about arbitrary axis.
-
-    Parameters
-    ----------
-    axis : `Vector`
-
-    Returns
-    -------
-    ndarray
-        3-element ndarray of (:math:`x,y,z`) coordinates of rotated
-        point.
-
-    """
-    if deg2rad:
-        angle = np.radians(angle)
-
-    a, b, c = p0
-    d, e, f = p1
-    u, v, w = d - a, e - b, f - c
-
-    Tmat = transformation_matrix(angle=angle, P0=[a, b, c],
-                                 rot_axis=[u, v, w], deg2rad=deg2rad)
-
-    x, y, z = r0
-    t0 = np.array([x, y, z, 1])
-    t = np.dot(Tmat, t0)
-    r = t[:3]
-
-    return r
-
-
-def transformation_matrix(angle=None, rot_axis=None, rvec=None,
-                          P0=None, P1=None, deg2rad=False, T4x4=True):
-    """Generate a :math:`3\\times 3` or :math:`4\\times 4` rotation matrix.
-
-    Parameters
-    ----------
-    angle : float
-        Rotation angle in **radians** unless `deg2rad` is `True`.
-        The sense of the rotation is defined by the *right hand rule*:
-        If you point your thumb alo
-    rot_axis : {array_like, str}
-        A 3-element list or ndarray defining the 3 components,
-        :math:`u, v, w`, of the vector defining the axis of rotation.
-    deg2rad : bool, optional
-        Angle is in degrees and needs to be converted to radians
-    T4x4 : bool, optional
-        If `True`, return a :math:`4\\times 4` matrix.
-        If `False`, return a :math:`3\\times 3` matrix.
-
-    Returns
-    -------
-    Tmat : ndarray
-        Transformation matrix
-
-    """
-    if angle is None or P0 is None or (rot_axis is None and P1 is None):
-        raise TypeError('`angle`, `P0`, and `rot_axis` or `P1` are required')
-    if isinstance(rot_axis, (str, unicode)):
-        try:
-            rot_axis = _str2array[rot_axis]
-        except KeyError:
-            raise ValueError('Invalid `rot_axis` string: {}'.format(rot_axis))
-    elif isinstance(rot_axis, (list, np.ndarray)) and len(rot_axis) != 3:
-        raise ValueError('`rot_axis` must be a 3-element list or ndarray')
-    elif rot_axis is None and isinstance(P1, (list, np.ndarray)) and \
-            len(P1) != 3:
-        raise ValueError('`P1` must be a 3-element list or ndarray')
-
-    if rot_axis is None:
-        rot_axis = np.asarray(P1) - np.asarray(P0)
-
-    Tmat = rotation_matrix(angle=angle, rot_axis=rot_axis, deg2rad=deg2rad,
-                           R4x4=True)
-
-    if deg2rad:
-        angle = np.radians(angle)
-
-    cosa = np.cos(angle)
-    sina = np.sin(angle)
-
-    a, b, c = P0
-    u, v, w = rot_axis
-    uu, vv, ww = u**2, v**2, w**2
-    au, bu, cu = a * u, b * u, c * u
-    av, bv, cv = a * v, b * v, c * v
-    aw, bw, cw = a * w, b * w, c * w
-    l = np.sqrt(uu + vv + ww)
-    ll = l**2
-
-    t14 = ((a * (vv + ww) - u * (bv + cw)) * (1 - cosa) +
-           (bw - cv) * l * sina) / ll
-    t24 = ((b * (uu + ww) - v * (au + cw)) * (1 - cosa) +
-           (cu - aw) * l * sina) / ll
-    t34 = ((c * (uu + vv) - w * (au + bv)) * (1 - cosa) +
-           (av - bu) * l * sina) / ll
-
-    Tmat[:3, 3] = np.array([t14, t24, t34])
+        Tmat[:3, 3] = np.array([t14, t24, t34])
 
     Tmat[np.where(np.abs(Tmat) <= np.finfo(float).eps)] = 0.0
-
-    if not T4x4:
-        Tmat = Tmat[:3,:3]
 
     return Tmat
