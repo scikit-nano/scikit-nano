@@ -69,6 +69,9 @@ class Point(object):
             return("Point(x={!r}, y={!r}, z={!r})".format(
                 self.x, self.y, self.z))
 
+    def __iter__(self):
+        return iter(self._p)
+
     @property
     def x(self):
         """:math:`x`-coordinate of `Point`.
@@ -305,6 +308,9 @@ class Point2D(object):
         else:
             return("Point(x={!r}, y={!r})".format(self.x, self.y))
 
+    def __iter__(self):
+        return iter(self._p)
+
     @property
     def x(self):
         """:math:`x`-coordinate of `Point2D`.
@@ -540,6 +546,9 @@ class Vector(object):
                        self._p, self._p0, True, self._units))
         else:
             return("Vector(p={!r}, p0={!r})".format(self._p, self._p0))
+
+    def __iter__(self):
+        return iter(self._v)
 
     @property
     def x(self):
@@ -819,6 +828,9 @@ class Vector2D(object):
                        self._p, self._p0, True, self._units))
         else:
             return("Vector2D(p={!r}, p0={!r})".format(self._p, self._p0))
+
+    def __iter__(self):
+        return iter(self._v)
 
     @property
     def x(self):
