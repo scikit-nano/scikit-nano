@@ -99,7 +99,36 @@ class CrossLinkedDefectGenerator(DefectGenerator):
 
 
 class StoneWalesDefectGenerator(DefectGenerator):
-    pass
+    """Class for generating Stone-Wales defects in structure data.
+
+    Parameters
+    ----------
+    fname : str
+        structure data filename
+    outpath : str, optional
+        Output path for structure data file.
+    structure_format : {None, str}, optional
+        chemical file format of saved structure data.
+        If `None`, then guess based on `fname` file extension.
+        Otherwise, must be one of:
+
+            - `xyz`
+            - `data`
+
+    verbose : bool, optional
+        Verbose output
+
+    """
+    def __init__(self, fname=str, outpath=None, structure_format=None,
+                 verbose=False):
+        super(StoneWalesDefectGenerator, self).__init__(
+            fname=fname, outpath=outpath, structure_format=structure_format,
+            verbose=verbose)
+
+        self._defect_bounds = OrderedDict(zip(xyz_tuple, 3 * [2 * [None]]))
+
+        self._vmd_selection_radius = np.sqrt(10.5)
+        self._show_vmd_selection_cmd = True
 
 
 class VacancyGenerator(DefectGenerator):
