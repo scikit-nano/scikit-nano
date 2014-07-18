@@ -305,11 +305,11 @@ class Point2D(object):
 
     def __repr__(self):
         if self._with_units:
-            return("Point(x={!r}, y={!r}, with_units={!r}, "
+            return("Point2D(x={!r}, y={!r}, with_units={!r}, "
                    "units={!r})".format(self.x.magnitude, self.y.magnitude,
                                         True, self._units))
         else:
-            return("Point(x={!r}, y={!r})".format(self.x, self.y))
+            return("Point2D(x={!r}, y={!r})".format(self.x, self.y))
 
     def __iter__(self):
         return iter(self._p)
