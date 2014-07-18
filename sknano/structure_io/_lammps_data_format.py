@@ -255,7 +255,8 @@ class DATAWriter(StructureWriter):
     def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
               atom_style='full', boxbounds=None, comment_line=None,
               assume_unique_atoms=False, enforce_consecutive_atomIDs=True,
-              pad_box=True, xpad=10., ypad=10., zpad=10., verbose=False):
+              pad_box=True, xpad=10., ypad=10., zpad=10., pad_tol=0.01,
+              verbose=False):
         """Write structure data to file.
 
         Parameters
@@ -281,6 +282,10 @@ class DATAWriter(StructureWriter):
             to each :class:`~sknano.structure_io.atoms.Atom`.
             If `assume_unique_atoms` is True, but the atomID's are not unique,
             LAMMPS will not be able to read the data file.
+        enforce_consecutive_atomIDs : bool, optional
+        pad_box : bool, optional
+        xpad, ypad, zpad : float, optional
+        pad_tol : float, optional
         verbose : bool, optional
             verbose output
 
@@ -320,16 +325,15 @@ class DATAWriter(StructureWriter):
                 boxbounds[dim]['max'] = atoms.coords[:, i].max()
 
         boxpad = {'x': xpad, 'y': ypad, 'z': zpad}
-        pad_eps = 0.001
         if pad_box:
             #for dim, pad in boxpad.iteritems():
             for i, dim in enumerate(('x', 'y', 'z')):
                 pad = boxpad[dim]
                 if abs(boxbounds[dim]['min'] - atoms.coords[:, i].min()) \
-                        < pad - pad_eps:
+                        < pad - pad_tol:
                     boxbounds[dim]['min'] = boxbounds[dim]['min'] - pad
                 if abs(boxbounds[dim]['max'] - atoms.coords[:, i].max()) \
-                        < pad - pad_eps:
+                        < pad - pad_tol:
                     boxbounds[dim]['max'] = boxbounds[dim]['max'] + pad
 
         lohi_width = 0
