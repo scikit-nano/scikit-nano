@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-=======================================================================
-Helper functions, LUTs, reference data, etc. (:mod:`sknano.tools`)
-=======================================================================
+============================================================================
+Helper classes, functions, LUTs, reference data, etc. (:mod:`sknano.tools`)
+============================================================================
 
 .. currentmodule:: sknano.tools
 
@@ -10,16 +10,13 @@ Contents
 ========
 
 Abstract mathematical data structures
--------------------------------------
+--------------------------------------
 .. autosummary::
    :toctree: generated/
 
    Point
    Vector
    Quaternion
-
-   Cuboid
-   Cube
 
 Helper functions for chirality data
 ------------------------------------
@@ -66,7 +63,9 @@ Helper functions for linear algebra transforms
 .. autosummary::
    :toctree: generated/
 
+   rotate_point
    rotation_matrix
+   transformation_matrix
 
 LUTs (Look-up 'tables' - lists and dictionaries)
 -------------------------------------------------
@@ -81,7 +80,9 @@ Sub-packages
 .. autosummary::
    :toctree: generated/
 
+   geometric_shapes
    refdata
+   symmetry_groups
 
 """
 from __future__ import division, print_function, absolute_import
@@ -91,7 +92,6 @@ __docformat__ = 'restructuredtext'
 from ._chirality_funcs import *
 from ._corefuncs import *
 from ._coremath import *
-from ._geometric_shapes import *
 from ._iofuncs import *
 from ._luts import *
 from ._mathfuncs import *
