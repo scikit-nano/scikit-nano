@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-=============================================================
-Nanotube structure tools (:mod:`sknano.nanogen._nanotubes`)
-=============================================================
+==============================================================================
+Class representation of Nanotube structures (:mod:`sknano.nanogen._nanotubes`)
+==============================================================================
 
 .. currentmodule:: sknano.nanogen._nanotubes
 
