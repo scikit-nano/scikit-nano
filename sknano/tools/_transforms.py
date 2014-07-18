@@ -40,6 +40,8 @@ def rotate_point(point=None, angle=None, rot_axis=None, axis_origin=None,
                  deg2rad=False):
     """Rotate point about arbitrary axis.
 
+    .. versionadded:: 0.2.26
+
     Parameters
     ----------
     point : array_like or :class:`~sknano.tools.Point`
@@ -125,6 +127,8 @@ def rotation_matrix(angle=None, rot_axis=None, deg2rad=False, R4x4=False):
 def transformation_matrix(angle=None, rot_axis=None, axis_origin=None,
                           deg2rad=False):
     """Generate a :math:`4\\times 4` transformation matrix.
+
+    .. versionadded:: 0.2.26
 
     Parameters
     ----------
