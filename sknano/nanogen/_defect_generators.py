@@ -19,8 +19,7 @@ from ..structure_io import DATAReader, DATAWriter, XYZWriter, \
     XYZ2DATAConverter, StructureFormatError, supported_structure_formats
 from ..structure_io.atoms import StructureAtoms as Atoms
 
-xyz_tuple = ('x', 'y', 'z')
-vac_type_cluster_size_map = {'double': 2, 'triple': 3}
+_vac_type_cluster_size_map = {'single': 1, 'double': 2, 'triple': 3}
 
 __all__ = ['DefectGenerator', 'CrossLinkedDefectGenerator',
            'StoneWalesDefectGenerator', 'VacancyGenerator']
