@@ -22,8 +22,9 @@ from ._structure_data import StructureReader, StructureWriter, \
     StructureConverter, StructureFormat, StructureDataError, \
     default_comment_line
 
-__all__ = ['DATAData', 'DATAReader', 'DATAWriter', 'DATA2XYZConverter',
-           'DATAFormat', 'DATAError', 'LAMMPSDATA']
+__all__ = ['DATAIO', 'DATAData', 'DATAReader', 'DATAWriter',
+           'DATA2XYZConverter', 'DATAFormat', 'DATAError',
+           'LAMMPSDATAIO', 'LAMMPSDATA']
 
 
 class DATAReader(StructureReader):
@@ -36,12 +37,12 @@ class DATAReader(StructureReader):
     atom_style : {'full', 'atomic'}, optional
 
     """
-    def __init__(self, fpath=None, atom_style='full'):
-        super(DATAReader, self).__init__(fpath=fpath)
+    def __init__(self, fpath=None, atom_style='full', **kwargs):
+        super(DATAReader, self).__init__(fpath=fpath, **kwargs)
 
         self._structure_atoms = LAMMPSAtoms()
 
-        data_format = DATAFormat(atom_style=atom_style)
+        data_format = DATAFormat(atom_style=atom_style, **kwargs)
         self._data_headers = data_format.properties['headers']
         self._data_sections = data_format.properties['sections']
         self._section_properties = data_format.section_properties
@@ -201,6 +202,8 @@ class DATAReader(StructureReader):
                 self._headers[' '.join([dim + lim for lim in ('lo', 'hi')])]
             self._boxbounds[dim] = {'min': bounds[0], 'max': bounds[-1]}
 
+        self._kwargs['boxbounds'] = self._boxbounds
+
     def get(self, section_key, colnum=None, colname=None, colindex=None):
         """Return section with `section_key`.
 
@@ -256,7 +259,7 @@ class DATAWriter(StructureWriter):
               atom_style='full', boxbounds=None, comment_line=None,
               assume_unique_atoms=False, enforce_consecutive_atomIDs=True,
               pad_box=True, xpad=10., ypad=10., zpad=10., pad_tol=0.01,
-              verbose=False):
+              verbose=False, **kwargs):
         """Write structure data to file.
 
         Parameters
@@ -392,62 +395,7 @@ class DATAWriter(StructureWriter):
                 f.write(line)
 
 
-class DATA2XYZConverter(StructureConverter):
-    """
-    `StructureConverter` class for converting `LAMMPS data` to `xyz` format.
-
-    .. versionadded:: 0.2.9
-
-    Parameters
-    ----------
-    datafile : str
-
-    """
-    def __init__(self, datafile):
-        self._datafile = datafile
-        self._xyzfile = os.path.splitext(self._datafile)[0] + '.xyz'
-
-        super(DATA2XYZConverter, self).__init__(
-            infile=self._datafile, outfile=self._xyzfile)
-
-    @property
-    def datafile(self):
-        """`LAMMPS data` file."""
-        return self.infile
-
-    @property
-    def xyzfile(self):
-        """`xyz` file name."""
-        return self.outfile
-
-    def convert(self, return_reader=False):
-        """Convert `LAMMPS data` to `xyz` chemical file format.
-
-        Parameters
-        ----------
-        return_reader : bool, optional
-            Return an instance of `XYZReader`
-
-        Returns
-        -------
-        `XYZReader` (only if `return_reader` is True)
-
-        """
-        from .atoms import AtomsConverter
-        from ._xyz_format import XYZReader, XYZWriter
-
-        datareader = DATAReader(fpath=self.infile)
-        atoms = AtomsConverter(atoms=datareader.atoms, to='xyz').atoms
-        comment_line = datareader.comment_line
-
-        XYZWriter.write(fpath=self.outfile, atoms=atoms,
-                        comment_line=comment_line)
-
-        if return_reader:
-            return XYZReader(fpath=self.outfile)
-
-
-class DATAData(DATAReader):
+class DATAIO(DATAReader):
     """Class for reading and writing `StructureData` in `LAMMPS data` format.
 
     Parameters
@@ -455,8 +403,8 @@ class DATAData(DATAReader):
     fpath : str, optional
 
     """
-    def __init__(self, fpath=None):
-        super(DATAData, self).__init__(fpath=fpath)
+    def __init__(self, fpath=None, **kwargs):
+        super(DATAIO, self).__init__(fpath=fpath, **kwargs)
 
     def delete(self, key):
         if key in self.headers:
@@ -531,7 +479,7 @@ class DATAData(DATAReader):
     def viz(self, isnap):
         pass
 
-    def write(self, datafile=None):
+    def write(self, datafile=None, **kwargs):
         """Write data file.
 
         Parameters
@@ -540,6 +488,8 @@ class DATAData(DATAReader):
 
         """
         try:
+            kwargs.update(self._kwargs)
+
             if (datafile is None or datafile == '') and \
                     (self.fpath is None or self.fpath == ''):
                 error_msg = \
@@ -551,18 +501,74 @@ class DATAData(DATAReader):
             else:
                 datafile = self.fpath
 
-            DATAWriter.write(fname=datafile,
-                             atoms=self._structure_atoms,
-                             boxbounds=self._boxbounds,
-                             comment_line=self._comment_line)
+            DATAWriter.write(fname=datafile, atoms=self._structure_atoms,
+                             comment_line=self._comment_line, **kwargs)
+
         except (TypeError, ValueError) as e:
             print(e)
 
     @classmethod
-    def format_spec(cls, atom_style='full'):
-        return DATAFormat(atom_style=atom_style)
+    def format_spec(cls, atom_style='full', **kwargs):
+        return DATAFormat(atom_style=atom_style, **kwargs)
 
-LAMMPSDATA = DATAData
+LAMMPSDATAIO = LAMMPSDATA = DATAData = DATAIO
+
+
+class DATA2XYZConverter(StructureConverter):
+    """
+    `StructureConverter` class for converting `LAMMPS data` to `xyz` format.
+
+    .. versionadded:: 0.2.9
+
+    Parameters
+    ----------
+    datafile : str
+
+    """
+    def __init__(self, datafile, **kwargs):
+        self._datafile = datafile
+        self._xyzfile = os.path.splitext(self._datafile)[0] + '.xyz'
+
+        super(DATA2XYZConverter, self).__init__(
+            infile=self._datafile, outfile=self._xyzfile, **kwargs)
+
+    @property
+    def datafile(self):
+        """`LAMMPS data` file."""
+        return self.infile
+
+    @property
+    def xyzfile(self):
+        """`xyz` file name."""
+        return self.outfile
+
+    def convert(self, return_reader=False, **kwargs):
+        """Convert `LAMMPS data` to `xyz` chemical file format.
+
+        Parameters
+        ----------
+        return_reader : bool, optional
+            Return an instance of `XYZReader`
+
+        Returns
+        -------
+        `XYZReader` (only if `return_reader` is True)
+
+        """
+        from .atoms import AtomsConverter
+        from ._xyz_format import XYZReader, XYZWriter
+
+        kwargs.update(self._kwargs)
+
+        datareader = DATAReader(fpath=self.infile, **kwargs)
+        atoms = AtomsConverter(atoms=datareader.atoms, to='xyz').atoms
+        comment_line = datareader.comment_line
+
+        XYZWriter.write(fpath=self.outfile, atoms=atoms,
+                        comment_line=comment_line, **kwargs)
+
+        if return_reader:
+            return XYZReader(fpath=self.outfile, **kwargs)
 
 
 class DATAError(StructureDataError):
@@ -590,8 +596,8 @@ class DATAFormat(StructureFormat):
         LAMMPS atom style.
 
     """
-    def __init__(self, atom_style='full'):
-        super(DATAFormat, self).__init__()
+    def __init__(self, atom_style='full', **kwargs):
+        super(DATAFormat, self).__init__(**kwargs)
         self._atom_style = atom_style
         self._section_properties = OrderedDict()
 

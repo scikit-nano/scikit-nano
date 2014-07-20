@@ -18,7 +18,7 @@ from ..tools import get_fpath
 from ._structure_data import StructureReader, StructureReaderError, \
     StructureWriter, StructureConverter, StructureFormat, default_comment_line
 
-__all__ = ['XYZData', 'XYZReader', 'XYZWriter',
+__all__ = ['XYZReader', 'XYZWriter', 'XYZIO', 'XYZData',
            'XYZ2DATAConverter', 'XYZFormat']
 
 
@@ -31,8 +31,8 @@ class XYZReader(StructureReader):
         `xyz` structure file path.
 
     """
-    def __init__(self, fpath=None):
-        super(XYZReader, self).__init__(fpath=fpath)
+    def __init__(self, fpath=None, **kwargs):
+        super(XYZReader, self).__init__(fpath=fpath, **kwargs)
 
         self._structure_atoms = XYZAtoms()
 
@@ -63,7 +63,7 @@ class XYZWriter(StructureWriter):
 
     @classmethod
     def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
-              comment_line=None):
+              comment_line=None, **kwargs):
         """Write structure data to file.
 
         Parameters
@@ -97,7 +97,7 @@ class XYZWriter(StructureWriter):
                     atom.symbol, atom.x, atom.y, atom.z))
 
 
-class XYZData(XYZReader):
+class XYZIO(XYZReader):
     """Class for reading and writing `StructureData` in `xyz` format.
 
     Parameters
@@ -105,10 +105,10 @@ class XYZData(XYZReader):
     fpath : str, optional
 
     """
-    def __init__(self, fpath=None):
-        super(XYZData, self).__init__(fpath=fpath)
+    def __init__(self, fpath=None, **kwargs):
+        super(XYZIO, self).__init__(fpath=fpath, **kwargs)
 
-    def write(self, xyzfile=None):
+    def write(self, xyzfile=None, **kwargs):
         """Write xyz file.
 
         Parameters
@@ -117,6 +117,7 @@ class XYZData(XYZReader):
 
         """
         try:
+            kwargs.update(self._kwargs)
             if (xyzfile is None or xyzfile == '') and \
                     (self.fpath is None or self.fpath == ''):
                 error_msg = '`xyzfile` must be a string at least 1 ' + \
@@ -127,10 +128,14 @@ class XYZData(XYZReader):
                     raise ValueError(error_msg)
             else:
                 xyzfile = self.fpath
+
             XYZWriter.write(fname=xyzfile, atoms=self._structure_atoms,
-                            comment_line=self._comment_line)
+                            comment_line=self._comment_line, **kwargs)
+
         except (TypeError, ValueError) as e:
             print(e)
+
+XYZData = XYZIO
 
 
 class XYZ2DATAConverter(StructureConverter):
@@ -153,20 +158,13 @@ class XYZ2DATAConverter(StructureConverter):
     zpad : float, optional
 
     """
-    def __init__(self, xyzfile, boxbounds=None, pad_box=True,
-                 xpad=10., ypad=10., zpad=10.):
+    def __init__(self, xyzfile, **kwargs):
 
         self._xyzfile = xyzfile
         self._datafile = os.path.splitext(self._xyzfile)[0] + '.data'
 
         super(XYZ2DATAConverter, self).__init__(
-            infile=self._xyzfile, outfile=self._datafile)
-
-        self._boxbounds = boxbounds
-        self._pad_box = pad_box
-        self._xpad = xpad
-        self._ypad = ypad
-        self._zpad = zpad
+            infile=self._xyzfile, outfile=self._datafile, **kwargs)
 
         self._new_atoms = []
         self._add_new_atoms = False
@@ -208,7 +206,7 @@ class XYZ2DATAConverter(StructureConverter):
         if not self._add_new_atomtypes:
             self._add_new_atomtypes = True
 
-    def convert(self, return_reader=False):
+    def convert(self, return_reader=False, **kwargs):
         """Convert `xyz` to `LAMMPS data` chemical file format.
 
         Parameters
@@ -224,7 +222,9 @@ class XYZ2DATAConverter(StructureConverter):
         from .atoms import AtomsConverter
         from ._lammps_data_format import DATAReader, DATAWriter
 
-        xyzreader = XYZReader(fpath=self.infile)
+        kwargs.update(self._kwargs)
+
+        xyzreader = XYZReader(fpath=self.infile, **kwargs)
         atoms = AtomsConverter(atoms=xyzreader.atoms, to='lammps').atoms
         comment_line = xyzreader.comment_line
 
@@ -233,23 +233,11 @@ class XYZ2DATAConverter(StructureConverter):
         if self._add_new_atomtypes:
             atoms.add_atomtypes(self._new_atomtypes)
 
-        if self._boxbounds is None:
-            boxbounds = {'x': {'min': None, 'max': None},
-                         'y': {'min': None, 'max': None},
-                         'z': {'min': None, 'max': None}}
-            for i, dim in enumerate(('x', 'y', 'z')):
-                boxbounds[dim]['min'] = atoms.coords[:, i].min()
-                boxbounds[dim]['max'] = atoms.coords[:, i].max()
-        else:
-            boxbounds = self._boxbounds
-
         DATAWriter.write(fpath=self.outfile, atoms=atoms,
-                         boxbounds=boxbounds, comment_line=comment_line,
-                         pad_box=self._pad_box, xpad=self._xpad,
-                         ypad=self._ypad, zpad=self._zpad)
+                         comment_line=comment_line, **kwargs)
 
         if return_reader:
-            return DATAReader(fpath=self.outfile)
+            return DATAReader(fpath=self.outfile, **kwargs)
 
 
 class XYZFormat(StructureFormat):

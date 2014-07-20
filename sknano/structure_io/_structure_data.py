@@ -43,10 +43,11 @@ class StructureData(object):
     fpath : {None, str}, optional
 
     """
-    def __init__(self, fpath=None):
+    def __init__(self, fpath=None, **kwargs):
         self._comment_line = default_comment_line
         self._fpath = fpath
         self._structure_atoms = None
+        self._kwargs = kwargs
         self._properties = OrderedDict()
 
     @property
@@ -121,8 +122,8 @@ class StructureReader(StructureData):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, fpath=None):
-        super(StructureReader, self).__init__(fpath=fpath)
+    def __init__(self, fpath=None, **kwargs):
+        super(StructureReader, self).__init__(fpath=fpath, **kwargs)
 
     @abstractmethod
     def read(self):
@@ -153,9 +154,10 @@ class StructureConverter(object):
     """
     __metaclass__ = ABCMeta
 
-    def __init__(self, infile=None, outfile=None):
+    def __init__(self, infile=None, outfile=None, **kwargs):
         self._infile = infile
         self._outfile = outfile
+        self._kwargs = kwargs
 
     @property
     def infile(self):
@@ -176,8 +178,9 @@ class StructureConverter(object):
 
 class StructureFormat(object):
     """Base class for containing structure format properties"""
-    def __init__(self):
+    def __init__(self, **kwargs):
         self._properties = OrderedDict()
+        self._kwargs = kwargs
 
     @property
     def properties(self):
