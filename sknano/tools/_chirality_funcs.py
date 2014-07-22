@@ -16,19 +16,8 @@ import numpy as np
 
 from ._luts import chiral_type_name_mappings as Ch_types
 
-__all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'filter_key_type_mappings',
+__all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list',
            'generate_Ch_list', 'get_Ch_indices', 'get_Ch_type']
-
-filter_key_type_mappings = {}
-filter_key_type_mappings['Ch_type'] = str
-for k in ('even', 'odd'):
-    filter_key_type_mappings[k + '_only'] = bool
-
-for k in ('min_index', 'max_index',
-          'min_n', 'max_n',
-          'min_m', 'max_m',
-          'n', 'm'):
-    filter_key_type_mappings[k] = int
 
 
 def cmp_Ch(Ch1, Ch2):
