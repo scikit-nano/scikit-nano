@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===================================================
-Core functions (:mod:`sknano.tools._corefuncs`)
+Core functions (:mod:`sknano.core._corefuncs`)
 ===================================================
 
-.. currentmodule:: sknano.tools._corefuncs
+.. currentmodule:: sknano.core._corefuncs
 
 """
 from __future__ import absolute_import, division, print_function

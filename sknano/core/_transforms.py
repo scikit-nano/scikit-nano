@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Linear algebra functions for transformations (:mod:`sknano.tools._transforms`)
+Linear algebra functions for transformations (:mod:`sknano.core._transforms`)
 ===============================================================================
 
-.. currentmodule:: sknano.tools._transforms
+.. currentmodule:: sknano.core._transforms
 
 """
 from __future__ import absolute_import, division, print_function
@@ -44,8 +44,8 @@ def rotate_point(point=None, angle=None, rot_axis=None, axis_origin=None,
 
     Parameters
     ----------
-    point : array_like or :class:`~sknano.tools.Point`
-        3-element list or ndarray or :class:`~sknano.tools.Point`
+    point : array_like or :class:`~sknano.core.Point`
+        3-element list or ndarray or :class:`~sknano.core.Point`
         defining the :math:`x, y, z` coordinates of point to rotate.
     angle : float
         Rotation angle in **radians** unless `deg2rad` is `True`.
@@ -53,12 +53,12 @@ def rotate_point(point=None, angle=None, rot_axis=None, axis_origin=None,
         If your right-hand's thumb points along the `rot_axis`,
         then your fingers wrap around the axis in the *positive sense* of
         the rotation angle.
-    rot_axis : {array_like, str, :class:`~sknano.tools.Vector`}
-        3-element list or ndarray or :class:`~sknano.tools.Vector` defining
+    rot_axis : {array_like, str, :class:`~sknano.core.Vector`}
+        3-element list or ndarray or :class:`~sknano.core.Vector` defining
         the 3 components, :math:`u, v, w`, of the vector defining the axis
         of rotation.
-    axis_origin : {array_like, :class:`~sknano.tools.Point`}
-        3-element list or ndarray or :class:`~sknano.tools.Point` defining
+    axis_origin : {array_like, :class:`~sknano.core.Point`}
+        3-element list or ndarray or :class:`~sknano.core.Point` defining
         origin point of rotation axis.
     deg2rad : bool, optional
         Angle is in degrees and needs to be converted to radians
@@ -99,8 +99,8 @@ def rotation_matrix(angle=None, rot_axis=None, deg2rad=False, R4x4=False):
         If your right-hand's thumb points along the `rot_axis`,
         then your fingers wrap around the axis in the *positive sense* of
         the rotation angle.
-    rot_axis : {array_like, str, :class:`~sknano.tools.Vector`}
-        3-element list or ndarray or :class:`~sknano.tools.Vector` defining
+    rot_axis : {array_like, str, :class:`~sknano.core.Vector`}
+        3-element list or ndarray or :class:`~sknano.core.Vector` defining
         the 3 components, :math:`u, v, w`, of the vector defining the axis
         of rotation.
     deg2rad : bool, optional
@@ -138,12 +138,12 @@ def transformation_matrix(angle=None, rot_axis=None, axis_origin=None,
         If your right-hand's thumb points along the `rot_axis`,
         then your fingers wrap around the axis in the *positive sense* of
         the rotation angle.
-    rot_axis : {array_like, str, :class:`~sknano.tools.Vector`}
-        3-element list or ndarray or :class:`~sknano.tools.Vector` defining
+    rot_axis : {array_like, str, :class:`~sknano.core.Vector`}
+        3-element list or ndarray or :class:`~sknano.core.Vector` defining
         the 3 components, :math:`u, v, w`, of the vector defining the axis
         of rotation.
-    axis_origin : {array_like, :class:`~sknano.tools.Point`}
-        3-element list or ndarray or :class:`~sknano.tools.Point` defining
+    axis_origin : {array_like, :class:`~sknano.core.Point`}
+        3-element list or ndarray or :class:`~sknano.core.Point` defining
         origin point of axis of rotation
     deg2rad : bool, optional
         Angle is in degrees and needs to be converted to radians

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==================================================================
-Custom NumPy data structures (:mod:`sknano.tools._npcoremath`)
+Custom NumPy data structures (:mod:`sknano.core._npcoremath`)
 ==================================================================
 
-.. currentmodule:: sknano.tools._npcoremath
+.. currentmodule:: sknano.core._npcoremath
 
 """
 from __future__ import absolute_import, division, print_function

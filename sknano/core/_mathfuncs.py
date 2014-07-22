@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =======================================================
-Math helper functions (:mod:`sknano.tools._mathfuncs`)
+Math helper functions (:mod:`sknano.core._mathfuncs`)
 =======================================================
 
-.. currentmodule:: sknano.tools._mathfuncs
+.. currentmodule:: sknano.core._mathfuncs
 
 """
 from __future__ import absolute_import, division, print_function

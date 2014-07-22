@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =========================================================================
-Helper functions for string manipulation (:mod:`sknano.tools._strfuncs`)
+Helper functions for string manipulation (:mod:`sknano.core._strfuncs`)
 =========================================================================
 
-.. currentmodule:: sknano.tools._strfuncs
+.. currentmodule:: sknano.core._strfuncs
 
 """
 from __future__ import absolute_import, division, print_function
