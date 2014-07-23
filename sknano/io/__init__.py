@@ -65,8 +65,8 @@ Sub-packages
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from ._lammps_data_format import *
-from ._xyz_format import *
-from ._structure_data import *
+#from ._lammps_data_format import *
+#from ._xyz_format import *
+#from ._structure_data import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]

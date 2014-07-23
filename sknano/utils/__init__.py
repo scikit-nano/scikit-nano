@@ -23,7 +23,7 @@ from __future__ import division, print_function, absolute_import
 
 __docformat__ = 'restructuredtext'
 
-from ._chirality_funcs import *
+#from ._chirality_funcs import *
 #from ._iofuncs import *
 #from ._luts import *
 #from ._mathfuncs import *
