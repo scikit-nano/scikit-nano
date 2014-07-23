@@ -12,12 +12,14 @@ Subpackages
 
 ::
 
- analysis       --- functions and classes for structure analysis
- nanogen        --- classes for generating nanostructures
- nanogen_gui    --- NanoGen GUI front-end
+ analysis       --- classes and functions for structure analysis
+ apps           --- GUI front-end app development
+ core           --- core classes and functions
+ generators     --- classes for generating abstract object representations
+                    of nanostructures
+ io             --- classes for reading/writing nanostructure data
  scripts        --- command-line scripts
- structure_io   --- classes for structure data I/O
- tools          --- helper funcs, LUTs, etc.
+ utils          --- utility classes and functions
 
 Utilitiy tools
 --------------
@@ -27,13 +29,15 @@ Utilitiy tools
  __version__    --- sknano version string
 
 """
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, division, print_function
 
 __all__ = ['analysis',
-           'nanogen',
-           'nanogen_gui',
+           'apps',
+           'core',
+           'generators',
+           'io',
            'scripts',
-           'structure_io',
-           'tools']
+           'structures',
+           'utils']
 
 from sknano.version import version as __version__
