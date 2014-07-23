@@ -18,25 +18,6 @@ Abstract mathematical data structures
    Vector
    Quaternion
 
-Helper functions for chirality data
-------------------------------------
-.. autosummary::
-   :toctree: generated/
-
-   cmp_Ch
-   filter_Ch
-   filter_Ch_list
-   generate_Ch_list
-   get_Ch_indices
-   get_Ch_type
-
-'Core' functions that don't fit under any specific category
-------------------------------------------------------------
-.. autosummary::
-   :toctree: generated/
-
-   check_type
-
 Helper functions for I/O
 -------------------------
 .. autosummary::
@@ -71,12 +52,10 @@ Helper functions for linear algebra transforms
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from ._corefuncs import *
 from ._coremath import *
 from ._iofuncs import *
 from ._luts import *
 from ._mathfuncs import *
-from ._nanotube_funcs import *
 from ._strfuncs import *
 from ._transforms import *
 
