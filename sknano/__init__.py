@@ -12,13 +12,13 @@ Subpackages
 
 ::
 
- analysis       --- classes and functions for structure analysis
  apps           --- GUI front-end app development
  core           --- core classes and functions
  generators     --- classes for generating abstract object representations
                     of nanostructures
  io             --- classes for reading/writing nanostructure data
  scripts        --- command-line scripts
+ structures     ---
  utils          --- utility classes and functions
 
 Utilitiy tools
@@ -31,8 +31,7 @@ Utilitiy tools
 """
 from __future__ import absolute_import, division, print_function
 
-__all__ = ['analysis',
-           'apps',
+__all__ = ['apps',
            'core',
            'generators',
            'io',
