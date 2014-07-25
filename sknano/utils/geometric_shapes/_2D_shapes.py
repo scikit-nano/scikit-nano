@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ======================================================================
-2D geometric shapes (:mod:`sknano.tools.geometric_shapes._2D_shapes`)
+2D geometric shapes (:mod:`sknano.utils.geometric_shapes._2D_shapes`)
 ======================================================================
 
-.. currentmodule:: sknano.tools.geometric_shapes._2D_shapes
+.. currentmodule:: sknano.utils.geometric_shapes._2D_shapes
 
 """
 from __future__ import absolute_import, division, print_function
@@ -14,7 +14,7 @@ from abc import ABCMeta, abstractmethod
 
 import numpy as np
 
-from sknano.tools import Point2D
+from sknano.core import Point2D
 
 __all__ = ['Circle', 'Ellipse', 'Polygon', 'Parallelogram', 'Rhombus',
            'Rhomboid', 'Rectangle', 'Square']
@@ -29,7 +29,7 @@ class Circle(object):
     ----------
     r : float
         Circle radius.
-    center : sequence or :class:`~sknano.tools.Point2D`
+    center : sequence or :class:`~sknano.core.Point2D`
         Center of circle
 
     """
@@ -74,7 +74,7 @@ class Ellipse(object):
 
     Parameters
     ----------
-    center : sequence or :class:`~sknano.tools.Point2D`
+    center : sequence or :class:`~sknano.core.Point2D`
         Center of axis-aligned ellipse with semi-axes :math:`r_x, r_y`
     rx, ry : float
         Lengths of semi-axes :math:`r_x, r_y`
@@ -143,7 +143,7 @@ class Parallelogram(object):
     ----------
     xmin, ymin : float
     xmax, ymax : float
-    pmin, pmax : sequence or :class:`~sknano.tools.Point2D`, optional
+    pmin, pmax : sequence or :class:`~sknano.core.Point2D`, optional
 
     """
     __metaclass__ = ABCMeta
@@ -223,7 +223,7 @@ class Rectangle(Parallelogram):
     ----------
     xmin, ymin : float
     xmax, ymax : float
-    pmin, pmax : sequence or :class:`~sknano.tools.Point2D`, optional
+    pmin, pmax : sequence or :class:`~sknano.core.Point2D`, optional
 
     """
     def __init__(self, xmin=None, ymin=None, xmax=None, ymax=None,
@@ -262,7 +262,7 @@ class Square(Rectangle):
     ----------
     a : float, optional
         length of side
-    center : sequence or :class:`~sknano.tools.Point2D`, optional
+    center : sequence or :class:`~sknano.core.Point2D`, optional
 
     """
     def __init__(self, a=None, center=None):

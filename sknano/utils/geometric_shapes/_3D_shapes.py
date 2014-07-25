@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =======================================================================
-3D geometric shapes (:mod:`sknano.tools.geometric_shapes._3D_shapes`)
+3D geometric shapes (:mod:`sknano.utils.geometric_shapes._3D_shapes`)
 =======================================================================
 
-.. currentmodule:: sknano.tools.geometric_shapes._3D_shapes
+.. currentmodule:: sknano.utils.geometric_shapes._3D_shapes
 
 """
 from __future__ import absolute_import, division, print_function
@@ -14,7 +14,7 @@ from abc import ABCMeta, abstractmethod
 
 import numpy as np
 
-from sknano.tools import Point
+from sknano.core import Point
 
 __all__ = ['Cube', 'Cuboid', 'Ellipsoid', 'Spheroid', 'Sphere',
            'Polyhedron', 'Hexahedron', 'Parallelepiped', 'Rhombohedron']
@@ -30,7 +30,7 @@ class Parallelepiped(object):
     ----------
     xmin, ymin, zmin : float
     xmax, ymax, zmax : float
-    pmin, pmax : sequence or :class:`~sknano.tools.Point`, optional
+    pmin, pmax : sequence or :class:`~sknano.core.Point`, optional
 
     """
     __metaclass__ = ABCMeta
@@ -111,7 +111,7 @@ class Cuboid(Parallelepiped):
     ----------
     xmin, ymin, zmin : float
     xmax, ymax, zmax : float
-    pmin, pmax : sequence or :class:`~sknano.tools.Point`, optional
+    pmin, pmax : sequence or :class:`~sknano.core.Point`, optional
 
     """
     def __init__(self, xmin=None, ymin=None, zmin=None,
@@ -157,9 +157,9 @@ class Cube(Cuboid):
     ----------
     a : float, optional
         length of edge
-    center : sequence or :class:`~sknano.tools.Point`
+    center : sequence or :class:`~sknano.core.Point`
         Either a 3-tuple of floats or an instance of the
-        :class:`~sknano.tools.Point` class specifying the :math:`(x,y,z)`
+        :class:`~sknano.core.Point` class specifying the :math:`(x,y,z)`
         coordinates of the cube center.
 
     """
@@ -223,9 +223,9 @@ class Ellipsoid(object):
     a, b, c : float, optional
         Semi-principal axes :math:`a, b, c` of axis-aligned
         :class:`Ellipsoid`
-    center : sequence or :class:`~sknano.tools.Point`
+    center : sequence or :class:`~sknano.core.Point`
         Either a 3-tuple of floats or an instance of the
-        :class:`~sknano.tools.Point` class specifying the :math:`(x,y,z)`
+        :class:`~sknano.core.Point` class specifying the :math:`(x,y,z)`
         coordinates of the :class:`Ellipsoid` center.
 
     """
@@ -293,9 +293,9 @@ class Spheroid(object):
     a, c : float, optional
         Semi-axes :math:`a, c` of axis-aligned
         :class:`Spheroid` with symmetry axis along :math:`z` axis.
-    center : sequence or :class:`~sknano.tools.Point`
+    center : sequence or :class:`~sknano.core.Point`
         Either a 3-tuple of floats or an instance of the
-        :class:`~sknano.tools.Point` class specifying the :math:`(x,y,z)`
+        :class:`~sknano.core.Point` class specifying the :math:`(x,y,z)`
         coordinates of the :class:`Spheroid` center.
 
     """
@@ -350,9 +350,9 @@ class Sphere(object):
     ----------
     r : float, optional
         Sphere radius :math:`r`
-    center : sequence or :class:`~sknano.tools.Point`
+    center : sequence or :class:`~sknano.core.Point`
         Either a 3-tuple of floats or an instance of the
-        :class:`~sknano.tools.Point` class specifying the :math:`(x,y,z)`
+        :class:`~sknano.core.Point` class specifying the :math:`(x,y,z)`
         coordinates of the :class:`Sphere` center.
 
     """
