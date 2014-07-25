@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-==================================================================
-Abstract data structures for math (:mod:`sknano.core._coremath`)
-==================================================================
+=====================================================================
+Units package (:mod:`sknano.core.units._units`)
+=====================================================================
 
-.. currentmodule:: sknano.core._coremath
+.. currentmodule:: sknano.core.units._units
 
 """
 from __future__ import absolute_import, division, print_function

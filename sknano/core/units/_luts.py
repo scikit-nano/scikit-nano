@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================
-Parameter LUTs (:mod:`sknano.nanogen._parameter_luts`)
+Parameter LUTs (:mod:`sknano.core.units._luts`)
 =============================================================
 
-.. currentmodule:: sknano.nanogen._parameter_luts
+.. currentmodule:: sknano.core.units._luts
 
 """
 from __future__ import absolute_import, division, print_function

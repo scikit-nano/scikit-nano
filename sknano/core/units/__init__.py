@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ======================================================
-Reference data package (:mod:`sknano.core.refdata`)
+Reference data package (:mod:`sknano.core.units`)
 ======================================================
 
-.. currentmodule:: sknano.core.refdata
+.. currentmodule:: sknano.core.units
 
 Contents
 ========
