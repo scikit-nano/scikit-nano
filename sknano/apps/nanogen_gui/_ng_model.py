@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-====================================================
-NanoGen model (:mod:`sknano.nanogen_gui._ng_model`)
-====================================================
+==========================================================
+NanoGen model (:mod:`sknano.apps.nanogen_gui._ng_model`)
+==========================================================
 
-.. currentmodule:: sknano.nanogen_gui._ng_model
+.. currentmodule:: sknano.apps.nanogen_gui._ng_model
 
 """
 from __future__ import absolute_import, division, print_function
@@ -16,7 +16,7 @@ __all__ = ['NGModel']
 
 
 class NGModel(object):
-    """:mod:`~sknano.nanogen_gui` MVC model class."""
+    """:mod:`~sknano.apps.nanogen_gui` MVC model class."""
     def __init__(self):
         self._observers = []
         self._swntbundle = NanotubeBundle(n=10, m=10, bond=1.42)

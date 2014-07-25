@@ -1,36 +1,35 @@
 # -*- coding: utf-8 -*-
 """
-==================================================
-NanoGen view (:mod:`sknano.nanogen_gui._ng_view`)
-==================================================
+=======================================================
+NanoGen view (:mod:`sknano.apps.nanogen_gui._ng_view`)
+=======================================================
 
-.. currentmodule:: sknano.nanogen_gui._ng_view
+.. currentmodule:: sknano.apps.nanogen_gui._ng_view
 
 """
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
+import importlib
+
 from PyQt4.QtCore import pyqtSlot
 from PyQt4.QtGui import QMainWindow
 
-from ..nanogen import NanotubeGenerator, NanotubeBundleGenerator, \
-    MWNTGenerator, MWNTBundleGenerator, UnrolledNanotubeGenerator, \
-    GrapheneGenerator  # , BiLayerGrapheneGenerator
 from ._ui_nanogen import Ui_NanoGen
 
 __all__ = ['NGView']
 
 
 class NGView(QMainWindow, Ui_NanoGen):
-    """:mod:`~sknano.nanogen_gui` MVC view class.
+    """:mod:`~sknano.apps.nanogen_gui` MVC view class.
 
     Parameters
     ----------
-    controller : :class:`~sknano.nanogen_gui._ng_controller.NGController`
+    controller : :class:`~sknano.apps.nanogen_gui._ng_controller.NGController`
         An instance of
-        :class:`~sknano.nanogen_gui._ng_controller.NGController`.
-    model : :class:`~sknano.nanogen_gui._ng_model.NGModel`
-        An instance of :class:`~sknano.nanogen_gui._ng_model.NGModel`.
+        :class:`~sknano.apps.nanogen_gui._ng_controller.NGController`.
+    model : :class:`~sknano.apps.nanogen_gui._ng_model.NGModel`
+        An instance of :class:`~sknano.apps.nanogen_gui._ng_model.NGModel`.
 
     """
     def __init__(self, controller=None, model=None):
@@ -180,61 +179,44 @@ class NGView(QMainWindow, Ui_NanoGen):
         generator_tab = \
             str(self.nanogen_tabWidget.tabText(
                 self.nanogen_tabWidget.currentIndex()))
+        kwargs = {}
 
         if generator_tab == 'Nanotubes':
+            kwargs['n'] = self.n_spinBox.value()
+            kwargs['m'] = self.m_spinBox.value()
+            kwargs['nx'] = self.nx_spinBox.value()
+            kwargs['ny'] = self.ny_spinBox.value()
+            kwargs['nz'] = self.nz_spinBox.value()
+            kwargs['bond'] = self.nanotube_bond_doubleSpinBox.value()
             if self.nanotube_generator_radioButton.isChecked():
                 if self.bundle_generator_checkBox.isChecked():
-                    generator = NanotubeBundleGenerator(
-                        n=self.n_spinBox.value(),
-                        m=self.m_spinBox.value(),
-                        nx=self.nx_spinBox.value(),
-                        ny=self.ny_spinBox.value(),
-                        nz=self.nz_spinBox.value(),
-                        bond=self.nanotube_bond_doubleSpinBox.value())
+                    generator_class = 'SWNTBundleGenerator'
                 else:
-                    generator = NanotubeGenerator(
-                        n=self.n_spinBox.value(),
-                        m=self.m_spinBox.value(),
-                        nz=self.nz_spinBox.value(),
-                        bond=self.nanotube_bond_doubleSpinBox.value())
+                    generator_class = 'SWNTGenerator'
             elif self.mwnt_generator_radioButton.isChecked():
                 if self.bundle_generator_checkBox.isChecked():
-                    generator = MWNTBundleGenerator(
-                        n=self.n_spinBox.value(),
-                        m=self.m_spinBox.value(),
-                        nx=self.nx_spinBox.value(),
-                        ny=self.ny_spinBox.value(),
-                        nz=self.nz_spinBox.value(),
-                        bond=self.nanotube_bond_doubleSpinBox.value())
+                    generator_class = 'MWNTBundleGenerator'
                 else:
-                    generator = MWNTGenerator(
-                        n=self.n_spinBox.value(),
-                        m=self.m_spinBox.value(),
-                        nz=self.nz_spinBox.value(),
-                        bond=self.nanotube_bond_doubleSpinBox.value())
+                    generator_class = 'MWNTGenerator'
             elif self.unrolled_nanotube_generator_radioButton.isChecked():
-                generator = UnrolledNanotubeGenerator(
-                    n=self.n_spinBox.value(),
-                    m=self.m_spinBox.value(),
-                    nx=self.nx_spinBox.value(),
-                    nz=self.nz_spinBox.value(),
-                    bond=self.nanotube_bond_doubleSpinBox.value())
+                generator_class = 'UnrolledNanotubeGenerator'
         elif generator_tab == 'Graphene':
+            kwargs['width'] = self.width_doubleSpinBox.value()
+            kwargs['length'] = self.length_doubleSpinBox.value()
+            kwargs['bond'] = self.graphene_bond_doubleSpinBox.value()
+            kwargs['nlayers'] = self.nlayers_spinBox.value()
+
             edge = 'AC'
             if self.ZZ_edge_radioButton.isChecked():
                 edge = 'ZZ'
-            stacking_order = None
+            kwargs['edge'] = edge
+
+            stacking_order = 'AB'
             if self.AA_stacking_radioButton.isChecked():
                 stacking_order = 'AA'
-            elif self.AB_stacking_radioButton.isChecked():
-                stacking_order = 'AB'
-            generator = GrapheneGenerator(
-                width=self.width_doubleSpinBox.value(),
-                length=self.length_doubleSpinBox.value(),
-                edge=edge,
-                bond=self.graphene_bond_doubleSpinBox.value(),
-                nlayers=self.nlayers_spinBox.value(),
-                stacking_order=stacking_order)
+            kwargs['stacking_order'] = stacking_order
+
+            generator_class = 'GrapheneGenerator'
 
         structure_format = \
             str(self.structure_format_comboBox.itemText(
@@ -242,7 +224,11 @@ class NGView(QMainWindow, Ui_NanoGen):
         if structure_format.endswith('data'):
             structure_format = 'data'
 
-        generator.save_data(structure_format=structure_format)
+        generator = getattr(importlib.import_module('sknano.generators'),
+                            generator_class)
+        #generator(**kwargs).save_data(fname=fname,
+        #                              structure_format=structure_format)
+        generator(**kwargs).save_data(structure_format=structure_format)
 
     def update_app_view(self):
         self.n_spinBox.setValue(self.model.n)
