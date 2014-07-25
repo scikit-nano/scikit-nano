@@ -77,10 +77,10 @@ import argparse
 import importlib
 import sys
 
-from ..structure_io.atoms import StructureAtom as Atom
-from ..nanogen import TubeGen, tubegen_format_ext_map
-from ..structure_io import XYZ2DATAConverter
-from ..tools.refdata import CCbond, dVDW
+from ..core import Atom
+from ..core.refdata import CCbond, dVDW
+from ..generators import TubeGen, tubegen_format_ext_map
+from ..io import XYZ2DATAConverter
 
 __all__ = ['nanogen', 'tubegen']
 
@@ -283,7 +283,7 @@ def nanogen(generator_class=None, element1='C', element2='C', bond=CCbond,
         output file format
 
     """
-    generator = getattr(importlib.import_module('sknano.nanogen'),
+    generator = getattr(importlib.import_module('sknano.generators'),
                         generator_class)
     del kwargs['func']
     generator(**kwargs).save_data(fname=fname,
