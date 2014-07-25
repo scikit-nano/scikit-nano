@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-=============================================================
-Fullerene structure tools (:mod:`sknano.nanogen._fullerenes`)
-=============================================================
+===================================================================
+Fullerene structure classes (:mod:`sknano.structures._fullerenes`)
+===================================================================
 
-.. currentmodule:: sknano.nanogen._fullerenes
+.. currentmodule:: sknano.structures._fullerenes
 
 """
-from __future__ import division, print_function, absolute_import
-__docformat__ = 'restructuredtext'
+from __future__ import absolute_import, division, print_function
+__docformat__ = 'restructuredtext en'
 
 #import itertools
 
@@ -16,15 +16,6 @@ __docformat__ = 'restructuredtext'
 #from collections import OrderedDict
 
 #import numpy as np
-
-try:
-    from pint import UnitRegistry
-    ureg = UnitRegistry()
-    Qty = ureg.Quantity
-except ImportError:
-    Qty = None
-
-#param_units = {}
 
 __all__ = ['Fullerene']
 
@@ -52,5 +43,5 @@ class Fullerene(object):
     --------
 
     """
-    def __init__(self, N=None, with_units=False, verbose=False):
+    def __init__(self, N=None, verbose=False):
         raise RuntimeError('This class is not yet implemented.')
