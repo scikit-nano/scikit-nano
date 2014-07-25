@@ -30,7 +30,7 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 #from ._fullerenes import *
-#from ._graphenes import *
-#from ._nanotubes import *
+from ._graphenes import *
+from ._nanotubes import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
