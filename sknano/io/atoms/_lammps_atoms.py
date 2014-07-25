@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ========================================================================
-Class for LAMMPS atoms (:mod:`sknano.structure_io.atoms._lammps_atoms`)
+Class for LAMMPS atoms (:mod:`sknano.io.atoms._lammps_atoms`)
 ========================================================================
 
-.. currentmodule:: sknano.structure_io.atoms._lammps_atoms
+.. currentmodule:: sknano.io.atoms._lammps_atoms
 
 """
 from __future__ import absolute_import, division, print_function
@@ -22,7 +22,7 @@ except ImportError:
           'nearest-neighbor queries between atoms.')
     has_kdtree = False
 
-from ...tools import xyz_axes
+from ...core import xyz_axes
 from ._atoms import Atoms
 
 __all__ = ['LAMMPSAtoms']
@@ -285,8 +285,8 @@ class LAMMPSAtoms(Atoms):
 
         Parameters
         ----------
-        atom : :class:`~sknano.structure_io.atoms.LAMMPSAtom`
-            A :class:`~sknano.structure_io.atoms.LAMMPSAtom` instance.
+        atom : :class:`~sknano.io.atoms.LAMMPSAtom`
+            A :class:`~sknano.io.atoms.LAMMPSAtom` instance.
 
         """
         if atom.atomtype not in self._atomtypes:

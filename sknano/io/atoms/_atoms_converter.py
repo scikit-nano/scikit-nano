@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Class for converting Atoms (:mod:`sknano.structure_io.atoms._atoms_converter`)
+Class for converting Atoms (:mod:`sknano.io.atoms._atoms_converter`)
 ==============================================================================
 
-.. currentmodule:: sknano.structure_io.atoms._atoms_converter
+.. currentmodule:: sknano.io.atoms._atoms_converter
 
 """
 from __future__ import absolute_import, division, print_function

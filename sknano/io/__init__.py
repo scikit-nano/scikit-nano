@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==========================================================
-Tools for structure data I/O (:mod:`sknano.structure_io`)
+Classes for structure data I/O (:mod:`sknano.io`)
 ==========================================================
 
-.. currentmodule:: sknano.structure_io
+.. currentmodule:: sknano.io
 
 Contents
 ========
@@ -37,7 +37,7 @@ Base classes for creating new structure data readers/writers/converters
 .. autosummary::
    :toctree: generated/
 
-   StructureData
+   StructureIO
    StructureReader
    StructureWriter
    StructureConverter
@@ -48,7 +48,7 @@ Base custom exception classes for handling errors
 .. autosummary::
    :toctree: generated/
 
-   StructureDataError
+   StructureIOError
    StructureReaderError
    StructureWriterError
    StructureConverterError
@@ -67,6 +67,6 @@ __docformat__ = 'restructuredtext en'
 
 #from ._lammps_data_format import *
 #from ._xyz_format import *
-#from ._structure_data import *
+#from ._structure_io import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]

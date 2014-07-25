@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 """
 ========================================================================
-Class for LAMMPS atom (:mod:`sknano.structure_io.atoms._lammps_atom`)
+Class for LAMMPS atom (:mod:`sknano.io.atoms._lammps_atom`)
 ========================================================================
 
-.. currentmodule:: sknano.structure_io.atoms._lammps_atom
+.. currentmodule:: sknano.io.atoms._lammps_atom
 
 """
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 import numpy as np
-
-from ...tools import check_type, Vector
 
 from ._atom import Atom
 
@@ -181,7 +179,6 @@ class LAMMPSAtom(Atom):
             :math:`e`.
 
         """
-        check_type(value, allowed_types=(int, float))
         self._q = value
 
     @property
@@ -199,7 +196,6 @@ class LAMMPSAtom(Atom):
             atom ID
 
         """
-        check_type(value, allowed_types=(int, float))
         self._atomID = int(value)
 
     @property
@@ -217,7 +213,6 @@ class LAMMPSAtom(Atom):
             molecule ID
 
         """
-        check_type(value, allowed_types=(int, float))
         self._moleculeID = int(value)
 
     @property
@@ -235,7 +230,6 @@ class LAMMPSAtom(Atom):
             atom type
 
         """
-        check_type(value, allowed_types=(int, float))
         self._atomtype = int(value)
 
     @property
@@ -260,7 +254,6 @@ class LAMMPSAtom(Atom):
             :math:`n_x` image flag.
 
         """
-        check_type(value, allowed_types=(int, float))
         self._n[0] = int(value)
 
     @property
@@ -285,7 +278,6 @@ class LAMMPSAtom(Atom):
             :math:`n_y` image flag.
 
         """
-        check_type(value, allowed_types=(int, float))
         self._n[1] = int(value)
 
     @property
@@ -310,7 +302,6 @@ class LAMMPSAtom(Atom):
             :math:`n_z` image flag.
 
         """
-        check_type(value, allowed_types=(int, float))
         self._n[2] = int(value)
 
     @property
@@ -337,7 +328,6 @@ class LAMMPSAtom(Atom):
             image flags of `Atom`.
 
         """
-        check_type(value, allowed_types=(np.ndarray,))
         for i, ni in enumerate(value):
             self._n[i] = ni
 

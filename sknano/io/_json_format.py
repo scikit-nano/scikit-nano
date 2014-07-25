@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 """
 ======================================================
-JSON format (:mod:`sknano.structure_io._json_format`)
+JSON format (:mod:`sknano.io._json_format`)
 ======================================================
 
-.. currentmodule:: sknano.structure_io._json_format
+.. currentmodule:: sknano.io._json_format
 
 """
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 from .atoms import Atom
-from ..tools import get_fpath
+from ..core import get_fpath
 
-from ._structure_data import StructureReader, StructureReaderError, \
+from ._structure_io import StructureReader, StructureReaderError, \
     StructureWriter, default_comment_line
 
 __all__ = ['JSONDATA', 'JSONReader', 'JSONWriter']
@@ -64,8 +64,8 @@ class JSONWriter(StructureWriter):
         fname : str
         outpath : str, optional
             Output path for structure data file.
-        atoms : :class:`~sknano.structure_io.atoms.Atoms`
-            An :class:`~sknano.structure_io.atoms.Atoms` instance.
+        atoms : :class:`~sknano.io.atoms.Atoms`
+            An :class:`~sknano.io.atoms.Atoms` instance.
         comment_line : str, optional
             A string written to the first line of `json` file. If `None`,
             then it is set to the full path of the output `json` file.

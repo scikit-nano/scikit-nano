@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Structure Atoms (:mod:`sknano.structure_io.atoms._structure_atoms`)
+Structure Atoms (:mod:`sknano.io.atoms._structure_atoms`)
 ==============================================================================
 
-`Atoms` class for the :class:`~sknano.nanogen.StructureGenerator` classes.
+`Atoms` class for the :class:`~sknano.generator.StructureGenerator` classes.
 
-.. currentmodule:: sknano.structure_io.atoms._structure_atoms
+.. currentmodule:: sknano.io.atoms._structure_atoms
 
 """
 from __future__ import absolute_import, division, print_function
@@ -24,7 +24,7 @@ except ImportError:
           'nearest-neighbor queries between atoms.')
     has_kdtree = False
 
-from ...tools import xyz_axes
+from ...core import xyz_axes
 from ._atoms import Atoms
 
 __all__ = ['StructureAtoms']
@@ -293,8 +293,8 @@ class StructureAtoms(Atoms):
 
         Parameters
         ----------
-        atom : :class:`~sknano.structure_io.atoms.StructureAtom`
-            A :class:`~sknano.structure_io.atoms.StructureAtom` instance.
+        atom : :class:`~sknano.io.atoms.StructureAtom`
+            A :class:`~sknano.io.atoms.StructureAtom` instance.
 
         """
         if atom.atomtype not in self._atomtypes:

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ====================================================================
-LAMMPS dump format (:mod:`sknano.structure_io._lammps_dump_format`)
+LAMMPS dump format (:mod:`sknano.io._lammps_dump_format`)
 ====================================================================
 
-.. currentmodule:: sknano.structure_io._lammps_dump_format
+.. currentmodule:: sknano.io._lammps_dump_format
 
 """
 from __future__ import absolute_import, division, print_function
@@ -13,10 +13,10 @@ __docformat__ = 'restructuredtext en'
 import numpy as np
 
 from .atoms import LAMMPSAtom as Atom
-from ..tools import get_fpath
+from ..core import get_fpath
 
-from ._structure_data import StructureReader, StructureWriter, \
-    StructureFormat, StructureDataError, default_comment_line
+from ._structure_io import StructureReader, StructureWriter, \
+    StructureFormat, StructureIOError, default_comment_line
 
 
 __all__ = ['DUMPReader', 'DUMPWriter', 'DUMPData', 'DUMPError', 'DUMPFormat']
@@ -541,7 +541,7 @@ class DUMPData(DUMPReader):
             print(e)
 
 
-class DUMPError(StructureDataError):
+class DUMPError(StructureIOError):
     """Exception raised for failed method calls.
 
     Parameters

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==================================================================
-Class for XYZ atoms (:mod:`sknano.structure_io.atoms._xyz_atoms`)
+Class for XYZ atoms (:mod:`sknano.io.atoms._xyz_atoms`)
 ==================================================================
 
-.. currentmodule:: sknano.structure_io.atoms._xyz_atoms
+.. currentmodule:: sknano.io.atoms._xyz_atoms
 
 """
 from __future__ import absolute_import, division, print_function
@@ -22,7 +22,7 @@ except ImportError:
           'nearest-neighbor queries between atoms.')
     has_kdtree = False
 
-from ...tools import xyz_axes
+from ...core import xyz_axes
 from ._atoms import Atoms
 
 __all__ = ['XYZAtoms']

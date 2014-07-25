@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ====================================================
-PDB format (:mod:`sknano.structure_io._pdb_format`)
+PDB format (:mod:`sknano.io._pdb_format`)
 ====================================================
 
-.. currentmodule:: sknano.structure_io._pdb_format
+.. currentmodule:: sknano.io._pdb_format
 
 """
 from __future__ import absolute_import, division, print_function
@@ -13,9 +13,9 @@ __docformat__ = 'restructuredtext en'
 from collections import OrderedDict
 
 #from .atoms import PDBAtom, PDBAtoms
-from ..tools import get_fpath
+from ..core import get_fpath
 
-from ._structure_data import StructureReader, StructureReaderError, \
+from ._structure_io import StructureReader, StructureIOError, \
     StructureWriter, StructureFormat, default_comment_line
 
 __all__ = ['PDBData', 'PDBReader', 'PDBWriter', 'PDBFormat']
@@ -60,8 +60,8 @@ class PDBWriter(StructureWriter):
             Output file path.
         fpath : str, optional
             Full path (directory path + file name) to output data file.
-        atoms : :py:class:`~sknano.structure_io.atoms.Atoms`
-            An :py:class:`~sknano.structure_io.atoms.Atoms` instance.
+        atoms : :py:class:`~sknano.io.atoms.Atoms`
+            An :py:class:`~sknano.io.atoms.Atoms` instance.
         comment_line : str, optional
 
         """
@@ -89,7 +89,7 @@ class PDBData(PDBReader):
     def __init__(self, fpath=None):
         try:
             super(PDBData, self).__init__(fpath=fpath)
-        except StructureReaderError:
+        except StructureIOError:
             pass
 
     def write(self, pdbfile=None):

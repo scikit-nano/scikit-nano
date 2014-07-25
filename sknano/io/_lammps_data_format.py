@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ====================================================================
-LAMMPS data format (:mod:`sknano.structure_io._lammps_data_format`)
+LAMMPS data format (:mod:`sknano.io._lammps_data_format`)
 ====================================================================
 
-.. currentmodule:: sknano.structure_io._lammps_data_format
+.. currentmodule:: sknano.io._lammps_data_format
 
 """
 from __future__ import absolute_import, division, print_function
@@ -16,15 +16,17 @@ import os
 import numpy as np
 
 from .atoms import LAMMPSAtom as Atom, LAMMPSAtoms, lammps_atom_styles
-from ..tools import get_fpath
+from ..core import get_fpath
 
-from ._structure_data import StructureReader, StructureWriter, \
-    StructureConverter, StructureFormat, StructureDataError, \
+from ._structure_io import StructureReader, StructureWriter, \
+    StructureConverter, StructureFormat, StructureIOError, \
     default_comment_line
 
-__all__ = ['DATAIO', 'DATAData', 'DATAReader', 'DATAWriter',
+__all__ = ['DATAData', 'DATAReader', 'DATAWriter',
            'DATA2XYZConverter', 'DATAFormat', 'DATAError',
-           'LAMMPSDATAIO', 'LAMMPSDATA']
+           'LAMMPSDATA', 'LAMMPSDATAReader',
+           'LAMMPSDATAWriter', 'LAMMPSDATA2XYZConverter',
+           'LAMMPSDATAFormat', 'LAMMPSDATAError']
 
 
 class DATAReader(StructureReader):
@@ -250,6 +252,8 @@ class DATAReader(StructureReader):
         finally:
             return section_data
 
+LAMMPSDATAReader = DATAReader
+
 
 class DATAWriter(StructureWriter):
     """`StructureWriter` class for writing `LAMMPS data` file format."""
@@ -270,19 +274,19 @@ class DATAWriter(StructureWriter):
             Output file path.
         fpath : str, optional
             Full path (directory path + file name) to output data file.
-        atoms : :class:`~sknano.structure_io.atoms.Atoms`
-            An :class:`~sknano.structure_io.atoms.Atoms` instance.
+        atoms : :class:`~sknano.io.atoms.Atoms`
+            An :class:`~sknano.io.atoms.Atoms` instance.
         boxbounds : dict, optional
             If `None`, determined automatically from the `atoms` coordinates.
         comment_line : str, optional
             A string written to the first line of `data` file. If `None`,
             then it is set to the full path of the output `data` file.
         assume_unique_atoms : bool, optional
-            Check that each :class:`~sknano.structure_io.atoms.Atom` in `atoms`
-            has a unique :attr:`~sknano.structure_io.atoms.Atom.atomID`.
+            Check that each :class:`~sknano.io.atoms.Atom` in `atoms`
+            has a unique :attr:`~sknano.io.atoms.Atom.atomID`.
             If the check fails, then assign a unique
-            :attr:`~sknano.structure_io.atoms.Atom.atomID`.
-            to each :class:`~sknano.structure_io.atoms.Atom`.
+            :attr:`~sknano.io.atoms.Atom.atomID`.
+            to each :class:`~sknano.io.atoms.Atom`.
             If `assume_unique_atoms` is True, but the atomID's are not unique,
             LAMMPS will not be able to read the data file.
         enforce_consecutive_atomIDs : bool, optional
@@ -394,9 +398,11 @@ class DATAWriter(StructureWriter):
 
                 f.write(line)
 
+LAMMPSDATAWriter = DATAWriter
 
-class DATAIO(DATAReader):
-    """Class for reading and writing `StructureData` in `LAMMPS data` format.
+
+class DATAData(DATAReader):
+    """Class for reading and writing `StructureIO` in `LAMMPS data` format.
 
     Parameters
     ----------
@@ -404,7 +410,7 @@ class DATAIO(DATAReader):
 
     """
     def __init__(self, fpath=None, **kwargs):
-        super(DATAIO, self).__init__(fpath=fpath, **kwargs)
+        super(DATAData, self).__init__(fpath=fpath, **kwargs)
 
     def delete(self, key):
         if key in self.headers:
@@ -511,7 +517,7 @@ class DATAIO(DATAReader):
     def format_spec(cls, atom_style='full', **kwargs):
         return DATAFormat(atom_style=atom_style, **kwargs)
 
-LAMMPSDATAIO = LAMMPSDATA = DATAData = DATAIO
+LAMMPSDATA = DATAData
 
 
 class DATA2XYZConverter(StructureConverter):
@@ -570,9 +576,11 @@ class DATA2XYZConverter(StructureConverter):
         if return_reader:
             return XYZReader(fpath=self.outfile, **kwargs)
 
+LAMMPSDATA2XYZConverter = DATA2XYZConverter
 
-class DATAError(StructureDataError):
-    """`StructureDataError` `Exception` for `LAMMPS data` file format.
+
+class DATAError(StructureIOError):
+    """`StructureIOError` `Exception` for `LAMMPS data` file format.
 
     Parameters
     ----------
@@ -585,6 +593,8 @@ class DATAError(StructureDataError):
 
     def __str__(self):
         return repr(self.msg)
+
+LAMMPSDATAError = DATAError
 
 
 class DATAFormat(StructureFormat):
@@ -768,3 +778,5 @@ class DATAFormat(StructureFormat):
     def section_syntax_dict(self):
         """Section syntax dictionary."""
         return self._section_syntax_dict
+
+LAMMPSDATAFormat = DATAFormat

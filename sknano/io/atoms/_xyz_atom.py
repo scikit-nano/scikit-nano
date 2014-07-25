@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ========================================================================
-Class for XYZ atom (:mod:`sknano.structure_io.atoms._xyz_atom`)
+Class for XYZ atom (:mod:`sknano.io.atoms._xyz_atom`)
 ========================================================================
 
-.. currentmodule:: sknano.structure_io.atoms._xyz_atom
+.. currentmodule:: sknano.io.atoms._xyz_atom
 
 """
 from __future__ import absolute_import, division, print_function

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-Base classes for structure data (:mod:`sknano.structure_io._structure_data`)
+Base classes for structure data (:mod:`sknano.io._structure_io`)
 =============================================================================
 
-.. currentmodule:: sknano.structure_io._structure_data
+.. currentmodule:: sknano.io._structure_io
 
 """
 from __future__ import absolute_import, division, print_function
@@ -20,12 +20,12 @@ default_comment_line = \
 default_structure_format = 'xyz'
 supported_structure_formats = ('xyz', 'data')
 
-__all__ = ['StructureData',
+__all__ = ['StructureIO',
            'StructureReader',
            'StructureWriter',
            'StructureConverter',
            'StructureFormat',
-           'StructureDataError',
+           'StructureIOError',
            'StructureReaderError',
            'StructureWriterError',
            'StructureConverterError',
@@ -35,7 +35,7 @@ __all__ = ['StructureData',
            'supported_structure_formats']
 
 
-class StructureData(object):
+class StructureIO(object):
     """Base class defining common properties for structure data.
 
     Parameters
@@ -57,7 +57,7 @@ class StructureData(object):
 
     @property
     def atoms(self):
-        """Alias for :attr:`~StructureData.structure_atoms`."""
+        """Alias for :attr:`~StructureIO.structure_atoms`."""
         return self.structure_atoms
 
     @property
@@ -99,7 +99,7 @@ class StructureData(object):
 
     @property
     def Natoms(self):
-        """Number of atoms in :attr:`~StructureData.structure_atoms`"""
+        """Number of atoms in :attr:`~StructureIO.structure_atoms`"""
         try:
             return self._structure_atoms.Natoms
         except AttributeError:
@@ -111,7 +111,7 @@ class StructureData(object):
         return self._properties
 
 
-class StructureReader(StructureData):
+class StructureReader(StructureIO):
     """Abstract base class for reading structure data.
 
     Parameters
@@ -196,12 +196,12 @@ class StructureFormatter(object):
         pass
 
 
-class StructureDataError(Exception):
-    """Base class for `StructureData` exceptions."""
+class StructureIOError(Exception):
+    """Base class for `StructureIO` exceptions."""
     pass
 
 
-class StructureReaderError(StructureDataError):
+class StructureReaderError(StructureIOError):
     """Exception raised for `StructureReader` errors.
 
     Parameters
@@ -217,7 +217,7 @@ class StructureReaderError(StructureDataError):
         return repr(self.msg)
 
 
-class StructureWriterError(StructureDataError):
+class StructureWriterError(StructureIOError):
     """Exception raised for `StructureWriter` errors.
 
     Parameters
@@ -233,7 +233,7 @@ class StructureWriterError(StructureDataError):
         return repr(self.msg)
 
 
-class StructureConverterError(StructureDataError):
+class StructureConverterError(StructureIOError):
     """Exception raised for `StructureConverter` errors.
 
     Parameters
@@ -249,7 +249,7 @@ class StructureConverterError(StructureDataError):
         return repr(self.msg)
 
 
-class StructureFormatError(StructureDataError):
+class StructureFormatError(StructureIOError):
     """Exception raised for `StructureFormat` errors.
 
     Parameters

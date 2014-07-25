@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ====================================================
-XYZ format (:mod:`sknano.structure_io._xyz_format`)
+XYZ format (:mod:`sknano.io._xyz_format`)
 ====================================================
 
-.. currentmodule:: sknano.structure_io._xyz_format
+.. currentmodule:: sknano.io._xyz_format
 
 """
 from __future__ import absolute_import, division, print_function
@@ -13,12 +13,12 @@ __docformat__ = 'restructuredtext en'
 import os
 
 from .atoms import XYZAtom as Atom, XYZAtoms
-from ..tools import get_fpath
+from ..core import get_fpath
 
-from ._structure_data import StructureReader, StructureReaderError, \
+from ._structure_io import StructureReader, StructureReaderError, \
     StructureWriter, StructureConverter, StructureFormat, default_comment_line
 
-__all__ = ['XYZReader', 'XYZWriter', 'XYZIO', 'XYZData',
+__all__ = ['XYZReader', 'XYZWriter', 'XYZData',
            'XYZ2DATAConverter', 'XYZFormat']
 
 
@@ -74,8 +74,8 @@ class XYZWriter(StructureWriter):
             Output file path.
         fpath : str, optional
             Full path (directory path + file name) to output data file.
-        atoms : :class:`~sknano.structure_io.atoms.Atoms`
-            An :class:`~sknano.structure_io.atoms.Atoms` instance.
+        atoms : :class:`~sknano.io.atoms.Atoms`
+            An :class:`~sknano.io.atoms.Atoms` instance.
         comment_line : str, optional
             A string written to the first line of `xyz` file. If `None`,
             then it is set to the full path of the output `xyz` file.
@@ -97,7 +97,7 @@ class XYZWriter(StructureWriter):
                     atom.symbol, atom.x, atom.y, atom.z))
 
 
-class XYZIO(XYZReader):
+class XYZData(XYZReader):
     """Class for reading and writing `StructureData` in `xyz` format.
 
     Parameters
@@ -106,7 +106,7 @@ class XYZIO(XYZReader):
 
     """
     def __init__(self, fpath=None, **kwargs):
-        super(XYZIO, self).__init__(fpath=fpath, **kwargs)
+        super(XYZData, self).__init__(fpath=fpath, **kwargs)
 
     def write(self, xyzfile=None, **kwargs):
         """Write xyz file.
@@ -134,8 +134,6 @@ class XYZIO(XYZReader):
 
         except (TypeError, ValueError) as e:
             print(e)
-
-XYZData = XYZIO
 
 
 class XYZ2DATAConverter(StructureConverter):

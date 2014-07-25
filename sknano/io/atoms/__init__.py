@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ====================================================================
-Structure data atoms (:mod:`sknano.structure_io.atoms`)
+Structure data atoms (:mod:`sknano.io.atoms`)
 ====================================================================
 
-.. currentmodule:: sknano.structure_io.atoms
+.. currentmodule:: sknano.io.atoms
 
 Contents
 ========
