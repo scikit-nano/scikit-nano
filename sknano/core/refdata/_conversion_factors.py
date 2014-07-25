@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =====================================================================
-Conversion factors (:mod:`sknano.tools.refdata._conversion_factors`)
+Conversion factors (:mod:`sknano.utils.refdata._conversion_factors`)
 =====================================================================
 
-.. currentmodule:: sknano.tools.refdata._conversion_factors
+.. currentmodule:: sknano.utils.refdata._conversion_factors
 
 """
 from __future__ import absolute_import, division, print_function

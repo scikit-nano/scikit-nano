@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==========================================================================
-Periodic Table of Elements (:mod:`sknano.tools.refdata._periodic_table`)
+Periodic Table of Elements (:mod:`sknano.utils.refdata._periodic_table`)
 ==========================================================================
 
-.. currentmodule:: sknano.tools.refdata._periodic_table
+.. currentmodule:: sknano.utils.refdata._periodic_table
 
 .. autosummary::
    :toctree: generated/
