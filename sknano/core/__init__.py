@@ -52,11 +52,11 @@ Helper functions for linear algebra transforms
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-#from ._coremath import *
-#from ._iofuncs import *
-#from ._luts import *
-#from ._mathfuncs import *
-#from ._strfuncs import *
-#from ._transforms import *
+from ._coremath import *
+from ._iofuncs import *
+from ._luts import *
+from ._mathfuncs import *
+from ._strfuncs import *
+from ._transforms import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
