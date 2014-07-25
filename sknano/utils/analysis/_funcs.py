@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ========================================================================
-Helper functions for structure analysis (:mod:`sknano.analysis._funcs`)
+Structure analysis functions (:mod:`sknano.utils.analysis._funcs`)
 ========================================================================
 
-.. currentmodule:: sknano.analysis._funcs
+.. currentmodule:: sknano.utils.analysis._funcs
 
 """
 from __future__ import absolute_import, division, print_function

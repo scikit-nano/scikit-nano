@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===========================================================================
-Helper functions for chirality data (:mod:`sknano.tools._chirality_funcs`)
+Helper functions for chirality data (:mod:`sknano.utils._chirality_funcs`)
 ===========================================================================
 
-.. currentmodule:: sknano.tools._chirality_funcs
+.. currentmodule:: sknano.utils._chirality_funcs
 
 """
 from __future__ import absolute_import, division, print_function

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Abstract symmetry group data structures (:mod:`sknano.tools.symmetry_groups`)
+Abstract symmetry group data structures (:mod:`sknano.utils.symmetry_groups`)
 ==============================================================================
 
-.. currentmodule:: sknano.tools.symmetry_groups
+.. currentmodule:: sknano.utils.symmetry_groups
 
 Contents
 ========

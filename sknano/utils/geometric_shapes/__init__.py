@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ============================================================================
-Abstract geometric data structures (:mod:`sknano.tools.geometric_shapes`)
+Abstract geometric data structures (:mod:`sknano.utils.geometric_shapes`)
 ============================================================================
 
-.. currentmodule:: sknano.tools.geometric_shapes
+.. currentmodule:: sknano.utils.geometric_shapes
 
 Contents
 ========
