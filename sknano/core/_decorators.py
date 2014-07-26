@@ -19,35 +19,7 @@ import warnings
 import functools
 
 
-def deprecated(func):
-    """Deprecated decorator.
-
-    A decorator which can be used to mark functions as deprecated.
-    replacement is a callable that will be called with the same args
-    as the decorated function.
-
-    Source: http://code.activestate.com/recipes/577819-deprecated-decorator/
-    Original Author: Giampaolo Rodola' <g.rodola [AT] gmail [DOT] com>
-    License: MIT
-
-    Returns
-    -------
-    wrapper : decorator function
-
-    """
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        warnings.warn_explicit(
-            "Call to deprecated function {}".format(func.__name__),
-            category=DeprecationWarning,
-            filename=func.func_code.co_filename,
-            lineno=func.func_code.co_firstlineno + 1
-        )
-        return func(*args, **kwargs)
-    return wrapper
-
-
-def deprecated_class(replacement=None):
+def deprecated(replacement=None):
     """Deprecated decorator.
 
     A decorator which can be used to mark functions as deprecated.
@@ -76,7 +48,12 @@ def deprecated_class(replacement=None):
 
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
-            warnings.warn(msg, category=DeprecationWarning, stacklevel=2)
+            warnings.warn_explicit(
+                "Call to deprecated function {}".format(func.__name__),
+                category=DeprecationWarning,
+                filename=func.func_code.co_filename,
+                lineno=func.func_code.co_firstlineno + 1
+            )
             return func(*args, **kwargs)
         return wrapper
     return decorator
