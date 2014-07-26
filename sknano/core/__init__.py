@@ -52,7 +52,11 @@ Helper functions for linear algebra transforms
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
+from ._atom import *
+from ._atoms import *
+from ._core import *
 from ._coremath import *
+from ._decorators import *
 from ._iofuncs import *
 from ._luts import *
 from ._mathfuncs import *
