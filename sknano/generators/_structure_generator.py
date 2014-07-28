@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-===================================================================
-Structure generator (:mod:`sknano.nanogen._structure_generator`)
-===================================================================
+===============================================================================
+Structure Generator base classes (:mod:`sknano.generators._base`)
+===============================================================================
 
-.. currentmodule:: sknano.nanogen._structure_generator
+.. currentmodule:: sknano.generators._base
 
 """
 from __future__ import absolute_import, division, print_function
@@ -12,23 +12,15 @@ __docformat__ = 'restructuredtext en'
 
 import os
 
-from ..structure_io import DATAWriter, XYZWriter, default_structure_format, \
+from ..core import rotation_matrix
+from ..io import StructureIO, default_structure_format, \
     supported_structure_formats
-from ..structure_io.atoms import StructureAtoms as Atoms
-from ..tools import rotation_matrix
 
-__all__ = ['StructureGenerator']
+__all__ = ['GeneratorMixin']
 
 
-class StructureGenerator(object):
-    """Base class for structure generator classes."""
-
-    def __init__(self):
-        self._fname = None
-        self._fpath = None
-        self._structure_atoms = Atoms()
-        self._structure_format = None
-        self._unit_cell = Atoms()
+class GeneratorMixin(object):
+    """Base mixin class for generator classes"""
 
     @property
     def fname(self):
@@ -114,9 +106,5 @@ class StructureGenerator(object):
                                        deg2rad=deg2rad)
             self.structure_atoms.rotate(R_matrix)
 
-        if structure_format == 'data':
-            DATAWriter.write(fname=fname, outpath=outpath,
-                             atoms=self.structure_atoms, **kwargs)
-        else:
-            XYZWriter.write(fname=fname, outpath=outpath,
-                            atoms=self.structure_atoms, **kwargs)
+        StructureIO.write(fname=fname, outpath=outpath,
+                          atoms=self.structure_atoms, **kwargs)
