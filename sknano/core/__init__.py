@@ -9,14 +9,32 @@ Core package modules (:mod:`sknano.core`)
 Contents
 ========
 
-Abstract mathematical data structures
---------------------------------------
+Abstract data structures for Atom objects
+-----------------------------------------
 .. autosummary::
    :toctree: generated/
 
-   Point
-   Vector
-   Quaternion
+   Atom
+   Atoms
+
+Core helper functions
+----------------------
+.. autosummary::
+   :toctree: generated/
+
+   check_type
+   get_object_signature
+   memoize
+   method_function
+   methodfunc
+
+Decorator functions
+--------------------
+.. autosummary::
+   :toctree: generated/
+
+   deprecated
+   with_doc
 
 Helper functions for I/O
 -------------------------
@@ -25,19 +43,27 @@ Helper functions for I/O
 
    get_fpath
 
-Helper functions for manipulating strings
-------------------------------------------
-.. autosummary::
-   :toctree: generated/
-
-   plural_word_check
-
 Math functions
 ---------------
 .. autosummary::
    :toctree: generated/
 
    totient_func
+
+Abstract mathematical data structures
+--------------------------------------
+.. autosummary::
+   :toctree: generated/
+
+   Point
+   Vector
+
+Helper functions for manipulating strings
+------------------------------------------
+.. autosummary::
+   :toctree: generated/
+
+   plural_word_check
 
 Helper functions for linear algebra transforms
 -----------------------------------------------
@@ -55,11 +81,11 @@ __docformat__ = 'restructuredtext en'
 from ._atom import *
 from ._atoms import *
 from ._core import *
-from ._coremath import *
 from ._decorators import *
 from ._iofuncs import *
 from ._luts import *
 from ._mathfuncs import *
+from ._npcoremath import *
 from ._strfuncs import *
 from ._transforms import *
 
