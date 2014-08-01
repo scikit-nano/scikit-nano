@@ -29,7 +29,6 @@ __all__ = ['StructureIO',
            'StructureReaderError',
            'StructureWriterError',
            'StructureConverterError',
-           'StructureFormatError',
            'default_comment_line',
            'default_structure_format',
            'supported_structure_formats']
@@ -48,7 +47,6 @@ class StructureIO(object):
         self._fpath = fpath
         self._structure_atoms = None
         self._kwargs = kwargs
-        self._properties = OrderedDict()
 
     @property
     def structure_atoms(self):
@@ -97,18 +95,14 @@ class StructureIO(object):
         """Delete file path string"""
         del self._fpath
 
-    @property
-    def Natoms(self):
-        """Number of atoms in :attr:`~StructureIO.structure_atoms`"""
-        try:
-            return self._structure_atoms.Natoms
-        except AttributeError:
-            return 0
-
-    @property
-    def properties(self):
-        """:class:`~python:collections.OrderedDict` of structure properties."""
-        return self._properties
+    @classmethod
+    def write(cls, fname, outpath, atoms, structure_format, **kwargs):
+        if structure_format == 'data':
+            from ._lammps_data_format import DATAWriter
+            DATAWriter.write(fname=fname, outpath=outpath, atoms=atoms)
+        else:
+            from ._xyz_format import XYZWriter
+            XYZWriter.write(fname=fname, outpath=outpath, atoms=atoms)
 
 
 class StructureReader(StructureIO):
@@ -188,14 +182,6 @@ class StructureFormat(object):
         return self._properties
 
 
-class StructureFormatter(object):
-    """Abstract base class for formatting `Atom` attributes."""
-
-    def format(self):
-        """Convert `Atom` attributes based on `StructureFormat`"""
-        pass
-
-
 class StructureIOError(Exception):
     """Base class for `StructureIO` exceptions."""
     pass
@@ -235,22 +221,6 @@ class StructureWriterError(StructureIOError):
 
 class StructureConverterError(StructureIOError):
     """Exception raised for `StructureConverter` errors.
-
-    Parameters
-    ----------
-    msg : str
-        Error message.
-
-    """
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return repr(self.msg)
-
-
-class StructureFormatError(StructureIOError):
-    """Exception raised for `StructureFormat` errors.
 
     Parameters
     ----------
