@@ -64,6 +64,6 @@ tclIndex
 
 # test output files #
 #####################
-tests/*.xyz
-tests/*.data
-tests/*.pdb
+**/tests/*.xyz
+**/tests/*.data
+**/tests/*.pdb
