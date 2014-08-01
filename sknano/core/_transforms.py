@@ -12,15 +12,12 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-from ._coremath import Point, Vector
-from ._luts import xyz_axes
-
 __all__ = ['rotate_point', 'rotation_matrix', 'transformation_matrix']
 
 I = np.identity(4)
 
 _str2array = {}
-for i, axis in enumerate(xyz_axes):
+for i, axis in enumerate(('x', 'y', 'z')):
     _str2array[axis] = np.asarray(I[:3, i])
 
 
@@ -78,7 +75,7 @@ def rotate_point(point=None, angle=None, rot_axis=None, axis_origin=None,
                                  deg2rad=deg2rad)
 
     if point is None:
-        point = Point()
+        point = np.zeros(3)
 
     x, y, z = point
     point = np.array([x, y, z, 1])
@@ -161,19 +158,14 @@ def transformation_matrix(angle=None, rot_axis=None, axis_origin=None,
             rot_axis = _str2array[rot_axis]
         except KeyError:
             raise ValueError('Invalid `rot_axis` string: {}'.format(rot_axis))
-    elif isinstance(rot_axis, Vector):
-        rot_axis = rot_axis.components
-    elif not (isinstance(rot_axis, (list, np.ndarray)) and
-              len(rot_axis) == 3) and not isinstance(rot_axis, Vector):
+    elif not (isinstance(rot_axis, (list, np.ndarray)) and len(rot_axis) == 3):
         raise ValueError('`rot_axis` must be a 3-element list or ndarray or '
                          '`Vector`')
 
     if axis_origin is None:
         axis_origin = np.zeros(3, dtype=float)
-    elif isinstance(axis_origin, Point):
-        axis_origin = axis_origin.coords
     elif not (isinstance(axis_origin, (list, np.ndarray)) and
-              len(axis_origin) == 3) and not isinstance(axis_origin, Point):
+              len(axis_origin) == 3):
         raise ValueError('`axis_origin` must be a 3-element list or ndarray '
                          'or `Point`')
 
