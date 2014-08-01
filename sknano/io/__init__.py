@@ -67,6 +67,6 @@ __docformat__ = 'restructuredtext en'
 
 #from ._lammps_data_format import *
 #from ._xyz_format import *
-#from ._structure_io import *
+from ._structure_io import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
