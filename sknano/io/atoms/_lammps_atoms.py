@@ -22,8 +22,7 @@ except ImportError:
           'nearest-neighbor queries between atoms.')
     has_kdtree = False
 
-from ...core import xyz_axes
-from ._atoms import Atoms
+from sknano.core import Atoms, xyz
 
 __all__ = ['LAMMPSAtoms']
 
@@ -395,7 +394,7 @@ class LAMMPSAtoms(Atoms):
 
         if as_dict:
             return OrderedDict(zip(
-                components, [filtered_coords[:, xyz_axes.index(component)]
+                components, [filtered_coords[:, xyz.index(component)]
                              for component in components]))
         else:
             filtered_coords

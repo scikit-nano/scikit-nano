@@ -10,7 +10,7 @@ Class for XYZ atom (:mod:`sknano.io.atoms._xyz_atom`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from ._atom import Atom
+from sknano.core import Atom
 
 __all__ = ['XYZAtom']
 
