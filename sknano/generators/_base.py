@@ -95,7 +95,7 @@ class GeneratorMixin(object):
         if outpath is not None:
             self._fpath = os.path.join(outpath, fname)
 
-        self._structure_format = structure_format
+        #self._structure_format = structure_format
 
         if center_CM:
             self.structure_atoms.center_CM()
@@ -107,4 +107,5 @@ class GeneratorMixin(object):
             self.structure_atoms.rotate(R_matrix)
 
         StructureIO.write(fname=fname, outpath=outpath,
-                          atoms=self.structure_atoms, **kwargs)
+                          atoms=self.structure_atoms,
+                          structure_format=structure_format)
