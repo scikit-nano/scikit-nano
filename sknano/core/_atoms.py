@@ -138,18 +138,10 @@ class Atoms(MutableSequence):
         self._symbols = symbols[:]
         return np.asarray(self._symbols)
 
-    def center_CM(self, r_indices=[0, 1, 2]):
-        """Center atoms on CM coordinates
-
-        Parameters
-        ----------
-        r_indices : sequence, optional
-            list of component indices of CM position vector to translate
-            and center on the origin.
-
-        """
+    def center_CM(self):
+        """Center atoms on CM coordinates."""
         dr = -self.CM
-        self.translate(dr, r_indices=r_indices)
+        self.translate(dr)
 
     def clip_bounds(self, min_limit=None, max_limit=None,
                     abs_limit=None, r_indices=[0, 1, 2]):
@@ -255,7 +247,7 @@ class Atoms(MutableSequence):
         for atom in self._data:
             atom.r = np.dot(R_matrix, atom.r.T).T
 
-    def translate(self, dr, r_indices=[0, 1, 2]):
+    def translate(self, dr):
         """Translate atom coordinates.
 
         Parameters
@@ -263,13 +255,9 @@ class Atoms(MutableSequence):
         dr : array_like
             array representation of displacement vector to translate
             coordinates of the atoms' position vector through
-        r_indices : sequence, optional
-            list of component indices of position vector that
-            `dr` vector acts upon
-
         """
         for atom in self._data:
-            atom.r[r_indices] += dr[r_indices]
+            atom.r += dr
 
     def __delitem__(self, index):
         """Concrete implementation of @abstractmethod.
