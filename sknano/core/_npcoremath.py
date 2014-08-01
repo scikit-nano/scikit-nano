@@ -140,14 +140,13 @@ class Vector(np.ndarray):
 
     Parameters
     ----------
-    coords : array_like, optional
+    p : array_like, optional
+        Terminating `Point` of vector.
         :math:`x, y` coordinates of point in :math:`R^2` space.
         :math:`x, y, z` coordinates of point in :math:`R^3` space.
     nd : {None, int}, optional
-    p, p0 : array_like
-        Terminating and starting `Point` of vector in :math:`R^n` space
-        relative to origin. If `p` is `None`, then it defaults
-        to a `Point` at the origin and similarly for `p0`.
+    p0 : array_like, optional
+        Origin `Point` of vector in :math:`R^n` space.
     dtype : data-type, optional
     copy : bool, optional
 
@@ -160,17 +159,26 @@ class Vector(np.ndarray):
     """
     __array_priority__ = 15.0
 
-    def __new__(cls, components=None, nd=None, p=None, p0=None,
-                dtype=None, copy=True):
+    def __new__(cls, p=None, nd=None, p0=None, dtype=None, copy=True):
 
-        if isinstance(components, Vector):
+        if p is None:
+            if nd is None or not isinstance(nd, numbers.Number):
+                nd = 3
+            p = Point(nd=nd, dtype=dtype)
+        else:
+            for i, coord in enumerate(p[:]):
+                if p is None:
+                    p[i] = 0.0
+            nd = len(p)
+
+        if isinstance(p, Vector):
             if dtype is None:
-                intype = components.dtype
+                intype = p.dtype
             else:
                 intype = np.dtype(dtype)
 
-            vec = components.view(cls)
-            if intype != components.dtype:
+            vec = p.view(cls)
+            if intype != p.dtype:
                 return vec.astype(intype)
 
             if copy:
@@ -179,33 +187,16 @@ class Vector(np.ndarray):
                 return vec
 
         if p0 is None:
-            p0 = Point(nd=nd, dtype=dtype, copy=copy)
+            p0 = Point(nd=nd, dtype=dtype)
         else:
-            p0 = Point(p0, nd=nd, dtype=dtype, copy=copy)
+            p0 = Point(p0, nd=nd, dtype=dtype)
 
-        if components is None:
-            if p is None:
-                p = Point(nd=nd, dtype=dtype, copy=copy)
-            else:
-                p = Point(p, nd=nd, dtype=dtype, copy=copy)
-            components = p - p0
-        else:
-            for i, component in enumerate(components[:]):
-                if component is None:
-                    components[i] = 0.0
-
-            if p is None:
-                p = Point(components, nd=nd, dtype=dtype, copy=copy)
-
-        nd = len(components)
-
-        arr = np.array(components, dtype=dtype, copy=copy).view(cls)
+        arr = np.array(p, dtype=dtype, copy=copy).view(cls)
         vec = super(Vector, cls).__new__(cls, arr.shape, arr.dtype,
                                          buffer=arr)
 
         vec.nd = nd
         vec._p0 = p0
-        vec._p = p
         if nd == 2:
             vec.x, vec.y = vec
         elif nd == 3:
@@ -214,17 +205,19 @@ class Vector(np.ndarray):
         return vec
 
     def __array_finalize__(self, vec):
+        #print('In __array_finalize__\n' +
+        #      'type(self): {}\n'.format(type(self)))
 
         if vec is None:
             return None
 
+        #print('In __array_finalize__\n' +
+        #      'type(self): {}\n'.format(type(self)) +
+        #      'type(vec): {}\n'.format(type(vec)))
+
         self.nd = len(vec)
 
-        #self._p0 = getattr(vec, 'p0', Point(nd=self.nd, dtype=vec.dtype))
-        #self._p = getattr(vec, 'p', Point(nd=self.nd, dtype=vec.dtype))
-
         self._p0 = getattr(vec, 'p0', None)
-        self._p = getattr(vec, 'p', None)
 
         if self.nd == 2:
             self.x, self.y = vec
@@ -268,27 +261,27 @@ class Vector(np.ndarray):
         else:
             super(Vector, self).__setattr__(name, value)
 
-    @property
-    def p(self):
-        """Terminating :class:`Point` class of vector."""
-        return self._p
+    #@property
+    #def p(self):
+    #    """Terminating :class:`Point` class of vector."""
+    #    return self._p
 
-    @p.setter
-    def p(self, value=np.ndarray):
-        """Terminating :class:`Point` class of vector."""
-        self._p[:] = value
-        self[:] = self._p - self._p0
+    #@p.setter
+    #def p(self, value=np.ndarray):
+    #    """Terminating :class:`Point` class of vector."""
+    #    self._p[:] = value
+    #    self[:] = self._p - self._p0
 
     @property
     def p0(self):
-        """Starting :class:`Point` class of vector."""
+        """Origin :class:`Point` class of vector."""
         return self._p0
 
     @p0.setter
     def p0(self, value=np.ndarray):
-        """Terminating :class:`Point` class of vector."""
+        """Set origin :class:`Point` class of vector."""
         self._p0[:] = value
-        self[:] = self._p - self._p0
+        #self[:] = self - self._p0
 
     def rezero_components(self, epsilon=1.0e-10):
         """Re-zero `Vector` coordinates near zero.
