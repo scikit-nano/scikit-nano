@@ -61,3 +61,9 @@ Icon?
 ehthumbs.db
 Thumbs.db
 tclIndex
+
+# test output files #
+#####################
+tests/*.xyz
+tests/*.data
+tests/*.pdb
