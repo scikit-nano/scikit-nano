@@ -1,61 +1,48 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Class representation of Nanotube structures (:mod:`sknano.nanogen._nanotubes`)
+Nanotube structure class (:mod:`sknano.structures._nanotubes`)
 ==============================================================================
 
-.. currentmodule:: sknano.nanogen._nanotubes
+.. currentmodule:: sknano.structures._nanotubes
 
 """
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from collections import OrderedDict
 from fractions import gcd
 
 import numpy as np
 np.seterr(all='raise')
 
-try:
-    from pint import UnitRegistry
-    ureg = UnitRegistry()
-    Qty = ureg.Quantity
-except ImportError:
-    Qty = None
+from ..core import Atom, comparison_symbol_operator_mappings
+from ..core.refdata import CCbond, dVDW, grams_per_Da
 
-from ..structure_io.atoms import StructureAtom as Atom
-from ..tools import comparison_symbol_operator_mappings
-from ..tools.refdata import CCbond, dVDW, grams_per_Da
-
-from ._parameter_luts import param_units, param_symbols, param_strfmt
-
-__all__ = ['Nanotube', 'NanotubeBundle']
+__all__ = ['Nanotube', 'NanotubeBundleMixin', 'MWNTMixin',
+           'SWNT', 'SWNTBundle', 'MWNT', 'MWNTBundle', 'UnrolledSWNT']
 
 
-class Nanotube(object):
-    u"""Class for creating interactive Nanotube objects.
+class SWNT(object):
+    u"""Class for creating interactive SWNT objects.
 
     Parameters
     ----------
     n, m : int
         Chiral indices defining the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-    nx, ny, nz : int, optional
-        Number of repeat unit cells in the :math:`x, y, z` dimensions
+    nz : int, optional
+        Number of repeat unit cells along the :math:`z` dimension
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.structure_io.atoms.Atom` 1 and 2
+        :class:`~sknano.io.atoms.Atom` 1 and 2
     bond : float, optional
         Distance between nearest neighbor atoms (i.e., bond length).
         Must be in units of **\u212b**. Default value is
         the carbon-carbon bond length in graphite, approximately
         :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
-    Lx, Ly, Lz : float, optional
-        Spatial extent of nanotube(s) in :math:`x, y, z` dimensions
-        in units of **nanometers**. By construction, the nanotube is oriented
-        with its principle axis along the :math:`z`-axis. Therefore,
-        :math:`L_z` represents the length of the nanotube(s).
-        Overrides the :math:`n_x, n_y, n_z` cell values.
+    Lz : float, optional
+        Length of the nanotube in **nanometers**.
+        Overrides the :math:`n_z` cell values.
 
         .. versionadded:: 0.2.5
 
@@ -71,27 +58,17 @@ class Nanotube(object):
         :math:`L_z` as possible. If `True`, then
         non integer :math:`n_z` cells are permitted.
 
-        .. versionadded:: 0.2.6
-
-    units : None, optional
-        System of physical units to attach to quantities.
-        **This parameter is not yet fully implemented or supported.
-        Use at your own risk!**
-    with_units : bool, optional
-        Attach `units` to physical quantities.
-        **This parameter is not yet fully implemented or supported.
-        Use at your own risk!**
     verbose : bool, optional
         verbose output
 
     Examples
     --------
 
-    >>> from sknano.nanogen import Nanotube
+    >>> from sknano.structures import SWNT
 
-    Create a Nanotube with :math:`\\mathbf{C}_{h} = (10, 10)` chirality.
+    Create a SWNT with :math:`\\mathbf{C}_{h} = (10, 10)` chirality.
 
-    >>> nt = Nanotube(n=10, m=10, verbose=True)
+    >>> nt = SWNT(n=10, m=10, verbose=True)
     n: 10
     m: 10
     t₁: 1
@@ -141,35 +118,22 @@ class Nanotube(object):
     rt: 7.83 Å
 
     """
-    def __init__(self, n=int, m=int, nx=1, ny=1, nz=1, element1='C',
-                 element2='C', bond=CCbond, tube_length=None,
-                 Lx=None, Ly=None, Lz=None, fix_Lz=False,
-                 with_units=False, units=None, verbose=False):
+    def __init__(self, n=10, m=0, nz=1, element1='C', element2='C',
+                 bond=CCbond, tube_length=None, Lz=None, fix_Lz=False,
+                 verbose=False, **kwargs):
 
         if tube_length is not None and Lz is None:
             Lz = tube_length
 
-        self._params = OrderedDict()
-
         # add each parameter in the order I want them to appear in
         # verbose output mode
-        self._params['n'] = {}
-        self._params['m'] = {}
-        self._params['t1'] = {}
-        self._params['t2'] = {}
-        self._params['d'] = {}
-        self._params['dR'] = {}
-        self._params['N'] = {}
-        #self._params['M'] = {}
-        self._params['R'] = {}
-        #self._params['bond'] = {}
-        self._params['chiral_angle'] = {}
-        self._params['Ch'] = {}
-        self._params['T'] = {}
-        self._params['dt'] = {}
-        self._params['rt'] = {}
-        self._params['electronic_type'] = {}
+        self._params = ['n', 'm', 't1', 't2', 'd', 'dR', 'N',
+                        'R', 'chiral_angle', 'Ch', 'T', 'dt', 'rt',
+                        'electronic_type']
+        #for i, p in enumerate(self._params[:]):
+        #    self._params[i] = '_' + p
 
+        #print('Ch = ({:d}, {:d})'.format(n, m))
         self._n = int(n)
         self._m = int(m)
         self._element1 = element1
@@ -178,19 +142,7 @@ class Nanotube(object):
         if bond is None:
             bond = CCbond
 
-        if with_units and Qty is None:
-            with_units = False
-        self._with_units = with_units
-
-        if with_units and units is None:
-            units = 'angstroms'
-        self._units = units
-
-        if with_units and isinstance(bond, float):
-            self._bond = Qty(bond, units)
-        else:
-            self._bond = bond
-
+        self._bond = bond
         #self._bond = bond_lengths[element1][element2]
 
         self._verbose = verbose
@@ -226,54 +178,44 @@ class Nanotube(object):
         self._tube_mass = None
 
         self._Ntubes = 1
-        self._nx = int(nx)
-        self._ny = int(ny)
-
-        self._Lx = Lx
-        self._Ly = Ly
 
         if Lz is not None:
-            self._T = self.compute_T(n=self._n,
-                                     m=self._m,
-                                     bond=self._bond,
-                                     with_units=with_units,
-                                     magnitude=False)
             self._Lz = float(Lz)
-            if with_units:
-                self._Lz = Qty(self._Lz, 'nanometers')
-                self._nz = \
-                    self._Lz.to('angstroms').magnitude / self._T.magnitude
-            else:
-                self._nz = 10 * self._Lz / self._T
+            self._T = self.compute_T(n=self._n, m=self._m, bond=self._bond)
+            self._nz = 10 * self._Lz / self._T
         else:
             self._nz = nz
 
         if self._assume_integer_unit_cells:
             self._nz = int(np.ceil(self._nz))
 
-        for k, v in self.__dict__.iteritems():
-            p = k.strip('_')
-            if p in self._params.keys():
-                self._params[p]['units'] = param_units.get(p)
-                self._params[p]['strfmt'] = param_strfmt.get(p)
-                if param_symbols.get(p) is not None:
-                    self._params[p]['var'] = param_symbols[p]
-                else:
-                    self._params[p]['var'] = p
-
-        self.compute_tube_params()
+        self.__compute_tube_params()
 
     def __repr__(self):
+        retstr = "SWNT(n={!r}, m={!r}, ".format(self._n, self._m) + \
+            "element1={!r}, element2={!r}, bond={!r}".format(
+                self._element1, self._element2, self._bond)
         if self._fix_Lz:
-            return("Nanotube(n={!r}, m={!r}, element1={!r}, element2={!r}, "
-                   "bond={!r}, Lz={!r}, fix_Lz={!r})".format(
-                       self._n, self._m, self._element1, self._element2,
-                       self._bond, self._Lz, self._fix_Lz))
+            retstr += ", Lz={!r}, fix_Lz={!r})".format(self._Lz, self._fix_Lz)
         else:
-            return("Nanotube(n={!r}, m={!r}, nz={!r}, element1={!r}, "
-                   "element2={!r}, bond={!r})".format(
-                       self._n, self._m, self._nz, self._element1,
-                       self._element2, self._bond))
+            retstr += ")"
+
+        return retstr
+
+    #def __getattr__(self, name):
+    #    try:
+    #        return getattr(self, name)
+    #    except AttributeError as e:
+    #        raise AttributeError(e)
+
+    #def __setattr__(self, name, value):
+    #    try:
+    #        setattr(self, name, value)
+    #    except AttributeError as e:
+    #        raise AttributeError(e)
+
+    #def __delattr__(self, name):
+    #    pass
 
     def compute_tube_params(self):
         """Compute/update nanotube parameters."""
@@ -287,47 +229,33 @@ class Nanotube(object):
             self.compute_chiral_angle(n=self._n, m=self._m)
 
         self._Ch = \
-            self.compute_Ch(n=self._n, m=self._m, bond=self._bond,
-                            with_units=self._with_units)
+            self.compute_Ch(n=self._n, m=self._m, bond=self._bond)
 
         self._T = \
-            self.compute_T(n=self._n, m=self._m, bond=self._bond,
-                           with_units=self._with_units)
+            self.compute_T(n=self._n, m=self._m, bond=self._bond)
 
         self._dt = \
-            self.compute_dt(n=self._n, m=self._m, bond=self._bond,
-                            with_units=self._with_units)
+            self.compute_dt(n=self._n, m=self._m, bond=self._bond)
 
         self._rt = \
-            self.compute_rt(n=self._n, m=self._m, bond=self._bond,
-                            with_units=self._with_units)
+            self.compute_rt(n=self._n, m=self._m, bond=self._bond)
 
         self._M = \
             self.compute_M(n=self._n, m=self._m)
 
-        self._Lx = \
-            self.compute_Lx(n=self._n, m=self._m, nx=self._nx, bond=self._bond,
-                            with_units=self._with_units)
-
-        self._Ly = \
-            self.compute_Ly(n=self._n, m=self._m, ny=self._ny, bond=self._bond,
-                            with_units=self._with_units)
-
         self._Lz = \
-            self.compute_Lz(n=self._n, m=self._m, nz=self._nz, bond=self._bond,
-                            with_units=self._with_units)
+            self.compute_Lz(n=self._n, m=self._m, nz=self._nz, bond=self._bond)
 
         self._unit_cell_mass = \
             self.compute_unit_cell_mass(n=self._n, m=self._m,
                                         element1=self._element1,
-                                        element2=self._element2,
-                                        with_units=self._with_units)
+                                        element2=self._element2)
 
         self._tube_mass = \
             self.compute_tube_mass(n=self._n, m=self._m, nz=self._nz,
                                    element1=self._element1,
-                                   element2=self._element2,
-                                   with_units=self._with_units)
+                                   element2=self._element2)
+
         self._electronic_type = \
             self.compute_electronic_type(n=self._n, m=self._m)
 
@@ -336,11 +264,9 @@ class Nanotube(object):
             self.compute_R(n=self._n, m=self._m)
 
         # Compute atomistic properties
-        self._N = \
-            self.compute_N(n=self._n, m=self._m)
+        self._N = self.compute_N(n=self._n, m=self._m)
 
-        self._Natoms = \
-            self.compute_Natoms(n=self._n, m=self._m)
+        self._Natoms = self.compute_Natoms(n=self._n, m=self._m)
 
         self._Natoms_per_tube = \
             self.compute_Natoms_per_tube(n=self._n, m=self._m, nz=self._nz)
@@ -348,33 +274,9 @@ class Nanotube(object):
         self._linear_mass_density = \
             self.compute_linear_mass_density(n=self._n, m=self._m,
                                              element1=self._element1,
-                                             element2=self._element2,
-                                             with_units=self._with_units)
+                                             element2=self._element2)
 
-        for k, v in self.__dict__.iteritems():
-            p = k.strip('_')
-            if p in self._params.keys():
-                self._params[p]['val'] = v
-
-        if self._verbose:
-            for p, pdict in self._params.iteritems():
-                pvar = pdict['var']
-                try:
-                    pval = pdict['val'].magnitude
-                except AttributeError:
-                    pval = pdict['val']
-                punits = pdict['units']
-                pstrfmt = pdict['strfmt']
-                if punits is not None:
-                    if pstrfmt is not None:
-                        print(u"{}: {}{}".format(pvar,
-                                                 pstrfmt.format(pval),
-                                                 punits))
-                    else:
-                        print(u"{}: {}{}".format(pvar, pval, punits))
-                else:
-                    print(u"{}: {}".format(pvar, pval))
-            print()
+    __compute_tube_params = compute_tube_params
 
     @property
     def bond(self):
@@ -389,23 +291,23 @@ class Nanotube(object):
 
     @property
     def element1(self):
-        """Element symbol of :class:`~sknano.structure_io.atoms.Atom` 1."""
+        """Element symbol of :class:`~sknano.io.atoms.Atom` 1."""
         return self._element1
 
     @element1.setter
     def element1(self, value):
-        """Set element symbol of :class:`~sknano.structure_io.atoms.Atom` 1."""
+        """Set element symbol of :class:`~sknano.io.atoms.Atom` 1."""
         self._element1 = value
         self.compute_tube_params()
 
     @property
     def element2(self):
-        """Element symbol of :class:`~sknano.structure_io.atoms.Atom` 2."""
+        """Element symbol of :class:`~sknano.io.atoms.Atom` 2."""
         return self._element2
 
     @element2.setter
     def element2(self, value):
-        """Set element symbol of :class:`~sknano.structure_io.atoms.Atom` 2."""
+        """Set element symbol of :class:`~sknano.io.atoms.Atom` 2."""
         self._element2 = value
         self.compute_tube_params()
 
@@ -459,6 +361,243 @@ class Nanotube(object):
         """
         return self._d
 
+    @property
+    def dR(self):
+        """:math:`d_R=\\gcd{(2n + m, 2m + n)}`
+
+        :math:`d_R` is the **G**\ reatest **C**\ ommon **D**\ ivisor of
+        :math:`2n + m` and :math:`2m + n`.
+
+        """
+        return self._dR
+
+    @property
+    def N(self):
+        """Number of graphene hexagons in nanotube *unit cell*.
+
+        .. math::
+
+           N = \\frac{4(n^2 + m^2 + nm)}{d_R}
+
+        """
+        return self._N
+
+    @property
+    def t1(self):
+        """:math:`t_{1} = \\frac{2m + n}{d_{R}}`
+
+        where :math:`d_R = \\gcd{(2n + m, 2m + n)}`.
+
+        The component of the translation vector :math:`\\mathbf{T}`
+        along :math:`\\mathbf{a}_1`:
+
+        .. math::
+
+           \\mathbf{T} = t_1\\mathbf{a}_{1} + t_2\\mathbf{a}_2
+
+        """
+        return self._t1
+
+    @property
+    def t2(self):
+        """:math:`t_2 = -\\frac{2n + m}{d_R}`
+
+        where :math:`d_R = \\gcd{(2n + m, 2m + n)}`.
+
+        The component of the translation vector :math:`\\mathbf{T}`
+        along :math:`\\mathbf{a}_2`:
+
+        .. math::
+
+           \\mathbf{T} = t_1\\mathbf{a}_1 + t_2\\mathbf{a}_2
+
+        """
+        return self._t2
+
+    @property
+    def Ch(self):
+        u"""SWNT circumference :math:`|\\mathbf{C}_h|` in **\u212b**"""
+        return self._Ch
+
+    @property
+    def chiral_angle(self):
+        """Chiral angle :math:`\\theta_c` in **degrees**.
+
+        .. math::
+
+           \\theta_c = \\tan^{-1}\\left(\\frac{\\sqrt{3} m}{2n + m}\\right)
+
+        """
+        return self._chiral_angle
+
+    @property
+    def T(self):
+        u"""Length of nanotube unit cell :math:`|\\mathbf{T}|` in \u212b.
+
+        .. math::
+
+           |\\mathbf{T}| = \\frac{\\sqrt{3} |\\mathbf{C}_{h}|}{d_{R}}
+
+        """
+        return self._T
+
+    @property
+    def dt(self):
+        u"""Nanotube diameter :math:`d_t = \\frac{|\\mathbf{C}_h|}{\\pi}`
+        in \u212b."""
+        return self._dt
+
+    @property
+    def rt(self):
+        u"""Nanotube radius :math:`r_t = \\frac{|\\mathbf{C}_h|}{2\\pi}`
+        in \u212b."""
+        return self._rt
+
+    @property
+    def M(self):
+        """:math:`M = np - nq`
+
+        :math:`M` is the number of multiples of the translation vector
+        :math:`\\mathbf{T}` in the vector :math:`N\\mathbf{R}`.
+
+        """
+        return self._M
+
+    @property
+    def R(self):
+        """Symmetry vector :math:`\\mathbf{R} = (p, q)`.
+
+        .. math::
+
+           \\mathbf{R} = p\\mathbf{a}_1 + q\\mathbf{a}_2
+
+        """
+        return self._R
+
+    @property
+    def nz(self):
+        """Number of nanotube unit cells along the :math:`z`-axis."""
+        return self._nz
+
+    @nz.setter
+    def nz(self, value):
+        """Set number of nanotube unit cells along the :math:`z`-axis."""
+        if self._assume_integer_unit_cells:
+            self._nz = int(value)
+        else:
+            self._nz = value
+        self.compute_tube_params()
+
+    @property
+    def Lx(self):
+        """Spatial extent of nanotubes along :math:`x`-axis in **nm**."""
+        return self._Lx
+
+    @property
+    def Ly(self):
+        """Spatial extent of nanotubes along :math:`y`-axis in **nm**."""
+        return self._Ly
+
+    @property
+    def Lz(self):
+        """SWNT length :math:`L_z = L_{\\mathrm{tube}}` in
+        **nanometers**."""
+        return self._Lz
+
+    @Lz.setter
+    def Lz(self, value=float):
+        """Set tube length"""
+        self._Lz = value
+
+    @property
+    def electronic_type(self):
+        """SWNT electronic type.
+
+        .. versionadded:: 0.2.7
+
+        The electronic type is determined as follows:
+
+        if :math:`(2n + m)\\,\\mathrm{mod}\\,3=0`, the nanotube is
+        **metallic**.
+
+        if :math:`(2n + m)\\,\\mathrm{mod}\\,3=1`, the nanotube is
+        **semiconducting, type 1**.
+
+        if :math:`(2n + m)\\,\\mathrm{mod}\\,3=2`, the nanotube is
+        **semiconducting, type 2**.
+
+        The :math:`x\\,\\mathrm{mod}\\,y` notation is mathematical
+        shorthand for the *modulo* operation, which computes the
+        **remainder** of the division of :math:`x` by :math:`y`.
+        So, for example, all *armchair* nanotubes must be metallic
+        since the chiral indices satisfy: :math:`2n + m = 2n + n = 3n` and
+        therefore :math:`3n\\,\\mathrm{mod}\\,3` i.e. the remainder of the
+        division of :math:`3n/3=n` is always zero.
+
+        .. note::
+           Mathematically, :math:`(2n + m)\\,\\mathrm{mod}\\,3` is equivalent
+           to :math:`(n - m)\\,\\mathrm{mod}\\,3` when distinguishing
+           between metallic and semiconducting. However, when
+           distinguishing between semiconducting types,
+           one must be careful to observe the following convention:
+
+           * Semiconducting, **type 1** means:
+
+             * :math:`(2n + m)\\,\\mathrm{mod}\\,3=1`
+             * :math:`(n - m)\\,\\mathrm{mod}\\,3=2`
+
+           * Semiconducting, **type 2** means:
+
+             * :math:`(2n + m)\\,\\mathrm{mod}\\,3=2`
+             * :math:`(n - m)\\,\\mathrm{mod}\\,3=1`
+
+        """
+        return self._electronic_type
+
+    @property
+    def Natoms(self):
+        """Number of atoms in nanotube *unit cell*.
+
+        .. math::
+
+           N_{\\mathrm{atoms}} = 2N = \\frac{4(n^2 + m^2 + nm)}{d_R}
+
+        where :math:`N` is the number of graphene hexagons mapped to the
+        nanotube unit cell.
+
+        """
+        return self._Natoms
+
+    @property
+    def Natoms_per_tube(self):
+        """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
+        return self._Natoms_per_tube
+
+    @property
+    def unit_cell_mass(self):
+        """Unit cell mass in atomic mass units."""
+        return self._unit_cell_mass
+
+    @property
+    def linear_mass_density(self):
+        """Linear mass density of nanotube in g/nm."""
+        return self._linear_mass_density
+
+    @property
+    def Ntubes(self):
+        """Number of nanotubes."""
+        return int(self._Ntubes)
+
+    @property
+    def tube_length(self):
+        """Alias for :attr:`SWNT.Lz`"""
+        return self.Lz
+
+    @property
+    def tube_mass(self):
+        """SWNT mass in **grams**."""
+        return self._tube_mass
+
     @classmethod
     def compute_d(cls, n=int, m=int):
         """Compute :math:`d=\\gcd{(n, m)}`
@@ -479,16 +618,6 @@ class Nanotube(object):
 
         """
         return gcd(n, m)
-
-    @property
-    def dR(self):
-        """:math:`d_R=\\gcd{(2n + m, 2m + n)}`
-
-        :math:`d_R` is the **G**\ reatest **C**\ ommon **D**\ ivisor of
-        :math:`2n + m` and :math:`2m + n`.
-
-        """
-        return self._dR
 
     @classmethod
     def compute_dR(cls, n=int, m=int):
@@ -511,17 +640,6 @@ class Nanotube(object):
         """
         return gcd(2 * m + n, 2 * n + m)
 
-    @property
-    def N(self):
-        """Number of graphene hexagons in nanotube *unit cell*.
-
-        .. math::
-
-           N = \\frac{4(n^2 + m^2 + nm)}{d_R}
-
-        """
-        return self._N
-
     @classmethod
     def compute_N(cls, n=int, m=int):
         """Compute :math:`N = \\frac{2(n^2+m^2+nm)}{d_R}`.
@@ -542,27 +660,11 @@ class Nanotube(object):
             :math:`N = \\frac{2(n^2+m^2+nm)}{d_R}`.
 
         """
-        dR = Nanotube.compute_dR(n=n, m=m)
+        dR = SWNT.compute_dR(n=n, m=m)
         try:
             return int(2 * (n**2 + m**2 + n * m) / dR)
         except ZeroDivisionError:
             return 0
-
-    @property
-    def t1(self):
-        """:math:`t_{1} = \\frac{2m + n}{d_{R}}`
-
-        where :math:`d_R = \\gcd{(2n + m, 2m + n)}`.
-
-        The component of the translation vector :math:`\\mathbf{T}`
-        along :math:`\\mathbf{a}_1`:
-
-        .. math::
-
-           \\mathbf{T} = t_1\\mathbf{a}_{1} + t_2\\mathbf{a}_2
-
-        """
-        return self._t1
 
     @classmethod
     def compute_t1(cls, n=int, m=int):
@@ -595,22 +697,6 @@ class Nanotube(object):
         except ZeroDivisionError:
             return 0
 
-    @property
-    def t2(self):
-        """:math:`t_2 = -\\frac{2n + m}{d_R}`
-
-        where :math:`d_R = \\gcd{(2n + m, 2m + n)}`.
-
-        The component of the translation vector :math:`\\mathbf{T}`
-        along :math:`\\mathbf{a}_2`:
-
-        .. math::
-
-           \\mathbf{T} = t_1\\mathbf{a}_1 + t_2\\mathbf{a}_2
-
-        """
-        return self._t2
-
     @classmethod
     def compute_t2(cls, n=int, m=int):
         """Compute :math:`t_2 = -\\frac{2n + m}{d_R}`
@@ -642,14 +728,8 @@ class Nanotube(object):
         except ZeroDivisionError:
             return 0
 
-    @property
-    def Ch(self):
-        u"""Nanotube circumference :math:`|\\mathbf{C}_h|` in **\u212b**"""
-        return self._Ch
-
     @classmethod
-    def compute_Ch(cls, n=int, m=int, bond=None, with_units=False,
-                   units='angstrom', magnitude=True):
+    def compute_Ch(cls, n=int, m=int, bond=None, **kwargs):
         u"""Compute nanotube circumference :math:`|\\mathbf{C}_{h}|` in
         **\u212b**.
 
@@ -678,27 +758,7 @@ class Nanotube(object):
         if bond is None:
             bond = CCbond
 
-        if with_units and isinstance(bond, float) and Qty is not None:
-            bond = Qty(bond, units)
-
-        if magnitude and with_units:
-            try:
-                return bond.magnitude * np.sqrt(3 * (n**2 + m**2 + n * m))
-            except AttributeError:
-                return bond * np.sqrt(3 * (n**2 + m**2 + n * m))
-        else:
-            return bond * np.sqrt(3 * (n**2 + m**2 + n * m))
-
-    @property
-    def chiral_angle(self):
-        """Chiral angle :math:`\\theta_c` in **degrees**.
-
-        .. math::
-
-           \\theta_c = \\tan^{-1}\\left(\\frac{\\sqrt{3} m}{2n + m}\\right)
-
-        """
-        return self._chiral_angle
+        return bond * np.sqrt(3 * (n**2 + m**2 + n * m))
 
     @classmethod
     def compute_chiral_angle(cls, n=int, m=int, rad2deg=True):
@@ -730,20 +790,8 @@ class Nanotube(object):
         else:
             return theta
 
-    @property
-    def T(self):
-        u"""Length of nanotube unit cell :math:`|\\mathbf{T}|` in \u212b.
-
-        .. math::
-
-           |\\mathbf{T}| = \\frac{\\sqrt{3} |\\mathbf{C}_{h}|}{d_{R}}
-
-        """
-        return self._T
-
     @classmethod
-    def compute_T(cls, n=None, m=None, bond=None, with_units=False,
-                  units='angstrom', length=True, magnitude=True):
+    def compute_T(cls, n=None, m=None, bond=None, length=True, **kwargs):
         u"""Compute length of nanotube unit cell :math:`|\\mathbf{T}|` in
         \u212b.
 
@@ -765,24 +813,12 @@ class Nanotube(object):
             :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
         length : bool, optional
             Compute the magnitude (i.e., length) of the translation vector.
-        magnitude : bool, optional
-            Return the length of the translation vector **without** units.
-        with_units : bool, optional
-        units : str, optional
 
         Returns
         -------
-        float or Qty or 2-tuple of ints
-            If `length` is `True` and `with_units` is `False`, then
+        float or 2-tuple of ints
+            If `length` is `True`, then
             return the length of unit cell in \u212b.
-
-            If `length` is `True` and `with_units` is `True` and
-            magnitude is `True`, then return the length of unit cell
-            as a float, but with units in `units`.
-
-            If `length` is `True` and `with_units` is `True` and
-            magnitude is `False`, then return the length of unit cell
-            as a `Quantity` instance and with units in `units`.
 
             If `length` is `False`, return the componets of the
             translation vector as a 2-tuple of ints
@@ -794,12 +830,7 @@ class Nanotube(object):
             if bond is None:
                 bond = CCbond
 
-            if with_units and isinstance(bond, float) and Qty is not None:
-                bond = Qty(bond, units)
-
-            Ch = Nanotube.compute_Ch(n=n, m=m, bond=bond,
-                                     with_units=with_units, units=units,
-                                     magnitude=magnitude)
+            Ch = Nanotube.compute_Ch(n=n, m=m, bond=bond, **kwargs)
             dR = Nanotube.compute_dR(n=n, m=m)
 
             try:
@@ -812,15 +843,8 @@ class Nanotube(object):
 
             return (t1, t2)
 
-    @property
-    def dt(self):
-        u"""Nanotube diameter :math:`d_t = \\frac{|\\mathbf{C}_h|}{\\pi}`
-        in \u212b."""
-        return self._dt
-
     @classmethod
-    def compute_dt(cls, n=int, m=int, bond=None, with_units=False,
-                   units='angstrom', magnitude=True):
+    def compute_dt(cls, n=int, m=int, bond=None, **kwargs):
         u"""Compute nanotube diameter :math:`d_t` in \u212b.
 
         .. math::
@@ -844,19 +868,11 @@ class Nanotube(object):
             Nanotube diameter :math:`d_t` in \u212b.
 
         """
-        Ch = Nanotube.compute_Ch(n, m, bond=bond, with_units=with_units,
-                                 units=units, magnitude=magnitude)
+        Ch = Nanotube.compute_Ch(n, m, bond=bond)
         return Ch / np.pi
 
-    @property
-    def rt(self):
-        u"""Nanotube radius :math:`r_t = \\frac{|\\mathbf{C}_h|}{2\\pi}`
-        in \u212b."""
-        return self._rt
-
     @classmethod
-    def compute_rt(cls, n=int, m=int, bond=None, with_units=False,
-                   units='angstrom', magnitude=True):
+    def compute_rt(cls, n=int, m=int, bond=None, **kwargs):
         u"""Compute nanotube radius :math:`r_t` in \u212b.
 
         .. math::
@@ -881,19 +897,8 @@ class Nanotube(object):
             Nanotube radius :math:`r_t` in \u212b.
 
         """
-        Ch = Nanotube.compute_Ch(n=n, m=m, bond=bond, with_units=with_units,
-                                 units=units, magnitude=magnitude)
+        Ch = Nanotube.compute_Ch(n=n, m=m, bond=bond, **kwargs)
         return Ch / (2 * np.pi)
-
-    @property
-    def M(self):
-        """:math:`M = np - nq`
-
-        :math:`M` is the number of multiples of the translation vector
-        :math:`\\mathbf{T}` in the vector :math:`N\\mathbf{R}`.
-
-        """
-        return self._M
 
     @classmethod
     def compute_M(cls, n=int, m=int):
@@ -917,20 +922,8 @@ class Nanotube(object):
         p, q = Nanotube.compute_R(n=n, m=m)
         return m * p - n * q
 
-    @property
-    def R(self):
-        """Symmetry vector :math:`\\mathbf{R} = (p, q)`.
-
-        .. math::
-
-           \\mathbf{R} = p\\mathbf{a}_1 + q\\mathbf{a}_2
-
-        """
-        return self._R
-
     @classmethod
-    def compute_R(cls, n=int, m=int, bond=None, with_units=False,
-                  units='angstrom', length=False, magnitude=True):
+    def compute_R(cls, n=int, m=int, bond=None, length=False, **kwargs):
         u"""Compute symmetry vector :math:`\\mathbf{R} = (p, q)`.
 
         The *symmetry vector* is any lattice vector of the unfolded graphene
@@ -993,16 +986,7 @@ class Nanotube(object):
             if bond is None:
                 bond = CCbond
 
-            if with_units and isinstance(bond, float) and Qty is not None:
-                bond = Qty(bond, units)
-
-            if magnitude and with_units:
-                try:
-                    return bond.magnitude * np.sqrt(3 * (p**2 + q**2 + p * q))
-                except AttributeError:
-                    return bond * np.sqrt(3 * (p**2 + q**2 + p * q))
-            else:
-                return bond * np.sqrt(3 * (p**2 + q**2 + p * q))
+            return bond * np.sqrt(3 * (p**2 + q**2 + p * q))
         else:
             return (p, q)
 
@@ -1102,8 +1086,7 @@ class Nanotube(object):
             return 0
 
     @classmethod
-    def compute_tau(cls, n=int, m=int, bond=None, with_units=False,
-                    units='angstrom', magnitude=True):
+    def compute_tau(cls, n=int, m=int, bond=None, **kwargs):
         u"""Compute translation component of symmetry operation
         :math:`\\tau` in **\u212b**.
 
@@ -1131,165 +1114,14 @@ class Nanotube(object):
         """
         M = Nanotube.compute_M(n=n, m=m)
         N = Nanotube.compute_N(n=n, m=m)
-        T = Nanotube.compute_T(n=n, m=m, bond=bond, with_units=with_units,
-                               units=units, length=True, magnitude=magnitude)
+        T = Nanotube.compute_T(n=n, m=m, bond=bond, **kwargs)
         try:
             return M * T / N
         except ZeroDivisionError:
             return 0
 
-    @property
-    def nx(self):
-        """Number of nanotubes along the :math:`x`-axis."""
-        return int(self._nx)
-
-    @nx.setter
-    def nx(self, value=int):
-        """Set :math:`n_x`"""
-        self._nx = value
-
-    @property
-    def ny(self):
-        """Number of nanotubes along the :math:`y`-axis."""
-        return int(self._ny)
-
-    @ny.setter
-    def ny(self, value=int):
-        """Set :math:`n_y`"""
-        self._ny = value
-
-    @property
-    def nz(self):
-        """Number of nanotube unit cells along the :math:`z`-axis."""
-        return self._nz
-
-    @nz.setter
-    def nz(self, value):
-        """Set number of nanotube unit cells along the :math:`z`-axis."""
-        if self._assume_integer_unit_cells:
-            self._nz = int(value)
-        else:
-            self._nz = value
-        self.compute_tube_params()
-
-    @property
-    def Lx(self):
-        """Spatial extent of nanotubes along :math:`x`-axis in **nm**."""
-        return self._Lx
-
     @classmethod
-    def compute_Lx(cls, n=int, m=int, nx=int, bond=None, with_units=False,
-                   units='nanometer', magnitude=True):
-        u"""Compute :math:`L_x` in **nanometers**.
-
-        .. math::
-
-           L_x = n_x (d_t + d_{\\mathrm{vdW}})
-
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-        nx : int
-            Number of nanotubes along :math:`x`-axis.
-        bond : float, optional
-            Distance between nearest neighbor atoms (i.e., bond length).
-            Must be in units of **\u212b**. Default value is
-            the carbon-carbon bond length in graphite, approximately
-            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
-
-        Returns
-        -------
-        float
-            :math:`L_x` in **nanometers**
-
-        """
-        dt = Nanotube.compute_dt(n=n, m=m, bond=bond, with_units=with_units,
-                                 units=units, magnitude=magnitude)
-        Lx = nx * (dt + dVDW)
-        if with_units:
-            try:
-                Lx.ito(units)
-            except Exception:
-                Lx.ito('nanometer')
-        else:
-            Lx = Lx / 10
-
-        if magnitude and with_units:
-            try:
-                return Lx.magnitude
-            except AttributeError:
-                return Lx
-        else:
-            return Lx
-
-    @property
-    def Ly(self):
-        """Spatial extent of nanotubes along :math:`y`-axis in **nm**."""
-        return self._Ly
-
-    @classmethod
-    def compute_Ly(cls, n=int, m=int, ny=int, bond=None, with_units=False,
-                   units='nanometer', magnitude=True):
-        """Compute :math:`L_y` in **nanometers**.
-
-        .. math::
-
-           L_y = n_y (d_t + d_{\\mathrm{vdW}})
-
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-        ny : int
-            Number of nanotubes along :math:`y`-axis.
-        bond : float, optional
-            Distance between nearest neighbor atoms (i.e., bond length).
-            Must be in units of **\u212b**. Default value is
-            the carbon-carbon bond length in graphite, approximately
-            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
-
-        Returns
-        -------
-        float
-            :math:`L_y` in **nanometers**
-
-        """
-        dt = Nanotube.compute_dt(n=n, m=m, bond=bond, with_units=with_units,
-                                 units=units, magnitude=magnitude)
-        Ly = ny * (dt + dVDW)
-        if with_units:
-            try:
-                Ly.ito(units)
-            except Exception:
-                Ly.ito('nanometer')
-        else:
-            Ly = Ly / 10
-
-        if magnitude and with_units:
-            try:
-                return Ly.magnitude
-            except AttributeError:
-                return Ly
-        else:
-            return Ly
-
-    @property
-    def Lz(self):
-        """Nanotube length :math:`L_z = L_{\\mathrm{tube}}` in
-        **nanometers**."""
-        return self._Lz
-
-    @Lz.setter
-    def Lz(self, value=float):
-        """Set tube length"""
-        self._Lz = value
-
-    @classmethod
-    def compute_Lz(cls, n=int, m=int, nz=float, bond=None, with_units=False,
-                   units='nanometer', magnitude=True):
+    def compute_Lz(cls, n=int, m=int, nz=float, bond=None, **kwargs):
         """Compute :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**.
 
         .. math::
@@ -1316,69 +1148,8 @@ class Nanotube(object):
             :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**
 
         """
-        T = Nanotube.compute_T(n=n, m=m, bond=bond, with_units=with_units,
-                               units=units, length=True, magnitude=False)
-        Lz = nz * T
-        if with_units:
-            try:
-                Lz.ito(units)
-            except Exception:
-                Lz.ito('nanometer')
-        else:
-            Lz = Lz / 10
-
-        if magnitude and with_units:
-            try:
-                return Lz.magnitude
-            except AttributeError:
-                return Lz
-        else:
-            return Lz
-
-    @property
-    def electronic_type(self):
-        """Nanotube electronic type.
-
-        .. versionadded:: 0.2.7
-
-        The electronic type is determined as follows:
-
-        if :math:`(2n + m)\\,\\mathrm{mod}\\,3=0`, the nanotube is
-        **metallic**.
-
-        if :math:`(2n + m)\\,\\mathrm{mod}\\,3=1`, the nanotube is
-        **semiconducting, type 1**.
-
-        if :math:`(2n + m)\\,\\mathrm{mod}\\,3=2`, the nanotube is
-        **semiconducting, type 2**.
-
-        The :math:`x\\,\\mathrm{mod}\\,y` notation is mathematical
-        shorthand for the *modulo* operation, which computes the
-        **remainder** of the division of :math:`x` by :math:`y`.
-        So, for example, all *armchair* nanotubes must be metallic
-        since the chiral indices satisfy: :math:`2n + m = 2n + n = 3n` and
-        therefore :math:`3n\\,\\mathrm{mod}\\,3` i.e. the remainder of the
-        division of :math:`3n/3=n` is always zero.
-
-        .. note::
-           Mathematically, :math:`(2n + m)\\,\\mathrm{mod}\\,3` is equivalent
-           to :math:`(n - m)\\,\\mathrm{mod}\\,3` when distinguishing
-           between metallic and semiconducting. However, when
-           distinguishing between semiconducting types,
-           one must be careful to observe the following convention:
-
-           * Semiconducting, **type 1** means:
-
-             * :math:`(2n + m)\\,\\mathrm{mod}\\,3=1`
-             * :math:`(n - m)\\,\\mathrm{mod}\\,3=2`
-
-           * Semiconducting, **type 2** means:
-
-             * :math:`(2n + m)\\,\\mathrm{mod}\\,3=2`
-             * :math:`(n - m)\\,\\mathrm{mod}\\,3=1`
-
-        """
-        return self._electronic_type
+        T = Nanotube.compute_T(n=n, m=m, bond=bond, **kwargs)
+        return nz * T / 10
 
     @classmethod
     def compute_electronic_type(cls, n=int, m=int):
@@ -1440,20 +1211,6 @@ class Nanotube(object):
         else:
             return 'metallic'
 
-    @property
-    def Natoms(self):
-        """Number of atoms in nanotube *unit cell*.
-
-        .. math::
-
-           N_{\\mathrm{atoms}} = 2N = \\frac{4(n^2 + m^2 + nm)}{d_R}
-
-        where :math:`N` is the number of graphene hexagons mapped to the
-        nanotube unit cell.
-
-        """
-        return self._Natoms
-
     @classmethod
     def compute_Natoms(cls, n=int, m=int):
         """Compute :math:`N_{\mathrm{atoms/cell}} = 2N`.
@@ -1482,11 +1239,6 @@ class Nanotube(object):
         N = Nanotube.compute_N(n=n, m=m)
         return 2 * N
 
-    @property
-    def Natoms_per_tube(self):
-        """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
-        return self._Natoms_per_tube
-
     @classmethod
     def compute_Natoms_per_tube(cls, n=int, m=int, nz=float):
         """Compute :math:`N_{\\mathrm{atoms/tube}}`
@@ -1512,15 +1264,10 @@ class Nanotube(object):
         Natoms = Nanotube.compute_Natoms(n=n, m=m)
         return int(Natoms * nz)
 
-    @property
-    def unit_cell_mass(self):
-        """Unit cell mass in atomic mass units."""
-        return self._unit_cell_mass
-
     @classmethod
     def compute_unit_cell_mass(cls, n=int, m=int, element1=None, element2=None,
-                               with_units=False, units='Da', magnitude=True):
-        """Compute nanotube unit cell mass in atomic mass units.
+                               **kwargs):
+        """Compute nanotube unit cell mass in atomic mass units units.
 
         Parameters
         ----------
@@ -1529,15 +1276,7 @@ class Nanotube(object):
             :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         element1, element2 : {str, int}, optional
             Element symbol or atomic number of basis
-            :class:`~sknano.structure_io.atoms.Atom` 1 and 2
-        with_units : bool, optional
-            Attach `units` to physical quantities.
-            **This parameter is not yet fully implemented or supported.
-            Use at your own risk!**
-        units : None, optional
-            System of physical units to attach to quantities.
-            **This parameter is not yet fully implemented or supported.
-            Use at your own risk!**
+            :class:`~sknano.io.atoms.Atom` 1 and 2
 
         Returns
         -------
@@ -1561,30 +1300,12 @@ class Nanotube(object):
             element2 = 'C'
 
         mass = N * (Atom(element1).m + Atom(element2).m)
-        if with_units and Qty is not None:
-            mass = Qty(mass, 'Da')
-            if units is not None and units not in ('Da', 'amu'):
-                mass.ito(units)
-            if magnitude:
-                try:
-                    return mass.magnitude
-                except AttributeError:
-                    return mass
-            else:
-                return mass
-        else:
-            return mass
-
-    @property
-    def linear_mass_density(self):
-        """Linear mass density of nanotube in g/nm."""
-        return self._linear_mass_density
+        return mass
 
     @classmethod
     def compute_linear_mass_density(cls, n=int, m=int, bond=None,
                                     element1=None, element2=None,
-                                    with_units=False, units='grams/nm',
-                                    magnitude=True):
+                                    **kwargs):
         """Compute nanotube linear mass density (mass per unit length) in
         **grams/nm**.
 
@@ -1595,7 +1316,7 @@ class Nanotube(object):
             :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
         element1, element2 : {str, int}, optional
             Element symbol or atomic number of basis
-            :class:`~sknano.structure_io.atoms.Atom` 1 and 2
+            :class:`~sknano.io.atoms.Atom` 1 and 2
         bond : float, optional
             Distance between nearest neighbor atoms (i.e., bond length).
             Must be in units of **\u212b**. Default value is
@@ -1619,36 +1340,16 @@ class Nanotube(object):
         mass = Nanotube.compute_unit_cell_mass(n=n, m=m,
                                                element1=element1,
                                                element2=element2,
-                                               with_units=False)
-        T = Nanotube.compute_T(n=n, m=m, bond=bond,
-                               with_units=False, length=True)
+                                               **kwargs)
+        T = Nanotube.compute_T(n=n, m=m, bond=bond, length=True, **kwargs)
 
         try:
             linear_mass_density = mass / T
-
-            if with_units and Qty is not None:
-                linear_mass_density = Qty(linear_mass_density, 'Da/angstrom')
-                if units is not None:
-                    linear_mass_density.ito(units)
-
-                if magnitude:
-                    try:
-                        return linear_mass_density.magnitude
-                    except AttributeError:
-                        return linear_mass_density
-                else:
-                    return linear_mass_density
-            else:
-                # there are 1.6605e-24 grams / Da and 10 angstroms / nm
-                linear_mass_density *= 10 * grams_per_Da
-                return linear_mass_density
+            # there are 1.6605e-24 grams / Da and 10 angstroms / nm
+            linear_mass_density *= 10 * grams_per_Da
+            return linear_mass_density
         except ZeroDivisionError:
             return 0
-
-    @property
-    def Ntubes(self):
-        """Number of nanotubes."""
-        return int(self._Ntubes)
 
     @classmethod
     def compute_symmetry_chiral_angle(cls, n=int, m=int, rad2deg=True):
@@ -1656,42 +1357,24 @@ class Nanotube(object):
         return Nanotube.compute_R_chiral_angle(n=n, m=m, rad2deg=rad2deg)
 
     @classmethod
-    def compute_tube_diameter(cls, n=int, m=int, bond=None, with_units=False,
-                              units='angstrom', magnitude=True):
+    def compute_tube_diameter(cls, n=int, m=int, bond=None, **kwargs):
         """Alias for :meth:`Nanotube.compute_dt`"""
-        return Nanotube.compute_dt(n=n, m=m, bond=bond, with_units=with_units,
-                                   units=units, magnitude=magnitude)
+        return Nanotube.compute_dt(n=n, m=m, bond=bond, **kwargs)
 
     @classmethod
-    def compute_tube_radius(cls, n=int, m=int, bond=None, with_units=False,
-                            units='angstrom', magnitude=True):
+    def compute_tube_radius(cls, n=int, m=int, bond=None, **kwargs):
         """Alias for :meth:`Nanotube.compute_rt`"""
-        return Nanotube.compute_rt(n, m, bond=bond, with_units=with_units,
-                                   units=units, magnitude=magnitude)
-
-    @property
-    def tube_length(self):
-        """Alias for :attr:`Nanotube.Lz`"""
-        return self.Lz
+        return Nanotube.compute_rt(n, m, bond=bond, **kwargs)
 
     @classmethod
     def compute_tube_length(cls, n=int, m=int, nz=float, bond=None,
-                            with_units=False, units='nanometer',
-                            magnitude=True):
+                            **kwargs):
         """Alias for :meth:`Nanotube.compute_Lz`"""
-        return Nanotube.compute_Lz(n=n, m=m, nz=nz, bond=bond,
-                                   with_units=with_units, units=units,
-                                   magnitude=magnitude)
-
-    @property
-    def tube_mass(self):
-        """Nanotube mass in **grams**."""
-        return self._tube_mass
+        return Nanotube.compute_Lz(n=n, m=m, nz=nz, bond=bond, **kwargs)
 
     @classmethod
     def compute_tube_mass(cls, n=int, m=int, nz=float, element1=None,
-                          element2=None, with_units=False, units='grams',
-                          magnitude=True):
+                          element2=None, **kwargs):
         """Compute nanotube mass in **grams**.
 
         Parameters
@@ -1703,15 +1386,7 @@ class Nanotube(object):
             Number of nanotube unit cells
         element1, element2 : {str, int}, optional
             Element symbol or atomic number of basis
-            :class:`~sknano.structure_io.atoms.Atom` 1 and 2
-        with_units : bool, optional
-            Attach `units` to physical quantities.
-            **This parameter is not yet fully implemented or supported.
-            Use at your own risk!**
-        units : None, optional
-            System of physical units to attach to quantities.
-            **This parameter is not yet fully implemented or supported.
-            Use at your own risk!**
+            :class:`~sknano.io.atoms.Atom` 1 and 2
 
         Returns
         -------
@@ -1739,21 +1414,9 @@ class Nanotube(object):
         atom2 = Atom(element2)
 
         mass = Natoms_per_tube * (atom1.m + atom2.m) / 2
-        if with_units and Qty is not None:
-            mass = Qty(mass, 'Da')
-            if units is not None and units not in ('Da', 'amu'):
-                mass.ito(units)
-            if magnitude:
-                try:
-                    return mass.magnitude
-                except AttributeError:
-                    return mass
-            else:
-                return mass
-        else:
-            # there are 1.6605e-24 grams / Da
-            mass *= grams_per_Da
-            return mass
+        # there are 1.6605e-24 grams / Da
+        mass *= grams_per_Da
+        return mass
 
     @classmethod
     def filter_Ch_list(cls, Ch_list=None, property_filters=None):
@@ -1790,61 +1453,126 @@ class Nanotube(object):
             return None
 
 
-class NanotubeBundle(Nanotube):
-    u"""Class for creating interactive Nanotube bundle objects.
+Nanotube = SWNT
 
-    Parameters
-    ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
-        :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-    nx, ny, nz : int, optional
-        Number of repeat unit cells in the :math:`x, y, z` dimensions
-    element1, element2 : {str, int}, optional
-        Element symbol or atomic number of basis
-        :class:`~sknano.structure_io.atoms.Atom` 1 and 2
-    bond : float, optional
-        Bond length between nearest neighbor atoms.
-        Must be in units of **\u212b**. Default value is
-        the carbon-carbon bond length in graphite, approximately
-        :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
-    Lx, Ly, Lz : float, optional
-        Length of bundle in :math:`x, y, z` dimensions in **nanometers**.
-        Overrides the :math:`n_x, n_y, n_z` cell values.
 
-        .. versionadded:: 0.2.5
+class UnrolledSWNTMixin(object):
+    @property
+    def nx(self):
+        """Number of nanotubes along the :math:`x`-axis."""
+        return int(self._nx)
 
-    tube_length : float, optional
-        Length of nanotube in units of **nanometers**.
+    @nx.setter
+    def nx(self, value=int):
+        """Set :math:`n_x`"""
+        self._nx = value
 
-        .. deprecated:: 0.2.5
-           Use `Lz` instead
+    @property
+    def ny(self):
+        """Number of nanotubes along the :math:`y`-axis."""
+        return int(self._ny)
 
-    fix_Lz : bool, optional
-        Generate the nanotube with length as close to the specified
-        :math:`L_z` as possible. If `True`, then
-        non integer :math:`n_z` cells are permitted.
+    @ny.setter
+    def ny(self, value=int):
+        """Set :math:`n_y`"""
+        self._ny = value
 
-        .. versionadded:: 0.2.6
+    @classmethod
+    def compute_Lx(cls, n=int, m=int, nx=int, bond=None, **kwargs):
+        u"""Compute :math:`L_x` in **nanometers**.
 
-    verbose : bool, optional
-        Verbose output.
+        .. math::
 
-    """
-    def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
-                 element1='C', element2='C', bond=CCbond, tube_length=None,
-                 vdw_spacing=dVDW, bundle_packing=None, bundle_geometry=None,
-                 Lx=None, Ly=None, Lz=None, fix_Lz=False, with_units=False,
-                 units=None, verbose=False):
+           L_x = n_x (d_t + d_{\\mathrm{vdW}})
 
-        if tube_length is not None and Lz is None:
-            Lz = tube_length
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        nx : int
+            Number of nanotubes along :math:`x`-axis.
+        bond : float, optional
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
 
-        super(NanotubeBundle, self).__init__(
-            n=n, m=m, nx=nx, ny=ny, nz=nz,
-            element1=element1, element2=element2,
-            bond=bond, Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz,
-            with_units=with_units, units=units, verbose=verbose)
+        Returns
+        -------
+        float
+            :math:`L_x` in **nanometers**
+
+        """
+        dt = Nanotube.compute_Ch(n=n, m=m, bond=bond, **kwargs)
+        return nx * dt / 10
+
+    @classmethod
+    def compute_Ly(cls, n=int, m=int, ny=int, bond=None, **kwargs):
+        """Compute :math:`L_y` in **nanometers**.
+
+        .. math::
+
+           L_y = n_y (d_t + d_{\\mathrm{vdW}})
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        ny : int
+            Number of nanotubes along :math:`y`-axis.
+        bond : float, optional
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
+
+        Returns
+        -------
+        float
+            :math:`L_y` in **nanometers**
+
+        """
+        return ny * dVDW / 10
+
+
+class UnrolledSWNT(UnrolledSWNTMixin, SWNT):
+
+    def __init__(self, nx=1, ny=1, Lx=None, Ly=None, **kwargs):
+        super(UnrolledSWNT, self).__init__(**kwargs)
+
+        self._nx = int(nx)
+        self._ny = int(ny)
+        self._Lx = Lx
+        self._Ly = Ly
+
+        self.compute_tube_params()
+
+    def compute_tube_params(self):
+
+        super(UnrolledSWNT, self).compute_tube_params()
+
+        self._Lx = \
+            self.compute_Lx(n=self._n, m=self._m, nx=self._nx, bond=self._bond)
+
+        self._Ly = \
+            self.compute_Ly(n=self._n, m=self._m, ny=self._ny, bond=self._bond)
+
+
+class NanotubeBundleMixin(object):
+
+    def __init__(self, nx=1, ny=1, Lx=None, Ly=None, vdw_spacing=dVDW,
+                 bundle_packing=None, bundle_geometry=None, **kwargs):
+
+        self._nx = int(nx)
+        self._ny = int(ny)
+        self._Lx = Lx
+        self._Ly = Ly
+
+        self._r1 = np.zeros(3)
+
+        self._r2 = np.zeros(3)
 
         self._vdw_spacing = vdw_spacing
         self._bundle_packing = bundle_packing
@@ -1855,28 +1583,27 @@ class NanotubeBundle(Nanotube):
         self._bundle_mass = None
         self._bundle_density = None
 
-        self.compute_bundle_params()
+        super(NanotubeBundleMixin, self).__init__(**kwargs)
 
-    def compute_bundle_params(self, d_vdw=None):
-        """Compute/update nanotube bundle parameters."""
-        super(NanotubeBundle, self).compute_tube_params()
-        self._Ntubes = self.compute_Ntubes(nx=self._nx, ny=self._ny)
-        self._bundle_mass = \
-            self.compute_bundle_mass(n=self._n, m=self._m,
-                                     nx=self._nx, ny=self._ny, nz=self._nz,
-                                     with_units=False)
-        self._Natoms_per_bundle = self._Ntubes * self._Natoms_per_tube
-        if d_vdw is None:
-            d_vdw = self._vdw_spacing
+    @property
+    def nx(self):
+        """Number of nanotubes along the :math:`x`-axis."""
+        return int(self._nx)
 
-        if self._with_units and isinstance(d_vdw, float):
-            d_vdw = Qty(d_vdw, 'angstrom')
+    @nx.setter
+    def nx(self, value=int):
+        """Set :math:`n_x`"""
+        self._nx = value
 
-        self._bundle_density = \
-            self.compute_bundle_density(n=self.n, m=self.m, d_vdw=d_vdw,
-                                        bond=self.bond, element1=self.element1,
-                                        element2=self.element2,
-                                        with_units=self._with_units)
+    @property
+    def ny(self):
+        """Number of nanotubes along the :math:`y`-axis."""
+        return int(self._ny)
+
+    @ny.setter
+    def ny(self, value=int):
+        """Set :math:`n_y`"""
+        self._ny = value
 
     @property
     def Natoms_per_bundle(self):
@@ -1895,6 +1622,244 @@ class NanotubeBundle(Nanotube):
 
         """
         self._Natoms_per_bundle = value
+
+    @property
+    def Ntubes(self):
+        """Number of nanotubes in nanotube bundle: :math:`n_x\\times n_y`."""
+        return int(self._Ntubes)
+
+    @Ntubes.setter
+    def Ntubes(self, value=int):
+        """Set Ntubes."""
+        self._Ntubes = value
+        self._nx = value
+        self._ny = 1
+        self.compute_bundle_params()
+
+    @property
+    def r1(self):
+        """Bundle lattice vector :math:`\\mathbf{r}_1`."""
+        return self._r1
+
+    @property
+    def r2(self):
+        """Bundle lattice vector :math:`\\mathbf{r}_2`."""
+        return self._r2
+
+    @property
+    def bundle_geometry(self):
+        """Bundle geometry."""
+        return self._bundle_geometry
+
+    @property
+    def bundle_packing(self):
+        """Bundle packing arrangement."""
+        return self._bundle_packing
+
+    @property
+    def bundle_density(self):
+        """Nanotube bundle mass density :math:`\\rho_{\\mathrm{bundle}}` in
+        :math:`\\mathrm{g/cm^3}`."""
+        return self._bundle_density
+
+    @property
+    def bundle_mass(self):
+        """Nanotube bundle mass :math:`M_{\\mathrm{bundle}}` in **grams**."""
+        return self._bundle_mass
+
+    @classmethod
+    def compute_Lx(cls, n=int, m=int, nx=int, bond=None, **kwargs):
+        u"""Compute :math:`L_x` in **nanometers**.
+
+        .. math::
+
+           L_x = n_x (d_t + d_{\\mathrm{vdW}})
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        nx : int
+            Number of nanotubes along :math:`x`-axis.
+        bond : float, optional
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
+
+        Returns
+        -------
+        float
+            :math:`L_x` in **nanometers**
+
+        """
+        dt = Nanotube.compute_dt(n=n, m=m, bond=bond, **kwargs)
+        return nx * (dt + dVDW) / 10
+
+    @classmethod
+    def compute_Ly(cls, n=int, m=int, ny=int, bond=None, **kwargs):
+        """Compute :math:`L_y` in **nanometers**.
+
+        .. math::
+
+           L_y = n_y (d_t + d_{\\mathrm{vdW}})
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        ny : int
+            Number of nanotubes along :math:`y`-axis.
+        bond : float, optional
+            Distance between nearest neighbor atoms (i.e., bond length).
+            Must be in units of **\u212b**. Default value is
+            the carbon-carbon bond length in graphite, approximately
+            :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
+
+        Returns
+        -------
+        float
+            :math:`L_y` in **nanometers**
+
+        """
+        dt = Nanotube.compute_dt(n=n, m=m, bond=bond, **kwargs)
+        return ny * (dt + dVDW) / 10
+
+    def compute_bundle_params(self, d_vdw=None):
+        """Compute/update nanotube bundle parameters."""
+        print('In compute_bundle_params\n' +
+              'called by type(self): {}'.format(type(self)))
+
+        self._r1[0] = \
+            Nanotube.compute_dt(n=self.n, m=self.m, bond=self.bond) + \
+            self._vdw_spacing
+        if self._bundle_packing is None and \
+                self._bundle_geometry in ('square', 'rectangle'):
+            self._bundle_packing = 'ccp'
+        elif self._bundle_packing is None and \
+                self._bundle_geometry in ('triangle', 'hexagon'):
+            self._bundle_packing = 'hcp'
+
+        if self._bundle_packing in ('cubic', 'ccp'):
+            self._r2[1] = self._r1[0]
+        else:
+            self._r2[0] = self._r1[0] * np.cos(2 * np.pi / 3)
+            self._r2[1] = self._r1[0] * np.sin(2 * np.pi / 3)
+            if self._bundle_packing is None:
+                self._bundle_packing = 'hcp'
+
+        self._Lx = \
+            self.compute_Lx(n=self._n, m=self._m, nx=self._nx, bond=self._bond)
+
+        self._Ly = \
+            self.compute_Ly(n=self._n, m=self._m, ny=self._ny, bond=self._bond)
+
+        self._Ntubes = self.compute_Ntubes(nx=self._nx, ny=self._ny)
+        self._bundle_mass = \
+            self.compute_bundle_mass(n=self._n, m=self._m,
+                                     nx=self._nx, ny=self._ny, nz=self._nz)
+        self._Natoms_per_bundle = self._Ntubes * self._Natoms_per_tube
+        if d_vdw is None:
+            d_vdw = self._vdw_spacing
+
+        self._bundle_density = \
+            self.compute_bundle_density(n=self.n, m=self.m, d_vdw=d_vdw,
+                                        bond=self.bond, element1=self.element1,
+                                        element2=self.element2)
+
+    @classmethod
+    def compute_bundle_density(cls, n=int, m=int, d_vdw=None, bond=None,
+                               element1=None, element2=None):
+        u"""Compute nanotube bundle mass density
+        :math:`\\rho_{\\mathrm{bundle}}(n, m)` in :math:`\\mathrm{g/cm^3}`.
+
+        .. math::
+
+           \\rho_{\\mathrm{bundle}}(n, m) = \\frac{8\\pi^2 m_{\\mathrm{C}}
+           \\sqrt{n^2 + m^2 + nm}}{9\\sqrt{3}a_{\\mathrm{CC}}^3 \\times
+           \\left(\\sqrt{n^2 + m^2 + nm} +
+           \\frac{\\pi d_{\\mathrm{vdW}}}{\\sqrt{3}a_{\\mathrm{CC}}}\\right)^2}
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        d_vdw : int
+            van der Waals distance between nearest-neighbor tubes
+        bond : float, optional
+            Bond length.
+
+        Returns
+        -------
+        float
+            :math:`\\rho_{\\mathrm{bundle}}` in units of
+            :math:`\\mathrm{\\frac{g}{cm^3}}`
+
+        """
+        if bond is None:
+            bond = CCbond
+
+        if d_vdw is None:
+            if n == m:
+                d_vdw = 3.38
+            elif (m == 0) or (n == 0):
+                d_vdw = 3.41
+            else:
+                d_vdw = 3.39
+
+        if element1 is None:
+            element1 = 'C'
+        if element2 is None:
+            element2 = 'C'
+
+        if element1 == element2:
+            bundle_density = 8 * np.pi**2 * Atom(element1).m * \
+                np.sqrt(n**2 + m**2 + n*m) / \
+                (9 * np.sqrt(3) * bond**3 *
+                    (np.sqrt(n**2 + m**2 + n*m) +
+                        np.pi * d_vdw / (np.sqrt(3) * bond))**2)
+        else:
+            bundle_density = 0
+
+        # there are 1.6605e-24 grams / Da and 1e-8 cm / angstrom
+        bundle_density *= grams_per_Da / (1e-8)**3
+        return bundle_density
+
+    @classmethod
+    def compute_bundle_mass(cls, n=int, m=int, nx=int, ny=int, nz=float,
+                            element1=None, element2=None):
+        """Compute nanotube bundle mass :math:`M_{\\mathrm{bundle}}`
+        in **grams**.
+
+        .. math::
+
+           M_{\\mathrm{bundle}} = N_{\\mathrm{tubes}} M_{\\mathrm{tube}}
+
+        Parameters
+        ----------
+        n, m : int
+            Chiral indices defining the nanotube chiral vector
+            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        nx, ny, nz : int, optional
+            Number of repeat unit cells in the :math:`x, y, z` dimensions
+        element1, element2 : {str, int}, optional
+            Element symbol or atomic number of basis
+            :class:`~sknano.chemistry.Atoms` 1 and 2
+
+        Returns
+        -------
+        float
+            Nanotube bundle mass :math:`M_{\\mathrm{bundle}}` in **grams**.
+
+        """
+        Ntubes = int(nx * ny)
+        tube_mass = Nanotube.compute_tube_mass(n=n, m=m, nz=nz,
+                                               element1=element1,
+                                               element2=element2)
+        return Ntubes * tube_mass
 
     @classmethod
     def compute_Natoms_per_bundle(cls, n=int, m=int, nz=float, Ntubes=None,
@@ -1939,19 +1904,6 @@ class NanotubeBundle(Nanotube):
 
         return Natoms_per_bundle
 
-    @property
-    def Ntubes(self):
-        """Number of nanotubes in nanotube bundle: :math:`n_x\\times n_y`."""
-        return int(self._Ntubes)
-
-    @Ntubes.setter
-    def Ntubes(self, value=int):
-        """Set Ntubes."""
-        self._Ntubes = value
-        self._nx = value
-        self._ny = 1
-        self.compute_bundle_params()
-
     @classmethod
     def compute_Ntubes(cls, nx=int, ny=int):
         """Compute number of nanotubes in nanotube bundle.
@@ -1969,134 +1921,76 @@ class NanotubeBundle(Nanotube):
         """
         return int(nx * ny)
 
-    @property
-    def bundle_density(self):
-        """Nanotube bundle mass density :math:`\\rho_{\\mathrm{bundle}}` in
-        :math:`\\mathrm{g/cm^3}`."""
-        return self._bundle_density
 
-    @classmethod
-    def compute_bundle_density(cls, n=int, m=int, d_vdw=None, bond=None,
-                               element1=None, element2=None,
-                               with_units=False, units='g/cm**3',
-                               magnitude=True):
-        u"""Compute nanotube bundle mass density
-        :math:`\\rho_{\\mathrm{bundle}}(n, m)` in :math:`\\mathrm{g/cm^3}`.
+class SWNTBundle(NanotubeBundleMixin, SWNT):
 
-        .. math::
+    def __init__(self, **kwargs):
 
-           \\rho_{\\mathrm{bundle}}(n, m) = \\frac{8\\pi^2 m_{\\mathrm{C}}
-           \\sqrt{n^2 + m^2 + nm}}{9\\sqrt{3}a_{\\mathrm{CC}}^3 \\times
-           \\left(\\sqrt{n^2 + m^2 + nm} +
-           \\frac{\\pi d_{\\mathrm{vdW}}}{\\sqrt{3}a_{\\mathrm{CC}}}\\right)^2}
+        super(SWNTBundle, self).__init__(**kwargs)
 
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-        d_vdw : int
-            van der Waals distance between nearest-neighbor tubes
-        bond : float, optional
-            Bond length.
+        self.compute_bundle_params()
 
-        Returns
-        -------
-        float
-            :math:`\\rho_{\\mathrm{bundle}}` in units of
-            :math:`\\mathrm{\\frac{g}{cm^3}}`
+    def compute_bundle_params(self):
+        super(SWNTBundle, self).compute_tube_params()
+        super(SWNTBundle, self).compute_bundle_params()
 
-        """
-        if bond is None:
-            bond = CCbond
-        else:
-            try:
-                bond = bond.magnitude
-            except AttributeError:
-                pass
 
-        if d_vdw is None:
-            if n == m:
-                d_vdw = 3.38
-            elif (m == 0) or (n == 0):
-                d_vdw = 3.41
-            else:
-                d_vdw = 3.39
-        else:
-            try:
-                d_vdw = d_vdw.magnitude
-            except AttributeError:
-                pass
+class MWNTMixin(object):
 
-        if element1 is None:
-            element1 = 'C'
-        if element2 is None:
-            element2 = 'C'
+    def __init__(self, add_inner_shells=True, add_outer_shells=False,
+                 max_shells=None, max_shell_diameter=np.inf,
+                 min_shells=None, min_shell_diameter=0.0,
+                 new_shell_type=None, shell_spacing=3.4, **kwargs):
 
-        if element1 == element2:
-            bundle_density = 8 * np.pi**2 * Atom(element1).m * \
-                np.sqrt(n**2 + m**2 + n*m) / \
-                (9 * np.sqrt(3) * bond**3 *
-                    (np.sqrt(n**2 + m**2 + n*m) +
-                        np.pi * d_vdw / (np.sqrt(3) * bond))**2)
-        else:
-            bundle_density = 0
+        self._add_inner_shells = add_inner_shells
+        self._add_outer_shells = add_outer_shells
+        self._starting_shell_position = 'outer'
 
-        if with_units and Qty is not None:
-            bundle_density = Qty(bundle_density, 'Da/angstroms**3')
-            if units is not None:
-                bundle_density.ito(units)
+        self._max_shells = max_shells
+        if max_shells is None:
+            self._max_shells = 10
+        self._max_shell_diameter = max_shell_diameter
 
-            if magnitude:
-                try:
-                    return bundle_density.magnitude
-                except AttributeError:
-                    return bundle_density
-            else:
-                return bundle_density
-        else:
-            # there are 1.6605e-24 grams / Da and 1e-8 cm / angstrom
-            bundle_density *= grams_per_Da / (1e-8)**3
-            return bundle_density
+        self._min_shells = min_shells
+        if min_shells is None:
+            self._min_shells = 2
+        self._min_shell_diameter = min_shell_diameter
+
+        self._new_shell_type = new_shell_type
+        self._shell_spacing = shell_spacing
+
+        self._Nshells_per_tube = 1
+        self._Natoms_per_tube = 0
+
+        super(MWNTMixin, self).__init__(**kwargs)
 
     @property
-    def bundle_mass(self):
-        """Nanotube bundle mass :math:`M_{\\mathrm{bundle}}` in **grams**."""
-        return self._bundle_mass
+    def max_shells(self):
+        return self._max_shells
 
-    @classmethod
-    def compute_bundle_mass(cls, n=int, m=int, nx=int, ny=int, nz=float,
-                            element1=None, element2=None, with_units=False,
-                            units='grams', magnitude=True):
-        """Compute nanotube bundle mass :math:`M_{\\mathrm{bundle}}`
-        in **grams**.
+    @max_shells.setter
+    def max_shells(self, value):
+        self._max_shells = value
 
-        .. math::
 
-           M_{\\mathrm{bundle}} = N_{\\mathrm{tubes}} M_{\\mathrm{tube}}
+class MWNT(MWNTMixin, SWNT):
 
-        Parameters
-        ----------
-        n, m : int
-            Chiral indices defining the nanotube chiral vector
-            :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-        nx, ny, nz : int, optional
-            Number of repeat unit cells in the :math:`x, y, z` dimensions
-        element1, element2 : {str, int}, optional
-            Element symbol or atomic number of basis
-            :class:`~sknano.structure_io.atoms.Atom` 1 and 2
+    def __init__(self, **kwargs):
 
-        Returns
-        -------
-        float
-            Nanotube bundle mass :math:`M_{\\mathrm{bundle}}` in **grams**.
+        super(MWNT, self).__init__(**kwargs)
 
-        """
-        Ntubes = NanotubeBundle.compute_Ntubes(nx=nx, ny=ny)
-        tube_mass = Nanotube.compute_tube_mass(n=n, m=m, nz=nz,
-                                               element1=element1,
-                                               element2=element2,
-                                               with_units=with_units,
-                                               units=units,
-                                               magnitude=magnitude)
-        return Ntubes * tube_mass
+        self.compute_tube_params()
+
+    def compute_tube_params(self):
+        super(MWNT, self).compute_tube_params()
+
+
+class MWNTBundle(NanotubeBundleMixin, MWNT):
+    def __init__(self, **kwargs):
+        super(MWNTBundle, self).__init__(**kwargs)
+
+        self.compute_bundle_params()
+
+    def compute_bundle_params(self):
+        super(MWNTBundle, self).compute_tube_params()
+        super(MWNTBundle, self).compute_bundle_params()

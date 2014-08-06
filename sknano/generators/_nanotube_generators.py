@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-===========================================================================
-Nanotube structure generators (:mod:`sknano.nanogen._nanotube_generators`)
-===========================================================================
+===============================================================================
+Nanotube structure generators (:mod:`sknano.generators._nanotube_generators`)
+===============================================================================
 
-.. currentmodule:: sknano.nanogen._nanotube_generators
+.. currentmodule:: sknano.generators._nanotube_generators
 
 .. todo::
 
@@ -25,17 +25,14 @@ import copy
 
 import numpy as np
 
-from ..structure_io.atoms import StructureAtom as Atom, StructureAtoms as Atoms
-from ..tools import plural_word_check
-from ..tools.refdata import CCbond
+from ..core import Atom, Atoms, plural_word_check
+from ..structures import SWNT, UnrolledSWNT, MWNTMixin
+from ._base import GeneratorMixin
 
-from ._nanotubes import Nanotube
-from ._structure_generator import StructureGenerator
-
-__all__ = ['NanotubeGenerator', 'UnrolledNanotubeGenerator', 'MWNTGenerator']
+__all__ = ['SWNTGenerator', 'UnrolledSWNTGenerator', 'MWNTGenerator']
 
 
-class NanotubeGenerator(Nanotube, StructureGenerator):
+class SWNTGenerator(SWNT, GeneratorMixin):
     u"""Class for generating nanotube structures.
 
     Parameters
@@ -48,7 +45,7 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
         the *length* of the nanotube.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.structure_io.atoms.Atom` 1 and 2
+        :class:`~sknano.core.Atom` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
@@ -74,25 +71,21 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
 
     autogen : bool, optional
         if `True`, automatically call
-        :meth:`~NanotubeGenerator.generate_unit_cell`,
-        followed by :meth:`~NanotubeGenerator.generate_structure_data`.
-    with_units : bool, optional
-        Attach `units` to physical quantities
-    units : None, optional
-        System of units to use.
+        :meth:`~SWNTGenerator.generate_unit_cell`,
+        followed by :meth:`~SWNTGenerator.generate_structure_data`.
     verbose : bool, optional
         if `True`, show verbose output
 
     Examples
     --------
-    First, load the :class:`~sknano.nanogen.NanotubeGenerator` class.
+    First, load the :class:`~sknano.generators.SWNTGenerator` class.
 
-    >>> from sknano.nanogen import NanotubeGenerator
+    >>> from sknano.generators import SWNTGenerator
 
     Now let's generate a :math:`\\mathbf{C}_{\\mathrm{h}} = (10, 5)`
     SWCNT unit cell.
 
-    >>> nt = NanotubeGenerator(n=10, m=5)
+    >>> nt = SWNTGenerator(n=10, m=5)
     >>> nt.save_data(fname='10,5_unit_cell.xyz')
 
     The rendered structure looks like (orhographic view):
@@ -104,21 +97,9 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
     .. image:: /images/10,5_unit_cell_perspective_view.png
 
     """
+    def __init__(self, autogen=True, **kwargs):
 
-    def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
-                 element1='C', element2='C', bond=CCbond, tube_length=None,
-                 Lx=None, Ly=None, Lz=None, fix_Lz=False,
-                 with_units=False, units=None,
-                 autogen=True, verbose=False):
-
-        if tube_length is not None and Lz is None:
-            Lz = tube_length
-
-        super(NanotubeGenerator, self).__init__(
-            n=n, m=m, nx=nx, ny=ny, nz=nz,
-            element1=element1, element2=element2,
-            bond=bond, Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz,
-            with_units=False, units=units, verbose=verbose)
+        super(SWNTGenerator, self).__init__(**kwargs)
 
         if autogen:
             self.generate_unit_cell()
@@ -138,7 +119,7 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
         e2 = self._element2
         verbose = self._verbose
 
-        aCh = Nanotube.compute_chiral_angle(n=n, m=m, rad2deg=False)
+        aCh = SWNT.compute_chiral_angle(n=n, m=m, rad2deg=False)
 
         tau = M * T / N
         dtau = bond * np.sin(np.pi / 6 - aCh)
@@ -197,7 +178,7 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
                   center_CM=True, **kwargs):
         """Save structure data.
 
-        See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
+        See :meth:`~sknano.generators.GeneratorMixin.save_data` method
         for documentation.
 
         """
@@ -226,18 +207,13 @@ class NanotubeGenerator(Nanotube, StructureGenerator):
             if center_CM:
                 self._structure_atoms.center_CM()
 
-        super(NanotubeGenerator, self).save_data(
+        super(SWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
             deg2rad=deg2rad, center_CM=False, **kwargs)
 
 
-class CappedNanotubeGenerator(Nanotube, StructureGenerator):
-    u"""Class for generating capped nanotube structures."""
-    pass
-
-
-class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
+class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
     u"""Class for generating unrolled nanotube structures.
 
     .. versionadded:: 0.2.23
@@ -251,7 +227,7 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
         Number of repeat unit cells in the :math:`x, y, z` dimensions
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.structure_io.atoms.Atom` 1 and 2
+        :class:`~sknano.core.Atom` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
@@ -266,53 +242,42 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
         if `True`, automatically call
         :meth:`~NanotubeGenerator.generate_unit_cell`,
         followed by :meth:`~NanotubeGenerator.generate_structure_data`.
-    with_units : bool, optional
-        Attach `units` to physical quantities
-    units : None, optional
-        System of units to use.
     verbose : bool, optional
         if `True`, show verbose output
 
     Notes
     -----
-    The `UnrolledNanotubeGenerator` class generates graphene using the
+    The `UnrolledSWNTGenerator` class generates graphene using the
     nanotube unit cell defined by the chiral vector
     :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
     If you want to generate graphene with an armchair or zigzag edge using
     `length` and `width` parameters, see the
-    :class:`~sknano.nanogen.GrapheneGenerator` class.
+    :class:`~sknano.generators.GrapheneGenerator` class.
 
-    .. seealso:: :class:`~sknano.nanogen.GrapheneGenerator`
+    .. seealso:: :class:`~sknano.generators.GrapheneGenerator`
 
 
     Examples
     --------
-    First, load the :class:`~sknano.nanogen.UnrolledNanotubeGenerator`
+    First, load the :class:`~sknano.generators.UnrolledSWNTGenerator`
     class.
 
-    >>> from sknano.nanogen import UnrolledNanotubeGenerator
+    >>> from sknano.generators import UnrolledSWNTGenerator
 
     Now let's generate an unrolled :math:`\\mathbf{C}_{\\mathrm{h}} = (10, 5)`
     SWCNT unit cell.
 
-    >>> flatswcnt = UnrolledNanotubeGenerator(n=10, m=5)
+    >>> flatswcnt = UnrolledSWNTGenerator(n=10, m=5)
     >>> flatswcnt.save_data()
 
     The rendered structure looks like:
 
     """
 
-    def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
-                 element1='C', element2='C', bond=CCbond,
-                 Lx=None, Ly=None, Lz=None, fix_Lz=False,
-                 nlayers=None, layer_spacing=None, stacking_order=None,
-                 with_units=False, units=None, autogen=True, verbose=False):
+    def __init__(self, nlayers=None, layer_spacing=None, stacking_order=None,
+                 autogen=True, **kwargs):
 
-        super(UnrolledNanotubeGenerator, self).__init__(
-            n=n, m=m, nx=nx, ny=ny, nz=nz,
-            element1=element1, element2=element2,
-            bond=bond, Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz,
-            with_units=False, units=units, verbose=verbose)
+        super(UnrolledSWNTGenerator, self).__init__(**kwargs)
 
         if autogen:
             self.generate_unit_cell()
@@ -332,7 +297,7 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
         e2 = self._element2
         verbose = self._verbose
 
-        aCh = Nanotube.compute_chiral_angle(n=n, m=m, rad2deg=False)
+        aCh = SWNT.compute_chiral_angle(n=n, m=m, rad2deg=False)
 
         tau = M * T / N
         dtau = bond * np.sin(np.pi / 6 - aCh)
@@ -390,7 +355,7 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
                   center_CM=True, **kwargs):
         """Save structure data.
 
-        See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
+        See :meth:`~sknano.generators.GeneratorMixin.save_data` method
         for documentation.
 
         """
@@ -440,13 +405,13 @@ class UnrolledNanotubeGenerator(Nanotube, StructureGenerator):
             if center_CM:
                 self._structure_atoms.center_CM()
 
-        super(UnrolledNanotubeGenerator, self).save_data(
+        super(UnrolledSWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
             deg2rad=deg2rad, center_CM=False, **kwargs)
 
 
-class MWNTGenerator(NanotubeGenerator):
+class MWNTGenerator(MWNTMixin, SWNTGenerator):
     u"""Class for generating single, multi-walled nanotubes.
 
     .. versionchanged:: 0.2.20
@@ -466,7 +431,7 @@ class MWNTGenerator(NanotubeGenerator):
         Number of repeat unit cells in the :math:`x, y, z` dimensions.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.structure_io.atoms.Atom` 1 and 2
+        :class:`~sknano.core.Atom` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
@@ -513,28 +478,19 @@ class MWNTGenerator(NanotubeGenerator):
     Examples
     --------
 
-    >>> from sknano.nanogen import MWNTGenerator
+    >>> from sknano.generators import MWNTGenerator
     >>> mwnt = MWNTGenerator(n=40, m=40, max_shells=5, Lz=1.0, fix_Lz=True)
     >>> mwnt.save_data()
 
     .. image:: /images/5shell_mwnt_4040_outer_Ch_1cellx1cellx4.06cells-01.png
 
     """
-    def __init__(self, n=int, m=int, nx=1, ny=1, nz=1,
-                 element1='C', element2='C', bond=CCbond,
-                 Lx=None, Ly=None, Lz=None, fix_Lz=False,
-                 add_inner_shells=True, add_outer_shells=False,
-                 max_shells=None, max_shell_diameter=np.inf,
-                 min_shells=None, min_shell_diameter=0.0,
-                 new_shell_type=None, shell_spacing=3.4,
-                 with_units=False, units=None, autogen=True, verbose=False):
+    def __init__(self, add_inner_shells=True, add_outer_shells=False,
+                 max_shells=None, max_shell_diameter=np.inf, min_shells=None,
+                 min_shell_diameter=0.0, new_shell_type=None,
+                 shell_spacing=3.4, autogen=True, **kwargs):
 
-        super(MWNTGenerator, self).__init__(
-            n=n, m=m, nx=nx, ny=ny, nz=nz,
-            element1=element1, element2=element2, bond=bond,
-            Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz,
-            with_units=with_units, units=units,
-            autogen=False, verbose=verbose)
+        super(MWNTGenerator, self).__init__(autogen=False, **kwargs)
 
         self._add_inner_shells = add_inner_shells
         self._add_outer_shells = add_outer_shells
@@ -567,15 +523,15 @@ class MWNTGenerator(NanotubeGenerator):
         e1 = self._element1
         e2 = self._element2
 
-        N = Nanotube.compute_N(n=n, m=m)
-        aCh = Nanotube.compute_chiral_angle(n=n, m=m, rad2deg=False)
-        rt = Nanotube.compute_rt(n=n, m=m, bond=bond, with_units=False)
-        T = Nanotube.compute_T(n=n, m=m, bond=bond, with_units=False)
+        N = SWNT.compute_N(n=n, m=m)
+        aCh = SWNT.compute_chiral_angle(n=n, m=m, rad2deg=False)
+        rt = SWNT.compute_rt(n=n, m=m, bond=bond)
+        T = SWNT.compute_T(n=n, m=m, bond=bond)
 
-        tau = Nanotube.compute_tau(n=n, m=m, bond=bond, with_units=False)
+        tau = SWNT.compute_tau(n=n, m=m, bond=bond)
         dtau = bond * np.sin(np.pi / 6 - aCh)
 
-        psi = Nanotube.compute_psi(n=n, m=m)
+        psi = SWNT.compute_psi(n=n, m=m)
         dpsi = bond * np.cos(np.pi / 6 - aCh) / rt
 
         unit_cell = Atoms()
@@ -623,7 +579,7 @@ class MWNTGenerator(NanotubeGenerator):
                     continue
                 else:
                     Ch.append((n, m))
-                    dt.append(Nanotube.compute_dt(n=n, m=m, bond=self._bond))
+                    dt.append(SWNT.compute_dt(n=n, m=m, bond=self._bond))
         Ch = np.asarray(Ch)
         dt = np.asarray(dt)
 
@@ -697,8 +653,8 @@ class MWNTGenerator(NanotubeGenerator):
             if len(next_Ch_candidates) > 0:
                 n, m = next_Ch_candidates[
                     np.random.choice(np.arange(len(next_Ch_candidates)))]
-                T = Nanotube.compute_T(n=n, m=m, bond=self._bond)
-                Lz = Nanotube.compute_Lz(
+                T = SWNT.compute_T(n=n, m=m, bond=self._bond)
+                Lz = SWNT.compute_Lz(
                     n=n, m=m, bond=self._bond, nz=self._nz)
                 Lzmin = min(Lzmin, Lz)
 
@@ -720,7 +676,7 @@ class MWNTGenerator(NanotubeGenerator):
                         atom.r = uc_atom.r + dr
                         shell.append(atom)
                 shell.center_CM()
-                self._structure_atoms.extend(shell.atoms)
+                self._structure_atoms.extend(shell)
                 self._Nshells_per_tube += 1
                 next_dt += delta_dt
             else:
@@ -744,7 +700,7 @@ class MWNTGenerator(NanotubeGenerator):
                   center_CM=True, **kwargs):
         """Save structure data.
 
-        See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
+        See :meth:`~sknano.generators.GeneratorMixin.save_data` method
         for documentation.
 
         """

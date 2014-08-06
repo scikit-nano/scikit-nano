@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-=============================================================================
-Generate defects in structure data (:mod:`sknano.nanogen._defect_generators`)
-=============================================================================
+===============================================================================
+Generate structures with defects (:mod:`sknano.generators._defect_generators`)
+===============================================================================
 
-.. currentmodule:: sknano.nanogen._defect_generators
+.. currentmodule:: sknano.generators._defect_generators
 
 """
 from __future__ import absolute_import, division, print_function
@@ -15,9 +15,8 @@ import os
 
 import numpy as np
 
-from ..structure_io import DATAReader, DATAWriter, XYZWriter, \
-    XYZ2DATAConverter, StructureFormatError, supported_structure_formats
-from ..structure_io.atoms import StructureAtoms as Atoms
+from ..io import StructureIO, supported_structure_formats
+from ..core import Atoms
 
 _vac_type_cluster_size_map = {'single': 1, 'double': 2, 'triple': 3}
 
@@ -60,7 +59,7 @@ class DefectGenerator(object):
                     structure_format is None) or \
                     (structure_format is not None and
                         structure_format not in supported_structure_formats):
-                raise StructureFormatError(
+                raise ValueError(
                     '{} is not a supported structure format'.format(
                         structure_format))
 
@@ -70,12 +69,8 @@ class DefectGenerator(object):
         self._verbose = verbose
 
         # parse structure data
-        if self._structure_format == 'data':
-            self._structure_data = DATAReader(fname)
-        elif self._structure_format == 'xyz':
-            self._structure_data = \
-                XYZ2DATAConverter(fname).convert(return_reader=True)
-
+        self._structure_data = \
+            StructureIO.read(fname, structure_format=self._structure_format)
         self._atoms = self._structure_data.atoms
         self._atom_ids = self._atoms.atom_ids
         self._atom_coords = self._atoms.get_coords(as_dict=True)

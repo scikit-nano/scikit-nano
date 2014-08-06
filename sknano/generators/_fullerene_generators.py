@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-============================================================================
-Fullerene structure generators (:mod:`sknano.nanogen._fullerene_generators`)
-============================================================================
+===============================================================================
+Fullerene structure generators (:mod:`sknano.generators._fullerene_generators`)
+===============================================================================
 
-.. currentmodule:: sknano.nanogen._fullerene_generators
+.. currentmodule:: sknano.generators._fullerene_generators
 
 """
 from __future__ import absolute_import, division, print_function
@@ -16,16 +16,14 @@ __docformat__ = 'restructuredtext en'
 
 #import numpy as np
 
-from ..structure_io.atoms import Atoms
-#from ..tools.refdata import CCbond
-
-from ._fullerenes import Fullerene
-from ._structure_generator import StructureGenerator
+from ..core import Atoms
+from ..structures import Fullerene
+from ._base import GeneratorMixin
 
 __all__ = ['FullereneGenerator']
 
 
-class FullereneGenerator(Fullerene, StructureGenerator):
+class FullereneGenerator(Fullerene, GeneratorMixin):
     u"""Class for generating fullerene structures.
 
     .. note::
@@ -52,9 +50,9 @@ class FullereneGenerator(Fullerene, StructureGenerator):
 
     Examples
     --------
-    First, load the :py:class:`~sknano.nanogen.FullereneGenerator` class.
+    First, load the :py:class:`~sknano.generators.FullereneGenerator` class.
 
-    >>> from sknano.nanogen import FullereneGenerator
+    >>> from sknano.generators import FullereneGenerator
     >>> fg = FullereneGenerator(N=60)
 
     """
@@ -78,7 +76,7 @@ class FullereneGenerator(Fullerene, StructureGenerator):
                   center_CM=True, **kwargs):
         """Save structure data.
 
-        See :py:meth:`~sknano.nanogen.StructureGenerator.save_data` method
+        See :py:meth:`~sknano.generators.GeneratorMixin.save_data` method
         for documentation.
 
         """

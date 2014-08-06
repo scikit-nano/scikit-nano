@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =================================================================
-Graphene structure tools (:mod:`sknano.nanogen._graphene`)
+Graphene structure classes (:mod:`sknano.structures._graphene`)
 =================================================================
 
-.. currentmodule:: sknano.nanogen._graphene
+.. currentmodule:: sknano.structures._graphene
 
 """
 from __future__ import absolute_import, division, print_function
@@ -12,18 +12,10 @@ __docformat__ = 'restructuredtext en'
 
 #import itertools
 
-try:
-    from pint import UnitRegistry
-    ureg = UnitRegistry()
-    Qty = ureg.Quantity
-except ImportError:
-    Qty = None
-
 import numpy as np
 
-from ..structure_io.atoms import Atom
-from ..tools import Vector2D, Vector3D
-from ..tools.refdata import CCbond
+from ..core import Atom
+from ..core.refdata import CCbond, dVDW, grams_per_Da
 
 edge_types = {'armchair': 'AC', 'zigzag': 'ZZ'}
 
@@ -33,46 +25,25 @@ __all__ = ['GraphenePrimitiveCell', 'Graphene']
 class GraphenePrimitiveCell(object):
     """Class for generating interactive Graphene primitive unit cell.
 
-    .. versionadded:: 0.2.23
-
     Parameters
     ----------
     bond : float, optional
         bond length between nearest-neighbor atoms in **Angstroms**.
 
     """
-    def __init__(self, bond=CCbond, with_units=False, units=None):
+    def __init__(self, bond=CCbond, **kwargs):
+        self._bond = bond
+        self._a = np.sqrt(3) * self._bond
 
-        if bond is None:
-            bond = CCbond
-
-        if with_units and Qty is None:
-            with_units = False
-        self._with_units = with_units
-
-        if with_units and units is None:
-            units = 'angstroms'
-        self._units = units
-
-        if with_units and isinstance(bond, float):
-            self._bond = Qty(bond, units)
-        else:
-            self._bond = bond
-
-        try:
-            self._a = np.sqrt(3) * self._bond.magnitude
-        except AttributeError:
-            self._a = np.sqrt(3) * self._bond
-
-        self._a1 = Vector2D(with_units=with_units, units=units)
-        self._a2 = Vector2D(with_units=with_units, units=units)
+        self._a1 = np.zeros(2)
+        self._a2 = np.zeros(2)
 
         self._a1.x = self._a2.x = np.sqrt(3) / 2 * self._a
         self._a1.y = 1 / 2 * self._a
         self._a2.y = -self._a1.y
 
-        self._b1 = Vector2D(with_units=with_units, units='1/{}'.format(units))
-        self._b2 = Vector2D(with_units=with_units, units='1/{}'.format(units))
+        self._b1 = np.zeros(2)
+        self._b2 = np.zeros(2)
 
         self._b1.x = self._b2.x = 1 / np.sqrt(3) * 2 * np.pi / self._a
         self._b1.y = 2 * np.pi / self._a
@@ -127,8 +98,6 @@ class Graphene(object):
         Distance between layers in **Angstroms**.
     stacking_order : {'AA', 'AB'}, optional
         Stacking order of graphene layers
-    autogen : bool, optional
-        automatically generate unit cell and full structure
     verbose : bool, optional
         verbose output
 
@@ -143,13 +112,10 @@ class Graphene(object):
 
     """
 
-    def __init__(self, length=None, width=None, edge=None,
-                 element1='C', element2='C', bond=CCbond, nlayers=1,
-                 layer_spacing=3.35, stacking_order='AB', with_units=False,
-                 units=None, verbose=False):
+    def __init__(self, length=None, width=None, edge=None, element1='C',
+                 element2='C', bond=CCbond, nlayers=1, layer_spacing=dVDW,
+                 stacking_order='AB', verbose=False):
 
-        # add each parameter in the order I want them to appear in
-        # verbose output mode
         self._element1 = element1
         self._element2 = element2
 
@@ -167,22 +133,11 @@ class Graphene(object):
         if bond is None:
             bond = CCbond
 
-        if with_units and Qty is None:
-            with_units = False
-        self._with_units = with_units
-
-        if with_units and units is None:
-            units = 'angstroms'
-        self._units = units
-
-        if with_units and isinstance(bond, float):
-            self._bond = Qty(bond, units)
-        else:
-            self._bond = bond
+        self._bond = bond
 
         self._verbose = verbose
 
-        self._cell = Vector2D(with_units=with_units, units=units)
+        self._cell = np.zeros(2)
 
         self._Nx = 0
         self._Ny = 0
@@ -195,7 +150,7 @@ class Graphene(object):
         self._layer_spacing = layer_spacing
         self._stacking_order = stacking_order
 
-        self._layer_shift = Vector3D(with_units=with_units, units=units)
+        self._layer_shift = np.zeros(3)
 
         if nlayers > 1 and stacking_order == 'AB':
             if edge == 'AC':
@@ -310,8 +265,7 @@ class Graphene(object):
 
     @classmethod
     def compute_layer_mass(cls, n=None, m=None, width=None, length=None,
-                           edge=None, element1=None, element2=None,
-                           with_units=False, units='grams', magnitude=True):
+                           edge=None, element1=None, element2=None):
         """Compute graphene layer mass in **grams**.
 
         Parameters
@@ -320,9 +274,6 @@ class Graphene(object):
         width, length : float, optional
         edge : {'AC', 'ZZ'}
         element1, element2 : str, optional
-        with_units : bool, optional
-        units : str, optional
-        magnitude : bool, optional
 
         Returns
         -------
