@@ -242,11 +242,6 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
         super(SWNTBundleGenerator, self).generate_structure_data()
         super(SWNTBundleGenerator, self).generate_bundle()
 
-        self._Natoms_per_bundle = \
-            self.compute_Natoms_per_bundle(n=self._n, m=self._m,
-                                           nz=self._nz,
-                                           Ntubes=self._Ntubes)
-
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
                   center_CM=True, **kwargs):
@@ -381,12 +376,6 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
         """Generate structure data."""
         super(MWNTBundleGenerator, self).generate_structure_data()
         super(MWNTBundleGenerator, self).generate_bundle()
-
-        self._Natoms_per_bundle = self._Ntubes * self._Natoms_per_tube
-
-        if self._verbose:
-            print('Ntubes: {}'.format(self._Ntubes))
-            print('Natoms_per_bundle: {}'.format(self._Natoms_per_bundle))
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
