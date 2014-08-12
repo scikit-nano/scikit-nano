@@ -26,7 +26,7 @@ import copy
 import numpy as np
 
 from ..core import Atom, Atoms, plural_word_check
-from ..structures import SWNT, UnrolledSWNT, MWNTMixin
+from ..structures import SWNT, UnrolledSWNT, MWNT
 from ._base import GeneratorMixin
 
 __all__ = ['SWNTGenerator', 'UnrolledSWNTGenerator', 'MWNTGenerator']
@@ -167,7 +167,7 @@ class SWNTGenerator(SWNT, GeneratorMixin):
         """Generate structure data."""
         self._structure_atoms = Atoms()
         for nz in xrange(int(np.ceil(self._nz))):
-            dr = np.array([0.0, 0.0, nz * self.T])
+            dr = np.array([0.0, 0.0, nz * self._T])
             for uc_atom in self._unit_cell:
                 nt_atom = Atom(uc_atom.symbol)
                 nt_atom.r = uc_atom.r + dr
@@ -411,7 +411,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
             deg2rad=deg2rad, center_CM=False, **kwargs)
 
 
-class MWNTGenerator(MWNTMixin, SWNTGenerator):
+class MWNTGenerator(MWNT, GeneratorMixin):
     u"""Class for generating single, multi-walled nanotubes.
 
     .. versionchanged:: 0.2.20
@@ -485,48 +485,30 @@ class MWNTGenerator(MWNTMixin, SWNTGenerator):
     .. image:: /images/5shell_mwnt_4040_outer_Ch_1cellx1cellx4.06cells-01.png
 
     """
-    def __init__(self, add_inner_shells=True, add_outer_shells=False,
-                 max_shells=None, max_shell_diameter=np.inf, min_shells=None,
-                 min_shell_diameter=0.0, new_shell_type=None,
-                 shell_spacing=3.4, autogen=True, **kwargs):
+    def __init__(self, autogen=True, **kwargs):
 
-        super(MWNTGenerator, self).__init__(autogen=False, **kwargs)
-
-        self._add_inner_shells = add_inner_shells
-        self._add_outer_shells = add_outer_shells
-        self._starting_shell_position = 'outer'
-
-        self._max_shells = max_shells
-        if max_shells is None:
-            self._max_shells = 10
-        self._max_shell_diameter = max_shell_diameter
-
-        self._min_shells = min_shells
-        if min_shells is None:
-            self._min_shells = 2
-        self._min_shell_diameter = min_shell_diameter
-
-        self._new_shell_type = new_shell_type
-        self._shell_spacing = shell_spacing
-
-        self._Nshells_per_tube = 1
-        self._Natoms_per_tube = 0
+        super(MWNTGenerator, self).__init__(**kwargs)
 
         if autogen:
-            super(MWNTGenerator, self).generate_unit_cell()
+            self.generate_unit_cell()
             self.generate_structure_data()
 
-    def _generate_unit_cell(self, n=int, m=int):
-        """Generate the unit cell of a MWNT shell"""
+    def generate_unit_cell(self, n=None, m=None):
+        """Generate the nanotube unit cell."""
         eps = 0.01
         bond = self._bond
         e1 = self._element1
         e2 = self._element2
+        verbose = self._verbose
+
+        if n is None or m is None:
+            n = self._n
+            m = self._m
 
         N = SWNT.compute_N(n=n, m=m)
+        T = SWNT.compute_T(n=n, m=m, bond=bond)
         aCh = SWNT.compute_chiral_angle(n=n, m=m, rad2deg=False)
         rt = SWNT.compute_rt(n=n, m=m, bond=bond)
-        T = SWNT.compute_T(n=n, m=m, bond=bond)
 
         tau = SWNT.compute_tau(n=n, m=m, bond=bond)
         dtau = bond * np.sin(np.pi / 6 - aCh)
@@ -534,7 +516,11 @@ class MWNTGenerator(MWNTMixin, SWNTGenerator):
         psi = SWNT.compute_psi(n=n, m=m)
         dpsi = bond * np.cos(np.pi / 6 - aCh) / rt
 
-        unit_cell = Atoms()
+        if verbose:
+            print('dpsi: {}'.format(dpsi))
+            print('dtau: {}\n'.format(dtau))
+
+        self._unit_cell = Atoms()
 
         for i in xrange(1, N + 1):
             x1 = rt * np.cos(i * psi)
@@ -547,7 +533,10 @@ class MWNTGenerator(MWNTMixin, SWNTGenerator):
             atom1 = Atom(e1, x=x1, y=y1, z=z1)
             atom1.rezero_coords()
 
-            unit_cell.append(atom1)
+            if verbose:
+                print('Basis Atom 1:\n{}'.format(atom1))
+
+            self._unit_cell.append(atom1)
 
             x2 = rt * np.cos(i * psi + dpsi)
             y2 = rt * np.sin(i * psi + dpsi)
@@ -558,9 +547,10 @@ class MWNTGenerator(MWNTMixin, SWNTGenerator):
             atom2 = Atom(e2, x=x2, y=y2, z=z2)
             atom2.rezero_coords()
 
-            unit_cell.append(atom2)
+            if verbose:
+                print('Basis Atom 2:\n{}'.format(atom2))
 
-        return unit_cell
+            self._unit_cell.append(atom2)
 
     def generate_structure_data(self):
         """Generate structure data.
@@ -583,7 +573,13 @@ class MWNTGenerator(MWNTMixin, SWNTGenerator):
         Ch = np.asarray(Ch)
         dt = np.asarray(dt)
 
-        super(MWNTGenerator, self).generate_structure_data()
+        self._structure_atoms = Atoms()
+        for nz in xrange(int(np.ceil(self._nz))):
+            dr = np.array([0.0, 0.0, nz * self._T])
+            for uc_atom in self._unit_cell:
+                nt_atom = Atom(uc_atom.symbol)
+                nt_atom.r = uc_atom.r + dr
+                self._structure_atoms.append(nt_atom)
 
         swnt0 = copy.deepcopy(self._structure_atoms)
         self._structure_atoms = Atoms(atoms=swnt0, deepcopy=True)
@@ -659,19 +655,19 @@ class MWNTGenerator(MWNTMixin, SWNTGenerator):
                 Lzmin = min(Lzmin, Lz)
 
                 # generate unit cell for new shell chiral indices
-                shell_unit_cell = self._generate_unit_cell(n=n, m=m)
+                self.generate_unit_cell(n=n, m=m)
 
                 if self._verbose:
                     print('new shell:\n'
                           'n, m = {}, {}\n'.format(n, m) +
                           'dt: {:.4f}\n'.format(next_dt) +
-                          'shell_unit_cell.Natoms: {}\n'.format(
-                              shell_unit_cell.Natoms))
+                          'shell unit cell Natoms: {}\n'.format(
+                              self._unit_cell.Natoms))
 
                 shell = Atoms()
                 for nz in xrange(int(np.ceil(self._nz))):
                     dr = np.array([0.0, 0.0, nz * T])
-                    for uc_atom in shell_unit_cell:
+                    for uc_atom in self._unit_cell:
                         atom = Atom(uc_atom.symbol)
                         atom.r = uc_atom.r + dr
                         shell.append(atom)
