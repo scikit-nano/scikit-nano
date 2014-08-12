@@ -98,14 +98,14 @@ class GeneratorMixin(object):
         #self._structure_format = structure_format
 
         if center_CM:
-            self.structure_atoms.center_CM()
+            self._structure_atoms.center_CM()
 
         if rotation_angle is not None:
             R_matrix = rotation_matrix(angle=rotation_angle,
                                        rot_axis=rot_axis,
                                        deg2rad=deg2rad)
-            self.structure_atoms.rotate(R_matrix)
+            self._structure_atoms.rotate(R_matrix)
 
         StructureIO.write(fname=fname, outpath=outpath,
-                          atoms=self.structure_atoms,
+                          atoms=self._structure_atoms,
                           structure_format=structure_format)
