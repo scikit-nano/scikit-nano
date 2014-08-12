@@ -1560,30 +1560,71 @@ class UnrolledSWNT(UnrolledSWNTMixin, SWNT):
             self.compute_Ly(n=self._n, m=self._m, ny=self._ny, bond=self._bond)
 
 
+class MWNTMixin(object):
+
+    @property
+    def max_shells(self):
+        return self._max_shells
+
+    @max_shells.setter
+    def max_shells(self, value):
+        self._max_shells = value
+
+    @property
+    def min_shells(self):
+        return self._min_shells
+
+    @min_shells.setter
+    def min_shells(self, value):
+        self._min_shells = value
+
+    @property
+    def Natoms_per_tube(self):
+        """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
+        return self._Natoms_per_tube
+
+    @property
+    def Nshells_per_tube(self):
+        """Number of shells in MWNT :math:`N_{\\mathrm{shells}}`."""
+        return self._Nshells_per_tube
+
+
+class MWNT(MWNTMixin, SWNT):
+
+    def __init__(self, add_inner_shells=True, add_outer_shells=False,
+                 max_shells=None, max_shell_diameter=np.inf,
+                 min_shells=None, min_shell_diameter=0.0,
+                 new_shell_type=None, shell_spacing=dVDW, **kwargs):
+
+        super(MWNT, self).__init__(**kwargs)
+
+        self._add_inner_shells = add_inner_shells
+        self._add_outer_shells = add_outer_shells
+        self._starting_shell_position = 'outer'
+
+        self._max_shells = max_shells
+        if max_shells is None:
+            self._max_shells = 10
+        self._max_shell_diameter = max_shell_diameter
+
+        self._min_shells = min_shells
+        if min_shells is None:
+            self._min_shells = 2
+        self._min_shell_diameter = min_shell_diameter
+
+        self._new_shell_type = new_shell_type
+        self._shell_spacing = shell_spacing
+
+        self._Nshells_per_tube = 1
+        self._Natoms_per_tube = 0
+
+        self.compute_tube_params()
+
+    def compute_tube_params(self):
+        super(MWNT, self).compute_tube_params()
+
+
 class NanotubeBundleMixin(object):
-
-    def __init__(self, nx=1, ny=1, Lx=None, Ly=None, vdw_spacing=dVDW,
-                 bundle_packing=None, bundle_geometry=None, **kwargs):
-
-        self._nx = int(nx)
-        self._ny = int(ny)
-        self._Lx = Lx
-        self._Ly = Ly
-
-        self._r1 = np.zeros(3)
-
-        self._r2 = np.zeros(3)
-
-        self._vdw_spacing = vdw_spacing
-        self._bundle_packing = bundle_packing
-        self._bundle_geometry = bundle_geometry
-
-        self._Natoms_per_bundle = None
-
-        self._bundle_mass = None
-        self._bundle_density = None
-
-        super(NanotubeBundleMixin, self).__init__(**kwargs)
 
     @property
     def nx(self):
@@ -1922,75 +1963,30 @@ class NanotubeBundleMixin(object):
         return int(nx * ny)
 
 
-class MWNTMixin(object):
-
-    @property
-    def max_shells(self):
-        return self._max_shells
-
-    @max_shells.setter
-    def max_shells(self, value):
-        self._max_shells = value
-
-    @property
-    def min_shells(self):
-        return self._min_shells
-
-    @min_shells.setter
-    def min_shells(self, value):
-        self._min_shells = value
-
-    @property
-    def Natoms_per_tube(self):
-        """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
-        return self._Natoms_per_tube
-
-    @property
-    def Nshells_per_tube(self):
-        """Number of shells in MWNT :math:`N_{\\mathrm{shells}}`."""
-        return self._Nshells_per_tube
-
-
-class MWNT(MWNTMixin, SWNT):
-
-    def __init__(self, add_inner_shells=True, add_outer_shells=False,
-                 max_shells=None, max_shell_diameter=np.inf,
-                 min_shells=None, min_shell_diameter=0.0,
-                 new_shell_type=None, shell_spacing=dVDW, **kwargs):
-
-        super(MWNT, self).__init__(**kwargs)
-
-        self._add_inner_shells = add_inner_shells
-        self._add_outer_shells = add_outer_shells
-        self._starting_shell_position = 'outer'
-
-        self._max_shells = max_shells
-        if max_shells is None:
-            self._max_shells = 10
-        self._max_shell_diameter = max_shell_diameter
-
-        self._min_shells = min_shells
-        if min_shells is None:
-            self._min_shells = 2
-        self._min_shell_diameter = min_shell_diameter
-
-        self._new_shell_type = new_shell_type
-        self._shell_spacing = shell_spacing
-
-        self._Nshells_per_tube = 1
-        self._Natoms_per_tube = 0
-
-        self.compute_tube_params()
-
-    def compute_tube_params(self):
-        super(MWNT, self).compute_tube_params()
-
-
 class SWNTBundle(NanotubeBundleMixin, SWNT):
 
-    def __init__(self, **kwargs):
+    def __init__(self, nx=1, ny=1, Lx=None, Ly=None, vdw_spacing=dVDW,
+                 bundle_packing=None, bundle_geometry=None, **kwargs):
 
         super(SWNTBundle, self).__init__(**kwargs)
+
+        self._nx = int(nx)
+        self._ny = int(ny)
+        self._Lx = Lx
+        self._Ly = Ly
+
+        self._r1 = np.zeros(3)
+
+        self._r2 = np.zeros(3)
+
+        self._vdw_spacing = vdw_spacing
+        self._bundle_packing = bundle_packing
+        self._bundle_geometry = bundle_geometry
+
+        self._Natoms_per_bundle = None
+
+        self._bundle_mass = None
+        self._bundle_density = None
 
         self.compute_bundle_params()
 
@@ -2000,8 +1996,28 @@ class SWNTBundle(NanotubeBundleMixin, SWNT):
 
 
 class MWNTBundle(NanotubeBundleMixin, MWNT):
-    def __init__(self, **kwargs):
+    def __init__(self, nx=1, ny=1, Lx=None, Ly=None, vdw_spacing=dVDW,
+                 bundle_packing=None, bundle_geometry=None, **kwargs):
+
         super(MWNTBundle, self).__init__(**kwargs)
+
+        self._nx = int(nx)
+        self._ny = int(ny)
+        self._Lx = Lx
+        self._Ly = Ly
+
+        self._r1 = np.zeros(3)
+
+        self._r2 = np.zeros(3)
+
+        self._vdw_spacing = vdw_spacing
+        self._bundle_packing = bundle_packing
+        self._bundle_geometry = bundle_geometry
+
+        self._Natoms_per_bundle = None
+
+        self._bundle_mass = None
+        self._bundle_density = None
 
         self.compute_bundle_params()
 
