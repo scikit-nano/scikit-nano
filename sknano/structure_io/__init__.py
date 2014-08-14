@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function
 
-from ..core import package_removed_warning
+from ..core import removed_package_warning
 
-package_removed_warning("sknano.structure_io", "sknano.io")
+removed_package_warning("sknano.structure_io", "sknano.io")
