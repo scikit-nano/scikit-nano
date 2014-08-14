@@ -88,5 +88,6 @@ from ._mathfuncs import *
 from ._npcoremath import *
 from ._strfuncs import *
 from ._transforms import *
+from ._warnings import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
