@@ -12,20 +12,30 @@ Contents
 """
 from __future__ import absolute_import, division, print_function
 
-__all__ = ['package_removed_warning']
+__all__ = ['removed_package_warning']
 
 
 import warnings
 
-def package_removed_warning(oldpkg, newpkg):
-    return warnings.warn(
-        "The {!r} package was removed or renamed in ".format(oldpkg) +
-        "version 0.3.\n"
-        "Most modules previously import from {!r},\n".format(oldpkg) +
-        "can now be found in the {!r} package.".format(newpkg) +
-        "Please check the documentation and review the module specific\n"
-        "ImportWarnings and update your code accordingly.\n"
-        "The fallback code and package ImportWarnings will be completely\n"
-        "removed in a future version.\n",
-        ImportWarning
-    )
+warnings.resetwarnings()
+
+
+def removed_package_warning(oldpkg, newpkg=None):
+    msg = '\n\n#TODO: CREATE CUSTOM TEMPLATE STRING FOR THIS WARNING MESSAGE.\n'
+    #msg = '\n\n{:<74.74}\n'.format('{:*^80}'.format(' NB '))
+    #    "As of version 0.3, the {!r} package was ".format(oldpkg)
+    #if newpkg is None:
+    #    msg += "removed.\n"
+    #else:
+    #    msg += "renamed.\n\n" + \
+    #        "Replace imports from: {!r}\n".format(oldpkg) + \
+    #        "with imports from: {!r}\n".format(newpkg)
+    #msg += "Also review the module specific Warnings issued by\n" + \
+    #    "module imports from a deprecated package location, as\n" + \
+    #    "in some cases the module code may have moved to a different\n" + \
+    #    "package entirely.\n\n"
+    #msg += "Please update your code accordingly as these warnings and\n" + \
+    #    "associated fallback code will likely be removed in a future version."
+    #msg += "\n{}\n".format(74 * '*')
+
+    warnings.warn(msg, ImportWarning)
