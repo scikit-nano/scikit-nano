@@ -135,7 +135,6 @@ class TestVector(unittest.TestCase):
         self.assertEqual(v.z, 1.0)
         self.assertTrue(np.allclose(v.p0, np.ones(3)))
 
-
     def test_changing_p0(self):
         v = Vector()
         v.p0 = np.ones(3)
