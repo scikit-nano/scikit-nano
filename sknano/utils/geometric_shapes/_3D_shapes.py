@@ -40,26 +40,24 @@ class Parallelepiped(Geometric3DRegion):
     ----------
     xmin, ymin, zmin : float
     xmax, ymax, zmax : float
-    pmin, pmax : sequence or :class:`~sknano.core.Point`, optional
+    pmin, pmax : sequence, optional
 
     """
     def __init__(self, xmin=None, ymin=None, zmin=None,
                  xmax=None, ymax=None, zmax=None, pmin=None, pmax=None):
 
         if pmin is None:
-            pmin = Point(x=xmin, y=ymin, z=zmin)
+            pmin = Point([xmin, ymin, zmin])
         elif isinstance(pmin, (tuple, list, np.ndarray)):
-            x, y, z = pmin
-            pmin = Point(x=x, y=y, z=z)
+            pmin = Point(pmin)
 
         self._pmin = pmin
         self._xmin, self._ymin, self._zmin = self._pmin
 
         if pmax is None:
-            pmax = Point(x=xmax, y=ymax, z=zmax)
+            pmax = Point([xmax, ymax, zmax])
         elif isinstance(pmax, (tuple, list, np.ndarray)):
-            x, y, z = pmax
-            pmax = Point(x=x, y=y, z=z)
+            pmax = Point(pmax)
 
         self._pmax = pmax
         self._xmax, self._ymax, self._zmax = self._pmax
@@ -125,15 +123,13 @@ class Cuboid(Geometric3DRegion):
     ----------
     xmin, ymin, zmin : float
     xmax, ymax, zmax : float
-    pmin, pmax : sequence or :class:`~sknano.core.Point`, optional
+    pmin, pmax : sequence, optional
 
     """
     def __init__(self, xmin=None, ymin=None, zmin=None,
                  xmax=None, ymax=None, zmax=None, pmin=None, pmax=None):
 
-        super(Cuboid, self).__init__(xmin=xmin, ymin=ymin, zmin=zmin,
-                                     xmax=xmax, ymax=ymax, zmax=zmax,
-                                     pmin=pmin, pmax=pmax)
+        pass
 
     def __repr__(self):
         return("Cuboid(xmin={!r}, ymin={!r}, zmin={!r}, "
@@ -177,51 +173,40 @@ class Cube(Geometric3DRegion):
 
     Parameters
     ----------
-    a : float, optional
-        length of edge
-    center : sequence or :class:`~sknano.core.Point`
+    center : sequence, optional
         Either a 3-tuple of floats or an instance of the
         :class:`~sknano.core.Point` class specifying the :math:`(x,y,z)`
         coordinates of the cube center.
+    a : float, optional
+        length of edge
 
     """
     def __init__(self, a=None, center=None):
 
-        if a is None:
-            raise TypeError('Please specify the edge length parameter `a`')
-
-        self._a = a
-
         if center is None:
             center = Point()
         elif isinstance(center, (tuple, list, np.ndarray)):
-            center = Point(x=center[0], y=center[1], z=center[2])
+            center = Point(center)
 
         self._center = center
 
+        if a is None:
+            a = 1.0
+
+        self._a = a
+
         h, k, l = self._center
-        super_kwargs = \
+
+        bounds = \
             {'xmin': h - a / 2, 'ymin': k - a / 2, 'zmin': l - a / 2,
              'xmax': h + a / 2, 'ymax': k + a / 2, 'zmax': l + a / 2}
 
-        super(Cube, self).__init__(**super_kwargs)
-
     def __repr__(self):
-        return("Cube(a={!r}, center={!r})".format(self.a, self.center))
+        return("Cube(center={!r}, a={!r})".format(self.center, self.a))
 
     @property
     def a(self):
         return self._a
-
-    @property
-    def b(self):
-        raise AttributeError("{!r} object has no attribute {!r}".format(
-            self.__class__.__name__, 'b'))
-
-    @property
-    def c(self):
-        raise AttributeError("{!r} object has no attribute {!r}".format(
-            self.__class__.__name__, 'c'))
 
     @property
     def center(self):
@@ -253,33 +238,36 @@ class Ellipsoid(Geometric3DRegion):
 
     Parameters
     ----------
-    a, b, c : float, optional
-        Semi-principal axes :math:`a, b, c` of axis-aligned
-        :class:`Ellipsoid`
     center : sequence or :class:`~sknano.core.Point`
         Either a 3-tuple of floats or an instance of the
         :class:`~sknano.core.Point` class specifying the :math:`(x,y,z)`
         coordinates of the :class:`Ellipsoid` center.
+    a, b, c : float, optional
+        Semi-principal axes :math:`a, b, c` of axis-aligned
+        :class:`Ellipsoid`
 
     """
-    def __init__(self, a=None, b=None, c=None, center=None):
+    def __init__(self, center=None, a=None, b=None, c=None):
 
-        if a is None or b is None or c is None:
-            raise TypeError("Parameters 'a', 'b', 'c' must be specified.")
+        if a is None:
+            a = 0.5
+        if b is None:
+            b = 0.5
+        if c is None:
+            c = 0.5
 
         self._a, self._b, self._c = a, b, c
 
         if center is None:
             center = Point()
         elif isinstance(center, (tuple, list, np.ndarray)):
-            h, k, l = center
-            center = Point(x=h, y=k, z=l)
+            center = Point(center)
 
         self._center = center
 
     def __repr__(self):
-        return("Ellipsoid(a={!r}, b={!r}, c={!r}, center={!r})".format(
-            self.a, self.b, self.c, self.center))
+        return("Ellipsoid(center={!r}, a={!r}, b={!r}, c={!r})".format(
+            self.center, self.a, self.b, self.c))
 
     @property
     def center(self):
@@ -331,33 +319,33 @@ class Spheroid(Geometric3DRegion):
 
     Parameters
     ----------
-    a, c : float, optional
-        Semi-axes :math:`a, c` of axis-aligned
-        :class:`Spheroid` with symmetry axis along :math:`z` axis.
-    center : sequence or :class:`~sknano.core.Point`
+    center : sequence, optional
         Either a 3-tuple of floats or an instance of the
         :class:`~sknano.core.Point` class specifying the :math:`(x,y,z)`
         coordinates of the :class:`Spheroid` center.
-
+    a, c : float, optional
+        Semi-axes :math:`a, c` of axis-aligned
+        :class:`Spheroid` with symmetry axis along :math:`z` axis.
     """
-    def __init__(self, a=None, c=None, center=None):
-
-        if a is None or c is None:
-            raise TypeError("Parameters 'a', 'c' must be specified.")
-
-        self._a, self._c = a, c
+    def __init__(self, center=None, a=None, c=None):
 
         if center is None:
             center = Point()
         elif isinstance(center, (tuple, list, np.ndarray)):
-            h, k, l = center
-            center = Point(x=h, y=k, z=l)
+            center = Point(center)
 
         self._center = center
 
+        if a is None:
+            a = 0.5
+        if c is None:
+            c = 0.5
+
+        self._a, self._c = a, c
+
     def __repr__(self):
-        return("Spheroid(a={!r}, c={!r}, center={!r})".format(
-            self.a, self.c, self.center))
+        return("Spheroid(center={!r}, a={!r}, c={!r})".format(
+            self.center, self.a, self.c))
 
     @property
     def center(self):
@@ -397,30 +385,29 @@ class Sphere(Geometric3DRegion):
 
     Parameters
     ----------
-    r : float, optional
-        Sphere radius :math:`r`
-    center : sequence or :class:`~sknano.core.Point`
+    center : sequence, optional
         Either a 3-tuple of floats or an instance of the
         :class:`~sknano.core.Point` class specifying the :math:`(x,y,z)`
         coordinates of the :class:`Sphere` center.
-
+    r : float, optional
+        Sphere radius :math:`r`
     """
-    def __init__(self, r=1.0, center=None):
-
-        if r is None:
-            raise TypeError('Please specify the sphere radius `r`')
-
-        self._r = r
+    def __init__(self, center=None, r=1.0):
 
         if center is None:
             center = Point()
         elif isinstance(center, (tuple, list, np.ndarray)):
-            center = Point(x=center[0], y=center[1], z=center[2])
+            center = Point(center)
 
         self._center = center
 
+        if r is None:
+            r = 1.0
+
+        self._r = r
+
     def __repr__(self):
-        return("Sphere(r={!r}, center={!r})".format(self.r, self.center))
+        return("Sphere(center={!r}, r={!r})".format(self.center, self.r))
 
     @property
     def r(self):
