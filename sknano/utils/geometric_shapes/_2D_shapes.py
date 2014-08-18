@@ -10,41 +10,62 @@
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 
+#import numbers
 import numpy as np
 
-from sknano.core import Point2D
+from sknano.core import Point, Vector
 
-__all__ = ['Circle', 'Ellipse', 'Polygon', 'Parallelogram', 'Rhombus',
-           'Rhomboid', 'Rectangle', 'Square']
+__all__ = ['Geometric2DRegion', 'Circle', 'Ellipse', 'Parallelogram',
+           'Rhombus', 'Rhomboid', 'Rectangle', 'Square']
 
 
-class Circle(object):
+class Geometric2DRegion(object):
+    """Abstract base class for representing 2D geometric regions."""
+    __metaclass__ = ABCMeta
+
+    @abstractproperty
+    def area(self):
+        """Area of 2D geometric region."""
+        raise NotImplementedError
+
+    @abstractproperty
+    def centroid(self):
+        """Centroid of 2D geometric region."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def contains_point(self):
+        """Check if point is contained within geometric region."""
+        raise NotImplementedError
+
+
+class Circle(Geometric2DRegion):
     """Abstract data structure representing a circle.
 
-    .. versionadded:: 0.2.26
+    .. versionadded:: 0.3.0
 
     Parameters
     ----------
-    r : float
-        Circle radius.
-    center : sequence or :class:`~sknano.core.Point2D`
+    center : sequence, optional
         Center of circle
+    r : float, optional
+        Circle radius.
 
     """
-    def __init__(self, r=1.0, center=None):
+    def __init__(self, center=None, r=1.0):
 
-        if center is None:
-            center = Point2D()
+        if center is None or not isinstance(center, (tuple, list, np.ndarray)):
+            center = Point(nd=2)
         elif isinstance(center, (tuple, list, np.ndarray)):
-            center = Point2D(x=center[0], y=center[1])
+            center = Point(center)
 
         self._r = r
         self._center = center
 
     def __repr__(self):
-        return("Circle(r={!r}, center={!r})".format(self.r, self.center))
+        return("Circle(center={!r}, r={!r})".format(self.center, self.r))
 
     @property
     def r(self):
@@ -64,17 +85,17 @@ class Circle(object):
 
         x, y = point
 
-        return((x - h)**2 + (y - k)**2 < r**2)
+        return (x - h)**2 + (y - k)**2 < r**2
 
 
-class Ellipse(object):
+class Ellipse(Geometric2DRegion):
     """Abstract data structure representing an ellipse.
 
-    .. versionadded:: 0.2.26
+    .. versionadded:: 0.3.0
 
     Parameters
     ----------
-    center : sequence or :class:`~sknano.core.Point2D`
+    center : sequence, optional
         Center of axis-aligned ellipse with semi-axes :math:`r_x, r_y`
     rx, ry : float
         Lengths of semi-axes :math:`r_x, r_y`
@@ -82,10 +103,10 @@ class Ellipse(object):
     """
     def __init__(self, center=None, rx=1, ry=1):
 
-        if center is None:
-            center = Point2D()
+        if center is None or not isinstance(center, (tuple, list, np.ndarray)):
+            center = Point(nd=2)
         elif isinstance(center, (tuple, list, np.ndarray)):
-            center = Point2D(x=center[0], y=center[1])
+            center = Point(center)
 
         self._center = center
         self._rx = rx
@@ -97,6 +118,14 @@ class Ellipse(object):
     def __repr__(self):
         return("Ellipse(center={!r}, rx={!r}, ry={!r})".format(
             self.center, self.rx, self.ry))
+
+    @property
+    def area(self):
+        pass
+
+    @property
+    def centroid(self):
+        pass
 
     @property
     def center(self):
@@ -126,48 +155,78 @@ class Ellipse(object):
 
         x, y = point
 
-        return((x - h)**2 / rx**2 + (y - k)**2 / ry**2 < 1.0)
+        return (x - h)**2 / rx**2 + (y - k)**2 / ry**2 < 1.0
 
 
-class Polygon(object):
+class Parallelogram(Geometric2DRegion):
+    """Abstract object representation of a parallelogram.
+
+    Represents a parallelogram with origin :math:`p` and directions
+    :math:`v_1` and :math:`v_2`.
+
+    Parameters
+    ----------
+    p : sequence, optional
+        parallelogram origin
+    v1, v2 : array_like, optional
+        parallelogram direction vectors stemming from origin `p`.
+
+    """
+    def __init__(self, p=None, v1=None, v2=None):
+
+        if p is None:
+            p = Point(nd=2)
+        elif isinstance(p, (tuple, list, np.ndarray)):
+            p = Point(p)
+
+        self._p = p
+
+        if v1 is None:
+            v1 = Vector(nd=2)
+
+
+class Rhombus(object):
     pass
 
 
-class Parallelogram(object):
-    """Abstract base class for defining common properties of geometric shapes
-    that are parallelograms or a subset of.
+class Rhomboid(object):
+    pass
 
-    .. versionadded:: 0.2.26
+
+class Rectangle(Geometric2DRegion):
+    """Abstract data structure representing a rectangle.
+
+    .. versionadded:: 0.3.0
 
     Parameters
     ----------
     xmin, ymin : float
     xmax, ymax : float
-    pmin, pmax : sequence or :class:`~sknano.core.Point2D`, optional
+    pmin, pmax : sequence, optional
 
     """
-    __metaclass__ = ABCMeta
-
     def __init__(self, xmin=None, ymin=None, xmax=None, ymax=None,
                  pmin=None, pmax=None):
 
         if pmin is None:
-            pmin = Point2D(x=xmin, y=ymin)
+            pmin = Point([xmin, ymin])
         elif isinstance(pmin, (tuple, list, np.ndarray)):
-            x, y = pmin
-            pmin = Point2D(x=x, y=y)
+            pmin = Point(pmin)
 
         self._pmin = pmin
         self._xmin, self._ymin = self._pmin
 
         if pmax is None:
-            pmax = Point2D(x=xmax, y=ymax)
+            pmax = Point([xmax, ymax])
         elif isinstance(pmax, (tuple, list, np.ndarray)):
-            x, y = pmax
-            pmax = Point2D(x=x, y=y)
+            pmax = Point(pmax)
 
         self._pmax = pmax
         self._xmax, self._ymax = self._pmax
+
+    def __repr__(self):
+        return("Rectangle(xmin={!r}, ymin={!r}, xmax={!r}, ymax={!r})".format(
+            self._xmin, self._ymin, self._xmax, self._ymax))
 
     @property
     def xmin(self):
@@ -197,45 +256,7 @@ class Parallelogram(object):
     def center(self):
         h = (self.xmax + self.xmin) / 2
         k = (self.ymax + self.ymin) / 2
-        return Point2D(x=h, y=k)
-
-    @abstractmethod
-    def contains_point(self):
-        """Check if point is contained within volume of parallelogram."""
-        return NotImplementedError('Subclasses of `Parallelogram` must '
-                                   'implement a `contains_point` method.')
-
-
-class Rhombus(object):
-    pass
-
-
-class Rhomboid(object):
-    pass
-
-
-class Rectangle(Parallelogram):
-    """Abstract data structure representing a rectangle.
-
-    .. versionadded:: 0.2.26
-
-    Parameters
-    ----------
-    xmin, ymin : float
-    xmax, ymax : float
-    pmin, pmax : sequence or :class:`~sknano.core.Point2D`, optional
-
-    """
-    def __init__(self, xmin=None, ymin=None, xmax=None, ymax=None,
-                 pmin=None, pmax=None):
-
-        super(Rectangle, self).__init__(xmin=xmin, ymin=ymin,
-                                        xmax=xmax, ymax=ymax,
-                                        pmin=pmin, pmax=pmax)
-
-    def __repr__(self):
-        return("Rectangle(xmin={!r}, ymin={!r}, xmax={!r}, ymax={!r})".format(
-            self._xmin, self._ymin, self._xmax, self._ymax))
+        return Point([h, k])
 
     @property
     def a(self):
@@ -245,59 +266,66 @@ class Rectangle(Parallelogram):
     def b(self):
         return self._ymax - self._ymin
 
+    @property
+    def area(self):
+        pass
+
+    @property
+    def centroid(self):
+        pass
+
     def contains_point(self, point=None):
         """Check if point is contained within volume of cuboid."""
         x, y = point
 
-        return((x > self._xmin) and (x < self._xmax) and
-               (y > self._ymin) and (y < self._ymax))
+        return (x > self._xmin) and (x < self._xmax) and \
+            (y > self._ymin) and (y < self._ymax)
 
 
-class Square(Rectangle):
+class Square(Geometric2DRegion):
     """Abstract data structure representing a square.
 
-    .. versionadded:: 0.2.26
+    .. versionadded:: 0.3.0
 
     Parameters
     ----------
     a : float, optional
         length of side
-    center : sequence or :class:`~sknano.core.Point2D`, optional
+    center : sequence, optional
 
     """
-    def __init__(self, a=None, center=None):
+    def __init__(self, center=None, a=None):
+
+        if center is None:
+            center = Point(nd=2)
+        elif isinstance(center, (tuple, list, np.ndarray)):
+            center = Point(center)
+
+        self._center = center
 
         if a is None:
             raise TypeError('Please specify the edge length parameter `a`')
 
         self._a = a
 
-        if center is None:
-            center = Point2D()
-        elif isinstance(center, (tuple, list, np.ndarray)):
-            h, k = center
-            center = Point2D(x=h, y=k)
-
-        self._center = center
-
-        h, k = self._center
-        super_kwargs = {'xmin': h - a / 2, 'ymin': k - a / 2,
-                        'xmax': h + a / 2, 'ymax': k + a / 2}
-
-        super(Square, self).__init__(**super_kwargs)
-
     def __repr__(self):
         return("Square(a={!r}, center={!r})".format(self.a, self.center))
+
+    @property
+    def center(self):
+        return self._center
 
     @property
     def a(self):
         return self._a
 
     @property
-    def b(self):
-        raise AttributeError("{!r} object has no attribute {!r}".format(
-            self.__class__.__name__, 'b'))
+    def area(self):
+        pass
 
     @property
-    def center(self):
-        return self._center
+    def centroid(self):
+        pass
+
+    def contains_point(self, point=None):
+        pass
