@@ -39,7 +39,4 @@ __all__ = ['apps',
            'structures',
            'utils']
 
-# Add deprecated packages with fallback code imports
-__all__ += ['analysis', 'chemistry', 'nanogen', 'structure_io', 'tools']
-
 from sknano.version import version as __version__
