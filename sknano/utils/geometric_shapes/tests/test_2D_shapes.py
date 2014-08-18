@@ -74,20 +74,9 @@ class TestRectangle(unittest.TestCase):
     def test_with_no_args(self):
         s = Rectangle()
         print('rectangle: {}'.format(s))
-        print('rectangle.center: {}'.format(e.center))
-        self.assertTrue(np.allclose(e.center, np.zeros(2)))
+        print('rectangle.center: {}'.format(s.center))
+        self.assertTrue(np.allclose(s.center, np.zeros(2)))
 
-    def test_with_list_of_zeros(self):
-        e = Ellipse([0, 0])
-        print('ellipse: {}'.format(e))
-        print('ellipse.center: {}'.format(e.center))
-        self.assertTrue(np.allclose(e.center, np.zeros(2)))
-
-    def test_with_tuple_of_zeros(self):
-        e = Ellipse((0, 0))
-        print('ellipse: {}'.format(e))
-        print('ellipse.center: {}'.format(e.center))
-        self.assertTrue(np.allclose(e.center, np.zeros(2)))
 
 if __name__ == '__main__':
     unittest.main()
