@@ -37,9 +37,12 @@ class Point(np.ndarray):
                 nd = 3
             coords = np.zeros(int(nd))
         else:
-            for i, coord in enumerate(coords[:]):
-                if coord is None:
-                    coords[i] = 0.0
+            try:
+                for i, coord in enumerate(coords[:]):
+                    if coord is None:
+                        coords[i] = 0.0
+            except TypeError:
+                coords = np.zeros(len(coords))
             nd = len(coords)
 
         if isinstance(coords, np.ndarray):
@@ -166,9 +169,12 @@ class Vector(np.ndarray):
                 nd = 3
             p = Point(nd=nd, dtype=dtype)
         else:
-            for i, coord in enumerate(p[:]):
-                if p is None:
-                    p[i] = 0.0
+            try:
+                for i, coord in enumerate(p[:]):
+                    if p is None:
+                        p[i] = 0.0
+            except TypeError:
+                p = np.zeros(len(p))
             nd = len(p)
 
         if isinstance(p, Vector):
