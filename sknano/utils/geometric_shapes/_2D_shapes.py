@@ -10,34 +10,25 @@
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta, abstractproperty
 
 #import numbers
 import numpy as np
 
 from sknano.core import Point, Vector
+from ._base import GeometricRegion
 
 __all__ = ['Geometric2DRegion', 'Circle', 'Ellipse', 'Parallelogram',
            'Rhombus', 'Rhomboid', 'Rectangle', 'Square']
 
 
-class Geometric2DRegion(object):
+class Geometric2DRegion(GeometricRegion):
     """Abstract base class for representing 2D geometric regions."""
     __metaclass__ = ABCMeta
 
     @abstractproperty
     def area(self):
         """Area of 2D geometric region."""
-        raise NotImplementedError
-
-    @abstractproperty
-    def centroid(self):
-        """Centroid of 2D geometric region."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def contains_point(self):
-        """Check if point is contained within geometric region."""
         raise NotImplementedError
 
 
@@ -78,6 +69,14 @@ class Circle(Geometric2DRegion):
     @property
     def center(self):
         return self._center
+
+    @property
+    def area(self):
+        pass
+
+    @property
+    def centroid(self):
+        pass
 
     def contains_point(self, point=None):
         h, k = self.center
@@ -120,14 +119,6 @@ class Ellipse(Geometric2DRegion):
             self.center, self.rx, self.ry))
 
     @property
-    def area(self):
-        pass
-
-    @property
-    def centroid(self):
-        pass
-
-    @property
     def center(self):
         return self._center
 
@@ -148,6 +139,14 @@ class Ellipse(Geometric2DRegion):
     def b(self):
         """Semi-minor axis length"""
         return self._b
+
+    @property
+    def area(self):
+        pass
+
+    @property
+    def centroid(self):
+        pass
 
     def contains_point(self, point=None):
         h, k = self.center

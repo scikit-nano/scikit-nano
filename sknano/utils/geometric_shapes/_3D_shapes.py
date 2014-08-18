@@ -10,21 +10,31 @@
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractproperty
 
 import numpy as np
 
 from sknano.core import Point
+from ._base import GeometricRegion
 
-__all__ = ['Cube', 'Cuboid', 'Ellipsoid', 'Spheroid', 'Sphere',
-           'Polyhedron', 'Hexahedron', 'Parallelepiped', 'Rhombohedron']
+__all__ = ['Geometric3DRegion', 'Cube', 'Cuboid', 'Ellipsoid', 'Spheroid',
+           'Sphere', 'Parallelepiped']
 
 
-class Parallelepiped(object):
-    """Abstract base class for defining common properties of
-    geometric shapes with 6 parallel sides.
+class Geometric3DRegion(GeometricRegion):
+    """Abstract base class for representing 3D geometric regions."""
+    __metaclass__ = ABCMeta
 
-    .. versionadded:: 0.2.26
+    @abstractproperty
+    def volume(self):
+        """Volume of 3D geometric region."""
+        raise NotImplementedError
+
+
+class Parallelepiped(Geometric3DRegion):
+    """Abstract representation of parallelepiped.
+
+    .. versionadded:: 0.3.0
 
     Parameters
     ----------
@@ -33,8 +43,6 @@ class Parallelepiped(object):
     pmin, pmax : sequence or :class:`~sknano.core.Point`, optional
 
     """
-    __metaclass__ = ABCMeta
-
     def __init__(self, xmin=None, ymin=None, zmin=None,
                  xmax=None, ymax=None, zmax=None, pmin=None, pmax=None):
 
@@ -95,17 +103,23 @@ class Parallelepiped(object):
         l = (self.zmax + self.zmin) / 2
         return Point(x=h, y=k, z=l)
 
-    @abstractmethod
+    @property
+    def centroid(self):
+        pass
+
+    @property
+    def volume(self):
+        pass
+
     def contains_point(self):
         """Check if point is contained within volume of parallelpiped."""
-        return NotImplementedError('Subclasses of `Parallelepiped` must '
-                                   'implement a `contains_point` method.')
+        pass
 
 
-class Cuboid(Parallelepiped):
+class Cuboid(Geometric3DRegion):
     """Abstract data structure representing a cuboid.
 
-    .. versionadded:: 0.2.26
+    .. versionadded:: 0.3.0
 
     Parameters
     ----------
@@ -139,6 +153,14 @@ class Cuboid(Parallelepiped):
     def c(self):
         return self._zmax - self._zmin
 
+    @property
+    def centroid(self):
+        pass
+
+    @property
+    def volume(self):
+        pass
+
     def contains_point(self, point=None):
         """Check if point is contained within volume of cuboid."""
         x, y, z = point
@@ -148,10 +170,10 @@ class Cuboid(Parallelepiped):
                (z > self._zmin) and (z < self._zmax))
 
 
-class Cube(Cuboid):
+class Cube(Geometric3DRegion):
     """Abstract data structure representing a cube.
 
-    .. versionadded:: 0.2.26
+    .. versionadded:: 0.3.0
 
     Parameters
     ----------
@@ -205,11 +227,22 @@ class Cube(Cuboid):
     def center(self):
         return self._center
 
+    @property
+    def centroid(self):
+        pass
 
-class Ellipsoid(object):
+    @property
+    def volume(self):
+        pass
+
+    def contains_point(self, point=None):
+        pass
+
+
+class Ellipsoid(Geometric3DRegion):
     """Abstract data structure representing an ellipsoid.
 
-    .. versionadded:: 0.2.26
+    .. versionadded:: 0.3.0
 
     The general ellipsoid is a quadratic surface with is given in
     Cartesian coordinates by:
@@ -264,6 +297,14 @@ class Ellipsoid(object):
     def c(self):
         return self._c
 
+    @property
+    def centroid(self):
+        pass
+
+    @property
+    def volume(self):
+        pass
+
     def contains_point(self, point=None):
         """Check if point is contained within volume of :class:`Ellipsoid`."""
         x, y, z = point
@@ -276,10 +317,10 @@ class Ellipsoid(object):
                (z - l)**2 / c**2 < 1.0)
 
 
-class Spheroid(object):
+class Spheroid(Geometric3DRegion):
     """Abstract data structure representing a spheroid.
 
-    .. versionadded:: 0.2.26
+    .. versionadded:: 0.3.0
 
     The general spheroid is a quadratic surface with is given in
     Cartesian coordinates by:
@@ -330,6 +371,14 @@ class Spheroid(object):
     def c(self):
         return self._c
 
+    @property
+    def centroid(self):
+        pass
+
+    @property
+    def volume(self):
+        pass
+
     def contains_point(self, point=None):
         """Check if point is contained within volume of :class:`Ellipsoid`."""
         x, y, z = point
@@ -341,10 +390,10 @@ class Spheroid(object):
                (z - l)**2 / c**2 < 1.0)
 
 
-class Sphere(object):
+class Sphere(Geometric3DRegion):
     """Abstract data structure representing a sphere.
 
-    .. versionadded:: 0.2.26
+    .. versionadded:: 0.3.0
 
     Parameters
     ----------
@@ -381,6 +430,14 @@ class Sphere(object):
     def center(self):
         return self._center
 
+    @property
+    def centroid(self):
+        pass
+
+    @property
+    def volume(self):
+        pass
+
     def contains_point(self, point=None):
         x, y, z = point
 
@@ -388,15 +445,3 @@ class Sphere(object):
         r = self.r
 
         return((x - h)**2 + (y - k)**2 + (z - l)**2 < r**2)
-
-
-class Polyhedron(object):
-    pass
-
-
-class Hexahedron(object):
-    pass
-
-
-class Rhombohedron(object):
-    pass
