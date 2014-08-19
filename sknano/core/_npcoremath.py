@@ -172,7 +172,7 @@ class Vector(np.ndarray):
        add new methods for coordinate transformations
 
     """
-    __array_priority__ = 15.0
+    __array_priority__ = 10.0
 
     def __new__(cls, v=None, nd=None, p=None, p0=None, dtype=None, copy=True):
 
