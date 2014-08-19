@@ -67,7 +67,7 @@ class TestPoint(unittest.TestCase):
 class TestVector(unittest.TestCase):
     def test_vector_with_no_args(self):
         v = Vector()
-        print('vector: {}'.format(v))
+        print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
         print('vector.z: {}'.format(v.z))
@@ -82,7 +82,7 @@ class TestVector(unittest.TestCase):
 
     def test_vector_with_list_of_ones(self):
         v = Vector([1, 1, 1])
-        print('vector: {}'.format(v))
+        print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
         print('vector.z: {}'.format(v.z))
@@ -97,7 +97,7 @@ class TestVector(unittest.TestCase):
 
     def test_vector_with_p_set(self):
         v = Vector(p=[1, 1, 1])
-        print('vector: {}'.format(v))
+        print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
         print('vector.z: {}'.format(v.z))
@@ -112,7 +112,7 @@ class TestVector(unittest.TestCase):
 
     def test_vector_with_p0_set(self):
         v = Vector(p0=[1, 1, 1])
-        print('vector: {}'.format(v))
+        print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
         print('vector.z: {}'.format(v.z))
@@ -127,7 +127,7 @@ class TestVector(unittest.TestCase):
 
     def test_vector_with_p_and_p0_set(self):
         v = Vector(p=[1, 1, 1], p0=[1, 1, 1])
-        print('vector: {}'.format(v))
+        print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
         print('vector.z: {}'.format(v.z))
@@ -142,7 +142,7 @@ class TestVector(unittest.TestCase):
 
     def test_changing_p0(self):
         v = Vector()
-        print('vector: {}'.format(v))
+        print('vector: {}\n'.format(v))
         v.p0 = np.ones(3)
         print('vector: {}'.format(v))
         print('vector.x: {}'.format(v.x))
@@ -157,9 +157,9 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v.p0, np.ones(3)))
         self.assertTrue(np.allclose(v.p, np.zeros(3)))
 
-    def test_changing_p_and_p0_on_vector_with_p_and_p0_set(self):
-        v = Vector(p=[1, 1, 1], p0=[1, 1, 1])
-        print('vector: {}'.format(v))
+    def test_property_changes(self):
+        v = Vector(p=[1., 1., 1.], p0=[1., 1., 1.])
+        print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
         print('vector.z: {}'.format(v.z))
@@ -171,19 +171,56 @@ class TestVector(unittest.TestCase):
         self.assertEqual(v.z, 0.0)
         self.assertTrue(np.allclose(v.p0, np.ones(3)))
         self.assertTrue(np.allclose(v.p, np.ones(3)))
+        print('changing v.p0')
         v.p0 = np.zeros(3)
         print('vector: {}'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
         print('vector.z: {}'.format(v.z))
         print('vector.p0: {}'.format(v.p0))
-        print('vector.p: {}\n'.format(v.p))
+        print('vector.p: {}'.format(v.p))
         self.assertTrue(np.allclose(v, np.ones(3)))
         self.assertEqual(v.x, 1.0)
         self.assertEqual(v.y, 1.0)
         self.assertEqual(v.z, 1.0)
         self.assertTrue(np.allclose(v.p0, np.zeros(3)))
         self.assertTrue(np.allclose(v.p, np.ones(3)))
+        print('changing v.x')
+        v.x = 5.0
+        print('changing v.y')
+        v.y = -5.0
+        print('changing v.z')
+        v.z = 0.0
+        self.assertEqual(v.x, 5.0)
+        self.assertEqual(v.y, -5.0)
+        self.assertEqual(v.z, 0.0)
+        print('vector: {}'.format(v))
+        print('vector.x: {}'.format(v.x))
+        print('vector.y: {}'.format(v.y))
+        print('vector.z: {}'.format(v.z))
+        print('vector.p0: {}'.format(v.p0))
+        print('vector.p: {}'.format(v.p))
+        print('vector.p.x: {}'.format(v.p.x))
+        print('vector.p.y: {}'.format(v.p.y))
+        print('vector.p.z: {}\n'.format(v.p.z))
+        self.assertEqual(v.x, v.p.x)
+        self.assertEqual(v.y, v.p.y)
+        self.assertEqual(v.z, v.p.z)
+        print('changing v.p0')
+        v.p0 = np.array([0.5,-10,2.5])
+        print('vector.p: {}'.format(v.p))
+        print('vector.p0: {}'.format(v.p0))
+        print('vector v=p-p0: {}'.format(v))
+        print('vector.p.x: {}'.format(v.p.x))
+        print('vector.p.y: {}'.format(v.p.y))
+        print('vector.p.z: {}'.format(v.p.z))
+        print('vector.p0.x: {}'.format(v.p0.x))
+        print('vector.p0.y: {}'.format(v.p0.y))
+        print('vector.p0.z: {}'.format(v.p0.z))
+        print('vector.x: {}'.format(v.x))
+        print('vector.y: {}'.format(v.y))
+        print('vector.z: {}'.format(v.z))
+        print()
 
 
 if __name__ == '__main__':
