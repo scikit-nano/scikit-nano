@@ -48,19 +48,24 @@ class Point(np.ndarray):
             else:
                 return pt
 
+        dtype = np.dtype(dtype)
+
         if isinstance(p, (tuple, list, np.ndarray)):
-            p = np.asarray(p)
             try:
                 for i, coord in enumerate(p[:]):
                     if coord is None:
                         p[i] = 0.0
             except TypeError:
-                p = np.zeros(len(p))
+                p = np.zeros(len(p), dtype=dtype)
+            else:
+                p = np.asarray(p, dtype=dtype)
             nd = len(p)
         else:
             if nd is None or not isinstance(nd, numbers.Number):
                 nd = 3
-            p = np.zeros(int(nd))
+            else:
+                nd = int(nd)
+            p = np.zeros(nd, dtype=dtype)
 
         arr = np.array(p, dtype=dtype, copy=copy).view(cls)
         pt = super(Point, cls).__new__(cls, arr.shape, arr.dtype,
