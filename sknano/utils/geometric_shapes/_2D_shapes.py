@@ -51,9 +51,11 @@ class Circle(Geometric2DRegion):
             center = Point(nd=2)
         elif isinstance(center, (tuple, list, np.ndarray)):
             center = Point(center)
-
-        self._r = r
         self._center = center
+
+        if r is None:
+            r = 1.0
+        self._r = r
 
     def __repr__(self):
         return("Circle(center={!r}, r={!r})".format(self.center, self.r))
@@ -84,7 +86,7 @@ class Circle(Geometric2DRegion):
 
         x, y = point
 
-        return (x - h)**2 + (y - k)**2 < r**2
+        return (x - h)**2 + (y - k)**2 <= r**2
 
 
 class Ellipse(Geometric2DRegion):
@@ -157,7 +159,7 @@ class Ellipse(Geometric2DRegion):
 
         x, y = point
 
-        return (x - h)**2 / rx**2 + (y - k)**2 / ry**2 < 1.0
+        return (x - h)**2 / rx**2 + (y - k)**2 / ry**2 <= 1.0
 
 
 class Parallelogram(Geometric2DRegion):
@@ -180,11 +182,11 @@ class Parallelogram(Geometric2DRegion):
             p = Point(nd=2)
         elif isinstance(p, (tuple, list, np.ndarray)):
             p = Point(p)
-
         self._p = p
 
-        if v1 is None:
-            v1 = Vector(nd=2)
+        if v1 is None or v2 is None:
+            v1 = Vector([1., 0.])
+            v2 = Vector([1., 1.])
 
 
 class Rhombus(object):
@@ -280,8 +282,8 @@ class Rectangle(Geometric2DRegion):
         """Check if point is contained within volume of cuboid."""
         x, y = point
 
-        return (x > self._xmin) and (x < self._xmax) and \
-            (y > self._ymin) and (y < self._ymax)
+        return (x >= self._xmin) and (x <= self._xmax) and \
+            (y >= self._ymin) and (y <= self._ymax)
 
 
 class Square(Geometric2DRegion):
@@ -291,9 +293,9 @@ class Square(Geometric2DRegion):
 
     Parameters
     ----------
+    center : sequence, optional
     a : float, optional
         length of side
-    center : sequence, optional
 
     """
     def __init__(self, center=None, a=None):
@@ -302,16 +304,14 @@ class Square(Geometric2DRegion):
             center = Point(nd=2)
         elif isinstance(center, (tuple, list, np.ndarray)):
             center = Point(center)
-
         self._center = center
 
         if a is None:
-            raise TypeError('Please specify the edge length parameter `a`')
-
+            a = 1.0
         self._a = a
 
     def __repr__(self):
-        return("Square(a={!r}, center={!r})".format(self.a, self.center))
+        return("Square(center={!r}, a={!r})".format(self.center, self.a))
 
     @property
     def center(self):
