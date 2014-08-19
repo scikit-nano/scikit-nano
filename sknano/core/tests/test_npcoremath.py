@@ -222,6 +222,18 @@ class TestVector(unittest.TestCase):
         print('vector.z: {}'.format(v.z))
         print()
 
+    def test_mathops(self):
+        v1 = Vector([1.0, 0.0])
+        v2 = Vector([1.0, 1.0])
+        print('v1: {}'.format(v1))
+        print('v2: {}'.format(v2))
+        v3 = v1 + v2
+        print('v3: {}'.format(v3))
+        self.assertIsInstance(v3, Vector)
+        c = np.dot(v1, v2)
+        print('c = np.dot(v1, v2): {}'.format(c))
+        self.assertEqual(c, 1.0)
+
 
 if __name__ == '__main__':
     unittest.main()
