@@ -17,8 +17,6 @@ __all__ = ['Point', 'Vector']
 
 
 class Point(np.ndarray):
-    __array_priority__ = 10.0
-
     """Abstract object representation of a point in :math:`R^n`
 
     Parameters
@@ -31,6 +29,8 @@ class Point(np.ndarray):
     copy : bool, optional
 
     """
+    __array_priority__ = 10.0
+
     def __new__(cls, p=None, nd=None, dtype=None, copy=True):
 
         if isinstance(p, Point):
@@ -84,7 +84,6 @@ class Point(np.ndarray):
         if pt is None:
             return None
 
-        #self.nd = getattr(pt, 'nd', None)
         self.nd = len(pt)
 
         if self.nd == 2:
@@ -94,7 +93,6 @@ class Point(np.ndarray):
 
     def __repr__(self):
         return np.array(self).__repr__()
-        #return super(Point, self).__repr__()
 
     def __getattr__(self, name):
         try:
@@ -230,9 +228,6 @@ class Vector(np.ndarray):
         return vec
 
     def __array_finalize__(self, vec):
-        #print('In __array_finalize__\n' +
-        #      'type(self): {}\n'.format(type(self)))
-
         if vec is None:
             return None
 
@@ -250,9 +245,6 @@ class Vector(np.ndarray):
 
         self._p = getattr(vec, 'p', None)
         self._p0 = getattr(vec, 'p0', None)
-
-        #print('self._p: {}'.format(self._p))
-        #print('self._p0: {}'.format(self._p0))
 
     def __repr__(self):
         return np.array(self).__repr__()
@@ -277,12 +269,6 @@ class Vector(np.ndarray):
         return super(Vector, self).__getattribute__(name)
 
     def __setattr__(self, name, value):
-        #print('In __setattr__\n' +
-        #      'type(self): {}\n'.format(type(self)) +
-        #      'self: {}\n'.format(self) +
-        #      'name: {}\n'.format(name) +
-        #      'value: {}\n'.format(value))
-        #p0 = self._p0
         #nd = len(self)
         nd = getattr(self, 'nd', None)
         if nd is not None and nd == 2 and name in ('x', 'y'):
@@ -322,23 +308,23 @@ class Vector(np.ndarray):
 
     @property
     def p(self):
-        """Terminating :class:`Point` class of vector."""
+        """Terminating :class:`Point` of vector."""
         return self._p
 
     @p.setter
     def p(self, value=np.ndarray):
-        """Terminating :class:`Point` class of vector."""
+        """Set new terminating :class:`Point` of vector."""
         self._p[:] = value
         self[:] = self._p - self._p0
 
     @property
     def p0(self):
-        """Origin :class:`Point` class of vector."""
+        """Origin :class:`Point` of vector."""
         return self._p0
 
     @p0.setter
     def p0(self, value=np.ndarray):
-        """Set origin :class:`Point` class of vector."""
+        """Set new origin :class:`Point` of vector."""
         self._p0[:] = value
         self[:] = self._p - self._p0
 
