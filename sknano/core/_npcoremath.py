@@ -97,30 +97,33 @@ class Point(np.ndarray):
         #return super(Point, self).__repr__()
 
     def __getattr__(self, name):
-        nd = len(self)
-        if nd == 2 and name in ('x', 'y'):
-            if name == 'x':
-                return self[0]
-            else:
-                return self[1]
-        elif nd == 3 and name in ('x', 'y', 'z'):
-            if name == 'x':
-                return self[0]
-            elif name == 'y':
-                return self[1]
-            else:
-                return self[2]
-        else:
-            return super(Point, self).__getattribute__(name)
+        try:
+            nd = len(self)
+            if nd == 2 and name in ('x', 'y'):
+                if name == 'x':
+                    return self[0]
+                else:
+                    return self[1]
+            elif nd == 3 and name in ('x', 'y', 'z'):
+                if name == 'x':
+                    return self[0]
+                elif name == 'y':
+                    return self[1]
+                else:
+                    return self[2]
+        except TypeError:
+            pass
+        return super(Point, self).__getattribute__(name)
 
     def __setattr__(self, name, value):
-        nd = len(self)
-        if nd == 2 and name in ('x', 'y'):
+        #nd = len(self)
+        nd = getattr(self, 'nd', None)
+        if nd is not None and nd == 2 and name in ('x', 'y'):
             if name == 'x':
                 self[0] = value
             else:
                 self[1] = value
-        elif nd == 3 and name in ('x', 'y', 'z'):
+        elif nd is not None and nd == 3 and name in ('x', 'y', 'z'):
             if name == 'x':
                 self[0] = value
             elif name == 'y':
@@ -255,31 +258,34 @@ class Vector(np.ndarray):
         return np.array(self).__repr__()
 
     def __getattr__(self, name):
-        nd = len(self)
-        if nd == 2 and name in ('x', 'y'):
-            if name == 'x':
-                return self[0]
-            else:
-                return self[1]
-        elif nd == 3 and name in ('x', 'y', 'z'):
-            if name == 'x':
-                return self[0]
-            elif name == 'y':
-                return self[1]
-            else:
-                return self[2]
-        else:
-            return super(Vector, self).__getattribute__(name)
+        try:
+            nd = len(self)
+            if nd == 2 and name in ('x', 'y'):
+                if name == 'x':
+                    return self[0]
+                else:
+                    return self[1]
+            elif nd == 3 and name in ('x', 'y', 'z'):
+                if name == 'x':
+                    return self[0]
+                elif name == 'y':
+                    return self[1]
+                else:
+                    return self[2]
+        except TypeError:
+            pass
+        return super(Vector, self).__getattribute__(name)
 
     def __setattr__(self, name, value):
-        nd = len(self)
         #print('In __setattr__\n' +
         #      'type(self): {}\n'.format(type(self)) +
         #      'self: {}\n'.format(self) +
         #      'name: {}\n'.format(name) +
         #      'value: {}\n'.format(value))
         #p0 = self._p0
-        if nd == 2 and name in ('x', 'y'):
+        #nd = len(self)
+        nd = getattr(self, 'nd', None)
+        if nd is not None and nd == 2 and name in ('x', 'y'):
             if name == 'x':
                 self[0] = value
                 try:
@@ -292,7 +298,7 @@ class Vector(np.ndarray):
                     self._p.y = self._p0.y + value
                 except AttributeError:
                     pass
-        elif nd == 3 and name in ('x', 'y', 'z'):
+        elif nd is not None and nd == 3 and name in ('x', 'y', 'z'):
             if name == 'x':
                 self[0] = value
                 try:
