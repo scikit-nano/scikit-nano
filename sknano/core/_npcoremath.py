@@ -23,7 +23,7 @@ class Point(np.ndarray):
 
     Parameters
     ----------
-    coords : array_like, optional
+    p : array_like, optional
         :math:`x, y` coordinates of point in :math:`R^2` space.
         :math:`x, y, z` coordinates of point in :math:`R^3` space.
     nd : {None, int}, optional
@@ -31,28 +31,16 @@ class Point(np.ndarray):
     copy : bool, optional
 
     """
-    def __new__(cls, coords=None, nd=None, dtype=None, copy=True):
-        if coords is None:
-            if nd is None or not isinstance(nd, numbers.Number):
-                nd = 3
-            coords = np.zeros(int(nd))
-        else:
-            try:
-                for i, coord in enumerate(coords[:]):
-                    if coord is None:
-                        coords[i] = 0.0
-            except TypeError:
-                coords = np.zeros(len(coords))
-            nd = len(coords)
+    def __new__(cls, p=None, nd=None, dtype=None, copy=True):
 
-        if isinstance(coords, np.ndarray):
+        if isinstance(p, Point):
             if dtype is None:
-                intype = coords.dtype
+                intype = p.dtype
             else:
                 intype = np.dtype(dtype)
 
-            pt = coords.view(cls)
-            if intype != coords.dtype:
+            pt = p.view(cls)
+            if intype != p.dtype:
                 return pt.astype(intype)
 
             if copy:
@@ -60,7 +48,21 @@ class Point(np.ndarray):
             else:
                 return pt
 
-        arr = np.array(coords, dtype=dtype, copy=copy).view(cls)
+        if isinstance(p, (tuple, list, np.ndarray)):
+            p = np.asarray(p)
+            try:
+                for i, coord in enumerate(p[:]):
+                    if coord is None:
+                        p[i] = 0.0
+            except TypeError:
+                p = np.zeros(len(p))
+            nd = len(p)
+        else:
+            if nd is None or not isinstance(nd, numbers.Number):
+                nd = 3
+            p = np.zeros(int(nd))
+
+        arr = np.array(p, dtype=dtype, copy=copy).view(cls)
         pt = super(Point, cls).__new__(cls, arr.shape, arr.dtype,
                                        buffer=arr)
 
@@ -191,18 +193,12 @@ class Vector(np.ndarray):
                 p0 = Point(p0, nd=nd, dtype=dtype)
             p = p0 + v
         else:
+            if nd is None or not isinstance(nd, numbers.Number):
+                nd = 3
             if p is None:
-                if nd is None or not isinstance(nd, numbers.Number):
-                    nd = 3
                 p = Point(nd=nd, dtype=dtype)
             else:
-                try:
-                    for i, coord in enumerate(p[:]):
-                        if p is None:
-                            p[i] = 0.0
-                except TypeError:
-                    p = np.zeros(len(p))
-                nd = len(p)
+                p = Point(p, nd=nd, dtype=dtype)
 
             if p0 is None:
                 p0 = Point(nd=nd, dtype=dtype)
@@ -232,19 +228,23 @@ class Vector(np.ndarray):
         if vec is None:
             return None
 
-        print('In __array_finalize__\n' +
-              'type(self): {}\n'.format(type(self)) +
-              'type(vec): {}\n'.format(type(vec)))
+        #print('In __array_finalize__\n' +
+        #      'type(self): {}\n'.format(type(self)) +
+        #      'type(vec): {}\n'.format(type(vec)) +
+        #      'vec: {}\n'.format(vec))
 
         self.nd = len(vec)
-
-        self._p = getattr(vec, 'p', None)
-        self._p0 = getattr(vec, 'p0', None)
 
         if self.nd == 2:
             self.x, self.y = vec
         elif self.nd == 3:
             self.x, self.y, self.z = vec
+
+        self._p = getattr(vec, 'p', None)
+        self._p0 = getattr(vec, 'p0', None)
+
+        #print('self._p: {}'.format(self._p))
+        #print('self._p0: {}'.format(self._p0))
 
     def __repr__(self):
         return np.array(self).__repr__()
@@ -268,18 +268,44 @@ class Vector(np.ndarray):
 
     def __setattr__(self, name, value):
         nd = len(self)
+        #print('In __setattr__\n' +
+        #      'type(self): {}\n'.format(type(self)) +
+        #      'self: {}\n'.format(self) +
+        #      'name: {}\n'.format(name) +
+        #      'value: {}\n'.format(value))
+        #p0 = self._p0
         if nd == 2 and name in ('x', 'y'):
             if name == 'x':
                 self[0] = value
+                try:
+                    self._p.x = self._p0.x + value
+                except AttributeError:
+                    pass
             else:
                 self[1] = value
+                try:
+                    self._p.y = self._p0.y + value
+                except AttributeError:
+                    pass
         elif nd == 3 and name in ('x', 'y', 'z'):
             if name == 'x':
                 self[0] = value
+                try:
+                    self._p.x = self._p0.x + value
+                except AttributeError:
+                    pass
             elif name == 'y':
                 self[1] = value
+                try:
+                    self._p.y = self._p0.y + value
+                except AttributeError:
+                    pass
             else:
                 self[2] = value
+                try:
+                    self._p.z = self._p0.z + value
+                except AttributeError:
+                    pass
         else:
             super(Vector, self).__setattr__(name, value)
 
