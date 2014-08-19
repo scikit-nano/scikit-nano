@@ -111,8 +111,11 @@ class Ellipse(Geometric2DRegion):
         self._rx = rx
         self._ry = ry
 
-        self._a = rx if rx >= ry else ry
-        self._b = ry if rx >= ry else rx
+        self._a = rx
+        self._b = ry
+        if rx < ry:
+            self._a = ry
+            self._b = rx
 
     def __repr__(self):
         return("Ellipse(center={!r}, rx={!r}, ry={!r})".format(
