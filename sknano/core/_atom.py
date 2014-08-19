@@ -17,7 +17,7 @@ import numpy as np
 from .refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols
 from ._luts import xyz
-from ._npcoremath import Point
+from ._npcoremath import Point, Vector
 
 __all__ = ['Atom']
 
@@ -38,7 +38,7 @@ class Atom(object):
     def __init__(self, element=None, m=None, x=None, y=None, z=None):
 
         self._r = Point(np.array([x, y, z]))
-        #self._dr = Vector(np.zeros(3))
+        self._dr = Vector(np.zeros(3))
 
         self._m = None
         self._symbol = None
