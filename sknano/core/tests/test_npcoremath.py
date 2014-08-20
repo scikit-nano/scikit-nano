@@ -66,7 +66,7 @@ class TestPoint(unittest.TestCase):
 
 class TestVector(unittest.TestCase):
     def test_vector_with_no_args(self):
-        v = Vector()
+        v = Vector(verbose=True)
         print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
@@ -81,7 +81,7 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v.p, np.zeros(3)))
 
     def test_vector_with_list_of_ones(self):
-        v = Vector([1, 1, 1])
+        v = Vector([1, 1, 1], verbose=True)
         print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
@@ -96,7 +96,7 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v.p, v))
 
     def test_vector_with_p_set(self):
-        v = Vector(p=[1, 1, 1])
+        v = Vector(p=[1, 1, 1], verbose=True)
         print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
@@ -111,7 +111,7 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v.p, v))
 
     def test_vector_with_p0_set(self):
-        v = Vector(p0=[1, 1, 1])
+        v = Vector(p0=[1, 1, 1], verbose=True)
         print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
@@ -141,7 +141,7 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v.p, np.ones(3)))
 
     def test_changing_p0(self):
-        v = Vector()
+        v = Vector(verbose=True)
         print('vector: {}\n'.format(v))
         v.p0 = np.ones(3)
         print('vector: {}'.format(v))
@@ -158,7 +158,7 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v.p, np.zeros(3)))
 
     def test_property_changes(self):
-        v = Vector(p=[1., 1., 1.], p0=[1., 1., 1.])
+        v = Vector(p=[1., 1., 1.], p0=[1., 1., 1.], verbose=True)
         print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
@@ -223,16 +223,20 @@ class TestVector(unittest.TestCase):
         print()
 
     def test_mathops(self):
-        v1 = Vector([1.0, 0.0])
-        v2 = Vector([1.0, 1.0])
+        v1 = Vector([1.0, 0.0], verbose=True)
+        v2 = Vector([1.0, 1.0], verbose=True)
         print('v1: {}'.format(v1))
         print('v2: {}'.format(v2))
+        print('adding v1 + v2')
         v3 = v1 + v2
-        print('v3: {}'.format(v3))
+        print('v3 = v1 + v2: {}\n'.format(v3))
         self.assertIsInstance(v3, Vector)
-        c = np.dot(v1, v2)
-        print('c = np.dot(v1, v2): {}'.format(c))
-        self.assertEqual(c, 1.0)
+        self.assertTrue(np.allclose(v3, np.array([2.0, 1.0])))
+
+        #print('\ncomputing np.dot(v1, v2)')
+        #c = np.dot(v1, v2)
+        #print('c = np.dot(v1, v2): {}'.format(c))
+        #self.assertEqual(c, 1.0)
 
 
 if __name__ == '__main__':
