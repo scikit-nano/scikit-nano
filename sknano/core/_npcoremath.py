@@ -246,7 +246,8 @@ class Vector(np.ndarray):
                   'self: {}\n'.format(self) +
                   'type(self): {}\n'.format(type(self)) +
                   'obj: {}\n'.format(obj) +
-                  'type(obj): {}\n'.format(type(obj)))
+                  'type(obj): {}\n'.format(type(obj)) +
+                  'obj.shape: {}\n'.format(obj.shape))
 
         if self.nd == 2:
             self.x, self.y = obj
@@ -256,27 +257,36 @@ class Vector(np.ndarray):
         self._p = getattr(obj, 'p', None)
         self._p0 = getattr(obj, 'p0', None)
 
-    #def __array_prepare__(self, obj, context=None):
-    #    print('In __array_prepare__\n'
-    #          'self: {}\n'.format(self) +
-    #          'type(self): {}\n'.format(type(self)) +
-    #          'obj: {}\n'.format(obj) +
-    #          'type(obj): {}\n'.format(type(obj)) +
-    #          'context: {}\n'.format(context))
-    #    return super(Vector, self).__array_prepare__(obj, context)
+    def __array_prepare__(self, obj, context=None):
+        print('In __array_prepare__\n'
+              'self: {}\n'.format(self) +
+              'type(self): {}\n'.format(type(self)) +
+              'obj: {}\n'.format(obj) +
+              'type(obj): {}\n'.format(type(obj)) +
+              'context: {}\n'.format(context))
 
-    #def __array_wrap__(self, obj, context=None):
-    #    print('In __array_wrap__\n'
-    #          'self: {}\n'.format(self) +
-    #          'type(self): {}\n'.format(type(self)) +
-    #          'obj: {}\n'.format(obj) +
-    #          'type(obj): {}\n'.format(type(obj)))
+        if self.__array_priority__ >= Vector.__array_priority__:
+            ret = obj if isinstance(obj, type(self)) else obj.view(type(self))
+        else:
+            ret = obj.view(Vector)
 
-    #    if obj.shape == ():
-    #        return obj[()]
-    #    else:
-    #        #return np.ndarray.__array_wrap__(self, obj, context)
-    #        return super(Vector, self).__array_wrap__(obj, context)
+        if context is None:
+            return ret
+        return super(Vector, self).__array_prepare__(obj, context)
+
+    def __array_wrap__(self, obj, context=None):
+        print('In __array_wrap__\n'
+              'self: {}\n'.format(self) +
+              'type(self): {}\n'.format(type(self)) +
+              'obj: {}\n'.format(obj) +
+              'type(obj): {}\n'.format(type(obj)) +
+              'context: {}\n'.format(context))
+
+        if obj.shape == ():
+            return obj[()]
+        else:
+            #return np.ndarray.__array_wrap__(self, obj, context)
+            return super(Vector, self).__array_wrap__(obj, context)
 
     def __repr__(self):
         return np.array(self).__repr__()
@@ -309,7 +319,7 @@ class Vector(np.ndarray):
         #nd = len(self)
         nd = getattr(self, 'nd', None)
         verbose = getattr(self, 'verbose', False)
-        
+
         if verbose:
             print('In __setattr__\n'
                   'self: {}\n'.format(self) +
@@ -361,13 +371,27 @@ class Vector(np.ndarray):
     #def __add__(self, other):
     #    return super(Vector, self).__add__(other)
 
-    #def __mul__(self, other):
-    #    print('in __mul__\n'
-    #          'self: {}\n'.format(self) +
-    #          'other: {}\n'.format(other))
-    #    #if isinstance(other, (np.ndarray, list, tuple)):
-    #    return np.multiply(np.asarray(self), np.asarray(other))
-    #    #return super(Vector, self).__mul__(other)
+    def __mul__(self, other):
+        print('in __mul__\n'
+              'self: {}\n'.format(self) +
+              'other: {}\n'.format(other))
+        if isinstance(other, (np.ndarray, list, tuple)):
+            return np.multiply(np.asarray(self), np.asarray(other))
+        return NotImplemented
+        #return super(Vector, self).__mul__(other)
+
+    def __imul__(self, other):
+        print('in __imul__\n'
+              'self: {}\n'.format(self) +
+              'other: {}\n'.format(other))
+        self[:] = self * other
+        return self
+
+    def __rmul__(self, other):
+        print('in __rmul__\n'
+              'self: {}\n'.format(self) +
+              'other: {}\n'.format(other))
+        return np.multiply(np.asarray(other), np.asarray(self))
 
     @property
     def p(self):
@@ -390,6 +414,9 @@ class Vector(np.ndarray):
         """Set new origin :class:`Point` of vector."""
         self._p0[:] = value
         self[:] = self._p - self._p0
+
+    def dot(self, other):
+        return np.dot(np.asarray(self), np.asarray(other))
 
     def rezero_components(self, epsilon=1.0e-10):
         """Re-zero `Vector` coordinates near zero.
