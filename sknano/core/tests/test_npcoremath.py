@@ -233,10 +233,29 @@ class TestVector(unittest.TestCase):
         self.assertIsInstance(v3, Vector)
         self.assertTrue(np.allclose(v3, np.array([2.0, 1.0])))
 
-        #print('\ncomputing np.dot(v1, v2)')
+        """The next test fails...Why?
+
+        .. todo:: understnad this test case failure.
+
+        """
+        #print('\ncomputing np.dot(v1, v2))')
         #c = np.dot(v1, v2)
-        #print('c = np.dot(v1, v2): {}'.format(c))
+        #print('c = np.dot(v1, v2): {}\n'.format(c))
         #self.assertEqual(c, 1.0)
+
+        # this way works, but defeats the purpose of the subclasses
+        print('\ncomputing np.dot(np.asarray(v1), np.asarray(v2))')
+        c = np.dot(np.asarray(v1), np.asarray(v2))
+        print('c = np.dot(v1, v2): {}\n'.format(c))
+        self.assertEqual(c, 1.0)
+
+        # now try using methods
+        print('v1: {}'.format(v1))
+        print('v2: {}'.format(v2))
+        print('\ncomputing v1.dot(v2)')
+        c = v1.dot(v2)
+        print('c = v1.dot(v2): {}\n'.format(c))
+        self.assertEqual(c, 1.0)
 
 
 if __name__ == '__main__':
