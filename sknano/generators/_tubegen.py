@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =========================================================
-TubeGen wrapper class (:mod:`sknano.nanogen._tubegen`)
+TubeGen wrapper class (:mod:`sknano.generators._tubegen`)
 =========================================================
 
-.. currentmodule:: sknano.nanogen._tubegen
+.. currentmodule:: sknano.generators._tubegen
 
 """
 from __future__ import absolute_import, division, print_function
@@ -18,11 +18,10 @@ import sys
 
 import numpy as np
 
-from ..structure_io import XYZReader, XYZWriter
-from ..tools import plural_word_check
-from ..tools.refdata import CCbond
-
-from ._nanotubes import Nanotube
+from ..core import plural_word_check
+from ..core.refdata import CCbond
+from ..io import XYZReader, XYZWriter
+from ..structures import Nanotube
 
 tubegen_format_ext_map = {'gaussian': '.com',
                           'gaussian-pbc': '.com',
@@ -93,7 +92,7 @@ class TubeGen(object):
     Examples
     --------
 
-    >>> from sknano.nanogen import TubeGen
+    >>> from sknano.generators import TubeGen
 
     Generate a single unit cell of a :math:`\\mathbf{C}_{h} = (10, 5)`
     :abbr:`SWCNT (single-walled carbon nanotube)` in `xyz` format:
