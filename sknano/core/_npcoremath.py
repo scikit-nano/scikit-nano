@@ -31,7 +31,7 @@ class Point(np.ndarray):
     """
     __array_priority__ = 10.0
 
-    def __new__(cls, p=None, nd=None, dtype=None, copy=True):
+    def __new__(cls, p=None, nd=None, dtype=None, copy=True, verbose=False):
 
         if isinstance(p, Point):
             if dtype is None:
@@ -68,8 +68,8 @@ class Point(np.ndarray):
             p = np.zeros(nd, dtype=dtype)
 
         arr = np.array(p, dtype=dtype, copy=copy).view(cls)
-        pt = super(Point, cls).__new__(cls, arr.shape, arr.dtype,
-                                       buffer=arr)
+        pt = np.ndarray.__new__(cls, arr.shape, arr.dtype, buffer=arr)
+        #pt = super(Point, cls).__new__(cls, arr.shape, arr.dtype, buffer=arr)
 
         pt.nd = nd
         if nd == 2:
@@ -172,7 +172,13 @@ class Vector(np.ndarray):
     """
     __array_priority__ = 10.0
 
-    def __new__(cls, v=None, nd=None, p=None, p0=None, dtype=None, copy=True):
+    def __new__(cls, v=None, nd=None, p=None, p0=None, dtype=None, copy=True,
+                verbose=False):
+        if verbose:
+            print('In __new__\n'
+                  'cls: {}\n'.format(cls) +
+                  'v: {}\n'.format(v) +
+                  'type(v): {}\n'.format(type(v)))
 
         if isinstance(v, Vector):
             if dtype is None:
@@ -214,8 +220,8 @@ class Vector(np.ndarray):
             v = p - p0
 
         arr = np.array(v, dtype=dtype, copy=copy).view(cls)
-        vec = super(Vector, cls).__new__(cls, arr.shape, arr.dtype,
-                                         buffer=arr)
+        vec = np.ndarray.__new__(cls, arr.shape, arr.dtype, buffer=arr)
+        #vec = super(Vector, cls).__new__(cls, arr.shape, arr.dtype, buffer=arr)
 
         vec.nd = nd
         vec._p = p
@@ -225,31 +231,62 @@ class Vector(np.ndarray):
         elif nd == 3:
             vec.x, vec.y, vec.z = vec
 
+        vec.verbose = verbose
+
         return vec
 
-    def __array_finalize__(self, vec):
-        if vec is None:
+    def __array_finalize__(self, obj):
+        if obj is None:
             return None
 
-        #print('In __array_finalize__\n' +
-        #      'type(self): {}\n'.format(type(self)) +
-        #      'type(vec): {}\n'.format(type(vec)) +
-        #      'vec: {}\n'.format(vec))
-
-        self.nd = len(vec)
+        self.nd = len(obj)
+        self.verbose = getattr(obj, 'verbose', False)
+        if self.verbose:
+            print('In __array_finalize__\n'
+                  'self: {}\n'.format(self) +
+                  'type(self): {}\n'.format(type(self)) +
+                  'obj: {}\n'.format(obj) +
+                  'type(obj): {}\n'.format(type(obj)))
 
         if self.nd == 2:
-            self.x, self.y = vec
+            self.x, self.y = obj
         elif self.nd == 3:
-            self.x, self.y, self.z = vec
+            self.x, self.y, self.z = obj
 
-        self._p = getattr(vec, 'p', None)
-        self._p0 = getattr(vec, 'p0', None)
+        self._p = getattr(obj, 'p', None)
+        self._p0 = getattr(obj, 'p0', None)
+
+    #def __array_prepare__(self, obj, context=None):
+    #    print('In __array_prepare__\n'
+    #          'self: {}\n'.format(self) +
+    #          'type(self): {}\n'.format(type(self)) +
+    #          'obj: {}\n'.format(obj) +
+    #          'type(obj): {}\n'.format(type(obj)) +
+    #          'context: {}\n'.format(context))
+    #    return super(Vector, self).__array_prepare__(obj, context)
+
+    #def __array_wrap__(self, obj, context=None):
+    #    print('In __array_wrap__\n'
+    #          'self: {}\n'.format(self) +
+    #          'type(self): {}\n'.format(type(self)) +
+    #          'obj: {}\n'.format(obj) +
+    #          'type(obj): {}\n'.format(type(obj)))
+
+    #    if obj.shape == ():
+    #        return obj[()]
+    #    else:
+    #        #return np.ndarray.__array_wrap__(self, obj, context)
+    #        return super(Vector, self).__array_wrap__(obj, context)
 
     def __repr__(self):
         return np.array(self).__repr__()
 
     def __getattr__(self, name):
+        verbose = self.__dict__.get('verbose', False)
+        if verbose and name.find('ufunc') > 0:
+            print('In __getattr__\n'
+                  'self: {}\n'.format(self.__array__()) +
+                  'name: {}\n'.format(name))
         try:
             nd = len(self)
             if nd == 2 and name in ('x', 'y'):
@@ -271,6 +308,14 @@ class Vector(np.ndarray):
     def __setattr__(self, name, value):
         #nd = len(self)
         nd = getattr(self, 'nd', None)
+        verbose = getattr(self, 'verbose', False)
+        
+        if verbose:
+            print('In __setattr__\n'
+                  'self: {}\n'.format(self) +
+                  'type(self): {}\n'.format(type(self)) +
+                  'name: {}\n'.format(name) +
+                  'value: {}\n'.format(value))
         if nd is not None and nd == 2 and name in ('x', 'y'):
             if name == 'x':
                 self[0] = value
@@ -305,6 +350,24 @@ class Vector(np.ndarray):
                     pass
         else:
             super(Vector, self).__setattr__(name, value)
+            #np.ndarray.__setattr__(self, name, value)
+
+    #def __getitem__(self, key):
+    #    super(Vector, self).__getitem__(key)
+
+    #def __setitem__(self, key, value):
+    #    super(Vector, self).__setitem__(key, value)
+
+    #def __add__(self, other):
+    #    return super(Vector, self).__add__(other)
+
+    #def __mul__(self, other):
+    #    print('in __mul__\n'
+    #          'self: {}\n'.format(self) +
+    #          'other: {}\n'.format(other))
+    #    #if isinstance(other, (np.ndarray, list, tuple)):
+    #    return np.multiply(np.asarray(self), np.asarray(other))
+    #    #return super(Vector, self).__mul__(other)
 
     @property
     def p(self):
