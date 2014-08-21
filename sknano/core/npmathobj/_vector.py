@@ -43,10 +43,11 @@ class Vector(np.ndarray):
 
     """
     __array_priority__ = 10.0
+    _verbose = False
 
     def __new__(cls, v=None, nd=None, p=None, p0=None, dtype=None, copy=True,
                 verbose=False):
-        if verbose:
+        if Vector._verbose:
             print('In __new__\n'
                   'cls: {}\n'.format(cls) +
                   'v: {}\n'.format(v) +
@@ -67,8 +68,17 @@ class Vector(np.ndarray):
             else:
                 return vec
 
+        dtype = np.dtype(dtype)
+
         if isinstance(v, (tuple, list, np.ndarray)):
-            v = np.asarray(v)
+            try:
+                for i, coord in enumerate(v[:]):
+                    if coord is None:
+                        v[i] = 0.0
+            except TypeError:
+                v = np.zeros(len(v), dtype=dtype)
+            else:
+                v = np.asarray(v, dtype=dtype)
             nd = len(v)
 
             if p0 is None:
@@ -103,7 +113,7 @@ class Vector(np.ndarray):
         elif nd == 3:
             vec.x, vec.y, vec.z = vec
 
-        vec.verbose = verbose
+        #vec.verbose = verbose
 
         return vec
 
@@ -112,8 +122,8 @@ class Vector(np.ndarray):
             return None
 
         self.nd = len(obj)
-        self.verbose = getattr(obj, 'verbose', False)
-        if self.verbose:
+        #self.verbose = getattr(obj, 'verbose', False)
+        if Vector._verbose:
             print('In __array_finalize__\n'
                   'self: {}\n'.format(self) +
                   'type(self): {}\n'.format(type(self)) +
@@ -130,12 +140,13 @@ class Vector(np.ndarray):
         self._p0 = getattr(obj, 'p0', None)
 
     def __array_prepare__(self, obj, context=None):
-        print('In __array_prepare__\n'
-              'self: {}\n'.format(self) +
-              'type(self): {}\n'.format(type(self)) +
-              'obj: {}\n'.format(obj) +
-              'type(obj): {}\n'.format(type(obj)) +
-              'context: {}\n'.format(context))
+        if Vector._verbose:
+            print('In __array_prepare__\n'
+                  'self: {}\n'.format(self) +
+                  'type(self): {}\n'.format(type(self)) +
+                  'obj: {}\n'.format(obj) +
+                  'type(obj): {}\n'.format(type(obj)) +
+                  'context: {}\n'.format(context))
 
         if self.__array_priority__ >= Vector.__array_priority__:
             ret = obj if isinstance(obj, type(self)) else obj.view(type(self))
@@ -147,12 +158,13 @@ class Vector(np.ndarray):
         return super(Vector, self).__array_prepare__(obj, context)
 
     def __array_wrap__(self, obj, context=None):
-        print('In __array_wrap__\n'
-              'self: {}\n'.format(self) +
-              'type(self): {}\n'.format(type(self)) +
-              'obj: {}\n'.format(obj) +
-              'type(obj): {}\n'.format(type(obj)) +
-              'context: {}\n'.format(context))
+        if Vector._verbose:
+            print('In __array_wrap__\n'
+                  'self: {}\n'.format(self) +
+                  'type(self): {}\n'.format(type(self)) +
+                  'obj: {}\n'.format(obj) +
+                  'type(obj): {}\n'.format(type(obj)) +
+                  'context: {}\n'.format(context))
 
         if obj.shape == ():
             return obj[()]
@@ -164,8 +176,7 @@ class Vector(np.ndarray):
         return np.array(self).__repr__()
 
     def __getattr__(self, name):
-        verbose = self.__dict__.get('verbose', False)
-        if verbose and name.find('ufunc') > 0:
+        if Vector._verbose and name.find('ufunc') > 0:
             print('In __getattr__\n'
                   'self: {}\n'.format(self.__array__()) +
                   'name: {}\n'.format(name))
@@ -190,9 +201,8 @@ class Vector(np.ndarray):
     def __setattr__(self, name, value):
         #nd = len(self)
         nd = getattr(self, 'nd', None)
-        verbose = getattr(self, 'verbose', False)
 
-        if verbose:
+        if Vector._verbose:
             print('In __setattr__\n'
                   'self: {}\n'.format(self) +
                   'type(self): {}\n'.format(type(self)) +
