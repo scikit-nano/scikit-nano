@@ -50,7 +50,7 @@ Math functions
 
    totient_func
 
-Abstract mathematical data structures
+Abstract data structures for math
 --------------------------------------
 .. autosummary::
    :toctree: generated/
@@ -65,7 +65,7 @@ Helper functions for manipulating strings
 
    plural_word_check
 
-Helper functions for linear algebra transforms
+Functions for linear algebra transforms
 -----------------------------------------------
 .. autosummary::
    :toctree: generated/
