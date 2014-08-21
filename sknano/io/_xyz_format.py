@@ -15,7 +15,7 @@ import os
 from .atoms import XYZAtom as Atom, XYZAtoms
 from ..core import get_fpath
 
-from ._structure_io import StructureReader, StructureReaderError, \
+from ._base import StructureReader, StructureReaderError, \
     StructureWriter, StructureConverter, StructureFormat, default_comment_line
 
 __all__ = ['XYZReader', 'XYZWriter', 'XYZData',

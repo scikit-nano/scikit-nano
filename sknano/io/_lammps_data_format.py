@@ -18,9 +18,8 @@ import numpy as np
 from .atoms import LAMMPSAtom as Atom, LAMMPSAtoms, lammps_atom_styles
 from ..core import get_fpath
 
-from ._structure_io import StructureReader, StructureWriter, \
-    StructureConverter, StructureFormat, StructureIOError, \
-    default_comment_line
+from ._base import StructureReader, StructureWriter, StructureConverter, \
+    StructureFormat, StructureIOError, default_comment_line
 
 __all__ = ['DATAData', 'DATAReader', 'DATAWriter',
            'DATA2XYZConverter', 'DATAFormat', 'DATAError',
