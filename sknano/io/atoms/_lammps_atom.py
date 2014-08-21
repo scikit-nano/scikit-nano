@@ -12,7 +12,8 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-from sknano.core import Atom, Vector
+from sknano.core.atoms import Atom
+from sknano.core.npmathobj import Vector
 
 __all__ = ['LAMMPSAtom', 'lammps_atom_styles']
 

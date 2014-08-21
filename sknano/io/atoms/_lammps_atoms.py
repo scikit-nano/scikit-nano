@@ -22,7 +22,8 @@ except ImportError:
           'nearest-neighbor queries between atoms.')
     has_kdtree = False
 
-from sknano.core import Atoms, xyz
+from sknano.core import xyz
+from sknano.core.atoms import Atoms
 
 __all__ = ['LAMMPSAtoms']
 
