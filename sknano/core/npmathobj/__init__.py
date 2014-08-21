@@ -25,3 +25,8 @@ from ._point import *
 from ._vector import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
+
+from . import _point as point
+from . import _vector as vector
+
+__all__ += ['point', 'vector']
