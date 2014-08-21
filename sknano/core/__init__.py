@@ -16,6 +16,8 @@ Abstract data structures for Atom objects
 
    Atom
    Atoms
+   XAtom
+   XAtoms
 
 Core helper functions
 ----------------------
@@ -80,6 +82,8 @@ __docformat__ = 'restructuredtext en'
 
 from ._atom import *
 from ._atoms import *
+from ._extended_atom import *
+from ._extended_atoms import *
 from ._core import *
 from ._decorators import *
 from ._iofuncs import *
