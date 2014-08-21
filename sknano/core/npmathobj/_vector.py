@@ -15,7 +15,7 @@ import numpy as np
 
 from ._point import Point
 
-__all__ = ['Vector']
+__all__ = ['Vector', 'cross', 'dot']
 
 
 class Vector(np.ndarray):
@@ -43,7 +43,7 @@ class Vector(np.ndarray):
 
     """
     __array_priority__ = 10.0
-    _verbose = True
+    _verbose = False
 
     def __new__(cls, v=None, nd=None, p=None, p0=None, dtype=None, copy=True,
                 verbose=False):
@@ -103,7 +103,8 @@ class Vector(np.ndarray):
 
         arr = np.array(v, dtype=dtype, copy=copy).view(cls)
         vec = np.ndarray.__new__(cls, arr.shape, arr.dtype, buffer=arr)
-        #vec = super(Vector, cls).__new__(cls, arr.shape, arr.dtype, buffer=arr)
+        #vec = \
+        #    super(Vector, cls).__new__(cls, arr.shape, arr.dtype, buffer=arr)
 
         vec.nd = nd
         vec._p = p
@@ -207,8 +208,18 @@ class Vector(np.ndarray):
             #return super(Vector, self).__array_wrap__(obj, context)
             return res
 
+    def __str__(self):
+        return repr(self)
+
     def __repr__(self):
-        return np.array(self).__repr__()
+        reprstr = \
+            "Vector({v!r}, nd={nd!r}, p={p!r}, p0={p0!r}, dtype={dtype!r})"
+        parameters = dict(v=self.__array__(),
+                          nd=getattr(self, 'nd', None),
+                          p=getattr(self, 'p', None),
+                          p0=getattr(self, 'p0', None),
+                          dtype=self.dtype)
+        return reprstr.format(**parameters)
 
     def __getattr__(self, name):
         #if Vector._verbose and name.find('ufunc') > 0:
@@ -353,8 +364,9 @@ class Vector(np.ndarray):
         self._p0[:] = value
         self[:] = self._p - self._p0
 
-    def dot(self, other):
-        return np.dot(np.asarray(self), np.asarray(other))
+    def dot(self, other, out=None):
+        """Computes dot product of two vectors."""
+        return self.__array__().dot(other.__array__())
 
     def rezero_components(self, epsilon=1.0e-10):
         """Re-zero `Vector` coordinates near zero.
@@ -369,3 +381,37 @@ class Vector(np.ndarray):
 
         """
         self[np.where(np.abs(self) <= epsilon)] = 0.0
+
+
+def cross(v1, v2):
+    """Vector cross product of two vectors.
+
+    Parameters
+    ----------
+    a, b : `Vector`
+
+    Returns
+    -------
+    np.number or `Vector`
+
+    """
+    val = np.cross(np.asarray(v1), np.asarray(v2))
+    if val.shape == ():
+        return val[()]
+    else:
+        return Vector(val, p0=v1.p0)
+
+
+def dot(v1, v2):
+    """Dot product of two vectors.
+
+    Parameters
+    ----------
+    a, b : `Vector`
+
+    Returns
+    -------
+    val
+
+    """
+    return np.dot(np.asarray(v1), np.asarray(v2))
