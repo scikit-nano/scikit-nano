@@ -14,12 +14,13 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-from ..core import Atom
+from ..core.atoms import Atom
+from ..core.npmathobj import Vector
 from ..core.refdata import CCbond, dVDW, grams_per_Da
 
 edge_types = {'armchair': 'AC', 'zigzag': 'ZZ'}
 
-__all__ = ['GraphenePrimitiveCell', 'Graphene']
+__all__ = ['GraphenePrimitiveCell', 'Graphene', 'BiLayerGraphene']
 
 
 class GraphenePrimitiveCell(object):
@@ -35,15 +36,15 @@ class GraphenePrimitiveCell(object):
         self._bond = bond
         self._a = np.sqrt(3) * self._bond
 
-        self._a1 = np.zeros(2)
-        self._a2 = np.zeros(2)
+        self._a1 = Vector(nd=2)
+        self._a2 = Vector(nd=2)
 
         self._a1.x = self._a2.x = np.sqrt(3) / 2 * self._a
         self._a1.y = 1 / 2 * self._a
         self._a2.y = -self._a1.y
 
-        self._b1 = np.zeros(2)
-        self._b2 = np.zeros(2)
+        self._b1 = Vector(nd=2)
+        self._b2 = Vector(nd=2)
 
         self._b1.x = self._b2.x = 1 / np.sqrt(3) * 2 * np.pi / self._a
         self._b1.y = 2 * np.pi / self._a
@@ -116,9 +117,6 @@ class Graphene(object):
                  element2='C', bond=CCbond, nlayers=1, layer_spacing=dVDW,
                  stacking_order='AB', verbose=False):
 
-        self._element1 = element1
-        self._element2 = element2
-
         self._length = length
         self._width = width
         if edge in ('armchair', 'zigzag'):
@@ -130,14 +128,15 @@ class Graphene(object):
             print('the randomly chosen edge type is: {}'.format(edge))
         self._edge = edge
 
+        self._element1 = element1
+        self._element2 = element2
+
         if bond is None:
             bond = CCbond
 
         self._bond = bond
 
         self._verbose = verbose
-
-        self._cell = np.zeros(2)
 
         self._Nx = 0
         self._Ny = 0
@@ -150,7 +149,7 @@ class Graphene(object):
         self._layer_spacing = layer_spacing
         self._stacking_order = stacking_order
 
-        self._layer_shift = np.zeros(3)
+        self._layer_shift = Vector()
 
         if nlayers > 1 and stacking_order == 'AB':
             if edge == 'AC':
@@ -171,6 +170,14 @@ class Graphene(object):
 
         self._Nx = int(np.ceil(10 * self._width / self._cell.x))
         self._Ny = int(np.ceil(10 * self._length / self._cell.y))
+
+    def __repr__(self):
+        retstr = 'Graphene(length={!r}, width={!r}, edge={!r}, ' + \
+            'element1={!r}, element2={!r}, bond={!r}, nlayers={!r}, ' + \
+            'layer_spacing={!r}, stacking_order={!r})'
+        return retstr.format(self.length, self.width, self.edge, self.element1,
+                             self.element2, self.bond, self.nlayers,
+                             self.layer_spacing, self.stacking_order)
 
     def compute_layer_params(self):
         pass
@@ -263,6 +270,22 @@ class Graphene(object):
         """Graphene layer mass in grams."""
         return self._layer_mass
 
+    @property
+    def nlayers(self):
+        return self._nlayers
+
+    @nlayers.setter
+    def nlayers(self, value):
+        self._nlayers = value
+
+    @property
+    def layer_spacing(self):
+        return self._layer_spacing
+
+    @layer_spacing.setter
+    def layer_spacing(self, value):
+        self._layer_spacing = value
+
     @classmethod
     def compute_layer_mass(cls, n=None, m=None, width=None, length=None,
                            edge=None, element1=None, element2=None):
@@ -295,18 +318,6 @@ class Graphene(object):
 
         return mass
 
-    @property
-    def nlayers(self):
-        return self._nlayers
 
-    @nlayers.setter
-    def nlayers(self, value):
-        self._nlayers = value
-
-    @property
-    def layer_spacing(self):
-        return self._layer_spacing
-
-    @layer_spacing.setter
-    def layer_spacing(self, value):
-        self._layer_spacing = value
+class BiLayerGraphene(Graphene):
+    pass
