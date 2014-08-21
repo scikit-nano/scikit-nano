@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ============================================================================
-Base class for structure data atom (:mod:`sknano.core._atom`)
+Base class for structure data atom (:mod:`sknano.core.atoms._atom`)
 ============================================================================
 
-.. currentmodule:: sknano.core._atom
+.. currentmodule:: sknano.core.atoms._atom
 
 """
 from __future__ import absolute_import, division, print_function
@@ -14,10 +14,10 @@ from collections import OrderedDict
 
 import numpy as np
 
-from .refdata import atomic_masses, atomic_mass_symbol_map, \
+from sknano.core import xyz
+from sknano.core.npmathobj import Vector
+from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols
-from ._luts import xyz
-from ._npcoremath import Vector
 
 __all__ = ['Atom']
 

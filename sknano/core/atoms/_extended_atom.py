@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-============================================================================
-Atom class with extended feature set (:mod:`sknano.core._extended_atom`)
-============================================================================
+===============================================================================
+Atom class with extended feature set (:mod:`sknano.core.atoms._extended_atom`)
+===============================================================================
 
 An "eXtended" `Atom` class for structure analysis.
 
-.. currentmodule:: sknano.core._extended_atom
+.. currentmodule:: sknano.core.atoms._extended_atom
 
 """
 from __future__ import absolute_import, division, print_function
@@ -14,8 +14,8 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
+from sknano.core.npmathobj import Vector
 from ._atom import Atom
-from ._npcoremath import Vector
 
 __all__ = ['XAtom']
 

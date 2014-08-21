@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-==============================================================================
-Atoms class with extended feature set (:mod:`sknano.core._extended_atoms`)
-==============================================================================
+===============================================================================
+Extended Atoms class feature set (:mod:`sknano.core.atoms._extended_atoms`)
+===============================================================================
 
 An "eXtended" `Atoms` class for structure analysis.
 
-.. currentmodule:: sknano.core._extended_atoms
+.. currentmodule:: sknano.core.atoms._extended_atoms
 
 """
 from __future__ import absolute_import, division, print_function
@@ -24,8 +24,8 @@ except ImportError:
           'nearest-neighbor queries between atoms.')
     has_kdtree = False
 
+from sknano.core import xyz
 from ._atoms import Atoms
-from ._luts import xyz
 
 __all__ = ['XAtoms']
 
@@ -293,8 +293,8 @@ class XAtoms(Atoms):
 
         Parameters
         ----------
-        atom : :class:`~sknano.core.XAtom`
-            A :class:`~sknano.core.XAtom` instance.
+        atom : :class:`~sknano.core.atoms.XAtom`
+            A :class:`~sknano.core.atoms.XAtom` instance.
 
         """
         if atom.atomtype not in self._atomtypes:

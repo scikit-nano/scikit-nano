@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Base class for structure data atoms (:mod:`sknano.core._atoms`)
+Base class for structure data atoms (:mod:`sknano.core.atoms._atoms`)
 ==============================================================================
 
-.. currentmodule:: sknano.core._atoms
+.. currentmodule:: sknano.core.atoms._atoms
 
 """
 from __future__ import absolute_import, division, print_function
@@ -17,7 +17,7 @@ from collections import OrderedDict, MutableSequence
 
 import numpy as np
 
-from ._luts import xyz
+from sknano.core import xyz
 
 __all__ = ['Atoms']
 
