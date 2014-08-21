@@ -3,7 +3,7 @@
 from __future__ import absolute_import, division, print_function
 import unittest
 
-from sknano.core import Atom, Atoms
+from sknano.core.atoms import Atom, Atoms
 
 
 class TestAtoms(unittest.TestCase):
