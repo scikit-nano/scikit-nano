@@ -7,7 +7,7 @@ import unittest
 
 import numpy as np
 
-from sknano.core._npcoremath import Point, Vector
+from sknano.core.npmathobj import Point, Vector
 
 
 class TestPoint(unittest.TestCase):
@@ -222,7 +222,7 @@ class TestVector(unittest.TestCase):
         print('vector.z: {}'.format(v.z))
         print()
 
-    def test_mathops(self):
+    def test_add(self):
         v1 = Vector([1.0, 0.0], verbose=True)
         v2 = Vector([1.0, 1.0], verbose=True)
         print('v1: {}'.format(v1))
@@ -232,7 +232,30 @@ class TestVector(unittest.TestCase):
         print('v3 = v1 + v2: {}\n'.format(v3))
         self.assertIsInstance(v3, Vector)
         self.assertTrue(np.allclose(v3, np.array([2.0, 1.0])))
+        print('v1: {}'.format(v1))
+        print('v2: {}'.format(v2))
+        print('v3: {}\n'.format(v3))
 
+        print('v3.nd: {}\n'.format(v3.nd))
+        print('v3.p0: {}\n'.format(v3.p0))
+        print('v3.p: {}\n'.format(v3.p))
+
+        print('adding v2 + v1')
+        v3 = v2 + v1
+        print('v3 = v2 + v1: {}\n'.format(v3))
+        self.assertIsInstance(v3, Vector)
+        self.assertTrue(np.allclose(v3, np.array([2.0, 1.0])))
+        print('v1: {}'.format(v1))
+        print('v2: {}'.format(v2))
+        print('v3: {}\n'.format(v3))
+
+        print('v3.nd: {}\n'.format(v3.nd))
+        print('v3.p0: {}\n'.format(v3.p0))
+        print('v3.p: {}\n'.format(v3.p))
+
+    def test_dot(self):
+        v1 = Vector([1.0, 0.0], verbose=True)
+        v2 = Vector([1.0, 1.0], verbose=True)
         """The next test fails...Why?
 
         .. todo:: understnad this test case failure.
