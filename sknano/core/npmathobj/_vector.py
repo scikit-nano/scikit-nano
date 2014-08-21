@@ -43,7 +43,7 @@ class Vector(np.ndarray):
 
     """
     __array_priority__ = 10.0
-    _verbose = False
+    _verbose = True
 
     def __new__(cls, v=None, nd=None, p=None, p0=None, dtype=None, copy=True,
                 verbose=False):
@@ -162,24 +162,59 @@ class Vector(np.ndarray):
             print('In __array_wrap__\n'
                   'self: {}\n'.format(self) +
                   'type(self): {}\n'.format(type(self)) +
+                  'type(self): {}\n'.format(type(self)) +
+                  'self.p: {}\n'.format(self.p) +
+                  'type(self.p): {}\n'.format(type(self.p)) +
+                  'self.p0: {}\n'.format(self.p0) +
+                  'type(self.p0): {}\n'.format(type(self.p0)) +
                   'obj: {}\n'.format(obj) +
                   'type(obj): {}\n'.format(type(obj)) +
+                  'obj.p: {}\n'.format(obj.p) +
+                  'type(obj.p): {}\n'.format(type(obj.p)) +
+                  'obj.p0: {}\n'.format(obj.p0) +
+                  'type(obj.p0): {}\n'.format(type(obj.p0)) +
                   'context: {}\n'.format(context))
 
         if obj.shape == ():
             return obj[()]
         else:
             #return np.ndarray.__array_wrap__(self, obj, context)
-            return super(Vector, self).__array_wrap__(obj, context)
+            res = super(Vector, self).__array_wrap__(obj, context)
+            #res._p0 = Point(self.p0)
+            #res._p = Point(self[:] + res._p0)
+            res = Vector(res.__array__(), p0=self.p0)
+            if Vector._verbose:
+                print('In __array_wrap__\n'
+                      'self: {}\n'.format(self) +
+                      'type(self): {}\n'.format(type(self)) +
+                      'self.p: {}\n'.format(self.p) +
+                      'type(self.p): {}\n'.format(type(self.p)) +
+                      'self.p0: {}\n'.format(self.p0) +
+                      'type(self.p0): {}\n'.format(type(self.p0)) +
+                      'obj: {}\n'.format(obj) +
+                      'type(obj): {}\n'.format(type(obj)) +
+                      'obj.p: {}\n'.format(obj.p) +
+                      'type(obj.p): {}\n'.format(type(obj.p)) +
+                      'obj.p0: {}\n'.format(obj.p0) +
+                      'type(obj.p0): {}\n'.format(type(obj.p0)) +
+                      'res: {}\n'.format(res) +
+                      'type(res): {}\n'.format(type(res)) +
+                      'res.p: {}\n'.format(res.p) +
+                      'type(res.p): {}\n'.format(type(res.p)) +
+                      'res.p0: {}\n'.format(res.p0) +
+                      'type(res.p0): {}\n'.format(type(res.p0)) +
+                      'context: {}\n'.format(context))
+            #return super(Vector, self).__array_wrap__(obj, context)
+            return res
 
     def __repr__(self):
         return np.array(self).__repr__()
 
     def __getattr__(self, name):
-        if Vector._verbose and name.find('ufunc') > 0:
-            print('In __getattr__\n'
-                  'self: {}\n'.format(self.__array__()) +
-                  'name: {}\n'.format(name))
+        #if Vector._verbose and name.find('ufunc') > 0:
+        #    print('In __getattr__\n'
+        #          'self: {}\n'.format(self.__array__()) +
+        #          'name: {}\n'.format(name))
         try:
             nd = len(self)
             if nd == 2 and name in ('x', 'y'):
@@ -202,12 +237,12 @@ class Vector(np.ndarray):
         #nd = len(self)
         nd = getattr(self, 'nd', None)
 
-        if Vector._verbose:
-            print('In __setattr__\n'
-                  'self: {}\n'.format(self) +
-                  'type(self): {}\n'.format(type(self)) +
-                  'name: {}\n'.format(name) +
-                  'value: {}\n'.format(value))
+        #if Vector._verbose:
+        #    print('In __setattr__\n'
+        #          'self: {}\n'.format(self) +
+        #          'type(self): {}\n'.format(type(self)) +
+        #          'name: {}\n'.format(name) +
+        #          'value: {}\n'.format(value))
         if nd is not None and nd == 2 and name in ('x', 'y'):
             if name == 'x':
                 self[0] = value
@@ -250,30 +285,51 @@ class Vector(np.ndarray):
     #def __setitem__(self, key, value):
     #    super(Vector, self).__setitem__(key, value)
 
-    #def __add__(self, other):
-    #    return super(Vector, self).__add__(other)
+    def __add__(self, other):
+        if Vector._verbose:
+            print('in __add__\n'
+                  'self: {}\n'.format(self) +
+                  'other: {}\n'.format(other))
+        return super(Vector, self).__add__(other)
 
     def __mul__(self, other):
-        print('in __mul__\n'
-              'self: {}\n'.format(self) +
-              'other: {}\n'.format(other))
+        if Vector._verbose:
+            print('in __mul__\n'
+                  'self: {}\n'.format(self) +
+                  'other: {}\n'.format(other))
         if isinstance(other, (np.ndarray, list, tuple)):
             return np.multiply(np.asarray(self), np.asarray(other))
         return NotImplemented
         #return super(Vector, self).__mul__(other)
 
-    def __imul__(self, other):
-        print('in __imul__\n'
-              'self: {}\n'.format(self) +
-              'other: {}\n'.format(other))
-        self[:] = self * other
-        return self
+    def __sub__(self, other):
+        if Vector._verbose:
+            print('in __sub__\n'
+                  'self: {}\n'.format(self) +
+                  'other: {}\n'.format(other))
+        return super(Vector, self).__sub__(np.asarray(other))
+
+    def __radd__(self, other):
+        if Vector._verbose:
+            print('in __radd__\n'
+                  'self: {}\n'.format(self) +
+                  'other: {}\n'.format(other))
+        return self.__add__(other)
 
     def __rmul__(self, other):
-        print('in __rmul__\n'
-              'self: {}\n'.format(self) +
-              'other: {}\n'.format(other))
+        if Vector._verbose:
+            print('in __rmul__\n'
+                  'self: {}\n'.format(self) +
+                  'other: {}\n'.format(other))
         return np.multiply(np.asarray(other), np.asarray(self))
+
+    def __imul__(self, other):
+        if Vector._verbose:
+            print('in __imul__\n'
+                  'self: {}\n'.format(self) +
+                  'other: {}\n'.format(other))
+        self[:] = self * other
+        return self
 
     @property
     def p(self):
