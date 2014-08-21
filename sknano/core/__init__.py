@@ -80,10 +80,11 @@ Functions for linear algebra transforms
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from ._atom import *
-from ._atoms import *
-from ._extended_atom import *
-from ._extended_atoms import *
+from . import atoms
+from .atoms import *
+from . import npmathobj
+from .npmathobj import *
+
 from ._core import *
 from ._decorators import *
 from ._iofuncs import *
@@ -95,3 +96,5 @@ from ._transforms import *
 from ._warnings import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
+__all__ += atoms.__all__
+__all__ += npmathobj.__all__
