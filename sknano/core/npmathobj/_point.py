@@ -91,8 +91,15 @@ class Point(np.ndarray):
         elif self.nd == 3:
             self.x, self.y, self.z = pt
 
+    def __str__(self):
+        return repr(self)
+
     def __repr__(self):
-        return np.array(self).__repr__()
+        reprstr = "Point({p!r}, nd={nd!r}, dtype={dtype!r})"
+        parameters = dict(p=self.__array__(),
+                          nd=getattr(self, 'nd', None),
+                          dtype=self.dtype)
+        return reprstr.format(**parameters)
 
     def __getattr__(self, name):
         try:
