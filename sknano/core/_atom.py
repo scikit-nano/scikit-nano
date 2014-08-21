@@ -17,7 +17,7 @@ import numpy as np
 from .refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols
 from ._luts import xyz
-from ._npcoremath import Point, Vector
+from ._npcoremath import Vector
 
 __all__ = ['Atom']
 
@@ -37,7 +37,7 @@ class Atom(object):
 
     def __init__(self, element=None, m=None, x=None, y=None, z=None):
 
-        self._r = Point(np.array([x, y, z]))
+        self._r = Vector([x, y, z])
         self._dr = Vector(np.zeros(3))
 
         self._m = None
@@ -202,7 +202,7 @@ class Atom(object):
 
     @property
     def r(self):
-        """:math:`x, y, z` coordinates of `Atom` in units of **Angstroms**.
+        """:math:`x, y, z` components of `Atom` in units of **Angstroms**.
 
         Returns
         -------
@@ -214,7 +214,7 @@ class Atom(object):
 
     @r.setter
     def r(self, value=np.ndarray):
-        """Set :math:`x, y, z` coordinates of `Atom`.
+        """Set :math:`x, y, z` components of `Atom` position vector.
 
         Parameters
         ----------
@@ -223,7 +223,7 @@ class Atom(object):
             **Angstroms**.
 
         """
-        self._r = value
+        self._r[:] = value
 
     def get_coords(self, as_dict=False):
         """Return atom coords.
@@ -237,17 +237,16 @@ class Atom(object):
         coords : :py:class:`python:~collections.OrderedDict` or ndarray
 
         """
-        coords = self.r
         if as_dict:
             return OrderedDict(zip(xyz, self.r))
         else:
-            return coords
+            return self.r
 
     def rezero_coords(self, epsilon=1.0e-10):
-        """Re-zero position coordinates near zero.
+        """Re-zero position vector components.
 
-        Set position coordinates with absolute value less than `epsilon` to
-        zero.
+        Set position vector components with absolute value less than
+        `epsilon` to zero.
 
         Parameters
         ----------
@@ -255,4 +254,4 @@ class Atom(object):
             smallest allowed absolute value of any :math:`x,y,z` component.
 
         """
-        self._r.rezero_coords(epsilon=epsilon)
+        self._r.rezero_components(epsilon=epsilon)
