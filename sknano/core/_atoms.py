@@ -80,6 +80,95 @@ class Atoms(MutableSequence):
         """Return `repr` string of `Atoms`."""
         return("Atoms(atoms={!r})".format(self._data))
 
+    def __delitem__(self, index):
+        """Concrete implementation of @abstractmethod.
+
+        Delete list element `self[index]` and delete all elements
+        from atom properties lists `self.masses[index]`,
+        `self.charges[index]`, and `self.coords[index]`
+
+        Parameters
+        ----------
+        index : int
+            index of target list element
+
+        """
+        del self._data[index]
+        for plist in self._property_lists.itervalues():
+            del plist[index]
+
+    def __getitem__(self, index):
+        """Concrete implementation of @abstractmethod.
+
+        Get `Atom` object instance at list element `self[index]`
+
+        Parameters
+        ----------
+        index : int
+            index of target list element
+
+        Returns
+        -------
+        `Atom`
+            `Atom` instance at target `self[index]`
+
+        """
+        return self._data[index]
+
+    def __len__(self):
+        """Concrete implementation of @abstractmethod.
+
+        Returns
+        -------
+        int
+            length of `self` list.
+
+        """
+        return len(self._data)
+
+    def __setitem__(self, index, atom):
+        """Concrete implementation of @abstractmethod.
+
+        set target list element `self[index] = atom`
+
+        Also set element of all atom properties lists (`self.masses[index]`,
+        `self.charges[index]`, and `self.coords[index]`) to atom instance
+        properties (`atom.m`, `atom.q`, `atom.r`), respectively.
+
+        Parameters
+        ----------
+        index : int
+            index of target list element
+        atom : `Atom`
+            `Atom` instance object to set target list element to.
+
+        """
+        self._data[index] = atom
+        for p, plist in self._property_lists.iteritems():
+            plist[index] = getattr(atom, p)
+
+    def insert(self, index, atom):
+        """Concrete implementation of @abstractmethod.
+
+        insert `Atom` instance at target list `index`
+
+        Also insert `Atom` instance properties at the given target list index
+        for all `Atom` properties in `self._property_lists.keys()`
+        into their respective target lists of `Atoms` properties
+        `self._property_lists.values()`.
+
+        Parameters
+        ----------
+        index : int
+            index of target list element
+        atom : `Atom`
+            `Atom` object instance to set target list element to
+
+        """
+        self._data.insert(index, atom)
+        for p, plist in self._property_lists.iteritems():
+            plist.insert(index, getattr(atom, p))
+
     @property
     def data(self):
         """Return the list of `Atom` objects"""
@@ -258,92 +347,3 @@ class Atoms(MutableSequence):
         """
         for atom in self._data:
             atom.r += dr
-
-    def __delitem__(self, index):
-        """Concrete implementation of @abstractmethod.
-
-        Delete list element `self[index]` and delete all elements
-        from atom properties lists `self.masses[index]`,
-        `self.charges[index]`, and `self.coords[index]`
-
-        Parameters
-        ----------
-        index : int
-            index of target list element
-
-        """
-        del self._data[index]
-        for plist in self._property_lists.itervalues():
-            del plist[index]
-
-    def __getitem__(self, index):
-        """Concrete implementation of @abstractmethod.
-
-        Get `Atom` object instance at list element `self[index]`
-
-        Parameters
-        ----------
-        index : int
-            index of target list element
-
-        Returns
-        -------
-        `Atom`
-            `Atom` instance at target `self[index]`
-
-        """
-        return self._data[index]
-
-    def __len__(self):
-        """Concrete implementation of @abstractmethod.
-
-        Returns
-        -------
-        int
-            length of `self` list.
-
-        """
-        return len(self._data)
-
-    def __setitem__(self, index, atom):
-        """Concrete implementation of @abstractmethod.
-
-        set target list element `self[index] = atom`
-
-        Also set element of all atom properties lists (`self.masses[index]`,
-        `self.charges[index]`, and `self.coords[index]`) to atom instance
-        properties (`atom.m`, `atom.q`, `atom.r`), respectively.
-
-        Parameters
-        ----------
-        index : int
-            index of target list element
-        atom : `Atom`
-            `Atom` instance object to set target list element to.
-
-        """
-        self._data[index] = atom
-        for p, plist in self._property_lists.iteritems():
-            plist[index] = getattr(atom, p)
-
-    def insert(self, index, atom):
-        """Concrete implementation of @abstractmethod.
-
-        insert `Atom` instance at target list `index`
-
-        Also insert `Atom` instance properties at the given target list index
-        for all `Atom` properties in `self._property_lists.keys()`
-        into their respective target lists of `Atoms` properties
-        `self._property_lists.values()`.
-
-        Parameters
-        ----------
-        index : int
-            index of target list element
-        atom : `Atom`
-            `Atom` object instance to set target list element to
-
-        """
-        self._data.insert(index, atom)
-        for p, plist in self._property_lists.iteritems():
-            plist.insert(index, getattr(atom, p))
