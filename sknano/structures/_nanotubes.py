@@ -15,7 +15,8 @@ from fractions import gcd
 import numpy as np
 np.seterr(all='raise')
 
-from ..core import Atom, comparison_symbol_operator_mappings
+from ..core import comparison_symbol_operator_mappings
+from ..core.atoms import Atom
 from ..core.refdata import CCbond, dVDW, grams_per_Da
 
 __all__ = ['Nanotube', 'NanotubeBundleMixin', 'MWNTMixin',
@@ -201,21 +202,6 @@ class SWNT(object):
             retstr += ")"
 
         return retstr
-
-    #def __getattr__(self, name):
-    #    try:
-    #        return getattr(self, name)
-    #    except AttributeError as e:
-    #        raise AttributeError(e)
-
-    #def __setattr__(self, name, value):
-    #    try:
-    #        setattr(self, name, value)
-    #    except AttributeError as e:
-    #        raise AttributeError(e)
-
-    #def __delattr__(self, name):
-    #    pass
 
     def compute_tube_params(self):
         """Compute/update nanotube parameters."""
