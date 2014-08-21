@@ -188,6 +188,20 @@ class Parallelogram(Geometric2DRegion):
             v1 = Vector([1., 0.])
             v2 = Vector([1., 1.])
 
+    @property
+    def area(self):
+        pass
+
+    @property
+    def centroid(self):
+        pass
+
+    def contains_point(self, point=None):
+        """Check if point is contained within volume of cuboid."""
+        x, y = point
+
+        return (x >= self._xmin) and (x <= self._xmax) and \
+            (y >= self._ymin) and (y <= self._ymax)
 
 class Rhombus(object):
     pass

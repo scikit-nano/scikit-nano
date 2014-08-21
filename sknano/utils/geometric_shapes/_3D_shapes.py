@@ -62,6 +62,11 @@ class Parallelepiped(Geometric3DRegion):
         self._pmax = pmax
         self._xmax, self._ymax, self._zmax = self._pmax
 
+    def __repr__(self):
+        return("Parallelepiped(xmin={!r}, ymin={!r}, zmin={!r}, "
+               "xmax={!r}, ymax={!r}, zmax={!r})".format(
+                   self._xmin, self._ymin, self._zmin,
+                   self._xmax, self._ymax, self._zmax))
     @property
     def xmin(self):
         return self._xmin
@@ -161,9 +166,9 @@ class Cuboid(Geometric3DRegion):
         """Check if point is contained within volume of cuboid."""
         x, y, z = point
 
-        return((x > self._xmin) and (x < self._xmax) and
-               (y > self._ymin) and (y < self._ymax) and
-               (z > self._zmin) and (z < self._zmax))
+        return((x >= self._xmin) and (x <= self._xmax) and
+               (y >= self._ymin) and (y <= self._ymax) and
+               (z >= self._zmin) and (z <= self._zmax))
 
 
 class Cube(Geometric3DRegion):
