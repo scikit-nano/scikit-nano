@@ -7,7 +7,7 @@ import unittest
 
 import numpy as np
 
-from sknano.core.npmathobj import Point, Vector
+from sknano.core.npmathobj import Point, Vector, vector as vec
 
 
 class TestPoint(unittest.TestCase):
@@ -223,10 +223,10 @@ class TestVector(unittest.TestCase):
         print()
 
     def test_add(self):
-        v1 = Vector([1.0, 0.0], verbose=True)
-        v2 = Vector([1.0, 1.0], verbose=True)
+        v1 = Vector([1.0, 0.0], p0=[5., 5.], verbose=True)
+        v2 = Vector([1.0, 1.0], p0=[5., 5.], verbose=True)
         print('v1: {}'.format(v1))
-        print('v2: {}'.format(v2))
+        print('v2: {}\n'.format(v2))
         print('adding v1 + v2')
         v3 = v1 + v2
         print('v3 = v1 + v2: {}\n'.format(v3))
@@ -253,18 +253,73 @@ class TestVector(unittest.TestCase):
         print('v3.p0: {}\n'.format(v3.p0))
         print('v3.p: {}\n'.format(v3.p))
 
+    def test_cross(self):
+        v1 = Vector([1.0, 0.0], verbose=True)
+        v2 = Vector([1.0, 1.0], verbose=True)
+
+        # now try the sknano.core.npmathobj.vector.cross function
+        print('\ncomputing vec.cross(v1, v2)')
+        print('v1: {}'.format(v1))
+        print('v2: {}'.format(v2))
+        v3 = vec.cross(v1, v2)
+        print('v3 = vec.cross(v1, v2) = {}\n'.format(v3))
+        self.assertIsInstance(v3, np.number)
+        self.assertEqual(v3, np.cross(np.asarray(v1), np.asarray(v2)))
+
+        v1 = Vector([1, 0, 0], p0=[1, 1, 1], verbose=True)
+        v2 = Vector([0, 1, 0], p0=[1, 1, 1], verbose=True)
+
+        print('\ncomputing vec.cross(v1, v2)')
+        print('v1: {}'.format(v1))
+        print('v2: {}'.format(v2))
+        v3 = vec.cross(v1, v2)
+        print('v3 = vec.cross(v1, v2) = {}\n'.format(v3))
+        print('v3.nd: {}\n'.format(v3.nd))
+        print('v3.p0: {}\n'.format(v3.p0))
+        print('v3.p: {}\n'.format(v3.p))
+        self.assertIsInstance(v3, Vector)
+        self.assertTrue(np.allclose(v3, np.cross(np.asarray(v1),
+                                                 np.asarray(v2))))
+        self.assertTrue(np.allclose(v3.p0, v1.p0))
+        self.assertTrue(np.allclose(v3.p0, v2.p0))
+
+        v1 = Vector([1, 0, 0], p0=[1, 0, 0], verbose=True)
+        v2 = Vector([0, 1, 0], p0=[0, 1, 0], verbose=True)
+
+        print('\ncomputing vec.cross(v1, v2)')
+        print('v1: {}'.format(v1))
+        print('v2: {}'.format(v2))
+        v3 = vec.cross(v1, v2)
+        print('v3 = vec.cross(v1, v2) = {}\n'.format(v3))
+        print('v3.nd: {}\n'.format(v3.nd))
+        print('v3.p0: {}\n'.format(v3.p0))
+        print('v3.p: {}\n'.format(v3.p))
+        self.assertIsInstance(v3, Vector)
+        self.assertTrue(np.allclose(v3, np.cross(np.asarray(v1),
+                                                 np.asarray(v2))))
+        self.assertTrue(np.allclose(v3.p0, v1.p0))
+        self.assertFalse(np.allclose(v3.p0, v2.p0))
+
+        v1 = Vector([1, 2, 3], p0=[1, 0, 0], verbose=True)
+        v2 = Vector([4, 5, 6], p0=[0, 1, 0], verbose=True)
+
+        print('\ncomputing vec.cross(v1, v2)')
+        print('v1: {}'.format(v1))
+        print('v2: {}'.format(v2))
+        v3 = vec.cross(v1, v2)
+        print('v3 = vec.cross(v1, v2) = {}\n'.format(v3))
+        print('v3.nd: {}\n'.format(v3.nd))
+        print('v3.p0: {}\n'.format(v3.p0))
+        print('v3.p: {}\n'.format(v3.p))
+        self.assertIsInstance(v3, Vector)
+        self.assertTrue(np.allclose(v3, np.cross(np.asarray(v1),
+                                                 np.asarray(v2))))
+        self.assertTrue(np.allclose(v3.p0, v1.p0))
+        self.assertFalse(np.allclose(v3.p0, v2.p0))
+
     def test_dot(self):
         v1 = Vector([1.0, 0.0], verbose=True)
         v2 = Vector([1.0, 1.0], verbose=True)
-        """The next test fails...Why?
-
-        .. todo:: understnad this test case failure.
-
-        """
-        #print('\ncomputing np.dot(v1, v2))')
-        #c = np.dot(v1, v2)
-        #print('c = np.dot(v1, v2): {}\n'.format(c))
-        #self.assertEqual(c, 1.0)
 
         # this way works, but defeats the purpose of the subclasses
         print('\ncomputing np.dot(np.asarray(v1), np.asarray(v2))')
@@ -272,14 +327,21 @@ class TestVector(unittest.TestCase):
         print('c = np.dot(v1, v2): {}\n'.format(c))
         self.assertEqual(c, 1.0)
 
-        # now try using methods
+        # now try the sknano.core.npmathobj.vector.dot function
         print('v1: {}'.format(v1))
         print('v2: {}'.format(v2))
-        print('\ncomputing v1.dot(v2)')
-        c = v1.dot(v2)
-        print('c = v1.dot(v2): {}\n'.format(c))
+        print('\ncomputing vec.dot(v1, v2)')
+        c = vec.dot(v1, v2)
+        print('c = vec.dot(v1, v2): {}\n'.format(c))
         self.assertEqual(c, 1.0)
 
+    def test_str(self):
+        v1 = Vector()
+        print('\n{!s}\n'.format(v1))
+
+    def test_repr(self):
+        v1 = Vector()
+        print('\n{!r}\n'.format(v1))
 
 if __name__ == '__main__':
     unittest.main()
