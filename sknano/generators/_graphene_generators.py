@@ -14,17 +14,16 @@ import copy
 
 import numpy as np
 
-from ..structure_io.atoms import StructureAtom as Atom, StructureAtoms as Atoms
-from ..tools import rotation_matrix
-from ..tools.refdata import CCbond
-
-from ._graphene import Graphene
-from ._structure_generator import StructureGenerator
+from ..core import rotation_matrix
+from ..core.atoms import Atom, Atoms
+from ..core.refdata import CCbond
+from ..structures import Graphene, BiLayerGraphene
+from ._base import GeneratorMixin
 
 __all__ = ['GrapheneGenerator', 'BiLayerGrapheneGenerator']
 
 
-class GrapheneGenerator(Graphene, StructureGenerator):
+class GrapheneGenerator(Graphene, GeneratorMixin):
     """Class for generating `N`-layer graphene nanostructures.
 
     Parameters
@@ -124,18 +123,9 @@ class GrapheneGenerator(Graphene, StructureGenerator):
 
     """
 
-    def __init__(self, length=None, width=None, edge=None,
-                 element1='C', element2='C', bond=CCbond,
-                 nlayers=1, layer_spacing=3.35, stacking_order='AB',
-                 autogen=True, with_units=False, units=None,
-                 verbose=False):
+    def __init__(self, autogen=True, **kwargs):
 
-        super(GrapheneGenerator, self).__init__(
-            length=length, width=width, edge=edge,
-            element1=element1, element2=element2, bond=bond,
-            nlayers=nlayers, layer_spacing=layer_spacing,
-            stacking_order=stacking_order, with_units=with_units, units=units,
-            verbose=verbose)
+        super(GrapheneGenerator, self).__init__(**kwargs)
 
         if autogen:
             self.generate_unit_cell()
@@ -204,7 +194,7 @@ class GrapheneGenerator(Graphene, StructureGenerator):
             # translate layer to put its center of mass at the origin
             layer.center_CM(r_indices=[0, 1])
             if (nlayer % 2) != 0:
-                layer.translate(self._layer_shift.components)
+                layer.translate(self._layer_shift)
 
             self._structure_atoms.extend(layer.atoms)
 
@@ -236,7 +226,7 @@ class GrapheneGenerator(Graphene, StructureGenerator):
             deg2rad=deg2rad, center_CM=False, **kwargs)
 
 
-class BiLayerGrapheneGenerator(GrapheneGenerator):
+class BiLayerGrapheneGenerator(BiLayerGraphene, GeneratorMixin):
     """Class for generating bi-layer graphene structures.
 
     Parameters

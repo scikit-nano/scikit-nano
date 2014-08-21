@@ -16,7 +16,7 @@ __docformat__ = 'restructuredtext en'
 
 #import numpy as np
 
-from ..core import Atoms
+from ..core.atoms import Atoms
 from ..structures import Fullerene
 from ._base import GeneratorMixin
 

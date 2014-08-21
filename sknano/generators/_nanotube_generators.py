@@ -25,7 +25,8 @@ import copy
 
 import numpy as np
 
-from ..core import Atom, Atoms, plural_word_check
+from ..core import plural_word_check
+from ..core.atoms import Atom, Atoms
 from ..structures import SWNT, UnrolledSWNT, MWNT
 from ._base import GeneratorMixin
 

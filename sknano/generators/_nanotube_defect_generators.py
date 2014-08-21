@@ -14,7 +14,7 @@ import itertools
 
 import numpy as np
 
-from ..tools.refdata import CCbond
+from ..core.refdata import CCbond
 
 from ._defect_generators import CrossLinkedDefectGenerator, \
     StoneWalesDefectGenerator, VacancyGenerator

@@ -15,8 +15,8 @@ import os
 
 import numpy as np
 
+from ..core.atoms import Atoms
 from ..io import StructureIO, supported_structure_formats
-from ..core import Atoms
 
 _vac_type_cluster_size_map = {'single': 1, 'double': 2, 'triple': 3}
 
