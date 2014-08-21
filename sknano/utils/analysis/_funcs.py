@@ -20,19 +20,19 @@ def find_target_atom(atoms, target_coords=None, search_radius=2.5,
 
     Parameters
     ----------
-    atoms : :class:`~sknano.structure_io.atoms.Atoms`
-        An :class:`~sknano.structure_io.atoms.Atoms` instance.
+    atoms : :class:`~sknano.core.atoms.XAtoms`
+        An :class:`~sknano.core.atoms.XAtoms` instance.
     target_coords : array_like
         An array or list of :math:`x,y,z` coordinates
     search_radius : float
         Cutoff distance to search within in units of
-        :class:`~sknano.structure_io.atoms.Atoms` style.
+        :class:`~sknano.core.atoms.XAtoms` style.
     nearest_target : bool, optional
 
     Returns
     -------
-    target_atom :class:`~sknano.structure_io.atoms.Atom`
-        An :class:`~sknano.structure_io.atoms.Atom` instance.
+    target_atom :class:`~sknano.core.atoms.XAtom`
+        An :class:`~sknano.core.atoms.XAtom` instance.
 
     """
     atom_tree = atoms.atom_tree
