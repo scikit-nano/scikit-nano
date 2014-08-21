@@ -14,13 +14,14 @@ Sub-packages
 .. autosummary::
    :toctree: generated/
 
+   analysis
    geometric_shapes
    symmetry_groups
 
 """
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
 
-__docformat__ = 'restructuredtext'
+__docformat__ = 'restructuredtext en'
 
 #from ._chirality_funcs import *
 
