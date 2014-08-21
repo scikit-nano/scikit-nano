@@ -15,7 +15,7 @@ from abc import ABCMeta, abstractproperty
 #import numbers
 import numpy as np
 
-from sknano.core import Point, Vector
+from sknano.core.npmathobj import Point, Vector
 from ._base import GeometricRegion
 
 __all__ = ['Geometric2DRegion', 'Circle', 'Ellipse', 'Parallelogram',
@@ -202,6 +202,7 @@ class Parallelogram(Geometric2DRegion):
 
         return (x >= self._xmin) and (x <= self._xmax) and \
             (y >= self._ymin) and (y <= self._ymax)
+
 
 class Rhombus(object):
     pass

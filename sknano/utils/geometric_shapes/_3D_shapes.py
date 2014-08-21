@@ -14,7 +14,7 @@ from abc import ABCMeta, abstractproperty
 
 import numpy as np
 
-from sknano.core import Point
+from sknano.core.npmathobj import Point
 from ._base import GeometricRegion
 
 __all__ = ['Geometric3DRegion', 'Cube', 'Cuboid', 'Ellipsoid', 'Spheroid',
@@ -67,6 +67,7 @@ class Parallelepiped(Geometric3DRegion):
                "xmax={!r}, ymax={!r}, zmax={!r})".format(
                    self._xmin, self._ymin, self._zmin,
                    self._xmax, self._ymax, self._zmax))
+
     @property
     def xmin(self):
         return self._xmin
@@ -202,9 +203,9 @@ class Cube(Geometric3DRegion):
 
         h, k, l = self._center
 
-        bounds = \
-            {'xmin': h - a / 2, 'ymin': k - a / 2, 'zmin': l - a / 2,
-             'xmax': h + a / 2, 'ymax': k + a / 2, 'zmax': l + a / 2}
+        #bounds = \
+        #    {'xmin': h - a / 2, 'ymin': k - a / 2, 'zmin': l - a / 2,
+        #     'xmax': h + a / 2, 'ymax': k + a / 2, 'zmax': l + a / 2}
 
     def __repr__(self):
         return("Cube(center={!r}, a={!r})".format(self.center, self.a))
