@@ -407,3 +407,6 @@ class XAtoms(Atoms):
                              for component in components]))
         else:
             filtered_coords
+
+    def select(self, **kwargs):
+        pass

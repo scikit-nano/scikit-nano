@@ -347,3 +347,6 @@ class XAtom(Atom):
 
         """
         self._v[:] = value
+
+    def compute_pyramidalization_angle(self):
+        pass
