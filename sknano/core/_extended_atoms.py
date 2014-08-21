@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Structure Atoms (:mod:`sknano.io.atoms._structure_atoms`)
+Atoms class with extended feature set (:mod:`sknano.core._extended_atoms`)
 ==============================================================================
 
-`Atoms` class for the :class:`~sknano.generator.StructureGenerator` classes.
+An "eXtended" `Atoms` class for structure analysis.
 
-.. currentmodule:: sknano.io.atoms._structure_atoms
+.. currentmodule:: sknano.core._extended_atoms
 
 """
 from __future__ import absolute_import, division, print_function
@@ -24,20 +24,20 @@ except ImportError:
           'nearest-neighbor queries between atoms.')
     has_kdtree = False
 
-from ...core import xyz_axes
 from ._atoms import Atoms
+from ._luts import xyz
 
-__all__ = ['StructureAtoms']
+__all__ = ['XAtoms']
 
 
-class StructureAtoms(Atoms):
-    """`Atoms` class for creating collection of `StructureAtom` objects.
+class XAtoms(Atoms):
+    """An eXtended `Atoms` class for structure analysis.
 
     Parameters
     ----------
-    atoms : {None, sequence, `StructureAtoms`}, optional
-        if not `None`, then a list of `StructureAtom` instance objects or an
-        existing `StructureAtoms` instance object.
+    atoms : {None, sequence, `XAtoms`}, optional
+        if not `None`, then a list of `XAtom` instance objects or an
+        existing `XAtoms` instance object.
     copylist : bool, optional
         perform shallow copy of atoms list
     deepcopy : bool, optional
@@ -51,7 +51,7 @@ class StructureAtoms(Atoms):
     def __init__(self, atoms=None, copylist=True, deepcopy=False,
                  use_kdtree=True):
 
-        super(StructureAtoms, self).__init__(
+        super(XAtoms, self).__init__(
             atoms=atoms, copylist=copylist, deepcopy=deepcopy,
             update_property_lists=False)
 
@@ -93,7 +93,7 @@ class StructureAtoms(Atoms):
 
     @property
     def atom_ids(self):
-        """Return array of `StructureAtom` IDs."""
+        """Return array of `XAtom` IDs."""
         atom_ids = []
         for atom in self._atoms:
             atom_ids.append(atom.atomID)
@@ -109,7 +109,7 @@ class StructureAtoms(Atoms):
 
     @property
     def charges(self):
-        """Return list of `StructureAtom` charges."""
+        """Return list of `XAtom` charges."""
         #self._charges_array = np.asarray(self._charges)
         charges = []
         for atom in self._atoms:
@@ -119,7 +119,7 @@ class StructureAtoms(Atoms):
 
     @property
     def coordination_numbers(self):
-        """Return array of `StructureAtom` coordination numbers."""
+        """Return array of `XAtom` coordination numbers."""
         self.update_coordination_numbers()
         coordination_numbers = []
         for atom in self._atoms:
@@ -128,7 +128,7 @@ class StructureAtoms(Atoms):
         return np.asarray(self._coordination_numbers)
 
     def update_coordination_numbers(self):
-        """Update `StructureAtom` coordination numbers."""
+        """Update `XAtom` coordination numbers."""
         if self._use_kdtree:
             NN_d, NN_i = \
                 self.query_atom_tree(n=self.NN_number,
@@ -142,7 +142,7 @@ class StructureAtoms(Atoms):
 
     @property
     def nearest_neighbors(self):
-        """Return array of nearest-neighbor atoms for each `StructureAtom`."""
+        """Return array of nearest-neighbor atoms for each `XAtom`."""
         self.update_nearest_neighbors()
         nearest_neighbors = []
         for atom in self._atoms:
@@ -151,7 +151,7 @@ class StructureAtoms(Atoms):
         return np.asarray(self._nearest_neighbors)
 
     def update_nearest_neighbors(self):
-        """Update `StructureAtom` nearest-neighbors."""
+        """Update `XAtom` nearest-neighbors."""
         if self._use_kdtree:
             NN_d, NN_i = self.query_atom_tree(n=self.NN_number,
                                               cutoff_radius=self.NN_cutoff)
@@ -202,7 +202,7 @@ class StructureAtoms(Atoms):
         return NN_d, NN_i
 
     def query_coordination_numbers(self, n=6, rc=np.inf):
-        """Query and update `StructureAtom` coordination numbers.
+        """Query and update `XAtom` coordination numbers.
 
         Parameters
         ----------
@@ -225,7 +225,7 @@ class StructureAtoms(Atoms):
         return np.asarray(self._coordination_numbers)
 
     def query_nearest_neighbors(self, n=6, rc=np.inf):
-        """Query and update `StructureAtom` nearest neighbors.
+        """Query and update `XAtom` nearest neighbors.
 
         Parameters
         ----------
@@ -249,17 +249,17 @@ class StructureAtoms(Atoms):
 
     @property
     def Ntypes(self):
-        """Number of atom types in `StructureAtoms`."""
+        """Number of atom types in `XAtoms`."""
         return len(self.atomtypes.keys())
 
     @property
     def q(self):
-        """Return the total net charge of `StructureAtoms`."""
+        """Return the total net charge of `XAtoms`."""
         return np.asarray(self.charges).sum()
 
     @property
     def velocities(self):
-        """Return array of `StructureAtom` velocities."""
+        """Return array of `XAtom` velocities."""
         velocities = []
         for atom in self._atoms:
             velocities.append(atom.v)
@@ -289,12 +289,12 @@ class StructureAtoms(Atoms):
         self._NN_cutoff = value
 
     def add_atomtype(self, atom):
-        """Add atom type to :attr:`~StructureAtoms.atomtypes`.
+        """Add atom type to :attr:`~XAtoms.atomtypes`.
 
         Parameters
         ----------
-        atom : :class:`~sknano.io.atoms.StructureAtom`
-            A :class:`~sknano.io.atoms.StructureAtom` instance.
+        atom : :class:`~sknano.core.XAtom`
+            A :class:`~sknano.core.XAtom` instance.
 
         """
         if atom.atomtype not in self._atomtypes:
@@ -307,19 +307,19 @@ class StructureAtoms(Atoms):
         Parameters
         ----------
         atomtypes : sequence
-            a list of `StructureAtom` object instances
+            a list of `XAtom` object instances
 
         """
         for atom in atomtypes:
             self.add_atomtype(atom)
 
     def assign_unique_ids(self, starting_id=1):
-        """Assign unique ID to each `StructureAtom` in `Atoms`."""
+        """Assign unique ID to each `XAtom` in `XAtoms`."""
         for i, atom in enumerate(self._atoms, start=starting_id):
             atom.atomID = i
 
     def filter_atoms(self, filter_atom_ids, invert=False):
-        """Filter `StructureAtoms`.
+        """Filter `XAtoms`.
 
         Parameters
         ----------
@@ -328,23 +328,23 @@ class StructureAtoms(Atoms):
 
         Returns
         -------
-        filtered_atoms : `StructureAtoms`
+        filtered_atoms : `XAtoms`
 
         """
         #if invert:
         #    filtered_atoms = \
-        #        StructureAtoms([atom for atom in self.atoms if
+        #        XAtoms([atom for atom in self.atoms if
         #               atom.atomID not in filter_atom_ids])
 
         #else:
         #    filtered_atoms = \
-        #        StructureAtoms([atom for atom in self.atoms if
+        #        XAtoms([atom for atom in self.atoms if
         #               atom.atomID in filter_atom_ids])
 
         filter_indices = \
             np.in1d(self.atom_ids, filter_atom_ids, invert=invert).nonzero()
         filtered_atoms = \
-            StructureAtoms(np.asarray(self._atoms)[filter_indices].tolist())
+            XAtoms(np.asarray(self._atoms)[filter_indices].tolist())
         return filtered_atoms
 
     def get_atom(self, atomID=None, index=None):
@@ -403,7 +403,7 @@ class StructureAtoms(Atoms):
 
         if as_dict:
             return OrderedDict(zip(
-                components, [filtered_coords[:, xyz_axes.index(component)]
+                components, [filtered_coords[:, xyz.index(component)]
                              for component in components]))
         else:
             filtered_coords

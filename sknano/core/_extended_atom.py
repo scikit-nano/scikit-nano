@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
 ============================================================================
-Structure Atom (:mod:`sknano.io.atoms._structure_atom`)
+Atom class with extended feature set (:mod:`sknano.core._extended_atom`)
 ============================================================================
 
-`Atom` class for :class:`~sknano.generator.StructureGenerator` classes.
+An "eXtended" `Atom` class for structure analysis.
 
-.. currentmodule:: sknano.io.atoms._structure_atom
+.. currentmodule:: sknano.core._extended_atom
 
 """
 from __future__ import absolute_import, division, print_function
@@ -15,12 +15,13 @@ __docformat__ = 'restructuredtext en'
 import numpy as np
 
 from ._atom import Atom
+from ._npcoremath import Vector
 
-__all__ = ['StructureAtom']
+__all__ = ['XAtom']
 
 
-class StructureAtom(Atom):
-    """`Atom` class for :class:`~sknano.nanogen.StructureGenerator` classes.
+class XAtom(Atom):
+    """An eXtended `Atom` class for structure analysis.
 
     Parameters
     ----------
@@ -28,7 +29,7 @@ class StructureAtom(Atom):
         A string representation of the element symbol or an integer specifying
         an element atomic number.
     x, y, z : float, optional
-        :math:`x, y, z` components of `Atom` position vector relative to
+        :math:`x, y, z` components of `XAtom` position vector relative to
         origin.
     atomID : int, optional
         atom ID
@@ -37,31 +38,25 @@ class StructureAtom(Atom):
     atomtype : int, optional
         atom type
     q : {int, float}, optional
-        Net charge of `Atom`.
+        Net charge of `XAtom`.
     vx, vy, vz : float, optional
-        :math:`v_x, v_y, v_z` components of `Atom` velocity.
-    r_units : str, optional
-        Units of position components.
-    v_units : str, optional
-        Units of velocity components.
+        :math:`v_x, v_y, v_z` components of `XAtom` velocity.
     nx, ny, nz : int, optional
         :math:`n_x, n_y, n_z` image flags
     CN : int, optional
-        `Atom` coordination number.
+        `XAtom` coordination number.
     NN : sequence, optional
-        List of nearest-neighbor `Atom` objects instances
+        List of nearest-neighbor `XAtom` objects instances
 
     """
 
     def __init__(self, element=None, atomID=0, moleculeID=0, atomtype=1, q=0.,
                  mass=None, x=None, y=None, z=None, vx=None, vy=None, vz=None,
-                 with_units=False, r_units=None, v_units=None,
                  nx=None, ny=None, nz=None, CN=None, NN=None):
 
-        super(StructureAtom, self).__init__(element=element, m=mass,
-                                            x=x, y=y, z=z)
+        super(XAtom, self).__init__(element=element, m=mass, x=x, y=y, z=z)
 
-        self._v = Vector(x=vx, y=vy, z=vz)
+        self._v = Vector([vx, vy, vz])
 
         self._n = np.zeros(3, dtype=int)
         for i, ni in enumerate((nx, ny, nz)):
@@ -80,22 +75,22 @@ class StructureAtom(Atom):
 
     @property
     def CN(self):
-        """Return `Atom` coordination number."""
+        """Return `XAtom` coordination number."""
         return self._CN
 
     @CN.setter
     def CN(self, value=int):
-        """Set `Atom` coordination number."""
+        """Set `XAtom` coordination number."""
         self._CN = int(value)
 
     @property
     def NN(self):
-        """Return list of nearest-neighbor `Atom` objects."""
+        """Return list of nearest-neighbor `XAtom` objects."""
         return self._NN
 
     @NN.setter
     def NN(self, value=list):
-        """Set list of nearest-neighbor `Atom` objects."""
+        """Set list of nearest-neighbor `XAtom` objects."""
         self._NN = value
 
     @property
@@ -107,7 +102,7 @@ class StructureAtom(Atom):
 
     @q.setter
     def q(self, value=float):
-        """Set `Atom` charge :math:`q`.
+        """Set `XAtom` charge :math:`q`.
 
         Parameters
         ----------
@@ -120,7 +115,7 @@ class StructureAtom(Atom):
 
     @property
     def atomID(self):
-        """:attr:`~StructureAtom.atomID`."""
+        """:attr:`~XAtom.atomID`."""
         return self._atomID
 
     @atomID.setter
@@ -137,12 +132,12 @@ class StructureAtom(Atom):
 
     @property
     def moleculeID(self):
-        """:attr:`~StructureAtom.moleculeID`."""
+        """:attr:`~XAtom.moleculeID`."""
         return self._moleculeID
 
     @moleculeID.setter
     def moleculeID(self, value=int):
-        """Set molecule ID of atom.
+        """Set :attr:`~XAtom.moleculeID` attribute.
 
         Parameters
         ----------
@@ -154,12 +149,12 @@ class StructureAtom(Atom):
 
     @property
     def atomtype(self):
-        """:attr:`~StructureAtom.atomtype`."""
+        """:attr:`~XAtom.atomtype`."""
         return self._atomtype
 
     @atomtype.setter
     def atomtype(self, value=int):
-        """Set atom type of atom.
+        """Set :attr:`~XAtom.atomtype` attribute.
 
         Parameters
         ----------
@@ -231,7 +226,7 @@ class StructureAtom(Atom):
 
     @nz.setter
     def nz(self, value=int):
-        """Set `Atom` :math:`n_z` image flag.
+        """Set `XAtom` :math:`n_z` image flag.
 
         Parameters
         ----------
@@ -243,125 +238,112 @@ class StructureAtom(Atom):
 
     @property
     def n(self):
-        """:math:`n_x, n_y, n_z` image flags of `Atom`.
+        """:math:`n_x, n_y, n_z` image flags of `XAtom`.
 
         Returns
         -------
         ndarray
             3-element ndarray of [:math:`n_x`, :math:`n_y`, :math:`n_z`]
-            image flags of `Atom`.
+            image flags of `XAtom`.
 
         """
         return self._n
 
     @n.setter
     def n(self, value=np.ndarray):
-        """Set :math:`n_x, n_y, n_z` image flags of `Atom`.
+        """Set :math:`n_x, n_y, n_z` image flags of `XAtom`.
 
         Parameters
         ----------
         value : array_like
             3-element ndarray of [:math:`n_x`, :math:`n_y`, :math:`n_z`]
-            image flags of `Atom`.
+            image flags of `XAtom`.
 
         """
-        for i, ni in enumerate(value):
-            self._n[i] = ni
+        self._n[:] = value
 
     @property
     def vx(self):
-        """:math:`v_x` component in units of `v_units`.
-
-        Returns
-        -------
-        float
-            :math:`v_x` component in units of `v_units`.
-
-        """
+        """:math:`x` component of `XAtom` velocity vector"""
         return self._v.x
 
     @vx.setter
     def vx(self, value=float):
-        """Set `Atom` :math:`v_x` component.
+        """Set :math:`v_x`.
+
+        Set :math:`v_x`, the :math:`x` component of `XAtom` velocity
+        vector.
 
         Parameters
         ----------
         value : float
-            :math:`v_x` component in units of `v_units`.
+            :math:`v_x` component of velocity
 
         """
         self._v.x = value
 
     @property
     def vy(self):
-        """:math:`v_y` component in units of `v_units`.
-
-        Returns
-        -------
-        float
-            :math:`v_y` component in units of `v_units`.
-
-        """
+        """:math:`x` component of `XAtom` velocity vector"""
         return self._v.y
 
     @vy.setter
     def vy(self, value=float):
-        """Set `Atom` :math:`v_y` component.
+        """Set :math:`v_y`.
+
+        Set :math:`v_y`, the :math:`y` component of `XAtom` velocity
+        vector.
 
         Parameters
         ----------
         value : float
-            :math:`v_y` component in units of `v_units`.
+            :math:`v_y` component of velocity
 
         """
         self._v.y = value
 
     @property
     def vz(self):
-        """:math:`v_z` component in units of `v_units`.
-
-        Returns
-        -------
-        float
-            :math:`v_z` component in units of `v_units`.
-
-        """
+        """:math:`z` component of `XAtom` velocity vector"""
         return self._v.z
 
     @vz.setter
     def vz(self, value=float):
-        """Set `Atom` :math:`v_z` component.
+        """Set :math:`v_z`.
+
+        Set :math:`v_z`, the :math:`z` component of `XAtom` velocity
+        vector.
 
         Parameters
         ----------
         value : float
-            :math:`v_z` component in units of `v_units`.
+            :math:`v_z` component of velocity
 
         """
         self._v.z = value
 
     @property
     def v(self):
-        """:math:`v_x, v_y, v_z` velocity components in default units.
+        """:math:`v_x, v_y, v_z` array of velocity components.
 
         Returns
         -------
         ndarray
             3-element ndarray of [:math:`v_x`, :math:`v_y`, :math:`v_z`]
-            velocity components of `Atom`.
+            velocity components of `XAtom`.
 
         """
-        return self._v.components
+        return self._v
 
     @v.setter
     def v(self, value=np.ndarray):
-        """Set :math:`x, y, z` components of `Atom` velocity.
+        """Set :math:`x, y, z` components of `XAtom` velocity.
 
         Parameters
         ----------
         value : array_like
             3-element ndarray of [:math:`v_x`, :math:`v_y`, :math:`v_z`]
-            velocity components of `Atom`.
+            velocity components of `XAtom`.
 
         """
-        self._v.components = value
+        self._v[:] = value
