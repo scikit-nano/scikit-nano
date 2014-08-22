@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-Nanotube defect generator (:mod:`sknano.nanogen._nanotube_defect_generators`)
+Nanotube defect generator (:mod:`sknano.generators._nanotube_defect_generators`)
 =============================================================================
 
-.. currentmodule:: sknano.nanogen._nanotube_defect_generators
+.. currentmodule:: sknano.generators._nanotube_defect_generators
 
 """
 from __future__ import absolute_import, division, print_function
@@ -79,12 +79,12 @@ class NanotubeStoneWalesDefectGenerator(StoneWalesDefectGenerator):
     in real-time. The `NanotubeStoneWalesDefectGenerator` uses
     the `NanotubeBundleGenerator` class to generate
     nanotube structure data. See the structure generator classes provided
-    by the :mod:`~sknano.nanogen` module for more detailed docs.
+    by the :mod:`~sknano.generators` module for more detailed docs.
 
     In the next example, we'll generate a nanotube bundle and add
     some SW defects to it.
 
-    >>> from sknano.nanogen import NanotubeStoneWalesDefectGenerator
+    >>> from sknano.generators import NanotubeStoneWalesDefectGenerator
     >>> swntbundle = NanotubeStoneWalesDefectGenerator(
     ...     n=10, m=5, Lz=10, fix_Lz=True, bundle_geometry='hexagon')
 
@@ -242,12 +242,12 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     in real-time. The `NanotubeVacancyGenerator` uses
     the `NanotubeBundleGenerator` class to generate
     nanotubes. See the structure generator classes provided by the
-    :mod:`~sknano.nanogen` module for more detailed docs.
+    :mod:`~sknano.generators` module for more detailed docs.
 
     In the next example, we'll generate a nanotube bundle and then
     poke some holes in it.
 
-    >>> from sknano.nanogen import NanotubeVacancyGenerator
+    >>> from sknano.generators import NanotubeVacancyGenerator
     >>> ntvg = NanotubeVacancyGenerator(n=10, m=5, Lz=10, fix_Lz=True,
     ...                                 bundle_geometry='hexagon')
 

@@ -1874,7 +1874,7 @@ class NanotubeBundleMixin(object):
             Number of repeat unit cells in the :math:`x, y, z` dimensions
         element1, element2 : {str, int}, optional
             Element symbol or atomic number of basis
-            :class:`~sknano.chemistry.Atoms` 1 and 2
+            :class:`~sknano.core.atoms.Atoms` 1 and 2
 
         Returns
         -------

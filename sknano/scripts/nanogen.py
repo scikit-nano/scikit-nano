@@ -5,14 +5,14 @@
 Command line script (:mod:`sknano.scripts.nanogen`)
 ====================================================
 
-CLI to :mod:`sknano.nanogen` tools.
+CLI to :mod:`sknano.generators` tools.
 
 .. currentmodule:: sknano.scripts.nanogen
 
 This module allows for easy structure generation from the command line.
 
-The :mod:`sknano.nanogen` package provides a python class
-(:py:class:`~sknano.nanogen.TubeGen`) which wraps the
+The :mod:`sknano.generators` package provides a python class
+(:py:class:`~sknano.generators.TubeGen`) which wraps the
 functionality of the TubeGen ([TG]_) binary executable.
 TubeGen generates structure data for nanotubes and graphene.
 
@@ -21,13 +21,13 @@ system :envvar:`PATH` and callable as :program:`tubegen`.
 
 .. seealso::
 
-   :py:class:`~sknano.nanogen.TubeGen`
+   :py:class:`~sknano.generators.TubeGen`
 
-   :py:class:`~sknano.nanogen.GrapheneGenerator`
+   :py:class:`~sknano.generators.GrapheneGenerator`
 
-   :py:class:`~sknano.nanogen.NanotubeBundleGenerator`
+   :py:class:`~sknano.generators.NanotubeBundleGenerator`
 
-   :py:class:`~sknano.nanogen.MWNTGenerator`
+   :py:class:`~sknano.generators.MWNTGenerator`
 
 .. code-block:: python
 

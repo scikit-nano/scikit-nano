@@ -34,7 +34,7 @@ class GeneratorMixin(object):
 
     @property
     def structure_atoms(self):
-        """Return structure :class:`~sknano.structure_io.atoms.Atoms`."""
+        """Return structure :class:`~sknano.core.atoms.Atoms`."""
         return self._structure_atoms
 
     @property
@@ -44,7 +44,7 @@ class GeneratorMixin(object):
 
     @property
     def unit_cell(self):
-        """Return unit cell :class:`~sknano.structure_io.atoms.Atoms`."""
+        """Return unit cell :class:`~sknano.core.atoms.Atoms`."""
         return self._unit_cell
 
     def save_data(self, fname=None, outpath=None, structure_format=None,

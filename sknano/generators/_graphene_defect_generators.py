@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =============================================================================
-Graphene defect generator (:mod:`sknano.nanogen._graphene_defect_generators`)
+Graphene defect generator (:mod:`sknano.generators._graphene_defect_generators`)
 =============================================================================
 
-.. currentmodule:: sknano.nanogen._graphene_defect_generators
+.. currentmodule:: sknano.generators._graphene_defect_generators
 
 """
 from __future__ import absolute_import, division, print_function
@@ -79,7 +79,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
 
     Import the `GrapheneVacancyGenerator` class.
 
-    >>> from sknano.nanogen import GrapheneVacancyGenerator
+    >>> from sknano.generators import GrapheneVacancyGenerator
 
     You can supply any existing structure data file
     (as long as its a supported format) to

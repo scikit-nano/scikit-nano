@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==========================================================================
-Graphene structure generators (:mod:`sknano.nanogen._graphene_generators`)
+Graphene structure generators (:mod:`sknano.generators._graphene_generators`)
 ==========================================================================
 
-.. currentmodule:: sknano.nanogen._graphene_generators
+.. currentmodule:: sknano.generators._graphene_generators
 
 """
 from __future__ import absolute_import, division, print_function
@@ -37,7 +37,7 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
         the `length` of the sheet.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.structure_io.atoms.Atom` 1 and 2
+        :class:`~sknano.core.atoms.Atom` 1 and 2
     bond : float, optional
         bond length between nearest-neighbor atoms in **Angstroms**.
     nlayers : int, optional
@@ -56,9 +56,9 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
     The `GrapheneGenerator` class and its subclasses generate graphene with
     either an armchair or zigzag edge using a 4-atom conventional unit cell.
     If you want to generate graphene as an *unrolled nanotube*, see the
-    :class:`~sknano.nanogen.UnrolledNanotubeGenerator` class.
+    :class:`~sknano.generators.UnrolledNanotubeGenerator` class.
 
-    .. seealso:: :class:`~sknano.nanogen.UnrolledNanotubeGenerator`
+    .. seealso:: :class:`~sknano.generators.UnrolledNanotubeGenerator`
 
     Examples
     --------
@@ -66,7 +66,7 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
     Start an interactive python or ipython session, then import the
     `GrapheneGenerator` class.
 
-    >>> from sknano.nanogen import GrapheneGenerator
+    >>> from sknano.generators import GrapheneGenerator
 
     Now generate a **20 nm x 1 nm** armchair edge graphene nano-ribbon.
 
@@ -203,7 +203,7 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
                   center_CM=True, **kwargs):
         """Save structure data.
 
-        See :meth:`~sknano.nanogen.StructureGenerator.save_data` method
+        See :meth:`~sknano.generators.StructureGenerator.save_data` method
         for documentation.
 
         """
@@ -240,7 +240,7 @@ class BiLayerGrapheneGenerator(BiLayerGraphene, GeneratorMixin):
         the `length` of the sheet.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.structure_io.atoms.Atom` 1 and 2
+        :class:`~sknano.core.atoms.Atom` 1 and 2
     bond : float, optional
         bond length between nearest-neighbor atoms in **Angstroms**.
     layer_spacing : float, optional
@@ -263,7 +263,7 @@ class BiLayerGrapheneGenerator(BiLayerGraphene, GeneratorMixin):
 
     Import the BiLayerGrapheneGenerator class
 
-    >>> from sknano.nanogen import BiLayerGrapheneGenerator
+    >>> from sknano.generators import BiLayerGrapheneGenerator
 
     Generate **10 nm** wide by **1 nm** long `AB` stacked
     bilayer-graphene with a `ZZ` edge:
