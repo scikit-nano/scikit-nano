@@ -9,20 +9,25 @@ Abstract geometric data structures (:mod:`sknano.utils.geometric_shapes`)
 Contents
 ========
 
-2D Shapes
-----------
-
+Abstract Base Classes for defining new geometric shapes
+--------------------------------------------------------
 .. autosummary::
    :toctree: generated/
 
-   Circle
-   Ellipse
+   GeometricRegion
+   Geometric2DRegion
+   Geometric3DRegion
+
+2D Shapes
+----------
+.. autosummary::
+   :toctree: generated/
+
    Parallelogram
-   Rhombus
-   Rhomboid
    Rectangle
    Square
-   Polygon
+   Ellipse
+   Circle
 
 3D Shapes
 ----------
@@ -30,21 +35,19 @@ Contents
 .. autosummary::
    :toctree: generated/
 
-   Cube
+   Parallelepiped
    Cuboid
+   Cube
    Ellipsoid
    Spheroid
    Sphere
-   Polyhedron
-   Hexahedron
-   Parallelepiped
-   Rhombohedron
 
 """
 from __future__ import absolute_import, division, print_function
 
 __docformat__ = 'restructuredtext en'
 
+from ._base import *
 from ._2D_shapes import *
 from ._3D_shapes import *
 
