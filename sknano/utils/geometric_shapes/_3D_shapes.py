@@ -14,11 +14,11 @@ from abc import ABCMeta, abstractproperty
 
 import numpy as np
 
-from sknano.core.npmathobj import Point
+from sknano.core.npmathobj import Point, vector as vec
 from ._base import GeometricRegion
 
-__all__ = ['Geometric3DRegion', 'Cube', 'Cuboid', 'Ellipsoid', 'Spheroid',
-           'Sphere', 'Parallelepiped']
+__all__ = ['Geometric3DRegion', 'Parallelepiped', 'Cuboid', 'Cube',
+           'Ellipsoid', 'Spheroid', 'Sphere']
 
 
 class Geometric3DRegion(GeometricRegion):
@@ -116,55 +116,100 @@ class Parallelepiped(Geometric3DRegion):
         pass
 
     def contains_point(self):
-        """Check if point is contained within volume of parallelpiped."""
+        """Check if point is contained within volume of `Parallelepiped`."""
         pass
 
 
 class Cuboid(Geometric3DRegion):
-    """Abstract data structure representing a cuboid.
+    """Abstract representation of cuboid.
 
     .. versionadded:: 0.3.0
 
     Parameters
     ----------
-    xmin, ymin, zmin : float
-    xmax, ymax, zmax : float
     pmin, pmax : sequence, optional
+    xmin, ymin, zmin : float, optional
+    xmax, ymax, zmax : float, optional
 
     """
-    def __init__(self, xmin=None, ymin=None, zmin=None,
-                 xmax=None, ymax=None, zmax=None, pmin=None, pmax=None):
+    def __init__(self, pmin=None, pmax=None,
+                 xmin=None, ymin=None, zmin=None,
+                 xmax=None, ymax=None, zmax=None):
 
-        pass
+        if pmin is None:
+            pmin = Point([xmin, ymin, zmin])
+        elif isinstance(pmin, (tuple, list, np.ndarray)):
+            pmin = Point(pmin)
+
+        self._pmin = pmin
+        self._xmin, self._ymin, self._zmin = self._pmin
+
+        if pmax is None:
+            pmax = Point([xmax, ymax, zmax])
+        elif isinstance(pmax, (tuple, list, np.ndarray)):
+            pmax = Point(pmax)
+
+        self._pmax = pmax
+        self._xmax, self._ymax, self._zmax = self._pmax
 
     def __repr__(self):
-        return("Cuboid(xmin={!r}, ymin={!r}, zmin={!r}, "
-               "xmax={!r}, ymax={!r}, zmax={!r})".format(
-                   self._xmin, self._ymin, self._zmin,
-                   self._xmax, self._ymax, self._zmax))
+        return "Cuboid(pmin={!r}, pmax={!r})".format(self.pmin, self.pmax)
 
     @property
-    def a(self):
-        return self._xmax - self._xmin
+    def pmin(self):
+        return self._pmin
 
     @property
-    def b(self):
-        return self._ymax - self._ymin
+    def pmax(self):
+        return self._pmax
 
     @property
-    def c(self):
-        return self._zmax - self._zmin
+    def xmin(self):
+        return self._xmin
+
+    @property
+    def ymin(self):
+        return self._ymin
+
+    @property
+    def zmin(self):
+        return self._zmin
+
+    @property
+    def xmax(self):
+        return self._xmax
+
+    @property
+    def ymax(self):
+        return self._ymax
+
+    @property
+    def zmax(self):
+        return self._zmax
+
+    @property
+    def center(self):
+        h = (self.xmax + self.xmin) / 2
+        k = (self.ymax + self.ymin) / 2
+        l = (self.zmax + self.zmin) / 2
+        return Point(x=h, y=k, z=l)
 
     @property
     def centroid(self):
-        pass
+        xcom = 0.5 * (self.xmin + self.xmax)
+        ycom = 0.5 * (self.ymin + self.ymax)
+        zcom = 0.5 * (self.zmin + self.zmax)
+        return Point([xcom, ycom, zcom])
 
     @property
     def volume(self):
-        pass
+        a = self.a
+        b = self.b
+        c = self.c
+        return a * b * c
 
     def contains_point(self, point=None):
-        """Check if point is contained within volume of cuboid."""
+        """Check if point is contained within volume of `Cuboid`."""
         x, y, z = point
 
         return((x >= self._xmin) and (x <= self._xmax) and
@@ -187,7 +232,7 @@ class Cube(Geometric3DRegion):
         length of edge
 
     """
-    def __init__(self, a=None, center=None):
+    def __init__(self, center=None, a=None):
 
         if center is None:
             center = Point()
@@ -201,30 +246,25 @@ class Cube(Geometric3DRegion):
 
         self._a = a
 
-        h, k, l = self._center
-
-        #bounds = \
-        #    {'xmin': h - a / 2, 'ymin': k - a / 2, 'zmin': l - a / 2,
-        #     'xmax': h + a / 2, 'ymax': k + a / 2, 'zmax': l + a / 2}
-
     def __repr__(self):
         return("Cube(center={!r}, a={!r})".format(self.center, self.a))
-
-    @property
-    def a(self):
-        return self._a
 
     @property
     def center(self):
         return self._center
 
     @property
+    def a(self):
+        return self._a
+
+    @property
     def centroid(self):
-        pass
+        self.center
 
     @property
     def volume(self):
-        pass
+        a = self.a
+        return a**3
 
     def contains_point(self, point=None):
         pass
@@ -255,6 +295,13 @@ class Ellipsoid(Geometric3DRegion):
     """
     def __init__(self, center=None, a=None, b=None, c=None):
 
+        if center is None:
+            center = Point()
+        elif isinstance(center, (tuple, list, np.ndarray)):
+            center = Point(center)
+
+        self._center = center
+
         if a is None:
             a = 0.5
         if b is None:
@@ -263,13 +310,6 @@ class Ellipsoid(Geometric3DRegion):
             c = 0.5
 
         self._a, self._b, self._c = a, b, c
-
-        if center is None:
-            center = Point()
-        elif isinstance(center, (tuple, list, np.ndarray)):
-            center = Point(center)
-
-        self._center = center
 
     def __repr__(self):
         return("Ellipsoid(center={!r}, a={!r}, b={!r}, c={!r})".format(
@@ -293,11 +333,14 @@ class Ellipsoid(Geometric3DRegion):
 
     @property
     def centroid(self):
-        pass
+        return self.center
 
     @property
     def volume(self):
-        pass
+        a = self.a
+        b = self.b
+        c = self.c
+        return 4 / 3 * np.pi * a * b * c
 
     def contains_point(self, point=None):
         """Check if point is contained within volume of :class:`Ellipsoid`."""
@@ -306,9 +349,7 @@ class Ellipsoid(Geometric3DRegion):
         h, k, l = self.center
         a, b, c = self.a, self.b, self.c
 
-        return((x - h)**2 / a**2 +
-               (y - k)**2 / b**2 +
-               (z - l)**2 / c**2 < 1.0)
+        return (x - h)**2 / a**2 + (y - k)**2 / b**2 + (z - l)**2 / c**2 <= 1.0
 
 
 class Spheroid(Geometric3DRegion):
@@ -367,21 +408,22 @@ class Spheroid(Geometric3DRegion):
 
     @property
     def centroid(self):
-        pass
+        return self.center
 
     @property
     def volume(self):
-        pass
+        a = self.a
+        c = self.c
+        return 4 / 3 * np.pi * a**2 * c
 
     def contains_point(self, point=None):
-        """Check if point is contained within volume of :class:`Ellipsoid`."""
+        """Check if point is contained within volume of :class:`Spheroid`."""
         x, y, z = point
 
         h, k, l = self.center
         a, c = self.a, self.c
 
-        return(((x - h)**2 + (y - k)**2) / a**2 +
-               (z - l)**2 / c**2 < 1.0)
+        return ((x - h)**2 + (y - k)**2) / a**2 + (z - l)**2 / c**2 <= 1.0
 
 
 class Sphere(Geometric3DRegion):
@@ -398,7 +440,7 @@ class Sphere(Geometric3DRegion):
     r : float, optional
         Sphere radius :math:`r`
     """
-    def __init__(self, center=None, r=1.0):
+    def __init__(self, center=None, r=None):
 
         if center is None:
             center = Point()
@@ -425,11 +467,12 @@ class Sphere(Geometric3DRegion):
 
     @property
     def centroid(self):
-        pass
+        return self.center
 
     @property
     def volume(self):
-        pass
+        r = self.r
+        return 4 / 3 * np.pi * r**3
 
     def contains_point(self, point=None):
         x, y, z = point
@@ -437,4 +480,4 @@ class Sphere(Geometric3DRegion):
         h, k, l = self.center
         r = self.r
 
-        return((x - h)**2 + (y - k)**2 + (z - l)**2 < r**2)
+        return (x - h)**2 + (y - k)**2 + (z - l)**2 <= r**2
