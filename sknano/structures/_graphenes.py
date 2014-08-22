@@ -15,7 +15,7 @@ __docformat__ = 'restructuredtext en'
 import numpy as np
 
 from ..core.atoms import Atom
-from ..core.npmathobj import Vector
+from ..core.math import Vector
 from ..core.refdata import CCbond, dVDW, grams_per_Da
 
 edge_types = {'armchair': 'AC', 'zigzag': 'ZZ'}

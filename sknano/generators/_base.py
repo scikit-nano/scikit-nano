@@ -12,7 +12,7 @@ __docformat__ = 'restructuredtext en'
 
 import os
 
-from ..core import rotation_matrix
+from ..core.math import rotation_matrix
 from ..io import StructureIO, default_structure_format, \
     supported_structure_formats
 

@@ -15,7 +15,7 @@ from collections import OrderedDict
 import numpy as np
 
 from sknano.core import xyz
-from sknano.core.npmathobj import Vector
+from sknano.core.math import Vector
 from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols
 

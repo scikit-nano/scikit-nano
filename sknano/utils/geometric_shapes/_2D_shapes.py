@@ -12,10 +12,9 @@ __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractproperty
 
-#import numbers
 import numpy as np
 
-from sknano.core.npmathobj import Point, Vector
+from sknano.core.math import Point, Vector
 from ._base import GeometricRegion
 
 __all__ = ['Geometric2DRegion', 'Parallelogram', 'Rectangle', 'Square',

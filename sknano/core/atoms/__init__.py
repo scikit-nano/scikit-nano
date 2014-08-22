@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-====================================================================
-Core structure atom classes (:mod:`sknano.core.atoms`)
-====================================================================
+===============================================================================
+Abstract data structures for Atom objects (:mod:`sknano.core.atoms`)
+===============================================================================
 
 .. currentmodule:: sknano.core.atoms
 
 Contents
 ========
+
 .. autosummary::
    :toctree: generated/
 

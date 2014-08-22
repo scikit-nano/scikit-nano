@@ -9,18 +9,8 @@ Core package modules (:mod:`sknano.core`)
 Contents
 ========
 
-Abstract data structures for Atom objects
------------------------------------------
-.. autosummary::
-   :toctree: generated/
-
-   Atom
-   Atoms
-   XAtom
-   XAtoms
-
-Core helper functions
-----------------------
+Core package helper functions
+------------------------------
 .. autosummary::
    :toctree: generated/
 
@@ -38,43 +28,28 @@ Decorator functions
    deprecated
    with_doc
 
-Helper functions for I/O
--------------------------
+Functions for file I/O
+-----------------------
 .. autosummary::
    :toctree: generated/
 
    get_fpath
 
-Math functions
----------------
-.. autosummary::
-   :toctree: generated/
-
-   totient_func
-
-Abstract data structures for math
---------------------------------------
-.. autosummary::
-   :toctree: generated/
-
-   Point
-   Vector
-
-Helper functions for manipulating strings
-------------------------------------------
+Functions for string manipulation
+----------------------------------
 .. autosummary::
    :toctree: generated/
 
    plural_word_check
 
-Functions for linear algebra transforms
------------------------------------------------
+Sub-packages
+------------
 .. autosummary::
    :toctree: generated/
 
-   rotate_point
-   rotation_matrix
-   transformation_matrix
+   atoms
+   math
+   refdata
 
 """
 from __future__ import absolute_import, division, print_function
@@ -84,9 +59,7 @@ from ._core import *
 from ._decorators import *
 from ._iofuncs import *
 from ._luts import *
-from ._mathfuncs import *
 from ._strfuncs import *
-from ._transforms import *
 from ._warnings import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]

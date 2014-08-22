@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Custom NumPy Point class (:mod:`sknano.core.npmathobj._point`)
+Custom NumPy Point class (:mod:`sknano.core.math._point`)
 ==============================================================================
 
-.. currentmodule:: sknano.core.npmathobj._point
+.. currentmodule:: sknano.core.math._point
 
 """
 from __future__ import absolute_import, division, print_function

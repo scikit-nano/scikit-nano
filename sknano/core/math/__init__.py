@@ -1,25 +1,44 @@
 # -*- coding: utf-8 -*-
 """
 ======================================================================
-Core package modules (:mod:`sknano.core`)
+Core data structures for math (:mod:`sknano.core.math`)
 ======================================================================
 
-.. currentmodule:: sknano.core
+.. currentmodule:: sknano.core.math
 
 Contents
 ========
 
-Abstract data structures for math
---------------------------------------
+Abstract object representations for points and vectors
+-------------------------------------------------------
 .. autosummary::
    :toctree: generated/
 
    Point
    Vector
 
+Linear algebra transforms
+----------------------------
+.. autosummary::
+   :toctree: generated/
+
+   rotate_point
+   rotation_matrix
+   transformation_matrix
+
+Number theory
+---------------
+.. autosummary::
+   :toctree: generated/
+
+   totient_func
+
 """
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
+
+from ._funcs import *
+from ._transforms import *
 
 from ._point import *
 from ._vector import *

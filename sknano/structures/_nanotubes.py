@@ -15,8 +15,8 @@ from fractions import gcd
 import numpy as np
 np.seterr(all='raise')
 
-from ..core import comparison_symbol_operator_mappings
 from ..core.atoms import Atom
+from ..core.math import comparison_symbol_operator_mappings
 from ..core.refdata import CCbond, dVDW, grams_per_Da
 
 __all__ = ['Nanotube', 'NanotubeBundleMixin', 'MWNTMixin',

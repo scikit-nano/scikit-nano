@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==================================================================
-Custom NumPy Vector class (:mod:`sknano.core.npmathobj._vector`)
+Custom NumPy Vector class (:mod:`sknano.core.math._vector`)
 ==================================================================
 
-.. currentmodule:: sknano.core.npmathobj._vector
+.. currentmodule:: sknano.core.math._vector
 
 """
 from __future__ import absolute_import, division, print_function

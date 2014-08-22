@@ -7,7 +7,7 @@ import unittest
 
 import numpy as np
 
-from sknano.core.npmathobj import Point, Vector, vector as vec
+from sknano.core.math import Point, Vector, vector as vec
 
 
 class TestPoint(unittest.TestCase):
@@ -257,7 +257,7 @@ class TestVector(unittest.TestCase):
         v1 = Vector([1.0, 0.0], verbose=True)
         v2 = Vector([1.0, 1.0], verbose=True)
 
-        # now try the sknano.core.npmathobj.vector.cross function
+        # now try the sknano.core.math.vector.cross function
         print('\ncomputing vec.cross(v1, v2)')
         print('v1: {}'.format(v1))
         print('v2: {}'.format(v2))
@@ -327,7 +327,7 @@ class TestVector(unittest.TestCase):
         print('c = np.dot(v1, v2): {}\n'.format(c))
         self.assertEqual(c, 1.0)
 
-        # now try the sknano.core.npmathobj.vector.dot function
+        # now try the sknano.core.math.vector.dot function
         print('v1: {}'.format(v1))
         print('v2: {}'.format(v2))
         print('\ncomputing vec.dot(v1, v2)')

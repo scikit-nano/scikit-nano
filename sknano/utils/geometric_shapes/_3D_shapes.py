@@ -14,7 +14,7 @@ from abc import ABCMeta, abstractproperty
 
 import numpy as np
 
-from sknano.core.npmathobj import Point, vector as vec
+from sknano.core.math import Point, vector as vec
 from ._base import GeometricRegion
 
 __all__ = ['Geometric3DRegion', 'Parallelepiped', 'Cuboid', 'Cube',
@@ -43,30 +43,12 @@ class Parallelepiped(Geometric3DRegion):
     pmin, pmax : sequence, optional
 
     """
-    def __init__(self, xmin=None, ymin=None, zmin=None,
-                 xmax=None, ymax=None, zmax=None, pmin=None, pmax=None):
-
-        if pmin is None:
-            pmin = Point([xmin, ymin, zmin])
-        elif isinstance(pmin, (tuple, list, np.ndarray)):
-            pmin = Point(pmin)
-
-        self._pmin = pmin
-        self._xmin, self._ymin, self._zmin = self._pmin
-
-        if pmax is None:
-            pmax = Point([xmax, ymax, zmax])
-        elif isinstance(pmax, (tuple, list, np.ndarray)):
-            pmax = Point(pmax)
-
-        self._pmax = pmax
-        self._xmax, self._ymax, self._zmax = self._pmax
+    def __init__(self, o=None, u=None, v=None, w=None):
+        pass
 
     def __repr__(self):
-        return("Parallelepiped(xmin={!r}, ymin={!r}, zmin={!r}, "
-               "xmax={!r}, ymax={!r}, zmax={!r})".format(
-                   self._xmin, self._ymin, self._zmin,
-                   self._xmax, self._ymax, self._zmax))
+        return "Parallelepiped(o={!r}, u={!r}, v={!r}, w={!r})".format(
+            self.o, self.u, self.v, self.w)
 
     @property
     def xmin(self):

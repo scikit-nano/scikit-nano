@@ -3,7 +3,8 @@
 from __future__ import absolute_import, division, print_function
 import unittest
 
-from sknano.core import rotate_point, rotation_matrix, transformation_matrix
+from sknano.core.math import rotate_point, rotation_matrix, \
+    transformation_matrix
 
 
 class TestTransforms(unittest.TestCase):
