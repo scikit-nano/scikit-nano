@@ -54,13 +54,6 @@ Base custom exception classes for handling errors
    StructureConverterError
    StructureFormatError
 
-Sub-packages
-=============
-.. autosummary::
-   :toctree: generated/
-
-   atoms
-
 """
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
