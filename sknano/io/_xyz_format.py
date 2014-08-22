@@ -12,8 +12,8 @@ __docformat__ = 'restructuredtext en'
 
 import os
 
-from .atoms import XYZAtom as Atom, XYZAtoms
 from ..core import get_fpath
+from ..core.atoms import XAtom as Atom, XAtoms as Atoms
 
 from ._base import StructureReader, StructureReaderError, \
     StructureWriter, StructureConverter, StructureFormat, default_comment_line
@@ -34,7 +34,7 @@ class XYZReader(StructureReader):
     def __init__(self, fpath=None, **kwargs):
         super(XYZReader, self).__init__(fpath=fpath, **kwargs)
 
-        self._structure_atoms = XYZAtoms()
+        self._structure_atoms = Atoms()
 
         if fpath is not None:
             self.read()
@@ -217,14 +217,12 @@ class XYZ2DATAConverter(StructureConverter):
         `DATAReader` (only if `return_reader` is True)
 
         """
-        from .atoms import AtomsConverter
         from ._lammps_data_format import DATAReader, DATAWriter
 
         kwargs.update(self._kwargs)
 
         xyzreader = XYZReader(fpath=self.infile, **kwargs)
-        atoms = AtomsConverter(atoms=xyzreader.atoms, to='lammps').atoms
-        comment_line = xyzreader.comment_line
+        atoms = xyzreader.atoms
 
         if self._add_new_atoms:
             atoms.extend(self._new_atoms)
@@ -232,7 +230,7 @@ class XYZ2DATAConverter(StructureConverter):
             atoms.add_atomtypes(self._new_atomtypes)
 
         DATAWriter.write(fpath=self.outfile, atoms=atoms,
-                         comment_line=comment_line, **kwargs)
+                         comment_line=xyzreader.comment_line, **kwargs)
 
         if return_reader:
             return DATAReader(fpath=self.outfile, **kwargs)

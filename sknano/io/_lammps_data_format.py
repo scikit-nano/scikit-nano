@@ -15,8 +15,8 @@ import os
 
 import numpy as np
 
-from .atoms import LAMMPSAtom as Atom, LAMMPSAtoms, lammps_atom_styles
 from ..core import get_fpath
+from ..core.atoms import XAtom as Atom, XAtoms as Atoms
 
 from ._base import StructureReader, StructureWriter, StructureConverter, \
     StructureFormat, StructureIOError, default_comment_line
@@ -25,7 +25,71 @@ __all__ = ['DATAData', 'DATAReader', 'DATAWriter',
            'DATA2XYZConverter', 'DATAFormat', 'DATAError',
            'LAMMPSDATA', 'LAMMPSDATAReader',
            'LAMMPSDATAWriter', 'LAMMPSDATA2XYZConverter',
-           'LAMMPSDATAFormat', 'LAMMPSDATAError']
+           'LAMMPSDATAFormat', 'LAMMPSDATAError', 'lammps_atom_styles']
+
+lammps_atom_styles = {}
+lammps_atom_styles['angle'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['atomic'] = \
+    ['atom-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['body'] = \
+    ['atom-ID', 'atom-type', 'bodyflag', 'mass',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['bond'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['charge'] = \
+    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['dipole'] = \
+    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z',
+     'mux', 'muy', 'muz', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['electron'] = \
+    ['atom-ID', 'atom-type', 'q', 'spin', 'eradius',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['ellipsoid'] = \
+    ['atom-ID', 'atom-type', 'ellipsoidflag', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['full'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'q',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['line'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'lineflag', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['meso'] = \
+    ['atom-ID', 'atom-type', 'rho', 'e', 'cv',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['molecular'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['peri'] = \
+    ['atom-ID', 'atom-type', 'volume', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['sphere'] = \
+    ['atom-ID', 'atom-type', 'diameter', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['template'] = \
+    ['atom-ID', 'molecule-ID', 'template-index', 'template-atom',
+     'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['tri'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'triangleflag', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['wavepacket'] = \
+    ['atom-ID', 'atom-type', 'charge', 'spin', 'eradius', 'etag',
+     'cs_re', 'cs_im', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
 
 class DATAReader(StructureReader):
@@ -41,7 +105,7 @@ class DATAReader(StructureReader):
     def __init__(self, fpath=None, atom_style='full', **kwargs):
         super(DATAReader, self).__init__(fpath=fpath, **kwargs)
 
-        self._structure_atoms = LAMMPSAtoms()
+        self._structure_atoms = Atoms()
 
         data_format = DATAFormat(atom_style=atom_style, **kwargs)
         self._data_headers = data_format.properties['headers']
@@ -560,17 +624,14 @@ class DATA2XYZConverter(StructureConverter):
         `XYZReader` (only if `return_reader` is True)
 
         """
-        from .atoms import AtomsConverter
         from ._xyz_format import XYZReader, XYZWriter
 
         kwargs.update(self._kwargs)
 
         datareader = DATAReader(fpath=self.infile, **kwargs)
-        atoms = AtomsConverter(atoms=datareader.atoms, to='xyz').atoms
-        comment_line = datareader.comment_line
 
-        XYZWriter.write(fpath=self.outfile, atoms=atoms,
-                        comment_line=comment_line, **kwargs)
+        XYZWriter.write(fpath=self.outfile, atoms=datareader.atoms,
+                        comment_line=datareader.comment_line, **kwargs)
 
         if return_reader:
             return XYZReader(fpath=self.outfile, **kwargs)
