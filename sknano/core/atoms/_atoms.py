@@ -78,7 +78,7 @@ class Atoms(MutableSequence):
 
     def __repr__(self):
         """Return `repr` string of `Atoms`."""
-        return("Atoms(atoms={!r})".format(self._data))
+        return "Atoms(atoms={!r})".format(self._data)
 
     def __delitem__(self, index):
         """Concrete implementation of @abstractmethod.

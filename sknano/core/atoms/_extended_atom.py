@@ -50,11 +50,14 @@ class XAtom(Atom):
 
     """
 
-    def __init__(self, element=None, atomID=0, moleculeID=0, atomtype=1, q=0.,
-                 mass=None, x=None, y=None, z=None, vx=None, vy=None, vz=None,
-                 nx=None, ny=None, nz=None, CN=None, NN=None):
+    def __init__(self, element=None, atomID=0, moleculeID=0, atomtype=1,
+                 q=0., m=None, mass=None, x=None, y=None, z=None,
+                 vx=None, vy=None, vz=None, nx=None, ny=None, nz=None,
+                 CN=None, NN=None, **kwargs):
+        if m is None and mass is not None:
+            m = mass
 
-        super(XAtom, self).__init__(element=element, m=mass, x=x, y=y, z=z)
+        super(XAtom, self).__init__(element=element, m=m, x=x, y=y, z=z)
 
         self._v = Vector([vx, vy, vz])
 
@@ -72,6 +75,17 @@ class XAtom(Atom):
 
         self._attributes.extend(
             ['q','v', 'atomID', 'moleculeID', 'atomtype', 'CN', 'NN'])
+
+    def __repr__(self):
+        """Return string representation of `XAtom`."""
+        reprstr = "Atom(element={element!r}, atomID={atomID!r}, " + \
+            "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
+            "q={q!r}, m={m!r}, x={x:.6f}, y={y:.6f}, z={z:.6f})"
+        parameters = dict(element=self.element, atomID=self.atomID,
+                          moleculeID=self.moleculeID, atomtype=self.atomtype,
+                          q=self.q, m=self.m, x=self.x, y=self.y, z=self.z)
+
+        return reprstr.format(**parameters)
 
     @property
     def CN(self):
