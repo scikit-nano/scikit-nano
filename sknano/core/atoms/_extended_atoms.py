@@ -74,7 +74,7 @@ class XAtoms(Atoms):
         self._NN_cutoff = np.inf
 
         if atoms is not None:
-            for atom in self._atoms:
+            for atom in self._data:
                 for p, plist in self._property_lists.iteritems():
                     plist.append(getattr(atom, p))
 
@@ -84,7 +84,7 @@ class XAtoms(Atoms):
     @property
     def atomtypes(self):
         """Return the atom type dictionary."""
-        for atom in self._atoms:
+        for atom in self._data:
             if atom.atomtype not in self._atomtypes:
                 self._atomtypes[atom.atomtype] = {}
                 self._atomtypes[atom.atomtype]['mass'] = atom.m
@@ -95,7 +95,7 @@ class XAtoms(Atoms):
     def atom_ids(self):
         """Return array of `XAtom` IDs."""
         atom_ids = []
-        for atom in self._atoms:
+        for atom in self._data:
             atom_ids.append(atom.atomID)
         self._atom_ids = atom_ids[:]
         return np.asarray(self._atom_ids)
@@ -103,7 +103,7 @@ class XAtoms(Atoms):
     @property
     def atom_tree(self):
         """Return the :py:class:`~scipy:scipy.spatial.KDTree` of coords."""
-        if self._use_kdtree and len(self._atoms) != 0:
+        if self._use_kdtree and len(self._data) != 0:
             self._atom_tree = KDTree(self.coords)
         return self._atom_tree
 
@@ -112,7 +112,7 @@ class XAtoms(Atoms):
         """Return list of `XAtom` charges."""
         #self._charges_array = np.asarray(self._charges)
         charges = []
-        for atom in self._atoms:
+        for atom in self._data:
             charges.append(atom.q)
         self._charges = charges[:]
         return np.asarray(self._charges)
@@ -122,7 +122,7 @@ class XAtoms(Atoms):
         """Return array of `XAtom` coordination numbers."""
         self.update_coordination_numbers()
         coordination_numbers = []
-        for atom in self._atoms:
+        for atom in self._data:
             coordination_numbers.append(atom.CN)
         self._coordination_numbers = coordination_numbers[:]
         return np.asarray(self._coordination_numbers)
@@ -133,7 +133,7 @@ class XAtoms(Atoms):
             NN_d, NN_i = \
                 self.query_atom_tree(n=self.NN_number,
                                      cutoff_radius=self.NN_cutoff)
-            for i, atom in enumerate(self._atoms):
+            for i, atom in enumerate(self._data):
                 CN = 0
                 for d in NN_d[i]:
                     if d < self.NN_cutoff:
@@ -145,7 +145,7 @@ class XAtoms(Atoms):
         """Return array of nearest-neighbor atoms for each `XAtom`."""
         self.update_nearest_neighbors()
         nearest_neighbors = []
-        for atom in self._atoms:
+        for atom in self._data:
             nearest_neighbors.append(atom.NN)
         self._nearest_neighbors = nearest_neighbors[:]
         return np.asarray(self._nearest_neighbors)
@@ -155,11 +155,11 @@ class XAtoms(Atoms):
         if self._use_kdtree:
             NN_d, NN_i = self.query_atom_tree(n=self.NN_number,
                                               cutoff_radius=self.NN_cutoff)
-            for i, atom in enumerate(self._atoms):
+            for i, atom in enumerate(self._data):
                 NN_atoms = []
                 for j, d in enumerate(NN_d[i]):
                     if d < self.NN_cutoff:
-                        NN_atoms.append(self._atoms[NN_i[i][j]])
+                        NN_atoms.append(self._data[NN_i[i][j]])
                 atom.NN = NN_atoms
 
     def query_atom_tree(self, n=6, eps=0, p=2, cutoff_radius=np.inf):
@@ -212,14 +212,14 @@ class XAtoms(Atoms):
         """
         if self._use_kdtree:
             NN_d, NN_i = self.query_atom_tree(n=n, cutoff_radius=rc)
-            for i, atom in enumerate(self._atoms):
+            for i, atom in enumerate(self._data):
                 CN = 0
                 for d in NN_d[i]:
                     if d < rc:
                         CN += 1
                 atom.CN = CN
         coordination_numbers = []
-        for atom in self._atoms:
+        for atom in self._data:
             coordination_numbers.append(atom.CN)
         self._coordination_numbers = coordination_numbers[:]
         return np.asarray(self._coordination_numbers)
@@ -235,14 +235,14 @@ class XAtoms(Atoms):
         """
         if self._use_kdtree:
             NN_d, NN_i = self.query_atom_tree(n=n, cutoff_radius=rc)
-            for i, atom in enumerate(self._atoms):
+            for i, atom in enumerate(self._data):
                 NN_atoms = []
                 for j, d in enumerate(NN_d[i]):
                     if d < rc:
-                        NN_atoms.append(self._atoms[NN_i[i][j]])
+                        NN_atoms.append(self._data[NN_i[i][j]])
                 atom.NN = NN_atoms
         nearest_neighbors = []
-        for atom in self._atoms:
+        for atom in self._data:
             nearest_neighbors.append(atom.NN)
         self._nearest_neighbors = nearest_neighbors[:]
         return np.asarray(self._nearest_neighbors)
@@ -261,7 +261,7 @@ class XAtoms(Atoms):
     def velocities(self):
         """Return array of `XAtom` velocities."""
         velocities = []
-        for atom in self._atoms:
+        for atom in self._data:
             velocities.append(atom.v)
         self._velocities = velocities[:]
         return np.asarray(self._velocities)
@@ -315,7 +315,7 @@ class XAtoms(Atoms):
 
     def assign_unique_ids(self, starting_id=1):
         """Assign unique ID to each `XAtom` in `XAtoms`."""
-        for i, atom in enumerate(self._atoms, start=starting_id):
+        for i, atom in enumerate(self._data, start=starting_id):
             atom.atomID = i
 
     def filter_atoms(self, filter_atom_ids, invert=False):
@@ -344,15 +344,15 @@ class XAtoms(Atoms):
         filter_indices = \
             np.in1d(self.atom_ids, filter_atom_ids, invert=invert).nonzero()
         filtered_atoms = \
-            XAtoms(np.asarray(self._atoms)[filter_indices].tolist())
+            XAtoms(np.asarray(self._data)[filter_indices].tolist())
         return filtered_atoms
 
     def get_atom(self, atomID=None, index=None):
         try:
-            return self._atoms[atomID - 1]
+            return self._data[atomID - 1]
         except (TypeError, IndexError):
             try:
-                return self._atoms[index]
+                return self._data[index]
             except (TypeError, IndexError):
                 return None
 
