@@ -14,7 +14,7 @@ import copy
 
 import numpy as np
 
-from ..core.atoms import Atom, Atoms
+from ..core.atoms import XAtom as Atom, XAtoms as Atoms
 from ..core.math import rotation_matrix
 from ..core.refdata import CCbond
 from ..structures import Graphene, BiLayerGraphene
