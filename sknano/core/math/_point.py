@@ -31,7 +31,7 @@ class Point(np.ndarray):
     """
     __array_priority__ = 10.0
 
-    def __new__(cls, p=None, nd=None, dtype=None, copy=True, verbose=False):
+    def __new__(cls, p=None, nd=None, dtype=None, copy=True):
 
         if isinstance(p, Point):
             if dtype is None:
@@ -95,11 +95,7 @@ class Point(np.ndarray):
         return repr(self)
 
     def __repr__(self):
-        reprstr = "Point({p!r}, nd={nd!r}, dtype={dtype!r})"
-        parameters = dict(p=self.__array__(),
-                          nd=getattr(self, 'nd', None),
-                          dtype=self.dtype)
-        return reprstr.format(**parameters)
+        return "Point({!r})".format(self.__array__().tolist())
 
     def __getattr__(self, name):
         try:
