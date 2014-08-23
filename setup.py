@@ -203,6 +203,7 @@ def setup_package():
         },
         packages=find_packages(),
         include_package_data=True,
+        zip_safe=False,
     )
 
     if len(sys.argv) >= 2 and ('--help' in sys.argv[1:] or
