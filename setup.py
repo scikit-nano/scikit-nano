@@ -1,12 +1,14 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Python toolkit for generating and analyzing nanostructure data"""
 
-from __future__ import division, print_function
+from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 import os
 import sys
 import subprocess
+from setuptools import find_packages, setup
 
 if sys.version_info[:2] < (2, 7):
     raise RuntimeError("Python version 2.7 required.")
@@ -145,6 +147,7 @@ def configuration(parent_package='', top_path=None):
                        quiet=True)
 
     config.add_subpackage('sknano')
+    config.add_data_dir('sknano/data')
     config.get_version('sknano/version.py')
 
     return config
@@ -198,6 +201,8 @@ def setup_package():
             'console_scripts': ['nanogen = sknano.scripts.nanogen:main',
                                 'nanogenui = sknano.scripts.nanogenui:main'],
         },
+        packages=find_packages(),
+        include_package_data=True,
     )
 
     if len(sys.argv) >= 2 and ('--help' in sys.argv[1:] or
@@ -208,17 +213,20 @@ def setup_package():
         # They are required to succeed without them when, for example,
         # pip is used to install Scipy when Numpy is not yet present in
         # the system.
-        try:
-            from setuptools import setup
-        except ImportError:
-            from distutils.core import setup
+        #try:
+        #    from setuptools import setup
+        #except ImportError:
+        #    from distutils.core import setup
 
         FULLVERSION, GIT_REVISION = get_version_info()
         metadata['version'] = FULLVERSION
     else:
-        from numpy.distutils.core import setup
+        FULLVERSION, GIT_REVISION = get_version_info()
+        metadata['version'] = FULLVERSION
+        #import setuptools
+        #from numpy.distutils.core import setup
 
-        metadata['configuration'] = configuration
+        #metadata['configuration'] = configuration
 
     setup(**metadata)
 
