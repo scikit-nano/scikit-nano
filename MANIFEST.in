@@ -1,7 +1,7 @@
 include MANIFEST.in
+include setup.py
 include *.rst
 include *.txt
-include setup.py
 recursive-include sknano *
 recursive-include sknano/data *
 recursive-include doc *
