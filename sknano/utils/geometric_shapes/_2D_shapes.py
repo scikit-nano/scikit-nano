@@ -34,86 +34,86 @@ class Geometric2DRegion(GeometricRegion):
 class Parallelogram(Geometric2DRegion):
     """Abstract object representation of a parallelogram.
 
-    Represents a parallelogram with origin :math:`p` and directions
+    Represents a parallelogram with origin :math:`o` and directions
     :math:`u` and :math:`v`.
 
     Parameters
     ----------
-    po : array_like, optional
+    o : array_like, optional
         parallelogram origin
     u, v : array_like, optional
-        parallelogram direction vectors stemming from origin `p`.
+        parallelogram direction vectors stemming from origin `o`.
 
     """
     def __init__(self, o=None, u=None, v=None):
 
-        if p is None:
-            p = Point(nd=2)
-        elif isinstance(p, (tuple, list, np.ndarray)):
-            p = Point(p)
-        self._p = p
+        if o is None:
+            o = Point(nd=2)
+        elif isinstance(o, (tuple, list, np.ndarray)):
+            o = Point(o)
+        self._o = o
 
-        if v1 is None:
-            v1 = Vector([1., 0.])
-        elif isinstance(v1, (tuple, list, np.ndarray)):
-            v1 = Vector(v1)
+        if u is None:
+            u = Vector([1., 0.])
+        elif isinstance(u, (tuple, list, np.ndarray)):
+            u = Vector(u)
 
-        self._v1 = v1
+        self._u = u
 
-        if v2 is None:
-            v2 = Vector([1., 1.])
-        elif isinstance(v2, (tuple, list, np.ndarray)):
-            v2 = Vector(v2)
+        if v is None:
+            v = Vector([1., 1.])
+        elif isinstance(v, (tuple, list, np.ndarray)):
+            v = Vector(v)
 
-        self._v2 = v2
+        self._v = v
 
     def __repr__(self):
-        return "Parallelogram(p={!r}, v1={!r}, v2={!r})".format(
-            self.p, self.v1, self.v2)
+        return "Parallelogram(o={!r}, u={!r}, v={!r})".format(
+            self.o.tolist(), self.u, self.v)
 
     @property
-    def p(self):
-        return self._p
+    def o(self):
+        return self._o
 
     @property
-    def v1(self):
-        return self._v1
+    def u(self):
+        return self._u
 
     @property
-    def v2(self):
-        return self._v2
+    def v(self):
+        return self._v
 
     @property
     def center(self):
-        return self.p
+        return self.centroid
 
     @property
     def area(self):
-        v1 = self.v1
-        v2 = self.v2
-        return np.abs(np.cross(v1, v2))
+        u = self.u
+        v = self.v
+        return np.abs(np.cross(u, v))
 
     @property
     def centroid(self):
-        c = self.center
-        v1 = self.v1
-        v2 = self.v2
+        o = self.o
+        u = self.u
+        v = self.v
 
-        xcom = 0.5 * (2 * c.x + v1.x + v2.x)
-        ycom = 0.5 * (2 * c.y + v1.y + v2.y)
+        xcom = 0.5 * (2 * o.x + u.x + v.x)
+        ycom = 0.5 * (2 * o.y + u.y + v.y)
 
         return Point([xcom, ycom])
 
-    def contains_point(self, point=None):
+    def contains_point(self, point):
         """Check if point is contained within volume of cuboid."""
         p = Point(point)
 
-        c = self.center
-        u = self.v1
-        v = self.v2
+        o = self.o
+        u = self.u
+        v = self.v
 
-        d1 = ((p.y - c.y) * v.x + (c.x - p.x) * v.y) / (u.y * v.x - u.x * v.y)
-        d2 = ((p.y - c.y) * u.x + (c.x - p.x) * u.y) / (u.x * v.y - u.y * v.x)
+        d1 = ((p.y - o.y) * v.x + (o.x - p.x) * v.y) / (u.y * v.x - u.x * v.y)
+        d2 = ((p.y - o.y) * u.x + (o.x - p.x) * u.y) / (u.x * v.y - u.y * v.x)
 
         return d1 >= 0 and d1 <= 1 and d2 >= 0 and d2 <= 1
 
@@ -130,44 +130,24 @@ class Rectangle(Geometric2DRegion):
     pmin, pmax : sequence, optional
 
     """
-    def __init__(self, xmin=None, ymin=None, xmax=None, ymax=None,
-                 pmin=None, pmax=None):
+    def __init__(self, pmin=None, pmax=None, xmin=None, ymin=None,
+                 xmax=None, ymax=None):
 
         if pmin is None:
             pmin = Point([xmin, ymin])
         elif isinstance(pmin, (tuple, list, np.ndarray)):
             pmin = Point(pmin)
-
         self._pmin = pmin
-        self._xmin, self._ymin = self._pmin
 
         if pmax is None:
             pmax = Point([xmax, ymax])
         elif isinstance(pmax, (tuple, list, np.ndarray)):
             pmax = Point(pmax)
-
         self._pmax = pmax
-        self._xmax, self._ymax = self._pmax
 
     def __repr__(self):
-        return("Rectangle(xmin={!r}, ymin={!r}, xmax={!r}, ymax={!r})".format(
-            self._xmin, self._ymin, self._xmax, self._ymax))
-
-    @property
-    def xmin(self):
-        return self._xmin
-
-    @property
-    def ymin(self):
-        return self._ymin
-
-    @property
-    def xmax(self):
-        return self._xmax
-
-    @property
-    def ymax(self):
-        return self._ymax
+        return "Rectangle(pmin={!r}, pmax={!r})".format(
+            self.pmin.tolist(), self.pmax.tolist())
 
     @property
     def pmin(self):
@@ -178,33 +158,55 @@ class Rectangle(Geometric2DRegion):
         return self._pmax
 
     @property
+    def xmin(self):
+        return self.pmin.x
+
+    @property
+    def xmax(self):
+        return self.pmax.x
+
+    @property
+    def ymin(self):
+        return self.pmin.y
+
+    @property
+    def ymax(self):
+        return self.pmax.y
+
+    @property
     def center(self):
+        return self.centroid
+
+    @property
+    def a(self):
+        return self.xmax - self.xmin
+
+    @property
+    def b(self):
+        return self.ymax - self.ymin
+
+    @property
+    def area(self):
+        a = self.a
+        b = self.b
+        return a * b
+
+    @property
+    def centroid(self):
         h = (self.xmax + self.xmin) / 2
         k = (self.ymax + self.ymin) / 2
         return Point([h, k])
 
-    @property
-    def a(self):
-        return self._xmax - self._xmin
-
-    @property
-    def b(self):
-        return self._ymax - self._ymin
-
-    @property
-    def area(self):
-        pass
-
-    @property
-    def centroid(self):
-        pass
-
-    def contains_point(self, point=None):
+    def contains_point(self, point):
         """Check if point is contained within volume of cuboid."""
-        x, y = point
+        p = Point(point)
+        xmin = self.xmin
+        xmax = self.xmax
+        ymin = self.ymin
+        ymax = self.ymax
 
-        return (x >= self._xmin) and (x <= self._xmax) and \
-            (y >= self._ymin) and (y <= self._ymax)
+        return (p.x >= xmin) and (p.x <= xmax) and \
+            (p.y >= ymin) and (p.y <= ymax)
 
 
 class Square(Geometric2DRegion):
@@ -232,26 +234,44 @@ class Square(Geometric2DRegion):
         self._a = a
 
     def __repr__(self):
-        return("Square(center={!r}, a={!r})".format(self.center, self.a))
+        return "Square(center={!r}, a={!r})".format(
+            self.center.tolist(), self.a)
 
     @property
     def center(self):
         return self._center
 
+    @center.setter
+    def center(self, value):
+        self._center = Point(value)
+
     @property
     def a(self):
         return self._a
 
+    @a.setter
+    def a(self, value):
+        self._a = value
+
     @property
     def area(self):
-        pass
+        a = self.a
+        return a**2
 
     @property
     def centroid(self):
-        pass
+        return self.center
 
-    def contains_point(self, point=None):
-        pass
+    def contains_point(self, point):
+        p = Point(point)
+        c = self.center
+        a = self.a
+        xmin = c.x - a / 2
+        ymin = c.y - a / 2
+        xmax = c.x + a / 2
+        ymax = c.y + a / 2
+        return (p.x >= xmin) and (p.x <= xmax) and \
+            (p.y >= ymin) and (p.y <= ymax)
 
 
 class Ellipse(Geometric2DRegion):
@@ -278,53 +298,70 @@ class Ellipse(Geometric2DRegion):
         self._rx = rx
         self._ry = ry
 
-        self._a = rx
-        self._b = ry
-        if rx < ry:
-            self._a = ry
-            self._b = rx
-
     def __repr__(self):
-        return("Ellipse(center={!r}, rx={!r}, ry={!r})".format(
-            self.center, self.rx, self.ry))
+        return "Ellipse(center={!r}, rx={!r}, ry={!r})".format(
+            self.center.tolist(), self.rx, self.ry)
 
     @property
     def center(self):
         return self._center
 
+    @center.setter
+    def center(self, value):
+        self._center = Point(value)
+
     @property
     def rx(self):
         return self._rx
+
+    @rx.setter
+    def rx(self, value):
+        self._rx = value
 
     @property
     def ry(self):
         return self._ry
 
+    @ry.setter
+    def ry(self, value):
+        self._ry = value
+
     @property
     def a(self):
         """Semi-major axis length"""
-        return self._a
+        rx = self.rx
+        ry = self.ry
+        if rx < ry:
+            return ry
+        else:
+            return rx
 
     @property
     def b(self):
         """Semi-minor axis length"""
-        return self._b
+        rx = self.rx
+        ry = self.ry
+        if rx < ry:
+            return rx
+        else:
+            return ry
 
     @property
     def area(self):
-        pass
+        a = self.a
+        b = self.b
+        return np.pi * a * b
 
     @property
     def centroid(self):
-        pass
+        return self.center
 
-    def contains_point(self, point=None):
-        h, k = self.center
+    def contains_point(self, point):
+        p = Point(point)
+        c = self.center
         rx, ry = self.rx, self.ry
 
-        x, y = point
-
-        return (x - h)**2 / rx**2 + (y - k)**2 / ry**2 <= 1.0
+        return (p.x - c.x)**2 / rx**2 + (p.y - c.y)**2 / ry**2 <= 1.0
 
 
 class Circle(Geometric2DRegion):
@@ -353,7 +390,16 @@ class Circle(Geometric2DRegion):
         self._r = r
 
     def __repr__(self):
-        return("Circle(center={!r}, r={!r})".format(self.center, self.r))
+        return "Circle(center={!r}, r={!r})".format(
+            self.center.tolist(), self.r)
+
+    @property
+    def center(self):
+        return self._center
+
+    @center.setter
+    def center(self, value):
+        self._center = Point(value)
 
     @property
     def r(self):
@@ -364,10 +410,6 @@ class Circle(Geometric2DRegion):
         self._r = value
 
     @property
-    def center(self):
-        return self._center
-
-    @property
     def area(self):
         r = self.r
         return np.pi * r**2
@@ -376,10 +418,9 @@ class Circle(Geometric2DRegion):
     def centroid(self):
         return self.center
 
-    def contains_point(self, point=None):
-        h, k = self.center
+    def contains_point(self, point):
+        p = Point(point)
+        c = self.center
         r = self.r
 
-        x, y = point
-
-        return (x - h)**2 + (y - k)**2 <= r**2
+        return (p.x - c.x)**2 + (p.y - c.y)**2 <= r**2

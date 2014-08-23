@@ -14,7 +14,7 @@ from abc import ABCMeta, abstractproperty
 
 import numpy as np
 
-from sknano.core.math import Point, vector as vec
+from sknano.core.math import Point, Vector, vector as vec
 from ._base import GeometricRegion
 
 __all__ = ['Geometric3DRegion', 'Parallelepiped', 'Cuboid', 'Cube',
@@ -36,70 +36,126 @@ class Parallelepiped(Geometric3DRegion):
 
     .. versionadded:: 0.3.0
 
+    Represents a parallelepiped with origin :math:`o` and directions
+    :math:`u, v, w`.
+
     Parameters
     ----------
-    xmin, ymin, zmin : float
-    xmax, ymax, zmax : float
-    pmin, pmax : sequence, optional
+    o : array_like, optional
+        parallelepiped origin
+    u, v, w : array_like, optional
+        parallelepiped direction vectors stemming from origin `o`.
+
 
     """
     def __init__(self, o=None, u=None, v=None, w=None):
-        pass
+
+        if o is None:
+            o = Point(nd=2)
+        elif isinstance(o, (tuple, list, np.ndarray)):
+            o = Point(o)
+        self._o = o
+
+        if u is None:
+            u = Vector([1., 0.])
+        elif isinstance(u, (tuple, list, np.ndarray)):
+            u = Vector(u)
+
+        self._u = u
+
+        if v is None:
+            v = Vector([1., 1.])
+        elif isinstance(v, (tuple, list, np.ndarray)):
+            v = Vector(v)
+
+        self._v = v
+
+        if w is None:
+            w = Vector([1., 1.])
+        elif isinstance(w, (tuple, list, np.ndarray)):
+            w = Vector(w)
+
+        self._w = w
 
     def __repr__(self):
         return "Parallelepiped(o={!r}, u={!r}, v={!r}, w={!r})".format(
-            self.o, self.u, self.v, self.w)
+            self.o.tolist(), self.u, self.v, self.w)
 
     @property
-    def xmin(self):
-        return self._xmin
+    def o(self):
+        return self._o
 
     @property
-    def ymin(self):
-        return self._ymin
+    def u(self):
+        return self._u
 
     @property
-    def zmin(self):
-        return self._zmin
+    def v(self):
+        return self._v
 
     @property
-    def xmax(self):
-        return self._xmax
-
-    @property
-    def ymax(self):
-        return self._ymax
-
-    @property
-    def zmax(self):
-        return self._zmax
-
-    @property
-    def pmin(self):
-        return self._pmin
-
-    @property
-    def pmax(self):
-        return self._pmax
+    def w(self):
+        return self._w
 
     @property
     def center(self):
-        h = (self.xmax + self.xmin) / 2
-        k = (self.ymax + self.ymin) / 2
-        l = (self.zmax + self.zmin) / 2
-        return Point(x=h, y=k, z=l)
-
-    @property
-    def centroid(self):
-        pass
+        return self.centroid
 
     @property
     def volume(self):
-        pass
+        u = self.u
+        v = self.v
+        w = self.w
+        return vec.scalar_triple_product(u, v, w)
 
-    def contains_point(self):
+    @property
+    def centroid(self):
+        o = self.o
+        u = self.u
+        v = self.v
+        w = self.w
+
+        xcom = 0.5 * (2 * o.x + u.x + v.x + w.x)
+        ycom = 0.5 * (2 * o.y + u.y + v.y + w.y)
+        zcom = 0.5 * (2 * o.y + u.y + v.y + w.z)
+
+        return Point([xcom, ycom, zcom])
+
+    def contains_point(self, point):
         """Check if point is contained within volume of `Parallelepiped`."""
-        pass
+        p = Point(point)
+
+        o = self.o
+        u = self.u
+        v = self.v
+        w = self.w
+
+        d1 = (v.z * (w.x * (p.y - o.y) + w.y * (o.x - p.x)) +
+              w.z * (v.x * (o.y - p.y) + v.y * (p.x - o.x)) +
+              o.z * (v.y * w.x - v.x * w.y) +
+              p.z * (v.x * w.y - v.y * w.x)) / \
+            (u.z * (v.x * w.y - v.y * w.x) +
+             u.y * (v.z * w.x - v.x * w.z) +
+             u.x * (v.y * w.z - v.z * w.y))
+
+        d2 = (u.z * (w.x * (p.y - o.y) + w.y * (o.x - p.x)) +
+              w.z * (u.x * (o.y - p.y) + u.y * (p.x - o.x)) +
+              o.z * (u.y * w.x - u.x * w.y) +
+              p.z * (u.x * w.y - u.y * w.x)) / \
+            (u.z * (v.y * w.x - v.x * w.y) +
+             u.y * (v.x * w.z - v.z * w.x) +
+             u.x * (v.z * w.y - v.y * w.z))
+
+        d3 = (u.z * (v.x * (p.y - o.y) + v.y * (o.x - p.x)) +
+              v.z * (u.x * (o.y - p.y) + u.y * (p.x - o.x)) +
+              o.z * (u.y * v.x - u.x * v.y) +
+              p.z * (u.x * v.y - u.y * v.x)) / \
+            (u.z * (v.x * w.y - v.y * w.x) +
+             u.y * (v.z * w.x - v.x * w.z) +
+             u.x * (v.y * w.z - v.z * w.y))
+
+        return d1 >= 0 and d1 <= 1 and d2 >= 0 and d2 <= 1 and \
+            d3 >= 0 and d3 <= 1
 
 
 class Cuboid(Geometric3DRegion):
@@ -122,20 +178,17 @@ class Cuboid(Geometric3DRegion):
             pmin = Point([xmin, ymin, zmin])
         elif isinstance(pmin, (tuple, list, np.ndarray)):
             pmin = Point(pmin)
-
         self._pmin = pmin
-        self._xmin, self._ymin, self._zmin = self._pmin
 
         if pmax is None:
             pmax = Point([xmax, ymax, zmax])
         elif isinstance(pmax, (tuple, list, np.ndarray)):
             pmax = Point(pmax)
-
         self._pmax = pmax
-        self._xmax, self._ymax, self._zmax = self._pmax
 
     def __repr__(self):
-        return "Cuboid(pmin={!r}, pmax={!r})".format(self.pmin, self.pmax)
+        return "Cuboid(pmin={!r}, pmax={!r})".format(
+            self.pmin.tolist(), self.pmax.tolist())
 
     @property
     def pmin(self):
@@ -147,34 +200,31 @@ class Cuboid(Geometric3DRegion):
 
     @property
     def xmin(self):
-        return self._xmin
+        return self.pmin.x
 
     @property
     def ymin(self):
-        return self._ymin
+        return self.pmin.y
 
     @property
     def zmin(self):
-        return self._zmin
+        return self.pmin.z
 
     @property
     def xmax(self):
-        return self._xmax
+        return self.pmax.x
 
     @property
     def ymax(self):
-        return self._ymax
+        return self.pmax.y
 
     @property
     def zmax(self):
-        return self._zmax
+        return self.pmax.z
 
     @property
     def center(self):
-        h = (self.xmax + self.xmin) / 2
-        k = (self.ymax + self.ymin) / 2
-        l = (self.zmax + self.zmin) / 2
-        return Point(x=h, y=k, z=l)
+        return self.centroid
 
     @property
     def centroid(self):
@@ -184,19 +234,31 @@ class Cuboid(Geometric3DRegion):
         return Point([xcom, ycom, zcom])
 
     @property
+    def a(self):
+        return self.xmax - self.xmin
+
+    @property
+    def b(self):
+        return self.ymax - self.ymin
+
+    @property
+    def c(self):
+        return self.zmax - self.zmin
+
+    @property
     def volume(self):
         a = self.a
         b = self.b
         c = self.c
         return a * b * c
 
-    def contains_point(self, point=None):
+    def contains_point(self, point):
         """Check if point is contained within volume of `Cuboid`."""
-        x, y, z = point
+        p = Point(point)
 
-        return((x >= self._xmin) and (x <= self._xmax) and
-               (y >= self._ymin) and (y <= self._ymax) and
-               (z >= self._zmin) and (z <= self._zmax))
+        return (p.x >= self.xmin) and (p.x <= self.xmax) and \
+            (p.y >= self.ymin) and (p.y <= self.ymax) and \
+            (p.z >= self.zmin) and (p.z <= self.zmax)
 
 
 class Cube(Geometric3DRegion):
@@ -225,11 +287,11 @@ class Cube(Geometric3DRegion):
 
         if a is None:
             a = 1.0
-
         self._a = a
 
     def __repr__(self):
-        return("Cube(center={!r}, a={!r})".format(self.center, self.a))
+        return("Cube(center={!r}, a={!r})".format(self.center.tolist(),
+                                                  self.a))
 
     @property
     def center(self):
@@ -248,8 +310,19 @@ class Cube(Geometric3DRegion):
         a = self.a
         return a**3
 
-    def contains_point(self, point=None):
-        pass
+    def contains_point(self, point):
+        p = Point(point)
+        c = self.center
+        a = self.a
+        xmin = c.x - a / 2
+        ymin = c.y - a / 2
+        zmin = c.z - a / 2
+        xmax = c.x + a / 2
+        ymax = c.y + a / 2
+        zmax = c.z + a / 2
+        return (p.x >= xmin) and (p.x <= xmax) and \
+            (p.y >= ymin) and (p.y <= ymax) and \
+            (p.z >= zmin) and (p.z <= zmax)
 
 
 class Ellipsoid(Geometric3DRegion):
@@ -290,7 +363,6 @@ class Ellipsoid(Geometric3DRegion):
             b = 0.5
         if c is None:
             c = 0.5
-
         self._a, self._b, self._c = a, b, c
 
     def __repr__(self):
@@ -324,14 +396,14 @@ class Ellipsoid(Geometric3DRegion):
         c = self.c
         return 4 / 3 * np.pi * a * b * c
 
-    def contains_point(self, point=None):
+    def contains_point(self, point):
         """Check if point is contained within volume of :class:`Ellipsoid`."""
-        x, y, z = point
-
-        h, k, l = self.center
+        p = Point(point)
+        c = self.center
         a, b, c = self.a, self.b, self.c
 
-        return (x - h)**2 / a**2 + (y - k)**2 / b**2 + (z - l)**2 / c**2 <= 1.0
+        return (p.x - c.x)**2 / a**2 + (p.y - c.y)**2 / b**2 + \
+            (p.z - c.z)**2 / c**2 <= 1.0
 
 
 class Spheroid(Geometric3DRegion):
