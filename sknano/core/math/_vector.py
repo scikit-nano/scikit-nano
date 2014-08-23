@@ -15,7 +15,8 @@ import numpy as np
 
 from ._point import Point
 
-__all__ = ['Vector', 'cross', 'dot']
+__all__ = ['Vector', 'cross', 'dot', 'scalar_triple_product',
+           'vector_triple_product']
 
 
 class Vector(np.ndarray):
@@ -26,12 +27,12 @@ class Vector(np.ndarray):
     v : array_like, optional
         components of vector
     nd : {None, int}, optional
+    p0 : array_like, optional
+        Origin `Point` of vector in :math:`R^n` space.
     p : array_like, optional
         Terminating `Point` of vector.
         :math:`x, y` coordinates of point in :math:`R^2` space.
         :math:`x, y, z` coordinates of point in :math:`R^3` space.
-    p0 : array_like, optional
-        Origin `Point` of vector in :math:`R^n` space.
     dtype : data-type, optional
     copy : bool, optional
 
@@ -42,12 +43,11 @@ class Vector(np.ndarray):
        add new methods for coordinate transformations
 
     """
-    __array_priority__ = 10.0
-    _verbose = False
+    __array_priority__ = 15.0
+    _verbosity = 0
 
-    def __new__(cls, v=None, nd=None, p=None, p0=None, dtype=None, copy=True,
-                verbose=False):
-        if Vector._verbose:
+    def __new__(cls, v=None, nd=None, p0=None, p=None, dtype=None, copy=True):
+        if Vector._verbosity > 0:
             print('In __new__\n'
                   'cls: {}\n'.format(cls) +
                   'v: {}\n'.format(v) +
@@ -114,8 +114,6 @@ class Vector(np.ndarray):
         elif nd == 3:
             vec.x, vec.y, vec.z = vec
 
-        #vec.verbose = verbose
-
         return vec
 
     def __array_finalize__(self, obj):
@@ -123,8 +121,7 @@ class Vector(np.ndarray):
             return None
 
         self.nd = len(obj)
-        #self.verbose = getattr(obj, 'verbose', False)
-        if Vector._verbose:
+        if Vector._verbosity > 0:
             print('In __array_finalize__\n'
                   'self: {}\n'.format(self) +
                   'type(self): {}\n'.format(type(self)) +
@@ -141,7 +138,7 @@ class Vector(np.ndarray):
         self._p0 = getattr(obj, 'p0', None)
 
     def __array_prepare__(self, obj, context=None):
-        if Vector._verbose:
+        if Vector._verbosity > 0:
             print('In __array_prepare__\n'
                   'self: {}\n'.format(self) +
                   'type(self): {}\n'.format(type(self)) +
@@ -159,7 +156,7 @@ class Vector(np.ndarray):
         return super(Vector, self).__array_prepare__(obj, context)
 
     def __array_wrap__(self, obj, context=None):
-        if Vector._verbose:
+        if Vector._verbosity > 0:
             print('In __array_wrap__\n'
                   'self: {}\n'.format(self) +
                   'type(self): {}\n'.format(type(self)) +
@@ -184,7 +181,7 @@ class Vector(np.ndarray):
             #res._p0 = Point(self.p0)
             #res._p = Point(self[:] + res._p0)
             res = Vector(res.__array__(), p0=self.p0)
-            if Vector._verbose:
+            if Vector._verbosity > 0:
                 print('In __array_wrap__\n'
                       'self: {}\n'.format(self) +
                       'type(self): {}\n'.format(type(self)) +
@@ -212,17 +209,15 @@ class Vector(np.ndarray):
         return repr(self)
 
     def __repr__(self):
-        reprstr = \
-            "Vector({v!r}, nd={nd!r}, p={p!r}, p0={p0!r}, dtype={dtype!r})"
-        parameters = dict(v=self.__array__(),
-                          nd=getattr(self, 'nd', None),
-                          p=getattr(self, 'p', None),
-                          p0=getattr(self, 'p0', None),
-                          dtype=self.dtype)
-        return reprstr.format(**parameters)
+        try:
+            return "Vector({!r}, p0={!r}, p={!r})".format(
+                self.__array__().tolist(),
+                self.p0.tolist(), self.p.tolist())
+        except AttributeError:
+            return "Vector({!r})".format(self.__array__().tolist())
 
     def __getattr__(self, name):
-        #if Vector._verbose and name.find('ufunc') > 0:
+        #if Vector._verbosity > 0 and name.find('ufunc') > 0:
         #    print('In __getattr__\n'
         #          'self: {}\n'.format(self.__array__()) +
         #          'name: {}\n'.format(name))
@@ -248,7 +243,7 @@ class Vector(np.ndarray):
         #nd = len(self)
         nd = getattr(self, 'nd', None)
 
-        #if Vector._verbose:
+        #if Vector._verbosity > 0:
         #    print('In __setattr__\n'
         #          'self: {}\n'.format(self) +
         #          'type(self): {}\n'.format(type(self)) +
@@ -297,14 +292,14 @@ class Vector(np.ndarray):
     #    super(Vector, self).__setitem__(key, value)
 
     def __add__(self, other):
-        if Vector._verbose:
+        if Vector._verbosity > 0:
             print('in __add__\n'
                   'self: {}\n'.format(self) +
                   'other: {}\n'.format(other))
         return super(Vector, self).__add__(other)
 
     def __mul__(self, other):
-        if Vector._verbose:
+        if Vector._verbosity > 0:
             print('in __mul__\n'
                   'self: {}\n'.format(self) +
                   'other: {}\n'.format(other))
@@ -314,28 +309,28 @@ class Vector(np.ndarray):
         #return super(Vector, self).__mul__(other)
 
     def __sub__(self, other):
-        if Vector._verbose:
+        if Vector._verbosity > 0:
             print('in __sub__\n'
                   'self: {}\n'.format(self) +
                   'other: {}\n'.format(other))
         return super(Vector, self).__sub__(np.asarray(other))
 
     def __radd__(self, other):
-        if Vector._verbose:
+        if Vector._verbosity > 0:
             print('in __radd__\n'
                   'self: {}\n'.format(self) +
                   'other: {}\n'.format(other))
         return self.__add__(other)
 
     def __rmul__(self, other):
-        if Vector._verbose:
+        if Vector._verbosity > 0:
             print('in __rmul__\n'
                   'self: {}\n'.format(self) +
                   'other: {}\n'.format(other))
         return np.multiply(np.asarray(other), np.asarray(self))
 
     def __imul__(self, other):
-        if Vector._verbose:
+        if Vector._verbosity > 0:
             print('in __imul__\n'
                   'self: {}\n'.format(self) +
                   'other: {}\n'.format(other))
@@ -415,3 +410,11 @@ def dot(v1, v2):
 
     """
     return np.dot(np.asarray(v1), np.asarray(v2))
+
+
+def scalar_triple_product(v1, v2, v3):
+    return dot(v1, cross(v2, v3))
+
+
+def vector_triple_product(v1, v2, v3):
+    return cross(v1, cross(v2, v3))
