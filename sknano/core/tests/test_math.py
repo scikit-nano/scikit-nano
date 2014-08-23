@@ -66,7 +66,7 @@ class TestPoint(unittest.TestCase):
 
 class TestVector(unittest.TestCase):
     def test_vector_with_no_args(self):
-        v = Vector(verbose=True)
+        v = Vector()
         print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
@@ -81,7 +81,7 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v.p, np.zeros(3)))
 
     def test_vector_with_list_of_ones(self):
-        v = Vector([1, 1, 1], verbose=True)
+        v = Vector([1, 1, 1])
         print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
@@ -96,7 +96,7 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v.p, v))
 
     def test_vector_with_p_set(self):
-        v = Vector(p=[1, 1, 1], verbose=True)
+        v = Vector(p=[1, 1, 1])
         print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
@@ -111,7 +111,7 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v.p, v))
 
     def test_vector_with_p0_set(self):
-        v = Vector(p0=[1, 1, 1], verbose=True)
+        v = Vector(p0=[1, 1, 1])
         print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
@@ -141,7 +141,7 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v.p, np.ones(3)))
 
     def test_changing_p0(self):
-        v = Vector(verbose=True)
+        v = Vector()
         print('vector: {}\n'.format(v))
         v.p0 = np.ones(3)
         print('vector: {}'.format(v))
@@ -158,7 +158,7 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v.p, np.zeros(3)))
 
     def test_property_changes(self):
-        v = Vector(p=[1., 1., 1.], p0=[1., 1., 1.], verbose=True)
+        v = Vector(p=[1., 1., 1.], p0=[1., 1., 1.])
         print('vector: {}\n'.format(v))
         print('vector.x: {}'.format(v.x))
         print('vector.y: {}'.format(v.y))
@@ -223,8 +223,8 @@ class TestVector(unittest.TestCase):
         print()
 
     def test_add(self):
-        v1 = Vector([1.0, 0.0], p0=[5., 5.], verbose=True)
-        v2 = Vector([1.0, 1.0], p0=[5., 5.], verbose=True)
+        v1 = Vector([1.0, 0.0], p0=[5., 5.])
+        v2 = Vector([1.0, 1.0], p0=[5., 5.])
         print('v1: {}'.format(v1))
         print('v2: {}\n'.format(v2))
         print('adding v1 + v2')
@@ -254,8 +254,8 @@ class TestVector(unittest.TestCase):
         print('v3.p: {}\n'.format(v3.p))
 
     def test_cross(self):
-        v1 = Vector([1.0, 0.0], verbose=True)
-        v2 = Vector([1.0, 1.0], verbose=True)
+        v1 = Vector([1.0, 0.0])
+        v2 = Vector([1.0, 1.0])
 
         # now try the sknano.core.math.vector.cross function
         print('\ncomputing vec.cross(v1, v2)')
@@ -263,11 +263,10 @@ class TestVector(unittest.TestCase):
         print('v2: {}'.format(v2))
         v3 = vec.cross(v1, v2)
         print('v3 = vec.cross(v1, v2) = {}\n'.format(v3))
-        self.assertIsInstance(v3, np.number)
         self.assertEqual(v3, np.cross(np.asarray(v1), np.asarray(v2)))
 
-        v1 = Vector([1, 0, 0], p0=[1, 1, 1], verbose=True)
-        v2 = Vector([0, 1, 0], p0=[1, 1, 1], verbose=True)
+        v1 = Vector([1, 0, 0], p0=[1, 1, 1])
+        v2 = Vector([0, 1, 0], p0=[1, 1, 1])
 
         print('\ncomputing vec.cross(v1, v2)')
         print('v1: {}'.format(v1))
@@ -283,8 +282,8 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v3.p0, v1.p0))
         self.assertTrue(np.allclose(v3.p0, v2.p0))
 
-        v1 = Vector([1, 0, 0], p0=[1, 0, 0], verbose=True)
-        v2 = Vector([0, 1, 0], p0=[0, 1, 0], verbose=True)
+        v1 = Vector([1, 0, 0], p0=[1, 0, 0])
+        v2 = Vector([0, 1, 0], p0=[0, 1, 0])
 
         print('\ncomputing vec.cross(v1, v2)')
         print('v1: {}'.format(v1))
@@ -300,8 +299,8 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v3.p0, v1.p0))
         self.assertFalse(np.allclose(v3.p0, v2.p0))
 
-        v1 = Vector([1, 2, 3], p0=[1, 0, 0], verbose=True)
-        v2 = Vector([4, 5, 6], p0=[0, 1, 0], verbose=True)
+        v1 = Vector([1, 2, 3], p0=[1, 0, 0])
+        v2 = Vector([4, 5, 6], p0=[0, 1, 0])
 
         print('\ncomputing vec.cross(v1, v2)')
         print('v1: {}'.format(v1))
@@ -318,8 +317,8 @@ class TestVector(unittest.TestCase):
         self.assertFalse(np.allclose(v3.p0, v2.p0))
 
     def test_dot(self):
-        v1 = Vector([1.0, 0.0], verbose=True)
-        v2 = Vector([1.0, 1.0], verbose=True)
+        v1 = Vector([1.0, 0.0])
+        v2 = Vector([1.0, 1.0])
 
         # this way works, but defeats the purpose of the subclasses
         print('\ncomputing np.dot(np.asarray(v1), np.asarray(v2))')
