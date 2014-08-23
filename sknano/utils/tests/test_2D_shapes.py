@@ -7,7 +7,14 @@ import unittest
 
 import numpy as np
 
-from sknano.utils.geometric_shapes import Circle, Ellipse, Rectangle, Square
+from sknano.utils.geometric_shapes import Parallelogram, Rectangle, Square, \
+    Ellipse, Circle
+
+
+class TestParallelogram(unittest.TestCase):
+    def test_no_args(self):
+        s = Parallelogram()
+        print('parallelogram: {}'.format(s))
 
 
 class TestCircle(unittest.TestCase):
