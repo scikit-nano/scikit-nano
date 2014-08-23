@@ -20,6 +20,8 @@ class TestSWNTGenerators(unittest.TestCase):
         swnt = SWNTGenerator(n=10, m=10)
         pprint('test instance: {}'.format(swnt))
         swnt.save_data()
+        swnt.save_data(structure_format='data')
+        #SWNTGenerator(n=10, m=10).save_data(structure_format='data')
 
     def test_swntbundle_generator(self):
         print('\nTesting SWNTBundleGenerator\n')
@@ -30,8 +32,10 @@ class TestSWNTGenerators(unittest.TestCase):
         #SWNTBundleGenerator(n=10, m=0, nx=10, ny=3, nz=5).save_data()
         #SWNTBundleGenerator(n=10, m=5, nx=3, ny=3, nz=1,
         #                    bundle_packing='ccp').save_data()
-        SWNTBundleGenerator(n=10, m=5, nx=3, ny=3, nz=1,
-                            bundle_geometry='hexagon').save_data()
+        swntbundle = SWNTBundleGenerator(n=10, m=5, nx=3, ny=3, nz=1,
+                                         bundle_geometry='hexagon')
+        swntbundle.save_data()
+        swntbundle.save_data(structure_format='data')
 
 
 class TestMWNTGenerators(unittest.TestCase):
@@ -45,6 +49,7 @@ class TestMWNTGenerators(unittest.TestCase):
         mwnt = MWNTGenerator(n=20, m=20, max_shells=3, Lz=1.0, fix_Lz=True)
         pprint('test instance: {}'.format(mwnt))
         mwnt.save_data()
+        mwnt.save_data(structure_format='data')
 
     def test_mwntbundle_generator(self):
         print('\nTesting MWNTBundleGenerator\n')
@@ -52,9 +57,11 @@ class TestMWNTGenerators(unittest.TestCase):
         pprint(MWNTBundleGenerator.__bases__)
         print('\nMWNTBundleGenerator.__mro__:')
         pprint(MWNTBundleGenerator.__mro__)
-        MWNTBundleGenerator(n=40, m=40, max_shells=5,
-                            Lz=1.0, fix_Lz=True,
-                            bundle_geometry='hexagon').save_data()
+        mwntbundle = MWNTBundleGenerator(n=40, m=40, max_shells=5,
+                                         Lz=1.0, fix_Lz=True,
+                                         bundle_geometry='hexagon')
+        mwntbundle.save_data()
+        mwntbundle.save_data(structure_format='data')
 
 
 if __name__ == '__main__':
