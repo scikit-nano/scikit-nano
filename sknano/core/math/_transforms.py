@@ -23,7 +23,7 @@ I = np.identity(4)
 
 _str2array = {}
 for i, axis in enumerate(('x', 'y', 'z')):
-    _str2array[axis] = Vector(np.asarray(I[:3, i]))
+    _str2array[axis] = Vector(I[:3, i])
 
 
 def Rx(angle, deg2rad=False):
@@ -59,7 +59,7 @@ def Rz(angle, deg2rad=False):
                      [0.0, 0.0, 1.0]])
 
 
-def rotation_matrix(angle=None, rot_axis=None, deg2rad=False):
+def rotation_matrix(angle=None, rot_axis=None, deg2rad=False, verbose=False):
     """Generate an :math:`n\\times n` rotation matrix.
 
     .. versionadded:: 0.3.0
@@ -94,12 +94,13 @@ def rotation_matrix(angle=None, rot_axis=None, deg2rad=False):
         gives a rotation around the direction of the vector `rot_axis`.
 
     """
-    Rmat = transformation_matrix(angle, rot_axis=rot_axis, deg2rad=deg2rad)
+    Rmat = transformation_matrix(angle, rot_axis=rot_axis, deg2rad=deg2rad,
+                                 verbose=verbose)
     return Rmat[:-1,:-1]
 
 
-def transformation_matrix(angle, rot_axis=None, axis_origin=None,
-                          deg2rad=False):
+def transformation_matrix(angle, rot_axis=None, anchor_point=None,
+                          deg2rad=False, verbose=False):
     """Generate an :math:`n+1\\times n+1` transformation matrix for
     an affine transformation in :math:`n` dimensions.
 
@@ -121,16 +122,16 @@ def transformation_matrix(angle, rot_axis=None, axis_origin=None,
         :math:`\\mathbf{v}_x=\\mathbf{\\hat{x}}`,
         :math:`\\mathbf{v}_y=\\mathbf{\\hat{y}}`, and
         :math:`\\mathbf{v}_z=\\mathbf{\\hat{z}}`, respectively.
-    axis_origin : {None, array_like}, optional
+    anchor_point : {None, array_like}, optional
         An :math:`n`-element list or ndarray or
         :class:`~sknano.core.math.Point` defining
         the origin of the rotation axis.
 
-        If `axis_origin` is not `None` and `rot_axis` is a `Vector` instance,
+        If `anchor_point` is not `None` and `rot_axis` is a `Vector` instance,
         then the origin of the vector defined by :attr:`Vector.p0` will be
-        changed to `axis_origin`.
+        changed to `anchor_point`.
 
-        If `axis_origin` is `None`, then it defaults to an
+        If `anchor_point` is `None`, then it defaults to an
         :math:`n`-element array of zeros.
     deg2rad : bool, optional
         If `True`, convert `angle` from degrees to radians.
@@ -141,17 +142,17 @@ def transformation_matrix(angle, rot_axis=None, axis_origin=None,
         :math:`n+1\\times n+1` transformation matrix for an affine transform
         in :math:`n` dimensions.
 
-        If `rot_axis` is `None` and `axis_origin` is `None`,
+        If `rot_axis` is `None` and `anchor_point` is `None`,
         then `Tmat` will be a :math:`2D` rotation matrix :math:`R(\\theta)`
         that rotates :math:`2D` vectors counterclockwise by `angle`
         :math:`\\theta`.
 
-        If `rot_axis` is `None` and `axis_origin` is a 2-element sequence,
+        If `rot_axis` is `None` and `anchor_point` is a 2-element sequence,
         then `Rmat` will be a :math:`2D` rotation matrix :math:`R(\\theta)`
-        about the :math:`2D` `Point` `axis_origin` by `angle`
+        about the :math:`2D` `Point` `anchor_point` by `angle`
         :math:`\\theta`.
 
-        If `rot_axis` is not `None` and `axis_origin` is `None`,
+        If `rot_axis` is not `None` and `anchor_point` is `None`,
         then `Rmat` will be a rotation matrix that gives a rotation around
         the direction of the vector `rot_axis`.
 
@@ -166,7 +167,7 @@ def transformation_matrix(angle, rot_axis=None, axis_origin=None,
     sina = np.sin(angle)
 
     # Handle 2D rotation about origin
-    if rot_axis is None and axis_origin is None:
+    if rot_axis is None and anchor_point is None:
         return Rz(angle)
 
     # Handle 3D rotation about origin
@@ -182,13 +183,11 @@ def transformation_matrix(angle, rot_axis=None, axis_origin=None,
     elif not isinstance(rot_axis, (tuple, list, np.ndarray)):
         raise ValueError('`rot_axis` must be a sequence')
 
-    if axis_origin is not None and \
-            isinstance(axis_origin, (tuple, list, np.ndarray)) and \
-            len(axis_origin) == len(rot_axis):
-        if isinstance(rot_axis, Vector):
-            rot_axis.p0 = Point(axis_origin)
-        else:
-            rot_axis = Vector(rot_axis, p0=axis_origin)
+    if anchor_point is not None and \
+            isinstance(anchor_point, (tuple, list, np.ndarray)) and \
+            len(anchor_point) == len(rot_axis):
+        #rot_axis.p0 = Point(anchor_point)
+        rot_axis = Vector(rot_axis, p0=anchor_point)
 
     if not isinstance(rot_axis, Vector):
         rot_axis = Vector(rot_axis)
@@ -255,8 +254,8 @@ def transformation_matrix(angle, rot_axis=None, axis_origin=None,
     return Tmat
 
 
-def rotate_point(point, angle, rot_axis=None, axis_origin=None,
-                 deg2rad=False):
+def rotate_point(point, angle, rot_axis=None, anchor_point=None,
+                 deg2rad=False, verbose=False):
     """Rotate point about arbitrary axis.
 
     .. versionadded:: 0.3.0
@@ -266,7 +265,7 @@ def rotate_point(point, angle, rot_axis=None, axis_origin=None,
     point : array_like or :class:`~sknano.core.math.Point`
     angle : float
     rot_axis : {array_like, str, :class:`~sknano.core.math.Vector`}
-    axis_origin : {array_like, :class:`~sknano.core.math.Point`}
+    anchor_point : {array_like, :class:`~sknano.core.math.Point`}
     deg2rad : bool, optional
 
     Returns
@@ -274,13 +273,18 @@ def rotate_point(point, angle, rot_axis=None, axis_origin=None,
     rotated_point : ndarray
 
     """
+    if verbose:
+        print('In rotate_point\n'
+              'point: {}\n'.format(point) +
+              'rot_axis: {}\n'.format(rot_axis) +
+              'anchor_point: {}\n'.format(anchor_point))
     p = Point(point)
     if rot_axis is None and p.nd > 2:
         raise TypeError('`rot_axis` must be a sequence for `n` dimensional '
                         'points wherer `n > 2`')
     Tmat = transformation_matrix(angle, rot_axis=rot_axis,
-                                 axis_origin=axis_origin,
-                                 deg2rad=deg2rad)
+                                 anchor_point=anchor_point, deg2rad=deg2rad,
+                                 verbose=verbose)
 
     t = np.ones(len(p) + 1)
     t[:-1] = p
