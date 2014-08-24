@@ -60,6 +60,10 @@ class Vector(np.ndarray):
                 intype = np.dtype(dtype)
 
             vec = v.view(cls)
+
+            if p0 is not None:
+                vec = Vector(np.asarray(vec), p0=p0)
+
             if intype != v.dtype:
                 return vec.astype(intype)
 
@@ -289,8 +293,23 @@ class Vector(np.ndarray):
 
     @property
     def length(self):
-        """Length of `Vector`."""
-        return None
+        """Alias for :attr:`Vector.norm`."""
+        return self.norm
+
+    @property
+    def magnitude(self):
+        """Alias for :attr:`Vector.norm`."""
+        return self.norm
+
+    @property
+    def mag(self):
+        """Alias for :attr:`Vector.norm`."""
+        return self.norm
+
+    @property
+    def norm(self):
+        """Return the vector norm."""
+        return np.sqrt((self**2).sum())
 
     @property
     def p(self):
@@ -314,9 +333,25 @@ class Vector(np.ndarray):
         self._p0[:] = value
         self[:] = self._p - self._p0
 
+    def _translate_p0(self, t, fix_components=False):
+        if fix_components:
+            self.translate(t)
+        else:
+            self.p0.translate(t)
+
+    def _translate_p(self, t, fix_components=False):
+        if fix_components:
+            self.translate(t)
+        else:
+            self.p.translate(t)
+
     def dot(self, other, out=None):
         """Computes dot product of two vectors."""
         return self.__array__().dot(other.__array__())
+
+    def normalize(self):
+        """Normalize the `Vector`."""
+        self[:] = self / self.length
 
     def rezero_components(self, epsilon=1.0e-10):
         """Re-zero `Vector` coordinates near zero.
@@ -331,6 +366,20 @@ class Vector(np.ndarray):
 
         """
         self[np.where(np.abs(self) <= epsilon)] = 0.0
+
+    def rotate(self, angle, rot_axis=None, anchor_point=None, deg2rad=False,
+               verbose=False):
+        from sknano.core.math import rotate_point
+        #self[:] = rotate_point(self, angle, rot_axis=rot_axis,
+        #                       anchor_point=anchor_point, deg2rad=deg2rad)
+        self.p0 = rotate_point(self.p0, angle, rot_axis=rot_axis,
+                               anchor_point=anchor_point, deg2rad=deg2rad)
+        self.p = rotate_point(self.p, angle, rot_axis=rot_axis,
+                              anchor_point=anchor_point, deg2rad=deg2rad)
+
+    def translate(self, t):
+        self.p0.translate(t)
+        self.p.translate(t)
 
 
 def cross(v1, v2):
