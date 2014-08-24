@@ -12,9 +12,6 @@ from sknano.core.math import Point, Vector, vector as vec
 
 class TestPoint(unittest.TestCase):
 
-    #def setUp(self):
-    #    self.nppoint = NPPoint()
-
     def test_point_with_no_args(self):
         pt = Point()
         print('point: {}'.format(pt))
@@ -62,6 +59,19 @@ class TestPoint(unittest.TestCase):
     def test_point_with_arange10(self):
         pt = Point(np.arange(10))
         print('point: {}\n'.format(pt))
+
+    def test_transforms(self):
+        p = Point([1.0, 0.0, 0.0])
+        p.rotate(np.pi/2, rot_axis='z')
+        self.assertTrue(np.allclose(p, np.array([0, 1, 0])))
+        p.rotate(np.pi/2, rot_axis='z')
+        self.assertTrue(np.allclose(p, np.array([-1, 0, 0])))
+        p.rotate(np.pi/2, rot_axis='z')
+        self.assertTrue(np.allclose(p, np.array([0, -1, 0])))
+        p.rotate(np.pi/2, rot_axis='z')
+        self.assertTrue(np.allclose(p, np.array([1, 0, 0])))
+        p.rotate(np.pi/2, rot_axis=[0, 0, 1], anchor_point=[1, 1, 0])
+        self.assertTrue(np.allclose(p, np.array([2, 1, 0])))
 
 
 class TestVector(unittest.TestCase):
@@ -325,6 +335,54 @@ class TestVector(unittest.TestCase):
         v1 = Vector()
         print('\n{!r}\n'.format(v1))
 
+    def test_transforms(self):
+        v = Vector([1.0, 0.0, 0.0])
+        v.rotate(np.pi/2, rot_axis='z')
+        self.assertTrue(np.allclose(v, np.array([0, 1, 0])))
+        self.assertTrue(np.allclose(v.p0, np.zeros(3)))
+        self.assertTrue(np.allclose(v.p, np.array([0, 1, 0])))
+        v.rotate(np.pi/2, rot_axis='z')
+        self.assertTrue(np.allclose(v, np.array([-1, 0, 0])))
+        self.assertTrue(np.allclose(v.p0, np.zeros(3)))
+        self.assertTrue(np.allclose(v.p, np.array([-1, 0, 0])))
+        v.rotate(np.pi/2, rot_axis='z')
+        self.assertTrue(np.allclose(v, np.array([0, -1, 0])))
+        self.assertTrue(np.allclose(v.p0, np.zeros(3)))
+        self.assertTrue(np.allclose(v.p, np.array([0, -1, 0])))
+        v.rotate(np.pi/2, rot_axis='z')
+        self.assertTrue(np.allclose(v, np.array([1, 0, 0])))
+        self.assertTrue(np.allclose(v.p0, np.zeros(3)))
+        self.assertTrue(np.allclose(v.p, np.array([1, 0, 0])))
+
+        v = Vector(p0=[1, 1, 1])
+        self.assertTrue(np.allclose(v, -np.ones(3)))
+        self.assertTrue(np.allclose(v.p0, np.ones(3)))
+        self.assertTrue(np.allclose(v.p, np.array([0, 0, 0])))
+        v.rotate(np.pi/2, rot_axis='z')
+        self.assertTrue(np.allclose(v, np.array([1, -1, -1])))
+        self.assertTrue(np.allclose(v.p0, np.array([-1, 1, 1])))
+        self.assertTrue(np.allclose(v.p, np.zeros(3)))
+
+        v = Vector(p0=[1, 1, 1])
+        self.assertTrue(np.allclose(v, -np.ones(3)))
+        self.assertTrue(np.allclose(v.p0, np.ones(3)))
+        self.assertTrue(np.allclose(v.p, np.array([0, 0, 0])))
+        print(v)
+        v.rotate(np.pi/2, rot_axis='z', anchor_point=[1, 1, 1])
+        print(v)
+        self.assertTrue(np.allclose(v, np.array([1, -1, -1])))
+        self.assertTrue(np.allclose(v.p0, np.array([1, 1, 1])))
+        self.assertTrue(np.allclose(v.p, np.array([2, 0, 0])))
+
+    def test_rotations(self):
+        v = Vector(p0=[1, 1, 1])
+        self.assertTrue(np.allclose(v, -np.ones(3)))
+        self.assertTrue(np.allclose(v.p0, np.ones(3)))
+        self.assertTrue(np.allclose(v.p, np.array([0, 0, 0])))
+        v.rotate(np.pi/2, rot_axis='z', anchor_point=[1, 1, 1])
+        self.assertTrue(np.allclose(v, np.array([1, -1, -1])))
+        self.assertTrue(np.allclose(v.p0, np.array([1, 1, 1])))
+        self.assertTrue(np.allclose(v.p, np.array([2, 0, 0])))
 
 if __name__ == '__main__':
     unittest.main()
