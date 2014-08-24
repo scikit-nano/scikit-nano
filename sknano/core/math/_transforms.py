@@ -17,7 +17,6 @@ from ._vector import Vector
 __all__ = ['Rx', 'Ry', 'Rz',
            'rotation_matrix',
            'transformation_matrix',
-           'rotation_transform',
            'rotate_point']
 
 I = np.identity(4)
@@ -201,8 +200,8 @@ def transformation_matrix(angle, rot_axis=None, axis_origin=None,
             a, b = rot_axis
             m13 = a - a * cosa + b * sina
             m23 = b - b * cosa - a * sina
-            Tmat[:, 2] = np.array([m13, m23])
-    else:
+            Tmat[:2, 2] = np.array([m13, m23])
+    elif rot_axis.nd == 3:
         Tmat = np.zeros((4, 4))
 
         if np.allclose(rot_axis, I[:3, 0]):
@@ -256,46 +255,6 @@ def transformation_matrix(angle, rot_axis=None, axis_origin=None,
     return Tmat
 
 
-def rotation_transform(angle, rot_axis=None, axis_origin=None, deg2rad=False):
-    """Generate an :math:`n\\times n` rotation matrix.
-
-    .. versionadded:: 0.3.0
-
-    Parameters
-    ----------
-    angle : float
-        Rotation angle in **radians** unless `deg2rad` is `True`.
-        The *sense* of the rotation is defined by the *right hand rule*:
-        If your right-hand's thumb points along the `rot_axis`,
-        then your fingers wrap around the axis in the *positive sense* of
-        the rotation angle.
-    rot_axis : {array_like, str, :class:`~sknano.core.math.Vector`}
-        3-element list or ndarray or :class:`~sknano.core.math.Vector` defining
-        the 3 components, :math:`u, v, w`, of the vector defining the axis
-        of rotation.
-    axis_origin : {array_like, :class:`~sknano.core.math.Point`}
-        3-element list or ndarray or :class:`~sknano.core.math.Point` defining
-        origin point of rotation axis.
-    deg2rad : bool, optional
-        Angle is in degrees and needs to be converted to radians
-
-    Returns
-    -------
-    transformation_function
-
-    """
-    Tmat = transformation_matrix(angle, rot_axis=rot_axis,
-                                 axis_origin=axis_origin,
-                                 deg2rad=deg2rad)
-
-    def transform_function(p0):
-        p1 = np.ones(len(p0) + 1)
-        p1[:-1] = p0
-        return Point(np.dot(Tmat, p1)[:3])
-
-    return transform_function
-
-
 def rotate_point(point, angle, rot_axis=None, axis_origin=None,
                  deg2rad=False):
     """Rotate point about arbitrary axis.
@@ -315,8 +274,16 @@ def rotate_point(point, angle, rot_axis=None, axis_origin=None,
     rotated_point : ndarray
 
     """
-    rotfn = rotation_transform(angle, rot_axis=rot_axis,
-                               axis_origin=axis_origin,
-                               deg2rad=deg2rad)
+    p = Point(point)
+    if rot_axis is None and p.nd > 2:
+        raise TypeError('`rot_axis` must be a sequence for `n` dimensional '
+                        'points wherer `n > 2`')
+    Tmat = transformation_matrix(angle, rot_axis=rot_axis,
+                                 axis_origin=axis_origin,
+                                 deg2rad=deg2rad)
 
-    return rotfn(point)
+    t = np.ones(len(p) + 1)
+    t[:-1] = p
+    rt = Point(np.dot(Tmat, t)[:-1])
+    rt.rezero_coords()
+    return rt
