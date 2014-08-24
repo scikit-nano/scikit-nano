@@ -22,9 +22,9 @@ Linear algebra transforms
 .. autosummary::
    :toctree: generated/
 
-   rotate_point
    rotation_matrix
    transformation_matrix
+   rotation_transform
 
 Number theory
 ---------------
