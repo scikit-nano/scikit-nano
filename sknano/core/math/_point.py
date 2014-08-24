@@ -17,7 +17,7 @@ __all__ = ['Point']
 
 
 class Point(np.ndarray):
-    """Abstract object representation of a point in :math:`R^n`
+    """Abstract object representation for a point in :math:`R^n`.
 
     Parameters
     ----------
@@ -80,7 +80,6 @@ class Point(np.ndarray):
         return pt
 
     def __array_finalize__(self, pt):
-
         if pt is None:
             return None
 
@@ -117,7 +116,6 @@ class Point(np.ndarray):
         return super(Point, self).__getattribute__(name)
 
     def __setattr__(self, name, value):
-        #nd = len(self)
         nd = getattr(self, 'nd', None)
         if nd is not None and nd == 2 and name in ('x', 'y'):
             if name == 'x':
@@ -147,3 +145,11 @@ class Point(np.ndarray):
 
         """
         self[np.where(np.abs(self) <= epsilon)] = 0.0
+
+    def rotate(self, angle, rot_axis=None, anchor_point=None, deg2rad=False):
+        from sknano.core.math import rotate_point
+        self[:] = rotate_point(self, angle, rot_axis=rot_axis,
+                               anchor_point=anchor_point, deg2rad=deg2rad)
+
+    def translate(self, t):
+        self += t
