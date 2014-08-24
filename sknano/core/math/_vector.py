@@ -44,11 +44,11 @@ class Vector(np.ndarray):
 
     """
     __array_priority__ = 15.0
-    _verbosity = 0
+    _verbosity = 1
 
     def __new__(cls, v=None, nd=None, p0=None, p=None, dtype=None, copy=True):
         if Vector._verbosity > 0:
-            print('In __new__\n'
+            print('In Vector.__new__\n'
                   'cls: {}\n'.format(cls) +
                   'v: {}\n'.format(v) +
                   'type(v): {}\n'.format(type(v)))
@@ -121,8 +121,8 @@ class Vector(np.ndarray):
             return None
 
         self.nd = len(obj)
-        if Vector._verbosity > 0:
-            print('In __array_finalize__\n'
+        if Vector._verbosity > 2:
+            print('In Vector.__array_finalize__\n'
                   'self: {}\n'.format(self) +
                   'type(self): {}\n'.format(type(self)) +
                   'obj: {}\n'.format(obj) +
@@ -138,8 +138,8 @@ class Vector(np.ndarray):
         self._p0 = getattr(obj, 'p0', None)
 
     def __array_prepare__(self, obj, context=None):
-        if Vector._verbosity > 0:
-            print('In __array_prepare__\n'
+        if Vector._verbosity > 2:
+            print('In Vector.__array_prepare__\n'
                   'self: {}\n'.format(self) +
                   'type(self): {}\n'.format(type(self)) +
                   'obj: {}\n'.format(obj) +
@@ -156,8 +156,8 @@ class Vector(np.ndarray):
         return super(Vector, self).__array_prepare__(obj, context)
 
     def __array_wrap__(self, obj, context=None):
-        if Vector._verbosity > 0:
-            print('In __array_wrap__\n'
+        if Vector._verbosity > 2:
+            print('In Vector.__array_wrap__\n'
                   'self: {}\n'.format(self) +
                   'type(self): {}\n'.format(type(self)) +
                   'type(self): {}\n'.format(type(self)) +
@@ -182,7 +182,7 @@ class Vector(np.ndarray):
             #res._p = Point(self[:] + res._p0)
             res = Vector(res.__array__(), p0=self.p0)
             if Vector._verbosity > 0:
-                print('In __array_wrap__\n'
+                print('In Vector.__array_wrap__\n'
                       'self: {}\n'.format(self) +
                       'type(self): {}\n'.format(type(self)) +
                       'self.p: {}\n'.format(self.p) +
@@ -220,10 +220,10 @@ class Vector(np.ndarray):
             return "Vector({!r})".format(self.__array__().tolist())
 
     def __getattr__(self, name):
-        #if Vector._verbosity > 0 and name.find('ufunc') > 0:
-        #    print('In __getattr__\n'
-        #          'self: {}\n'.format(self.__array__()) +
-        #          'name: {}\n'.format(name))
+        if Vector._verbosity > 4 and name.find('ufunc') > 0:
+            print('In Vector.__getattr__\n'
+                  'self: {}\n'.format(self.__array__()) +
+                  'name: {}\n'.format(name))
         try:
             nd = len(self)
             if nd == 2 and name in ('x', 'y'):
@@ -246,12 +246,12 @@ class Vector(np.ndarray):
         #nd = len(self)
         nd = getattr(self, 'nd', None)
 
-        #if Vector._verbosity > 0:
-        #    print('In __setattr__\n'
-        #          'self: {}\n'.format(self) +
-        #          'type(self): {}\n'.format(type(self)) +
-        #          'name: {}\n'.format(name) +
-        #          'value: {}\n'.format(value))
+        if Vector._verbosity > 3:
+            print('In Vector.__setattr__\n'
+                  'self: {}\n'.format(self) +
+                  'type(self): {}\n'.format(type(self)) +
+                  'name: {}\n'.format(name) +
+                  'value: {}\n'.format(value))
         if nd is not None and nd == 2 and name in ('x', 'y'):
             if name == 'x':
                 self[0] = value
@@ -286,59 +286,11 @@ class Vector(np.ndarray):
                     pass
         else:
             super(Vector, self).__setattr__(name, value)
-            #np.ndarray.__setattr__(self, name, value)
 
-    #def __getitem__(self, key):
-    #    super(Vector, self).__getitem__(key)
-
-    #def __setitem__(self, key, value):
-    #    super(Vector, self).__setitem__(key, value)
-
-    def __add__(self, other):
-        if Vector._verbosity > 0:
-            print('in __add__\n'
-                  'self: {}\n'.format(self) +
-                  'other: {}\n'.format(other))
-        return super(Vector, self).__add__(other)
-
-    def __mul__(self, other):
-        if Vector._verbosity > 0:
-            print('in __mul__\n'
-                  'self: {}\n'.format(self) +
-                  'other: {}\n'.format(other))
-        if isinstance(other, (np.ndarray, list, tuple)):
-            return np.multiply(np.asarray(self), np.asarray(other))
-        return NotImplemented
-        #return super(Vector, self).__mul__(other)
-
-    def __sub__(self, other):
-        if Vector._verbosity > 0:
-            print('in __sub__\n'
-                  'self: {}\n'.format(self) +
-                  'other: {}\n'.format(other))
-        return super(Vector, self).__sub__(np.asarray(other))
-
-    def __radd__(self, other):
-        if Vector._verbosity > 0:
-            print('in __radd__\n'
-                  'self: {}\n'.format(self) +
-                  'other: {}\n'.format(other))
-        return self.__add__(other)
-
-    def __rmul__(self, other):
-        if Vector._verbosity > 0:
-            print('in __rmul__\n'
-                  'self: {}\n'.format(self) +
-                  'other: {}\n'.format(other))
-        return np.multiply(np.asarray(other), np.asarray(self))
-
-    def __imul__(self, other):
-        if Vector._verbosity > 0:
-            print('in __imul__\n'
-                  'self: {}\n'.format(self) +
-                  'other: {}\n'.format(other))
-        self[:] = self * other
-        return self
+    @property
+    def length(self):
+        """Length of `Vector`."""
+        return None
 
     @property
     def p(self):
