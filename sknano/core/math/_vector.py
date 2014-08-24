@@ -44,7 +44,7 @@ class Vector(np.ndarray):
 
     """
     __array_priority__ = 15.0
-    _verbosity = 1
+    _verbosity = 0
 
     def __new__(cls, v=None, nd=None, p0=None, p=None, dtype=None, copy=True):
         if Vector._verbosity > 0:
