@@ -10,10 +10,10 @@ Structure Generator base classes (:mod:`sknano.generators._base`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
+import copy
 import os
 
-from ..core.math import rotation_matrix
-from ..io import StructureIO, default_structure_format, \
+from sknano.io import StructureIO, default_structure_format, \
     supported_structure_formats
 
 __all__ = ['GeneratorMixin']
@@ -48,8 +48,8 @@ class GeneratorMixin(object):
         return self._unit_cell
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
-                  rotation_angle=None, rot_axis=None, deg2rad=True,
-                  center_CM=True, **kwargs):
+                  rotation_angle=None, rot_axis=None, anchor_point=None,
+                  deg2rad=True, center_CM=True, savecopy=True, **kwargs):
         """Save structure data.
 
         Parameters
@@ -70,6 +70,8 @@ class GeneratorMixin(object):
             Angle of rotation
         rot_axis : {'x', 'y', 'z'}, optional
             Rotation axis
+        anchor_point : array_like, optional
+            Rotation axis origin
         deg2rad : bool, optional
             Convert `rotation_angle` from degrees to radians.
         center_CM : bool, optional
@@ -97,15 +99,17 @@ class GeneratorMixin(object):
 
         #self._structure_format = structure_format
 
+        if savecopy:
+            atoms = copy.deepcopy(self._structure_atoms)
+        else:
+            atoms = self._structure_atoms
+
         if center_CM:
-            self._structure_atoms.center_CM()
+            atoms.center_CM()
 
         if rotation_angle is not None:
-            R_matrix = rotation_matrix(angle=rotation_angle,
-                                       rot_axis=rot_axis,
-                                       deg2rad=deg2rad)
-            self._structure_atoms.rotate(R_matrix)
+            atoms.rotate(angle=rotation_angle, rot_axis=rot_axis,
+                         anchor_point=anchor_point, deg2rad=deg2rad)
 
-        StructureIO.write(fname=fname, outpath=outpath,
-                          atoms=self._structure_atoms,
+        StructureIO.write(fname=fname, outpath=outpath, atoms=atoms,
                           structure_format=structure_format)
