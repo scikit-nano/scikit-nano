@@ -1525,7 +1525,9 @@ class UnrolledSWNTMixin(object):
 
 class UnrolledSWNT(UnrolledSWNTMixin, SWNT):
 
-    def __init__(self, nx=1, ny=1, Lx=None, Ly=None, **kwargs):
+    def __init__(self, nx=1, ny=1, Lx=None, Ly=None, nlayers=1,
+                 layer_spacing=dVDW, stacking_order='AB', **kwargs):
+
         super(UnrolledSWNT, self).__init__(**kwargs)
 
         self._nx = int(nx)
