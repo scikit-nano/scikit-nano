@@ -15,7 +15,7 @@ from collections import OrderedDict
 import numpy as np
 
 from sknano.core import xyz
-from sknano.core.math import Vector
+from sknano.core.math import Vector, rotation_transform
 from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols
 
@@ -38,7 +38,7 @@ class Atom(object):
     def __init__(self, element=None, m=None, x=None, y=None, z=None):
 
         self._r = Vector([x, y, z])
-        self._dr = Vector(np.zeros(3))
+        self._dr = Vector(np.zeros(3), p0=[x, y, z])
 
         self._m = None
         self._symbol = None
@@ -60,8 +60,6 @@ class Atom(object):
             except KeyError:
                 print('Unrecognized atomic symbol: {}'.format(element))
         else:
-            self._symbol = None
-            self._Z = None
             if m is not None and isinstance(m, (int, float)):
                 try:
                     if isinstance(m, float):
@@ -78,6 +76,10 @@ class Atom(object):
                 self._m = 0
 
         self._attributes = ['symbol', 'Z', 'm', 'r']
+
+    def __str__(self):
+        """Return string representation of atom."""
+        return repr(self)
 
     def __repr__(self):
         """Return string representation of atom."""
@@ -102,7 +104,7 @@ class Atom(object):
         Returns
         -------
         str
-            Element symbol.
+            Symbol of chemical element.
         """
         return self.symbol
 
@@ -213,7 +215,7 @@ class Atom(object):
         return self._r
 
     @r.setter
-    def r(self, value=np.ndarray):
+    def r(self, value):
         """Set :math:`x, y, z` components of `Atom` position vector.
 
         Parameters
@@ -225,6 +227,30 @@ class Atom(object):
         """
         self._r[:] = value
 
+    @property
+    def dr(self):
+        """:math:`x, y, z` components of `Atom` in units of **Angstroms**.
+
+        Returns
+        -------
+        ndarray
+            3-element ndarray of [:math:`x, y, z`] coordinates of `Atom`.
+
+        """
+        return self._dr
+
+    @dr.setter
+    def dr(self, value):
+        """Set :math:`x, y, z` components of `Atom` displacement vector.
+
+        Parameters
+        ----------
+        value : array_like
+            :math:`x, y, z` components of `Atom` displacement vector.
+
+        """
+        self._dr[:] = value
+
     def get_coords(self, as_dict=False):
         """Return atom coords.
 
@@ -234,7 +260,7 @@ class Atom(object):
 
         Returns
         -------
-        coords : :py:class:`python:~collections.OrderedDict` or ndarray
+        coords : :class:`python:~collections.OrderedDict` or ndarray
 
         """
         if as_dict:
@@ -254,4 +280,16 @@ class Atom(object):
             smallest allowed absolute value of any :math:`x,y,z` component.
 
         """
-        self._r.rezero_components(epsilon=epsilon)
+        self._r.rezero(epsilon=epsilon)
+
+    def rotate(self, angle=None, rot_axis=None, anchor_point=None,
+               deg2rad=False, transform_matrix=None):
+        try:
+            self.r = rotation_transform(self.r,
+                                        transform_matrix=transform_matrix)
+        except ValueError:
+            self.r.rotate(angle, rot_axis=rot_axis, anchor_point=anchor_point,
+                          deg2rad=deg2rad)
+
+    def translate(self, t):
+        pass
