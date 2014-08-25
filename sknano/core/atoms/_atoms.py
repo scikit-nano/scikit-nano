@@ -18,6 +18,7 @@ from collections import OrderedDict, MutableSequence
 import numpy as np
 
 from sknano.core import xyz
+from sknano.core.math import transformation_matrix
 
 __all__ = ['Atoms']
 
@@ -324,26 +325,28 @@ class Atoms(MutableSequence):
     def rezero_xyz(self, epsilon=1.0e-10):
         self.rezero_coords(epsilon=epsilon)
 
-    def rotate(self, R_matrix):
-        """Rotate atom coordinates using rotation matrix `R_matrix`.
+    def rotate(self, angle=None, rot_axis=None, anchor_point=None,
+               deg2rad=False, transform_matrix=None):
+        """Rotate atom coordinates about arbitrary axis.
 
         Parameters
         ----------
-        R_matrix : array_like
-            3x3 array representation of *3D rotation matrix*.
+        angle : float
 
         """
-        for atom in self._data:
-            atom.r = np.dot(R_matrix, atom.r.T).T
+        if transform_matrix is None:
+            transform_matrix = \
+                transformation_matrix(angle, rot_axis=rot_axis,
+                                      anchor_point=anchor_point,
+                                      deg2rad=deg2rad)
+        [atom.rotate(transform_matrix=transform_matrix) for atom in self._data]
 
-    def translate(self, dr):
+    def translate(self, t):
         """Translate atom coordinates.
 
         Parameters
         ----------
-        dr : array_like
-            array representation of displacement vector to translate
-            coordinates of the atoms' position vector through
+        t : array_like
+            3-elment array of :math:`x,y,z` components of translation vector
         """
-        for atom in self._data:
-            atom.r += dr
+        [atom.translate(t) for atom in self._data]
