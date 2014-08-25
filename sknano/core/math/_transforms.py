@@ -15,7 +15,8 @@ import numpy as np
 __all__ = ['Rx', 'Ry', 'Rz',
            'rotation_matrix',
            'transformation_matrix',
-           'rotate_point']
+           'affine_transform',
+           'rotation_transform']
 
 I = np.identity(4)
 
@@ -57,7 +58,7 @@ def Rz(angle, deg2rad=False):
                      [0.0, 0.0, 1.0]])
 
 
-def rotation_matrix(angle=None, rot_axis=None, deg2rad=False, verbose=False):
+def rotation_matrix(angle, rot_axis=None, deg2rad=False, verbose=False):
     """Generate an :math:`n\\times n` rotation matrix.
 
     .. versionadded:: 0.3.0
@@ -177,7 +178,8 @@ def transformation_matrix(angle, rot_axis=None, anchor_point=None,
         try:
             rot_axis = _str2array[rot_axis]
         except KeyError:
-            raise ValueError('Invalid `rot_axis` string: {}'.format(rot_axis))
+            raise ValueError(
+                'Invalid `rot_axis` string: {}'.format(rot_axis))
     elif not isinstance(rot_axis, (tuple, list, np.ndarray)):
         raise ValueError('`rot_axis` must be a sequence')
 
@@ -247,15 +249,21 @@ def transformation_matrix(angle, rot_axis=None, anchor_point=None,
     return Tmat
 
 
-def rotate_point(point, angle, rot_axis=None, anchor_point=None,
-                 deg2rad=False, verbose=False):
-    """Rotate point about arbitrary axis.
+def affine_transform(obj, angle=None, rot_axis=None, anchor_point=None,
+                     deg2rad=False, transform_matrix=None, verbose=False):
+    """Perform affine transform about arbitrary axis."""
+    raise NotImplementedError("Not implemented yet, sorry.")
+
+
+def rotation_transform(arr, angle=None, rot_axis=None, anchor_point=None,
+                       deg2rad=False, transform_matrix=None, verbose=False):
+    """Rotate array_like object about arbitrary axis.
 
     .. versionadded:: 0.3.0
 
     Parameters
     ----------
-    point : array_like
+    arr : array_like
     angle : float
     rot_axis : {array_like, str, :class:`~sknano.core.math.Vector`}
     anchor_point : {array_like, :class:`~sknano.core.math.Point`}
@@ -263,21 +271,26 @@ def rotate_point(point, angle, rot_axis=None, anchor_point=None,
 
     Returns
     -------
-    rotated_point : ndarray
+    rotated_arr
 
     """
     if verbose:
-        print('In rotate_point\n'
-              'point: {}\n'.format(point) +
+        print('In rotation_transform\n'
+              'arr: {}\n'.format(arr) +
               'rot_axis: {}\n'.format(rot_axis) +
-              'anchor_point: {}\n'.format(anchor_point))
-    if rot_axis is None and len(point) > 2:
-        raise TypeError('`rot_axis` must be a sequence with the same '
-                        'shape as `point`')
-    Tmat = transformation_matrix(angle, rot_axis=rot_axis,
-                                 anchor_point=anchor_point, deg2rad=deg2rad,
-                                 verbose=verbose)
+              'anchor_point: {}\n'.format(anchor_point) +
+              'transform_matrix: {}\n'.format(transform_matrix))
 
-    t = np.ones(len(point) + 1)
-    t[:-1] = point
-    return np.dot(Tmat, t)[:-1]
+    t = np.append(np.asarray(arr), 1)
+    try:
+        return np.dot(transform_matrix, t)[:-1]
+    except TypeError:
+        if rot_axis is None and len(arr) > 2:
+            raise TypeError('`rot_axis` must be a sequence with the same '
+                            'shape as `point`')
+        tmatrix = \
+            transformation_matrix(angle, rot_axis=rot_axis,
+                                  anchor_point=anchor_point, deg2rad=deg2rad,
+                                  verbose=verbose)
+
+        return np.dot(tmatrix, t)[:-1]
