@@ -115,7 +115,8 @@ class Graphene(object):
 
     def __init__(self, length=None, width=None, edge=None, element1='C',
                  element2='C', bond=CCbond, nlayers=1, layer_spacing=dVDW,
-                 stacking_order='AB', verbose=False):
+                 layer_rotation_angles=None, stacking_order='AB',
+                 verbose=False):
 
         self._length = length
         self._width = width
@@ -147,6 +148,7 @@ class Graphene(object):
 
         self._nlayers = nlayers
         self._layer_spacing = layer_spacing
+        self._layer_rotation_angles = layer_rotation_angles
         self._stacking_order = stacking_order
 
         self._layer_shift = Vector()
@@ -174,10 +176,12 @@ class Graphene(object):
     def __repr__(self):
         retstr = 'Graphene(length={!r}, width={!r}, edge={!r}, ' + \
             'element1={!r}, element2={!r}, bond={!r}, nlayers={!r}, ' + \
-            'layer_spacing={!r}, stacking_order={!r})'
+            'layer_spacing={!r}, layer_rotation_angles={!r}, ' + \
+            'stacking_order={!r})'
         return retstr.format(self.length, self.width, self.edge, self.element1,
                              self.element2, self.bond, self.nlayers,
-                             self.layer_spacing, self.stacking_order)
+                             self.layer_spacing, self.layer_rotation_angles,
+                             self.stacking_order)
 
     def compute_layer_params(self):
         pass
@@ -286,6 +290,14 @@ class Graphene(object):
     def layer_spacing(self, value):
         self._layer_spacing = value
 
+    @property
+    def layer_rotation_angles(self):
+        return self._layer_rotation_angles
+
+    @layer_rotation_angles.setter
+    def layer_rotation_angles(self, value):
+        self._layer_rotation_angles = value
+
     @classmethod
     def compute_layer_mass(cls, n=None, m=None, width=None, length=None,
                            edge=None, element1=None, element2=None):
@@ -320,4 +332,20 @@ class Graphene(object):
 
 
 class BiLayerGraphene(Graphene):
-    pass
+    def __init__(self, layer_rotation_angle=None, deg2rad=True, **kwargs):
+
+        if layer_rotation_angle is not None and deg2rad:
+            layer_rotation_angle = np.radians(layer_rotation_angle)
+        kwargs['layer_rotation_angles'] = layer_rotation_angle
+        kwargs['nlayers'] = 2
+
+        super(BiLayerGraphene, self).__init__(**kwargs)
+        self._layer_rotation_angle = self._layer_rotation_angles
+
+    @property
+    def layer_rotation_angle(self):
+        return self._layer_rotation_angle
+
+    @layer_rotation_angle.setter
+    def layer_rotation_angle(self, value):
+        self._layer_rotation_angle = value
