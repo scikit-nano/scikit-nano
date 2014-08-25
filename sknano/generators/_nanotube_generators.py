@@ -175,8 +175,8 @@ class SWNTGenerator(SWNT, GeneratorMixin):
                 self._structure_atoms.append(nt_atom)
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
-                  rotation_angle=None, rot_axis=None, deg2rad=True,
-                  center_CM=True, **kwargs):
+                  rotation_angle=None, rot_axis=None, anchor_point=None,
+                  deg2rad=True, center_CM=True, savecopy=True, **kwargs):
         """Save structure data.
 
         See :meth:`~sknano.generators.GeneratorMixin.save_data` method
@@ -211,7 +211,8 @@ class SWNTGenerator(SWNT, GeneratorMixin):
         super(SWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
-            deg2rad=deg2rad, center_CM=False, **kwargs)
+            anchor_point=anchor_point, deg2rad=deg2rad, center_CM=False,
+            savecopy=savecopy, **kwargs)
 
 
 class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
@@ -275,8 +276,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
 
     """
 
-    def __init__(self, nlayers=None, layer_spacing=None, stacking_order=None,
-                 autogen=True, **kwargs):
+    def __init__(self, autogen=True, **kwargs):
 
         super(UnrolledSWNTGenerator, self).__init__(**kwargs)
 
@@ -352,8 +352,8 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
                     self._structure_atoms.append(nt_atom)
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
-                  rotation_angle=None, rot_axis=None, deg2rad=True,
-                  center_CM=True, **kwargs):
+                  rotation_angle=None, rot_axis=None, anchor_point=None,
+                  deg2rad=True, center_CM=True, savecopy=True, **kwargs):
         """Save structure data.
 
         See :meth:`~sknano.generators.GeneratorMixin.save_data` method
@@ -409,7 +409,8 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
         super(UnrolledSWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
-            deg2rad=deg2rad, center_CM=False, **kwargs)
+            anchor_point=anchor_point, deg2rad=deg2rad, center_CM=False,
+            savecopy=savecopy, **kwargs)
 
 
 class MWNTGenerator(MWNT, GeneratorMixin):
@@ -694,7 +695,7 @@ class MWNTGenerator(MWNT, GeneratorMixin):
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
-                  center_CM=True, **kwargs):
+                  anchor_point=None, center_CM=True, savecopy=True, **kwargs):
         """Save structure data.
 
         See :meth:`~sknano.generators.GeneratorMixin.save_data` method
@@ -719,4 +720,5 @@ class MWNTGenerator(MWNT, GeneratorMixin):
         super(MWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
-            deg2rad=deg2rad, center_CM=center_CM, **kwargs)
+            anchor_point=anchor_point, deg2rad=deg2rad, center_CM=center_CM,
+            savecopy=savecopy, **kwargs)
