@@ -38,14 +38,14 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 from ._funcs import *
-from ._transforms import *
-
 from ._point import *
 from ._vector import *
+from ._transforms import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
 
 from . import _point as point
 from . import _vector as vector
+from . import _transforms as transforms
 
-__all__ += ['point', 'vector']
+__all__ += ['point', 'vector', 'transforms']
