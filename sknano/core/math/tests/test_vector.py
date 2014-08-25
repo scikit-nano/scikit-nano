@@ -7,7 +7,7 @@ import unittest
 
 import numpy as np
 
-from sknano.core.math import Vector, vector as vec
+from sknano.core.math import Point, Vector, vector as vec
 
 
 class TestVector(unittest.TestCase):
@@ -96,11 +96,7 @@ class TestVector(unittest.TestCase):
     def test_add(self):
         v1 = Vector([1.0, 0.0], p0=[5., 5.])
         v2 = Vector([1.0, 1.0], p0=[5., 5.])
-        print('v1: {}'.format(v1))
-        print('v2: {}\n'.format(v2))
-        print('adding v1 + v2')
         v3 = v1 + v2
-        print('v3 = v1 + v2: {}\n'.format(v3))
         self.assertIsInstance(v3, Vector)
         self.assertTrue(np.allclose(v3, np.array([2.0, 1.0])))
         print('v1: {}'.format(v1))
@@ -277,23 +273,33 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v, np.array([0, 1, 0])))
         self.assertTrue(np.allclose(v.p0, np.zeros(3)))
         self.assertTrue(np.allclose(v.p, np.array([0, 1, 0])))
+        self.assertIsInstance(v.p0, Point)
+        self.assertIsInstance(v.p, Point)
         v.rotate(np.pi/2, rot_axis='z')
         self.assertTrue(np.allclose(v, np.array([-1, 0, 0])))
         self.assertTrue(np.allclose(v.p0, np.zeros(3)))
         self.assertTrue(np.allclose(v.p, np.array([-1, 0, 0])))
+        self.assertIsInstance(v.p0, Point)
+        self.assertIsInstance(v.p, Point)
         v.rotate(np.pi/2, rot_axis='z')
         self.assertTrue(np.allclose(v, np.array([0, -1, 0])))
         self.assertTrue(np.allclose(v.p0, np.zeros(3)))
         self.assertTrue(np.allclose(v.p, np.array([0, -1, 0])))
+        self.assertIsInstance(v.p0, Point)
+        self.assertIsInstance(v.p, Point)
         v.rotate(np.pi/2, rot_axis='z')
         self.assertTrue(np.allclose(v, np.array([1, 0, 0])))
         self.assertTrue(np.allclose(v.p0, np.zeros(3)))
         self.assertTrue(np.allclose(v.p, np.array([1, 0, 0])))
+        self.assertIsInstance(v.p0, Point)
+        self.assertIsInstance(v.p, Point)
 
         v = Vector(p0=[1, 1, 1])
         self.assertTrue(np.allclose(v, -np.ones(3)))
         self.assertTrue(np.allclose(v.p0, np.ones(3)))
         self.assertTrue(np.allclose(v.p, np.array([0, 0, 0])))
+        self.assertIsInstance(v.p0, Point)
+        self.assertIsInstance(v.p, Point)
         v.rotate(np.pi/2, rot_axis='z')
         self.assertTrue(np.allclose(v, np.array([1, -1, -1])))
         self.assertTrue(np.allclose(v.p0, np.array([-1, 1, 1])))
@@ -303,12 +309,14 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v, -np.ones(3)))
         self.assertTrue(np.allclose(v.p0, np.ones(3)))
         self.assertTrue(np.allclose(v.p, np.array([0, 0, 0])))
-        print(v)
+        self.assertIsInstance(v.p0, Point)
+        self.assertIsInstance(v.p, Point)
         v.rotate(np.pi/2, rot_axis='z', anchor_point=[1, 1, 1])
-        print(v)
         self.assertTrue(np.allclose(v, np.array([1, -1, -1])))
         self.assertTrue(np.allclose(v.p0, np.array([1, 1, 1])))
         self.assertTrue(np.allclose(v.p, np.array([2, 0, 0])))
+        self.assertIsInstance(v.p0, Point)
+        self.assertIsInstance(v.p, Point)
 
     def test_rotations(self):
         v = Vector(p0=[1, 1, 1])
@@ -316,6 +324,8 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v.p0, np.ones(3)))
         self.assertTrue(np.allclose(v.p, np.array([0, 0, 0])))
         v.rotate(np.pi/2, rot_axis='z', anchor_point=[1, 1, 1])
+        self.assertIsInstance(v.p0, Point)
+        self.assertIsInstance(v.p, Point)
         self.assertTrue(np.allclose(v, np.array([1, -1, -1])))
         self.assertTrue(np.allclose(v.p0, np.array([1, 1, 1])))
         self.assertTrue(np.allclose(v.p, np.array([2, 0, 0])))

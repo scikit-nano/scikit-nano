@@ -13,6 +13,8 @@ __docformat__ = 'restructuredtext en'
 import numbers
 import numpy as np
 
+from ._transforms import rotation_transform
+
 __all__ = ['Point']
 
 
@@ -133,6 +135,10 @@ class Point(np.ndarray):
             super(Point, self).__setattr__(name, value)
 
     def rezero_coords(self, epsilon=1.0e-10):
+        """Alias for :meth:`Point.rezero`."""
+        self.rezero(epsilon=epsilon)
+
+    def rezero(self, epsilon=1.0e-10):
         """Re-zero `Point` coordinates near zero.
 
         Set `Point` coordinates with absolute value less than `epsilon` to
@@ -147,9 +153,9 @@ class Point(np.ndarray):
         self[np.where(np.abs(self) <= epsilon)] = 0.0
 
     def rotate(self, angle, rot_axis=None, anchor_point=None, deg2rad=False):
-        from ._transforms import rotate_point
-        self[:] = rotate_point(self, angle, rot_axis=rot_axis,
-                               anchor_point=anchor_point, deg2rad=deg2rad)
+        self[:] = rotation_transform(self, angle=angle, rot_axis=rot_axis,
+                                     anchor_point=anchor_point,
+                                     deg2rad=deg2rad)
 
     def translate(self, t):
         self += t

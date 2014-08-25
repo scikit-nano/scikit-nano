@@ -24,7 +24,7 @@ Linear algebra transforms
 
    rotation_matrix
    transformation_matrix
-   rotate_point
+   rotation_transform
 
 Number theory
 ---------------

@@ -14,7 +14,7 @@ import numbers
 import numpy as np
 
 from ._point import Point
-from ._transforms import rotate_point
+from ._transforms import rotation_transform
 
 __all__ = ['Vector', 'cross', 'dot', 'scalar_triple_product',
            'vector_triple_product']
@@ -359,6 +359,10 @@ class Vector(np.ndarray):
         return dot(u, v) / dot(v, v) * v
 
     def rezero_components(self, epsilon=1.0e-10):
+        """Alias for :meth:`Vector.rezero`"""
+        self.rezero(epsilon=epsilon)
+
+    def rezero(self, epsilon=1.0e-10):
         """Re-zero `Vector` coordinates near zero.
 
         Set `Vector` coordinates with absolute value less than `epsilon` to
@@ -374,12 +378,12 @@ class Vector(np.ndarray):
 
     def rotate(self, angle, rot_axis=None, anchor_point=None, deg2rad=False,
                verbose=False):
-        #self[:] = rotate_point(self, angle, rot_axis=rot_axis,
-        #                       anchor_point=anchor_point, deg2rad=deg2rad)
-        self.p0 = rotate_point(self.p0, angle, rot_axis=rot_axis,
+        self.p0 = \
+            rotation_transform(self.p0, angle=angle, rot_axis=rot_axis,
                                anchor_point=anchor_point, deg2rad=deg2rad)
-        self.p = rotate_point(self.p, angle, rot_axis=rot_axis,
-                              anchor_point=anchor_point, deg2rad=deg2rad)
+        self.p = \
+            rotation_transform(self.p, angle=angle, rot_axis=rot_axis,
+                               anchor_point=anchor_point, deg2rad=deg2rad)
 
     def translate(self, t):
         self.p0.translate(t)
