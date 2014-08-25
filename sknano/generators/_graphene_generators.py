@@ -15,8 +15,6 @@ import copy
 import numpy as np
 
 from ..core.atoms import XAtom as Atom, XAtoms as Atoms
-from ..core.math import rotation_matrix
-from ..core.refdata import CCbond
 from ..structures import Graphene, BiLayerGraphene
 from ._base import GeneratorMixin
 
@@ -305,26 +303,9 @@ class BiLayerGrapheneGenerator(BiLayerGraphene, GeneratorMixin):
 
     """
 
-    def __init__(self, length=None, width=None, edge=None,
-                 element1='C', element2='C', bond=CCbond,
-                 layer_spacing=3.35, stacking_order='AB',
-                 layer_rotation_angle=None, rotation_angle=None,
-                 deg2rad=True, autogen=True, verbose=False):
+    def __init__(self, autogen=True, **kwargs):
 
-        super(BiLayerGrapheneGenerator, self).__init__(
-            length=length, width=width, edge=edge,
-            element1=element1, element2=element2, bond=bond,
-            nlayers=2, layer_spacing=layer_spacing, autogen=False,
-            verbose=verbose)
-
-        if rotation_angle is not None and layer_rotation_angle is None:
-            layer_rotation_angle = rotation_angle
-
-        self._rotation_matrix = None
-        if layer_rotation_angle is not None:
-            self._rotation_matrix = rotation_matrix(angle=layer_rotation_angle,
-                                                    rot_axis='z',
-                                                    deg2rad=deg2rad)
+        super(BiLayerGrapheneGenerator, self).__init__(**kwargs)
 
         if autogen:
             super(BiLayerGrapheneGenerator, self).generate_unit_cell()
@@ -334,7 +315,7 @@ class BiLayerGrapheneGenerator(BiLayerGraphene, GeneratorMixin):
         """Generate the full structure coordinates."""
         super(BiLayerGrapheneGenerator, self).generate_structure_data()
 
-        if self._rotation_matrix is not None:
+        if self.layer_rotation_angle is not None:
             bilayer = copy.deepcopy(self._structure_atoms)
             self._structure_atoms = Atoms()
 
@@ -347,6 +328,6 @@ class BiLayerGrapheneGenerator(BiLayerGraphene, GeneratorMixin):
                     np.where(np.abs(z_coords - z) < epsilon)].tolist(),
                     deepcopy=True)
                 if (n % 2) != 0:
-                    layer.rotate(self._rotation_matrix)
+                    layer.rotate(angle=self.layer_rotation_angle, rot_axis='z')
 
                 self._structure_atoms.extend(layer.atoms)
