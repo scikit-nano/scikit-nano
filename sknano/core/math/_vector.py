@@ -353,6 +353,10 @@ class Vector(np.ndarray):
         """Normalize the `Vector`."""
         self[:] = self / self.length
 
+    def projection(self, v):
+        u = self
+        return dot(u, v) / dot(v, v) * v
+
     def rezero_components(self, epsilon=1.0e-10):
         """Re-zero `Vector` coordinates near zero.
 
@@ -382,43 +386,48 @@ class Vector(np.ndarray):
         self.p.translate(t)
 
 
-def cross(v1, v2):
+def angle(u, v):
+    """Compute the angle between two Cartesian vectors."""
+    return np.arccos(dot(u, v) / (u.norm * v.norm))
+
+
+def cross(u, v):
     """Vector cross product of two vectors.
 
     Parameters
     ----------
-    a, b : `Vector`
+    u, v : `Vector`
 
     Returns
     -------
     np.number or `Vector`
 
     """
-    val = np.cross(np.asarray(v1), np.asarray(v2))
+    val = np.cross(np.asarray(u), np.asarray(v))
     if val.shape == ():
         return val[()]
     else:
-        return Vector(val, p0=v1.p0)
+        return Vector(val, p0=u.p0)
 
 
-def dot(v1, v2):
+def dot(u, v):
     """Dot product of two vectors.
 
     Parameters
     ----------
-    a, b : `Vector`
+    u, v : `Vector`
 
     Returns
     -------
     val
 
     """
-    return np.dot(np.asarray(v1), np.asarray(v2))
+    return np.dot(np.asarray(u), np.asarray(v))
 
 
-def scalar_triple_product(v1, v2, v3):
-    return dot(v1, cross(v2, v3))
+def scalar_triple_product(u, v, w):
+    return dot(u, cross(v, w))
 
 
-def vector_triple_product(v1, v2, v3):
-    return cross(v1, cross(v2, v3))
+def vector_triple_product(u, v, w):
+    return cross(u, cross(v, w))
