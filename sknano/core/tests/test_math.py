@@ -384,5 +384,19 @@ class TestVector(unittest.TestCase):
         self.assertTrue(np.allclose(v.p0, np.array([1, 1, 1])))
         self.assertTrue(np.allclose(v.p, np.array([2, 0, 0])))
 
+    def test_projection(self):
+
+        u = Vector([5, 6, 7])
+        self.assertTrue(np.allclose(
+            u.projection(Vector([1, 0, 0])), Vector([5, 0, 0])))
+        self.assertTrue(np.allclose(
+            u.projection(Vector([1, 1, 1])), Vector([6, 6, 6])))
+
+    def test_vector_angle(self):
+        u = Vector([1, 0])
+        v = Vector([1, 1])
+        self.assertAlmostEqual(vec.angle(u, v), np.pi/4)
+
+
 if __name__ == '__main__':
     unittest.main()
