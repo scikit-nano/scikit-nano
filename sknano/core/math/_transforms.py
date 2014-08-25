@@ -11,8 +11,6 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 import numpy as np
-from ._point import Point
-from ._vector import Vector
 
 __all__ = ['Rx', 'Ry', 'Rz',
            'rotation_matrix',
@@ -23,7 +21,7 @@ I = np.identity(4)
 
 _str2array = {}
 for i, axis in enumerate(('x', 'y', 'z')):
-    _str2array[axis] = Vector(I[:3, i])
+    _str2array[axis] = I[:3, i]
 
 
 def Rx(angle, deg2rad=False):
@@ -183,15 +181,11 @@ def transformation_matrix(angle, rot_axis=None, anchor_point=None,
     elif not isinstance(rot_axis, (tuple, list, np.ndarray)):
         raise ValueError('`rot_axis` must be a sequence')
 
-    if anchor_point is not None and \
-            isinstance(anchor_point, (tuple, list, np.ndarray)) and \
-            len(anchor_point) == len(rot_axis):
-        rot_axis = Vector(rot_axis, p0=anchor_point)
+    if anchor_point is None:
+        anchor_point = np.zeros(len(rot_axis))
 
-    if not isinstance(rot_axis, Vector):
-        rot_axis = Vector(rot_axis)
-
-    if rot_axis.nd == 2:
+    nd = len(rot_axis)
+    if nd == 2:
         Tmat = Rz(angle)
         # Handle 2D rotation about arbitrary 2D point
         if not np.allclose(rot_axis, np.zeros(2)):
@@ -199,7 +193,7 @@ def transformation_matrix(angle, rot_axis=None, anchor_point=None,
             m13 = a - a * cosa + b * sina
             m23 = b - b * cosa - a * sina
             Tmat[:2, 2] = np.array([m13, m23])
-    elif rot_axis.nd == 3:
+    elif nd == 3:
         Tmat = np.zeros((4, 4))
 
         if np.allclose(rot_axis, I[:3, 0]):
@@ -229,8 +223,8 @@ def transformation_matrix(angle, rot_axis=None, anchor_point=None,
                                     [m21, m22, m23],
                                     [m31, m32, m33]])
 
-        if not np.allclose(rot_axis.p0, np.zeros(3)):
-            a, b, c = rot_axis.p0
+        if not np.allclose(anchor_point, np.zeros(3)):
+            a, b, c = anchor_point
             u, v, w = rot_axis
             uu, vv, ww = u**2, v**2, w**2
             au, bu, cu = a * u, b * u, c * u
@@ -261,7 +255,7 @@ def rotate_point(point, angle, rot_axis=None, anchor_point=None,
 
     Parameters
     ----------
-    point : array_like or :class:`~sknano.core.math.Point`
+    point : array_like
     angle : float
     rot_axis : {array_like, str, :class:`~sknano.core.math.Vector`}
     anchor_point : {array_like, :class:`~sknano.core.math.Point`}
@@ -277,16 +271,13 @@ def rotate_point(point, angle, rot_axis=None, anchor_point=None,
               'point: {}\n'.format(point) +
               'rot_axis: {}\n'.format(rot_axis) +
               'anchor_point: {}\n'.format(anchor_point))
-    p = Point(point)
-    if rot_axis is None and p.nd > 2:
-        raise TypeError('`rot_axis` must be a sequence for `n` dimensional '
-                        'points wherer `n > 2`')
+    if rot_axis is None and len(point) > 2:
+        raise TypeError('`rot_axis` must be a sequence with the same '
+                        'shape as `point`')
     Tmat = transformation_matrix(angle, rot_axis=rot_axis,
                                  anchor_point=anchor_point, deg2rad=deg2rad,
                                  verbose=verbose)
 
-    t = np.ones(len(p) + 1)
-    t[:-1] = p
-    rt = Point(np.dot(Tmat, t)[:-1])
-    rt.rezero_coords()
-    return rt
+    t = np.ones(len(point) + 1)
+    t[:-1] = point
+    return np.dot(Tmat, t)[:-1]
