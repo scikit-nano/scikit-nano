@@ -186,7 +186,6 @@ def transformation_matrix(angle, rot_axis=None, anchor_point=None,
     if anchor_point is not None and \
             isinstance(anchor_point, (tuple, list, np.ndarray)) and \
             len(anchor_point) == len(rot_axis):
-        #rot_axis.p0 = Point(anchor_point)
         rot_axis = Vector(rot_axis, p0=anchor_point)
 
     if not isinstance(rot_axis, Vector):
