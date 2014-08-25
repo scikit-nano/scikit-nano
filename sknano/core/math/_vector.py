@@ -369,7 +369,7 @@ class Vector(np.ndarray):
 
     def rotate(self, angle, rot_axis=None, anchor_point=None, deg2rad=False,
                verbose=False):
-        from sknano.core.math import rotate_point
+        from ._transforms import rotate_point
         #self[:] = rotate_point(self, angle, rot_axis=rot_axis,
         #                       anchor_point=anchor_point, deg2rad=deg2rad)
         self.p0 = rotate_point(self.p0, angle, rot_axis=rot_axis,
