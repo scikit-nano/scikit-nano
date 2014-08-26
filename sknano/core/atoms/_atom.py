@@ -11,17 +11,18 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
-
+from functools import total_ordering
 import numpy as np
 
 from sknano.core import xyz
 from sknano.core.math import Vector, rotation_transform
 from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
-    atomic_numbers, atomic_number_symbol_map, element_symbols
+    atomic_numbers, atomic_number_symbol_map, element_symbols, element_names
 
 __all__ = ['Atom']
 
 
+@total_ordering
 class Atom(object):
     """Base class for structure data atom.
 
@@ -37,43 +38,40 @@ class Atom(object):
 
     def __init__(self, element=None, m=None, x=None, y=None, z=None):
 
-        self._r = Vector([x, y, z])
-        self._dr = Vector(np.zeros(3), p0=[x, y, z])
-
-        self._m = None
-        self._symbol = None
-        self._Z = None
+        if m is None:
+            m = 0
 
         if isinstance(element, (int, float)):
-            self._Z = int(element)
-            idx = self._Z - 1
             try:
-                self._symbol = element_symbols[idx]
-                self._m = atomic_masses[self._symbol]
+                Z = int(element)
+                idx = Z - 1
+                symbol = element_symbols[idx]
+                m = atomic_masses[symbol]
             except KeyError:
                 print('unrecognized element number: {}'.format(element))
-        elif isinstance(element, (str, unicode)):
-            self._symbol = element
-            try:
-                self._Z = atomic_numbers[self._symbol]
-                self._m = atomic_masses[self._symbol]
-            except KeyError:
-                print('Unrecognized atomic symbol: {}'.format(element))
         else:
-            if m is not None and isinstance(m, (int, float)):
-                try:
-                    if isinstance(m, float):
-                        self._symbol = atomic_mass_symbol_map[m]
-                    elif isinstance(m, int):
-                        self._symbol = atomic_number_symbol_map[int(m / 2)]
-                    self._Z = atomic_numbers[self._symbol]
-                    self._m = atomic_masses[self._symbol]
-                except KeyError:
-                    self._symbol = None
-                    self._Z = None
-                    self._m = m
+            if element in element_symbols:
+                symbol = element
+            elif element in element_names:
+                symbol = element_symbols[element_names.index(element)]
+            elif m in atomic_mass_symbol_map:
+                symbol = atomic_mass_symbol_map[m]
+            elif int(m / 2) in atomic_number_symbol_map:
+                symbol = atomic_number_symbol_map[int(m / 2)]
             else:
-                self._m = 0
+                symbol = 'X'
+
+        try:
+            Z = atomic_numbers[symbol]
+            m = atomic_masses[symbol]
+        except KeyError:
+            Z = 0
+
+        self._symbol = symbol
+        self._Z = Z
+        self._m = m
+        self._r = Vector([x, y, z])
+        self._dr = Vector(np.zeros(3), p0=[x, y, z])
 
         self._attributes = ['symbol', 'Z', 'm', 'r']
 
@@ -85,6 +83,12 @@ class Atom(object):
         """Return string representation of atom."""
         return "Atom(element={!r}, m={!r}, x={!r}, y={!r}, z={!r})".format(
             self.element, self.m, self.x, self.y, self.z)
+
+    def __eq__(self, other):
+        return self.Z == other.Z
+
+    def __lt__(self, other):
+        return self.Z < other.Z
 
     @property
     def Z(self):
