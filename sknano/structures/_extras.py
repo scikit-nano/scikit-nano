@@ -14,7 +14,7 @@ import re
 import numpy as np
 
 from sknano.core.math import comparison_symbol_operator_mappings
-import sknano.structures as nanostructs
+from ._nanotubes import SWNT
 
 __all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'generate_Ch_list',
            'generate_Ch_property_grid', 'get_Ch_indices', 'get_Ch_type',
@@ -189,7 +189,7 @@ def filter_Ch_list(Ch_list, property_filters=None, **kwargs):
                 tmp_list = []
                 for Ch in filtered_list:
                     n, m = Ch
-                    nanotube = nanostructs.SWNT(n=n, m=m)
+                    nanotube = SWNT(n=n, m=m)
                     try:
                         if cmp_op(getattr(nanotube, prop), value):
                             tmp_list.append(Ch)
