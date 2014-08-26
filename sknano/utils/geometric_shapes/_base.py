@@ -21,10 +21,20 @@ class GeometricRegion(object):
 
     @abstractproperty
     def centroid(self):
-        """Centroid of 2D geometric region."""
+        """Centroid of geometric region."""
         raise NotImplementedError
 
     @abstractmethod
     def contains_point(self):
         """Check if point is contained within geometric region."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def rotate(self):
+        """Rotate region about centroid or arbitrary vector."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def translate(self):
+        """Translate region."""
         raise NotImplementedError
