@@ -1,34 +1,20 @@
 #! /usr/bin/env python
 
 from __future__ import absolute_import, division, print_function
-import unittest
 
-from sknano.core.atoms import Atom, Atoms
+import nose
+from nose.tools import *
+from sknano.core.atoms import Atoms, XAtom, XAtoms
 
 
-class TestAtoms(unittest.TestCase):
+def test_atoms():
+    xatoms = XAtoms()
+    assert_is_instance(xatoms, (Atoms, XAtoms))
+    for Z in range(1, 101):
+        xatoms.append(XAtom(Z))
 
-    def test_atom(self):
-        C_atom = Atom('C')
-        print(C_atom)
-        C_atom.x = 1.5
-        print(C_atom)
-        C_atom.rezero_coords()
-
-    def test_atoms(self):
-        atoms = Atoms()
-        atom1 = Atom('C')
-        atoms.append(atom1)
-        print(atoms)
-        atom2 = Atom('B')
-        atoms.append(atom2)
-        print(atoms)
-        atom3 = Atom('N')
-        atoms.append(atom3)
-        print(atoms)
-        atom3.x = 1.5
-        print(atoms)
+    assert_equals(xatoms.Natoms, 100)
 
 
 if __name__ == '__main__':
-    unittest.main()
+    nose.runmodule()
