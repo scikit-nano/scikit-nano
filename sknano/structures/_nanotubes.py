@@ -13,7 +13,6 @@ __docformat__ = 'restructuredtext en'
 from fractions import gcd
 
 import numpy as np
-np.seterr(all='raise')
 
 from ..core.atoms import Atom
 from ..core.math import Vector
