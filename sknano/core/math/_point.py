@@ -70,8 +70,8 @@ class Point(np.ndarray):
             p = np.zeros(nd, dtype=dtype)
 
         arr = np.array(p, dtype=dtype, copy=copy).view(cls)
-        pt = np.ndarray.__new__(cls, arr.shape, arr.dtype, buffer=arr)
-        #pt = super(Point, cls).__new__(cls, arr.shape, arr.dtype, buffer=arr)
+        #pt = np.ndarray.__new__(cls, arr.shape, arr.dtype, buffer=arr)
+        pt = super(Point, cls).__new__(cls, arr.shape, arr.dtype, buffer=arr)
 
         pt.nd = nd
         if nd == 2:
