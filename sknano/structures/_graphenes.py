@@ -20,7 +20,7 @@ from ..core.refdata import CCbond, dVDW, grams_per_Da
 
 edge_types = {'armchair': 'AC', 'zigzag': 'ZZ'}
 
-__all__ = ['GraphenePrimitiveCell', 'Graphene', 'BiLayerGraphene']
+__all__ = ['GraphenePrimitiveCell', 'Graphene', 'BilayerGraphene']
 
 
 class GraphenePrimitiveCell(object):
@@ -331,7 +331,7 @@ class Graphene(object):
         return mass
 
 
-class BiLayerGraphene(Graphene):
+class BilayerGraphene(Graphene):
     def __init__(self, layer_rotation_angle=None, deg2rad=True, **kwargs):
 
         if layer_rotation_angle is not None and deg2rad:
@@ -339,7 +339,7 @@ class BiLayerGraphene(Graphene):
         kwargs['layer_rotation_angles'] = layer_rotation_angle
         kwargs['nlayers'] = 2
 
-        super(BiLayerGraphene, self).__init__(**kwargs)
+        super(BilayerGraphene, self).__init__(**kwargs)
         self._layer_rotation_angle = self._layer_rotation_angles
 
     @property
