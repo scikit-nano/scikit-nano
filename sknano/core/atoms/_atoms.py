@@ -14,6 +14,7 @@ import copy
 import math
 
 from collections import OrderedDict, MutableSequence
+from operator import attrgetter
 
 import numpy as np
 
@@ -76,6 +77,9 @@ class Atoms(MutableSequence):
                                     'argument.\n atoms must be `None`, a list '
                                     'of `Atom` objects, or an `Atoms` object '
                                     'instance.')
+
+    def __str__(self):
+        return repr(self)
 
     def __repr__(self):
         """Return `repr` string of `Atoms`."""
@@ -174,6 +178,14 @@ class Atoms(MutableSequence):
     def data(self):
         """Return the list of `Atom` objects"""
         return self._data
+
+    def sort(self, key=None, reverse=False):
+
+        if key is None:
+            self._data.sort(key=attrgetter('element', 'Z', 'r.norm'),
+                            reverse=reverse)
+        else:
+            self._data.sort(key=key, reverse=reverse)
 
     @property
     def CM(self):
