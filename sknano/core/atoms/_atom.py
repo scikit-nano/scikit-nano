@@ -204,7 +204,7 @@ class Atom(object):
 
     @property
     def r(self):
-        """:math:`x, y, z` components of `Atom` in units of **Angstroms**.
+        """:math:`x, y, z` components of `Atom` position vector.
 
         Returns
         -------
@@ -221,15 +221,15 @@ class Atom(object):
         Parameters
         ----------
         value : array_like
-            3-element array of :math:`x, y, z`-coordinates in units of
-            **Angstroms**.
+            :math:`x, y, z` coordinates of `Atom` position vector relative to
+            the origin.
 
         """
         self._r[:] = value
 
     @property
     def dr(self):
-        """:math:`x, y, z` components of `Atom` in units of **Angstroms**.
+        """:math:`x, y, z` components of `Atom` displacement vector.
 
         Returns
         -------
@@ -251,19 +251,19 @@ class Atom(object):
         """
         self._dr[:] = value
 
-    def get_coords(self, as_dict=False):
+    def get_coords(self, asdict=False):
         """Return atom coords.
 
         Parameters
         ----------
-        as_dict : bool, optional
+        asdict : bool, optional
 
         Returns
         -------
         coords : :class:`python:~collections.OrderedDict` or ndarray
 
         """
-        if as_dict:
+        if asdict:
             return OrderedDict(zip(xyz, self.r))
         else:
             return self.r
