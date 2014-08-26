@@ -30,7 +30,7 @@ def test_instantiation():
     assert_true(np.allclose(p, np.arange(10)))
 
 
-def test_rezero_coords():
+def test_rezero():
     p = Point([1e-9,1e-11,-1e-16])
     p.rezero()
 
