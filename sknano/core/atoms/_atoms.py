@@ -18,7 +18,7 @@ from collections import OrderedDict, MutableSequence
 import numpy as np
 
 from sknano.core import xyz
-from sknano.core.math import transformation_matrix
+from sknano.core.math import Vector, transformation_matrix
 
 __all__ = ['Atoms']
 
@@ -188,7 +188,7 @@ class Atoms(MutableSequence):
         masses = np.asarray([self.masses])
         coords = np.asarray(self.coords)
         MxR = masses.T * coords
-        return np.sum(MxR, axis=0) / np.sum(masses)
+        return Vector(np.sum(MxR, axis=0) / np.sum(masses))
 
     @property
     def M(self):
@@ -203,9 +203,7 @@ class Atoms(MutableSequence):
     @property
     def coords(self):
         """Return array of `Atom` coordinates."""
-        coords = []
-        for atom in self._data:
-            coords.append(atom.r)
+        coords = [atom.r for atom in self._data]
         self._coords = coords[:]
         return np.asarray(self._coords)
 
@@ -213,18 +211,14 @@ class Atoms(MutableSequence):
     def masses(self):
         """Return the list of `Atom` masses."""
         #self._masses_array = np.asarray(self._masses)
-        masses = []
-        for atom in self._data:
-            masses.append(atom.m)
+        masses = [atom.m for atom in self._data]
         self._masses = masses[:]
         return self._masses
 
     @property
     def symbols(self):
         """Return array of `Atom` symbols."""
-        symbols = []
-        for atom in self._data:
-            symbols.append(atom.symbol)
+        symbols = [atom.symbol for atom in self._data]
         self._symbols = symbols[:]
         return np.asarray(self._symbols)
 
@@ -308,6 +302,13 @@ class Atoms(MutableSequence):
             return coords
 
     def rezero_coords(self, epsilon=1.0e-10):
+        """Alias for :meth:`Atoms.rezero`."""
+        self.rezero(epsilon=epsilon)
+
+    def rezero_xyz(self, epsilon=1.0e-10):
+        self.rezero(epsilon=epsilon)
+
+    def rezero(self, epsilon=1.0e-10):
         """Set really really small coordinates to zero.
 
         Set all coordinates with absolute value less than
@@ -319,11 +320,7 @@ class Atoms(MutableSequence):
             smallest allowed absolute value of any :math:`x,y,z` component.
 
         """
-        for atom in self._data:
-            atom.rezero_coords(epsilon=epsilon)
-
-    def rezero_xyz(self, epsilon=1.0e-10):
-        self.rezero_coords(epsilon=epsilon)
+        [atom.rezero(epsilon=epsilon) for atom in self._data]
 
     def rotate(self, angle=None, rot_axis=None, anchor_point=None,
                deg2rad=False, transform_matrix=None):

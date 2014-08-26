@@ -94,9 +94,7 @@ class XAtoms(Atoms):
     @property
     def atom_ids(self):
         """Return array of `XAtom` IDs."""
-        atom_ids = []
-        for atom in self._data:
-            atom_ids.append(atom.atomID)
+        atom_ids = [atom.atomID for atom in self._data]
         self._atom_ids = atom_ids[:]
         return np.asarray(self._atom_ids)
 
@@ -111,9 +109,7 @@ class XAtoms(Atoms):
     def charges(self):
         """Return list of `XAtom` charges."""
         #self._charges_array = np.asarray(self._charges)
-        charges = []
-        for atom in self._data:
-            charges.append(atom.q)
+        charges = [atom.q for atom in self._data]
         self._charges = charges[:]
         return np.asarray(self._charges)
 
@@ -121,9 +117,7 @@ class XAtoms(Atoms):
     def coordination_numbers(self):
         """Return array of `XAtom` coordination numbers."""
         self.update_coordination_numbers()
-        coordination_numbers = []
-        for atom in self._data:
-            coordination_numbers.append(atom.CN)
+        coordination_numbers = [atom.CN for atom in self._data]
         self._coordination_numbers = coordination_numbers[:]
         return np.asarray(self._coordination_numbers)
 
@@ -144,9 +138,7 @@ class XAtoms(Atoms):
     def nearest_neighbors(self):
         """Return array of nearest-neighbor atoms for each `XAtom`."""
         self.update_nearest_neighbors()
-        nearest_neighbors = []
-        for atom in self._data:
-            nearest_neighbors.append(atom.NN)
+        nearest_neighbors = [atom.NN for atom in self._data]
         self._nearest_neighbors = nearest_neighbors[:]
         return np.asarray(self._nearest_neighbors)
 
@@ -218,9 +210,7 @@ class XAtoms(Atoms):
                     if d < rc:
                         CN += 1
                 atom.CN = CN
-        coordination_numbers = []
-        for atom in self._data:
-            coordination_numbers.append(atom.CN)
+        coordination_numbers = [atom.CN for atom in self._data]
         self._coordination_numbers = coordination_numbers[:]
         return np.asarray(self._coordination_numbers)
 
@@ -241,9 +231,7 @@ class XAtoms(Atoms):
                     if d < rc:
                         NN_atoms.append(self._data[NN_i[i][j]])
                 atom.NN = NN_atoms
-        nearest_neighbors = []
-        for atom in self._data:
-            nearest_neighbors.append(atom.NN)
+        nearest_neighbors = [atom.NN for atom in self._data]
         self._nearest_neighbors = nearest_neighbors[:]
         return np.asarray(self._nearest_neighbors)
 
@@ -260,9 +248,7 @@ class XAtoms(Atoms):
     @property
     def velocities(self):
         """Return array of `XAtom` velocities."""
-        velocities = []
-        for atom in self._data:
-            velocities.append(atom.v)
+        velocities = [atom.v for atom in self._data]
         self._velocities = velocities[:]
         return np.asarray(self._velocities)
 
@@ -310,8 +296,7 @@ class XAtoms(Atoms):
             a list of `XAtom` object instances
 
         """
-        for atom in atomtypes:
-            self.add_atomtype(atom)
+        [self.add_atomtype(atom) for atom in atomtypes]
 
     def assign_unique_ids(self, starting_id=1):
         """Assign unique ID to each `XAtom` in `XAtoms`."""
@@ -402,9 +387,9 @@ class XAtoms(Atoms):
             components = (components,)
 
         if as_dict:
-            return OrderedDict(zip(
-                components, [filtered_coords[:, xyz.index(component)]
-                             for component in components]))
+            return OrderedDict(zip(components,
+                                   [filtered_coords[:, xyz.index(component)]
+                                    for component in components]))
         else:
             filtered_coords
 
