@@ -1,44 +1,21 @@
 # -*- coding: utf-8 -*-
-#
 from __future__ import absolute_import, division, print_function
 
-from sknano.structures import SWNT, MWNT, SWNTBundle, MWNTBundle
+import nose
+from nose.tools import *
+from sknano.structures import filter_Ch_list, generate_Ch_list
 
 
-class TestSWNT(unittest.TestCase):
-
-    def setUp(self):
-        self.swnt = SWNT(10, 10)
-
-    def test_swnt(self):
-        self.assertEqual(self.swnt.n, 10)
+def test_generate_Ch_list():
+    Ch_list = generate_Ch_list(ni=5, nf=20, mi=0, mf=20, handedness='right')
+    assert_equal(len(Ch_list), 216)
 
 
-class TestSWNTBundle(unittest.TestCase):
+def test_filter_Ch_list():
+    Ch_list = generate_Ch_list(ni=5, nf=20, mi=0, mf=20, handedness='right')
+    Ch_list = filter_Ch_list(Ch_list)
+    assert_equal(len(Ch_list), 216)
 
-    def setUp(self):
-        self.swntbundle = SWNTBundle(10, 10)
-
-    def test_swnt(self):
-        self.assertEqual(self.swntbundle.n, 10)
-
-
-class TestMWNT(unittest.TestCase):
-
-    def setUp(self):
-        self.mwnt = MWNT(10, 10)
-
-    def test_mwnt(self):
-        self.assertEqual(self.mwnt.n, 10)
-
-
-class TestMWNTBundle(unittest.TestCase):
-
-    def setUp(self):
-        self.mwntbundle = MWNTBundle(10, 10)
-
-    def test_mwnt(self):
-        self.assertEqual(self.mwntbundle.n, 10)
 
 if __name__ == '__main__':
-    unittest.main()
+    nose.runmodule()
