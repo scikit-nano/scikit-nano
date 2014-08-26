@@ -145,7 +145,7 @@ def argparser():
     nanogen_graphene_parser.set_defaults(func=nanogen)
 
     nanogen_bilayer_graphene_parser = \
-        subparsers.add_parser('BiLayerGrapheneGenerator',
+        subparsers.add_parser('BilayerGrapheneGenerator',
                               parents=[nanogen_parent_parser,
                                        nanogen_graphene_parsers])
     nanogen_bilayer_graphene_parser.add_argument('--layer-rotation-angle',
