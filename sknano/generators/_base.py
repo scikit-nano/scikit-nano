@@ -23,6 +23,11 @@ class GeneratorMixin(object):
     """Base mixin class for generator classes"""
 
     @property
+    def atoms(self):
+        """Return structure :class:`~sknano.core.atoms.Atoms`."""
+        return self.structure_atoms
+
+    @property
     def fname(self):
         """Structure file name."""
         return self._fname
