@@ -77,7 +77,7 @@ import argparse
 import importlib
 import sys
 
-from ..core import Atom
+from ..core.atoms import Atom
 from ..core.refdata import CCbond, dVDW
 from ..generators import TubeGen, tubegen_format_ext_map
 from ..io import XYZ2DATAConverter
