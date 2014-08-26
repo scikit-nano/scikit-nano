@@ -5,14 +5,17 @@ from __future__ import absolute_import, division, print_function
 import nose
 from nose.tools import *
 
-import numpy as np
+#import numpy as np
 
+from sknano.core.refdata import element_symbols
 from sknano.utils.testing import generate_atoms
 
 
 def test_generate_atoms():
-    atoms = generate_atoms(from='periodic_table', filter=None)
-    
+    atoms = generate_atoms(elements=element_symbols)
+    assert_equals(atoms.Natoms, len(element_symbols))
+
+    atoms = generate_atoms(structure='SWNT')
 
 
 if __name__ == '__main__':
