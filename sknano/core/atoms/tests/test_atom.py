@@ -10,8 +10,11 @@ from sknano.core.atoms import Atom
 def test_instantiation():
     a = Atom('C')
     assert_is_instance(a, Atom)
-    assert_equals(a.element, 'C')
 
+
+def test_attributes():
+    a = Atom('C')
+    assert_equals(a.element, 'C')
     for c in ('x', 'y', 'z'):
         assert_equals(getattr(a, c), 0.0)
 
