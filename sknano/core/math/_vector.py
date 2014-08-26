@@ -300,9 +300,45 @@ class Vector(np.ndarray):
             #        pass
 
     def __iadd__(self, other):
+        """Add other to self in-place."""
         super(Vector, self).__iadd__(other)
-        self._p[:] = self._p0 + self.__array__()
+        #self._p[:] = self._p0 + self.__array__()
+        self._update_p()
         return self
+
+    def __isub__(self, other):
+        """Subtract other from self in-place."""
+        super(Vector, self).__isub__(other)
+        self._update_p()
+        return self
+
+    def __imul__(self, other):
+        super(Vector, self).__imul__(other)
+        self._update_p()
+        return self
+
+    def __idiv__(self, other):
+        super(Vector, self).__idiv__(other)
+        self._update_p()
+        return self
+
+    def __ifloordiv__(self, other):
+        super(Vector, self).__ifloordiv__(other)
+        self._update_p()
+        return self
+
+    def __itruediv__(self, other):
+        super(Vector, self).__itruediv__(other)
+        self._update_p()
+        return self
+
+    def __ipow__(self, other):
+        super(Vector, self).__ipow__(other)
+        self._update_p()
+        return self
+
+    def _update_p(self):
+        self._p[:] = self._p0 + self.__array__()
 
     @property
     def length(self):
@@ -396,6 +432,9 @@ class Vector(np.ndarray):
         self.p = \
             rotation_transform(self.p, angle=angle, rot_axis=rot_axis,
                                anchor_point=anchor_point, deg2rad=deg2rad)
+
+    def scale(self):
+        return NotImplemented
 
     def translate(self, t, fix_tail=False, fix_head=False):
         #if not fix_tail:
