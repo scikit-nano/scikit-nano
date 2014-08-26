@@ -293,6 +293,11 @@ class Vector(np.ndarray):
                     pass
         else:
             super(Vector, self).__setattr__(name, value)
+            #if name is not None and name.endswith('p'):
+            #    try:
+            #        self[:] = self._p.__array__() - self._p0.__array__()
+            #    except (AttributeError, TypeError):
+            #        pass
 
     def __iadd__(self, other):
         super(Vector, self).__iadd__(other)
@@ -392,9 +397,13 @@ class Vector(np.ndarray):
             rotation_transform(self.p, angle=angle, rot_axis=rot_axis,
                                anchor_point=anchor_point, deg2rad=deg2rad)
 
-    def translate(self, t):
-        self.p0.translate(t)
-        self.p.translate(t)
+    def translate(self, t, fix_tail=False, fix_head=False):
+        #if not fix_tail:
+        #    self.p0.translate(t)
+        #if not fix_head:
+        #    self.p.translate(t)
+        self.p0 += t
+        self.p += t
 
 
 def angle(u, v):
