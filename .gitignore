@@ -64,6 +64,12 @@ tclIndex
 
 # test output files #
 #####################
+./*.xyz
+./*.data
+./*.pdb
+sknano/*.xyz
+sknano/*.data
+sknano/*.pdb
 **/tests/*.xyz
 **/tests/*.data
 **/tests/*.pdb
