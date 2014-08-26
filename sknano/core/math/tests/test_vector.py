@@ -117,8 +117,6 @@ def test_advanced_ops():
     assert_true(np.allclose(v.p, 2*np.ones(3)))
 
     v[:] += np.ones(3)
-    print('v: {}'.format(v))
-    print('v.p: {}'.format(v.p))
     assert_true(np.allclose(v, 2 * np.ones(3)))
     assert_true(np.allclose(v.p0, np.ones(3)))
     assert_true(np.allclose(v.p, 3 * np.ones(3)))
@@ -265,6 +263,19 @@ def test_rotations():
     assert_true(np.allclose(v, np.array([1, -1, -1])))
     assert_true(np.allclose(v.p0, np.array([1, 1, 1])))
     assert_true(np.allclose(v.p, np.array([2, 0, 0])))
+
+
+def test_translations():
+    v = Vector()
+    v += np.ones(3)
+    assert_true(np.allclose(v, np.ones(3)))
+    assert_true(np.allclose(v.p0, np.zeros(3)))
+    assert_true(np.allclose(v.p, np.ones(3)))
+
+    v.p += np.ones(3)
+    assert_true(np.allclose(v, 2 * np.ones(3)))
+    assert_true(np.allclose(v.p0, np.zeros(3)))
+    assert_true(np.allclose(v.p, 2 * np.ones(3)))
 
 
 def test_projection():
