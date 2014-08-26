@@ -107,9 +107,8 @@ class Vector(np.ndarray):
             v = p - p0
 
         arr = np.array(v, dtype=dtype, copy=copy).view(cls)
-        vec = np.ndarray.__new__(cls, arr.shape, arr.dtype, buffer=arr)
-        #vec = \
-        #    super(Vector, cls).__new__(cls, arr.shape, arr.dtype, buffer=arr)
+        #vec = np.ndarray.__new__(cls, arr.shape, arr.dtype, buffer=arr)
+        vec = super(Vector, cls).__new__(cls, arr.shape, arr.dtype, buffer=arr)
 
         vec.nd = nd
         vec._p = p
@@ -139,8 +138,8 @@ class Vector(np.ndarray):
         elif self.nd == 3:
             self.x, self.y, self.z = obj
 
-        self._p = getattr(obj, 'p', None)
         self._p0 = getattr(obj, 'p0', None)
+        self._p = getattr(obj, 'p', None)
 
     def __array_prepare__(self, obj, context=None):
         if Vector._verbosity > 2:
@@ -165,7 +164,6 @@ class Vector(np.ndarray):
             print('In Vector.__array_wrap__\n'
                   'self: {}\n'.format(self) +
                   'type(self): {}\n'.format(type(self)) +
-                  'type(self): {}\n'.format(type(self)) +
                   'self.p: {}\n'.format(self.p) +
                   'type(self.p): {}\n'.format(type(self.p)) +
                   'self.p0: {}\n'.format(self.p0) +
@@ -181,11 +179,10 @@ class Vector(np.ndarray):
         if obj.shape == ():
             return obj[()]
         else:
-            #return np.ndarray.__array_wrap__(self, obj, context)
+
             res = super(Vector, self).__array_wrap__(obj, context)
-            #res._p0 = Point(self.p0)
-            #res._p = Point(self[:] + res._p0)
             res = Vector(res.__array__(), p0=self.p0)
+
             if Vector._verbosity > 0:
                 print('In Vector.__array_wrap__\n'
                       'self: {}\n'.format(self) +
@@ -248,15 +245,20 @@ class Vector(np.ndarray):
         return super(Vector, self).__getattribute__(name)
 
     def __setattr__(self, name, value):
+
+        if Vector._verbosity > 3:
+            try:
+                print('In Vector.__setattr__\n'
+                      'self: {}\n'.format(self) +
+                      'type(self): {}\n'.format(type(self)) +
+                      'name: {}\n'.format(name) +
+                      'value: {}\n'.format(value))
+            except TypeError:
+                pass
+
         #nd = len(self)
         nd = getattr(self, 'nd', None)
 
-        if Vector._verbosity > 3:
-            print('In Vector.__setattr__\n'
-                  'self: {}\n'.format(self) +
-                  'type(self): {}\n'.format(type(self)) +
-                  'name: {}\n'.format(name) +
-                  'value: {}\n'.format(value))
         if nd is not None and nd == 2 and name in ('x', 'y'):
             if name == 'x':
                 self[0] = value
@@ -291,6 +293,11 @@ class Vector(np.ndarray):
                     pass
         else:
             super(Vector, self).__setattr__(name, value)
+
+    def __iadd__(self, other):
+        super(Vector, self).__iadd__(other)
+        self._p[:] = self._p0 + self.__array__()
+        return self
 
     @property
     def length(self):
