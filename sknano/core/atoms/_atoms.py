@@ -263,32 +263,29 @@ class Atoms(MutableSequence):
                                 del self._data[self._data.index(atom)]
                                 break
 
-    def getatomsattr(self, asarray=False, as_array=False):
-        pass
-
-    def get_atoms(self, asarray=False, as_array=False):
+    def get_atoms(self, asarray=False):
         """Return list of `Atoms`.
 
         Parameters
         ----------
-        asarray, as_array : bool, optional
+        asarray : bool, optional
 
         Returns
         -------
         sequence or ndarray
 
         """
-        if asarray or as_array:
+        if asarray:
             return np.asarray(self._data)
         else:
             return self._data
 
-    def get_coords(self, as_dict=False):
+    def get_coords(self, asdict=False):
         """Return atom coords.
 
         Parameters
         ----------
-        as_dict : bool, optional
+        asdict : bool, optional
 
         Returns
         -------
@@ -296,7 +293,7 @@ class Atoms(MutableSequence):
 
         """
         coords = self.coords
-        if as_dict:
+        if asdict:
             return OrderedDict(zip(xyz, self.coords))
         else:
             return coords

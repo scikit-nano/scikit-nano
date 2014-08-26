@@ -359,14 +359,14 @@ class XAtoms(Atoms):
         return atom_ids[filter_indices]
 
     def get_filtered_coords(self, filter_atom_ids, components=None,
-                            as_dict=False, invert=False):
+                            asdict=False, invert=False):
         """Return filtered coordinates filtered by filter_atom_ids.
 
         Parameters
         ----------
         filter_atom_ids : array_like
         components : {None, sequence}, optional
-        as_dict : bool, optional
+        asdict : bool, optional
         invert : bool, optional
 
         Returns
@@ -386,7 +386,7 @@ class XAtoms(Atoms):
         elif isinstance(components, (str, unicode)):
             components = (components,)
 
-        if as_dict:
+        if asdict:
             return OrderedDict(zip(components,
                                    [filtered_coords[:, xyz.index(component)]
                                     for component in components]))
