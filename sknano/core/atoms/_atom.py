@@ -268,7 +268,7 @@ class Atom(object):
         else:
             return self.r
 
-    def rezero_coords(self, epsilon=1.0e-10):
+    def rezero(self, epsilon=1.0e-10):
         """Re-zero position vector components.
 
         Set position vector components with absolute value less than
@@ -282,6 +282,10 @@ class Atom(object):
         """
         self._r.rezero(epsilon=epsilon)
 
+    def rezero_coords(self, epsilon=1.0e-10):
+        """Alias for :meth:`Atom.rezero`."""
+        self.rezero(epsilon=epsilon)
+
     def rotate(self, angle=None, rot_axis=None, anchor_point=None,
                deg2rad=False, transform_matrix=None):
         try:
@@ -293,5 +297,5 @@ class Atom(object):
 
     def translate(self, t):
         #TODO compare timing benchmarks for translation of position vector.
-        self.r.translate(t)
-        #self.r += t
+        #self.r.translate(t, fix_tail=True)
+        self.r += t
