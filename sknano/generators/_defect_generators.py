@@ -73,7 +73,7 @@ class DefectGenerator(object):
             StructureIO.read(fname, structure_format=self._structure_format)
         self._atoms = self._structure_data.atoms
         self._atom_ids = self._atoms.atom_ids
-        self._atom_coords = self._atoms.get_coords(as_dict=True)
+        self._atom_coords = self._atoms.get_coords(asdict=True)
 
     @property
     def atoms(self):

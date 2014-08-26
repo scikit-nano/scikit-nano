@@ -428,7 +428,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                 tube_atom_ids = self._atom_ids[tube_atom_indices]
 
                 tube_coords = self._atoms.get_filtered_coords(tube_atom_ids,
-                                                              as_dict=True,
+                                                              asdict=True,
                                                               invert=False)
 
                 if self._verbose:

@@ -319,7 +319,7 @@ class BiLayerGrapheneGenerator(BiLayerGraphene, GeneratorMixin):
             bilayer = copy.deepcopy(self._structure_atoms)
             self._structure_atoms = Atoms()
 
-            z_coords = bilayer.get_coords(as_dict=True)['z']
+            z_coords = bilayer.get_coords(asdict=True)['z']
             z_set = np.asarray(sorted(list(set(z_coords))))
             epsilon = 1e-10
 
