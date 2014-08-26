@@ -1,18 +1,12 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import absolute_import, division, print_function
 
-import unittest
-#import nose
-
-#from sknano.core import deprecated
+import nose
+from nose.tools import *
 
 
-class TestDecorators(unittest.TestCase):
-
-    def test_decorator(self):
-        pass
-
+def test_data_structures():
+    pass
 
 if __name__ == '__main__':
-    unittest.main()
+    nose.runmodule()
