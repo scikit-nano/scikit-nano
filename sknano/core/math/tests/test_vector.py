@@ -103,6 +103,27 @@ def test_add():
     assert_true(np.allclose(v3, np.array([2.0, 1.0])))
 
 
+def test_advanced_ops():
+    v = Vector(np.zeros(3))
+    assert_true(np.allclose(v.p0, np.zeros(3)))
+
+    v = Vector(np.ones(3))
+    assert_true(np.allclose(v.p0, np.zeros(3)))
+    assert_true(np.allclose(v.p, np.ones(3)))
+
+    v = Vector(np.ones(3), p0=[1, 1, 1])
+    assert_true(np.allclose(v, np.ones(3)))
+    assert_true(np.allclose(v.p0, np.ones(3)))
+    assert_true(np.allclose(v.p, 2*np.ones(3)))
+
+    v[:] += np.ones(3)
+    print('v: {}'.format(v))
+    print('v.p: {}'.format(v.p))
+    assert_true(np.allclose(v, 2 * np.ones(3)))
+    assert_true(np.allclose(v.p0, np.ones(3)))
+    assert_true(np.allclose(v.p, 3 * np.ones(3)))
+
+
 def test_2D_dot():
     v1 = Vector([1.0, 0.0])
     v2 = Vector([1.0, 1.0])
