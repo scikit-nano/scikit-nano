@@ -27,6 +27,7 @@ import numpy as np
 
 from ..core import plural_word_check
 from ..core.atoms import XAtom as Atom, XAtoms as Atoms
+from ..core.math import Vector
 from ..structures import SWNT, UnrolledSWNT, MWNT
 from ._base import GeneratorMixin
 
@@ -143,7 +144,7 @@ class SWNTGenerator(SWNT, GeneratorMixin):
                 z1 -= T
 
             atom1 = Atom(e1, x=x1, y=y1, z=z1)
-            atom1.rezero_coords()
+            atom1.rezero()
 
             if verbose:
                 print('Basis Atom 1:\n{}'.format(atom1))
@@ -157,7 +158,7 @@ class SWNTGenerator(SWNT, GeneratorMixin):
                 z2 -= T
 
             atom2 = Atom(e2, x=x2, y=y2, z=z2)
-            atom2.rezero_coords()
+            atom2.rezero()
 
             if verbose:
                 print('Basis Atom 2:\n{}'.format(atom2))
@@ -168,7 +169,7 @@ class SWNTGenerator(SWNT, GeneratorMixin):
         """Generate structure data."""
         self._structure_atoms = Atoms()
         for nz in xrange(int(np.ceil(self._nz))):
-            dr = np.array([0.0, 0.0, nz * self._T])
+            dr = Vector([0.0, 0.0, nz * self._T])
             for uc_atom in self._unit_cell:
                 nt_atom = Atom(uc_atom.symbol)
                 nt_atom.r = uc_atom.r + dr
@@ -320,7 +321,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
                 z1 -= T
 
             atom1 = Atom(e1, x=x1, z=z1)
-            atom1.rezero_coords()
+            atom1.rezero()
 
             if verbose:
                 print('Basis Atom 1:\n{}'.format(atom1))
@@ -333,7 +334,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
                 z2 -= T
 
             atom2 = Atom(e2, x=x2, z=z2)
-            atom2.rezero_coords()
+            atom2.rezero()
 
             if verbose:
                 print('Basis Atom 2:\n{}'.format(atom2))
@@ -345,7 +346,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
         self._structure_atoms = Atoms()
         for nx in xrange(self.nx):
             for nz in xrange(int(np.ceil(self.nz))):
-                dr = np.array([nx * self.Ch, 0.0, nz * self.T])
+                dr = Vector([nx * self.Ch, 0.0, nz * self.T])
                 for uc_atom in self._unit_cell:
                     nt_atom = Atom(uc_atom.symbol)
                     nt_atom.r = uc_atom.r + dr
@@ -533,7 +534,7 @@ class MWNTGenerator(MWNT, GeneratorMixin):
                 z1 -= T
 
             atom1 = Atom(e1, x=x1, y=y1, z=z1)
-            atom1.rezero_coords()
+            atom1.rezero()
 
             if verbose:
                 print('Basis Atom 1:\n{}'.format(atom1))
@@ -547,7 +548,7 @@ class MWNTGenerator(MWNT, GeneratorMixin):
                 z2 -= T
 
             atom2 = Atom(e2, x=x2, y=y2, z=z2)
-            atom2.rezero_coords()
+            atom2.rezero()
 
             if verbose:
                 print('Basis Atom 2:\n{}'.format(atom2))
@@ -577,7 +578,7 @@ class MWNTGenerator(MWNT, GeneratorMixin):
 
         self._structure_atoms = Atoms()
         for nz in xrange(int(np.ceil(self._nz))):
-            dr = np.array([0.0, 0.0, nz * self._T])
+            dr = Vector([0.0, 0.0, nz * self._T])
             for uc_atom in self._unit_cell:
                 nt_atom = Atom(uc_atom.symbol)
                 nt_atom.r = uc_atom.r + dr
@@ -668,7 +669,7 @@ class MWNTGenerator(MWNT, GeneratorMixin):
 
                 shell = Atoms()
                 for nz in xrange(int(np.ceil(self._nz))):
-                    dr = np.array([0.0, 0.0, nz * T])
+                    dr = Vector([0.0, 0.0, nz * T])
                     for uc_atom in self._unit_cell:
                         atom = Atom(uc_atom.symbol)
                         atom.r = uc_atom.r + dr

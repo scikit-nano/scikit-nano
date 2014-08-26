@@ -13,10 +13,9 @@ __docformat__ = 'restructuredtext en'
 import copy
 #import itertools
 
-import numpy as np
-
 from ..core import plural_word_check
 from ..core.atoms import XAtoms as Atoms
+from ..core.math import Vector
 from ..structures import SWNTBundle, MWNTBundle
 from ._nanotube_generators import SWNTGenerator, MWNTGenerator
 
@@ -48,9 +47,9 @@ class NanotubeBundleGeneratorMixin(object):
                     for ny in (-row, row):
                         atomsobj = Atoms(atoms=self._atomsobj0, deepcopy=True)
                         atomsobj.center_CM()
-                        dr = np.zeros(3)
-                        dr[0] = abs(ny * self._r2[0])
-                        dr[1] = ny * self._r2[1]
+                        dr = Vector()
+                        dr.x = abs(ny * self._r2.x)
+                        dr.y = ny * self._r2.y
                         dr = nx * self._r1 + dr
                         atomsobj.translate(dr)
                         self._structure_atoms.extend(atomsobj)
@@ -65,8 +64,8 @@ class NanotubeBundleGeneratorMixin(object):
                 atomsobj = Atoms(atoms=self._atomsobj0, deepcopy=True)
                 atomsobj.center_CM()
                 dr = nx * self._r1 + ny * self._r2
-                while dr[0] < 0:
-                    dr[0] += Lx
+                while dr.x < 0:
+                    dr.x += Lx
                 atomsobj.translate(dr)
                 self._structure_atoms.extend(atomsobj)
                 self._Ntubes += 1

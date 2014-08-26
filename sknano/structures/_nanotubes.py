@@ -16,7 +16,7 @@ import numpy as np
 np.seterr(all='raise')
 
 from ..core.atoms import Atom
-from ..core.math import comparison_symbol_operator_mappings
+from ..core.math import Vector, comparison_symbol_operator_mappings
 from ..core.refdata import CCbond, dVDW, grams_per_Da
 
 __all__ = ['Nanotube', 'NanotubeBundleMixin', 'MWNTMixin',
@@ -1761,7 +1761,7 @@ class NanotubeBundleMixin(object):
         print('In compute_bundle_params\n' +
               'called by type(self): {}'.format(type(self)))
 
-        self._r1[0] = \
+        self._r1.x = \
             Nanotube.compute_dt(n=self.n, m=self.m, bond=self.bond) + \
             self._vdw_spacing
         if self._bundle_packing is None and \
@@ -1772,10 +1772,10 @@ class NanotubeBundleMixin(object):
             self._bundle_packing = 'hcp'
 
         if self._bundle_packing in ('cubic', 'ccp'):
-            self._r2[1] = self._r1[0]
+            self._r2.y = self._r1.x
         else:
-            self._r2[0] = self._r1[0] * np.cos(2 * np.pi / 3)
-            self._r2[1] = self._r1[0] * np.sin(2 * np.pi / 3)
+            self._r2.x = self._r1.x * np.cos(2 * np.pi / 3)
+            self._r2.y = self._r1.x * np.sin(2 * np.pi / 3)
             if self._bundle_packing is None:
                 self._bundle_packing = 'hcp'
 
@@ -1963,9 +1963,9 @@ class SWNTBundle(NanotubeBundleMixin, SWNT):
         self._Lx = Lx
         self._Ly = Ly
 
-        self._r1 = np.zeros(3)
+        self._r1 = Vector()
 
-        self._r2 = np.zeros(3)
+        self._r2 = Vector()
 
         self._vdw_spacing = vdw_spacing
         self._bundle_packing = bundle_packing
@@ -1994,9 +1994,9 @@ class MWNTBundle(NanotubeBundleMixin, MWNT):
         self._Lx = Lx
         self._Ly = Ly
 
-        self._r1 = np.zeros(3)
+        self._r1 = Vector()
 
-        self._r2 = np.zeros(3)
+        self._r2 = Vector()
 
         self._vdw_spacing = vdw_spacing
         self._bundle_packing = bundle_packing
