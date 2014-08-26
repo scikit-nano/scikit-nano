@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ========================================================================
-Helper functions (:mod:`sknano.utils.testing._funcs`)
+Helper functions (:mod:`sknano.core.testing._funcs`)
 ========================================================================
 
-.. currentmodule:: sknano.utils.testing._funcs
+.. currentmodule:: sknano.core.testing._funcs
 
 """
 from __future__ import absolute_import, division, print_function
