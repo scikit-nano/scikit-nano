@@ -292,4 +292,6 @@ class Atom(object):
                           deg2rad=deg2rad)
 
     def translate(self, t):
-        pass
+        #TODO compare timing benchmarks for transltion of position vector.
+        self.r.translate(t)
+        #self.r += t
