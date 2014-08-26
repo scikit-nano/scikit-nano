@@ -19,9 +19,9 @@ def test_instantiation():
 
     p = Point(np.ones(3))
     assert_true(np.allclose(p, np.ones(3)))
-    assert_equal(pt.x, 1.0)
-    assert_equal(pt.y, 1.0)
-    assert_equal(pt.z, 1.0)
+    assert_equal(p.x, 1.0)
+    assert_equal(p.y, 1.0)
+    assert_equal(p.z, 1.0)
 
     p = Point([None, None, None])
     assert_true(np.allclose(p, np.zeros(3)))
