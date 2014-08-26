@@ -30,6 +30,12 @@ class Geometric3DRegion(GeometricRegion):
         """Volume of 3D geometric region."""
         raise NotImplementedError
 
+    def rotate(self):
+        pass
+
+    def translate(self):
+        pass
+
 
 class Parallelepiped(Geometric3DRegion):
     """Abstract representation of parallelepiped.

@@ -30,6 +30,12 @@ class Geometric2DRegion(GeometricRegion):
         """Area of 2D geometric region."""
         raise NotImplementedError
 
+    def rotate(self):
+        pass
+
+    def translate(self):
+        pass
+
 
 class Parallelogram(Geometric2DRegion):
     """Abstract object representation of a parallelogram.

@@ -14,13 +14,9 @@ from sknano.utils.geometric_shapes import Parallelogram, Rectangle, Square, \
 class TestParallelogram(unittest.TestCase):
     def test_no_args(self):
         s = Parallelogram()
-        print('parallelogram: {}'.format(s))
 
 
 class TestCircle(unittest.TestCase):
-
-    #def setUp(self):
-    #    self.circle = Circle()
 
     def test_with_no_args(self):
         c = Circle()
@@ -84,6 +80,9 @@ class TestRectangle(unittest.TestCase):
         print('rectangle.center: {}'.format(s.center))
         self.assertTrue(np.allclose(s.center, np.zeros(2)))
 
+
+class TestSquare(unittest.TestCase):
+    pass
 
 if __name__ == '__main__':
     unittest.main()
