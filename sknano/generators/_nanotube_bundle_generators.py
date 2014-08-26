@@ -16,7 +16,7 @@ import copy
 import numpy as np
 
 from ..core import plural_word_check
-from ..core.atoms import Atoms
+from ..core.atoms import XAtoms as Atoms
 from ..structures import SWNTBundle, MWNTBundle
 from ._nanotube_generators import SWNTGenerator, MWNTGenerator
 
