@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================
-Reference data from NIST (:mod:`sknano.utils.refdata._nist`)
+Reference data from NIST (:mod:`sknano.core.refdata._nist`)
 ==============================================================
 
-.. currentmodule:: sknano.utils.refdata._nist
+.. currentmodule:: sknano.core.refdata._nist
 
 .. autodata:: atomic_masses_nist_list
 

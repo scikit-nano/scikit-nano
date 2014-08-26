@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =========================================================
-Reference data (:mod:`sknano.utils.refdata._constants`)
+Reference data (:mod:`sknano.core.refdata._constants`)
 =========================================================
 
-.. currentmodule:: sknano.utils.refdata._constants
+.. currentmodule:: sknano.core.refdata._constants
 
 """
 from __future__ import absolute_import, division, print_function
