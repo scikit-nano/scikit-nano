@@ -16,7 +16,12 @@ import os
 from sknano.io import StructureIO, default_structure_format, \
     supported_structure_formats
 
-__all__ = ['GeneratorMixin']
+__all__ = ['GeneratorMixin', 'STRUCTURE_GENERATORS']
+
+
+STRUCTURE_GENERATORS = tuple('SWNTGenerator', 'SWNTBundleGenerator',
+                             'MWNTGenerator', 'MWNTBundleGenerator',
+                             'GrapheneGenerator', 'BilayerGrapheneGenerator')
 
 
 class GeneratorMixin(object):

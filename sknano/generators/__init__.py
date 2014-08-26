@@ -14,6 +14,8 @@ Contents
 
    GeneratorMixin
 
+.. autodata:: STRUCTURE_GENERATORS
+
 """
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
