@@ -7,7 +7,7 @@ from nose.tools import *
 from sknano.core.atoms import Atoms, XAtom, XAtoms
 
 
-def test_atoms():
+def test_instantiation():
     xatoms = XAtoms()
     assert_is_instance(xatoms, (Atoms, XAtoms))
     for Z in range(1, 101):

@@ -7,7 +7,7 @@ from nose.tools import *
 from sknano.core.atoms import Atom, Atoms
 
 
-def test_atoms_attributes():
+def test_instantiation():
     atoms = Atoms()
     assert_is_instance(atoms, Atoms)
     for Z in range(1, 101):

@@ -7,7 +7,7 @@ from nose.tools import *
 from sknano.core.atoms import Atom
 
 
-def test_atom_attributes():
+def test_instantiation():
     a = Atom('C')
     assert_is_instance(a, Atom)
     assert_equals(a.element, 'C')
