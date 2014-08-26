@@ -18,7 +18,7 @@ Subpackages
                     of nanostructures
  io             --- classes for reading/writing nanostructure data
  scripts        --- command-line scripts
- structures     ---
+ structures     --- classes defining structures and their properties
  utils          --- utility classes and functions
 
 Utilitiy tools
