@@ -29,6 +29,7 @@ Classes for creating abstract object representations of nano-structures
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
+from ._extras import *
 #from ._fullerenes import *
 from ._graphenes import *
 from ._nanotubes import *
