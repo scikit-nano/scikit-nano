@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Utility functions for nanotube properties (:mod:`sknano.core._nanotube_funcs`)
+Utility functions for nanotube properties (:mod:`sknano.structures._extras`)
 ===============================================================================
 
-.. currentmodule:: sknano.core._nanotube_funcs
+.. currentmodule:: sknano.structures._extras
 
 """
 from __future__ import absolute_import, division, print_function
@@ -13,11 +13,27 @@ __docformat__ = 'restructuredtext en'
 import re
 import numpy as np
 
-from sknano.core import chiral_type_name_mappings as Ch_types
+from sknano.core.math import comparison_symbol_operator_mappings
+import sknano.structures as nanostructs
 
 __all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'generate_Ch_list',
            'generate_Ch_property_grid', 'get_Ch_indices', 'get_Ch_type',
-           'map_Ch']
+           'map_Ch', 'chiral_type_name_mappings', 'Ch_types',
+           'filter_key_type_mappings']
+
+chiral_type_name_mappings = Ch_types = \
+    {'achiral': 'aCh', 'armchair': 'AC', 'zigzag': 'ZZ', 'chiral': 'Ch'}
+
+filter_key_type_mappings = {}
+filter_key_type_mappings['Ch_type'] = str
+for k in ('even', 'odd'):
+    filter_key_type_mappings[k + '_only'] = bool
+
+for k in ('min_index', 'max_index',
+          'min_n', 'max_n',
+          'min_m', 'max_m',
+          'n', 'm'):
+    filter_key_type_mappings[k] = int
 
 
 def cmp_Ch(Ch1, Ch2):
@@ -147,13 +163,14 @@ def filter_Ch(Ch, even_only=False, odd_only=False, Ch_type=None,
         return True
 
 
-def filter_Ch_list(Ch_list, **kwargs):
-    """Filter for filtering list of chiralities against set of conditions.
+def filter_Ch_list(Ch_list, property_filters=None, **kwargs):
+    """Filter list of chiralities by properties.
 
     Parameters
     ----------
     Ch_list : sequence
         list of chiralities
+    property_filters : sequence, optional
     kwargs : dict, optional
         dictionary of conditions to test each chirality against.
 
@@ -163,6 +180,26 @@ def filter_Ch_list(Ch_list, **kwargs):
         list of chiralities which passed conditions
 
     """
+    if property_filters is not None:
+        filtered_list = Ch_list[:]
+        try:
+            for filter_index, (prop, cmp_symbol, value) in \
+                    enumerate(property_filters, start=1):
+                cmp_op = comparison_symbol_operator_mappings[cmp_symbol]
+                tmp_list = []
+                for Ch in filtered_list:
+                    n, m = Ch
+                    nanotube = nanostructs.SWNT(n=n, m=m)
+                    try:
+                        if cmp_op(getattr(nanotube, prop), value):
+                            tmp_list.append(Ch)
+                    except AttributeError:
+                        break
+                filtered_list = tmp_list[:]
+        except ValueError as e:
+            print(e)
+        finally:
+            Ch_list = filtered_list[:]
     return [Ch for Ch in Ch_list if filter_Ch(Ch, **kwargs)]
 
 

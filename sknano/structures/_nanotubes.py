@@ -16,7 +16,7 @@ import numpy as np
 np.seterr(all='raise')
 
 from ..core.atoms import Atom
-from ..core.math import Vector, comparison_symbol_operator_mappings
+from ..core.math import Vector
 from ..core.refdata import CCbond, dVDW, grams_per_Da
 
 __all__ = ['Nanotube', 'NanotubeBundleMixin', 'MWNTMixin',
@@ -1403,41 +1403,6 @@ class SWNT(object):
         # there are 1.6605e-24 grams / Da
         mass *= grams_per_Da
         return mass
-
-    @classmethod
-    def filter_Ch_list(cls, Ch_list=None, property_filters=None):
-        """Filter list of chiralities by list of properties.
-
-        Parameters
-        ----------
-        Ch_list : sequence
-            List of chiralities
-        property_filters : sequence
-
-        """
-        if Ch_list is not None and property_filters is not None:
-            filtered_list = Ch_list[:]
-            try:
-                for filter_index, (prop, cmp_symbol, value) in \
-                        enumerate(property_filters, start=1):
-                    cmp_op = comparison_symbol_operator_mappings[cmp_symbol]
-                    tmp_list = []
-                    for Ch in filtered_list:
-                        n, m = Ch
-                        nanotube = Nanotube(n=n, m=m)
-                        try:
-                            if cmp_op(getattr(nanotube, prop), value):
-                                tmp_list.append(Ch)
-                        except AttributeError:
-                            break
-                    filtered_list = tmp_list[:]
-            except ValueError as e:
-                print(e)
-            finally:
-                return filtered_list
-        else:
-            return None
-
 
 Nanotube = SWNT
 
