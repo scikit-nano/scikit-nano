@@ -13,7 +13,7 @@ __docformat__ = 'restructuredtext en'
 import re
 import numpy as np
 
-from ._luts import chiral_type_name_mappings as Ch_types
+from sknano.core import chiral_type_name_mappings as Ch_types
 
 __all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'generate_Ch_list',
            'generate_Ch_property_grid', 'get_Ch_indices', 'get_Ch_type',
