@@ -72,9 +72,11 @@ class XAtom(Atom):
         self._q = q
         self._CN = CN
         self._NN = NN
+        self._bonds = None
 
         self._attributes.extend(
-            ['q','v', 'atomID', 'moleculeID', 'atomtype', 'CN', 'NN'])
+            ['q','v', 'atomID', 'moleculeID', 'atomtype', 'CN', 'NN',
+             'bonds'])
 
     def __repr__(self):
         """Return string representation of `XAtom`."""
