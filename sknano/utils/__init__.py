@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Utility functions and classes (:mod:`sknano.utils`)
+Utility modules for analysis, testing, and general use (:mod:`sknano.utils`)
 ===============================================================================
 
 .. currentmodule:: sknano.utils
@@ -20,9 +20,6 @@ Sub-packages
 
 """
 from __future__ import absolute_import, division, print_function
-
 __docformat__ = 'restructuredtext en'
-
-#from ._chirality_funcs import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
