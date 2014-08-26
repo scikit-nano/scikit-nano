@@ -190,7 +190,7 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
     :math:`C_{\\mathrm{h}} = (6, 5)`.
 
     >>> SWCNTbundle = SWNTBundleGenerator(n=6, m=5, nz=5,
-    ...                                       bundle_geometry='hexagon')
+    ...                                   bundle_geometry='hexagon')
     >>> SWCNTbundle.save_data()
 
     which looks like:
@@ -209,7 +209,7 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
     :math:`C_{\\mathrm{h}} = (10, 0)`.
 
     >>> BIGASSHEXABUN = SWNTBundleGenerator(10, 0, nx=25, ny=25, nz=1,
-    ...                                         bundle_geometry='hexagon')
+    ...                                     bundle_geometry='hexagon')
     >>> BIGASSHEXABUN.save_data()
 
     Take a look at the 469 :math:`(10, 0)` unit cells in this big ass bundle!
@@ -220,7 +220,7 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
     bundle arrangement:
 
     >>> SWCNTbundle = SWNTBundleGenerator(10, 10, nx=3, ny=3, nz=5,
-    ...                                       bundle_packing='ccp')
+    ...                                   bundle_packing='ccp')
     >>> SWCNTbundle.save_data()
 
     The rendered `ccp` structure looks like:
