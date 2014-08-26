@@ -2,9 +2,10 @@
 #
 from __future__ import absolute_import, division, print_function
 
-import unittest
-
+import nose
+from nose.tools import *
 from sknano.structures import Graphene
 
+
 if __name__ == '__main__':
-    unittest.main()
+    nose.runmodule()
