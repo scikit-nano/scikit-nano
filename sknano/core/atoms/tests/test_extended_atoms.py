@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function
 import nose
 from nose.tools import *
 from sknano.core.atoms import XAtom, XAtoms
+from sknano.core.testing import generate_atoms
 
 
 def test_instantiation():
@@ -38,6 +39,32 @@ def test_structure_analysis():
     assert_equals(swnt.Natoms_per_tube, swnt.Natoms * swnt.nz)
     atoms = swnt.atoms
     assert_equals(atoms.Natoms, swnt.Natoms_per_tube)
+
+    atoms = \
+        generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
+    assert_equals(atoms.Natoms, 400)
+
+    atoms.assign_unique_ids()
+    atoms.NN_number = 3
+    atoms.NN_cutoff = 2.0
+
+    atoms.update_nearest_neighbors()
+    nearest_neighbors = atoms.nearest_neighbors
+    assert_equals(len(nearest_neighbors), atoms.Natoms)
+
+    atoms.update_coordination_numbers()
+    coordination_numbers = atoms.coordination_numbers
+    assert_equals(len(coordination_numbers), atoms.Natoms)
+
+    a100 = atoms.get_atom(atomID=100)
+    assert_true(a100 is atoms[99])
+    assert_equals(atoms.index(a100), 99)
+    a200 = atoms.get_atom(atomID=200)
+    assert_true(a200 is atoms[199])
+    assert_equals(atoms.index(a200), 199)
+    a300 = atoms.get_atom(atomID=300)
+    assert_true(a300 is atoms[299])
+    assert_equals(atoms.index(a300), 299)
 
 
 if __name__ == '__main__':
