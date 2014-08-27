@@ -13,6 +13,7 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
+from operator import attrgetter
 
 import numpy as np
 
@@ -80,6 +81,14 @@ class XAtoms(Atoms):
 
             if use_kdtree:
                 self._atom_tree = self.atom_tree
+
+    def sort(self, key=None, reverse=False):
+        if key is None:
+            self._data.sort(key=attrgetter('element', 'Z', 'atomtype',
+                                           'moleculeID', 'atomID'),
+                            reverse=reverse)
+        else:
+            self._data.sort(key=key, reverse=reverse)
 
     @property
     def atomtypes(self):
