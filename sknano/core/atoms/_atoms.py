@@ -182,7 +182,7 @@ class Atoms(MutableSequence):
     def sort(self, key=None, reverse=False):
 
         if key is None:
-            self._data.sort(key=attrgetter('element', 'Z', 'r.norm'),
+            self._data.sort(key=attrgetter('element', 'Z', 'z'),
                             reverse=reverse)
         else:
             self._data.sort(key=key, reverse=reverse)
