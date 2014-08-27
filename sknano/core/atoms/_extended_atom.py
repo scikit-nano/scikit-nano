@@ -12,6 +12,7 @@ An "eXtended" `Atom` class for structure analysis.
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
+from functools import total_ordering
 import numpy as np
 
 from sknano.core.math import Vector
@@ -20,6 +21,7 @@ from ._atom import Atom
 __all__ = ['XAtom']
 
 
+@total_ordering
 class XAtom(Atom):
     """An eXtended `Atom` class for structure analysis.
 
@@ -86,6 +88,12 @@ class XAtom(Atom):
                           q=self.q, m=self.m, x=self.x, y=self.y, z=self.z)
 
         return reprstr.format(**parameters)
+
+    def __eq__(self, other):
+        return self is other
+
+    def __lt__(self, other):
+        return self.atomID < other.atomID
 
     @property
     def CN(self):
