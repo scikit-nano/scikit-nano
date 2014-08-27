@@ -19,9 +19,9 @@ from sknano.io import StructureIO, default_structure_format, \
 __all__ = ['GeneratorMixin', 'STRUCTURE_GENERATORS']
 
 
-STRUCTURE_GENERATORS = tuple('SWNTGenerator', 'SWNTBundleGenerator',
-                             'MWNTGenerator', 'MWNTBundleGenerator',
-                             'GrapheneGenerator', 'BilayerGrapheneGenerator')
+STRUCTURE_GENERATORS = ('SWNTGenerator', 'SWNTBundleGenerator',
+                        'MWNTGenerator', 'MWNTBundleGenerator',
+                        'GrapheneGenerator', 'BilayerGrapheneGenerator')
 
 
 class GeneratorMixin(object):
