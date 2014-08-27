@@ -85,7 +85,7 @@ class Atom(object):
             self.element, self.m, self.x, self.y, self.z)
 
     def __eq__(self, other):
-        return self.Z == other.Z
+        return self is other
 
     def __lt__(self, other):
         return self.Z < other.Z
