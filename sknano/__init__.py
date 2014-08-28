@@ -12,14 +12,14 @@ Subpackages
 
 ::
 
- apps           --- GUI front-end app development
+ apps           --- GUI front-end development
  core           --- core classes and functions
- generators     --- classes for generating abstract object representations
-                    of nanostructures
+ generators     --- classes for generating nanostructure data
  io             --- classes for reading/writing nanostructure data
- scripts        --- command-line scripts
- structures     --- classes defining structures and their properties
- utils          --- utility classes and functions
+ scripts        --- command-line utilities
+ structures     --- abstract representations of nanostructures
+ testing        --- modules for testing
+ utils          --- utility modules for analysis, testing, and general use
 
 Utilitiy tools
 --------------
@@ -37,6 +37,7 @@ __all__ = ['apps',
            'io',
            'scripts',
            'structures',
+           'testing',
            'utils']
 
 from sknano.version import version as __version__
