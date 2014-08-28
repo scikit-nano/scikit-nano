@@ -340,7 +340,12 @@ class Vector(np.ndarray):
         return self
 
     def __eq__(self, other):
-        return self is other
+        if self is other or \
+                (self.x == other.x and self.y == other.y and self.z == other.z
+                 and self.p0 == other.p0 and self.p == other.p):
+            return True
+        else:
+            return False
 
     def __lt__(self, other):
         return self.length < other.length
@@ -352,6 +357,11 @@ class Vector(np.ndarray):
     def length(self):
         """Alias for :attr:`Vector.norm`."""
         return self.norm
+
+    @property
+    def unit_vector(self):
+        """Unit vector for `Vector`."""
+        return self / self.norm
 
     @property
     def magnitude(self):
