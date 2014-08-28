@@ -37,7 +37,7 @@ Number theory
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from ._funcs import *
+from ._extras import *
 from ._point import *
 from ._vector import *
 from ._transforms import *
