@@ -404,3 +404,6 @@ class XAtoms(Atoms):
 
     def select(self, **kwargs):
         pass
+
+    def select_within(self, volume):
+        pass
