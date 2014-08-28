@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Graphene structure classes (:mod:`sknano.structures._graphenes`)
+Graphene structure classes (:mod:`sknano.structures._graphene`)
 ===============================================================================
 
-.. currentmodule:: sknano.structures._graphenes
+.. currentmodule:: sknano.structures._graphene
 
 """
 from __future__ import absolute_import, division, print_function
@@ -20,7 +20,7 @@ from ..core.refdata import CCbond, dVDW, grams_per_Da
 
 edge_types = {'armchair': 'AC', 'zigzag': 'ZZ'}
 
-__all__ = ['GraphenePrimitiveCell', 'Graphene', 'BilayerGraphene']
+__all__ = ['GraphenePrimitiveCell', 'Graphene']
 
 
 class GraphenePrimitiveCell(object):
@@ -329,23 +329,3 @@ class Graphene(object):
         mass = Natoms_per_layer * (atom1.m + atom2.m) / 2
 
         return mass
-
-
-class BilayerGraphene(Graphene):
-    def __init__(self, layer_rotation_angle=None, deg2rad=True, **kwargs):
-
-        if layer_rotation_angle is not None and deg2rad:
-            layer_rotation_angle = np.radians(layer_rotation_angle)
-        kwargs['layer_rotation_angles'] = layer_rotation_angle
-        kwargs['nlayers'] = 2
-
-        super(BilayerGraphene, self).__init__(**kwargs)
-        self._layer_rotation_angle = self._layer_rotation_angles
-
-    @property
-    def layer_rotation_angle(self):
-        return self._layer_rotation_angle
-
-    @layer_rotation_angle.setter
-    def layer_rotation_angle(self, value):
-        self._layer_rotation_angle = value

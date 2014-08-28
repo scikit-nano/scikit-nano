@@ -20,8 +20,9 @@ Classes for creating abstract object representations of nano-structures
 .. autosummary::
    :toctree: generated/
 
-   Graphene
    GraphenePrimitiveCell
+   Graphene
+   BilayerGraphene
    Nanotube
    NanotubeBundle
 
@@ -31,7 +32,12 @@ __docformat__ = 'restructuredtext en'
 
 from ._extras import *
 #from ._fullerenes import *
-from ._graphenes import *
-from ._nanotubes import *
+from ._graphene import *
+from ._bilayer_graphene import *
+from ._mixins import *
+from ._swnt import *
+from ._swnt_bundle import *
+from ._mwnt import *
+from ._mwnt_bundle import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
