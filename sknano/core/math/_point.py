@@ -10,8 +10,6 @@ Custom NumPy Point class (:mod:`sknano.core.math._point`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from functools import total_ordering
-
 import numbers
 import numpy as np
 
@@ -20,7 +18,6 @@ from ._transforms import rotation_transform
 __all__ = ['Point']
 
 
-@total_ordering
 class Point(np.ndarray):
     """Abstract object representation for a point in :math:`R^n`.
 

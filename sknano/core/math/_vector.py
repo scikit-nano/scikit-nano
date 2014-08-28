@@ -10,8 +10,6 @@ Custom NumPy Vector class (:mod:`sknano.core.math._vector`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from functools import total_ordering
-
 import numbers
 import numpy as np
 
@@ -22,7 +20,6 @@ __all__ = ['Vector', 'cross', 'dot', 'scalar_triple_product',
            'vector_triple_product']
 
 
-@total_ordering
 class Vector(np.ndarray):
     """Abstract object representation of a vector in :math:`R^n`
 
