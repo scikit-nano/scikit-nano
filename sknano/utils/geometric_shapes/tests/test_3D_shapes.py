@@ -6,10 +6,16 @@ import nose
 from nose.tools import *
 import numpy as np
 
-from sknano.utils.geometric_shapes import Sphere, Ellipsoid
+from sknano.core.math import Vector
+from sknano.utils.geometric_shapes import Parallelepiped, Sphere, Ellipsoid
 
 
-def test_instantiation():
+def test_parallelepiped():
+    s = Parallelepiped()
+    assert_true(np.allclose(s.o, np.zeros(3)))
+
+
+def test_sphere():
     s = Sphere()
     assert_true(np.allclose(s.center, np.zeros(3)))
     assert_equal(s.r, 1.0)
@@ -22,6 +28,8 @@ def test_instantiation():
     assert_true(np.allclose(s.center, np.zeros(3)))
     assert_equal(s.r, 1.0)
 
+
+def test_ellipsoid():
     s = Ellipsoid()
     assert_true(np.allclose(s.center, np.zeros(3)))
 
