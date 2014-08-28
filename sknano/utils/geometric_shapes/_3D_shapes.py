@@ -30,6 +30,8 @@ class Geometric3DRegion(GeometricRegion):
         """Volume of 3D geometric region."""
         raise NotImplementedError
 
+
+class GeometricTransformsMixin(
     def rotate(self):
         pass
 
@@ -57,51 +59,64 @@ class Parallelepiped(Geometric3DRegion):
     def __init__(self, o=None, u=None, v=None, w=None):
 
         if o is None:
-            o = Point(nd=2)
+            o = Point(nd=3)
         elif isinstance(o, (tuple, list, np.ndarray)):
             o = Point(o)
         self._o = o
 
         if u is None:
-            u = Vector([1., 0.])
+            u = Vector([1., 0., 0.])
         elif isinstance(u, (tuple, list, np.ndarray)):
             u = Vector(u)
-
         self._u = u
 
         if v is None:
-            v = Vector([1., 1.])
+            v = Vector([0., 1., 0.])
         elif isinstance(v, (tuple, list, np.ndarray)):
             v = Vector(v)
-
         self._v = v
 
         if w is None:
-            w = Vector([1., 1.])
+            w = Vector([1., 1., 1.])
         elif isinstance(w, (tuple, list, np.ndarray)):
             w = Vector(w)
-
         self._w = w
 
     def __repr__(self):
         return "Parallelepiped(o={!r}, u={!r}, v={!r}, w={!r})".format(
-            self.o.tolist(), self.u, self.v, self.w)
+            self.o.tolist(), self.u.tolist(), self.v.tolist(), self.w.tolist())
 
     @property
     def o(self):
         return self._o
 
+    @o.setter
+    def o(self, value):
+        self._o[:] = value
+
     @property
     def u(self):
         return self._u
+
+    @u.setter
+    def u(self, value):
+        self._u[:] = value
 
     @property
     def v(self):
         return self._v
 
+    @v.setter
+    def v(self, value):
+        self._v[:] = value
+
     @property
     def w(self):
         return self._w
+
+    @w.setter
+    def w(self, value):
+        self._w[:] = value
 
     @property
     def center(self):
