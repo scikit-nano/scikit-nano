@@ -5,7 +5,7 @@ from __future__ import absolute_import, division, print_function
 import nose
 from nose.tools import *
 from sknano.core.atoms import XAtom, XAtoms
-from sknano.core.testing import generate_atoms
+from sknano.testing import generate_atoms
 from sknano.utils.geometric_shapes import Ellipsoid
 
 

@@ -8,7 +8,7 @@ from nose.tools import *
 #import numpy as np
 
 from sknano.core.refdata import element_symbols
-from sknano.core.testing import generate_atoms
+from sknano.testing import generate_atoms
 
 
 def test_generate_atoms():

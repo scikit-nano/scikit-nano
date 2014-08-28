@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Core code for testing, development, and general use (:mod:`sknano.core`)
+Core package code for development and general use (:mod:`sknano.core`)
 ===============================================================================
 
 .. currentmodule:: sknano.core
@@ -50,7 +50,6 @@ Sub-packages
    atoms
    math
    refdata
-   testing
 
 """
 from __future__ import absolute_import, division, print_function

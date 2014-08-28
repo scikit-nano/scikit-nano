@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ============================================================================
-Helper functions for testing and development (:mod:`sknano.core.testing`)
+Helper functions for testing and development (:mod:`sknano.testing`)
 ============================================================================
 
-.. currentmodule:: sknano.core.testing
+.. currentmodule:: sknano.testing
 
 Contents
 ========
