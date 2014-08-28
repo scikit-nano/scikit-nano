@@ -11,8 +11,20 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod, abstractproperty
+#from sknano.core.math import rotation_matrix
 
 __all__ = ['GeometricRegion']
+
+
+class GeometricTransformsMixin(object):
+
+    def rotate(self):
+        """Rotate region about centroid or arbitrary vector."""
+        pass
+
+    def translate(self):
+        """Translate region."""
+        raise NotImplementedError
 
 
 class GeometricRegion(object):
@@ -27,14 +39,4 @@ class GeometricRegion(object):
     @abstractmethod
     def contains_point(self):
         """Check if point is contained within geometric region."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def rotate(self):
-        """Rotate region about centroid or arbitrary vector."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def translate(self):
-        """Translate region."""
         raise NotImplementedError
