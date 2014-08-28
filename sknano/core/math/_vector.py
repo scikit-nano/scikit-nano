@@ -340,15 +340,27 @@ class Vector(np.ndarray):
         return self
 
     def __eq__(self, other):
-        if self is other or \
-                (self.x == other.x and self.y == other.y and self.z == other.z
-                 and self.p0 == other.p0 and self.p == other.p):
+        if self is other or (np.allclose(self, other) and
+                             np.allclose(self.p0, other.p0) and
+                             np.allclose(self.p, other.p)):
             return True
         else:
             return False
 
     def __lt__(self, other):
-        return self.length < other.length
+        return self.norm < other.norm
+
+    def __le__(self, other):
+        return self < other or self == other
+
+    def __gt__(self, other):
+        return not (self < other or self == other)
+
+    def __ge__(self, other):
+        return not (self < other)
+
+    def __ne__(self, other):
+        return not self == other
 
     def _update_p(self):
         self._p[:] = self._p0 + self.__array__()

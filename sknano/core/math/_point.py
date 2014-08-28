@@ -19,6 +19,7 @@ from ._transforms import rotation_transform
 
 __all__ = ['Point']
 
+
 @total_ordering
 class Point(np.ndarray):
     """Abstract object representation for a point in :math:`R^n`.
@@ -137,14 +138,30 @@ class Point(np.ndarray):
             super(Point, self).__setattr__(name, value)
 
     def __eq__(self, other):
-        if self is other or (self.x == other.x and self.y == other.y and
-                             self.z == other.z):
+        if self is other or np.allclose(self, other):
             return True
         else:
             return False
 
     def __lt__(self, other):
-        return self.x < other.x and self.y < other.y and self.z < other.z
+        origin = Point(nd=self.nd)
+        return self.euclidean_distance(origin) < \
+            other.euclidean_distance(origin)
+
+    def __le__(self, other):
+        return self < other or self == other
+
+    def __gt__(self, other):
+        return not (self < other or self == other)
+
+    def __ge__(self, other):
+        return not (self < other)
+
+    def __ne__(self, other):
+        return not self == other
+
+    def euclidean_distance(self, pt):
+        return np.sqrt(((self - pt)**2).sum())
 
     def rezero_coords(self, epsilon=1.0e-10):
         """Alias for :meth:`Point.rezero`."""
@@ -162,7 +179,7 @@ class Point(np.ndarray):
             Smallest allowed absolute value of any :math:`x,y,z` coordinate.
 
         """
-        self[np.where(np.abs(self) <= epsilon)] = 0.0
+        self[np.where(np.abs(self.__array__()) <= epsilon)] = 0.0
 
     def rotate(self, angle, rot_axis=None, anchor_point=None, deg2rad=False):
         self[:] = rotation_transform(self, angle=angle, rot_axis=rot_axis,
