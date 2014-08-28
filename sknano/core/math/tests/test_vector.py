@@ -13,41 +13,26 @@ from sknano.core.math import Point, Vector, vector as vec
 def test_instantiation():
     v = Vector()
     assert_true(np.allclose(v, np.zeros(3)))
-    assert_equal(v.x, 0.0)
-    assert_equal(v.y, 0.0)
-    assert_equal(v.z, 0.0)
     assert_true(np.allclose(v.p0, np.zeros(3)))
     assert_true(np.allclose(v.p, np.zeros(3)))
 
     v = Vector([1, 1, 1])
     assert_true(np.allclose(v, np.ones(3)))
-    assert_equal(v.x, 1.0)
-    assert_equal(v.y, 1.0)
-    assert_equal(v.z, 1.0)
     assert_true(np.allclose(v.p0, np.zeros(3)))
     assert_true(np.allclose(v.p, np.ones(3)))
 
     v = Vector(p=[1, 1, 1])
     assert_true(np.allclose(v, np.ones(3)))
-    assert_equal(v.x, 1.0)
-    assert_equal(v.y, 1.0)
-    assert_equal(v.z, 1.0)
     assert_true(np.allclose(v.p0, np.zeros(3)))
     assert_true(np.allclose(v.p, np.ones(3)))
 
     v = Vector(p0=[1, 1, 1])
     assert_true(np.allclose(v, -np.ones(3)))
-    assert_equal(v.x, -1.0)
-    assert_equal(v.y, -1.0)
-    assert_equal(v.z, -1.0)
     assert_true(np.allclose(v.p0, np.ones(3)))
     assert_true(np.allclose(v.p, np.zeros(3)))
 
     v = Vector(p=[1, 1, 1], p0=[1, 1, 1])
     assert_true(np.allclose(v, np.zeros(3)))
-    assert_equal(v.x, 0.0)
-    assert_equal(v.y, 0.0)
-    assert_equal(v.z, 0.0)
     assert_true(np.allclose(v.p0, np.ones(3)))
     assert_true(np.allclose(v.p, np.ones(3)))
 
@@ -56,24 +41,15 @@ def test_property_changes():
     v = Vector()
     v.p0 = np.ones(3)
     assert_true(np.allclose(v, -np.ones(3)))
-    assert_equal(v.x, -1.0)
-    assert_equal(v.y, -1.0)
-    assert_equal(v.z, -1.0)
     assert_true(np.allclose(v.p0, np.ones(3)))
     assert_true(np.allclose(v.p, np.zeros(3)))
 
     v = Vector(p=[1., 1., 1.], p0=[1., 1., 1.])
     assert_true(np.allclose(v, np.zeros(3)))
-    assert_equal(v.x, 0.0)
-    assert_equal(v.y, 0.0)
-    assert_equal(v.z, 0.0)
     assert_true(np.allclose(v.p0, np.ones(3)))
     assert_true(np.allclose(v.p, np.ones(3)))
     v.p0 = np.zeros(3)
     assert_true(np.allclose(v, np.ones(3)))
-    assert_equal(v.x, 1.0)
-    assert_equal(v.y, 1.0)
-    assert_equal(v.z, 1.0)
     assert_true(np.allclose(v.p0, np.zeros(3)))
     assert_true(np.allclose(v.p, np.ones(3)))
     v.x = 5.0
@@ -92,18 +68,7 @@ def test_property_changes():
     assert_equal(v.p0.z, 2.5)
 
 
-def test_add():
-    v1 = Vector([1.0, 0.0], p0=[5., 5.])
-    v2 = Vector([1.0, 1.0], p0=[5., 5.])
-    v3 = v1 + v2
-    assert_is_instance(v3, Vector)
-    assert_true(np.allclose(v3, np.array([2.0, 1.0])))
-    v3 = v2 + v1
-    assert_is_instance(v3, Vector)
-    assert_true(np.allclose(v3, np.array([2.0, 1.0])))
-
-
-def test_advanced_ops():
+def test_math_ops():
     v = Vector(np.zeros(3))
     assert_true(np.allclose(v.p0, np.zeros(3)))
 
@@ -120,6 +85,15 @@ def test_advanced_ops():
     assert_true(np.allclose(v, 2 * np.ones(3)))
     assert_true(np.allclose(v.p0, np.ones(3)))
     assert_true(np.allclose(v.p, 3 * np.ones(3)))
+
+    v1 = Vector([1.0, 0.0], p0=[5., 5.])
+    v2 = Vector([1.0, 1.0], p0=[5., 5.])
+    v3 = v1 + v2
+    assert_is_instance(v3, Vector)
+    assert_true(np.allclose(v3, np.array([2.0, 1.0])))
+    v3 = v2 + v1
+    assert_is_instance(v3, Vector)
+    assert_true(np.allclose(v3, np.array([2.0, 1.0])))
 
 
 def test_2D_dot():
@@ -291,10 +265,12 @@ def test_properties():
     v = Vector([5, 5, 0])
     assert_almost_equal(v.unit_vector.length, 1.0)
 
+
 def test_vector_angle():
     u = Vector([1, 0])
     v = Vector([1, 1])
     assert_almost_equal(vec.angle(u, v), np.pi/4)
+
 
 def test_scalar_triple_product():
     u = Vector([1, 0, 0])
@@ -302,11 +278,13 @@ def test_scalar_triple_product():
     w = Vector([0, 1, 1])
     assert_equals(vec.scalar_triple_product(u, v, w), 1)
 
-def test_scalar_triple_product():
+
+def test_vector_triple_product():
     u = Vector([1, 0, 0])
     v = Vector([1, 1, 0])
     w = Vector([0, 1, 1])
     assert_is_instance(vec.vector_triple_product(u, v, w), Vector)
+
 
 def test_comparison_operators():
     u = Vector([1, 2, 3])
