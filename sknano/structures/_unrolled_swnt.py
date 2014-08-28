@@ -12,7 +12,8 @@ __docformat__ = 'restructuredtext en'
 
 from sknano.core.refdata import dVDW
 
-from ._mixins import UnrolledSWNTMixin, SWNT
+from ._mixins import UnrolledSWNTMixin
+from ._swnt import SWNT
 
 __all__ = ['UnrolledSWNT']
 

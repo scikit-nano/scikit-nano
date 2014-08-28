@@ -39,5 +39,6 @@ from ._swnt import *
 from ._swnt_bundle import *
 from ._mwnt import *
 from ._mwnt_bundle import *
+from ._unrolled_swnt import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
