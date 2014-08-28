@@ -10,6 +10,8 @@ Custom NumPy Point class (:mod:`sknano.core.math._point`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
+from functools import total_ordering
+
 import numbers
 import numpy as np
 
@@ -17,7 +19,7 @@ from ._transforms import rotation_transform
 
 __all__ = ['Point']
 
-
+@total_ordering
 class Point(np.ndarray):
     """Abstract object representation for a point in :math:`R^n`.
 
@@ -133,6 +135,16 @@ class Point(np.ndarray):
                 self[2] = value
         else:
             super(Point, self).__setattr__(name, value)
+
+    def __eq__(self, other):
+        if self is other or (self.x == other.x and self.y == other.y and
+                             self.z == other.z):
+            return True
+        else:
+            return False
+
+    def __lt__(self, other):
+        return self.x < other.x and self.y < other.y and self.z < other.z
 
     def rezero_coords(self, epsilon=1.0e-10):
         """Alias for :meth:`Point.rezero`."""
