@@ -31,14 +31,6 @@ class Geometric3DRegion(GeometricRegion):
         raise NotImplementedError
 
 
-class GeometricTransformsMixin(
-    def rotate(self):
-        pass
-
-    def translate(self):
-        pass
-
-
 class Parallelepiped(Geometric3DRegion):
     """Abstract representation of parallelepiped.
 
@@ -67,19 +59,19 @@ class Parallelepiped(Geometric3DRegion):
         if u is None:
             u = Vector([1., 0., 0.])
         elif isinstance(u, (tuple, list, np.ndarray)):
-            u = Vector(u)
+            u = Vector(u, p0=self._o)
         self._u = u
 
         if v is None:
-            v = Vector([0., 1., 0.])
+            v = Vector([1., 1., 0.])
         elif isinstance(v, (tuple, list, np.ndarray)):
-            v = Vector(v)
+            v = Vector(v, p0=self._o)
         self._v = v
 
         if w is None:
-            w = Vector([1., 1., 1.])
+            w = Vector([0., 1., 1.])
         elif isinstance(w, (tuple, list, np.ndarray)):
-            w = Vector(w)
+            w = Vector(w, p0=self._o)
         self._w = w
 
     def __repr__(self):

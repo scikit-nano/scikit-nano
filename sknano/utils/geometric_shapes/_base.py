@@ -40,3 +40,7 @@ class GeometricRegion(object):
     def contains_point(self):
         """Check if point is contained within geometric region."""
         raise NotImplementedError
+
+    @abstractproperty
+    def points(self):
+        return self._points

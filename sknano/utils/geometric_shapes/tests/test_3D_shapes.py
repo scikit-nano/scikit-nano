@@ -14,6 +14,8 @@ def test_parallelepiped():
     s = Parallelepiped()
     assert_true(np.allclose(s.o, np.zeros(3)))
 
+    assert_equal(s.volume, 1.0)
+
 
 def test_sphere():
     s = Sphere()
