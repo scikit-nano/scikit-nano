@@ -14,7 +14,7 @@ import re
 import numpy as np
 
 from sknano.core.math import comparison_symbol_operator_mappings
-from ._nanotubes import SWNT
+from ._swnt import SWNT
 
 __all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'generate_Ch_list',
            'generate_Ch_property_grid', 'get_Ch_indices', 'get_Ch_type',
