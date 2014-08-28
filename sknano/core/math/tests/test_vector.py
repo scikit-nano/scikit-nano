@@ -287,10 +287,35 @@ def test_projection():
         u.projection(Vector([1, 1, 1])), Vector([6, 6, 6])))
 
 
+def test_properties():
+    v = Vector([5, 5, 0])
+    assert_almost_equal(v.unit_vector.length, 1.0)
+
 def test_vector_angle():
     u = Vector([1, 0])
     v = Vector([1, 1])
     assert_almost_equal(vec.angle(u, v), np.pi/4)
+
+def test_scalar_triple_product():
+    u = Vector([1, 0, 0])
+    v = Vector([1, 1, 0])
+    w = Vector([0, 1, 1])
+    assert_equals(vec.scalar_triple_product(u, v, w), 1)
+
+def test_scalar_triple_product():
+    u = Vector([1, 0, 0])
+    v = Vector([1, 1, 0])
+    w = Vector([0, 1, 1])
+    assert_is_instance(vec.vector_triple_product(u, v, w), Vector)
+
+def test_comparison_operators():
+    u = Vector([1, 2, 3])
+    v = Vector([1, 2, 3])
+    w = Vector([1, 1, 1])
+    assert_equals(u, v)
+    assert_true(u == v)
+    assert_not_equals(u, w)
+    assert_false(u == w)
 
 
 if __name__ == '__main__':
