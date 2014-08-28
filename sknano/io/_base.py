@@ -122,8 +122,8 @@ class StructureReader(StructureIO):
     @abstractmethod
     def read(self):
         """Read structure data from file"""
-        return NotImplementedError('Subclasses of `StructureReader` need to '
-                                   'implement the `read` method.')
+        raise NotImplementedError('Subclasses of `StructureReader` need to '
+                                  'implement the `read` method.')
 
 
 class StructureWriter(object):
@@ -133,8 +133,8 @@ class StructureWriter(object):
     @abstractmethod
     def write(self):
         """Write structure data to file"""
-        return NotImplementedError('Subclasses of `StructureWriter` need to '
-                                   'implement the `write` method.')
+        raise NotImplementedError('Subclasses of `StructureWriter` need to '
+                                  'implement the `write` method.')
 
 
 class StructureConverter(object):
@@ -166,8 +166,8 @@ class StructureConverter(object):
     @abstractmethod
     def convert(self):
         """Convert structure data from one format to another format."""
-        return NotImplementedError('Subclasses of `StructureConverter` need '
-                                   'to implement the `convert` method.')
+        raise NotImplementedError('Subclasses of `StructureConverter` need '
+                                  'to implement the `convert` method.')
 
 
 class StructureFormat(object):
