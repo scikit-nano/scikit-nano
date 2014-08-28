@@ -6,6 +6,7 @@ import nose
 from nose.tools import *
 from sknano.core.atoms import XAtom, XAtoms
 from sknano.core.testing import generate_atoms
+from sknano.utils.geometric_shapes import Ellipsoid
 
 
 def test_instantiation():
@@ -65,6 +66,14 @@ def test_structure_analysis():
     a300 = atoms.get_atom(atomID=300)
     assert_true(a300 is atoms[299])
     assert_equals(atoms.index(a300), 299)
+
+
+def test_atom_selections():
+    atoms = \
+        generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
+    a200 = atoms.get_atom(atomID=200)
+    a200NN = atoms.select_within(Sphere(center=a200.r, r=2.5))
+    assert_equals(a200NN.Natoms, 4)
 
 
 if __name__ == '__main__':
