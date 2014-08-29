@@ -366,7 +366,7 @@ class DATAWriter(StructureWriter):
         if comment_line is None:
             comment_line = default_comment_line
 
-        atoms.rezero_coords()
+        atoms.rezero()
 
         atomtypes = atoms.atomtypes
 
