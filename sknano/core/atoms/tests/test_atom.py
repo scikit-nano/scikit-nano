@@ -19,5 +19,9 @@ def test_attributes():
         assert_equals(getattr(a, c), 0.0)
 
 
+def test_comparisons():
+    a = Atom('C')
+    
+
 if __name__ == '__main__':
     nose.runmodule()

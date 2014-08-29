@@ -13,6 +13,21 @@ def test_instantiation():
     from sknano.core.atoms import Atoms
     xatoms = XAtoms()
     assert_is_instance(xatoms, (Atoms, XAtoms))
+    swnt_atoms = \
+        generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=1)
+    for atom in swnt_atoms:
+        xatoms.append(atom)
+
+    assert_equal(len(xatoms), len(swnt_atoms))
+
+    atoms = XAtoms(atoms=xatoms)
+    assert_equal(len(atoms), len(swnt_atoms))
+
+    atoms = XAtoms(atoms=xatoms.data)
+    assert_equal(len(atoms), len(swnt_atoms))
+
+    atoms = XAtoms(atoms=atoms)
+    assert_equal(len(atoms), len(swnt_atoms))
 
 
 def test_list_methods():
@@ -71,9 +86,9 @@ def test_structure_analysis():
 def test_atom_selections():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    a200 = atoms.get_atom(atomID=200)
-    a200NN = atoms.select_within(Sphere(center=a200.r, r=2.5))
-    assert_equals(a200NN.Natoms, 4)
+    #a200 = atoms.get_atom(atomID=200)
+    #a200NN = atoms.select_within(Ellipsoid(center=a200.r, r=2.5))
+    #assert_equals(a200NN.Natoms, 4)
 
 
 if __name__ == '__main__':
