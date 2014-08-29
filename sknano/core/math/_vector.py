@@ -449,7 +449,7 @@ class Vector(np.ndarray):
             Smallest allowed absolute value of any :math:`x,y,z` coordinate.
 
         """
-        self[np.where(np.abs(self) <= epsilon)] = 0.0
+        self[np.where(np.abs(self.__array__()) <= epsilon)] = 0.0
 
     def rotate(self, angle, rot_axis=None, anchor_point=None, deg2rad=False,
                verbose=False):
