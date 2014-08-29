@@ -25,10 +25,11 @@ import copy
 
 import numpy as np
 
-from ..core import plural_word_check
-from ..core.atoms import XAtom as Atom, XAtoms as Atoms
-from ..core.math import Vector
-from ..structures import SWNT, UnrolledSWNT, MWNT
+from sknano.core import pluralize
+from sknano.core.atoms import XAtom as Atom, XAtoms as Atoms
+from sknano.core.math import Vector
+from sknano.structures import SWNT, UnrolledSWNT, MWNT
+from sknano.utils.geometric_shapes import Cuboid
 from ._base import GeneratorMixin
 
 __all__ = ['SWNTGenerator', 'UnrolledSWNTGenerator', 'MWNTGenerator']
@@ -189,25 +190,24 @@ class SWNTGenerator(SWNT, GeneratorMixin):
                                        '{}'.format(self._m).zfill(2))
             if self._assume_integer_unit_cells:
                 nz = ''.join(('{}'.format(self._nz),
-                              plural_word_check('cell', self._nz)))
+                              pluralize('cell', self._nz)))
             else:
                 nz = ''.join(('{:.2f}'.format(self._nz),
-                              plural_word_check('cell', self._nz)))
+                              pluralize('cell', self._nz)))
             fname_wordlist = (chirality, nz)
             fname = '_'.join(fname_wordlist)
 
+        if self._L0 is not None and self._fix_Lz:
+            pmin = [-np.inf, -np.inf, 0]
+            pmax = [np.inf, np.inf, 10 * self._L0 + 0.25]
+            region_bounds = Cuboid(pmin=pmin, pmax=pmax)
+            region_bounds.update_region_limits()
+
+            self._structure_atoms.clip_bounds(region_bounds,
+                                              center_before_clipping=True)
+
         if center_CM:
             self._structure_atoms.center_CM()
-
-        if self._L0 is not None and self._fix_Lz:
-            self._structure_atoms.clip_bounds(
-                min_limit=-(10 * self._L0 + 0.2) / 2, r_indices=[2])
-            if center_CM:
-                self._structure_atoms.center_CM()
-            self._structure_atoms.clip_bounds(
-                max_limit=(10 * self._L0 + 0.2) / 2, r_indices=[2])
-            if center_CM:
-                self._structure_atoms.center_CM()
 
         super(SWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
@@ -369,43 +369,30 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
             fname_wordlist = None
             if nx != 1 or ny != 1:
                 nx = ''.join(('{}'.format(self.nx),
-                              plural_word_check('cell', self.nx)))
+                              pluralize('cell', self.nx)))
                 ny = ''.join(('{}'.format(self.ny),
-                              plural_word_check('cell', self.ny)))
+                              pluralize('cell', self.ny)))
 
                 if self._assume_integer_unit_cells:
                     nz = ''.join(('{}'.format(self.nz),
-                                  plural_word_check('cell', self.nz)))
+                                  pluralize('cell', self.nz)))
                 else:
                     nz = ''.join(('{:.2f}'.format(self.nz),
-                                  plural_word_check('cell', self.nz)))
+                                  pluralize('cell', self.nz)))
 
                 cells = 'x'.join((nx, ny, nz))
                 fname_wordlist = (chirality, cells)
             else:
                 if self._assume_integer_unit_cells:
                     nz = ''.join(('{}'.format(self.nz),
-                                  plural_word_check('cell', self.nz)))
+                                  pluralize('cell', self.nz)))
                 else:
                     nz = ''.join(('{:.2f}'.format(self.nz),
-                                  plural_word_check('cell', self.nz)))
+                                  pluralize('cell', self.nz)))
 
                 fname_wordlist = (chirality, nz)
 
             fname = '_'.join(fname_wordlist)
-
-        if center_CM:
-            self._structure_atoms.center_CM()
-
-        if self._L0 is not None and self._fix_Lz:
-            self._structure_atoms.clip_bounds(
-                min_limit=-(10 * self._L0 + 0.2) / 2, r_indices=[2])
-            if center_CM:
-                self._structure_atoms.center_CM()
-            self._structure_atoms.clip_bounds(
-                max_limit=(10 * self._L0 + 0.2) / 2, r_indices=[2])
-            if center_CM:
-                self._structure_atoms.center_CM()
 
         super(UnrolledSWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
@@ -681,12 +668,19 @@ class MWNTGenerator(MWNT, GeneratorMixin):
             else:
                 break
 
+        pmin = [-np.inf, -np.inf, -np.inf]
+        pmax = [np.inf, np.inf, np.inf]
+        region_bounds = Cuboid(pmin=pmin, pmax=pmax)
         if self._L0 is not None and self._fix_Lz:
-            self._structure_atoms.clip_bounds(
-                abs_limit=(10 * self._L0 + 1) / 2, r_indices=[2])
+            region_bounds.zmax = (10 * self._L0 + 1) / 2
         else:
-            self._structure_atoms.clip_bounds(
-                abs_limit=(10 * Lzmin + 1) / 2, r_indices=[2])
+            region_bounds.zmax = (10 * Lzmin + 1) / 2
+
+        region_bounds.zmin = -region_bounds.zmax
+        region_bounds.update_region_limits()
+
+        self._structure_atoms.clip_bounds(region_bounds,
+                                          center_before_clipping=True)
 
         self._Natoms_per_tube = self._structure_atoms.Natoms
 
@@ -711,10 +705,11 @@ class MWNTGenerator(MWNT, GeneratorMixin):
             fname_wordlist = None
             if self._assume_integer_unit_cells:
                 nz = ''.join(('{}'.format(self._nz),
-                              plural_word_check('cell', self._nz)))
+                              pluralize('cell', self._nz)))
             else:
                 nz = ''.join(('{:.2f}'.format(self._nz),
-                              plural_word_check('cell', self._nz)))
+                              pluralize('cell', self._nz)))
+
             fname_wordlist = (Nshells, chirality, nz)
             fname = '_'.join(fname_wordlist)
 
