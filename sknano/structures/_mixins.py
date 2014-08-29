@@ -275,8 +275,6 @@ class NanotubeBundleMixin(object):
 
     def compute_bundle_params(self, d_vdw=None):
         """Compute/update nanotube bundle parameters."""
-        print('In compute_bundle_params\n' +
-              'called by type(self): {}'.format(type(self)))
 
         self._r1.x = \
             Nanotube.compute_dt(n=self.n, m=self.m, bond=self.bond) + \
