@@ -50,20 +50,20 @@ class XAtoms(Atoms):
     """
 
     def __init__(self, atoms=None, copylist=True, deepcopy=False,
-                 use_kdtree=True):
+                 use_kdtree=True, update_tree=True):
 
-        super(XAtoms, self).__init__(
-            atoms=atoms, copylist=copylist, deepcopy=deepcopy,
-            update_property_lists=False)
+        super(XAtoms, self).__init__(atoms=atoms,
+                                     copylist=copylist,
+                                     deepcopy=deepcopy)
 
         self._atomtypes = {}
 
-        self._property_lists['q'] = self._charges = []
-        self._property_lists['v'] = self._velocities = []
-        self._property_lists['atomID'] = self._atom_ids = []
-        self._property_lists['moleculeID'] = self._molecule_ids = []
-        self._property_lists['CN'] = self._coordination_numbers = []
-        self._property_lists['NN'] = self._nearest_neighbors = []
+        self._charges = []
+        self._velocities = []
+        self._atom_ids = []
+        self._molecule_ids = []
+        self._coordination_numbers = []
+        self._nearest_neighbors = []
         #self._forces = []
 
         self._atom_tree = None
@@ -73,14 +73,8 @@ class XAtoms(Atoms):
 
         self._NN_number = 6
         self._NN_cutoff = np.inf
-
-        if atoms is not None:
-            for atom in self._data:
-                for p, plist in self._property_lists.iteritems():
-                    plist.append(getattr(atom, p))
-
-            if use_kdtree:
-                self._atom_tree = self.atom_tree
+        if use_kdtree:
+            self._atom_tree = self.atom_tree
 
     def sort(self, key=None, reverse=False):
         if key is None:
@@ -157,7 +151,7 @@ class XAtoms(Atoms):
             NN_d, NN_i = self.query_atom_tree(n=self.NN_number,
                                               cutoff_radius=self.NN_cutoff)
             for i, atom in enumerate(self._data):
-                NN_atoms = []
+                NN_atoms = XAtoms()
                 for j, d in enumerate(NN_d[i]):
                     if d < self.NN_cutoff:
                         NN_atoms.append(self._data[NN_i[i][j]])
@@ -235,7 +229,7 @@ class XAtoms(Atoms):
         if self._use_kdtree:
             NN_d, NN_i = self.query_atom_tree(n=n, cutoff_radius=rc)
             for i, atom in enumerate(self._data):
-                NN_atoms = []
+                NN_atoms = XAtoms()
                 for j, d in enumerate(NN_d[i]):
                     if d < rc:
                         NN_atoms.append(self._data[NN_i[i][j]])
