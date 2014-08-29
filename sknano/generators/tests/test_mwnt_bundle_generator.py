@@ -7,7 +7,7 @@ from nose.tools import *
 from sknano.generators import MWNTBundleGenerator
 
 
-def test_mwntbundle_generator():
+def test1():
     mwntbundle = MWNTBundleGenerator(n=40, m=40, max_shells=5, Lz=1.0,
                                      fix_Lz=True, bundle_geometry='hexagon')
     mwntbundle.save_data()

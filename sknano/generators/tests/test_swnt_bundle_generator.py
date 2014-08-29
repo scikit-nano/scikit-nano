@@ -7,7 +7,7 @@ from nose.tools import *
 from sknano.generators import SWNTBundleGenerator
 
 
-def test_swntbundle_generator():
+def test1():
     #SWNTBundleGenerator(n=10, m=0, nx=10, ny=3, nz=5).save_data()
     #SWNTBundleGenerator(n=10, m=5, nx=3, ny=3, nz=1,
     #                    bundle_packing='ccp').save_data()
