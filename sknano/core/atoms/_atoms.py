@@ -39,44 +39,26 @@ class Atoms(MutableSequence):
 
     """
 
-    def __init__(self, atoms=None, copylist=True, deepcopy=False,
-                 update_property_lists=True):
+    def __init__(self, atoms=None, copylist=True, deepcopy=False):
         self._data = []
-
         self._coords = []
         self._masses = []
         self._symbols = []
 
-        self._property_lists = \
-            {'m': self._masses, 'r': self._coords, 'symbol': self._symbols}
-
         if atoms is not None:
             try:
                 if copylist and not deepcopy:
-                    self._data.extend(atoms.data[:])
+                    self._data.extend(atoms[:])
                 elif deepcopy:
-                    self._data.extend(copy.deepcopy(atoms.data))
+                    self._data.extend(copy.deepcopy(atoms))
                 else:
-                    self._data.extend(atoms.data)
+                    self._data.extend(atoms)
             except AttributeError:
-                if isinstance(atoms, list):
-                    if copylist and not deepcopy:
-                        self._data = atoms[:]
-                    elif deepcopy:
-                        self._data = copy.deepcopy(atoms)
-                    else:
-                        self._data = atoms
-
-                    if update_property_lists:
-                        for atom in self._data:
-                            for p, plist in self._property_lists.iteritems():
-                                plist.append(getattr(atom, p))
-                else:
-                    raise TypeError('`atoms={!r}` '.format(atoms) +
-                                    'is not a valid `Atoms` constructor '
-                                    'argument.\n atoms must be `None`, a list '
-                                    'of `Atom` objects, or an `Atoms` object '
-                                    'instance.')
+                raise TypeError('`atoms={!r}` '.format(atoms) +
+                                'is not a valid `Atoms` constructor '
+                                'argument.\n atoms must be `None`, a list '
+                                'of `Atom` objects, or an `Atoms` object '
+                                'instance.')
 
     def __str__(self):
         return repr(self)
@@ -99,8 +81,6 @@ class Atoms(MutableSequence):
 
         """
         del self._data[index]
-        for plist in self._property_lists.itervalues():
-            del plist[index]
 
     def __getitem__(self, index):
         """Concrete implementation of @abstractmethod.
@@ -120,17 +100,6 @@ class Atoms(MutableSequence):
         """
         return self._data[index]
 
-    def __len__(self):
-        """Concrete implementation of @abstractmethod.
-
-        Returns
-        -------
-        int
-            length of `self` list.
-
-        """
-        return len(self._data)
-
     def __setitem__(self, index, atom):
         """Concrete implementation of @abstractmethod.
 
@@ -149,18 +118,22 @@ class Atoms(MutableSequence):
 
         """
         self._data[index] = atom
-        for p, plist in self._property_lists.iteritems():
-            plist[index] = getattr(atom, p)
+
+    def __len__(self):
+        """Concrete implementation of @abstractmethod.
+
+        Returns
+        -------
+        int
+            length of `self` list.
+
+        """
+        return len(self._data)
 
     def insert(self, index, atom):
         """Concrete implementation of @abstractmethod.
 
         insert `Atom` instance at target list `index`
-
-        Also insert `Atom` instance properties at the given target list index
-        for all `Atom` properties in `self._property_lists.keys()`
-        into their respective target lists of `Atoms` properties
-        `self._property_lists.values()`.
 
         Parameters
         ----------
@@ -171,8 +144,6 @@ class Atoms(MutableSequence):
 
         """
         self._data.insert(index, atom)
-        for p, plist in self._property_lists.iteritems():
-            plist.insert(index, getattr(atom, p))
 
     @property
     def data(self):
@@ -234,46 +205,61 @@ class Atoms(MutableSequence):
         self._symbols = symbols[:]
         return np.asarray(self._symbols)
 
+    @property
+    def x(self):
+        """Return x coordinates of `Atom` objects as array"""
+        return self.get_coords(asdict=True)['x']
+
+    @property
+    def y(self):
+        """Return y coordinates of `Atom` objects as array"""
+        return self.get_coords(asdict=True)['y']
+
+    @property
+    def z(self):
+        """Return z coordinates of `Atom` objects as array"""
+        return self.get_coords(asdict=True)['z']
+
     def center_CM(self):
         """Center atoms on CM coordinates."""
         dr = -self.CM
         self.translate(dr)
 
-    def clip_bounds(self, min_limit=None, max_limit=None,
-                    abs_limit=None, r_indices=[0, 1, 2]):
+    def clip_bounds(self, region, center_before_clipping=False):
         """Remove atoms outside the given limits along given dimension.
 
         Parameters
         ----------
-        min_limit : {None, float}, optional
-        max_limit : {None, float}, optional
-        abs_limit : {None, float}, optional
-        r_indices : sequence, optional
+        region : :class:`~sknano.utils.geometric_shapes.`GeometricRegion`
 
         """
-        for atom in self._data[:]:
-            r = atom.r.tolist()
-            for i, ri in enumerate(r[:]):
-                if i in r_indices:
-                    if abs_limit is not None:
-                        if abs(ri) <= abs_limit:
-                            continue
-                        else:
-                            del self._data[self._data.index(atom)]
-                            break
-                    else:
-                        if min_limit is not None:
-                            if ri >= min_limit:
-                                continue
-                            else:
-                                del self._data[self._data.index(atom)]
-                                break
-                        if max_limit is not None:
-                            if ri <= max_limit:
-                                continue
-                            else:
-                                del self._data[self._data.index(atom)]
-                                break
+        CM0 = None
+        if center_before_clipping:
+            CM0 = self.CM
+            self.translate(-CM0)
+
+        atoms = self.get_atoms(asarray=True)
+        limits = region.limits
+        self._data = \
+            atoms[np.logical_and(
+                np.logical_and(
+                    self.x <= limits['x']['max'],
+                    np.logical_and(
+                        self.y <= limits['y']['max'],
+                        self.z <= limits['z']['max'])),
+                np.logical_and(
+                    self.x >= limits['x']['min'],
+                    np.logical_and(
+                        self.y >= limits['y']['min'],
+                        self.z >= limits['z']['min'])))].tolist()
+
+        #for dim, limits in region.limits.iteritems():
+        #    atoms = atoms[np.where(getattr(self, dim) <= limits['max'])]
+        #    atoms = atoms[np.where(getattr(self, dim) >= limits['min'])]
+        #    self = atoms.tolist()
+
+        if CM0 is not None:
+            self.translate(CM0)
 
     def get_atoms(self, asarray=False):
         """Return list of `Atoms`.
@@ -306,7 +292,7 @@ class Atoms(MutableSequence):
         """
         coords = self.coords
         if asdict:
-            return OrderedDict(zip(xyz, self.coords))
+            return OrderedDict(zip(xyz, self.coords.T))
         else:
             return coords
 
