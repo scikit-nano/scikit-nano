@@ -90,13 +90,13 @@ class XAtom(Atom):
         return reprstr.format(**parameters)
 
     def __eq__(self, other):
-        return super(XAtom, self).__eq__(self, other)
+        return super(XAtom, self).__eq__(other)
 
     def __lt__(self, other):
         if self.atomID < other.atomID:
             return True
         else:
-            return super(XAtom, self).__lt__(self, other)
+            return super(XAtom, self).__lt__(other)
 
     @property
     def CN(self):
@@ -372,6 +372,9 @@ class XAtom(Atom):
 
         """
         self._v[:] = value
+
+    def compute_sigma_bond_angle(self):
+        pass
 
     def compute_pyramidalization_angle(self):
         pass
