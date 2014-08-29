@@ -13,10 +13,10 @@ __docformat__ = 'restructuredtext en'
 import copy
 #import itertools
 
-from ..core import plural_word_check
-from ..core.atoms import XAtoms as Atoms
-from ..core.math import Vector
-from ..structures import SWNTBundle, MWNTBundle
+from sknano.core import pluralize
+from sknano.core.atoms import XAtoms as Atoms
+from sknano.core.math import Vector
+from sknano.structures import SWNTBundle, MWNTBundle
 from ._nanotube_generators import SWNTGenerator, MWNTGenerator
 
 __all__ = ['SWNTBundleGenerator', 'MWNTBundleGenerator']
@@ -255,21 +255,21 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
                                       '{}'.format(self._m).zfill(2))
             packing = '{}cp'.format(self._bundle_packing[0])
             #Ntubes = ''.join(('{}'.format(self._Ntubes),
-            #                  plural_word_check('tube', self._Ntubes)))
+            #                  pluralize('tube', self._Ntubes)))
             Ntube = '{}tube'.format(self._Ntubes)
 
             fname_wordlist = None
             if self._bundle_geometry is None:
                 nx = ''.join(('{}'.format(self._nx),
-                             plural_word_check('cell', self._nx)))
+                             pluralize('cell', self._nx)))
                 ny = ''.join(('{}'.format(self._ny),
-                             plural_word_check('cell', self._ny)))
+                             pluralize('cell', self._ny)))
                 if self._assume_integer_unit_cells:
                     nz = ''.join(('{}'.format(self._nz),
-                                  plural_word_check('cell', self._nz)))
+                                  pluralize('cell', self._nz)))
                 else:
                     nz = ''.join(('{:.2f}'.format(self._nz),
-                                  plural_word_check('cell', self._nz)))
+                                  pluralize('cell', self._nz)))
                 cells = 'x'.join((nx, ny, nz))
                 fname_wordlist = (chirality, packing, cells)
             else:
@@ -397,15 +397,15 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
             fname_wordlist = None
             if self._bundle_geometry is None:
                 nx = ''.join(('{}'.format(self._nx),
-                             plural_word_check('cell', self._nx)))
+                             pluralize('cell', self._nx)))
                 ny = ''.join(('{}'.format(self._ny),
-                             plural_word_check('cell', self._ny)))
+                             pluralize('cell', self._ny)))
                 if self._assume_integer_unit_cells:
                     nz = ''.join(('{}'.format(self._nz),
-                                  plural_word_check('cell', self._nz)))
+                                  pluralize('cell', self._nz)))
                 else:
                     nz = ''.join(('{:.2f}'.format(self._nz),
-                                  plural_word_check('cell', self._nz)))
+                                  pluralize('cell', self._nz)))
                 cells = 'x'.join((nx, ny, nz))
 
                 if self._nx == 1 and self._ny == 1:
