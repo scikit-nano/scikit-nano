@@ -76,7 +76,7 @@ class XAtom(Atom):
         self._NN = NN
 
         self._attributes.extend(
-            ['q','v', 'atomID', 'moleculeID', 'atomtype', 'CN', 'NN'])
+            ['q','v', 'atomID', 'moleculeID', 'atomtype', 'CN'])
 
     def __repr__(self):
         """Return string representation of `XAtom`."""
@@ -90,10 +90,13 @@ class XAtom(Atom):
         return reprstr.format(**parameters)
 
     def __eq__(self, other):
-        return self is other
+        return super(XAtom, self).__eq__(self, other)
 
     def __lt__(self, other):
-        return self.atomID < other.atomID
+        if self.atomID < other.atomID:
+            return True
+        else:
+            return super(XAtom, self).__lt__(self, other)
 
     @property
     def CN(self):

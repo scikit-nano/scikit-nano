@@ -85,7 +85,13 @@ class Atom(object):
             self.element, self.m, self.x, self.y, self.z)
 
     def __eq__(self, other):
-        return self is other
+        if self is other:
+            return True
+        else:
+            for p in self._attributes:
+                if getattr(self, p) != getattr(other, p):
+                    return False
+            return True
 
     def __lt__(self, other):
         return self.Z < other.Z
