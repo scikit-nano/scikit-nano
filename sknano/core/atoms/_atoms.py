@@ -41,9 +41,6 @@ class Atoms(MutableSequence):
 
     def __init__(self, atoms=None, copylist=True, deepcopy=False):
         self._data = []
-        self._coords = []
-        self._masses = []
-        self._symbols = []
 
         if atoms is not None:
             try:
@@ -70,9 +67,7 @@ class Atoms(MutableSequence):
     def __delitem__(self, index):
         """Concrete implementation of @abstractmethod.
 
-        Delete list element `self[index]` and delete all elements
-        from atom properties lists `self.masses[index]`,
-        `self.charges[index]`, and `self.coords[index]`
+        Delete list element `self[index]`.
 
         Parameters
         ----------
@@ -104,10 +99,6 @@ class Atoms(MutableSequence):
         """Concrete implementation of @abstractmethod.
 
         set target list element `self[index] = atom`
-
-        Also set element of all atom properties lists (`self.masses[index]`,
-        `self.charges[index]`, and `self.coords[index]`) to atom instance
-        properties (`atom.m`, `atom.q`, `atom.r`), respectively.
 
         Parameters
         ----------
@@ -150,13 +141,17 @@ class Atoms(MutableSequence):
         """Return the list of `Atom` objects"""
         return self._data
 
+    def tolist(self):
+        """Return list of `Atom` objects as `list` type."""
+        return self.data
+
     def sort(self, key=None, reverse=False):
 
         if key is None:
-            self._data.sort(key=attrgetter('element', 'Z', 'z'),
-                            reverse=reverse)
+            self.sort(key=attrgetter('element', 'Z', 'z'),
+                      reverse=reverse)
         else:
-            self._data.sort(key=key, reverse=reverse)
+            self.sort(key=key, reverse=reverse)
 
     @property
     def CM(self):
@@ -181,29 +176,22 @@ class Atoms(MutableSequence):
     @property
     def Natoms(self):
         """Number of atoms in `Atoms`."""
-        return len(self._data)
+        return len(self)
 
     @property
     def coords(self):
-        """Return array of `Atom` coordinates."""
-        coords = [atom.r for atom in self._data]
-        self._coords = coords[:]
-        return np.asarray(self._coords)
+        """Return list of `Atom` coordinates."""
+        return [atom.r for atom in self]
 
     @property
     def masses(self):
-        """Return the list of `Atom` masses."""
-        #self._masses_array = np.asarray(self._masses)
-        masses = [atom.m for atom in self._data]
-        self._masses = masses[:]
-        return self._masses
+        """Return list of `Atom` masses."""
+        return [atom.m for atom in self]
 
     @property
     def symbols(self):
-        """Return array of `Atom` symbols."""
-        symbols = [atom.symbol for atom in self._data]
-        self._symbols = symbols[:]
-        return np.asarray(self._symbols)
+        """Return list of `Atom` symbols."""
+        return [atom.symbol for atom in self]
 
     @property
     def x(self):
@@ -274,9 +262,9 @@ class Atoms(MutableSequence):
 
         """
         if asarray:
-            return np.asarray(self._data)
+            return np.asarray(self)
         else:
-            return self._data
+            return self
 
     def get_coords(self, asdict=False):
         """Return atom coords.
@@ -290,9 +278,9 @@ class Atoms(MutableSequence):
         coords : :py:class:`python:~collections.OrderedDict` or ndarray
 
         """
-        coords = self.coords
+        coords = np.asarray(self.coords)
         if asdict:
-            return OrderedDict(zip(xyz, self.coords.T))
+            return OrderedDict(zip(xyz, coords.T))
         else:
             return coords
 
@@ -315,7 +303,7 @@ class Atoms(MutableSequence):
             smallest allowed absolute value of any :math:`x,y,z` component.
 
         """
-        [atom.rezero(epsilon=epsilon) for atom in self._data]
+        [atom.rezero(epsilon=epsilon) for atom in self]
 
     def rotate(self, angle=None, rot_axis=None, anchor_point=None,
                deg2rad=False, transform_matrix=None):
@@ -331,7 +319,7 @@ class Atoms(MutableSequence):
                 transformation_matrix(angle, rot_axis=rot_axis,
                                       anchor_point=anchor_point,
                                       deg2rad=deg2rad)
-        [atom.rotate(transform_matrix=transform_matrix) for atom in self._data]
+        [atom.rotate(transform_matrix=transform_matrix) for atom in self]
 
     def translate(self, t):
         """Translate atom coordinates.
@@ -341,4 +329,4 @@ class Atoms(MutableSequence):
         t : array_like
             3-elment array of :math:`x,y,z` components of translation vector
         """
-        [atom.translate(t) for atom in self._data]
+        [atom.translate(t) for atom in self]
