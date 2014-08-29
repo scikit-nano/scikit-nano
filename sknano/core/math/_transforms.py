@@ -255,6 +255,10 @@ def affine_transform(obj, angle=None, rot_axis=None, anchor_point=None,
     raise NotImplementedError("Not implemented yet, sorry.")
 
 
+def reflection_transform():
+    pass
+
+
 def rotation_transform(arr, angle=None, rot_axis=None, anchor_point=None,
                        deg2rad=False, transform_matrix=None, verbose=False):
     """Rotate array_like object about arbitrary axis.
