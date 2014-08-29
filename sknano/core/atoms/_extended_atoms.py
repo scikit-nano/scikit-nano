@@ -119,12 +119,12 @@ class XAtoms(Atoms):
     @property
     def coordination_numbers(self):
         """Return array of `XAtom` coordination numbers."""
-        self.update_coordination_numbers()
+        self._update_coordination_numbers()
         coordination_numbers = [atom.CN for atom in self._data]
         self._coordination_numbers = coordination_numbers[:]
         return np.asarray(self._coordination_numbers)
 
-    def update_coordination_numbers(self):
+    def _update_coordination_numbers(self):
         """Update `XAtom` coordination numbers."""
         if self._use_kdtree:
             NN_d, NN_i = \
@@ -137,15 +137,36 @@ class XAtoms(Atoms):
                         CN += 1
                 atom.CN = CN
 
+    def query_coordination_numbers(self, n=6, rc=np.inf):
+        """Query and update `XAtom` coordination numbers.
+
+        Parameters
+        ----------
+        n : int, optional
+        rc : nonnegative float, optional
+
+        """
+        if self._use_kdtree:
+            NN_d, NN_i = self.query_atom_tree(n=n, cutoff_radius=rc)
+            for i, atom in enumerate(self._data):
+                CN = 0
+                for d in NN_d[i]:
+                    if d < rc:
+                        CN += 1
+                atom.CN = CN
+        coordination_numbers = [atom.CN for atom in self._data]
+        self._coordination_numbers = coordination_numbers[:]
+        return np.asarray(self._coordination_numbers)
+
     @property
     def nearest_neighbors(self):
         """Return array of nearest-neighbor atoms for each `XAtom`."""
-        self.update_nearest_neighbors()
+        self._update_nearest_neighbors()
         nearest_neighbors = [atom.NN for atom in self._data]
         self._nearest_neighbors = nearest_neighbors[:]
         return np.asarray(self._nearest_neighbors)
 
-    def update_nearest_neighbors(self):
+    def _update_nearest_neighbors(self):
         """Update `XAtom` nearest-neighbors."""
         if self._use_kdtree:
             NN_d, NN_i = self.query_atom_tree(n=self.NN_number,
@@ -156,6 +177,27 @@ class XAtoms(Atoms):
                     if d < self.NN_cutoff:
                         NN_atoms.append(self._data[NN_i[i][j]])
                 atom.NN = NN_atoms
+
+    def query_nearest_neighbors(self, n=6, rc=np.inf):
+        """Query and update `XAtom` nearest neighbors.
+
+        Parameters
+        ----------
+        n : int, optional
+        rc : nonnegative float, optional
+
+        """
+        if self._use_kdtree:
+            NN_d, NN_i = self.query_atom_tree(n=n, cutoff_radius=rc)
+            for i, atom in enumerate(self._data):
+                NN_atoms = XAtoms()
+                for j, d in enumerate(NN_d[i]):
+                    if d < rc:
+                        NN_atoms.append(self._data[NN_i[i][j]])
+                atom.NN = NN_atoms
+        nearest_neighbors = [atom.NN for atom in self._data]
+        self._nearest_neighbors = nearest_neighbors[:]
+        return np.asarray(self._nearest_neighbors)
 
     def query_atom_tree(self, n=6, eps=0, p=2, cutoff_radius=np.inf):
         """Query atom tree for nearest neighbors distances and indices.
@@ -195,48 +237,6 @@ class XAtoms(Atoms):
                                    distance_upper_bound=cutoff_radius)
             NN_d, NN_i = d[:, 1:], i[:, 1:]
         return NN_d, NN_i
-
-    def query_coordination_numbers(self, n=6, rc=np.inf):
-        """Query and update `XAtom` coordination numbers.
-
-        Parameters
-        ----------
-        n : int, optional
-        rc : nonnegative float, optional
-
-        """
-        if self._use_kdtree:
-            NN_d, NN_i = self.query_atom_tree(n=n, cutoff_radius=rc)
-            for i, atom in enumerate(self._data):
-                CN = 0
-                for d in NN_d[i]:
-                    if d < rc:
-                        CN += 1
-                atom.CN = CN
-        coordination_numbers = [atom.CN for atom in self._data]
-        self._coordination_numbers = coordination_numbers[:]
-        return np.asarray(self._coordination_numbers)
-
-    def query_nearest_neighbors(self, n=6, rc=np.inf):
-        """Query and update `XAtom` nearest neighbors.
-
-        Parameters
-        ----------
-        n : int, optional
-        rc : nonnegative float, optional
-
-        """
-        if self._use_kdtree:
-            NN_d, NN_i = self.query_atom_tree(n=n, cutoff_radius=rc)
-            for i, atom in enumerate(self._data):
-                NN_atoms = XAtoms()
-                for j, d in enumerate(NN_d[i]):
-                    if d < rc:
-                        NN_atoms.append(self._data[NN_i[i][j]])
-                atom.NN = NN_atoms
-        nearest_neighbors = [atom.NN for atom in self._data]
-        self._nearest_neighbors = nearest_neighbors[:]
-        return np.asarray(self._nearest_neighbors)
 
     @property
     def Ntypes(self):
