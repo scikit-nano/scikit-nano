@@ -15,13 +15,13 @@ from abc import ABCMeta, abstractproperty
 import numpy as np
 
 from sknano.core.math import Point, Vector
-from ._base import GeometricRegion
+from ._base import GeometricRegion, GeometricTransformsMixin
 
 __all__ = ['Geometric2DRegion', 'Parallelogram', 'Rectangle', 'Square',
            'Ellipse', 'Circle']
 
 
-class Geometric2DRegion(GeometricRegion):
+class Geometric2DRegion(GeometricTransformsMixin, GeometricRegion):
     """Abstract base class for representing 2D geometric regions."""
     __metaclass__ = ABCMeta
 
@@ -47,6 +47,8 @@ class Parallelogram(Geometric2DRegion):
     """
     def __init__(self, o=None, u=None, v=None):
 
+        super(Parallelogram, self).__init__()
+
         if o is None:
             o = Point(nd=2)
         elif isinstance(o, (tuple, list, np.ndarray)):
@@ -54,18 +56,15 @@ class Parallelogram(Geometric2DRegion):
         self._o = o
 
         if u is None:
-            u = Vector([1., 0.])
-        elif isinstance(u, (tuple, list, np.ndarray)):
-            u = Vector(u)
-
-        self._u = u
+            u = [1., 0.]
+        self._u = Vector(u, p0=self._o)
 
         if v is None:
-            v = Vector([1., 1.])
-        elif isinstance(v, (tuple, list, np.ndarray)):
-            v = Vector(v)
+            v = [1., 1.]
+        self._v = Vector(v, p0=self._o)
 
-        self._v = v
+        self.points.append(self.o)
+        self.vectors.extend([self.u, self.v])
 
     def __repr__(self):
         return "Parallelogram(o={!r}, u={!r}, v={!r})".format(
@@ -133,6 +132,8 @@ class Rectangle(Geometric2DRegion):
     def __init__(self, pmin=None, pmax=None, xmin=None, ymin=None,
                  xmax=None, ymax=None):
 
+        super(Rectangle, self).__init__()
+
         if pmin is None:
             pmin = Point([xmin, ymin])
         elif isinstance(pmin, (tuple, list, np.ndarray)):
@@ -144,6 +145,8 @@ class Rectangle(Geometric2DRegion):
         elif isinstance(pmax, (tuple, list, np.ndarray)):
             pmax = Point(pmax)
         self._pmax = pmax
+
+        self.points.append([self.pmin, self.pmax])
 
     def __repr__(self):
         return "Rectangle(pmin={!r}, pmax={!r})".format(
@@ -223,6 +226,8 @@ class Square(Geometric2DRegion):
     """
     def __init__(self, center=None, a=None):
 
+        super(Square, self).__init__()
+
         if center is None:
             center = Point(nd=2)
         elif isinstance(center, (tuple, list, np.ndarray)):
@@ -232,6 +237,8 @@ class Square(Geometric2DRegion):
         if a is None:
             a = 1.0
         self._a = a
+
+        self.points.append(self.center)
 
     def __repr__(self):
         return "Square(center={!r}, a={!r})".format(
@@ -288,6 +295,7 @@ class Ellipse(Geometric2DRegion):
 
     """
     def __init__(self, center=None, rx=1, ry=1):
+        super(Ellipse, self).__init__()
 
         if center is None or not isinstance(center, (tuple, list, np.ndarray)):
             center = Point(nd=2)
@@ -297,6 +305,8 @@ class Ellipse(Geometric2DRegion):
         self._center = center
         self._rx = rx
         self._ry = ry
+
+        self.points.append(self.center)
 
     def __repr__(self):
         return "Ellipse(center={!r}, rx={!r}, ry={!r})".format(
@@ -379,6 +389,8 @@ class Circle(Geometric2DRegion):
     """
     def __init__(self, center=None, r=1.0):
 
+        super(Circle, self).__init__()
+
         if center is None or not isinstance(center, (tuple, list, np.ndarray)):
             center = Point(nd=2)
         elif isinstance(center, (tuple, list, np.ndarray)):
@@ -388,6 +400,8 @@ class Circle(Geometric2DRegion):
         if r is None:
             r = 1.0
         self._r = r
+
+        self.points.append(self.center)
 
     def __repr__(self):
         return "Circle(center={!r}, r={!r})".format(

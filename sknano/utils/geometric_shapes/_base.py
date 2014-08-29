@@ -13,23 +13,41 @@ __docformat__ = 'restructuredtext en'
 from abc import ABCMeta, abstractmethod, abstractproperty
 #from sknano.core.math import rotation_matrix
 
-__all__ = ['GeometricRegion']
+import numpy as np
+
+__all__ = ['GeometricRegion', 'GeometricTransformsMixin']
 
 
 class GeometricTransformsMixin(object):
 
-    def rotate(self):
+    def rotate(self, angle, rot_axis=None, anchor_point=None, deg2rad=False):
         """Rotate region about centroid or arbitrary vector."""
-        pass
+        for p in self.points:
+            p.rotate(angle, rot_axis=rot_axis, anchor_point=anchor_point,
+                     deg2rad=deg2rad)
+        for v in self.vectors:
+            v.rotate(angle, rot_axis=rot_axis, anchor_point=anchor_point,
+                     deg2rad=deg2rad)
 
-    def translate(self):
+    def translate(self, t):
         """Translate region."""
-        raise NotImplementedError
+        for p in self.points:
+            p.translate(t)
+
+        for v in self.vectors:
+            v.translate(t)
 
 
 class GeometricRegion(object):
     """Abstract base class for geometric regions."""
     __metaclass__ = ABCMeta
+
+    def __init__(self):
+        self._points = []
+        self._vectors = []
+        self._limits = {'x': {'min': -np.inf, 'max': np.inf},
+                        'y': {'min': -np.inf, 'max': np.inf},
+                        'z': {'min': -np.inf, 'max': np.inf}}
 
     @abstractproperty
     def centroid(self):
@@ -41,6 +59,14 @@ class GeometricRegion(object):
         """Check if point is contained within geometric region."""
         raise NotImplementedError
 
-    @abstractproperty
+    @property
+    def limits(self):
+        return self._limits
+
+    @property
     def points(self):
         return self._points
+
+    @property
+    def vectors(self):
+        return self._vectors

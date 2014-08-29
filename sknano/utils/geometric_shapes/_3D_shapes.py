@@ -12,16 +12,17 @@ __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractproperty
 
+import numbers
 import numpy as np
 
 from sknano.core.math import Point, Vector, vector as vec
-from ._base import GeometricRegion
+from ._base import GeometricRegion, GeometricTransformsMixin
 
 __all__ = ['Geometric3DRegion', 'Parallelepiped', 'Cuboid', 'Cube',
            'Ellipsoid', 'Spheroid', 'Sphere']
 
 
-class Geometric3DRegion(GeometricRegion):
+class Geometric3DRegion(GeometricTransformsMixin, GeometricRegion):
     """Abstract base class for representing 3D geometric regions."""
     __metaclass__ = ABCMeta
 
@@ -49,6 +50,7 @@ class Parallelepiped(Geometric3DRegion):
 
     """
     def __init__(self, o=None, u=None, v=None, w=None):
+        super(Parallelepiped, self).__init__()
 
         if o is None:
             o = Point(nd=3)
@@ -57,22 +59,19 @@ class Parallelepiped(Geometric3DRegion):
         self._o = o
 
         if u is None:
-            u = Vector([1., 0., 0.])
-        elif isinstance(u, (tuple, list, np.ndarray)):
-            u = Vector(u, p0=self._o)
-        self._u = u
+            u = [1., 0., 0.]
+        self._u = Vector(u, p0=self._o)
 
         if v is None:
-            v = Vector([1., 1., 0.])
-        elif isinstance(v, (tuple, list, np.ndarray)):
-            v = Vector(v, p0=self._o)
-        self._v = v
+            v = [1., 1., 0.]
+        self._v = Vector(v, p0=self._o)
 
         if w is None:
-            w = Vector([0., 1., 1.])
-        elif isinstance(w, (tuple, list, np.ndarray)):
-            w = Vector(w, p0=self._o)
-        self._w = w
+            w = [0., 1., 1.]
+        self._w = Vector(w, p0=self._o)
+
+        self.points.append(self.o)
+        self.vectors.extend([self.u, self.v, self.w])
 
     def __repr__(self):
         return "Parallelepiped(o={!r}, u={!r}, v={!r}, w={!r})".format(
@@ -170,6 +169,14 @@ class Parallelepiped(Geometric3DRegion):
         return d1 >= 0 and d1 <= 1 and d2 >= 0 and d2 <= 1 and \
             d3 >= 0 and d3 <= 1
 
+    def update_region_limits(self):
+        self._limits['x']['min'] = self.xmin
+        self._limits['x']['max'] = self.xmax
+        self._limits['y']['min'] = self.ymin
+        self._limits['y']['max'] = self.ymax
+        self._limits['z']['min'] = self.zmin
+        self._limits['z']['max'] = self.zmax
+
 
 class Cuboid(Geometric3DRegion):
     """Abstract representation of cuboid.
@@ -186,6 +193,7 @@ class Cuboid(Geometric3DRegion):
     def __init__(self, pmin=None, pmax=None,
                  xmin=None, ymin=None, zmin=None,
                  xmax=None, ymax=None, zmax=None):
+        super(Cuboid, self).__init__()
 
         if pmin is None:
             pmin = Point([xmin, ymin, zmin])
@@ -199,6 +207,8 @@ class Cuboid(Geometric3DRegion):
             pmax = Point(pmax)
         self._pmax = pmax
 
+        self.points.extend([self.pmin, self.pmax])
+
     def __repr__(self):
         return "Cuboid(pmin={!r}, pmax={!r})".format(
             self.pmin.tolist(), self.pmax.tolist())
@@ -207,33 +217,83 @@ class Cuboid(Geometric3DRegion):
     def pmin(self):
         return self._pmin
 
+    @pmin.setter
+    def pmin(self, point):
+        if not isinstance(point, (list, np.ndarray)) or \
+                len(point) != self.pmin.nd:
+            raise TypeError('Expected a 3-element list or ndarray')
+        self._pmin[:] = point
+
     @property
     def pmax(self):
         return self._pmax
+
+    @pmax.setter
+    def pmax(self, point):
+        if not isinstance(point, (list, np.ndarray)) or \
+                len(point) != self.pmax.nd:
+            raise TypeError('Expected a 3-element list or ndarray')
+        self._pmax[:] = point
 
     @property
     def xmin(self):
         return self.pmin.x
 
+    @xmin.setter
+    def xmin(self, value):
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._pmin.x = value
+
     @property
     def ymin(self):
         return self.pmin.y
+
+    @ymin.setter
+    def ymin(self, value):
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._pmin.y = value
 
     @property
     def zmin(self):
         return self.pmin.z
 
+    @zmin.setter
+    def zmin(self, value):
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._pmin.z = value
+
     @property
     def xmax(self):
         return self.pmax.x
+
+    @xmax.setter
+    def xmax(self, value):
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._pmax.x = value
 
     @property
     def ymax(self):
         return self.pmax.y
 
+    @ymax.setter
+    def ymax(self, value):
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._pmax.y = value
+
     @property
     def zmax(self):
         return self.pmax.z
+
+    @zmax.setter
+    def zmax(self, value):
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._pmax.z = value
 
     @property
     def center(self):
@@ -273,6 +333,14 @@ class Cuboid(Geometric3DRegion):
             (p.y >= self.ymin) and (p.y <= self.ymax) and \
             (p.z >= self.zmin) and (p.z <= self.zmax)
 
+    def update_region_limits(self):
+        self._limits['x']['min'] = self.xmin
+        self._limits['x']['max'] = self.xmax
+        self._limits['y']['min'] = self.ymin
+        self._limits['y']['max'] = self.ymax
+        self._limits['z']['min'] = self.zmin
+        self._limits['z']['max'] = self.zmax
+
 
 class Cube(Geometric3DRegion):
     """Abstract data structure representing a cube.
@@ -290,17 +358,19 @@ class Cube(Geometric3DRegion):
 
     """
     def __init__(self, center=None, a=None):
+        super(Cube, self).__init__()
 
         if center is None:
             center = Point()
         elif isinstance(center, (tuple, list, np.ndarray)):
             center = Point(center)
-
         self._center = center
 
         if a is None:
             a = 1.0
         self._a = a
+
+        self.points.append(self.center)
 
     def __repr__(self):
         return("Cube(center={!r}, a={!r})".format(self.center.tolist(),
@@ -337,6 +407,14 @@ class Cube(Geometric3DRegion):
             (p.y >= ymin) and (p.y <= ymax) and \
             (p.z >= zmin) and (p.z <= zmax)
 
+    def update_region_limits(self):
+        self._limits['x']['min'] = self.xmin
+        self._limits['x']['max'] = self.xmax
+        self._limits['y']['min'] = self.ymin
+        self._limits['y']['max'] = self.ymax
+        self._limits['z']['min'] = self.zmin
+        self._limits['z']['max'] = self.zmax
+
 
 class Ellipsoid(Geometric3DRegion):
     """Abstract data structure representing an ellipsoid.
@@ -362,12 +440,12 @@ class Ellipsoid(Geometric3DRegion):
 
     """
     def __init__(self, center=None, a=None, b=None, c=None):
+        super(Ellipsoid, self).__init__()
 
         if center is None:
             center = Point()
         elif isinstance(center, (tuple, list, np.ndarray)):
             center = Point(center)
-
         self._center = center
 
         if a is None:
@@ -377,6 +455,8 @@ class Ellipsoid(Geometric3DRegion):
         if c is None:
             c = 0.5
         self._a, self._b, self._c = a, b, c
+
+        self.points.append(self.center)
 
     def __repr__(self):
         return("Ellipsoid(center={!r}, a={!r}, b={!r}, c={!r})".format(
@@ -418,6 +498,16 @@ class Ellipsoid(Geometric3DRegion):
         return (p.x - c.x)**2 / a**2 + (p.y - c.y)**2 / b**2 + \
             (p.z - c.z)**2 / c**2 <= 1.0
 
+    def update_region_limits(self):
+        c = self.center
+        r = self.r
+        self._limits['x']['min'] = c.x - r
+        self._limits['x']['max'] = c.x + r
+        self._limits['y']['min'] = c.y - r
+        self._limits['y']['max'] = c.y + r
+        self._limits['z']['min'] = c.z - r
+        self._limits['z']['max'] = c.z + r
+
 
 class Spheroid(Geometric3DRegion):
     """Abstract data structure representing a spheroid.
@@ -442,12 +532,12 @@ class Spheroid(Geometric3DRegion):
         :class:`Spheroid` with symmetry axis along :math:`z` axis.
     """
     def __init__(self, center=None, a=None, c=None):
+        super(Spheroid, self).__init__()
 
         if center is None:
             center = Point()
         elif isinstance(center, (tuple, list, np.ndarray)):
             center = Point(center)
-
         self._center = center
 
         if a is None:
@@ -456,6 +546,8 @@ class Spheroid(Geometric3DRegion):
             c = 0.5
 
         self._a, self._c = a, c
+
+        self.points.append(self.center)
 
     def __repr__(self):
         return("Spheroid(center={!r}, a={!r}, c={!r})".format(
@@ -492,6 +584,16 @@ class Spheroid(Geometric3DRegion):
 
         return ((x - h)**2 + (y - k)**2) / a**2 + (z - l)**2 / c**2 <= 1.0
 
+    def update_region_limits(self):
+        c = self.center
+        r = self.r
+        self._limits['x']['min'] = c.x - r
+        self._limits['x']['max'] = c.x + r
+        self._limits['y']['min'] = c.y - r
+        self._limits['y']['max'] = c.y + r
+        self._limits['z']['min'] = c.z - r
+        self._limits['z']['max'] = c.z + r
+
 
 class Sphere(Geometric3DRegion):
     """Abstract data structure representing a sphere.
@@ -508,18 +610,19 @@ class Sphere(Geometric3DRegion):
         Sphere radius :math:`r`
     """
     def __init__(self, center=None, r=None):
+        super(Sphere, self).__init__()
 
         if center is None:
             center = Point()
         elif isinstance(center, (tuple, list, np.ndarray)):
             center = Point(center)
-
         self._center = center
 
         if r is None:
             r = 1.0
-
         self._r = r
+
+        self.points.append(self.center)
 
     def __repr__(self):
         return("Sphere(center={!r}, r={!r})".format(self.center, self.r))
@@ -527,6 +630,10 @@ class Sphere(Geometric3DRegion):
     @property
     def r(self):
         return self._r
+
+    @r.setter
+    def r(self, value):
+        self._r = value
 
     @property
     def center(self):
@@ -541,10 +648,19 @@ class Sphere(Geometric3DRegion):
         r = self.r
         return 4 / 3 * np.pi * r**3
 
-    def contains_point(self, point=None):
-        x, y, z = point
-
-        h, k, l = self.center
+    def contains_point(self, point):
+        p = point
+        c = self.center
         r = self.r
 
-        return (x - h)**2 + (y - k)**2 + (z - l)**2 <= r**2
+        return (p.x - c.x)**2 + (p.y - c.y)**2 + (p.z - c.z)**2 <= r**2
+
+    def update_region_limits(self):
+        c = self.center
+        r = self.r
+        self._limits['x']['min'] = c.x - r
+        self._limits['x']['max'] = c.x + r
+        self._limits['y']['min'] = c.y - r
+        self._limits['y']['max'] = c.y + r
+        self._limits['z']['min'] = c.z - r
+        self._limits['z']['max'] = c.z + r
