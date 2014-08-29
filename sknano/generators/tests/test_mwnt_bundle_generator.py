@@ -8,10 +8,10 @@ from sknano.generators import MWNTBundleGenerator
 
 
 def test1():
-    mwntbundle = MWNTBundleGenerator(n=40, m=40, max_shells=5, Lz=1.0,
-                                     fix_Lz=True, bundle_geometry='hexagon')
-    mwntbundle.save_data()
-    mwntbundle.save_data(structure_format='data')
+    bundle = MWNTBundleGenerator(n=40, m=40, max_shells=5, Lz=1.0,
+                                 fix_Lz=True, bundle_geometry='hexagon')
+    bundle.save_data()
+    bundle.save_data(structure_format='data')
 
 
 if __name__ == '__main__':
