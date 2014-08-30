@@ -58,14 +58,6 @@ class XAtoms(Atoms):
 
         self._atomtypes = {}
 
-        self._charges = []
-        self._velocities = []
-        self._atom_ids = []
-        self._molecule_ids = []
-        self._coordination_numbers = []
-        self._nearest_neighbors = []
-        #self._forces = []
-
         self._atom_tree = None
         if use_kdtree and has_kdtree is False:
             use_kdtree = False
@@ -73,8 +65,6 @@ class XAtoms(Atoms):
 
         self._NN_number = 6
         self._NN_cutoff = np.inf
-        if use_kdtree:
-            self._atom_tree = self.atom_tree
 
     def sort(self, key=None, reverse=False):
         if key is None:
@@ -87,42 +77,42 @@ class XAtoms(Atoms):
     @property
     def atomtypes(self):
         """Return the atom type dictionary."""
-        for atom in self._data:
+        self.update_atomtypes()
+        return self._atomtypes
+
+    def update_atomtypes(self):
+        for atom in self:
             if atom.atomtype not in self._atomtypes:
                 self._atomtypes[atom.atomtype] = {}
                 self._atomtypes[atom.atomtype]['mass'] = atom.m
                 self._atomtypes[atom.atomtype]['q'] = atom.q
-        return self._atomtypes
+
+    def get_atomtypes(self, update=False):
+        if update:
+            self.update_atomtypes()
+        return self.atomtypes
 
     @property
     def atom_ids(self):
-        """Return array of `XAtom` IDs."""
-        atom_ids = [atom.atomID for atom in self._data]
-        self._atom_ids = atom_ids[:]
-        return np.asarray(self._atom_ids)
+        """Return list of `XAtom` IDs."""
+        return np.asarray([atom.atomID for atom in self])
 
     @property
     def atom_tree(self):
         """Return the :py:class:`~scipy:scipy.spatial.KDTree` of coords."""
-        if self._use_kdtree and len(self._data) != 0:
-            self._atom_tree = KDTree(self.coords)
-        return self._atom_tree
+        if self._use_kdtree and len(self) != 0:
+            return KDTree(self.coords)
 
     @property
     def charges(self):
         """Return list of `XAtom` charges."""
-        #self._charges_array = np.asarray(self._charges)
-        charges = [atom.q for atom in self._data]
-        self._charges = charges[:]
-        return np.asarray(self._charges)
+        return np.asarray([atom.q for atom in self])
 
     @property
     def coordination_numbers(self):
-        """Return array of `XAtom` coordination numbers."""
+        """Return list of `XAtom` coordination numbers."""
         self._update_coordination_numbers()
-        coordination_numbers = [atom.CN for atom in self._data]
-        self._coordination_numbers = coordination_numbers[:]
-        return np.asarray(self._coordination_numbers)
+        return np.asarray([atom.CN for atom in self])
 
     def _update_coordination_numbers(self):
         """Update `XAtom` coordination numbers."""
@@ -130,7 +120,7 @@ class XAtoms(Atoms):
             NN_d, NN_i = \
                 self.query_atom_tree(n=self.NN_number,
                                      cutoff_radius=self.NN_cutoff)
-            for i, atom in enumerate(self._data):
+            for i, atom in enumerate(self):
                 CN = 0
                 for d in NN_d[i]:
                     if d < self.NN_cutoff:
@@ -146,36 +136,33 @@ class XAtoms(Atoms):
         rc : nonnegative float, optional
 
         """
+        l = []
         if self._use_kdtree:
             NN_d, NN_i = self.query_atom_tree(n=n, cutoff_radius=rc)
-            for i, atom in enumerate(self._data):
+            for i, atom in enumerate(self):
                 CN = 0
                 for d in NN_d[i]:
                     if d < rc:
                         CN += 1
-                atom.CN = CN
-        coordination_numbers = [atom.CN for atom in self._data]
-        self._coordination_numbers = coordination_numbers[:]
-        return np.asarray(self._coordination_numbers)
+                l.append(CN)
+        return np.asarray(l)
 
     @property
     def nearest_neighbors(self):
         """Return array of nearest-neighbor atoms for each `XAtom`."""
         self._update_nearest_neighbors()
-        nearest_neighbors = [atom.NN for atom in self._data]
-        self._nearest_neighbors = nearest_neighbors[:]
-        return np.asarray(self._nearest_neighbors)
+        return np.asarray([atom.NN for atom in self])
 
     def _update_nearest_neighbors(self):
         """Update `XAtom` nearest-neighbors."""
         if self._use_kdtree:
             NN_d, NN_i = self.query_atom_tree(n=self.NN_number,
                                               cutoff_radius=self.NN_cutoff)
-            for i, atom in enumerate(self._data):
+            for i, atom in enumerate(self):
                 NN_atoms = XAtoms()
                 for j, d in enumerate(NN_d[i]):
                     if d < self.NN_cutoff:
-                        NN_atoms.append(self._data[NN_i[i][j]])
+                        NN_atoms.append(self[NN_i[i][j]])
                 atom.NN = NN_atoms
 
     def query_nearest_neighbors(self, n=6, rc=np.inf):
@@ -187,17 +174,16 @@ class XAtoms(Atoms):
         rc : nonnegative float, optional
 
         """
+        l = []
         if self._use_kdtree:
             NN_d, NN_i = self.query_atom_tree(n=n, cutoff_radius=rc)
-            for i, atom in enumerate(self._data):
-                NN_atoms = XAtoms()
+            for i, atom in enumerate(self):
+                NN_atoms = []
                 for j, d in enumerate(NN_d[i]):
                     if d < rc:
-                        NN_atoms.append(self._data[NN_i[i][j]])
-                atom.NN = NN_atoms
-        nearest_neighbors = [atom.NN for atom in self._data]
-        self._nearest_neighbors = nearest_neighbors[:]
-        return np.asarray(self._nearest_neighbors)
+                        NN_atoms.append(self[NN_i[i][j]])
+                l.append(NN_atoms)
+        return np.asarray(l)
 
     def query_atom_tree(self, n=6, eps=0, p=2, cutoff_radius=np.inf):
         """Query atom tree for nearest neighbors distances and indices.
@@ -231,12 +217,11 @@ class XAtoms(Atoms):
 
         """
         atom_tree = self.atom_tree
-        NN_d = NN_i = None
         if atom_tree is not None:
-            d, i = atom_tree.query(self.coords, k=n+1, eps=eps, p=p,
+            d, i = atom_tree.query(self.coords,
+                                   k=n+1, eps=eps, p=p,
                                    distance_upper_bound=cutoff_radius)
-            NN_d, NN_i = d[:, 1:], i[:, 1:]
-        return NN_d, NN_i
+            return d[:, 1:], i[:, 1:]
 
     @property
     def Ntypes(self):
@@ -246,14 +231,12 @@ class XAtoms(Atoms):
     @property
     def q(self):
         """Return the total net charge of `XAtoms`."""
-        return np.asarray(self.charges).sum()
+        return self.charges.sum()
 
     @property
     def velocities(self):
-        """Return array of `XAtom` velocities."""
-        velocities = [atom.v for atom in self._data]
-        self._velocities = velocities[:]
-        return np.asarray(self._velocities)
+        """Return list of `XAtom` velocities."""
+        return np.asarray([atom.v for atom in self])
 
     @property
     def NN_number(self):
@@ -291,19 +274,22 @@ class XAtoms(Atoms):
             self._atomtypes[atom.atomtype]['mass'] = atom.m
             self._atomtypes[atom.atomtype]['q'] = atom.q
 
-    def add_atomtypes(self, atomtypes=[]):
-        """Add atom type in atomtypes list to atomtype dictionary.
+    def add_atomtypes(self, atoms=None):
+        """Add atomtype for each atom in atoms to atomtypes dictionary.
         Parameters
         ----------
-        atomtypes : sequence
+        atoms : sequence
             a list of `XAtom` object instances
 
         """
-        [self.add_atomtype(atom) for atom in atomtypes]
+        try:
+            [self.add_atomtype(atom) for atom in atoms]
+        except TypeError:
+            print('Expected an iterable sequence of `XAtom` objects.')
 
     def assign_unique_ids(self, starting_id=1):
         """Assign unique ID to each `XAtom` in `XAtoms`."""
-        for i, atom in enumerate(self._data, start=starting_id):
+        for i, atom in enumerate(self, start=starting_id):
             atom.atomID = i
 
     def filter_atoms(self, filter_atom_ids, invert=False):
@@ -319,28 +305,16 @@ class XAtoms(Atoms):
         filtered_atoms : `XAtoms`
 
         """
-        #if invert:
-        #    filtered_atoms = \
-        #        XAtoms([atom for atom in self.atoms if
-        #               atom.atomID not in filter_atom_ids])
-
-        #else:
-        #    filtered_atoms = \
-        #        XAtoms([atom for atom in self.atoms if
-        #               atom.atomID in filter_atom_ids])
-
         filter_indices = \
             np.in1d(self.atom_ids, filter_atom_ids, invert=invert).nonzero()
-        filtered_atoms = \
-            XAtoms(np.asarray(self._data)[filter_indices].tolist())
-        return filtered_atoms
+        return XAtoms(np.asarray(self)[filter_indices].tolist())
 
     def get_atom(self, atomID=None, index=None):
         try:
-            return self._data[atomID - 1]
+            return self[atomID - 1]
         except (TypeError, IndexError):
             try:
-                return self._data[index]
+                return self[index]
             except (TypeError, IndexError):
                 return None
 
@@ -356,10 +330,9 @@ class XAtoms(Atoms):
         ndarray
 
         """
-        atom_ids = self.atom_ids
         filter_indices = \
-            np.in1d(atom_ids, filter_atom_ids, invert=invert).nonzero()
-        return atom_ids[filter_indices]
+            np.in1d(self.atom_ids, filter_atom_ids, invert=invert).nonzero()
+        return self.atom_ids[filter_indices]
 
     def get_filtered_coords(self, filter_atom_ids, components=None,
                             asdict=False, invert=False):
@@ -378,11 +351,9 @@ class XAtoms(Atoms):
         ndarray
 
         """
-        atom_ids = self.atom_ids
-        coords = self.coords
         filter_indices = \
-            np.in1d(atom_ids, filter_atom_ids, invert=invert).nonzero()
-        filtered_coords = coords[filter_indices]
+            np.in1d(self.atom_ids, filter_atom_ids, invert=invert).nonzero()
+        filtered_coords = self.coords[filter_indices]
 
         if components is None or components == 'r':
             components = ('x', 'y', 'z')
