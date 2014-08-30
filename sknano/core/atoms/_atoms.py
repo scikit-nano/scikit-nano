@@ -10,12 +10,12 @@ Base class for structure data atoms (:mod:`sknano.core.atoms._atoms`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-import copy
-#import math
-
 from collections import OrderedDict, MutableSequence
 from functools import total_ordering
 from operator import attrgetter
+
+import copy
+#import math
 
 import numpy as np
 
