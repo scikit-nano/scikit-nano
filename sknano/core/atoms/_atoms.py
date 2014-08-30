@@ -11,7 +11,7 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 import copy
-import math
+#import math
 
 from collections import OrderedDict, MutableSequence
 from operator import attrgetter
@@ -148,10 +148,10 @@ class Atoms(MutableSequence):
     def sort(self, key=None, reverse=False):
 
         if key is None:
-            self.sort(key=attrgetter('element', 'Z', 'z'),
-                      reverse=reverse)
+            self._data.sort(key=attrgetter('element', 'Z', 'z'),
+                            reverse=reverse)
         else:
-            self.sort(key=key, reverse=reverse)
+            self._data.sort(key=key, reverse=reverse)
 
     @property
     def CM(self):
@@ -164,14 +164,15 @@ class Atoms(MutableSequence):
 
         """
         masses = np.asarray([self.masses])
-        coords = np.asarray(self.coords)
+        coords = self.coords
         MxR = masses.T * coords
         return Vector(np.sum(MxR, axis=0) / np.sum(masses))
 
     @property
     def M(self):
         """Total mass of `Atoms`."""
-        return math.fsum(self.masses)
+        #return math.fsum(self.masses)
+        return self.masses.sum()
 
     @property
     def Natoms(self):
@@ -181,17 +182,17 @@ class Atoms(MutableSequence):
     @property
     def coords(self):
         """Return list of `Atom` coordinates."""
-        return [atom.r for atom in self]
+        return np.asarray([atom.r for atom in self])
 
     @property
     def masses(self):
         """Return list of `Atom` masses."""
-        return [atom.m for atom in self]
+        return np.asarray([atom.m for atom in self])
 
     @property
     def symbols(self):
         """Return list of `Atom` symbols."""
-        return [atom.symbol for atom in self]
+        return np.asarray([atom.symbol for atom in self])
 
     @property
     def x(self):
@@ -226,20 +227,18 @@ class Atoms(MutableSequence):
             CM0 = self.CM
             self.translate(-CM0)
 
-        atoms = self.get_atoms(asarray=True)
-        limits = region.limits
         self._data = \
-            atoms[np.logical_and(
+            np.asarray(self)[np.logical_and(
                 np.logical_and(
-                    self.x <= limits['x']['max'],
+                    self.x <= region.limits['x']['max'],
                     np.logical_and(
-                        self.y <= limits['y']['max'],
-                        self.z <= limits['z']['max'])),
+                        self.y <= region.limits['y']['max'],
+                        self.z <= region.limits['z']['max'])),
                 np.logical_and(
-                    self.x >= limits['x']['min'],
+                    self.x >= region.limits['x']['min'],
                     np.logical_and(
-                        self.y >= limits['y']['min'],
-                        self.z >= limits['z']['min'])))].tolist()
+                        self.y >= region.limits['y']['min'],
+                        self.z >= region.limits['z']['min'])))].tolist()
 
         #for dim, limits in region.limits.iteritems():
         #    atoms = atoms[np.where(getattr(self, dim) <= limits['max'])]
@@ -278,7 +277,7 @@ class Atoms(MutableSequence):
         coords : :py:class:`python:~collections.OrderedDict` or ndarray
 
         """
-        coords = np.asarray(self.coords)
+        coords = self.coords
         if asdict:
             return OrderedDict(zip(xyz, coords.T))
         else:
