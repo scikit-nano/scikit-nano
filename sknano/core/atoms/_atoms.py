@@ -14,6 +14,7 @@ import copy
 #import math
 
 from collections import OrderedDict, MutableSequence
+from functools import total_ordering
 from operator import attrgetter
 
 import numpy as np
@@ -24,6 +25,7 @@ from sknano.core.math import Vector, transformation_matrix
 __all__ = ['Atoms']
 
 
+@total_ordering
 class Atoms(MutableSequence):
     """Base class for collection of `Atom` objects.
 
@@ -136,14 +138,16 @@ class Atoms(MutableSequence):
         """
         self._data.insert(index, atom)
 
+    def __eq__(self, other):
+        return self[:] == other[:]
+
+    def __lt__(self, other):
+        return self[:] < other[:]
+
     @property
     def data(self):
         """Return the list of `Atom` objects"""
         return self._data
-
-    def tolist(self):
-        """Return list of `Atom` objects as `list` type."""
-        return self.data
 
     def sort(self, key=None, reverse=False):
 

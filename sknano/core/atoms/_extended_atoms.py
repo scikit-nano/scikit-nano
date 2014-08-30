@@ -13,7 +13,9 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
+from functools import total_ordering
 from operator import attrgetter
+import numbers
 
 import numpy as np
 
@@ -31,6 +33,7 @@ from ._atoms import Atoms
 __all__ = ['XAtoms']
 
 
+@total_ordering
 class XAtoms(Atoms):
     """An eXtended `Atoms` class for structure analysis.
 
@@ -63,8 +66,14 @@ class XAtoms(Atoms):
             use_kdtree = False
         self._use_kdtree = use_kdtree
 
-        self._NN_number = 6
+        self._kNN = 6
         self._NN_cutoff = np.inf
+
+    def __eq__(self, other):
+        return self[:] == other[:]
+
+    def __lt__(self, other):
+        return self[:] < other[:]
 
     def sort(self, key=None, reverse=False):
         if key is None:
@@ -113,7 +122,7 @@ class XAtoms(Atoms):
         """Update `XAtom` coordination numbers."""
         if self._use_kdtree:
             NN_d, NN_i = \
-                self.query_atom_tree(n=self.NN_number,
+                self.query_atom_tree(n=self.kNN,
                                      cutoff_radius=self.NN_cutoff)
             for i, atom in enumerate(self):
                 CN = 0
@@ -131,7 +140,7 @@ class XAtoms(Atoms):
     def _update_nearest_neighbors(self):
         """Update `XAtom` nearest-neighbors."""
         if self._use_kdtree:
-            NN_d, NN_i = self.query_atom_tree(n=self.NN_number,
+            NN_d, NN_i = self.query_atom_tree(n=self.kNN,
                                               cutoff_radius=self.NN_cutoff)
             for i, atom in enumerate(self):
                 NN_atoms = XAtoms()
@@ -194,15 +203,17 @@ class XAtoms(Atoms):
         return np.asarray([atom.v for atom in self])
 
     @property
-    def NN_number(self):
+    def kNN(self):
         """Number of nearest neighbors to return when querying the kd-tree."""
-        return self._NN_number
+        return self._kNN
 
-    @NN_number.setter
-    def NN_number(self, value):
+    @kNN.setter
+    def kNN(self, value):
         """Set maximum number of nearest neighbors to return when querying
         the kd-tree."""
-        self._NN_number = int(value)
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected an integer >= 0')
+        self._kNN = int(value)
 
     @property
     def NN_cutoff(self):
@@ -213,6 +224,8 @@ class XAtoms(Atoms):
     @NN_cutoff.setter
     def NN_cutoff(self, value):
         """Set the cutoff distance to check for neighest neighbors."""
+        if not (isinstance(value, numbers.Number) and value >= 0):
+            raise TypeError('Expected a real number greater >= 0')
         self._NN_cutoff = value
 
     def add_atomtype(self, atom):
