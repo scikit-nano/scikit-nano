@@ -12,6 +12,7 @@ __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
 from functools import total_ordering
+import numbers
 import numpy as np
 
 from sknano.core import xyz
@@ -41,7 +42,7 @@ class Atom(object):
         if m is None:
             m = 0
 
-        if isinstance(element, (int, float)):
+        if isinstance(element, numbers.Number):
             try:
                 Z = int(element)
                 idx = Z - 1
@@ -153,7 +154,7 @@ class Atom(object):
         return self._r.x
 
     @x.setter
-    def x(self, value=float):
+    def x(self, value):
         """Set `Atom` :math:`x`-coordinate in units of **Angstroms**.
 
         Parameters
@@ -162,6 +163,8 @@ class Atom(object):
             :math:`x`-coordinate in units of **Angstroms**.
 
         """
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
         self._r.x = value
 
     @property
@@ -177,7 +180,7 @@ class Atom(object):
         return self._r.y
 
     @y.setter
-    def y(self, value=float):
+    def y(self, value):
         """Set `Atom` :math:`y`-coordinate in units of **Angstroms**.
 
         Parameters
@@ -186,6 +189,8 @@ class Atom(object):
             :math:`y`-coordinate in units of **Angstroms**.
 
         """
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
         self._r.y = value
 
     @property
@@ -201,7 +206,7 @@ class Atom(object):
         return self._r.z
 
     @z.setter
-    def z(self, value=float):
+    def z(self, value):
         """Set `Atom` :math:`z`-coordinate in units of **Angstroms**.
 
         Parameters
@@ -210,6 +215,8 @@ class Atom(object):
             :math:`z`-coordinate in units of **Angstroms**.
 
         """
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
         self._r.z = value
 
     @property
@@ -235,6 +242,8 @@ class Atom(object):
             the origin.
 
         """
+        if not isinstance(value, (list, np.ndarray)):
+            raise TypeError('Expected an array_like object')
         self._r[:] = value
 
     @property
@@ -259,6 +268,8 @@ class Atom(object):
             :math:`x, y, z` components of `Atom` displacement vector.
 
         """
+        if not isinstance(value, (list, np.ndarray)):
+            raise TypeError('Expected an array_like object')
         self._dr[:] = value
 
     def get_coords(self, asdict=False):

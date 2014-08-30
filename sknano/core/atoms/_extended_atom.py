@@ -13,10 +13,12 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 from functools import total_ordering
+import numbers
 import numpy as np
 
-from sknano.core.math import Vector
+from sknano.core.math import Point, Vector
 from ._atom import Atom
+#from ._neighbor_atoms import NeighborAtoms
 
 __all__ = ['XAtom']
 
@@ -62,11 +64,7 @@ class XAtom(Atom):
         super(XAtom, self).__init__(element=element, m=m, x=x, y=y, z=z)
 
         self._v = Vector([vx, vy, vz])
-
-        self._n = np.zeros(3, dtype=int)
-        for i, ni in enumerate((nx, ny, nz)):
-            if ni is not None:
-                self._n[i] = ni
+        self._n = Point([nx, ny, nz], dtype=int)
 
         self._atomID = int(atomID)
         self._moleculeID = int(moleculeID)
@@ -104,8 +102,10 @@ class XAtom(Atom):
         return self._CN
 
     @CN.setter
-    def CN(self, value=int):
+    def CN(self, value):
         """Set `XAtom` coordination number."""
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number.')
         self._CN = int(value)
 
     @property
@@ -114,8 +114,10 @@ class XAtom(Atom):
         return self._NN
 
     @NN.setter
-    def NN(self, value=list):
+    def NN(self, value):
         """Set list of nearest-neighbor `XAtom` objects."""
+        if not isinstance(value, (list, np.ndarray)):
+            raise TypeError('Expected an ndarray.')
         self._NN = value
 
     @property
@@ -126,7 +128,7 @@ class XAtom(Atom):
         return self._q
 
     @q.setter
-    def q(self, value=float):
+    def q(self, value):
         """Set `XAtom` charge :math:`q`.
 
         Parameters
@@ -136,6 +138,8 @@ class XAtom(Atom):
             :math:`e`.
 
         """
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
         self._q = value
 
     @property
@@ -144,7 +148,7 @@ class XAtom(Atom):
         return self._atomID
 
     @atomID.setter
-    def atomID(self, value=int):
+    def atomID(self, value):
         """Set atom ID of atom.
 
         Parameters
@@ -153,6 +157,8 @@ class XAtom(Atom):
             atom ID
 
         """
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
         self._atomID = int(value)
 
     @property
@@ -161,7 +167,7 @@ class XAtom(Atom):
         return self._moleculeID
 
     @moleculeID.setter
-    def moleculeID(self, value=int):
+    def moleculeID(self, value):
         """Set :attr:`~XAtom.moleculeID` attribute.
 
         Parameters
@@ -170,6 +176,8 @@ class XAtom(Atom):
             molecule ID
 
         """
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
         self._moleculeID = int(value)
 
     @property
@@ -178,7 +186,7 @@ class XAtom(Atom):
         return self._atomtype
 
     @atomtype.setter
-    def atomtype(self, value=int):
+    def atomtype(self, value):
         """Set :attr:`~XAtom.atomtype` attribute.
 
         Parameters
@@ -187,6 +195,8 @@ class XAtom(Atom):
             atom type
 
         """
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
         self._atomtype = int(value)
 
     @property
@@ -199,10 +209,10 @@ class XAtom(Atom):
             :math:`n_x` image flag.
 
         """
-        return self._n[0]
+        return self._n.x
 
     @nx.setter
-    def nx(self, value=int):
+    def nx(self, value):
         """Set :math:`n_x` image flag.
 
         Parameters
@@ -211,7 +221,9 @@ class XAtom(Atom):
             :math:`n_x` image flag.
 
         """
-        self._n[0] = int(value)
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._n.x = int(value)
 
     @property
     def ny(self):
@@ -223,10 +235,10 @@ class XAtom(Atom):
             :math:`n_y` image flag.
 
         """
-        return self._n[1]
+        return self._n.y
 
     @ny.setter
-    def ny(self, value=int):
+    def ny(self, value):
         """Set :math:`n_y` image flag.
 
         Parameters
@@ -235,7 +247,9 @@ class XAtom(Atom):
             :math:`n_y` image flag.
 
         """
-        self._n[1] = int(value)
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._n.y = int(value)
 
     @property
     def nz(self):
@@ -247,10 +261,10 @@ class XAtom(Atom):
             :math:`n_z` image flag.
 
         """
-        return self._n[2]
+        return self._n.z
 
     @nz.setter
-    def nz(self, value=int):
+    def nz(self, value):
         """Set `XAtom` :math:`n_z` image flag.
 
         Parameters
@@ -259,7 +273,9 @@ class XAtom(Atom):
             :math:`n_z` image flag.
 
         """
-        self._n[2] = int(value)
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._n.z = int(value)
 
     @property
     def n(self):
@@ -285,6 +301,8 @@ class XAtom(Atom):
             image flags of `XAtom`.
 
         """
+        if not isinstance(value, (list, np.ndarray)):
+            raise TypeError('Expected an array_like object')
         self._n[:] = value
 
     @property
@@ -293,7 +311,7 @@ class XAtom(Atom):
         return self._v.x
 
     @vx.setter
-    def vx(self, value=float):
+    def vx(self, value):
         """Set :math:`v_x`.
 
         Set :math:`v_x`, the :math:`x` component of `XAtom` velocity
@@ -305,6 +323,8 @@ class XAtom(Atom):
             :math:`v_x` component of velocity
 
         """
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
         self._v.x = value
 
     @property
@@ -313,7 +333,7 @@ class XAtom(Atom):
         return self._v.y
 
     @vy.setter
-    def vy(self, value=float):
+    def vy(self, value):
         """Set :math:`v_y`.
 
         Set :math:`v_y`, the :math:`y` component of `XAtom` velocity
@@ -325,6 +345,8 @@ class XAtom(Atom):
             :math:`v_y` component of velocity
 
         """
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
         self._v.y = value
 
     @property
@@ -333,7 +355,7 @@ class XAtom(Atom):
         return self._v.z
 
     @vz.setter
-    def vz(self, value=float):
+    def vz(self, value):
         """Set :math:`v_z`.
 
         Set :math:`v_z`, the :math:`z` component of `XAtom` velocity
@@ -345,6 +367,8 @@ class XAtom(Atom):
             :math:`v_z` component of velocity
 
         """
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
         self._v.z = value
 
     @property
@@ -361,7 +385,7 @@ class XAtom(Atom):
         return self._v
 
     @v.setter
-    def v(self, value=np.ndarray):
+    def v(self, value):
         """Set :math:`x, y, z` components of `XAtom` velocity.
 
         Parameters
@@ -371,6 +395,8 @@ class XAtom(Atom):
             velocity components of `XAtom`.
 
         """
+        if not isinstance(value, (list, np.ndarray)):
+            raise TypeError('Expected an array_like object')
         self._v[:] = value
 
     def compute_sigma_bond_angle(self):
