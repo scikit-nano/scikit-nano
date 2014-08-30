@@ -10,13 +10,13 @@ import sys
 import subprocess
 from setuptools import find_packages, setup
 
-if sys.version_info[:2] < (2, 7):
-    raise RuntimeError("Python version 2.7 required.")
+if sys.version_info[:2] < (2, 7) or (3, 0) <= sys.version_info[:2] < (3, 3):
+    raise RuntimeError("Python version 2.7 or >= 3.3 required.")
 
-if sys.version_info[0] < 3:
-    import __builtin__ as builtins
-else:
+if sys.version_info[0] >= 3:
     import builtins
+else:
+    import __builtin__ as builtins
 
 DISTNAME = 'scikit-nano'
 DESCRIPTION = __doc__
@@ -40,6 +40,8 @@ Operating System :: POSIX
 Operating System :: Unix
 Programming Language :: Python
 Programming Language :: Python :: 2.7
+Programming Language :: Python :: 3.3
+Programming Language :: Python :: 3.4
 Topic :: Scientific/Engineering
 Topic :: Scientific/Engineering :: Chemistry
 Topic :: Scientific/Engineering :: Physics
@@ -166,7 +168,7 @@ def setup_package():
     try:
         import numpy
         numpy_version = \
-            tuple(map(int, numpy.version.short_version.split('.'))[:2])
+            tuple(list(map(int, numpy.version.short_version.split('.')))[:2])
         if numpy_version < (1, 8):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
@@ -175,7 +177,7 @@ def setup_package():
     try:
         import scipy
         scipy_version = \
-            tuple(map(int, scipy.version.short_version.split('.'))[:2])
+            tuple(list(map(int, scipy.version.short_version.split('.')))[:2])
         if scipy_version < (0, 14):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
