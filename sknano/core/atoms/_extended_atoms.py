@@ -77,24 +77,19 @@ class XAtoms(Atoms):
     @property
     def atomtypes(self):
         """Return the atom type dictionary."""
-        self.update_atomtypes()
+        self._update_atomtypes()
         return self._atomtypes
 
-    def update_atomtypes(self):
+    def _update_atomtypes(self):
         for atom in self:
             if atom.atomtype not in self._atomtypes:
                 self._atomtypes[atom.atomtype] = {}
                 self._atomtypes[atom.atomtype]['mass'] = atom.m
                 self._atomtypes[atom.atomtype]['q'] = atom.q
 
-    def get_atomtypes(self, update=False):
-        if update:
-            self.update_atomtypes()
-        return self.atomtypes
-
     @property
     def atom_ids(self):
-        """Return list of `XAtom` IDs."""
+        """Return array of `XAtom` IDs."""
         return np.asarray([atom.atomID for atom in self])
 
     @property
@@ -105,12 +100,12 @@ class XAtoms(Atoms):
 
     @property
     def charges(self):
-        """Return list of `XAtom` charges."""
+        """Return array of `XAtom` charges."""
         return np.asarray([atom.q for atom in self])
 
     @property
     def coordination_numbers(self):
-        """Return list of `XAtom` coordination numbers."""
+        """Return array of `XAtom` coordination numbers."""
         self._update_coordination_numbers()
         return np.asarray([atom.CN for atom in self])
 
@@ -126,26 +121,6 @@ class XAtoms(Atoms):
                     if d < self.NN_cutoff:
                         CN += 1
                 atom.CN = CN
-
-    def query_coordination_numbers(self, n=6, rc=np.inf):
-        """Query and update `XAtom` coordination numbers.
-
-        Parameters
-        ----------
-        n : int, optional
-        rc : nonnegative float, optional
-
-        """
-        l = []
-        if self._use_kdtree:
-            NN_d, NN_i = self.query_atom_tree(n=n, cutoff_radius=rc)
-            for i, atom in enumerate(self):
-                CN = 0
-                for d in NN_d[i]:
-                    if d < rc:
-                        CN += 1
-                l.append(CN)
-        return np.asarray(l)
 
     @property
     def nearest_neighbors(self):
@@ -164,26 +139,6 @@ class XAtoms(Atoms):
                     if d < self.NN_cutoff:
                         NN_atoms.append(self[NN_i[i][j]])
                 atom.NN = NN_atoms
-
-    def query_nearest_neighbors(self, n=6, rc=np.inf):
-        """Query and update `XAtom` nearest neighbors.
-
-        Parameters
-        ----------
-        n : int, optional
-        rc : nonnegative float, optional
-
-        """
-        l = []
-        if self._use_kdtree:
-            NN_d, NN_i = self.query_atom_tree(n=n, cutoff_radius=rc)
-            for i, atom in enumerate(self):
-                NN_atoms = []
-                for j, d in enumerate(NN_d[i]):
-                    if d < rc:
-                        NN_atoms.append(self[NN_i[i][j]])
-                l.append(NN_atoms)
-        return np.asarray(l)
 
     def query_atom_tree(self, n=6, eps=0, p=2, cutoff_radius=np.inf):
         """Query atom tree for nearest neighbors distances and indices.
@@ -235,7 +190,7 @@ class XAtoms(Atoms):
 
     @property
     def velocities(self):
-        """Return list of `XAtom` velocities."""
+        """Return array of `XAtom` velocities."""
         return np.asarray([atom.v for atom in self])
 
     @property
