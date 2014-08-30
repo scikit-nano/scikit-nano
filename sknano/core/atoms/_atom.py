@@ -12,6 +12,7 @@ __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
 from functools import total_ordering
+
 import numbers
 import numpy as np
 
@@ -271,6 +272,10 @@ class Atom(object):
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
         self._dr[:] = value
+
+    def todict(self):
+        return dict(element=self.element, m=self.m,
+                    x=self.x, y=self.y, z=self.z)
 
     def get_coords(self, asdict=False):
         """Return atom coords.

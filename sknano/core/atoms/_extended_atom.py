@@ -366,3 +366,10 @@ class XAtom(Atom):
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
         self._v[:] = value
+
+    def todict(self):
+        return dict(element=self.element, atomID=self.atomID,
+                    moleculeID=self.moleculeID, atomtype=self.atomtype,
+                    q=self.q, m=self.m, x=self.x, y=self.y, z=self.z,
+                    vx=self.vx, vy=self.vy, vz=self.vz,
+                    nx=self.nx, ny=self.ny, nz=self.nz)
