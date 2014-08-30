@@ -62,6 +62,10 @@ class GeneratorMixin(object):
                   deg2rad=True, center_CM=True, savecopy=True, **kwargs):
         """Save structure data.
 
+        .. todo::
+
+           Use the unit cell to set the bounds on output.
+
         Parameters
         ----------
         fname : {None, str}, optional
