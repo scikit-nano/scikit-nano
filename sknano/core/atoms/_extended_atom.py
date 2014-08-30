@@ -57,7 +57,7 @@ class XAtom(Atom):
     def __init__(self, element=None, atomID=0, moleculeID=0, atomtype=1,
                  q=0., m=None, mass=None, x=None, y=None, z=None,
                  vx=None, vy=None, vz=None, nx=None, ny=None, nz=None,
-                 CN=None, NN=None, **kwargs):
+                 CN=0, NN=None, **kwargs):
         if m is None and mass is not None:
             m = mass
 
