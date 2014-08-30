@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Atom class with extended feature set (:mod:`sknano.core.atoms._bonds`)
+Classes for atom bonds (:mod:`sknano.core.atoms._bonds`)
 ===============================================================================
 
-An "eXtended" `Atom` class for structure analysis.
+Classes for `Atom` bonds
 
 .. currentmodule:: sknano.core.atoms._bonds
 
@@ -14,10 +14,11 @@ __docformat__ = 'restructuredtext en'
 
 from collections import MutableSequence
 from operator import attrgetter
+import copy
 
-import numpy as np
+#import numpy as np
 
-from sknano.core.math import Vector, transformation_matrix
+from sknano.core.math import Vector, vector as vec
 
 __all__ = ['Bonds', 'BondMixin']
 
@@ -27,34 +28,32 @@ class Bonds(MutableSequence):
 
     Parameters
     ----------
-    atoms : {None, sequence, `Atoms`}, optional
+    bonds : {None, sequence, `Atoms`}, optional
         if not `None`, then a list of `Atom` instance objects
     copylist : bool, optional
-        perform shallow copy of atoms list
+        perform shallow copy of bonds list
     deepcopy : bool, optional
-        perform deepcopy of atoms list
+        perform deepcopy of bonds list
 
     """
 
-    def __init__(self, atoms=None, copylist=True, deepcopy=False):
+    def __init__(self, bonds=None, copylist=True, deepcopy=False):
         self._data = []
-        self._coords = []
-        self._masses = []
-        self._symbols = []
+        self._vectors = []
 
-        if atoms is not None:
+        if bonds is not None:
             try:
                 if copylist and not deepcopy:
-                    self._data.extend(atoms[:])
+                    self._data.extend(bonds[:])
                 elif deepcopy:
-                    self._data.extend(copy.deepcopy(atoms))
+                    self._data.extend(copy.deepcopy(bonds))
                 else:
-                    self._data.extend(atoms)
+                    self._data.extend(bonds)
             except AttributeError:
-                raise TypeError('`atoms={!r}` '.format(atoms) +
+                raise TypeError('`bonds={!r}` '.format(bonds) +
                                 'is not a valid `Bonds` constructor '
-                                'argument.\n atoms must be `None`, a list '
-                                'of `Atom` objects, or an `Atoms` object '
+                                'argument.\n bonds must be `None`, a list '
+                                'of `Atom` objects, or an `Bonds` object '
                                 'instance.')
 
     def __str__(self):
@@ -62,7 +61,7 @@ class Bonds(MutableSequence):
 
     def __repr__(self):
         """Return `repr` string of `Bonds`."""
-        return "Bonds(atoms={!r})".format(self._data)
+        return "Bonds(bonds={!r})".format(self._data)
 
     def __delitem__(self, index):
         """Concrete implementation of @abstractmethod.
@@ -144,124 +143,36 @@ class Bonds(MutableSequence):
 
     @property
     def data(self):
-        """Return the list of `Atom` objects"""
+        """Return the list of `Bonds` objects"""
         return self._data
 
     def sort(self, key=None, reverse=False):
 
         if key is None:
-            self._data.sort(key=attrgetter('element', 'Z', 'z'),
-                            reverse=reverse)
+            self._data.sort(key=attrgetter('length'), reverse=reverse)
         else:
             self._data.sort(key=key, reverse=reverse)
 
     @property
-    def Nbonds(self):
-        """Number of bonds in `Bonds`."""
-        return len(self._data)
+    def bond_vectors(self):
+        return self._vectors
 
-    @property
-    def bonds(self):
-        """Return array of `Atom` coordinates."""
-        coords = [atom.r for atom in self._data]
-        self._coords = coords[:]
-        return np.asarray(self._coords)
-
-    @property
-    def lengths(self):
-        """Return the list of `Atom` masses."""
-        masses = [atom.m for atom in self._data]
-        self._masses = masses[:]
-        return self._masses
-
-    @property
-    def symbols(self):
-        """Return array of `Atom` symbols."""
-        symbols = [atom.symbol for atom in self._data]
-        self._symbols = symbols[:]
-        return np.asarray(self._symbols)
-
-    def clip_bounds(self, region, center_before_clipping=False):
-        """Remove atoms outside the given limits along given dimension.
-
-        Parameters
-        ----------
-        region : :class:`~sknano.utils.geometric_shapes.`GeometricRegion`
-
-        """
-        CM0 = None
-        if center_before_clipping:
-            CM0 = self.CM
-            self.translate(-CM0)
-
-        bonds = self.get_bonds(asarray=True)
-        limits = region.limits
-        self._data = \
-            bonds[np.logical_and(
-                np.logical_and(
-                    self.x <= limits['x']['max'],
-                    np.logical_and(
-                        self.y <= limits['y']['max'],
-                        self.z <= limits['z']['max'])),
-                np.logical_and(
-                    self.x >= limits['x']['min'],
-                    np.logical_and(
-                        self.y >= limits['y']['min'],
-                        self.z >= limits['z']['min'])))].tolist()
-
-        #for dim, limits in region.limits.iteritems():
-        #    bonds = bonds[np.where(getattr(self, dim) <= limits['max'])]
-        #    bonds = bonds[np.where(getattr(self, dim) >= limits['min'])]
-        #    self = bonds.tolist()
-
-        if CM0 is not None:
-            self.translate(CM0)
-
-    def get_bonds(self, asarray=False):
-        """Return list of `Bonds`.
-
-        Parameters
-        ----------
-        asarray : bool, optional
-
-        Returns
-        -------
-        sequence or ndarray
-
-        """
-        if asarray:
-            return np.asarray(self._data)
-        else:
-            return self._data
-
-    def rotate(self, angle=None, rot_axis=None, anchor_point=None,
-               deg2rad=False, transform_matrix=None):
-        """Rotate atom coordinates about arbitrary axis.
-
-        Parameters
-        ----------
-        angle : float
-
-        """
-        if transform_matrix is None:
-            transform_matrix = \
-                transformation_matrix(angle, rot_axis=rot_axis,
-                                      anchor_point=anchor_point,
-                                      deg2rad=deg2rad)
-        [atom.rotate(transform_matrix=transform_matrix) for atom in self._data]
-
-    def translate(self, t):
-        """Translate atom coordinates.
-
-        Parameters
-        ----------
-        t : array_like
-            3-elment array of :math:`x,y,z` components of translation vector
-        """
-        [atom.translate(t) for atom in self._data]
+    @bond_vectors.setter
+    def bonds_vectors(self, value):
+        self._vectors = value
 
 
 class BondMixin(object):
 
     def bond_length(self):
         return self._bond_length
+
+    def compute_sigma_bond_angles(self):
+
+        for atom in enumerate(self):
+            for nnatom in enumerate(atom.NN):
+                nnv = Vector(nnatom.r, p0=atom.r.p0)
+                atom.bonds.vectors.append(nnv)
+
+    def compute_pyramidalization_angle(self):
+        pass
