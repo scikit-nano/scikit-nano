@@ -6,7 +6,7 @@ import nose
 from nose.tools import *
 from sknano.core.atoms import XAtom, XAtoms
 from sknano.testing import generate_atoms
-from sknano.utils.geometric_shapes import Ellipsoid
+#from sknano.utils.geometric_shapes import Ellipsoid
 
 
 def test_instantiation():
@@ -31,20 +31,17 @@ def test_instantiation():
 
 
 def test_list_methods():
-    xatoms = XAtoms()
+    xatoms1 = XAtoms()
+    for Z in range(100, 0, -1):
+        xatoms1.append(XAtom(Z))
+    xatoms1.sort(key=lambda a: a.Z)
+    xatoms2 = XAtoms()
     for Z in range(1, 101):
-        xatoms.append(XAtom(Z))
-    xatoms.sort()
+        xatoms2.append(XAtom(Z))
+    assert_equal(xatoms1, xatoms2)
 
 
-def test_atom_tree():
-    Catoms = XAtoms()
-    for Z in range(1, 101):
-        Catoms.append(XAtom(Z))
-    assert_equals(Catoms.Natoms, 100)
-
-
-def test_structure_analysis():
+def test_generator_atoms():
     from sknano.generators import SWNTGenerator
     n, m = 10, 10
     nz = 10
@@ -60,18 +57,6 @@ def test_structure_analysis():
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
     assert_equals(atoms.Natoms, 400)
 
-    atoms.assign_unique_ids()
-    atoms.NN_number = 3
-    atoms.NN_cutoff = 2.0
-
-    atoms.update_nearest_neighbors()
-    nearest_neighbors = atoms.nearest_neighbors
-    assert_equals(len(nearest_neighbors), atoms.Natoms)
-
-    atoms.update_coordination_numbers()
-    coordination_numbers = atoms.coordination_numbers
-    assert_equals(len(coordination_numbers), atoms.Natoms)
-
     a100 = atoms.get_atom(atomID=100)
     assert_true(a100 is atoms[99])
     assert_equals(atoms.index(a100), 99)
@@ -86,7 +71,9 @@ def test_structure_analysis():
 def test_atom_selections():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    #a200 = atoms.get_atom(atomID=200)
+    a200 = atoms.get_atom(atomID=200)
+    assert_true(a200 is atoms[199])
+    assert_true(a200 == atoms[199])
     #a200NN = atoms.select_within(Ellipsoid(center=a200.r, r=2.5))
     #assert_equals(a200NN.Natoms, 4)
 
