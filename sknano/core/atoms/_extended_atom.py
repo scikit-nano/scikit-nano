@@ -18,7 +18,7 @@ import numpy as np
 
 from sknano.core.math import Point, Vector
 from ._atom import Atom
-#from ._neighbor_atoms import NeighborAtoms
+from ._neighbor_atoms import NeighborAtoms
 
 __all__ = ['XAtom']
 
@@ -71,6 +71,8 @@ class XAtom(Atom):
         self._atomtype = int(atomtype)
         self._q = q
         self._CN = CN
+        if NN is None or not isinstance(NN, NeighborAtoms):
+            NN = NeighborAtoms()
         self._NN = NN
 
         self._attributes.extend(
@@ -110,14 +112,14 @@ class XAtom(Atom):
 
     @property
     def NN(self):
-        """Return list of nearest-neighbor `XAtom` objects."""
+        """Return `XAtom` `NeighborAtoms` object."""
         return self._NN
 
     @NN.setter
     def NN(self, value):
-        """Set list of nearest-neighbor `XAtom` objects."""
-        if not isinstance(value, (list, np.ndarray)):
-            raise TypeError('Expected an ndarray.')
+        """Set `XAtom` `NeighborAtoms`."""
+        if not isinstance(value, NeighborAtoms):
+            raise TypeError('Expected `NeighborAtoms`.')
         self._NN = value
 
     @property
@@ -291,7 +293,7 @@ class XAtom(Atom):
         return self._n
 
     @n.setter
-    def n(self, value=np.ndarray):
+    def n(self, value):
         """Set :math:`n_x, n_y, n_z` image flags of `XAtom`.
 
         Parameters
