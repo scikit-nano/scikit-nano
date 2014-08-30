@@ -125,11 +125,9 @@ class XAtoms(Atoms):
                 self.query_atom_tree(n=self.kNN,
                                      cutoff_radius=self.NN_cutoff)
             for i, atom in enumerate(self):
-                CN = 0
                 for d in NN_d[i]:
                     if d < self.NN_cutoff:
-                        CN += 1
-                atom.CN = CN
+                        atom.CN += 1
 
     @property
     def nearest_neighbors(self):
@@ -143,11 +141,9 @@ class XAtoms(Atoms):
             NN_d, NN_i = self.query_atom_tree(n=self.kNN,
                                               cutoff_radius=self.NN_cutoff)
             for i, atom in enumerate(self):
-                NN_atoms = XAtoms()
                 for j, d in enumerate(NN_d[i]):
                     if d < self.NN_cutoff:
-                        NN_atoms.append(self[NN_i[i][j]])
-                atom.NN = NN_atoms
+                        atom.NN.append(self[NN_i[i][j]])
 
     def query_atom_tree(self, n=6, eps=0, p=2, cutoff_radius=np.inf):
         """Query atom tree for nearest neighbors distances and indices.
