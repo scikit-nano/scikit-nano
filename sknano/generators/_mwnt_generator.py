@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Nanotube structure generators (:mod:`sknano.generators._nanotube_generators`)
+Nanotube structure generators (:mod:`sknano.generators._mwnt_generator`)
 ===============================================================================
 
-.. currentmodule:: sknano.generators._nanotube_generators
+.. currentmodule:: sknano.generators._mwnt_generator
 
 .. todo::
 
@@ -20,8 +20,6 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 import copy
-#import itertools
-#import sys
 
 import numpy as np
 
