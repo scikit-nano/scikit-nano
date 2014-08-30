@@ -66,8 +66,8 @@ class XAtoms(Atoms):
             use_kdtree = False
         self._use_kdtree = use_kdtree
 
-        self._kNN = 6
-        self._NN_cutoff = np.inf
+        self._kNN = 3
+        self._NN_cutoff = 0
 
     def __eq__(self, other):
         return self[:] == other[:]
