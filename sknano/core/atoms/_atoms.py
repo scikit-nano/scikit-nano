@@ -200,18 +200,18 @@ class Atoms(MutableSequence):
 
     @property
     def x(self):
-        """Return x coordinates of `Atom` objects as array"""
-        return self.get_coords(asdict=True)['x']
+        """Return x coordinates of `Atom` objects as array."""
+        return self.coords[:,0]
 
     @property
     def y(self):
-        """Return y coordinates of `Atom` objects as array"""
-        return self.get_coords(asdict=True)['y']
+        """Return y coordinates of `Atom` objects as array."""
+        return self.coords[:,1]
 
     @property
     def z(self):
-        """Return z coordinates of `Atom` objects as array"""
-        return self.get_coords(asdict=True)['z']
+        """Return z coordinates of `Atom` objects as array."""
+        return self.coords[:,2]
 
     def center_CM(self):
         """Center atoms on CM coordinates."""
