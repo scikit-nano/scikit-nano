@@ -61,7 +61,6 @@ class XAtoms(Atoms):
 
         self._atomtypes = {}
 
-        self._atom_tree = None
         if use_kdtree and has_kdtree is False:
             use_kdtree = False
         self._use_kdtree = use_kdtree
