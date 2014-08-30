@@ -18,14 +18,13 @@ import numpy as np
 
 from sknano.core.math import Point, Vector
 from ._atom import Atom
-from ._neighbor_atoms import NeighborAtoms
 
 __all__ = ['XAtom']
 
 
 @total_ordering
 class XAtom(Atom):
-    """An eXtended `Atom` class for structure analysis.
+    """An `Atom` class with an eXtended set of attributes.
 
     Parameters
     ----------
@@ -47,17 +46,13 @@ class XAtom(Atom):
         :math:`v_x, v_y, v_z` components of `XAtom` velocity.
     nx, ny, nz : int, optional
         :math:`n_x, n_y, n_z` image flags
-    CN : int, optional
-        `XAtom` coordination number.
-    NN : sequence, optional
-        List of nearest-neighbor `XAtom` objects instances
 
     """
 
     def __init__(self, element=None, atomID=0, moleculeID=0, atomtype=1,
                  q=0., m=None, mass=None, x=None, y=None, z=None,
                  vx=None, vy=None, vz=None, nx=None, ny=None, nz=None,
-                 CN=0, NN=None, **kwargs):
+                 **kwargs):
         if m is None and mass is not None:
             m = mass
 
@@ -70,13 +65,8 @@ class XAtom(Atom):
         self._moleculeID = int(moleculeID)
         self._atomtype = int(atomtype)
         self._q = q
-        self._CN = CN
-        if NN is None or not isinstance(NN, NeighborAtoms):
-            NN = NeighborAtoms()
-        self._NN = NN
 
-        self._attributes.extend(
-            ['q','v', 'atomID', 'moleculeID', 'atomtype', 'CN'])
+        self._attributes.extend(['q','v', 'atomID', 'moleculeID', 'atomtype'])
 
     def __repr__(self):
         """Return string representation of `XAtom`."""
@@ -97,30 +87,6 @@ class XAtom(Atom):
             return True
         else:
             return super(XAtom, self).__lt__(other)
-
-    @property
-    def CN(self):
-        """Return `XAtom` coordination number."""
-        return self._CN
-
-    @CN.setter
-    def CN(self, value):
-        """Set `XAtom` coordination number."""
-        if not isinstance(value, numbers.Number):
-            raise TypeError('Expected a number.')
-        self._CN = int(value)
-
-    @property
-    def NN(self):
-        """Return `XAtom` `NeighborAtoms` object."""
-        return self._NN
-
-    @NN.setter
-    def NN(self, value):
-        """Set `XAtom` `NeighborAtoms`."""
-        if not isinstance(value, NeighborAtoms):
-            raise TypeError('Expected `NeighborAtoms`.')
-        self._NN = value
 
     @property
     def q(self):
@@ -400,9 +366,3 @@ class XAtom(Atom):
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
         self._v[:] = value
-
-    def compute_sigma_bond_angle(self):
-        pass
-
-    def compute_pyramidalization_angle(self):
-        pass

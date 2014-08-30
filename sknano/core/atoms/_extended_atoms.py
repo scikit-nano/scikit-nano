@@ -15,18 +15,8 @@ __docformat__ = 'restructuredtext en'
 from collections import OrderedDict
 from functools import total_ordering
 from operator import attrgetter
-import numbers
 
 import numpy as np
-
-try:
-    from scipy.spatial import KDTree
-    has_kdtree = True
-except ImportError:
-    print('Install scipy version >= 0.13.0 to allow '
-          'nearest-neighbor queries between atoms.')
-    has_kdtree = False
-
 from sknano.core import xyz
 from ._atoms import Atoms
 
@@ -35,7 +25,7 @@ __all__ = ['XAtoms']
 
 @total_ordering
 class XAtoms(Atoms):
-    """An eXtended `Atoms` class for structure analysis.
+    """An eXtended `Atoms` class with more atom attributes.
 
     Parameters
     ----------
@@ -46,27 +36,15 @@ class XAtoms(Atoms):
         perform shallow copy of atoms list
     deepcopy : bool, optional
         perform deepcopy of atoms list
-    use_kdtree : bool, optional
-        use :py:class:`~scipy:scipy.spatial.KDTree` to perform
-        nearest-neighbor analysis.
 
     """
 
-    def __init__(self, atoms=None, copylist=True, deepcopy=False,
-                 use_kdtree=True, update_tree=True):
+    def __init__(self, atoms=None, copylist=True, deepcopy=False):
 
         super(XAtoms, self).__init__(atoms=atoms,
                                      copylist=copylist,
                                      deepcopy=deepcopy)
-
         self._atomtypes = {}
-
-        if use_kdtree and has_kdtree is False:
-            use_kdtree = False
-        self._use_kdtree = use_kdtree
-
-        self._kNN = 3
-        self._NN_cutoff = 0
 
     def __eq__(self, other):
         return self[:] == other[:]
@@ -101,86 +79,9 @@ class XAtoms(Atoms):
         return np.asarray([atom.atomID for atom in self])
 
     @property
-    def atom_tree(self):
-        """Return the :py:class:`~scipy:scipy.spatial.KDTree` of coords."""
-        if self._use_kdtree and len(self) != 0:
-            return KDTree(self.coords)
-
-    @property
     def charges(self):
         """Return array of `XAtom` charges."""
         return np.asarray([atom.q for atom in self])
-
-    @property
-    def coordination_numbers(self):
-        """Return array of `XAtom` coordination numbers."""
-        self._update_coordination_numbers()
-        return np.asarray([atom.CN for atom in self])
-
-    def _update_coordination_numbers(self):
-        """Update `XAtom` coordination numbers."""
-        if self._use_kdtree:
-            NN_d, NN_i = \
-                self.query_atom_tree(n=self.kNN,
-                                     cutoff_radius=self.NN_cutoff)
-            for i, atom in enumerate(self):
-                for d in NN_d[i]:
-                    if d < self.NN_cutoff:
-                        atom.CN += 1
-
-    @property
-    def nearest_neighbors(self):
-        """Return array of nearest-neighbor atoms for each `XAtom`."""
-        self._update_nearest_neighbors()
-        return np.asarray([atom.NN for atom in self])
-
-    def _update_nearest_neighbors(self):
-        """Update `XAtom` nearest-neighbors."""
-        if self._use_kdtree:
-            NN_d, NN_i = self.query_atom_tree(n=self.kNN,
-                                              cutoff_radius=self.NN_cutoff)
-            for i, atom in enumerate(self):
-                for j, d in enumerate(NN_d[i]):
-                    if d < self.NN_cutoff:
-                        atom.NN.append(self[NN_i[i][j]])
-
-    def query_atom_tree(self, n=6, eps=0, p=2, cutoff_radius=np.inf):
-        """Query atom tree for nearest neighbors distances and indices.
-
-        Parameters
-        ----------
-        n : integer
-            The number of nearest neighbors to return.
-        eps : nonnegative float
-            Return approximate nearest neighbors; the kth returned value
-            is guaranteed to be no further than (1+eps) times the
-            distance to the real kth nearest neighbor.
-        p : float, 1<=p<=infinity
-            Which Minkowski p-norm to use.
-            1 is the sum-of-absolute-values "Manhattan" distance
-            2 is the usual Euclidean distance
-            infinity is the maximum-coordinate-difference distance
-        cutoff_radius : nonnegative float
-            Return only neighbors within this distance. This is used to prune
-            tree searches, so if you are doing a series of nearest-neighbor
-            queries, it may help to supply the distance to the nearest neighbor
-            of the most recent point.
-
-        Returns
-        -------
-        NN_d : array of floats
-            The distances to the nearest neighbors.
-        NN_i : array of integers
-            The locations of the neighbors in self.atom_tree.data. NN_i is the
-            same shape as NN_d.
-
-        """
-        atom_tree = self.atom_tree
-        if atom_tree is not None:
-            d, i = atom_tree.query(self.coords,
-                                   k=n+1, eps=eps, p=p,
-                                   distance_upper_bound=cutoff_radius)
-            return d[:, 1:], i[:, 1:]
 
     @property
     def Ntypes(self):
@@ -196,32 +97,6 @@ class XAtoms(Atoms):
     def velocities(self):
         """Return array of `XAtom` velocities."""
         return np.asarray([atom.v for atom in self])
-
-    @property
-    def kNN(self):
-        """Number of nearest neighbors to return when querying the kd-tree."""
-        return self._kNN
-
-    @kNN.setter
-    def kNN(self, value):
-        """Set maximum number of nearest neighbors to return when querying
-        the kd-tree."""
-        if not isinstance(value, numbers.Number):
-            raise TypeError('Expected an integer >= 0')
-        self._kNN = int(value)
-
-    @property
-    def NN_cutoff(self):
-        """Only return neighbors within this distance when querying the
-        kd-tree."""
-        return self._NN_cutoff
-
-    @NN_cutoff.setter
-    def NN_cutoff(self, value):
-        """Set the cutoff distance to check for neighest neighbors."""
-        if not (isinstance(value, numbers.Number) and value >= 0):
-            raise TypeError('Expected a real number greater >= 0')
-        self._NN_cutoff = value
 
     def add_atomtype(self, atom):
         """Add atom type to :attr:`~XAtoms.atomtypes`.

@@ -16,6 +16,8 @@ Contents
    Atoms
    XAtom
    XAtoms
+   KDTAtom
+   KDTAtoms
 
 """
 from __future__ import absolute_import, division, print_function
@@ -25,5 +27,7 @@ from ._atom import *
 from ._atoms import *
 from ._extended_atom import *
 from ._extended_atoms import *
+from ._kdtree_atom import *
+from ._kdtree_atoms import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
