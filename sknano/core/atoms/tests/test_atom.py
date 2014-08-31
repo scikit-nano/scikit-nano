@@ -13,15 +13,21 @@ def test_instantiation():
 
 
 def test_attributes():
-    a = Atom('C')
-    assert_equals(a.element, 'C')
+    atom = Atom('C')
+    assert_equals(atom.element, 'C')
     for c in ('x', 'y', 'z'):
-        assert_equals(getattr(a, c), 0.0)
+        assert_equals(getattr(atom, c), 0.0)
+    assert_equals(atom.Z, 6)
 
 
 def test_comparisons():
-    a = Atom('C')
-    
+    B = Atom('B')
+    C = Atom('C')
+    N = Atom('N')
+    assert_true(B < C)
+    assert_true(N > C)
+    assert_true(B < N)
+
 
 if __name__ == '__main__':
     nose.runmodule()

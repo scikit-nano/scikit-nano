@@ -4,47 +4,47 @@ from __future__ import absolute_import, division, print_function
 
 import nose
 from nose.tools import *
-from sknano.core.atoms import XAtom, XAtoms
+from sknano.core.atoms import KDTAtom, KDTAtoms
 from sknano.testing import generate_atoms
 #from sknano.utils.geometric_shapes import Ellipsoid
 
 
 def test_instantiation():
-    from sknano.core.atoms import Atoms
-    xatoms = XAtoms()
-    assert_is_instance(xatoms, (Atoms, XAtoms))
+    from sknano.core.atoms import Atoms, XAtoms
+    atoms = KDTAtoms()
+    assert_is_instance(atoms, (Atoms, XAtoms, KDTAtoms))
     swnt_atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=1)
     for atom in swnt_atoms:
-        xatoms.append(atom)
+        atoms.append(atom)
 
-    assert_equal(len(xatoms), len(swnt_atoms))
-
-    atoms = XAtoms(atoms=xatoms)
     assert_equal(len(atoms), len(swnt_atoms))
 
-    atoms = XAtoms(atoms=xatoms.data)
+    atoms = KDTAtoms(atoms=atoms)
     assert_equal(len(atoms), len(swnt_atoms))
 
-    atoms = XAtoms(atoms=atoms)
+    atoms = KDTAtoms(atoms=atoms.data)
+    assert_equal(len(atoms), len(swnt_atoms))
+
+    atoms = KDTAtoms(atoms=atoms)
     assert_equal(len(atoms), len(swnt_atoms))
 
 
 def test_list_methods():
-    xatoms1 = XAtoms()
+    atoms1 = KDTAtoms()
     for Z in range(100, 0, -1):
-        xatoms1.append(XAtom(Z))
-    xatoms1.sort(key=lambda a: a.Z)
-    xatoms2 = XAtoms()
+        atoms1.append(KDTAtom(Z=Z))
+    atoms1.sort(key=lambda a: a.Z)
+    atoms2 = KDTAtoms()
     for Z in range(1, 101):
-        xatoms2.append(XAtom(Z))
-    assert_equal(xatoms1, xatoms2)
+        atoms2.append(KDTAtom(Z=Z))
+    assert_equal(atoms1, atoms2)
 
 
 def test_atom_tree():
-    Catoms = XAtoms()
+    Catoms = KDTAtoms()
     for Z in range(1, 101):
-        Catoms.append(XAtom(Z))
+        Catoms.append(KDTAtom(Z))
     assert_equals(Catoms.Natoms, 100)
 
 
@@ -64,14 +64,17 @@ def test_structure_analysis():
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
     assert_equals(atoms.Natoms, 400)
 
+    atoms = KDTAtoms(atoms=atoms)
+    assert_equals(atoms.Natoms, 400)
+
     atoms.assign_unique_ids()
     atoms.kNN = 3
     atoms.NN_cutoff = 2.0
-    nearest_neighbors = atoms.nearest_neighbors
-    assert_equals(len(nearest_neighbors), atoms.Natoms)
+    NNatoms = atoms.nearest_neighbors
+    assert_equals(len(NNatoms), atoms.Natoms)
 
-    coordination_numbers = atoms.coordination_numbers
-    assert_equals(len(coordination_numbers), atoms.Natoms)
+    atomCN = atoms.coordination_numbers
+    assert_equals(len(atomCN), atoms.Natoms)
 
     a100 = atoms.get_atom(atomID=100)
     assert_true(a100 is atoms[99])
