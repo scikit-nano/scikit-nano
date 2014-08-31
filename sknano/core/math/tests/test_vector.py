@@ -86,14 +86,25 @@ def test_math_ops():
     assert_true(np.allclose(v.p0, np.ones(3)))
     assert_true(np.allclose(v.p, 3 * np.ones(3)))
 
+    v = Vector()
+    v[:] += np.ones(3)
+    assert_true(np.allclose(v, np.ones(3)))
+    assert_true(np.allclose(v.p0, np.zeros(3)))
+    assert_true(np.allclose(v.p, np.ones(3)))
+
     v1 = Vector([1.0, 0.0], p0=[5., 5.])
     v2 = Vector([1.0, 1.0], p0=[5., 5.])
     v3 = v1 + v2
+    #print('v3: {}'.format(v3))
     assert_is_instance(v3, Vector)
     assert_true(np.allclose(v3, np.array([2.0, 1.0])))
+    assert_true(np.allclose(v3.p0, np.array([5.0, 5.0])))
+    assert_true(np.allclose(v3.p, np.array([7.0, 6.0])))
     v3 = v2 + v1
     assert_is_instance(v3, Vector)
     assert_true(np.allclose(v3, np.array([2.0, 1.0])))
+    assert_true(np.allclose(v3.p0, np.array([5.0, 5.0])))
+    assert_true(np.allclose(v3.p, np.array([7.0, 6.0])))
 
 
 def test_2D_dot():
@@ -250,6 +261,29 @@ def test_translations():
     assert_true(np.allclose(v, 2 * np.ones(3)))
     assert_true(np.allclose(v.p0, np.zeros(3)))
     assert_true(np.allclose(v.p, 2 * np.ones(3)))
+
+    v1 = Vector()
+    dr = Vector(np.ones(3))
+    v2 = v1 + dr
+    #print('v2: {}'.format(v2))
+    #print('v2.p: {}'.format(v2.p))
+    assert_true(np.allclose(v2, np.ones(3)))
+    assert_true(np.allclose(v2.p0, np.zeros(3)))
+    assert_true(np.allclose(v2.p, np.ones(3)))
+
+
+def test_iadd():
+
+    v1 = Vector()
+    dr = Vector(np.ones(3))
+    v3 = Vector()
+    v3 = Vector(v1 + dr)
+    #v3[:] = v1 + dr
+    #print('v3: {}'.format(v3))
+    #print('v3.p: {}'.format(v3.p))
+    assert_true(np.allclose(v3, np.ones(3)))
+    assert_true(np.allclose(v3.p0, np.zeros(3)))
+    assert_true(np.allclose(v3.p, np.ones(3)))
 
 
 def test_projection():
