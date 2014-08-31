@@ -22,11 +22,11 @@ __docformat__ = 'restructuredtext en'
 import numpy as np
 
 from sknano.core import pluralize
-from sknano.core.atoms import XAtom as Atom, XAtoms as Atoms
 from sknano.core.math import Vector
 from sknano.structures import SWNT, UnrolledSWNT
 #from sknano.utils.geometric_shapes import Cuboid
-from ._base import GeneratorMixin
+from ._base import GeneratorAtom as Atom, GeneratorAtoms as Atoms, \
+    GeneratorMixin
 
 __all__ = ['UnrolledSWNTGenerator']
 
@@ -135,7 +135,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
             while z1 > T - eps:
                 z1 -= T
 
-            atom1 = Atom(e1, x=x1, z=z1)
+            atom1 = Atom(element=e1, x=x1, z=z1)
             atom1.rezero()
 
             if verbose:
@@ -148,7 +148,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
             while z2 > T - eps:
                 z2 -= T
 
-            atom2 = Atom(e2, x=x2, z=z2)
+            atom2 = Atom(element=e2, x=x2, z=z2)
             atom2.rezero()
 
             if verbose:
@@ -163,7 +163,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
             for nz in xrange(int(np.ceil(self.nz))):
                 dr = Vector([nx * self.Ch, 0.0, nz * self.T])
                 for uc_atom in self._unit_cell:
-                    nt_atom = Atom(uc_atom.symbol)
+                    nt_atom = Atom(element=uc_atom.symbol)
                     nt_atom.r = uc_atom.r + dr
                     self._structure_atoms.append(nt_atom)
 

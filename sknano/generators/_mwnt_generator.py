@@ -24,379 +24,13 @@ import copy
 import numpy as np
 
 from sknano.core import pluralize
-from sknano.core.atoms import XAtom as Atom, XAtoms as Atoms
 from sknano.core.math import Vector
-from sknano.structures import SWNT, UnrolledSWNT, MWNT
+from sknano.structures import SWNT, MWNT
 from sknano.utils.geometric_shapes import Cuboid
-from ._base import GeneratorMixin
+from ._base import GeneratorAtom as Atom, GeneratorAtoms as Atoms, \
+    GeneratorMixin
 
-__all__ = ['SWNTGenerator', 'UnrolledSWNTGenerator', 'MWNTGenerator']
-
-
-class SWNTGenerator(SWNT, GeneratorMixin):
-    u"""Class for generating nanotube structures.
-
-    Parameters
-    ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
-        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
-    nz : int, optional
-        Number of repeat unit cells in the :math:`z` direction, along
-        the *length* of the nanotube.
-    element1, element2 : {str, int}, optional
-        Element symbol or atomic number of basis
-        :class:`~sknano.core.Atom` 1 and 2
-    bond : float, optional
-        :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
-        nearest neighbor atoms. Must be in units of **Angstroms**.
-    Lz : float, optional
-        Length of nanotube in units of **nanometers**.
-        Overrides the `nz` value.
-
-        .. versionadded:: 0.2.5
-
-    tube_length : float, optional
-        Length of nanotube in units of **nanometers**.
-        Overrides the `nz` value.
-
-        .. deprecated:: 0.2.5
-           Use `Lz` instead
-
-    fix_Lz : bool, optional
-        Generate the nanotube with length as close to the specified
-        :math:`L_z` as possible. If `True`, then
-        non integer :math:`n_z` cells are permitted.
-
-        .. versionadded:: 0.2.6
-
-    autogen : bool, optional
-        if `True`, automatically call
-        :meth:`~SWNTGenerator.generate_unit_cell`,
-        followed by :meth:`~SWNTGenerator.generate_structure_data`.
-    verbose : bool, optional
-        if `True`, show verbose output
-
-    Examples
-    --------
-    First, load the :class:`~sknano.generators.SWNTGenerator` class.
-
-    >>> from sknano.generators import SWNTGenerator
-
-    Now let's generate a :math:`\\mathbf{C}_{\\mathrm{h}} = (10, 5)`
-    SWCNT unit cell.
-
-    >>> nt = SWNTGenerator(n=10, m=5)
-    >>> nt.save_data(fname='10,5_unit_cell.xyz')
-
-    The rendered structure looks like (orhographic view):
-
-    .. image:: /images/10,5_unit_cell_orthographic_view.png
-
-    and the perspective view:
-
-    .. image:: /images/10,5_unit_cell_perspective_view.png
-
-    """
-    def __init__(self, autogen=True, **kwargs):
-
-        super(SWNTGenerator, self).__init__(**kwargs)
-
-        if autogen:
-            self.generate_unit_cell()
-            self.generate_structure_data()
-
-    def generate_unit_cell(self):
-        """Generate the nanotube unit cell."""
-        eps = 0.01
-        n = self._n
-        m = self._m
-        bond = self._bond
-        M = self._M
-        T = self._T
-        N = self._N
-        rt = self._rt
-        e1 = self._element1
-        e2 = self._element2
-        verbose = self._verbose
-
-        aCh = SWNT.compute_chiral_angle(n=n, m=m, rad2deg=False)
-
-        tau = M * T / N
-        dtau = bond * np.sin(np.pi / 6 - aCh)
-
-        psi = 2 * np.pi / N
-        dpsi = bond * np.cos(np.pi / 6 - aCh) / rt
-
-        if verbose:
-            print('dpsi: {}'.format(dpsi))
-            print('dtau: {}\n'.format(dtau))
-
-        self._unit_cell = Atoms()
-
-        for i in xrange(1, N + 1):
-            x1 = rt * np.cos(i * psi)
-            y1 = rt * np.sin(i * psi)
-            z1 = i * tau
-
-            while z1 > T - eps:
-                z1 -= T
-
-            atom1 = Atom(e1, x=x1, y=y1, z=z1)
-            atom1.rezero()
-
-            if verbose:
-                print('Basis Atom 1:\n{}'.format(atom1))
-
-            self._unit_cell.append(atom1)
-
-            x2 = rt * np.cos(i * psi + dpsi)
-            y2 = rt * np.sin(i * psi + dpsi)
-            z2 = i * tau - dtau
-            while z2 > T - eps:
-                z2 -= T
-
-            atom2 = Atom(e2, x=x2, y=y2, z=z2)
-            atom2.rezero()
-
-            if verbose:
-                print('Basis Atom 2:\n{}'.format(atom2))
-
-            self._unit_cell.append(atom2)
-
-    def generate_structure_data(self):
-        """Generate structure data."""
-        self._structure_atoms = Atoms()
-        for nz in xrange(int(np.ceil(self._nz))):
-            dr = Vector([0.0, 0.0, nz * self._T])
-            for uc_atom in self._unit_cell:
-                nt_atom = Atom(uc_atom.symbol)
-                nt_atom.r = uc_atom.r + dr
-                self._structure_atoms.append(nt_atom)
-
-    def save_data(self, fname=None, outpath=None, structure_format=None,
-                  rotation_angle=None, rot_axis=None, anchor_point=None,
-                  deg2rad=True, center_CM=True, savecopy=True, **kwargs):
-        """Save structure data.
-
-        See :meth:`~sknano.generators.GeneratorMixin.save_data` method
-        for documentation.
-
-        """
-        if fname is None:
-            chirality = '{}{}r'.format('{}'.format(self._n).zfill(2),
-                                       '{}'.format(self._m).zfill(2))
-            if self._assume_integer_unit_cells:
-                nz = ''.join(('{}'.format(self._nz),
-                              pluralize('cell', self._nz)))
-            else:
-                nz = ''.join(('{:.2f}'.format(self._nz),
-                              pluralize('cell', self._nz)))
-            fname_wordlist = (chirality, nz)
-            fname = '_'.join(fname_wordlist)
-
-        if self._L0 is not None and self._fix_Lz:
-            pmin = [-np.inf, -np.inf, 0]
-            pmax = [np.inf, np.inf, 10 * self._L0 + 0.25]
-            region_bounds = Cuboid(pmin=pmin, pmax=pmax)
-            region_bounds.update_region_limits()
-
-            self._structure_atoms.clip_bounds(region_bounds,
-                                              center_before_clipping=True)
-
-        if center_CM:
-            self._structure_atoms.center_CM()
-
-        super(SWNTGenerator, self).save_data(
-            fname=fname, outpath=outpath, structure_format=structure_format,
-            rotation_angle=rotation_angle, rot_axis=rot_axis,
-            anchor_point=anchor_point, deg2rad=deg2rad, center_CM=False,
-            savecopy=savecopy, **kwargs)
-
-
-class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
-    u"""Class for generating unrolled nanotube structures.
-
-    .. versionadded:: 0.2.23
-
-    Parameters
-    ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
-        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
-    nx, ny, nz : int, optional
-        Number of repeat unit cells in the :math:`x, y, z` dimensions
-    element1, element2 : {str, int}, optional
-        Element symbol or atomic number of basis
-        :class:`~sknano.core.Atom` 1 and 2
-    bond : float, optional
-        :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
-        nearest neighbor atoms. Must be in units of **Angstroms**.
-    Lx, Ly, Lz : float, optional
-        Length of bundle in :math:`x, y, z` dimensions in **nanometers**.
-        Overrides the :math:`n_x, n_y, n_z` cell values.
-    fix_Lz : bool, optional
-        Generate the nanotube with length as close to the specified
-        :math:`L_z` as possible. If `True`, then
-        non integer :math:`n_z` cells are permitted.
-    autogen : bool, optional
-        if `True`, automatically call
-        :meth:`~NanotubeGenerator.generate_unit_cell`,
-        followed by :meth:`~NanotubeGenerator.generate_structure_data`.
-    verbose : bool, optional
-        if `True`, show verbose output
-
-    Notes
-    -----
-    The `UnrolledSWNTGenerator` class generates graphene using the
-    nanotube unit cell defined by the chiral vector
-    :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
-    If you want to generate graphene with an armchair or zigzag edge using
-    `length` and `width` parameters, see the
-    :class:`~sknano.generators.GrapheneGenerator` class.
-
-    .. seealso:: :class:`~sknano.generators.GrapheneGenerator`
-
-
-    Examples
-    --------
-    First, load the :class:`~sknano.generators.UnrolledSWNTGenerator`
-    class.
-
-    >>> from sknano.generators import UnrolledSWNTGenerator
-
-    Now let's generate an unrolled :math:`\\mathbf{C}_{\\mathrm{h}} = (10, 5)`
-    SWCNT unit cell.
-
-    >>> flatswcnt = UnrolledSWNTGenerator(n=10, m=5)
-    >>> flatswcnt.save_data()
-
-    The rendered structure looks like:
-
-    """
-
-    def __init__(self, autogen=True, **kwargs):
-
-        super(UnrolledSWNTGenerator, self).__init__(**kwargs)
-
-        if autogen:
-            self.generate_unit_cell()
-            self.generate_structure_data()
-
-    def generate_unit_cell(self):
-        """Generate the nanotube unit cell."""
-        eps = 0.01
-        n = self._n
-        m = self._m
-        bond = self._bond
-        M = self._M
-        T = self._T
-        N = self._N
-        rt = self._rt
-        e1 = self._element1
-        e2 = self._element2
-        verbose = self._verbose
-
-        aCh = SWNT.compute_chiral_angle(n=n, m=m, rad2deg=False)
-
-        tau = M * T / N
-        dtau = bond * np.sin(np.pi / 6 - aCh)
-
-        psi = 2 * np.pi / N
-        dpsi = bond * np.cos(np.pi / 6 - aCh) / rt
-
-        if verbose:
-            print('dpsi: {}'.format(dpsi))
-            print('dtau: {}\n'.format(dtau))
-
-        self._unit_cell = Atoms()
-
-        for i in xrange(N):
-            x1 = rt * i * psi
-            z1 = i * tau
-
-            while z1 > T - eps:
-                z1 -= T
-
-            atom1 = Atom(e1, x=x1, z=z1)
-            atom1.rezero()
-
-            if verbose:
-                print('Basis Atom 1:\n{}'.format(atom1))
-
-            self._unit_cell.append(atom1)
-
-            x2 = rt * (i * psi + dpsi)
-            z2 = i * tau - dtau
-            while z2 > T - eps:
-                z2 -= T
-
-            atom2 = Atom(e2, x=x2, z=z2)
-            atom2.rezero()
-
-            if verbose:
-                print('Basis Atom 2:\n{}'.format(atom2))
-
-            self._unit_cell.append(atom2)
-
-    def generate_structure_data(self):
-        """Generate structure data."""
-        self._structure_atoms = Atoms()
-        for nx in xrange(self.nx):
-            for nz in xrange(int(np.ceil(self.nz))):
-                dr = Vector([nx * self.Ch, 0.0, nz * self.T])
-                for uc_atom in self._unit_cell:
-                    nt_atom = Atom(uc_atom.symbol)
-                    nt_atom.r = uc_atom.r + dr
-                    self._structure_atoms.append(nt_atom)
-
-    def save_data(self, fname=None, outpath=None, structure_format=None,
-                  rotation_angle=None, rot_axis=None, anchor_point=None,
-                  deg2rad=True, center_CM=True, savecopy=True, **kwargs):
-        """Save structure data.
-
-        See :meth:`~sknano.generators.GeneratorMixin.save_data` method
-        for documentation.
-
-        """
-        if fname is None:
-            chirality = '{}{}f'.format('{}'.format(self._n).zfill(2),
-                                       '{}'.format(self._m).zfill(2))
-            nx = self.nx
-            ny = self.ny
-            fname_wordlist = None
-            if nx != 1 or ny != 1:
-                nx = ''.join(('{}'.format(self.nx),
-                              pluralize('cell', self.nx)))
-                ny = ''.join(('{}'.format(self.ny),
-                              pluralize('cell', self.ny)))
-
-                if self._assume_integer_unit_cells:
-                    nz = ''.join(('{}'.format(self.nz),
-                                  pluralize('cell', self.nz)))
-                else:
-                    nz = ''.join(('{:.2f}'.format(self.nz),
-                                  pluralize('cell', self.nz)))
-
-                cells = 'x'.join((nx, ny, nz))
-                fname_wordlist = (chirality, cells)
-            else:
-                if self._assume_integer_unit_cells:
-                    nz = ''.join(('{}'.format(self.nz),
-                                  pluralize('cell', self.nz)))
-                else:
-                    nz = ''.join(('{:.2f}'.format(self.nz),
-                                  pluralize('cell', self.nz)))
-
-                fname_wordlist = (chirality, nz)
-
-            fname = '_'.join(fname_wordlist)
-
-        super(UnrolledSWNTGenerator, self).save_data(
-            fname=fname, outpath=outpath, structure_format=structure_format,
-            rotation_angle=rotation_angle, rot_axis=rot_axis,
-            anchor_point=anchor_point, deg2rad=deg2rad, center_CM=False,
-            savecopy=savecopy, **kwargs)
+__all__ = ['MWNTGenerator']
 
 
 class MWNTGenerator(MWNT, GeneratorMixin):
@@ -518,7 +152,7 @@ class MWNTGenerator(MWNT, GeneratorMixin):
             while z1 > T - eps:
                 z1 -= T
 
-            atom1 = Atom(e1, x=x1, y=y1, z=z1)
+            atom1 = Atom(element=e1, x=x1, y=y1, z=z1)
             atom1.rezero()
 
             if verbose:
@@ -532,7 +166,7 @@ class MWNTGenerator(MWNT, GeneratorMixin):
             while z2 > T - eps:
                 z2 -= T
 
-            atom2 = Atom(e2, x=x2, y=y2, z=z2)
+            atom2 = Atom(element=e2, x=x2, y=y2, z=z2)
             atom2.rezero()
 
             if verbose:
@@ -565,7 +199,7 @@ class MWNTGenerator(MWNT, GeneratorMixin):
         for nz in xrange(int(np.ceil(self._nz))):
             dr = Vector([0.0, 0.0, nz * self._T])
             for uc_atom in self._unit_cell:
-                nt_atom = Atom(uc_atom.symbol)
+                nt_atom = Atom(element=uc_atom.symbol)
                 nt_atom.r = uc_atom.r + dr
                 self._structure_atoms.append(nt_atom)
 
@@ -656,7 +290,7 @@ class MWNTGenerator(MWNT, GeneratorMixin):
                 for nz in xrange(int(np.ceil(self._nz))):
                     dr = Vector([0.0, 0.0, nz * T])
                     for uc_atom in self._unit_cell:
-                        atom = Atom(uc_atom.symbol)
+                        atom = Atom(element=uc_atom.symbol)
                         atom.r = uc_atom.r + dr
                         shell.append(atom)
                 shell.center_CM()

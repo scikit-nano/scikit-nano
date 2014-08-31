@@ -12,9 +12,9 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-from sknano.core.atoms import XAtom as Atom, XAtoms as Atoms
 from sknano.structures import Graphene
-from ._base import GeneratorMixin
+from ._base import GeneratorAtom as Atom, GeneratorAtoms as Atoms, \
+    GeneratorMixin
 
 __all__ = ['GrapheneGenerator']
 
@@ -141,7 +141,10 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
         self._unit_cell = Atoms()
         # Set up 4 atom basis
         # Leave atom 1 at the origin
-        atom1, atom2, atom3, atom4 = Atom(e1), Atom(e2), Atom(e1), Atom(e2)
+        atom1 = Atom(element=e1)
+        atom2 = Atom(element=e2)
+        atom3 = Atom(element=e1)
+        atom4 = Atom(element=e2)
         if edge == 'AC':
             # Move atom 2 to 2nd basis position
             atom2.x = -np.sqrt(3) / 2 * bond
@@ -180,7 +183,7 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
                                    ny * self._cell.y,
                                    nlayer * self._layer_spacing])
                     for atom in self._unit_cell:
-                        layer_atom = Atom(atom.symbol)
+                        layer_atom = Atom(element=atom.symbol)
                         layer_atom.r = atom.r + dr
                         layer.append(layer_atom)
 
@@ -211,8 +214,6 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
             fname_wordlist = (dimensions, nlayer, edge, atombond, 'graphene')
             fname = '_'.join(fname_wordlist)
 
-        #structure_atoms = list(itertools.chain(*self._structure_atoms))
-        #structure_atoms = Atoms(structure_atoms)
         if center_CM and self._nlayers > 1:
             self._structure_atoms.center_CM()
 
