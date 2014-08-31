@@ -13,15 +13,35 @@ __docformat__ = 'restructuredtext en'
 import copy
 import os
 
+try:
+    from sknano.core.atoms import KDTAtom as Atom, KDTAtoms as Atoms
+except ImportError:
+    from sknano.core.atoms import XAtom as Atom, XAtoms as Atoms
+
 from sknano.io import StructureIO, default_structure_format, \
     supported_structure_formats
 
-__all__ = ['GeneratorMixin', 'STRUCTURE_GENERATORS']
+__all__ = ['GeneratorAtom', 'GeneratorAtoms', 'GeneratorMixin',
+           'STRUCTURE_GENERATORS']
 
 
 STRUCTURE_GENERATORS = ('SWNTGenerator', 'SWNTBundleGenerator',
                         'MWNTGenerator', 'MWNTBundleGenerator',
                         'GrapheneGenerator', 'BilayerGrapheneGenerator')
+
+
+GeneratorAtom = Atom
+GeneratorAtoms = Atoms
+#class GeneratorAtom(object):
+#
+#    def __init__(self, atomstyle=None, **kwargs):
+#        super(GeneratorAtom, self).__init__(**kwargs)
+
+
+#class GeneratorAtoms(object):
+#
+#    def __init__(self, atomstyle=None, **kwargs):
+#        super(GeneratorAtoms, self).__init__(**kwargs)
 
 
 class GeneratorMixin(object):
