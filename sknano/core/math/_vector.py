@@ -126,12 +126,23 @@ class Vector(np.ndarray):
 
         self.nd = len(obj)
         if Vector._verbosity > 2:
-            print('In Vector.__array_finalize__\n'
-                  'self: {}\n'.format(self) +
-                  'type(self): {}\n'.format(type(self)) +
-                  'obj: {}\n'.format(obj) +
-                  'type(obj): {}\n'.format(type(obj)) +
-                  'obj.shape: {}\n'.format(obj.shape))
+            try:
+                print('In Vector.__array_finalize__\n'
+                      'self: {}\n'.format(self) +
+                      'type(self): {}\n'.format(type(self)) +
+                      'self.p: {}\n'.format(self.p) +
+                      'type(self.p): {}\n'.format(type(self.p)) +
+                      'self.p0: {}\n'.format(self.p0) +
+                      'type(self.p0): {}\n'.format(type(self.p0)) +
+                      'obj: {}\n'.format(obj) +
+                      'type(obj): {}\n'.format(type(obj)) +
+                      'obj.p: {}\n'.format(obj.p) +
+                      'type(obj.p): {}\n'.format(type(obj.p)) +
+                      'obj.p0: {}\n'.format(obj.p0) +
+                      'type(obj.p0): {}\n'.format(type(obj.p0)) +
+                      'obj.shape: {}\n'.format(obj.shape))
+            except AttributeError:
+                pass
 
         if self.nd == 2:
             self.x, self.y = obj
@@ -140,6 +151,14 @@ class Vector(np.ndarray):
 
         self._p0 = getattr(obj, 'p0', None)
         self._p = getattr(obj, 'p', None)
+        if self._p0 is not None and self._p is None:
+            try:
+                self._p = self._p0 + self.__array__()
+            except TypeError:
+                try:
+                    self._p = self._p0 + np.asarray(obj)
+                except TypeError:
+                    pass
 
     def __array_prepare__(self, obj, context=None):
         if Vector._verbosity > 2:
@@ -161,29 +180,7 @@ class Vector(np.ndarray):
 
     def __array_wrap__(self, obj, context=None):
         if Vector._verbosity > 2:
-            print('In Vector.__array_wrap__\n'
-                  'self: {}\n'.format(self) +
-                  'type(self): {}\n'.format(type(self)) +
-                  'self.p: {}\n'.format(self.p) +
-                  'type(self.p): {}\n'.format(type(self.p)) +
-                  'self.p0: {}\n'.format(self.p0) +
-                  'type(self.p0): {}\n'.format(type(self.p0)) +
-                  'obj: {}\n'.format(obj) +
-                  'type(obj): {}\n'.format(type(obj)) +
-                  'obj.p: {}\n'.format(obj.p) +
-                  'type(obj.p): {}\n'.format(type(obj.p)) +
-                  'obj.p0: {}\n'.format(obj.p0) +
-                  'type(obj.p0): {}\n'.format(type(obj.p0)) +
-                  'context: {}\n'.format(context))
-
-        if obj.shape == ():
-            return obj[()]
-        else:
-
-            res = super(Vector, self).__array_wrap__(obj, context)
-            res = Vector(res.__array__(), p0=self.p0)
-
-            if Vector._verbosity > 0:
+            try:
                 print('In Vector.__array_wrap__\n'
                       'self: {}\n'.format(self) +
                       'type(self): {}\n'.format(type(self)) +
@@ -197,15 +194,43 @@ class Vector(np.ndarray):
                       'type(obj.p): {}\n'.format(type(obj.p)) +
                       'obj.p0: {}\n'.format(obj.p0) +
                       'type(obj.p0): {}\n'.format(type(obj.p0)) +
-                      'res: {}\n'.format(res) +
-                      'type(res): {}\n'.format(type(res)) +
-                      'res.p: {}\n'.format(res.p) +
-                      'type(res.p): {}\n'.format(type(res.p)) +
-                      'res.p0: {}\n'.format(res.p0) +
-                      'type(res.p0): {}\n'.format(type(res.p0)) +
                       'context: {}\n'.format(context))
-            #return super(Vector, self).__array_wrap__(obj, context)
-            return res
+            except TypeError:
+                pass
+
+        #if obj.shape == ():
+        #    return obj[()]
+        #else:
+
+        res = super(Vector, self).__array_wrap__(obj, context)
+        res = Vector(res.__array__(), p0=self.p0)
+        #res.p = self.p
+        #res = Vector(p0=self.p0, p=self.p)
+        #res = Vector(res.__array__())
+
+        if Vector._verbosity > 0:
+            print('In Vector.__array_wrap__\n'
+                  'self: {}\n'.format(self) +
+                  'type(self): {}\n'.format(type(self)) +
+                  'self.p: {}\n'.format(self.p) +
+                  'type(self.p): {}\n'.format(type(self.p)) +
+                  'self.p0: {}\n'.format(self.p0) +
+                  'type(self.p0): {}\n'.format(type(self.p0)) +
+                  'obj: {}\n'.format(obj) +
+                  'type(obj): {}\n'.format(type(obj)) +
+                  'obj.p: {}\n'.format(obj.p) +
+                  'type(obj.p): {}\n'.format(type(obj.p)) +
+                  'obj.p0: {}\n'.format(obj.p0) +
+                  'type(obj.p0): {}\n'.format(type(obj.p0)) +
+                  'res: {}\n'.format(res) +
+                  'type(res): {}\n'.format(type(res)) +
+                  'res.p: {}\n'.format(res.p) +
+                  'type(res.p): {}\n'.format(type(res.p)) +
+                  'res.p0: {}\n'.format(res.p0) +
+                  'type(res.p0): {}\n'.format(type(res.p0)) +
+                  'context: {}\n'.format(context))
+        #return super(Vector, self).__array_wrap__(obj, context)
+        return res
 
     def __str__(self):
         return repr(self)
@@ -222,7 +247,7 @@ class Vector(np.ndarray):
             return "Vector({!r})".format(self.__array__().tolist())
 
     def __getattr__(self, name):
-        if Vector._verbosity > 4 and name.find('ufunc') > 0:
+        if Vector._verbosity > 4:
             print('In Vector.__getattr__\n'
                   'self: {}\n'.format(self.__array__()) +
                   'name: {}\n'.format(name))
@@ -301,7 +326,6 @@ class Vector(np.ndarray):
     def __iadd__(self, other):
         """Add other to self in-place."""
         super(Vector, self).__iadd__(other)
-        #self._p[:] = self._p0 + self.__array__()
         self._update_p()
         return self
 
@@ -360,7 +384,7 @@ class Vector(np.ndarray):
         return not self == other
 
     def _update_p(self):
-        self._p[:] = self._p0 + self.__array__()
+        self._p[:] = self._p0[:] + self.__array__()
 
     @property
     def length(self):
