@@ -35,7 +35,7 @@ math_symbol_operator_mappings = \
     {'+': operator.add,
      '-': operator.sub,
      '*': operator.mul,
-     '/': operator.div}
+     '/': operator.truediv}
 symbol_operator_mappings.update(math_symbol_operator_mappings)
 
 
