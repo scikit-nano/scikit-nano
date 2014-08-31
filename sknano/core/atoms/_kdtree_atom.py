@@ -40,19 +40,32 @@ class KDTAtom(XAtom):
             NN = NeighborAtoms()
         self._NN = NN
 
-    #def __repr__(self):
-    #    """Return string representation of `KDTAtom`."""
-    #    reprstr = "Atom(element={element!r}, atomID={atomID!r}, " + \
-    #        "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
-    #        "q={q!r}, m={m!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
-    #        "CN={CN!r}, NN={NN!r})"
+    def __str__(self):
+        """Return a nice string representation of `KDTAtom`."""
+        strrep = "Atom(element={element!s}, atomID={atomID!s}, " + \
+            "moleculeID={moleculeID!s}, atomtype={atomtype!s}, " + \
+            "q={q!s}, m={m!s}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
+            "CN={CN!s}, NN={NN!s})"
 
-    #    parameters = dict(element=self.element, atomID=self.atomID,
-    #                      moleculeID=self.moleculeID, atomtype=self.atomtype,
-    #                      q=self.q, m=self.m, x=self.x, y=self.y, z=self.z,
-    #                      CN=self.CN, NN=self.NN)
+        parameters = dict(element=self.element, atomID=self.atomID,
+                          moleculeID=self.moleculeID, atomtype=self.atomtype,
+                          q=self.q, m=self.m, x=self.x, y=self.y, z=self.z,
+                          CN=self.CN, NN=self.NN)
 
-    #    return reprstr.format(**parameters)
+        return strrep.format(**parameters)
+
+    def __repr__(self):
+        """Return canonical string representation of `KDTAtom`."""
+        #strrep = "Atom(element={element!r}, atomID={atomID!r}, " + \
+        #    "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
+        #    "q={q!r}, m={m!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
+        #    "CN={CN!r}, NN={NN!r})"
+        #parameters = dict(element=self.element, atomID=self.atomID,
+        #                  moleculeID=self.moleculeID, atomtype=self.atomtype,
+        #                  q=self.q, m=self.m, x=self.x, y=self.y, z=self.z,
+        #                  CN=self.CN, NN=self.NN)
+        #return strrep.format(**parameters)
+        return super(KDTAtom, self).__repr__()
 
     @property
     def CN(self):
