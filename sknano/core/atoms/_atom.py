@@ -73,6 +73,7 @@ class Atom(object):
         self._Z = Z
         self._m = m
         self._r = Vector([x, y, z])
+        #self._p0 = Point([x, y, z])
         self._dr = Vector(np.zeros(3), p0=[x, y, z])
 
         self._attributes = ['symbol', 'Z', 'm', 'r']
@@ -245,7 +246,7 @@ class Atom(object):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        self._r[:] = value
+        self._r = Vector(value)
 
     @property
     def dr(self):
@@ -271,7 +272,7 @@ class Atom(object):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        self._dr[:] = value
+        self._dr = Vector(value)
 
     def todict(self):
         return dict(element=self.element, m=self.m,
