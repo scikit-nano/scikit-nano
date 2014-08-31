@@ -36,7 +36,7 @@ class KDTAtoms(XAtoms):
         super(KDTAtoms, self).__init__(**kwargs)
 
         self._kNN = 3
-        self._NN_cutoff = 0
+        self._NNrc = 0
 
     @property
     def atom_tree(self):
@@ -55,13 +55,11 @@ class KDTAtoms(XAtoms):
     def _update_coordination_numbers(self):
         """Update `KDTAtom` coordination numbers."""
         try:
-            NN_d, NN_i = \
-                self.query_atom_tree(n=self.kNN,
-                                     cutoff_radius=self.NN_cutoff)
+            NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
             for i, atom in enumerate(self):
                 atom.CN = 0
-                for d in NN_d[i]:
-                    if d < self.NN_cutoff:
+                for d in NNd[i]:
+                    if d < self.NNrc:
                         atom.CN += 1
         except ValueError:
             pass
@@ -75,17 +73,16 @@ class KDTAtoms(XAtoms):
     def _update_nearest_neighbors(self):
         """Update `KDTAtom` nearest-neighbors."""
         try:
-            NN_d, NN_i = self.query_atom_tree(n=self.kNN,
-                                              cutoff_radius=self.NN_cutoff)
-            for i, atom in enumerate(self):
+            NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
+            for j, atom in enumerate(self):
                 atom.NN = NeighborAtoms()
-                for j, d in enumerate(NN_d[i]):
-                    if d < self.NN_cutoff:
-                        atom.NN.append(self[NN_i[i][j]])
+                for k, d in enumerate(NNd[j]):
+                    if d < self.NNrc:
+                        atom.NN.append(self[NNi[j][k]])
         except ValueError:
             pass
 
-    def query_atom_tree(self, n=6, eps=0, p=2, cutoff_radius=np.inf):
+    def query_atom_tree(self, k=3, eps=0, p=2, rc=np.inf):
         """Query atom tree for nearest neighbors distances and indices.
 
         Parameters
@@ -101,26 +98,25 @@ class KDTAtoms(XAtoms):
             1 is the sum-of-absolute-values "Manhattan" distance
             2 is the usual Euclidean distance
             infinity is the maximum-coordinate-difference distance
-        cutoff_radius : nonnegative float
-            Return only neighbors within this distance. This is used to prune
-            tree searches, so if you are doing a series of nearest-neighbor
-            queries, it may help to supply the distance to the nearest neighbor
-            of the most recent point.
+        rc : nonnegative float
+            Radius cutoff. Return only neighbors within this distance.
+            This is used to prune tree searches, so if you are doing a series
+            of nearest-neighbor queries, it may help to supply the distance to
+            the nearest neighbor of the most recent point.
 
         Returns
         -------
-        NN_d : array of floats
+        d : array of floats
             The distances to the nearest neighbors.
-        NN_i : array of integers
-            The locations of the neighbors in self.atom_tree.data. NN_i is the
-            same shape as NN_d.
+        i : array of integers
+            The locations of the neighbors in self.atom_tree.data. `i` is the
+            same shape as `d`.
 
         """
         atom_tree = self.atom_tree
         if atom_tree is not None:
-            d, i = atom_tree.query(self.coords,
-                                   k=n+1, eps=eps, p=p,
-                                   distance_upper_bound=cutoff_radius)
+            d, i = atom_tree.query(self.coords, k=k+1, eps=eps, p=p,
+                                   distance_upper_bound=rc)
             return d[:, 1:], i[:, 1:]
 
     @property
@@ -137,20 +133,14 @@ class KDTAtoms(XAtoms):
         self._kNN = int(value)
 
     @property
-    def NN_cutoff(self):
+    def NNrc(self):
         """Only return neighbors within this distance when querying the
         kd-tree."""
-        return self._NN_cutoff
+        return self._NNrc
 
-    @NN_cutoff.setter
-    def NN_cutoff(self, value):
+    @NNrc.setter
+    def NNrc(self, value):
         """Set the cutoff distance to check for neighest neighbors."""
         if not (isinstance(value, numbers.Number) and value >= 0):
             raise TypeError('Expected a real number greater >= 0')
-        self._NN_cutoff = value
-
-    def select(self, **kwargs):
-        pass
-
-    def select_within(self, volume):
-        pass
+        self._NNrc = value
