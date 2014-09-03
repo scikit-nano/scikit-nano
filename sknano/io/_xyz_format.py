@@ -13,17 +13,16 @@ __docformat__ = 'restructuredtext en'
 import os
 
 from ..core import get_fpath
-from ..core.atoms import XAtom as Atom, XAtoms as Atoms
 
-from ._base import StructureReader, StructureReaderError, \
-    StructureWriter, StructureConverter, StructureFormat, default_comment_line
+from ._base import Atom, StructureIO, StructureConverter, StructureFormat, \
+    StructureIOError, default_comment_line
 
 __all__ = ['XYZReader', 'XYZWriter', 'XYZData',
            'XYZ2DATAConverter', 'XYZFormat']
 
 
-class XYZReader(StructureReader):
-    """`StructureReader` class for reading `xyz` chemical file format.
+class XYZReader(StructureIO):
+    """`StructureIO` class for reading `xyz` chemical file format.
 
     Parameters
     ----------
@@ -31,12 +30,10 @@ class XYZReader(StructureReader):
         `xyz` structure file path.
 
     """
-    def __init__(self, fpath=None, **kwargs):
+    def __init__(self, fpath, **kwargs):
         super(XYZReader, self).__init__(fpath=fpath, **kwargs)
 
-        self._structure_atoms = Atoms()
-
-        if fpath is not None:
+        if self.fpath is not None:
             self.read()
 
     def read(self):
@@ -49,16 +46,17 @@ class XYZReader(StructureReader):
                 s = line.strip().split()
                 if len(s) != 0:
                     atom = \
-                        Atom(s[0], x=float(s[1]), y=float(s[2]), z=float(s[3]))
+                        Atom(element=s[0],
+                             x=float(s[1]), y=float(s[2]), z=float(s[3]))
                     self._structure_atoms.append(atom)
             if self._structure_atoms.Natoms != Natoms:
                 error_msg = '`xyz` data contained {} atoms '.format(
                     self._structure_atoms.Natoms) + 'but should contain ' + \
                     '{}'.format(Natoms)
-                raise StructureReaderError(error_msg)
+                raise StructureIOError(error_msg)
 
 
-class XYZWriter(StructureWriter):
+class XYZWriter(object):
     """`StructureWriter` class for writing `xyz` chemical file format."""
 
     @classmethod
@@ -106,7 +104,7 @@ class XYZData(XYZReader):
 
     """
     def __init__(self, fpath=None, **kwargs):
-        super(XYZData, self).__init__(fpath=fpath, **kwargs)
+        super(XYZData, self).__init__(fpath, **kwargs)
 
     def write(self, xyzfile=None, **kwargs):
         """Write xyz file.

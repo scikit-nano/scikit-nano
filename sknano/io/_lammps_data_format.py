@@ -16,10 +16,9 @@ import os
 import numpy as np
 
 from ..core import get_fpath
-from ..core.atoms import XAtom as Atom, XAtoms as Atoms
 
-from ._base import StructureReader, StructureWriter, StructureConverter, \
-    StructureFormat, StructureIOError, default_comment_line
+from ._base import Atom, StructureIO, StructureConverter, StructureFormat, \
+    StructureIOError, default_comment_line
 
 __all__ = ['DATAData', 'DATAReader', 'DATAWriter',
            'DATA2XYZConverter', 'DATAFormat', 'DATAError',
@@ -92,8 +91,8 @@ lammps_atom_styles['wavepacket'] = \
      'cs_re', 'cs_im', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
 
-class DATAReader(StructureReader):
-    """`StructureReader` class for reading `LAMMPS data` file format.
+class DATAReader(StructureIO):
+    """`StructureIO` class for reading `LAMMPS data` file format.
 
     Parameters
     ----------
@@ -102,10 +101,8 @@ class DATAReader(StructureReader):
     atom_style : {'full', 'atomic'}, optional
 
     """
-    def __init__(self, fpath=None, atom_style='full', **kwargs):
+    def __init__(self, fpath, atom_style='full', **kwargs):
         super(DATAReader, self).__init__(fpath=fpath, **kwargs)
-
-        self._structure_atoms = Atoms()
 
         data_format = DATAFormat(atom_style=atom_style, **kwargs)
         self._data_headers = data_format.properties['headers']
@@ -117,7 +114,7 @@ class DATAReader(StructureReader):
         self._sections = {}
         self._boxbounds = {}
 
-        if fpath is not None:
+        if self.fpath is not None:
             self.read()
 
     @property
@@ -318,7 +315,7 @@ class DATAReader(StructureReader):
 LAMMPSDATAReader = DATAReader
 
 
-class DATAWriter(StructureWriter):
+class DATAWriter(object):
     """`StructureWriter` class for writing `LAMMPS data` file format."""
 
     @classmethod
@@ -473,7 +470,7 @@ class DATAData(DATAReader):
 
     """
     def __init__(self, fpath=None, **kwargs):
-        super(DATAData, self).__init__(fpath=fpath, **kwargs)
+        super(DATAData, self).__init__(fpath, **kwargs)
 
     def delete(self, key):
         if key in self.headers:
