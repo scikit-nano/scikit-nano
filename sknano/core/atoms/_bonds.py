@@ -38,7 +38,6 @@ class Bonds(BondList):
     def __init__(self, bonds=None, copylist=True, deepcopy=False):
         super(Bonds, self).__init__(bonds=bonds, copylist=copylist,
                                     deepcopy=deepcopy)
-        self._angles = []
 
     def __str__(self):
         """Return a nice string representation of `Bonds`."""
