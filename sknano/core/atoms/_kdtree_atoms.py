@@ -22,6 +22,10 @@ except ImportError:
     raise ImportError('Install scipy version >= 0.13.0 to allow '
                       'nearest-neighbor queries between atoms.')
 
+from sknano.core.math import vector as vec
+#from ._atom_bonds import AtomBonds
+from ._bond import Bond
+from ._bonds import Bonds
 from ._extended_atoms import XAtoms
 from ._neighbor_atoms import NeighborAtoms
 
@@ -76,9 +80,11 @@ class KDTAtoms(XAtoms):
             NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
             for j, atom in enumerate(self):
                 atom.NN = NeighborAtoms()
+                atom.bonds = Bonds()
                 for k, d in enumerate(NNd[j]):
                     if d < self.NNrc:
                         atom.NN.append(self[NNi[j][k]])
+                        atom.bonds.append(Bond(atom, atom.NN[-1]))
         except ValueError:
             pass
 
@@ -144,3 +150,18 @@ class KDTAtoms(XAtoms):
         if not (isinstance(value, numbers.Number) and value >= 0):
             raise TypeError('Expected a real number greater >= 0')
         self._NNrc = value
+
+    @property
+    def bonds(self):
+        self._update_nearest_neighbors()
+        return np.asarray([atom.bonds for atom in self])
+
+    def update_pyramidalization_angles(self):
+        self._update_nearest_neighbors()
+        for atom in self:
+            if atom.bonds.Nbonds == 3:
+                b1, b2, b3 = atom.bonds
+                poav = vec.cross(b2.vector - b1.vector, b3.vector - b1.vector)
+                atom.poav = poav.unit_vector
+                atom.pyramidalization_angle = \
+                    vec.angle(b1.vector, atom.poav) - np.pi / 2
