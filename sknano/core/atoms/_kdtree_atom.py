@@ -14,6 +14,7 @@ __docformat__ = 'restructuredtext en'
 
 import numbers
 
+from ._bonds import Bonds
 from ._extended_atom import XAtom
 from ._neighbor_atoms import NeighborAtoms
 
@@ -32,25 +33,26 @@ class KDTAtom(XAtom):
 
     """
 
-    def __init__(self, CN=0, NN=None, **kwargs):
+    def __init__(self, **kwargs):
         super(KDTAtom, self).__init__(**kwargs)
 
-        self._CN = CN
-        if NN is None or not isinstance(NN, NeighborAtoms):
-            NN = NeighborAtoms()
-        self._NN = NN
+        self._CN = 0
+        self._NN = NeighborAtoms()
+        self._bonds = Bonds()
+        self._pyramidalization_angle = None
+        self._poav = None
 
     def __str__(self):
         """Return a nice string representation of `KDTAtom`."""
-        strrep = "Atom(element={element!s}, atomID={atomID!s}, " + \
-            "moleculeID={moleculeID!s}, atomtype={atomtype!s}, " + \
-            "q={q!s}, m={m!s}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
-            "CN={CN!s}, NN={NN!s})"
+        strrep = "Atom(element={element!r}, atomID={atomID!r}, " + \
+            "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
+            "q={q!r}, m={m!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
+            "CN={CN!r}, NN={NN!s}, bonds={bonds!s})"
 
         parameters = dict(element=self.element, atomID=self.atomID,
                           moleculeID=self.moleculeID, atomtype=self.atomtype,
                           q=self.q, m=self.m, x=self.x, y=self.y, z=self.z,
-                          CN=self.CN, NN=self.NN)
+                          CN=self.CN, NN=self.NN, bonds=self.bonds)
 
         return strrep.format(**parameters)
 
@@ -90,3 +92,31 @@ class KDTAtom(XAtom):
         if not isinstance(value, NeighborAtoms):
             raise TypeError('Expected `NeighborAtoms`.')
         self._NN = value
+
+    @property
+    def bonds(self):
+        return self._bonds
+
+    @bonds.setter
+    def bonds(self, value):
+        if not isinstance(value, Bonds):
+            raise TypeError('Expected a `Bonds` object.')
+        self._bonds = value
+
+    @property
+    def poav(self):
+        return self._poav
+
+    @poav.setter
+    def poav(self, value):
+        self._poav = value
+
+    @property
+    def pyramidalization_angle(self):
+        return self._pyramidalization_angle
+
+    @pyramidalization_angle.setter
+    def pyramidalization_angle(self, value):
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._pyramidalization_angle = value
