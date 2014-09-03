@@ -271,7 +271,7 @@ class XAtom(Atom):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        self._n[:] = value
+        self._n = Point(value, dtype=int)
 
     @property
     def vx(self):
@@ -365,7 +365,7 @@ class XAtom(Atom):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        self._v[:] = value
+        self._v = Vector(value)
 
     def todict(self):
         return dict(element=self.element, atomID=self.atomID,
