@@ -18,7 +18,7 @@ try:
 except ImportError:
     from sknano.core.atoms import XAtom as Atom, XAtoms as Atoms
 
-from sknano.io import StructureIO, default_structure_format, \
+from sknano.io import StructureWriter, default_structure_format, \
     supported_structure_formats
 
 __all__ = ['GeneratorAtom', 'GeneratorAtoms', 'GeneratorMixin',
@@ -145,5 +145,5 @@ class GeneratorMixin(object):
             atoms.rotate(angle=rotation_angle, rot_axis=rot_axis,
                          anchor_point=anchor_point, deg2rad=deg2rad)
 
-        StructureIO.write(fname=fname, outpath=outpath, atoms=atoms,
-                          structure_format=structure_format)
+        StructureWriter.write(fname=fname, outpath=outpath, atoms=atoms,
+                              structure_format=structure_format)
