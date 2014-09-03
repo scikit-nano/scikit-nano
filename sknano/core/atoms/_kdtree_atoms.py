@@ -40,7 +40,7 @@ class KDTAtoms(XAtoms):
         super(KDTAtoms, self).__init__(**kwargs)
 
         self._kNN = 3
-        self._NNrc = 0
+        self._NNrc = 2.0
 
     @property
     def atom_tree(self):
