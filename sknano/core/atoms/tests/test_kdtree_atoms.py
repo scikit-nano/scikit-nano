@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, print_function
 
 import nose
 from nose.tools import *
+import numpy as np
 from sknano.core.atoms import KDTAtom, KDTAtoms
 from sknano.testing import generate_atoms
 #from sknano.utils.geometric_shapes import Ellipsoid
@@ -44,7 +45,7 @@ def test_list_methods():
 def test_atom_tree():
     Catoms = KDTAtoms()
     for Z in range(1, 101):
-        Catoms.append(KDTAtom(Z))
+        Catoms.append(KDTAtom(Z=Z))
     assert_equals(Catoms.Natoms, 100)
 
 
@@ -69,7 +70,7 @@ def test_structure_analysis():
 
     atoms.assign_unique_ids()
     atoms.kNN = 3
-    atoms.NN_cutoff = 2.0
+    atoms.NNrc = 2.0
     NNatoms = atoms.nearest_neighbors
     assert_equals(len(NNatoms), atoms.Natoms)
 
@@ -95,6 +96,42 @@ def test_atom_selections():
     assert_true(a200 == atoms[199])
     #a200NN = atoms.select_within(Ellipsoid(center=a200.r, r=2.5))
     #assert_equals(a200NN.Natoms, 4)
+
+
+def test_atom_bonds():
+    atoms = \
+        generate_atoms(generator_class='SWNTGenerator', n=20, m=10, nz=2)
+    atoms.assign_unique_ids()
+    atoms.NNrc = 2.0
+    bonds = atoms.bonds
+    #print('bonds: {!s}'.format(bonds))
+    assert_equal(len(bonds), atoms.Natoms)
+
+    for i, atom in enumerate(atoms):
+        if atom.bonds.Nbonds > 1:
+            print('atom.bonds.angles:\n'
+                  '{}'.format(np.degrees(atom.bonds.angles)))
+            for j, bond in enumerate(atom.bonds):
+                assert_true(np.allclose(bond.vector, atom.bonds.vectors[j]))
+                assert_equal(bond.length, atom.bonds.lengths[j])
+
+
+def test_pyramidalization_angles():
+    atoms = \
+        generate_atoms(generator_class='SWNTGenerator', n=20, m=10, nz=2)
+    atoms.assign_unique_ids()
+    atoms.NNrc = 2.0
+    atoms.update_pyramidalization_angles()
+
+    for i, atom in enumerate(atoms):
+        try:
+            if atom.poav is not None:
+                print('atom.poav:\n'
+                      '{}\n'.format(atom.poav))
+                print('atom.pyramidalization_angle: '
+                      '{}\n'.format(np.degrees(atom.pyramidalization_angle)))
+        except AttributeError:
+            continue
 
 
 if __name__ == '__main__':

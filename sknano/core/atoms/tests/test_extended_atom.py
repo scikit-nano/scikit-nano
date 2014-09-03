@@ -16,7 +16,7 @@ def test_instantiation():
 def test_attributes():
     elements = ['H', 'He', 'B', 'C', 'N', 'O', 'Ar']
     for element in elements:
-        xatom = XAtom(element)
+        xatom = XAtom(element=element)
         assert_equals(xatom.element, element)
 
 
