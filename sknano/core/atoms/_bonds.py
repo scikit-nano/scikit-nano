@@ -12,7 +12,6 @@ __docformat__ = 'restructuredtext en'
 
 from itertools import combinations
 from operator import attrgetter
-import copy
 
 import numpy as np
 
@@ -37,23 +36,9 @@ class Bonds(BondList):
 
     """
     def __init__(self, bonds=None, copylist=True, deepcopy=False):
-        self._data = []
+        super(Bonds, self).__init__(bonds=bonds, copylist=copylist,
+                                    deepcopy=deepcopy)
         self._angles = []
-
-        if bonds is not None:
-            try:
-                if copylist and not deepcopy:
-                    self._data.extend(bonds[:])
-                elif deepcopy:
-                    self._data.extend(copy.deepcopy(bonds))
-                else:
-                    self._data.extend(bonds)
-            except AttributeError:
-                raise TypeError('`bonds={!r}` '.format(bonds) +
-                                'is not a valid `Bonds` constructor '
-                                'argument.\n bonds must be `None`, a list '
-                                'of `Bond` objects, or a `Bonds` object '
-                                'instance.')
 
     def __str__(self):
         """Return a nice string representation of `Bonds`."""
