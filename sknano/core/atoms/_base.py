@@ -10,13 +10,12 @@ Base classes for atoms package (:mod:`sknano.core.atoms._base`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from collections import MutableSequence
+from collections import MutableSequence, OrderedDict
 from functools import total_ordering
 
 import copy
-#import math
 
-__all__ = ['AtomList']
+__all__ = ['AtomList', 'BondList', 'BondDict']
 
 
 @total_ordering
@@ -53,12 +52,11 @@ class AtomList(MutableSequence):
                                 'of `Atom` objects, or an `AtomList` '
                                 'instance.')
 
-    def __str__(self):
-        return repr(self)
+    def __eq__(self, other):
+        return self[:] == other[:]
 
-    def __repr__(self):
-        """Return canonical string representation of `AtomList`."""
-        return "AtomList(atoms={!r})".format(self._data)
+    def __lt__(self, other):
+        return self[:] < other[:]
 
     def __delitem__(self, index):
         """Concrete implementation of @abstractmethod.
@@ -132,18 +130,127 @@ class AtomList(MutableSequence):
         """
         self._data.insert(index, atom)
 
+    @property
+    def data(self):
+        """Return the list of `Atom` objects"""
+        return self._data
+
+
+@total_ordering
+class BondList(MutableSequence):
+    """Base class for collection of atom `Bonds`.
+
+    Parameters
+    ----------
+    bonds : {None, sequence, `Bonds`}, optional
+        if not `None`, then a list of `Bond` instance objects
+    copylist : bool, optional
+        perform shallow copy of bonds list
+    deepcopy : bool, optional
+        perform deepcopy of bonds list
+
+    """
+    def __init__(self, bonds=None, copylist=True, deepcopy=False):
+        self._data = []
+
+        if bonds is not None:
+            try:
+                if copylist and not deepcopy:
+                    self._data.extend(bonds[:])
+                elif deepcopy:
+                    self._data.extend(copy.deepcopy(bonds))
+                else:
+                    self._data.extend(bonds)
+            except AttributeError:
+                raise TypeError('`bonds={!r}` '.format(bonds) +
+                                'is not a valid `Bonds` constructor '
+                                'argument.\n bonds must be `None`, a list '
+                                'of `Bond` objects, or a `Bonds` object '
+                                'instance.')
+
     def __eq__(self, other):
         return self[:] == other[:]
 
     def __lt__(self, other):
         return self[:] < other[:]
 
-    @property
-    def data(self):
-        """Return the list of `Atom` objects"""
-        return self._data
+    def __delitem__(self, index):
+        """Concrete implementation of @abstractmethod.
+
+        Delete list element `self[index]`.
+
+        Parameters
+        ----------
+        index : int
+            index of target list element
+
+        """
+        del self._data[index]
+
+    def __getitem__(self, index):
+        """Concrete implementation of @abstractmethod.
+
+        Get `Bond` object instance at list element `self[index]`
+
+        Parameters
+        ----------
+        index : int
+            index of target list element
+
+        Returns
+        -------
+        `Bond`
+            `Bond` instance at target `self[index]`
+
+        """
+        return self._data[index]
+
+    def __setitem__(self, index, bond):
+        """Concrete implementation of @abstractmethod.
+
+        set target list element `self[index] = bond`
+
+        Parameters
+        ----------
+        index : int
+            index of target list element
+        bond : `Bond`
+            `Bond` instance object to set target list element to.
+
+        """
+        self._data[index] = bond
+
+    def __len__(self):
+        """Concrete implementation of @abstractmethod.
+
+        Returns
+        -------
+        int
+            length of `self` list.
+
+        """
+        return len(self._data)
+
+    def insert(self, index, bond):
+        """Concrete implementation of @abstractmethod.
+
+        insert `Bond` instance at target list `index`
+
+        Parameters
+        ----------
+        index : int
+            index of target list element
+        bond : `Bond`
+            `Bond` object instance to set target list element to
+
+        """
+        self._data.insert(index, bond)
 
     @property
-    def Natoms(self):
-        """Number of atoms in `Atoms`."""
-        return len(self)
+    def data(self):
+        """Return the list of `Bonds` objects"""
+        return self._data
+
+
+class BondDict(OrderedDict):
+    pass
