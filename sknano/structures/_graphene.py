@@ -159,6 +159,7 @@ class Graphene(object):
             else:
                 self._layer_shift.x = self._bond
 
+        self._cell = Vector()
         if edge == 'AC':
             # Set up the unit cell with the armchair edge aligned
             # along the `y`-axis.
