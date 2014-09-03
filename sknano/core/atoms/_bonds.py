@@ -69,12 +69,5 @@ class Bonds(BondList):
 
     @property
     def angles(self):
-        self._compute_bond_angles()
-        return np.asarray(self._angles)
-
-    def _compute_bond_angles(self):
-        try:
-            self._angles = [vec.angle(b1.vector, b2.vector) for (b1, b2) in
-                            combinations(self, 2)]
-        except ValueError:
-            pass
+        return np.asarray([vec.angle(b1.vector, b2.vector) for (b1, b2) in
+                           combinations(self, 2)])
