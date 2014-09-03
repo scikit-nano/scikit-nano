@@ -15,20 +15,22 @@ from collections import OrderedDict
 
 from sknano.version import short_version as version
 
+try:
+    from sknano.core.atoms import KDTAtom as Atom, KDTAtoms as Atoms
+except ImportError:
+    from sknano.core.atoms import XAtom as Atom, XAtoms as Atoms
+
 default_comment_line = \
     'Structure data generated using scikit-nano version {}'.format(version)
 default_structure_format = 'xyz'
 supported_structure_formats = ('xyz', 'data')
 
-__all__ = ['StructureIO',
-           'StructureReader',
+__all__ = ['Atom', 'Atoms',
+           'StructureIO',
            'StructureWriter',
            'StructureConverter',
            'StructureFormat',
            'StructureIOError',
-           'StructureReaderError',
-           'StructureWriterError',
-           'StructureConverterError',
            'default_comment_line',
            'default_structure_format',
            'supported_structure_formats']
@@ -42,21 +44,23 @@ class StructureIO(object):
     fpath : {None, str}, optional
 
     """
-    def __init__(self, fpath=None, **kwargs):
+    def __init__(self, fpath=None, fname=None, **kwargs):
+        self._structure_atoms = Atoms()
         self._comment_line = default_comment_line
+        if fpath is None and fname is not None:
+            fpath = fname
         self._fpath = fpath
-        self._structure_atoms = None
         self._kwargs = kwargs
-
-    @property
-    def structure_atoms(self):
-        """Return structure_atoms attribute"""
-        return self._structure_atoms
 
     @property
     def atoms(self):
         """Alias for :attr:`~StructureIO.structure_atoms`."""
         return self.structure_atoms
+
+    @property
+    def structure_atoms(self):
+        """Return structure_atoms attribute"""
+        return self._structure_atoms
 
     @property
     def comment_line(self):
@@ -95,6 +99,8 @@ class StructureIO(object):
         """Delete file path string"""
         del self._fpath
 
+
+class StructureWriter(object):
     @classmethod
     def write(cls, fname, outpath, atoms, structure_format, **kwargs):
         if structure_format == 'data':
@@ -103,38 +109,6 @@ class StructureIO(object):
         else:
             from ._xyz_format import XYZWriter
             XYZWriter.write(fname=fname, outpath=outpath, atoms=atoms)
-
-
-class StructureReader(StructureIO):
-    """Abstract base class for reading structure data.
-
-    Parameters
-    ----------
-    fpath : str
-        structure file
-
-    """
-    __metaclass__ = ABCMeta
-
-    def __init__(self, fpath=None, **kwargs):
-        super(StructureReader, self).__init__(fpath=fpath, **kwargs)
-
-    @abstractmethod
-    def read(self):
-        """Read structure data from file"""
-        raise NotImplementedError('Subclasses of `StructureReader` need to '
-                                  'implement the `read` method.')
-
-
-class StructureWriter(object):
-    """Abstract base class for writing structure data."""
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def write(self):
-        """Write structure data to file"""
-        raise NotImplementedError('Subclasses of `StructureWriter` need to '
-                                  'implement the `write` method.')
 
 
 class StructureConverter(object):
@@ -183,44 +157,7 @@ class StructureFormat(object):
 
 
 class StructureIOError(Exception):
-    """Base class for `StructureIO` exceptions."""
-    pass
-
-
-class StructureReaderError(StructureIOError):
-    """Exception raised for `StructureReader` errors.
-
-    Parameters
-    ----------
-    msg : str
-        Error message.
-
-    """
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return repr(self.msg)
-
-
-class StructureWriterError(StructureIOError):
-    """Exception raised for `StructureWriter` errors.
-
-    Parameters
-    ----------
-    msg : str
-        Error message.
-
-    """
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return repr(self.msg)
-
-
-class StructureConverterError(StructureIOError):
-    """Exception raised for `StructureConverter` errors.
+    """Base class for `StructureIO` errors.
 
     Parameters
     ----------
