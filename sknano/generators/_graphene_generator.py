@@ -191,11 +191,13 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
                 self._Natoms_per_layer = layer.Natoms
 
             # translate layer to put its center of mass at the origin
-            layer.center_CM(r_indices=[0, 1])
+            dr = layer.CM
+            dr.z = 0
+            layer.translate(dr)
             if (nlayer % 2) != 0:
                 layer.translate(self._layer_shift)
 
-            self._structure_atoms.extend(layer.atoms)
+            self._structure_atoms.extend(layer)
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=-90, rot_axis='x', deg2rad=True,
