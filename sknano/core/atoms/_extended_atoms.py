@@ -13,7 +13,6 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
-from functools import total_ordering
 from operator import attrgetter
 
 import numpy as np
@@ -23,7 +22,6 @@ from ._atoms import Atoms
 __all__ = ['XAtoms']
 
 
-@total_ordering
 class XAtoms(Atoms):
     """An eXtended `Atoms` class with more atom attributes.
 
@@ -45,12 +43,6 @@ class XAtoms(Atoms):
                                      copylist=copylist,
                                      deepcopy=deepcopy)
         self._atomtypes = {}
-
-    def __eq__(self, other):
-        return self[:] == other[:]
-
-    def __lt__(self, other):
-        return self[:] < other[:]
 
     def sort(self, key=None, reverse=False):
         if key is None:
