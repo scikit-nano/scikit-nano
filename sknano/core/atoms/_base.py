@@ -135,6 +135,9 @@ class AtomList(MutableSequence):
         """Return the list of `Atom` objects"""
         return self._data
 
+    def clear(self):
+        self._data = []
+
 
 @total_ordering
 class BondList(MutableSequence):
@@ -250,6 +253,9 @@ class BondList(MutableSequence):
     def data(self):
         """Return the list of `Bonds` objects"""
         return self._data
+
+    def clear(self):
+        self._data = []
 
 
 class BondDict(OrderedDict):
