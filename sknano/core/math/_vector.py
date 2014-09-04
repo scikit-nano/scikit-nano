@@ -501,7 +501,7 @@ def angle(u, v):
     return np.arccos(dot(u, v) / (u.norm * v.norm))
 
 
-def cross(u, v):
+def cross(u, v, p0=None):
     """Vector cross product of two vectors.
 
     Parameters
@@ -514,10 +514,12 @@ def cross(u, v):
 
     """
     val = np.cross(np.asarray(u), np.asarray(v))
+    if p0 is None:
+        p0 = u.p0
     if val.shape == ():
         return val[()]
     else:
-        return Vector(val, p0=u.p0)
+        return Vector(val, p0=p0)
 
 
 def dot(u, v):
