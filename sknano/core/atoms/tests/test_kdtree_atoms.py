@@ -6,6 +6,8 @@ import nose
 from nose.tools import *
 import numpy as np
 from sknano.core.atoms import KDTAtom, KDTAtoms
+from sknano.generators import SWNTGenerator
+from sknano.io import DATAReader
 from sknano.testing import generate_atoms
 #from sknano.utils.geometric_shapes import Ellipsoid
 
@@ -114,6 +116,14 @@ def test_atom_bonds():
             for j, bond in enumerate(atom.bonds):
                 assert_true(np.allclose(bond.vector, atom.bonds.vectors[j]))
                 assert_equal(bond.length, atom.bonds.lengths[j])
+
+
+def test_structure_data():
+    fname = '1005_5cells.data'
+    swnt = SWNTGenerator(n=10, m=5, nz=5)
+    swnt.save_data(fname=fname, structure_format='data')
+    data = DATAReader(fname)
+    assert_equals(swnt.atoms.Natoms, data.atoms.Natoms)
 
 
 def test_pyramidalization_angles():

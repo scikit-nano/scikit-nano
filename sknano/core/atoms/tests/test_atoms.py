@@ -12,7 +12,6 @@ def test_instantiation():
     assert_is_instance(atoms, Atoms)
     for Z in range(1, 101):
         atoms.append(Atom(Z))
-
     assert_equals(atoms.Natoms, 100)
 
 
