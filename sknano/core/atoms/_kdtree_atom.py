@@ -39,8 +39,10 @@ class KDTAtom(XAtom):
         self._CN = 0
         self._NN = NeighborAtoms()
         self._bonds = Bonds()
+        self.poav = None
+        self.poav_misalignment_angles = []
         self._pyramidalization_angle = None
-        self._poav = None
+        self._sigma_bond_angle = None
 
     def __str__(self):
         """Return a nice string representation of `KDTAtom`."""
@@ -104,12 +106,14 @@ class KDTAtom(XAtom):
         self._bonds = value
 
     @property
-    def poav(self):
-        return self._poav
+    def sigma_bond_angle(self):
+        return self._sigma_bond_angle
 
-    @poav.setter
-    def poav(self, value):
-        self._poav = value
+    @sigma_bond_angle.setter
+    def sigma_bond_angle(self, value):
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._sigma_bond_angle = value
 
     @property
     def pyramidalization_angle(self):
@@ -120,3 +124,13 @@ class KDTAtom(XAtom):
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
         self._pyramidalization_angle = value
+
+    #@property
+    #def poav_misalignment_angle(self):
+    #    return self._poav_misalignment_angle
+
+    #@poav_misalignment_angle.setter
+    #def poav_misalignment_angle(self, value):
+    #    if not isinstance(value, ):
+    #        raise TypeError('Expected a number')
+    #    self._poav_misalignment_angle = value
