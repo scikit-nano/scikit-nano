@@ -134,9 +134,9 @@ class GeneratorMixin(object):
         #self._structure_format = structure_format
 
         if savecopy:
-            atoms = copy.deepcopy(self._structure_atoms)
+            atoms = copy.deepcopy(self.structure_atoms)
         else:
-            atoms = self._structure_atoms
+            atoms = self.structure_atoms
 
         if center_CM:
             atoms.center_CM()
