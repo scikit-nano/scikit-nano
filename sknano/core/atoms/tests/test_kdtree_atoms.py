@@ -52,17 +52,6 @@ def test_atom_tree():
 
 
 def test_structure_analysis():
-    from sknano.generators import SWNTGenerator
-    n, m = 10, 10
-    nz = 10
-    swnt = SWNTGenerator(n=n, m=m, nz=nz)
-    assert_equals(swnt.N, 2 * n)
-    assert_equals(swnt.Natoms, 2 * swnt.N)
-    assert_equals(swnt.nz, nz)
-    assert_equals(swnt.Natoms_per_tube, swnt.Natoms * swnt.nz)
-    atoms = swnt.atoms
-    assert_equals(atoms.Natoms, swnt.Natoms_per_tube)
-
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
     assert_equals(atoms.Natoms, 400)
@@ -107,7 +96,8 @@ def test_atom_bonds():
     atoms.NNrc = 2.0
     bonds = atoms.bonds
     #print('bonds: {!s}'.format(bonds))
-    assert_equal(len(bonds), atoms.Natoms)
+    assert_equal(len(bonds), atoms.coordination_numbers.sum())
+    assert_equal(bonds.Nbonds, atoms.coordination_numbers.sum())
 
     for i, atom in enumerate(atoms):
         if atom.bonds.Nbonds > 1:
@@ -131,7 +121,7 @@ def test_pyramidalization_angles():
         generate_atoms(generator_class='SWNTGenerator', n=20, m=10, nz=2)
     atoms.assign_unique_ids()
     atoms.NNrc = 2.0
-    atoms.update_pyramidalization_angles()
+    atoms._update_pyramidalization_angles()
 
     for i, atom in enumerate(atoms):
         try:

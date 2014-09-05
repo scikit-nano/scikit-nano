@@ -47,9 +47,10 @@ def test_generator_atoms():
     nz = 10
     swnt = SWNTGenerator(n=n, m=m, nz=nz)
     assert_equals(swnt.N, 2 * n)
-    assert_equals(swnt.Natoms, 2 * swnt.N)
+    assert_equals(swnt.Natoms, 2 * swnt.N * swnt.nz)
+    assert_equals(swnt.Natoms_per_unit_cell, 2 * swnt.N)
     assert_equals(swnt.nz, nz)
-    assert_equals(swnt.Natoms_per_tube, swnt.Natoms * swnt.nz)
+    assert_equals(swnt.Natoms_per_tube, swnt.Natoms_per_unit_cell * swnt.nz)
     atoms = swnt.atoms
     assert_equals(atoms.Natoms, swnt.Natoms_per_tube)
 
