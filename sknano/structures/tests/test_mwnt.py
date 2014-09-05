@@ -8,12 +8,36 @@ from sknano.structures import MWNT
 
 def test1():
     mwnt = MWNT(Ch=[(5,5),(10,10)])
+    print(mwnt)
+    print(mwnt.todict())
+    assert_equal(mwnt.Ntubes, 1)
     assert_equal(mwnt.Nwalls, 2)
+
 
 def test2():
     mwnt = MWNT(max_shells=5)
-    assert_equal(mwnt.Nwalls, 5)
+    print(mwnt)
+    print(mwnt.todict())
     assert_equal(mwnt.Ntubes, 1)
+    assert_equal(mwnt.Nwalls, 5)
+
+
+def test3():
+    mwnt = MWNT(Ch=[(5, 5), (10, 10), (15, 15), (20, 20)],
+                Lz=2.5, fix_Lz=True)
+    print(mwnt)
+    print(mwnt.todict())
+    assert_equal(mwnt.Ntubes, 1)
+    assert_equal(mwnt.Nwalls, 4)
+
+
+def test4():
+    mwnt = MWNT(Ch=[(5, 0), (5, 5), (10, 5), (10, 0), (10, 10), (20, 10)],
+                nz=5.0)
+    print(mwnt)
+    print(mwnt.todict())
+    assert_equal(mwnt.Ntubes, 1)
+    assert_equal(mwnt.Nwalls, 6)
 
 if __name__ == '__main__':
     nose.runmodule()
