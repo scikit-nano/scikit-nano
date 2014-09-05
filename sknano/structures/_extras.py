@@ -19,11 +19,13 @@ from ._swnt import SWNT
 
 __all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'generate_Ch_list',
            'generate_Ch_property_grid', 'get_Ch_indices', 'get_Ch_type',
-           'map_Ch', 'chiral_type_name_mappings', 'Ch_types',
+           'map_Ch', 'chiral_type_name_mappings', 'Ch_types', 'edge_types',
            'filter_key_type_mappings']
 
 chiral_type_name_mappings = Ch_types = \
     {'achiral': 'aCh', 'armchair': 'AC', 'zigzag': 'ZZ', 'chiral': 'Ch'}
+
+edge_types = {'armchair': 'AC', 'zigzag': 'ZZ'}
 
 filter_key_type_mappings = {}
 filter_key_type_mappings['Ch_type'] = str
