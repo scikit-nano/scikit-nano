@@ -22,10 +22,10 @@ __all__ = ['NanotubeBundleGeneratorMixin']
 class NanotubeBundleGeneratorMixin(object):
 
     def generate_bundle(self):
-        self._atomsobj0 = copy.deepcopy(self.structure_atoms)
-        self.structure_atoms = Atoms()
+        self._atomsobj0 = copy.deepcopy(self.atoms)
+        self.atoms = Atoms()
         for dr in self.bundle_coords:
             atomsobj = Atoms(atoms=self._atomsobj0, deepcopy=True)
             atomsobj.center_CM()
             atomsobj.translate(dr)
-            self.structure_atoms.extend(atomsobj)
+            self.atoms.extend(atomsobj)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Nanotube structure generators (:mod:`sknano.generators._swnt_generator`)
+SWNT structure generator (:mod:`sknano.generators._swnt_generator`)
 ===============================================================================
 
 .. currentmodule:: sknano.generators._swnt_generator
@@ -116,7 +116,7 @@ class SWNTGenerator(SWNT, GeneratorMixin):
         rt = self.rt
         e1 = self.element1
         e2 = self.element2
-        verbose = self._verbose
+        verbose = self.verbose
 
         aCh = compute_chiral_angle(n=n, m=m, rad2deg=False)
 
@@ -164,13 +164,13 @@ class SWNTGenerator(SWNT, GeneratorMixin):
 
     def generate_structure_data(self):
         """Generate structure data."""
-        self.structure_atoms = Atoms()
+        self.atoms = Atoms()
         for nz in xrange(int(np.ceil(self.nz))):
             dr = Vector([0.0, 0.0, nz * self.T])
             for uc_atom in self.unit_cell:
                 nt_atom = Atom(element=uc_atom.symbol)
                 nt_atom.r = uc_atom.r + dr
-                self.structure_atoms.append(nt_atom)
+                self.atoms.append(nt_atom)
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, anchor_point=None,
@@ -182,8 +182,8 @@ class SWNTGenerator(SWNT, GeneratorMixin):
 
         """
         if fname is None:
-            chirality = '{}{}r'.format('{}'.format(self.n).zfill(2),
-                                       '{}'.format(self.m).zfill(2))
+            chirality = '{}{}'.format('{}'.format(self.n).zfill(2),
+                                      '{}'.format(self.m).zfill(2))
             if self._assume_integer_unit_cells:
                 nz = ''.join(('{}'.format(self.nz),
                               pluralize('cell', self.nz)))
@@ -199,11 +199,10 @@ class SWNTGenerator(SWNT, GeneratorMixin):
             region_bounds = Cuboid(pmin=pmin, pmax=pmax)
             region_bounds.update_region_limits()
 
-            self.structure_atoms.clip_bounds(region_bounds,
-                                             center_before_clipping=True)
+            self.atoms.clip_bounds(region_bounds, center_before_clipping=True)
 
         if center_CM:
-            self.structure_atoms.center_CM()
+            self.atoms.center_CM()
 
         super(SWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,

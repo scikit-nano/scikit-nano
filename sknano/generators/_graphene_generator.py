@@ -173,7 +173,7 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
 
     def generate_structure_data(self):
         """Generate the full structure coordinates."""
-        self.structure_atoms = Atoms()
+        self.atoms = Atoms()
         for nlayer in xrange(self.nlayers):
             layer = Atoms()
             for nx in xrange(self.Nx):
@@ -196,7 +196,7 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
             if (nlayer % 2) != 0:
                 layer.translate(self.layer_shift)
 
-            self.structure_atoms.extend(layer)
+            self.atoms.extend(layer)
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=-90, rot_axis='x', deg2rad=True,
@@ -216,7 +216,7 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
             fname = '_'.join(fname_wordlist)
 
         if center_CM and self.nlayers > 1:
-            self.structure_atoms.center_CM()
+            self.atoms.center_CM()
 
         super(GrapheneGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,

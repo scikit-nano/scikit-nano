@@ -69,7 +69,7 @@ class FullereneGenerator(Fullerene, GeneratorMixin):
 
     def generate_structure_data(self):
         """Generate structure data."""
-        self.structure_atoms = Atoms()
+        self.atoms = Atoms()
 
     def save_data(self, fname=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,

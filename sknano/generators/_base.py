@@ -50,30 +50,17 @@ class GeneratorMixin(object):
     @property
     def atoms(self):
         """Return structure :class:`~sknano.core.atoms.Atoms`."""
-        return self.structure_atoms
+        return self._atoms
 
     @atoms.setter
     def atoms(self, value):
-        self.structure_atoms = value
+        if not isinstance(value, Atoms):
+            raise TypeError('Expected an `Atoms` object.')
+        self._atoms = value
 
     @atoms.deleter
     def atoms(self):
-        del self.structure_atoms
-
-    @property
-    def fname(self):
-        """Structure file name."""
-        return self._fname
-
-    @property
-    def fpath(self):
-        """Structure file path."""
-        return self._fpath
-
-    @property
-    def structure_format(self):
-        """Structure file format."""
-        return self._structure_format
+        del self._atoms
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, anchor_point=None,
@@ -124,17 +111,16 @@ class GeneratorMixin(object):
 
         if not fname.endswith(structure_format):
             fname += '.' + structure_format
-        self._fname = fname
 
         if outpath is not None:
-            self._fpath = os.path.join(outpath, fname)
+            self.fpath = os.path.join(outpath, fname)
 
         #self._structure_format = structure_format
 
         if savecopy:
-            atoms = copy.deepcopy(self.structure_atoms)
+            atoms = copy.deepcopy(self.atoms)
         else:
-            atoms = self.structure_atoms
+            atoms = self.atoms
 
         if center_CM:
             atoms.center_CM()
