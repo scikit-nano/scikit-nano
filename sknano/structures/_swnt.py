@@ -128,10 +128,7 @@ class SWNT(StructureBase):
         self._params = ['n', 'm', 't1', 't2', 'd', 'dR', 'N',
                         'R', 'chiral_angle', 'Ch', 'T', 'dt', 'rt',
                         'electronic_type']
-        #for i, p in enumerate(self._params[:]):
-        #    self._params[i] = '_' + p
 
-        #print('Ch = ({:d}, {:d})'.format(n, m))
         self.n = n
         self.m = m
 
@@ -152,17 +149,21 @@ class SWNT(StructureBase):
         if self._assume_integer_unit_cells:
             self.nz = int(np.ceil(self.nz))
 
+    def __str__(self):
+        """Return nice string representation of `SWNT`."""
+        return repr(self)
+
     def __repr__(self):
         """Return canonical string representation of `SWNT`."""
-        retstr = "SWNT(n={!r}, m={!r}, ".format(self.n, self.m) + \
-            "element1={!r}, element2={!r}, bond={!r}".format(
-                self.element1, self.element2, self.bond)
+        strrep = "SWNT(n={!r}, m={!r}, element1={!r}, element2={!r}, bond={!r}"
         if self._fix_Lz:
-            retstr += ", Lz={!r}, fix_Lz={!r})".format(self.Lz, self._fix_Lz)
+            strrep += ", Lz={!r}, fix_Lz={!r})"
+            return strrep.format(self.n, self.m, self.element1, self.element2,
+                                 self.bond, self.Lz, self._fix_Lz)
         else:
-            retstr += ")"
-
-        return retstr
+            strrep += ")"
+            return strrep.format(self.n, self.m, self.element1,
+                                 self.element2, self.bond)
 
     @property
     def n(self):
