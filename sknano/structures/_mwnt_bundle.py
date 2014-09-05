@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-MWNT Bundle structure class (:mod:`sknano.structures._mwnt_bundle`)
+MWNT bundle structure class (:mod:`sknano.structures._mwnt_bundle`)
 ==============================================================================
 
 .. currentmodule:: sknano.structures._mwnt_bundle
