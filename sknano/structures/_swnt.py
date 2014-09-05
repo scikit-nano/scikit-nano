@@ -129,15 +129,15 @@ class SWNT(StructureBase):
         self.n = n
         self.m = m
 
+        self._assume_integer_unit_cells = True
+        if fix_Lz:
+            self._assume_integer_unit_cells = False
+        self._fix_Lz = fix_Lz
+
         if Lz is not None:
             self.nz = 10 * float(Lz) / self.T
         else:
             self.nz = nz
-
-        self._fix_Lz = fix_Lz
-        self._assume_integer_unit_cells = True
-        if fix_Lz:
-            self._assume_integer_unit_cells = False
 
         if self._assume_integer_unit_cells:
             self.nz = int(np.ceil(self.nz))
