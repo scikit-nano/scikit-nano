@@ -36,8 +36,6 @@ class MWNT(StructureBase):
         self.Ch = Ch
         if Ch is None or not isinstance(Ch, list):
             self.Ch = []
-            self._L0 = Lz  # store initial value of Lz
-
             self._fix_Lz = fix_Lz
             self._assume_integer_unit_cells = True
             if fix_Lz:
@@ -144,20 +142,23 @@ class MWNT(StructureBase):
                     break
 
         for Ch in self.Ch:
-            print(self.shells)
+            if self.verbose:
+                print(self.shells)
             self.shells.append(SWNT(Ch[0], Ch[-1]))
+
+        self._L0 = Lz  # store initial value of Lz
 
     def __repr__(self):
         """Return canonical string representation of `SWNT`."""
-        retstr = "MWNT(Ch={!r}, ".format(self.Ch) + \
-            "element1={!r}, element2={!r}, bond={!r}".format(
-                self.element1, self.element2, self.bond)
+        strrep = "MWNT(Ch={!r}, element1={!r}, element2={!r}, bond={!r}"
         if self._fix_Lz:
-            retstr += ", Lz={!r}, fix_Lz={!r})".format(self.Lz, self._fix_Lz)
+            strrep += ", Lz={!r}, fix_Lz={!r})"
+            return strrep.format(self.Ch, self.element1, self.element2,
+                                 self.bond, self.Lz, self._fix_Lz)
         else:
-            retstr += ")"
-
-        return retstr
+            strrep += ")"
+            return strrep.format(self.Ch, self.element1, self.element2,
+                                 self.bond)
 
     @property
     def Nwalls(self):
@@ -234,23 +235,3 @@ class MWNT(StructureBase):
     def tube_mass(self):
         """SWNT mass in **grams**."""
         return np.asarray([swnt.tube_mass for swnt in self.shells]).sum()
-
-    @property
-    def max_shells(self):
-        return self._max_shells
-
-    @max_shells.setter
-    def max_shells(self, value):
-        if not (isinstance(value, numbers.Number) or value > 0):
-            raise TypeError('Expected a real, positive integer.')
-        self._max_shells = int(value)
-
-    @property
-    def min_shells(self):
-        return self._min_shells
-
-    @min_shells.setter
-    def min_shells(self, value):
-        if not (isinstance(value, numbers.Number) or value >= 0):
-            raise TypeError('Expected a real integer.')
-        self._min_shells = int(value)
