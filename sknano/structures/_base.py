@@ -35,7 +35,8 @@ class StructureBase(object):
         :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
 
     """
-    def __init__(self, element1='C', element2='C', bond=CCbond, **kwargs):
+    def __init__(self, element1='C', element2='C', bond=CCbond, verbose=False,
+                 **kwargs):
 
         self.element1 = element1
         self.element2 = element2
@@ -44,6 +45,7 @@ class StructureBase(object):
             bond = CCbond
 
         self.bond = bond
+        self.verbose = verbose
 
     @property
     def bond(self):
