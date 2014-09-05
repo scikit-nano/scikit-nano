@@ -11,6 +11,7 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 import numbers
+
 import numpy as np
 
 from sknano.core.refdata import dVDW
@@ -23,7 +24,7 @@ __all__ = ['MWNT']
 
 
 class MWNT(StructureBase):
-    def __init__(self, Ch=None, Nwalls=None, Lz=None, fix_Lz=False,
+    def __init__(self, Ch=None, Nwalls=None, Lz=None, fix_Lz=False, nz=1,
                  add_inner_shells=False, add_outer_shells=True,
                  max_shells=None, max_shell_diameter=np.inf,
                  min_shells=None, min_shell_diameter=0.0,
@@ -31,15 +32,11 @@ class MWNT(StructureBase):
 
         super(MWNT, self).__init__(**kwargs)
 
+        self.Ch = Ch
         self.shells = []
 
-        self.Ch = Ch
         if Ch is None or not isinstance(Ch, list):
             self.Ch = []
-            self._fix_Lz = fix_Lz
-            self._assume_integer_unit_cells = True
-            if fix_Lz:
-                self._assume_integer_unit_cells = False
 
             self._add_inner_shells = add_inner_shells
             self._add_outer_shells = add_outer_shells
@@ -72,8 +69,6 @@ class MWNT(StructureBase):
 
             self.max_shell_diameter = min(self.max_shell_diameter, dt.max())
             self.min_shell_diameter = max(self.min_shell_diameter, dt.min())
-
-            #Lzmin = self.Lz
 
             delta_dt = -2 * self.shell_spacing
             max_dt_diff = 0.05
@@ -142,39 +137,92 @@ class MWNT(StructureBase):
                     break
 
         for Ch in self.Ch:
-            if self.verbose:
-                print(self.shells)
-            self.shells.append(SWNT(Ch[0], Ch[-1]))
+            self.shells.append(SWNT(Ch[0], Ch[-1], Lz=Lz, fix_Lz=fix_Lz,
+                                    nz=nz, **kwargs))
 
-        self._L0 = Lz  # store initial value of Lz
+        self.fix_Lz = fix_Lz
+        self.nz = nz
+        self.L0 = self.Lz  # store initial value of Lz
+
+        if self.verbose:
+            print(self.shells)
+
+    def __str__(self):
+        return repr(self)
 
     def __repr__(self):
-        """Return canonical string representation of `SWNT`."""
-        strrep = "MWNT(Ch={!r}, element1={!r}, element2={!r}, bond={!r}"
-        if self._fix_Lz:
-            strrep += ", Lz={!r}, fix_Lz={!r})"
-            return strrep.format(self.Ch, self.element1, self.element2,
-                                 self.bond, self.Lz, self._fix_Lz)
-        else:
-            strrep += ")"
-            return strrep.format(self.Ch, self.element1, self.element2,
-                                 self.bond)
+        """Return canonical string representation of `MWNT`."""
+        strrep = "MWNT(Ch={!r}, Nwalls={!r}, Lz={!r}, fix_Lz={!r}, " + \
+            "nz={!r}, element1={!r}, element2={!r}, bond={!r})"
+        return strrep.format(self.Ch, self.Nwalls, self.Lz, self.fix_Lz,
+                             self.nz, self.element1, self.element2, self.bond)
+
+    @property
+    def chiral_types(self):
+        return [swnt.chiral_type for swnt in self.shells]
+
+    @property
+    def chiral_set(self):
+        return set(self.chiral_types)
+
+    @property
+    def nz(self):
+        """Number of nanotube unit cells along the :math:`z`-axis."""
+        if len(self.chiral_set) == 1:
+            return self._nz
+        return [swnt.nz for swnt in self.shells]
+
+    @nz.setter
+    def nz(self, value):
+        """Set number of nanotube unit cells along the :math:`z`-axis."""
+        if not (isinstance(value, numbers.Real) or value > 0):
+            raise TypeError('Expected a real, positive number.')
+        self._nz = value
+        if self._assume_integer_unit_cells:
+            self._nz = int(np.ceil(value))
+
+    @property
+    def Lz(self):
+        """MWNT length :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**."""
+        if len(self.chiral_set) == 1:
+            return self.nz * self.T
+        return np.asarray([swnt.Lz for swnt in self.shells]).max()
+
+    @property
+    def fix_Lz(self):
+        return self._fix_Lz
+
+    @fix_Lz.setter
+    def fix_Lz(self, value):
+        if not isinstance(value, bool):
+            raise TypeError('Expected `True` or `False`')
+        self._fix_Lz = value
+        self._assume_integer_unit_cells = True
+        if self.fix_Lz:
+            self._assume_integer_unit_cells = False
 
     @property
     def Nwalls(self):
         return len(self.shells)
 
     @property
+    def T(self):
+        """Length of `MWNT` unit cell :math:`|\\mathbf{T}|` in \u212b."""
+        if len(self.chiral_set) == 1:
+            return self.shells[-1].T
+        return np.asarray([swnt.T for swnt in self.shells]).max()
+
+    @property
     def dt(self):
-        u"""`MWNT` diameter :math:`d_t = \\frac{|\\mathbf{C}_h|}{\\pi}`
+        u"""`MWNT` diameter :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}`
         in \u212b."""
-        return self.shells[-1].dt
+        return np.asarray([swnt.dt for swnt in self.shells]).max()
 
     @property
     def rt(self):
-        u"""`MWNT` radius :math:`r_t = \\frac{|\\mathbf{C}_h|}{2\\pi}`
+        u"""`MWNT` radius :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}`
         in \u212b."""
-        return self.shells[-1].rt
+        return np.asarray([swnt.rt for swnt in self.shells]).max()
 
     @property
     def Natoms(self):
@@ -183,7 +231,7 @@ class MWNT(StructureBase):
         .. versionchanged:: 0.3.0
 
            **Returns total number of atoms per nanotube.**
-           Use :attr:`~SWNT.Natoms_per_unit_cell` to get the number of
+           Use :attr:`~MWNT.Natoms_per_unit_cell` to get the number of
            atoms per unit cell.
 
         .. math::
@@ -233,5 +281,10 @@ class MWNT(StructureBase):
 
     @property
     def tube_mass(self):
-        """SWNT mass in **grams**."""
+        """MWNT mass in **grams**."""
         return np.asarray([swnt.tube_mass for swnt in self.shells]).sum()
+
+    def todict(self):
+        return dict(Ch=self.Ch, Nwalls=self.Nwalls, nz=self.nz, Lz=self.Lz,
+                    fix_Lz=self.fix_Lz, element1=self.element1,
+                    element2=self.element2, bond=self.bond)
