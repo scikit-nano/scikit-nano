@@ -35,8 +35,7 @@ class StructureBase(object):
         :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
 
     """
-    def __init__(self, element1='C', element2='C', bond=CCbond, verbose=False,
-                 **kwargs):
+    def __init__(self, element1='C', element2='C', bond=CCbond, verbose=False):
 
         self.element1 = element1
         self.element2 = element2
@@ -59,6 +58,10 @@ class StructureBase(object):
             raise TypeError('Expected a real, positive number.')
         self._bond = float(value)
 
+    @bond.deleter
+    def bond(self):
+        del self._bond
+
     @property
     def element1(self):
         """Element symbol of :class:`~sknano.core.atoms.Atom` 1."""
@@ -69,6 +72,10 @@ class StructureBase(object):
         """Set element symbol of :class:`~sknano.core.atoms.Atom` 1."""
         self._element1 = value
 
+    @element1.deleter
+    def element1(self):
+        del self._element1
+
     @property
     def element2(self):
         """Element symbol of :class:`~sknano.core.atoms.Atom` 2."""
@@ -78,3 +85,7 @@ class StructureBase(object):
     def element2(self, value):
         """Set element symbol of :class:`~sknano.core.atoms.Atom` 2."""
         self._element2 = value
+
+    @element2.deleter
+    def element2(self):
+        del self._element2
