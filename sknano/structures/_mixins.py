@@ -143,6 +143,18 @@ class NanotubeBundleMixin(object):
     def bundle_packing(self):
         del self._bundle_packing
 
+    @property
+    def bundle_mass(self):
+        return self.Ntubes * self.tube_mass
+
+    @property
+    def Natoms_per_bundle(self):
+        return self.Ntubes * self.Natoms_per_tube
+
+    @property
+    def Ntubes(self):
+        return len(self.bundle_coords)
+
 
 class UnrolledSWNTMixin(object):
     @property
