@@ -15,7 +15,6 @@ import re
 import numpy as np
 
 from sknano.core.math import comparison_symbol_operator_mappings
-from ._swnt import SWNT
 
 __all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'generate_Ch_list',
            'generate_Ch_property_grid', 'get_Ch_indices', 'get_Ch_type',
@@ -180,6 +179,7 @@ def filter_Ch_list(Ch_list, property_filters=None, **kwargs):
         list of chiralities which passed conditions
 
     """
+    from ._swnt import SWNT
     if property_filters is not None:
         filtered_list = Ch_list[:]
         try:
