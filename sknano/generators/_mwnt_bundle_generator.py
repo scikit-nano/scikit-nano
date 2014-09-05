@@ -89,8 +89,7 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
     --------
 
     >>> from sknano.generators import MWNTBundleGenerator
-    >>> mwntbundle = MWNTBundleGenerator(n=40, m=40, max_shells=5,
-    ...                                  Lz=1.0, fix_Lz=True,
+    >>> mwntbundle = MWNTBundleGenerator(max_shells=5, Lz=1.0, fix_Lz=True,
     ...                                  bundle_geometry='hexagon')
     >>> mwntbundle.save_data()
 
@@ -120,35 +119,35 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
 
         """
         if fname is None:
-            Nshells = '{}shell_mwnt'.format(self._Nshells_per_tube)
-            chirality = '{}{}_{}_Ch'.format('{}'.format(self._n).zfill(2),
-                                            '{}'.format(self._m).zfill(2),
-                                            self._starting_shell_position)
+            Nshells = '{}shell_mwnt'.format(self.Nshells)
+            chiralities = '@'.join([str(Ch).replace(' ', '')
+                                    for Ch in self.Ch])
             packing = '{}cp'.format(self.bundle_packing[0])
-            Ntubes = '{}tube'.format(self._Ntubes)
+            Ntubes = '{}tube'.format(self.Ntubes)
 
             fname_wordlist = None
-            if self._bundle_geometry is None:
-                nx = ''.join(('{}'.format(self._nx),
-                             pluralize('cell', self._nx)))
-                ny = ''.join(('{}'.format(self._ny),
-                             pluralize('cell', self._ny)))
-                if self._assume_integer_unit_cells:
-                    nz = ''.join(('{}'.format(self._nz),
-                                  pluralize('cell', self._nz)))
-                else:
-                    nz = ''.join(('{:.2f}'.format(self._nz),
-                                  pluralize('cell', self._nz)))
-                cells = 'x'.join((nx, ny, nz))
+            if self.bundle_geometry is None:
+                nx = ''.join(('{}'.format(self.nx),
+                             pluralize('cell', self.nx)))
+                ny = ''.join(('{}'.format(self.ny),
+                             pluralize('cell', self.ny)))
+                cells = 'x'.join((nx, ny))
+                #if self._assume_integer_unit_cells:
+                #    nz = ''.join(('{}'.format(self.nz),
+                #                  pluralize('cell', self.nz)))
+                #else:
+                #    nz = ''.join(('{:.2f}'.format(self.nz),
+                #                  pluralize('cell', self.nz)))
+                #cells = 'x'.join((nx, ny, nz))
 
-                if self._nx == 1 and self._ny == 1:
-                    fname_wordlist = (Nshells, chirality, cells)
+                if self.nx == 1 and self.ny == 1:
+                    fname_wordlist = (Nshells, chiralities, cells)
                 else:
-                    fname_wordlist = (Nshells, chirality, packing, cells)
+                    fname_wordlist = (Nshells, chiralities, packing, cells)
             else:
                 fname_wordlist = \
-                    (Nshells, chirality, packing, Ntubes,
-                     self._bundle_geometry)
+                    (Nshells, chiralities, packing, Ntubes,
+                     self.bundle_geometry)
 
             fname = '_'.join(fname_wordlist)
 

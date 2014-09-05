@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Nanotube structure generators (:mod:`sknano.generators._mwnt_generator`)
+MWNT structure generator (:mod:`sknano.generators._mwnt_generator`)
 ===============================================================================
 
 .. currentmodule:: sknano.generators._mwnt_generator
@@ -19,16 +19,16 @@ Nanotube structure generators (:mod:`sknano.generators._mwnt_generator`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-import copy
+#import copy
 
-import numpy as np
+#import numpy as np
 
-from sknano.core import pluralize
-from sknano.core.math import Vector
-from sknano.structures import SWNT, MWNT
-from sknano.utils.geometric_shapes import Cuboid
-from ._base import GeneratorAtom as Atom, GeneratorAtoms as Atoms, \
-    GeneratorMixin
+#from sknano.core import pluralize
+#from sknano.core.math import Vector
+from sknano.structures import MWNT
+#from sknano.utils.geometric_shapes import Cuboid
+from ._base import GeneratorAtoms as Atoms, GeneratorMixin
+from ._swnt_generator import SWNTGenerator
 
 __all__ = ['MWNTGenerator']
 
@@ -115,64 +115,11 @@ class MWNTGenerator(MWNT, GeneratorMixin):
             self.generate_unit_cell()
             self.generate_structure_data()
 
-    def generate_unit_cell(self, n=None, m=None):
-        """Generate the nanotube unit cell."""
-        eps = 0.01
-        bond = self._bond
-        e1 = self._element1
-        e2 = self._element2
-        verbose = self._verbose
-
-        if n is None or m is None:
-            n = self._n
-            m = self._m
-
-        N = SWNT.compute_N(n=n, m=m)
-        T = SWNT.compute_T(n=n, m=m, bond=bond)
-        aCh = SWNT.compute_chiral_angle(n=n, m=m, rad2deg=False)
-        rt = SWNT.compute_rt(n=n, m=m, bond=bond)
-
-        tau = SWNT.compute_tau(n=n, m=m, bond=bond)
-        dtau = bond * np.sin(np.pi / 6 - aCh)
-
-        psi = SWNT.compute_psi(n=n, m=m)
-        dpsi = bond * np.cos(np.pi / 6 - aCh) / rt
-
-        if verbose:
-            print('dpsi: {}'.format(dpsi))
-            print('dtau: {}\n'.format(dtau))
-
-        self._unit_cell = Atoms()
-
-        for i in xrange(1, N + 1):
-            x1 = rt * np.cos(i * psi)
-            y1 = rt * np.sin(i * psi)
-            z1 = i * tau
-
-            while z1 > T - eps:
-                z1 -= T
-
-            atom1 = Atom(element=e1, x=x1, y=y1, z=z1)
-            atom1.rezero()
-
-            if verbose:
-                print('Basis Atom 1:\n{}'.format(atom1))
-
-            self.unit_cell.append(atom1)
-
-            x2 = rt * np.cos(i * psi + dpsi)
-            y2 = rt * np.sin(i * psi + dpsi)
-            z2 = i * tau - dtau
-            while z2 > T - eps:
-                z2 -= T
-
-            atom2 = Atom(element=e2, x=x2, y=y2, z=z2)
-            atom2.rezero()
-
-            if verbose:
-                print('Basis Atom 2:\n{}'.format(atom2))
-
-            self.unit_cell.append(atom2)
+    def generate_unit_cell(self):
+        """Generate the `MWNT` unit cell."""
+        self.unit_cell = Atoms()
+        for swnt in self.shells:
+            self.unit_cell.extend(SWNTGenerator(**swnt.todict()).unit_cell)
 
     def generate_structure_data(self):
         """Generate structure data.
@@ -183,142 +130,33 @@ class MWNTGenerator(MWNT, GeneratorMixin):
            generating it every time.
 
         """
-        Ch = []
-        dt = []
-        for n in xrange(0, 201):
-            for m in xrange(0, 201):
-                if (n <= 2 and m <= 2):
-                    continue
-                else:
-                    Ch.append((n, m))
-                    dt.append(SWNT.compute_dt(n=n, m=m, bond=self._bond))
-        Ch = np.asarray(Ch)
-        dt = np.asarray(dt)
 
-        self._structure_atoms = Atoms()
-        for nz in xrange(int(np.ceil(self.nz))):
-            dr = Vector([0.0, 0.0, nz * self.T])
-            for uc_atom in self._unit_cell:
-                nt_atom = Atom(element=uc_atom.symbol)
-                nt_atom.r = uc_atom.r + dr
-                self._structure_atoms.append(nt_atom)
+        #self.atoms = Atoms(atoms=self.unit_cell)
+        self.atoms = Atoms()
+        for swnt in self.shells:
+            self.atoms.extend(SWNTGenerator(**swnt.todict()).atoms)
+        #for n, m in self.Ch:
+        #for nz in xrange(int(np.ceil(self.nz))):
+        #    dr = Vector([0.0, 0.0, nz * self.T])
+        #    for uc_atom in self.unit_cell:
+        #        nt_atom = Atom(element=uc_atom.symbol)
+        #        nt_atom.r = uc_atom.r + dr
+        #        self.atoms.append(nt_atom)
 
-        swnt0 = copy.deepcopy(self._structure_atoms)
-        self._structure_atoms = Atoms(atoms=swnt0, deepcopy=True)
-        self._structure_atoms.center_CM()
+        #Lzmin = self.atoms
+        #pmin = [-np.inf, -np.inf, -np.inf]
+        #pmax = [np.inf, np.inf, np.inf]
+        #region_bounds = Cuboid(pmin=pmin, pmax=pmax)
+        #if self._L0 is not None and self._fix_Lz:
+        #    region_bounds.zmax = (10 * self._L0 + 1) / 2
+        #else:
+        #    region_bounds.zmax = (10 * Lzmin + 1) / 2
 
-        self._max_shell_diameter = min(self._max_shell_diameter, dt.max())
-        self._min_shell_diameter = max(self._min_shell_diameter, dt.min())
+        #region_bounds.zmin = -region_bounds.zmax
+        #region_bounds.update_region_limits()
 
-        Lzmin = self.Lz
-
-        delta_dt = -2 * self._shell_spacing
-        max_dt_diff = 0.05
-
-        if self._add_outer_shells:
-            delta_dt = -delta_dt
-            self._starting_shell_position = 'inner'
-
-        next_dt = self.dt + delta_dt
-        while self._Nshells_per_tube < self._max_shells and \
-                next_dt <= self._max_shell_diameter and \
-                next_dt >= self._min_shell_diameter:
-
-            # get chiral indices for next_dt
-            next_Ch_candidates = []
-            while len(next_Ch_candidates) == 0 and \
-                    next_dt <= self._max_shell_diameter and \
-                    next_dt >= self._min_shell_diameter:
-
-                if self._new_shell_type in ('AC', 'armchair'):
-                    next_Ch_candidates = \
-                        Ch[np.where(
-                            np.logical_and(np.abs(dt - next_dt) <= max_dt_diff,
-                                           Ch[:,0] == Ch[:,1]))]
-                elif self._new_shell_type in ('ZZ', 'zigzag'):
-                    next_Ch_candidates = \
-                        Ch[np.where(
-                            np.logical_and(np.abs(dt - next_dt) <= max_dt_diff,
-                                           np.logical_or(Ch[:,0] == 0,
-                                                         Ch[:,1] == 0)))]
-                elif self._new_shell_type == 'achiral':
-                    next_Ch_candidates = \
-                        Ch[np.where(
-                            np.logical_and(np.abs(dt - next_dt) <= max_dt_diff,
-                                           np.logical_or(
-                                               Ch[:,0] == Ch[:,1],
-                                               np.logical_or(
-                                                   Ch[:,0] == 0,
-                                                   Ch[:,1] == 0))))]
-                elif self._new_shell_type == 'chiral':
-                    next_Ch_candidates = \
-                        Ch[np.where(
-                            np.logical_and(np.abs(dt - next_dt) <= max_dt_diff,
-                                           np.logical_and(
-                                               Ch[:,0] != Ch[:,1],
-                                               np.logical_and(
-                                                   Ch[:,0] != 0,
-                                                   Ch[:,1] != 1))))]
-                else:
-                    next_Ch_candidates = \
-                        Ch[np.where(np.abs(dt - next_dt) <= max_dt_diff)]
-
-                if self._add_outer_shells:
-                    next_dt += max_dt_diff
-                else:
-                    next_dt -= max_dt_diff
-
-            if len(next_Ch_candidates) > 0:
-                n, m = next_Ch_candidates[
-                    np.random.choice(np.arange(len(next_Ch_candidates)))]
-                T = SWNT.compute_T(n=n, m=m, bond=self._bond)
-                Lz = SWNT.compute_Lz(
-                    n=n, m=m, bond=self._bond, nz=self._nz)
-                Lzmin = min(Lzmin, Lz)
-
-                # generate unit cell for new shell chiral indices
-                self.generate_unit_cell(n=n, m=m)
-
-                if self._verbose:
-                    print('new shell:\n'
-                          'n, m = {}, {}\n'.format(n, m) +
-                          'dt: {:.4f}\n'.format(next_dt) +
-                          'shell unit cell Natoms: {}\n'.format(
-                              self._unit_cell.Natoms))
-
-                shell = Atoms()
-                for nz in xrange(int(np.ceil(self._nz))):
-                    dr = Vector([0.0, 0.0, nz * T])
-                    for uc_atom in self._unit_cell:
-                        atom = Atom(element=uc_atom.symbol)
-                        atom.r = uc_atom.r + dr
-                        shell.append(atom)
-                shell.center_CM()
-                self._structure_atoms.extend(shell)
-                self._Nshells_per_tube += 1
-                next_dt += delta_dt
-            else:
-                break
-
-        pmin = [-np.inf, -np.inf, -np.inf]
-        pmax = [np.inf, np.inf, np.inf]
-        region_bounds = Cuboid(pmin=pmin, pmax=pmax)
-        if self._L0 is not None and self._fix_Lz:
-            region_bounds.zmax = (10 * self._L0 + 1) / 2
-        else:
-            region_bounds.zmax = (10 * Lzmin + 1) / 2
-
-        region_bounds.zmin = -region_bounds.zmax
-        region_bounds.update_region_limits()
-
-        self._structure_atoms.clip_bounds(region_bounds,
-                                          center_before_clipping=True)
-
-        self._Natoms_per_tube = self._structure_atoms.Natoms
-
-        if self._verbose:
-            print('Nshells_per_tube: {}'.format(self._Nshells_per_tube))
-            print('Natoms_per_tube: {}'.format(self._Natoms_per_tube))
+        #self.atoms.clip_bounds(region_bounds,
+        #                                 center_before_clipping=True)
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
@@ -330,19 +168,19 @@ class MWNTGenerator(MWNT, GeneratorMixin):
 
         """
         if fname is None:
-            Nshells = '{}shell_mwnt'.format(self._Nshells_per_tube)
-            chirality = '{}{}_{}_Ch'.format('{}'.format(self._n).zfill(2),
-                                            '{}'.format(self._m).zfill(2),
-                                            self._starting_shell_position)
-            fname_wordlist = None
-            if self._assume_integer_unit_cells:
-                nz = ''.join(('{}'.format(self._nz),
-                              pluralize('cell', self._nz)))
-            else:
-                nz = ''.join(('{:.2f}'.format(self._nz),
-                              pluralize('cell', self._nz)))
+            Nshells = '{}shell_mwnt'.format(self.Nshells)
+            chiralities = '@'.join([str(Ch).replace(' ', '') for
+                                    Ch in self.Ch])
 
-            fname_wordlist = (Nshells, chirality, nz)
+            fname_wordlist = None
+            #if self._assume_integer_unit_cells:
+            #    nz = ''.join(('{}'.format(self.nz),
+            #                  pluralize('cell', self.nz)))
+            #else:
+            #    nz = ''.join(('{:.2f}'.format(self.nz),
+            #                  pluralize('cell', self.nz)))
+            #fname_wordlist = (Nshells, chiralities, nz)
+            fname_wordlist = (Nshells, chiralities)
             fname = '_'.join(fname_wordlist)
 
         super(MWNTGenerator, self).save_data(
