@@ -15,9 +15,8 @@ import os
 
 import numpy as np
 
-from ..core import get_fpath
-
-from ._base import Atom, Atoms, StructureIO, StructureConverter, \
+from sknano.core import get_fpath
+from ._base import Atom, StructureIO, StructureConverter, \
     StructureFormat, StructureIOError, default_comment_line
 
 __all__ = ['DATAData', 'DATAReader', 'DATAWriter',
@@ -118,11 +117,6 @@ class DATAReader(StructureIO):
             self.read()
 
     @property
-    def headers(self):
-        """LAMMPS data file headers."""
-        return self._headers
-
-    @property
     def sections(self):
         """LAMMPS data file sections."""
         return self._sections
@@ -134,7 +128,7 @@ class DATAReader(StructureIO):
 
     def read(self):
         """Read data file."""
-        self.structure_atoms.clear()
+        self.atoms.clear()
         with open(self.fpath, 'r') as f:
             self._comment_line = f.readline().strip()
 
@@ -246,17 +240,17 @@ class DATAReader(StructureIO):
                 #    print('unknown atom keyword: {}'.format(kw))
 
             atom = Atom(**atom_kwargs)
-            self.structure_atoms.append(atom)
+            self.atoms.append(atom)
 
     def _parse_atomtypes(self):
-        Ntypes = self.structure_atoms.Ntypes
-        atomtypes = self.structure_atoms.atomtypes
+        Ntypes = self.atoms.Ntypes
+        atomtypes = self.atoms.atomtypes
         if Ntypes != self._headers['atom types']:
             for atomtype in xrange(1, self._headers['atom types'] + 1):
                 if atomtype not in atomtypes:
                     mass = self._sections['Masses'][atomtype - 1][
                         self._section_properties['Masses']['mass']['index']]
-                    self.structure_atoms.add_atomtype(
+                    self.atoms.add_atomtype(
                         Atom(atomtype=atomtype, mass=mass))
 
     def _parse_boxbounds(self):
@@ -265,7 +259,7 @@ class DATAReader(StructureIO):
                 self._headers[' '.join([dim + lim for lim in ('lo', 'hi')])]
             self._boxbounds[dim] = {'min': bounds[0], 'max': bounds[-1]}
 
-        self._kwargs['boxbounds'] = self._boxbounds
+        self.kwargs['boxbounds'] = self._boxbounds
 
     def get(self, section_key, colnum=None, colname=None, colindex=None):
         """Return section with `section_key`.
@@ -474,9 +468,9 @@ class DATAData(DATAReader):
         super(DATAData, self).__init__(fpath, **kwargs)
 
     def delete(self, key):
-        if key in self.headers:
+        if key in self._headers:
             del self._headers[key]
-        elif key in self.sections:
+        elif key in self._sections:
             del self._sections[key]
         else:
             raise DATAError('{} not in DATA object'.format(key))
@@ -538,7 +532,7 @@ class DATAData(DATAReader):
             self._section_properties[section_key][atom_attr]['dtype']
         new_data = np.asarray(new_data, dtype=attr_dtype)
 
-        for i, atom in enumerate(self.structure_atoms):
+        for i, atom in enumerate(self.atoms):
             self._sections[section_key][i][colidx] = \
                 attr_dtype(float(new_data[i]))
             setattr(atom, atom_attr, attr_dtype(float(new_data[i])))
@@ -555,7 +549,7 @@ class DATAData(DATAReader):
 
         """
         try:
-            kwargs.update(self._kwargs)
+            kwargs.update(self.kwargs)
 
             if (datafile is None or datafile == '') and \
                     (self.fpath is None or self.fpath == ''):
@@ -568,7 +562,7 @@ class DATAData(DATAReader):
             else:
                 datafile = self.fpath
 
-            DATAWriter.write(fname=datafile, atoms=self.structure_atoms,
+            DATAWriter.write(fname=datafile, atoms=self.atoms,
                              comment_line=self._comment_line, **kwargs)
 
         except (TypeError, ValueError) as e:
@@ -624,7 +618,7 @@ class DATA2XYZConverter(StructureConverter):
         """
         from ._xyz_format import XYZReader, XYZWriter
 
-        kwargs.update(self._kwargs)
+        kwargs.update(self.kwargs)
 
         datareader = DATAReader(fpath=self.infile, **kwargs)
 
@@ -686,9 +680,9 @@ class DATAFormat(StructureFormat):
 
         section_keys = ['Atoms', 'Masses', 'Velocities']
         self._section_syntax_dict = \
-            {'Atoms': atoms_section_syntax[self.atom_style],
+            {'Atoms': atoms_section_syntax[self._atom_style],
              'Masses': ['atomtype', 'mass'],
-             'Velocities': velocities_section_syntax[self.atom_style]}
+             'Velocities': velocities_section_syntax[self._atom_style]}
 
         for section_key in section_keys:
             self._section_properties[section_key] = OrderedDict()
@@ -745,7 +739,7 @@ class DATAFormat(StructureFormat):
                          'zlo zhi': {'dtype': float, 'items': 2},
                          'xy xz yz': {'dtype': float, 'items': 3}}
 
-        self._properties['headers'] = self._headers
+        self.properties['headers'] = self._headers
 
         # A LAMMPS data file is partitioned into sections identified
         # by a keyword string. The header data are used by one or
@@ -815,12 +809,7 @@ class DATAFormat(StructureFormat):
         self._section_header_map.update(
             dict.fromkeys(dihedral_types_sections, 'dihedral types'))
 
-        self._properties['sections'] = self._section_header_map
-
-    @property
-    def atom_style(self):
-        """Atom style."""
-        return self._atom_style
+        self.properties['sections'] = self._section_header_map
 
     @property
     def header_keys(self):
