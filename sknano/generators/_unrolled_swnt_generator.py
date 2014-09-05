@@ -126,7 +126,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
             print('dpsi: {}'.format(dpsi))
             print('dtau: {}\n'.format(dtau))
 
-        self._unit_cell = Atoms()
+        self.unit_cell = Atoms()
 
         for i in xrange(N):
             x1 = rt * i * psi
@@ -141,7 +141,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
             if verbose:
                 print('Basis Atom 1:\n{}'.format(atom1))
 
-            self._unit_cell.append(atom1)
+            self.unit_cell.append(atom1)
 
             x2 = rt * (i * psi + dpsi)
             z2 = i * tau - dtau
@@ -154,7 +154,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
             if verbose:
                 print('Basis Atom 2:\n{}'.format(atom2))
 
-            self._unit_cell.append(atom2)
+            self.unit_cell.append(atom2)
 
     def generate_structure_data(self):
         """Generate structure data."""
@@ -162,7 +162,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
         for nx in xrange(self.nx):
             for nz in xrange(int(np.ceil(self.nz))):
                 dr = Vector([nx * self.Ch, 0.0, nz * self.T])
-                for uc_atom in self._unit_cell:
+                for uc_atom in self.unit_cell:
                     nt_atom = Atom(element=uc_atom.symbol)
                     nt_atom.r = uc_atom.r + dr
                     self.structure_atoms.append(nt_atom)

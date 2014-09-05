@@ -130,7 +130,7 @@ class SWNTGenerator(SWNT, GeneratorMixin):
             print('dpsi: {}'.format(dpsi))
             print('dtau: {}\n'.format(dtau))
 
-        self._unit_cell = Atoms()
+        self.unit_cell = Atoms()
 
         for i in xrange(1, N + 1):
             x1 = rt * np.cos(i * psi)

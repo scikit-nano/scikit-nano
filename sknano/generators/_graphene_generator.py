@@ -138,7 +138,7 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
         e1 = self.element1
         e2 = self.element2
 
-        self._unit_cell = Atoms()
+        self.unit_cell = Atoms()
         # Set up 4 atom basis
         # Leave atom 1 at the origin
         atom1 = Atom(element=e1)
