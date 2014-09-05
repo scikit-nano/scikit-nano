@@ -17,8 +17,8 @@ import numpy as np
 
 from ..core import get_fpath
 
-from ._base import Atom, StructureIO, StructureConverter, StructureFormat, \
-    StructureIOError, default_comment_line
+from ._base import Atom, Atoms, StructureIO, StructureConverter, \
+    StructureFormat, StructureIOError, default_comment_line
 
 __all__ = ['DATAData', 'DATAReader', 'DATAWriter',
            'DATA2XYZConverter', 'DATAFormat', 'DATAError',
@@ -134,6 +134,7 @@ class DATAReader(StructureIO):
 
     def read(self):
         """Read data file."""
+        self._structure_atoms.clear()
         with open(self.fpath, 'r') as f:
             self._comment_line = f.readline().strip()
 

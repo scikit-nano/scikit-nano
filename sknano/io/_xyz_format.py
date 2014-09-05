@@ -14,8 +14,8 @@ import os
 
 from ..core import get_fpath
 
-from ._base import Atom, StructureIO, StructureConverter, StructureFormat, \
-    StructureIOError, default_comment_line
+from ._base import Atom, Atoms, StructureIO, StructureConverter, \
+    StructureFormat, StructureIOError, default_comment_line
 
 __all__ = ['XYZReader', 'XYZWriter', 'XYZData',
            'XYZ2DATAConverter', 'XYZFormat']
@@ -38,6 +38,7 @@ class XYZReader(StructureIO):
 
     def read(self):
         """Read `xyz` file."""
+        self._structure_atoms.clear()
         with open(self.fpath, 'r') as f:
             Natoms = int(f.readline().strip())
             self._comment_line = f.readline().strip()
