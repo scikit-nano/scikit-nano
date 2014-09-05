@@ -12,6 +12,7 @@ __docformat__ = 'restructuredtext en'
 
 from ._nanotube_bundle import NanotubeBundle
 from ._mwnt import MWNT
+#from ._swnt_bundle import SWNTBundle
 
 __all__ = ['MWNTBundle']
 
@@ -20,3 +21,5 @@ class MWNTBundle(NanotubeBundle, MWNT):
     def __init__(self, **kwargs):
 
         super(MWNTBundle, self).__init__(**kwargs)
+
+        #self.shell_bundles = [SWNTBundle(**swnt.todict()
