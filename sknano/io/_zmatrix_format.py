@@ -47,10 +47,10 @@ class ZMATRIXReader(StructureReader):
                 if len(s) != 0:
                     atom = \
                         Atom(s[0], x=float(s[1]), y=float(s[2]), z=float(s[3]))
-                    self._structure_atoms.append(atom)
-            if self._structure_atoms.Natoms != Natoms:
+                    self.structure_atoms.append(atom)
+            if self.structure_atoms.Natoms != Natoms:
                 error_msg = '`zmatrixfile` contained {} atoms '.format(
-                    self._structure_atoms.Natoms) + 'but should contain ' + \
+                    self.structure_atoms.Natoms) + 'but should contain ' + \
                     '{}'.format(Natoms)
                 raise StructureReaderError(error_msg)
 
@@ -125,7 +125,7 @@ class ZMATRIXDATA(ZMATRIXReader):
             else:
                 zmatrixfile = self.fpath
             ZMATRIXWriter.write(fname=zmatrixfile,
-                                atoms=self._structure_atoms,
+                                atoms=self.structure_atoms,
                                 comment_line=self._comment_line)
         except (TypeError, ValueError) as e:
             print(e)

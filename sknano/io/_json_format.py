@@ -44,10 +44,10 @@ class JSONReader(StructureReader):
                 if len(s) != 0:
                     atom = \
                         Atom(s[0], x=float(s[1]), y=float(s[2]), z=float(s[3]))
-                    self._structure_atoms.append(atom)
-            if self._structure_atoms.Natoms != Natoms:
+                    self.structure_atoms.append(atom)
+            if self.structure_atoms.Natoms != Natoms:
                 error_msg = '`jsonfile` contained {} atoms '.format(
-                    self._structure_atoms.Natoms) + 'but should contain ' + \
+                    self.structure_atoms.Natoms) + 'but should contain ' + \
                     '{}'.format(Natoms)
                 raise StructureReaderError(error_msg)
 
@@ -114,7 +114,7 @@ class JSONDATA(JSONReader):
                     raise ValueError(error_msg)
             else:
                 jsonfile = self.fpath
-            JSONWriter.write(fname=jsonfile, atoms=self._structure_atoms,
+            JSONWriter.write(fname=jsonfile, atoms=self.structure_atoms,
                              comment_line=self._comment_line)
         except (TypeError, ValueError) as e:
             print(e)

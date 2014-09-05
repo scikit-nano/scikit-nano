@@ -45,7 +45,7 @@ class StructureIO(object):
 
     """
     def __init__(self, fpath=None, fname=None, **kwargs):
-        self._structure_atoms = Atoms()
+        self.structure_atoms = Atoms()
         self._comment_line = default_comment_line
         if fpath is None and fname is not None:
             fpath = fname
@@ -56,11 +56,6 @@ class StructureIO(object):
     def atoms(self):
         """Alias for :attr:`~StructureIO.structure_atoms`."""
         return self.structure_atoms
-
-    @property
-    def structure_atoms(self):
-        """Return structure_atoms attribute"""
-        return self._structure_atoms
 
     @property
     def comment_line(self):

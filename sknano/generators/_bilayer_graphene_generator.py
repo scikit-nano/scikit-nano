@@ -112,8 +112,8 @@ class BilayerGrapheneGenerator(BilayerGraphene, GeneratorMixin):
         super(BilayerGrapheneGenerator, self).generate_structure_data()
 
         if self.layer_rotation_angle is not None:
-            bilayer = copy.deepcopy(self._structure_atoms)
-            self._structure_atoms = Atoms()
+            bilayer = copy.deepcopy(self.structure_atoms)
+            self.structure_atoms = Atoms()
 
             z_coords = bilayer.get_coords(asdict=True)['z']
             z_set = np.asarray(sorted(list(set(z_coords))))
@@ -126,4 +126,4 @@ class BilayerGrapheneGenerator(BilayerGraphene, GeneratorMixin):
                 if (n % 2) != 0:
                     layer.rotate(angle=self.layer_rotation_angle, rot_axis='z')
 
-                self._structure_atoms.extend(layer.atoms)
+                self.structure_atoms.extend(layer.atoms)

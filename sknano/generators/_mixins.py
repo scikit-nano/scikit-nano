@@ -23,7 +23,7 @@ class NanotubeBundleGeneratorMixin(object):
 
     def generate_bundle(self):
         self._atomsobj0 = copy.deepcopy(self.structure_atoms)
-        self._structure_atoms = Atoms()
+        self.structure_atoms = Atoms()
         for dr in self.bundle_coords:
             atomsobj = Atoms(atoms=self._atomsobj0, deepcopy=True)
             atomsobj.center_CM()

@@ -164,7 +164,7 @@ class SWNTGenerator(SWNT, GeneratorMixin):
 
     def generate_structure_data(self):
         """Generate structure data."""
-        self._structure_atoms = Atoms()
+        self.structure_atoms = Atoms()
         for nz in xrange(int(np.ceil(self.nz))):
             dr = Vector([0.0, 0.0, nz * self.T])
             for uc_atom in self.unit_cell:

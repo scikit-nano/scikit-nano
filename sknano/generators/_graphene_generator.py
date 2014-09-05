@@ -173,7 +173,7 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
 
     def generate_structure_data(self):
         """Generate the full structure coordinates."""
-        self._structure_atoms = Atoms()
+        self.structure_atoms = Atoms()
         for nlayer in xrange(self.nlayers):
             layer = Atoms()
             for nx in xrange(self.Nx):

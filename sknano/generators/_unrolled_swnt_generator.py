@@ -158,14 +158,14 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
 
     def generate_structure_data(self):
         """Generate structure data."""
-        self._structure_atoms = Atoms()
+        self.structure_atoms = Atoms()
         for nx in xrange(self.nx):
             for nz in xrange(int(np.ceil(self.nz))):
                 dr = Vector([nx * self.Ch, 0.0, nz * self.T])
                 for uc_atom in self._unit_cell:
                     nt_atom = Atom(element=uc_atom.symbol)
                     nt_atom.r = uc_atom.r + dr
-                    self._structure_atoms.append(nt_atom)
+                    self.structure_atoms.append(nt_atom)
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, anchor_point=None,

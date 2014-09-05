@@ -52,6 +52,14 @@ class GeneratorMixin(object):
         """Return structure :class:`~sknano.core.atoms.Atoms`."""
         return self.structure_atoms
 
+    @atoms.setter
+    def atoms(self, value):
+        self.structure_atoms = value
+
+    @atoms.deleter
+    def atoms(self):
+        del self.structure_atoms
+
     @property
     def fname(self):
         """Structure file name."""
@@ -63,19 +71,9 @@ class GeneratorMixin(object):
         return self._fpath
 
     @property
-    def structure_atoms(self):
-        """Return structure :class:`~sknano.core.atoms.Atoms`."""
-        return self._structure_atoms
-
-    @property
     def structure_format(self):
         """Structure file format."""
         return self._structure_format
-
-    @property
-    def unit_cell(self):
-        """Return unit cell :class:`~sknano.core.atoms.Atoms`."""
-        return self._unit_cell
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, anchor_point=None,
