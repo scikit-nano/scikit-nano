@@ -64,14 +64,10 @@ def cmp_Ch(Ch1, Ch2):
         n2, m2 = get_Ch_indices(Ch2)
         Ch2_type = get_Ch_type(Ch2)
 
-    if Ch1_type == 'AC' and Ch2_type == 'ZZ':
+    if Ch1_type == 'armchair' and Ch2_type == 'zigzag':
         return 1
-    elif Ch1_type == 'ZZ' and Ch2_type == 'AC':
+    elif Ch1_type == 'zigzag' and Ch2_type == 'armchair':
         return -1
-    #if dt1 > dt2:
-    #    return 1
-    #elif dt1 < dt2:
-    #    return -1
     else:
         if n1 > n2:
             return 1
@@ -119,7 +115,7 @@ def filter_Ch(Ch, even_only=False, odd_only=False, Ch_type=None,
             return False
 
     elif odd_only:
-        if this_Ch_type != 'ZZ':
+        if this_Ch_type != 'zigzag':
             if n % 2 != 0 and m % 2 != 0:
                 return True
             else:
@@ -131,21 +127,22 @@ def filter_Ch(Ch, even_only=False, odd_only=False, Ch_type=None,
                 return False
 
     elif Ch_type is not None:
-        if Ch_type in Ch_types:
-            Ch_type = Ch_types[Ch_type]
-
-        if this_Ch_type in ('AC', 'ZZ'):
-            if Ch_type == 'aCh' or this_Ch_type == Ch_type:
+        if this_Ch_type in ('armchair', 'zigzag'):
+            if Ch_type in ('achiral', 'aCh') or \
+                    (Ch_type in ('armchair', 'AC') and
+                     this_Ch_type == 'armchair') or \
+                    (Ch_type in ('zigzag', 'ZZ') and
+                     this_Ch_type == 'zigzag'):
                 return True
             else:
                 return False
-        elif Ch_type == 'Ch' and this_Ch_type == Ch_type:
+        elif Ch_type in ('chiral', 'Ch') and this_Ch_type == 'chiral':
             return True
         else:
             return False
 
     elif min_index is not None and isinstance(min_index, int):
-        if this_Ch_type != 'ZZ':
+        if this_Ch_type != 'zigzag':
             if n >= min_index and m >= min_index:
                 return True
             else:
@@ -444,9 +441,9 @@ def get_Ch_type(Ch):
     Returns
     -------
     str
-        `AC` for armchair tubes,
-        `ZZ` for zigzag tubes,
-        `Ch` for chiral tubes,
+        `armchair` for armchair tubes,
+        `zigzag` for zigzag tubes,
+        `chiral` for chiral tubes,
 
     """
     if isinstance(Ch, tuple):
@@ -454,11 +451,11 @@ def get_Ch_type(Ch):
     else:
         n, m = get_Ch_indices(Ch)
     if n == m:
-        return 'AC'
+        return 'armchair'
     elif n != m and (n == 0 or m == 0):
-        return 'ZZ'
+        return 'zigzag'
     else:
-        return 'Ch'
+        return 'chiral'
 
 
 def map_Ch(Ch, compute=None, **kwargs):
