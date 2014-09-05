@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Utility functions for nanotube properties (:mod:`sknano.structures._extras`)
+Extra helper functions (:mod:`sknano.structures._extras`)
 ===============================================================================
 
 .. currentmodule:: sknano.structures._extras
@@ -10,6 +10,7 @@ Utility functions for nanotube properties (:mod:`sknano.structures._extras`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
+import importlib
 import re
 import numpy as np
 
@@ -383,7 +384,7 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
         return Ch_list
 
 
-def generate_Ch_property_grid(compute_method=str, imax=10, **kwargs):
+def generate_Ch_property_grid(compute=str, imax=10, **kwargs):
     """Generate a 2-dimensional,
     :math:`i_{\\mathrm{max}}\\times i_{\\mathrm{max}}` grid of
     nanotube properties.
@@ -402,13 +403,13 @@ def generate_Ch_property_grid(compute_method=str, imax=10, **kwargs):
     grid : ndarray
 
     """
-    from ._nanotubes import Nanotube
     try:
-        nanotube_compute = getattr(Nanotube, compute_method)
+        compute_func = \
+            getattr(importlib.import_module('sknano.structures'), compute)
         grid = np.zeros((imax + 1, imax + 1)) - 1
-        for ni in xrange(imax + 1):
-            for mi in xrange(imax + 1):
-                grid[ni, mi] = nanotube_compute(n=ni, m=mi, **kwargs)
+        for n in xrange(imax + 1):
+            for m in xrange(imax + 1):
+                grid[n, m] = compute_func(n, m, **kwargs)
         return grid
     except AttributeError as e:
         print(e)
@@ -458,16 +459,16 @@ def get_Ch_type(Ch):
         return 'Ch'
 
 
-def map_Ch(Ch, compute_method=None, **kwargs):
-    from ._nanotubes import Nanotube
+def map_Ch(Ch, compute=None, **kwargs):
     try:
-        nanotube_compute = getattr(Nanotube, compute_method)
+        compute_func = \
+            getattr(importlib.import_module('sknano.structures'), compute)
         if isinstance(Ch, tuple):
             n, m = Ch
         else:
             n, m = get_Ch_indices(Ch)
 
-        return nanotube_compute(n=n, m=m, **kwargs)
+        return compute_func(n, m, **kwargs)
     except AttributeError as e:
         print(e)
         return None
