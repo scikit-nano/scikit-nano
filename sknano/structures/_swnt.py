@@ -15,6 +15,7 @@ import numpy as np
 
 from ._base import StructureBase
 from ._compute_funcs import *
+from ._extras import get_Ch_type
 
 __all__ = ['SWNT', 'Nanotube']
 
@@ -129,20 +130,13 @@ class SWNT(StructureBase):
         self.n = n
         self.m = m
 
-        self._assume_integer_unit_cells = True
-        if fix_Lz:
-            self._assume_integer_unit_cells = False
-        self._fix_Lz = fix_Lz
-
+        self.fix_Lz = fix_Lz
         if Lz is not None:
             self.nz = 10 * float(Lz) / self.T
         else:
             self.nz = nz
 
-        if self._assume_integer_unit_cells:
-            self.nz = int(np.ceil(self.nz))
-
-        self._L0 = Lz  # store initial value of Lz
+        self.L0 = self.Lz  # store initial value of Lz
 
     def __str__(self):
         """Return nice string representation of `SWNT`."""
@@ -151,14 +145,14 @@ class SWNT(StructureBase):
     def __repr__(self):
         """Return canonical string representation of `SWNT`."""
         strrep = "SWNT(n={!r}, m={!r}, element1={!r}, element2={!r}, bond={!r}"
-        if self._fix_Lz:
+        if self.fix_Lz:
             strrep += ", Lz={!r}, fix_Lz={!r})"
             return strrep.format(self.n, self.m, self.element1, self.element2,
-                                 self.bond, self.Lz, self._fix_Lz)
+                                 self.bond, self.Lz, self.fix_Lz)
         else:
-            strrep += ")"
-            return strrep.format(self.n, self.m, self.element1,
-                                 self.element2, self.bond)
+            strrep += ", nz={!r})"
+            return strrep.format(self.n, self.m, self.element1, self.element2,
+                                 self.bond, self.nz)
 
     @property
     def n(self):
@@ -290,6 +284,10 @@ class SWNT(StructureBase):
         return compute_chiral_angle(self.n, self.m)
 
     @property
+    def chiral_type(self):
+        return get_Ch_type((self.n, self.m))
+
+    @property
     def T(self):
         u"""Length of nanotube unit cell :math:`|\\mathbf{T}|` in \u212b.
 
@@ -343,14 +341,9 @@ class SWNT(StructureBase):
         """Set number of nanotube unit cells along the :math:`z`-axis."""
         if not (isinstance(value, numbers.Real) or value > 0):
             raise TypeError('Expected a real, positive number.')
+        self._nz = value
         if self._assume_integer_unit_cells:
-            self._nz = int(value)
-        else:
-            self._nz = value
-
-    @nz.deleter
-    def nz(self):
-        del self._nz
+            self._nz = int(np.ceil(value))
 
     @property
     def electronic_type(self):
@@ -463,6 +456,19 @@ class SWNT(StructureBase):
         return self.nz * self.T
 
     @property
+    def fix_Lz(self):
+        return self._fix_Lz
+
+    @fix_Lz.setter
+    def fix_Lz(self, value):
+        if not isinstance(value, bool):
+            raise TypeError('Expected `True` or `False`')
+        self._fix_Lz = value
+        self._assume_integer_unit_cells = True
+        if self.fix_Lz:
+            self._assume_integer_unit_cells = False
+
+    @property
     def tube_length(self):
         """Alias for :attr:`SWNT.Lz`"""
         return self.Lz
@@ -473,5 +479,10 @@ class SWNT(StructureBase):
         return compute_tube_mass(self.n, self.m, self.nz,
                                  element1=self.element1,
                                  element2=self.element2)
+
+    def todict(self):
+        return dict(n=self.n, m=self.m, nz=self.nz, Lz=self.Lz,
+                    fix_Lz=self.fix_Lz, element1=self.element1,
+                    element2=self.element2, bond=self.bond)
 
 Nanotube = SWNT
