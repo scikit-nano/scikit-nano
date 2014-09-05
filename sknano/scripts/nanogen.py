@@ -25,7 +25,7 @@ system :envvar:`PATH` and callable as :program:`tubegen`.
 
    :py:class:`~sknano.generators.GrapheneGenerator`
 
-   :py:class:`~sknano.generators.NanotubeBundleGenerator`
+   :py:class:`~sknano.generators.SWNTBundleGenerator`
 
    :py:class:`~sknano.generators.MWNTGenerator`
 
@@ -77,10 +77,10 @@ import argparse
 import importlib
 import sys
 
-from ..core.atoms import Atom
-from ..core.refdata import CCbond, dVDW
-from ..generators import TubeGen, tubegen_format_ext_map
-from ..io import XYZ2DATAConverter
+from sknano.core.atoms import Atom
+from sknano.core.refdata import CCbond, dVDW
+from sknano.generators import TubeGen, tubegen_format_ext_map
+from sknano.io import XYZ2DATAConverter
 
 __all__ = ['nanogen', 'tubegen']
 
@@ -183,13 +183,13 @@ def argparser():
                                           'permitted. (default: '
                                           '%(default)s)')
     nanogen_nanotube_parser = \
-        subparsers.add_parser('NanotubeGenerator',
+        subparsers.add_parser('SWNTGenerator',
                               parents=[nanogen_parent_parser,
                                        nanogen_nanotube_parsers])
     nanogen_nanotube_parser.set_defaults(func=nanogen)
 
     nanogen_unrolled_nanotube_parser = \
-        subparsers.add_parser('UnrolledNanotubeGenerator',
+        subparsers.add_parser('UnrolledSWNTGenerator',
                               parents=[nanogen_parent_parser,
                                        nanogen_nanotube_parsers])
     nanogen_unrolled_nanotube_parser.set_defaults(func=nanogen)
@@ -201,7 +201,7 @@ def argparser():
     nanogen_mwnt_parser.set_defaults(func=nanogen)
 
     nanogen_nanotube_bundle_parser = \
-        subparsers.add_parser('NanotubeBundleGenerator',
+        subparsers.add_parser('SWNTBundleGenerator',
                               parents=[nanogen_parent_parser,
                                        nanogen_nanotube_parsers])
     nanogen_nanotube_bundle_parser.add_argument('--vdw-spacing', type=float,
