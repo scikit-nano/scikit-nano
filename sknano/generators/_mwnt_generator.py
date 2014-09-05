@@ -158,7 +158,7 @@ class MWNTGenerator(MWNT, GeneratorMixin):
             if verbose:
                 print('Basis Atom 1:\n{}'.format(atom1))
 
-            self._unit_cell.append(atom1)
+            self.unit_cell.append(atom1)
 
             x2 = rt * np.cos(i * psi + dpsi)
             y2 = rt * np.sin(i * psi + dpsi)
@@ -172,7 +172,7 @@ class MWNTGenerator(MWNT, GeneratorMixin):
             if verbose:
                 print('Basis Atom 2:\n{}'.format(atom2))
 
-            self._unit_cell.append(atom2)
+            self.unit_cell.append(atom2)
 
     def generate_structure_data(self):
         """Generate structure data.
@@ -196,8 +196,8 @@ class MWNTGenerator(MWNT, GeneratorMixin):
         dt = np.asarray(dt)
 
         self._structure_atoms = Atoms()
-        for nz in xrange(int(np.ceil(self._nz))):
-            dr = Vector([0.0, 0.0, nz * self._T])
+        for nz in xrange(int(np.ceil(self.nz))):
+            dr = Vector([0.0, 0.0, nz * self.T])
             for uc_atom in self._unit_cell:
                 nt_atom = Atom(element=uc_atom.symbol)
                 nt_atom.r = uc_atom.r + dr

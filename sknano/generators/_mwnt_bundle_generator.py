@@ -124,7 +124,7 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
             chirality = '{}{}_{}_Ch'.format('{}'.format(self._n).zfill(2),
                                             '{}'.format(self._m).zfill(2),
                                             self._starting_shell_position)
-            packing = '{}cp'.format(self._bundle_packing[0])
+            packing = '{}cp'.format(self.bundle_packing[0])
             Ntubes = '{}tube'.format(self._Ntubes)
 
             fname_wordlist = None

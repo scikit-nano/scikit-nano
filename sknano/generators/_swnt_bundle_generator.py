@@ -169,30 +169,30 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
 
         """
         if fname is None:
-            chirality = '{}{}'.format('{}'.format(self._n).zfill(2),
-                                      '{}'.format(self._m).zfill(2))
-            packing = '{}cp'.format(self._bundle_packing[0])
+            chirality = '{}{}'.format('{}'.format(self.n).zfill(2),
+                                      '{}'.format(self.m).zfill(2))
+            packing = '{}cp'.format(self.bundle_packing[0])
             #Ntubes = ''.join(('{}'.format(self._Ntubes),
             #                  pluralize('tube', self._Ntubes)))
-            Ntube = '{}tube'.format(self._Ntubes)
+            Ntube = '{}tube'.format(self.Ntubes)
 
             fname_wordlist = None
-            if self._bundle_geometry is None:
-                nx = ''.join(('{}'.format(self._nx),
-                             pluralize('cell', self._nx)))
-                ny = ''.join(('{}'.format(self._ny),
-                             pluralize('cell', self._ny)))
+            if self.bundle_geometry is None:
+                nx = ''.join(('{}'.format(self.nx),
+                             pluralize('cell', self.nx)))
+                ny = ''.join(('{}'.format(self.ny),
+                             pluralize('cell', self.ny)))
                 if self._assume_integer_unit_cells:
-                    nz = ''.join(('{}'.format(self._nz),
-                                  pluralize('cell', self._nz)))
+                    nz = ''.join(('{}'.format(self.nz),
+                                  pluralize('cell', self.nz)))
                 else:
-                    nz = ''.join(('{:.2f}'.format(self._nz),
-                                  pluralize('cell', self._nz)))
+                    nz = ''.join(('{:.2f}'.format(self.nz),
+                                  pluralize('cell', self.nz)))
                 cells = 'x'.join((nx, ny, nz))
                 fname_wordlist = (chirality, packing, cells)
             else:
                 fname_wordlist = \
-                    (chirality, packing, Ntube, self._bundle_geometry)
+                    (chirality, packing, Ntube, self.bundle_geometry)
 
             fname = '_'.join(fname_wordlist)
 

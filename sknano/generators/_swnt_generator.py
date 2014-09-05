@@ -23,7 +23,7 @@ import numpy as np
 
 from sknano.core import pluralize
 from sknano.core.math import Vector
-from sknano.structures import SWNT
+from sknano.structures import SWNT, compute_chiral_angle
 from sknano.utils.geometric_shapes import Cuboid
 from ._base import GeneratorAtom as Atom, GeneratorAtoms as Atoms, \
     GeneratorMixin
@@ -107,18 +107,18 @@ class SWNTGenerator(SWNT, GeneratorMixin):
     def generate_unit_cell(self):
         """Generate the nanotube unit cell."""
         eps = 0.01
-        n = self._n
-        m = self._m
-        bond = self._bond
-        M = self._M
-        T = self._T
-        N = self._N
-        rt = self._rt
-        e1 = self._element1
-        e2 = self._element2
+        n = self.n
+        m = self.m
+        bond = self.bond
+        M = self.M
+        T = self.T
+        N = self.N
+        rt = self.rt
+        e1 = self.element1
+        e2 = self.element2
         verbose = self._verbose
 
-        aCh = SWNT.compute_chiral_angle(n=n, m=m, rad2deg=False)
+        aCh = compute_chiral_angle(n=n, m=m, rad2deg=False)
 
         tau = M * T / N
         dtau = bond * np.sin(np.pi / 6 - aCh)
@@ -146,7 +146,7 @@ class SWNTGenerator(SWNT, GeneratorMixin):
             if verbose:
                 print('Basis Atom 1:\n{}'.format(atom1))
 
-            self._unit_cell.append(atom1)
+            self.unit_cell.append(atom1)
 
             x2 = rt * np.cos(i * psi + dpsi)
             y2 = rt * np.sin(i * psi + dpsi)
@@ -160,17 +160,17 @@ class SWNTGenerator(SWNT, GeneratorMixin):
             if verbose:
                 print('Basis Atom 2:\n{}'.format(atom2))
 
-            self._unit_cell.append(atom2)
+            self.unit_cell.append(atom2)
 
     def generate_structure_data(self):
         """Generate structure data."""
         self._structure_atoms = Atoms()
-        for nz in xrange(int(np.ceil(self._nz))):
-            dr = Vector([0.0, 0.0, nz * self._T])
-            for uc_atom in self._unit_cell:
+        for nz in xrange(int(np.ceil(self.nz))):
+            dr = Vector([0.0, 0.0, nz * self.T])
+            for uc_atom in self.unit_cell:
                 nt_atom = Atom(element=uc_atom.symbol)
                 nt_atom.r = uc_atom.r + dr
-                self._structure_atoms.append(nt_atom)
+                self.structure_atoms.append(nt_atom)
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, anchor_point=None,
@@ -182,14 +182,14 @@ class SWNTGenerator(SWNT, GeneratorMixin):
 
         """
         if fname is None:
-            chirality = '{}{}r'.format('{}'.format(self._n).zfill(2),
-                                       '{}'.format(self._m).zfill(2))
+            chirality = '{}{}r'.format('{}'.format(self.n).zfill(2),
+                                       '{}'.format(self.m).zfill(2))
             if self._assume_integer_unit_cells:
-                nz = ''.join(('{}'.format(self._nz),
-                              pluralize('cell', self._nz)))
+                nz = ''.join(('{}'.format(self.nz),
+                              pluralize('cell', self.nz)))
             else:
-                nz = ''.join(('{:.2f}'.format(self._nz),
-                              pluralize('cell', self._nz)))
+                nz = ''.join(('{:.2f}'.format(self.nz),
+                              pluralize('cell', self.nz)))
             fname_wordlist = (chirality, nz)
             fname = '_'.join(fname_wordlist)
 
@@ -199,11 +199,11 @@ class SWNTGenerator(SWNT, GeneratorMixin):
             region_bounds = Cuboid(pmin=pmin, pmax=pmax)
             region_bounds.update_region_limits()
 
-            self._structure_atoms.clip_bounds(region_bounds,
-                                              center_before_clipping=True)
+            self.structure_atoms.clip_bounds(region_bounds,
+                                             center_before_clipping=True)
 
         if center_CM:
-            self._structure_atoms.center_CM()
+            self.structure_atoms.center_CM()
 
         super(SWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,

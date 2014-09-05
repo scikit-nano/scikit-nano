@@ -133,10 +133,10 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
         Called automatically if `autogen` is `True`.
 
         """
-        bond = self._bond
-        edge = self._edge
-        e1 = self._element1
-        e2 = self._element2
+        bond = self.bond
+        edge = self.edge
+        e1 = self.element1
+        e2 = self.element2
 
         self._unit_cell = Atoms()
         # Set up 4 atom basis
@@ -168,36 +168,35 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
             atom4.x = -bond / 2
             atom4.y = np.sqrt(3) / 2 * bond
 
-        for atom in (atom1, atom2, atom3, atom4):
-            self._unit_cell.append(atom)
-        self._Natoms = self._unit_cell.Natoms
+        self.unit_cell.extend([atom1, atom2, atom3, atom4])
+        #self.Natoms = self.unit_cell.Natoms
 
     def generate_structure_data(self):
         """Generate the full structure coordinates."""
         self._structure_atoms = Atoms()
-        for nlayer in xrange(self._nlayers):
+        for nlayer in xrange(self.nlayers):
             layer = Atoms()
-            for nx in xrange(self._Nx):
-                for ny in xrange(self._Ny):
-                    dr = np.array([nx * self._cell.x,
-                                   ny * self._cell.y,
-                                   nlayer * self._layer_spacing])
-                    for atom in self._unit_cell:
+            for nx in xrange(self.Nx):
+                for ny in xrange(self.Ny):
+                    dr = np.array([nx * self.cell.x,
+                                   ny * self.cell.y,
+                                   nlayer * self.layer_spacing])
+                    for atom in self.unit_cell:
                         layer_atom = Atom(element=atom.symbol)
                         layer_atom.r = atom.r + dr
                         layer.append(layer_atom)
 
-            if self._Natoms_per_layer is None:
-                self._Natoms_per_layer = layer.Natoms
+            if self.Natoms_per_layer is None:
+                self.Natoms_per_layer = layer.Natoms
 
             # translate layer to put its center of mass at the origin
             dr = layer.CM
             dr.z = 0
             layer.translate(dr)
             if (nlayer % 2) != 0:
-                layer.translate(self._layer_shift)
+                layer.translate(self.layer_shift)
 
-            self._structure_atoms.extend(layer)
+            self.structure_atoms.extend(layer)
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=-90, rot_axis='x', deg2rad=True,
@@ -209,15 +208,15 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
 
         """
         if fname is None:
-            dimensions = '{}nmx{}nm'.format(self._length, self._width)
-            nlayer = '{}layer'.format(self._nlayers)
-            edge = 'AC' if self._edge in ('AC', 'armchair') else 'ZZ'
-            atombond = '{}{}'.format(self._element1, self._element2)
+            dimensions = '{}nmx{}nm'.format(self.length, self.width)
+            nlayer = '{}layer'.format(self.nlayers)
+            edge = 'AC' if self.edge in ('AC', 'armchair') else 'ZZ'
+            atombond = '{}{}'.format(self.element1, self.element2)
             fname_wordlist = (dimensions, nlayer, edge, atombond, 'graphene')
             fname = '_'.join(fname_wordlist)
 
-        if center_CM and self._nlayers > 1:
-            self._structure_atoms.center_CM()
+        if center_CM and self.nlayers > 1:
+            self.structure_atoms.center_CM()
 
         super(GrapheneGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
