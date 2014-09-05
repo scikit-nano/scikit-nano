@@ -10,14 +10,19 @@ def test1():
     mwnt = MWNT(Ch=[(5,5),(10,10)])
     print(mwnt)
     print(mwnt.todict())
+    print(mwnt.chiral_types)
+    print(mwnt.chiral_set)
     assert_equal(mwnt.Ntubes, 1)
     assert_equal(mwnt.Nwalls, 2)
+    assert_equal(mwnt.chiral_set, set(['armchair']))
 
 
 def test2():
     mwnt = MWNT(max_shells=5)
     print(mwnt)
     print(mwnt.todict())
+    print(mwnt.chiral_types)
+    print(mwnt.chiral_set)
     assert_equal(mwnt.Ntubes, 1)
     assert_equal(mwnt.Nwalls, 5)
 
@@ -27,8 +32,11 @@ def test3():
                 Lz=2.5, fix_Lz=True)
     print(mwnt)
     print(mwnt.todict())
+    print(mwnt.chiral_types)
+    print(mwnt.chiral_set)
     assert_equal(mwnt.Ntubes, 1)
     assert_equal(mwnt.Nwalls, 4)
+    assert_equal(mwnt.chiral_set, set(['armchair']))
 
 
 def test4():
@@ -36,8 +44,11 @@ def test4():
                 nz=5.0)
     print(mwnt)
     print(mwnt.todict())
+    print(mwnt.chiral_types)
+    print(mwnt.chiral_set)
     assert_equal(mwnt.Ntubes, 1)
     assert_equal(mwnt.Nwalls, 6)
+    assert_equal(mwnt.chiral_set, set(['armchair', 'chiral', 'zigzag']))
 
 if __name__ == '__main__':
     nose.runmodule()
