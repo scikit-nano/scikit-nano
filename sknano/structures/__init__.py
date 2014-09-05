@@ -21,6 +21,7 @@ Classes for creating abstract object representations of nanostructures
    :toctree: generated/
 
    StructureBase
+   NanotubeBundle
 
    MWNTMixin
    NanotubeBundleMixin
@@ -90,6 +91,7 @@ __docformat__ = 'restructuredtext en'
 from ._compute_funcs import *
 
 from ._base import *
+from ._nanotube_bundle import *
 from ._extras import *
 from ._mixins import *
 
