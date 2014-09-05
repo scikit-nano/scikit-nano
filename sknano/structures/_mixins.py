@@ -148,7 +148,7 @@ class UnrolledSWNTMixin(object):
     @property
     def nx(self):
         """Number of nanotubes along the :math:`x`-axis."""
-        return int(self._nx)
+        return self._nx
 
     @nx.setter
     def nx(self, value):
@@ -160,7 +160,7 @@ class UnrolledSWNTMixin(object):
     @property
     def ny(self):
         """Number of nanotubes along the :math:`y`-axis."""
-        return int(self._ny)
+        return self._ny
 
     @ny.setter
     def ny(self, value):
