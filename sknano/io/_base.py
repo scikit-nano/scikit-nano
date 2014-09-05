@@ -45,17 +45,27 @@ class StructureIO(object):
 
     """
     def __init__(self, fpath=None, fname=None, **kwargs):
-        self.structure_atoms = Atoms()
-        self._comment_line = default_comment_line
+        self.atoms = Atoms()
+        self.comment_line = default_comment_line
         if fpath is None and fname is not None:
             fpath = fname
-        self._fpath = fpath
-        self._kwargs = kwargs
+        self.fpath = fpath
+        self.kwargs = kwargs
 
     @property
     def atoms(self):
-        """Alias for :attr:`~StructureIO.structure_atoms`."""
-        return self.structure_atoms
+        """Alias for :attr:`~StructureIO.atoms`."""
+        return self._atoms
+
+    @atoms.setter
+    def atoms(self, value):
+        if not isinstance(value, Atoms):
+            raise TypeError('Expected an `Atoms` instance.')
+        self._atoms = value
+
+    @atoms.deleter
+    def atoms(self):
+        del self._atoms
 
     @property
     def comment_line(self):
@@ -63,7 +73,7 @@ class StructureIO(object):
         return self._comment_line
 
     @comment_line.setter
-    def comment_line(self, value=str):
+    def comment_line(self, value):
         """Set the comment line string.
 
         Parameters
@@ -71,28 +81,13 @@ class StructureIO(object):
         value : str
 
         """
+        if not isinstance(value, str):
+            raise TypeError('Expected a string.')
         self._comment_line = value
 
-    @property
-    def fpath(self):
-        """File path"""
-        return self._fpath
-
-    @fpath.setter
-    def fpath(self, value=str):
-        """Set the file path string.
-
-        Parameters
-        ----------
-        value : str
-
-        """
-        self._fpath = value
-
-    @fpath.deleter
-    def fpath(self):
-        """Delete file path string"""
-        del self._fpath
+    @comment_line.deleter
+    def comment_line(self):
+        del self._comment_line
 
 
 class StructureWriter(object):
@@ -118,19 +113,9 @@ class StructureConverter(object):
     __metaclass__ = ABCMeta
 
     def __init__(self, infile=None, outfile=None, **kwargs):
-        self._infile = infile
-        self._outfile = outfile
-        self._kwargs = kwargs
-
-    @property
-    def infile(self):
-        """Return `infile`"""
-        return self._infile
-
-    @property
-    def outfile(self):
-        """Return `outfile`"""
-        return self._outfile
+        self.infile = infile
+        self.outfile = outfile
+        self.kwargs = kwargs
 
     @abstractmethod
     def convert(self):
@@ -142,13 +127,8 @@ class StructureConverter(object):
 class StructureFormat(object):
     """Base class for containing structure format properties"""
     def __init__(self, **kwargs):
-        self._properties = OrderedDict()
-        self._kwargs = kwargs
-
-    @property
-    def properties(self):
-        """:class:`~python:collections.OrderedDict` of format properties."""
-        return self._properties
+        self.properties = OrderedDict()
+        self.kwargs = kwargs
 
 
 class StructureIOError(Exception):
