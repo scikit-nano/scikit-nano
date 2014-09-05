@@ -55,9 +55,6 @@ class SWNT(StructureBase):
         :math:`L_z` as possible. If `True`, then
         non integer :math:`n_z` cells are permitted.
 
-    verbose : bool, optional
-        verbose output
-
     Examples
     --------
 
@@ -116,7 +113,7 @@ class SWNT(StructureBase):
 
     """
     def __init__(self, n=10, m=0, nz=1, tube_length=None, Lz=None,
-                 fix_Lz=False, verbose=False, **kwargs):
+                 fix_Lz=False, **kwargs):
 
         super(SWNT, self).__init__(**kwargs)
 
@@ -132,22 +129,20 @@ class SWNT(StructureBase):
         self.n = n
         self.m = m
 
-        self._verbose = verbose
-
-        self._L0 = Lz  # store initial value of Lz
+        if Lz is not None:
+            self.nz = 10 * float(Lz) / self.T
+        else:
+            self.nz = nz
 
         self._fix_Lz = fix_Lz
         self._assume_integer_unit_cells = True
         if fix_Lz:
             self._assume_integer_unit_cells = False
 
-        if Lz is not None:
-            self.nz = 10 * float(Lz) / self.T
-        else:
-            self.nz = nz
-
         if self._assume_integer_unit_cells:
             self.nz = int(np.ceil(self.nz))
+
+        self._L0 = Lz  # store initial value of Lz
 
     def __str__(self):
         """Return nice string representation of `SWNT`."""
@@ -186,6 +181,10 @@ class SWNT(StructureBase):
             raise TypeError('Expected an integer.')
         self._n = int(value)
 
+    @n.deleter
+    def n(self):
+        del self._n
+
     @property
     def m(self):
         """Chiral index :math:`m`.
@@ -206,6 +205,10 @@ class SWNT(StructureBase):
         if not (isinstance(value, numbers.Real) or value >= 0):
             raise TypeError('Expected an integer.')
         self._m = int(value)
+
+    @m.deleter
+    def m(self):
+        del self._m
 
     @property
     def d(self):
@@ -344,6 +347,10 @@ class SWNT(StructureBase):
             self._nz = int(value)
         else:
             self._nz = value
+
+    @nz.deleter
+    def nz(self):
+        del self._nz
 
     @property
     def electronic_type(self):
