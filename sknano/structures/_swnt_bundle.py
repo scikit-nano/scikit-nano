@@ -24,14 +24,14 @@ class SWNTBundle(NanotubeBundle, SWNT):
         super(SWNTBundle, self).__init__(**kwargs)
 
     @property
-    def bundle_mass(self):
-        return self.Ntubes * self.tube_mass
-
-    @property
     def bundle_density(self):
-        return compute_bundle_density(self.n, self.m, d_vdw=self._vdw_spacing,
+        return compute_bundle_density(self.n, self.m, d_vdw=self.vdw_spacing,
                                       bond=self.bond, element1=self.element1,
                                       element2=self.element2)
+
+    @property
+    def bundle_mass(self):
+        return self.Ntubes * self.tube_mass
 
     @property
     def Natoms_per_bundle(self):
