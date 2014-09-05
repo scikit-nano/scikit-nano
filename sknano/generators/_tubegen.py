@@ -18,10 +18,11 @@ import sys
 
 import numpy as np
 
-from ..core import plural_word_check
-from ..core.refdata import CCbond
-from ..io import XYZReader, XYZWriter
-from ..structures import Nanotube
+from sknano.core import plural_word_check
+from sknano.core.refdata import CCbond
+from sknano.io import XYZReader, XYZWriter
+from sknano.structures import compute_dt, compute_T
+from sknano.utils.geometric_shapes import Cuboid
 
 tubegen_format_ext_map = {'gaussian': '.com',
                           'gaussian-pbc': '.com',
@@ -237,7 +238,7 @@ class TubeGen(object):
         n = int(chirality[0])
         m = int(chirality[1])
 
-        T = Nanotube.compute_T(n=n, m=m, bond=bond)
+        T = compute_T(n=n, m=m, bond=bond)
 
         if Lz is None and tube_length is not None:
             Lz = tube_length
@@ -255,7 +256,7 @@ class TubeGen(object):
             Lz = nz * T
 
         self._Lz = Lz
-        self._dt = Nanotube.compute_dt(n=n, m=m, bond=bond)
+        self._dt = compute_dt(n=n, m=m, bond=bond)
 
         self._fmt = fmt
         self._units = units
@@ -370,7 +371,14 @@ class TubeGen(object):
             if self._fmt == 'xyz':
                 xyzreader = XYZReader(self._output)
                 atoms = xyzreader.atoms
-                atoms.clip_bounds(abs_limit=self._Lz / 2 + 0.1, r_indices=[2])
+                pmin = [-np.inf, -np.inf, -(self._Lz + 0.2) / 2]
+                pmax = [np.inf, np.inf, (self._Lz + 0.2) / 2]
+                region_bounds = Cuboid(pmin=pmin, pmax=pmax)
+                region_bounds.update_region_limits()
+
+                atoms.clip_bounds(region_bounds, center_before_clipping=True)
+
+                #atoms.clip_bounds(abs_limit=self._Lz / 2 + 0.1)
                 XYZWriter.write(fname=self._output, atoms=atoms,
                                 comment_line=xyzreader.comment_line)
 
