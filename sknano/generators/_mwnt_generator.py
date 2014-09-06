@@ -147,8 +147,8 @@ class MWNTGenerator(MWNT, GeneratorMixin):
         #pmin = [-np.inf, -np.inf, -np.inf]
         #pmax = [np.inf, np.inf, np.inf]
         #region_bounds = Cuboid(pmin=pmin, pmax=pmax)
-        #if self._L0 is not None and self._fix_Lz:
-        #    region_bounds.zmax = (10 * self._L0 + 1) / 2
+        #if self.L0 is not None and self.fix_Lz:
+        #    region_bounds.zmax = (10 * self.L0 + 1) / 2
         #else:
         #    region_bounds.zmax = (10 * Lzmin + 1) / 2
 
