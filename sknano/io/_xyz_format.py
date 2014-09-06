@@ -116,7 +116,7 @@ class XYZData(XYZReader):
 
         """
         try:
-            kwargs.update(self._kwargs)
+            kwargs.update(self.kwargs)
             if (xyzfile is None or xyzfile == '') and \
                     (self.fpath is None or self.fpath == ''):
                 error_msg = '`xyzfile` must be a string at least 1 ' + \
@@ -218,7 +218,7 @@ class XYZ2DATAConverter(StructureConverter):
         """
         from ._lammps_data_format import DATAReader, DATAWriter
 
-        kwargs.update(self._kwargs)
+        kwargs.update(self.kwargs)
 
         xyzreader = XYZReader(fpath=self.infile, **kwargs)
         atoms = xyzreader.atoms
