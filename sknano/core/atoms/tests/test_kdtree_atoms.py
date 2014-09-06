@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, print_function
 
 import nose
 from nose.tools import *
+from pkg_resources import resource_filename
 import numpy as np
 from sknano.core.atoms import KDTAtom, KDTAtoms
 from sknano.generators import SWNTGenerator
@@ -109,9 +110,9 @@ def test_atom_bonds():
 
 
 def test_structure_data():
-    fname = '1005_5cells.data'
+    fname = resource_filename('sknano', 'data/nanotubes/1005_5cells.data')
     swnt = SWNTGenerator(n=10, m=5, nz=5)
-    swnt.save_data(fname=fname, structure_format='data')
+    #swnt.save_data(fname=fname, structure_format='data')
     data = DATAReader(fname)
     assert_equals(swnt.atoms.Natoms, data.atoms.Natoms)
 

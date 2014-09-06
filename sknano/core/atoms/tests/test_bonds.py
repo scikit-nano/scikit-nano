@@ -4,14 +4,15 @@ from __future__ import absolute_import, division, print_function
 
 import nose
 from nose.tools import *
+from pkg_resources import resource_filename
 import numpy as np
-from sknano.core.atoms import Bond, Bonds
+#from sknano.core.atoms import Bond, Bonds
 from sknano.generators import SWNTGenerator
 from sknano.io import DATAReader
 
 
 def test1():
-    infile = '1005_5cells.data'
+    infile = resource_filename('sknano', 'data/nanotubes/1005_5cells.data')
     data = DATAReader(infile)
     atoms = data.atoms
     #atoms._update_nearest_neighbors()
