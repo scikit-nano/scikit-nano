@@ -1,1 +1,1 @@
-.. automodule:: sknano.nanogen_gui
+.. automodule:: sknano.apps.nanogen_gui

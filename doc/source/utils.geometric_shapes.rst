@@ -1,1 +1,1 @@
-.. automodule:: sknano.tools.geometric_shapes
+.. automodule:: sknano.utils.geometric_shapes

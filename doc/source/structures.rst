@@ -1,1 +1,1 @@
-.. automodule:: sknano.nanogen
+.. automodule:: sknano.structures

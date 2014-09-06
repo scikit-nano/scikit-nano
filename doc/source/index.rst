@@ -36,12 +36,14 @@ Reference
 .. toctree::
    :maxdepth: 1
 
-   analysis.rst
-   nanogen.rst
-   nanogen_gui.rst
+   apps.rst
+   core.rst
+   generators.rst
+   io.rst
    scripts.rst
-   structure_io.rst
-   tools.rst
+   structures.rst
+   testing.rst
+   utils.rst
 
 
 * :ref:`genindex`

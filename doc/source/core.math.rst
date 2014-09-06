@@ -1,1 +1,1 @@
-.. automodule:: sknano.structure_io.atoms
+.. automodule:: sknano.core.math

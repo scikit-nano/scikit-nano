@@ -1,1 +1,1 @@
-.. automodule:: sknano.tools.symmetry_groups
+.. automodule:: sknano.utils.symmetry_groups

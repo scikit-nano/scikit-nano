@@ -1,8 +1,8 @@
-.. automodule:: sknano.tools
+.. automodule:: sknano.utils
 
 .. toctree::
    :hidden:
 
-   tools.geometric_shapes.rst
-   tools.refdata.rst
-   tools.symmetry_groups.rst
+   utils.analysis.rst
+   utils.geometric_shapes.rst
+   utils.symmetry_groups.rst

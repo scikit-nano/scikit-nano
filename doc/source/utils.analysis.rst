@@ -1,1 +1,1 @@
-.. automodule:: sknano.analysis
+.. automodule:: sknano.utils.analysis

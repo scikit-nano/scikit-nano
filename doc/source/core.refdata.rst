@@ -1,1 +1,1 @@
-.. automodule:: sknano.tools.refdata
+.. automodule:: sknano.core.refdata

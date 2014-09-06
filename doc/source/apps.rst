@@ -1,1 +1,6 @@
-.. automodule:: sknano.nanogen_gui
+.. automodule:: sknano.apps
+
+.. toctree::
+   :hidden:
+
+   apps.nanogen_gui.rst
