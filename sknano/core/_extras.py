@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================
-Preset data structures (:mod:`sknano.core._luts`)
+LUTs, etc. (:mod:`sknano.core._extras`)
 ==============================================================
 
-.. currentmodule:: sknano.core._luts
+.. currentmodule:: sknano.core._extras
 
 """
 from __future__ import absolute_import, division, print_function
