@@ -14,19 +14,18 @@ import numpy as np
 __all__ = ['find_target_atom']
 
 
-def find_target_atom(atoms, target_coords=None, search_radius=2.5,
+def find_target_atom(atoms, target_coords=None, search_radius=2.0,
                      nearest_target=False):
     """Search for atom closest to target location.
 
     Parameters
     ----------
-    atoms : :class:`~sknano.core.atoms.XAtoms`
-        An :class:`~sknano.core.atoms.XAtoms` instance.
+    atoms : :class:`~sknano.core.atoms.Atoms`
+        An :class:`~sknano.core.atoms.Atoms` instance.
     target_coords : array_like
         An array or list of :math:`x,y,z` coordinates
     search_radius : float
-        Cutoff distance to search within in units of
-        :class:`~sknano.core.atoms.XAtoms` style.
+        Search radius
     nearest_target : bool, optional
 
     Returns
@@ -35,9 +34,9 @@ def find_target_atom(atoms, target_coords=None, search_radius=2.5,
         An :class:`~sknano.core.atoms.XAtom` instance.
 
     """
-    atom_tree = atoms.atom_tree
     print('Starting search radius: {}'.format(search_radius))
     target_atom = None
+    atom_tree = atoms.atom_tree
     while True:
         try:
             target_index = None
@@ -53,9 +52,8 @@ def find_target_atom(atoms, target_coords=None, search_radius=2.5,
             target_atom = atoms[target_index]
         except (IndexError, ValueError):
             search_radius += 1
-            errmsg = 'No target atom found within search radius.\n' + \
-                'Increasing search radius by 1 to {}'.format(search_radius)
-            print(errmsg)
+            print('No target atom within search radius.\n'
+                  'Increasing radius by 1 unit to {}'.format(search_radius))
         else:
             print('Found target atom.')
             return target_atom
