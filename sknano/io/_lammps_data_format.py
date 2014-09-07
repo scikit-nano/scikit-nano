@@ -16,14 +16,13 @@ import os
 import numpy as np
 
 from sknano.core import get_fpath
-from ._base import Atom, StructureIO, StructureConverter, \
-    StructureFormat, StructureIOError, default_comment_line
+from ._base import Atom, StructureIO, StructureIOError, StructureConverter, \
+    StructureFormat, default_comment_line
 
-__all__ = ['DATAData', 'DATAReader', 'DATAWriter',
-           'DATA2XYZConverter', 'DATAFormat', 'DATAError',
-           'LAMMPSDATA', 'LAMMPSDATAReader',
-           'LAMMPSDATAWriter', 'LAMMPSDATA2XYZConverter',
-           'LAMMPSDATAFormat', 'LAMMPSDATAError', 'lammps_atom_styles']
+__all__ = ['DATAReader', 'DATAWriter', 'DATAData', 'DATAFormat', 'DATAIOError',
+           'DATA2XYZConverter', 'LAMMPSDATAReader', 'LAMMPSDATAWriter',
+           'LAMMPSDATA', 'LAMMPSDATAFormat', 'LAMMPSDATAIOError',
+           'LAMMPSDATA2XYZConverter', 'lammps_atom_styles']
 
 lammps_atom_styles = {}
 lammps_atom_styles['angle'] = \
@@ -468,12 +467,13 @@ class DATAData(DATAReader):
         super(DATAData, self).__init__(fpath, **kwargs)
 
     def delete(self, key):
-        if key in self._headers:
+        try:
             del self._headers[key]
-        elif key in self._sections:
-            del self._sections[key]
-        else:
-            raise DATAError('{} not in DATA object'.format(key))
+        except KeyError:
+            try:
+                del self._sections[key]
+            except KeyError as e:
+                print(e)
 
     def map(self, *pairs):
         pass
@@ -525,8 +525,7 @@ class DATAData(DATAReader):
                 elif colindex is not None:
                     colidx = int(colindex)
             except (KeyError, TypeError, ValueError) as e:
-                print(e)
-                raise DATAError('replace called with invalid arguments')
+                raise DATAIOError(e)
         atom_attr = self._section_syntax_dict[section_key][colidx]
         attr_dtype = \
             self._section_properties[section_key][atom_attr]['dtype']
@@ -631,22 +630,10 @@ class DATA2XYZConverter(StructureConverter):
 LAMMPSDATA2XYZConverter = DATA2XYZConverter
 
 
-class DATAError(StructureIOError):
-    """`StructureIOError` `Exception` for `LAMMPS data` file format.
+class DATAIOError(StructureIOError):
+    pass
 
-    Parameters
-    ----------
-    msg : str
-        Error message
-
-    """
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return repr(self.msg)
-
-LAMMPSDATAError = DATAError
+LAMMPSDATAIOError = DATAIOError
 
 
 class DATAFormat(StructureFormat):

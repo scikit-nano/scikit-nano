@@ -9,50 +9,40 @@ Classes for structure data I/O (:mod:`sknano.io`)
 Contents
 ========
 
-Classes for handling `LAMMPS data` structure data format
---------------------------------------------------------
-.. autosummary::
-   :toctree: generated/
-
-   DATAData
-   DATAReader
-   DATAWriter
-   DATA2XYZConverter
-   DATAFormat
-   DATAError
-
-Classes for handling `xyz` structure data format
--------------------------------------------------
-.. autosummary::
-   :toctree: generated/
-
-   XYZData
-   XYZReader
-   XYZWriter
-   XYZ2DATAConverter
-   XYZFormat
-
-Base classes for creating new structure data readers/writers/converters
-------------------------------------------------------------------------
+Base I/O classes to inherit from when creating new I/O classes
+----------------------------------------------------------------
 .. autosummary::
    :toctree: generated/
 
    StructureIO
-   StructureReader
    StructureWriter
-   StructureConverter
    StructureFormat
+   StructureIOError
+   StructureConverter
 
-Base custom exception classes for handling errors
---------------------------------------------------
+I/O classes for the `LAMMPS data` structure data format
+--------------------------------------------------------
 .. autosummary::
    :toctree: generated/
 
-   StructureIOError
-   StructureReaderError
-   StructureWriterError
-   StructureConverterError
-   StructureFormatError
+   DATAReader
+   DATAWriter
+   DATAData
+   DATAFormat
+   DATAIOError
+   DATA2XYZConverter
+
+I/O classes for the `xyz` structure data format
+-------------------------------------------------
+.. autosummary::
+   :toctree: generated/
+
+   XYZReader
+   XYZWriter
+   XYZData
+   XYZFormat
+   XYZIOError
+   XYZ2DATAConverter
 
 """
 from __future__ import absolute_import, division, print_function

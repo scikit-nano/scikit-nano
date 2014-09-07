@@ -17,8 +17,8 @@ from sknano.core import get_fpath
 from ._base import Atom, StructureIO, StructureConverter, \
     StructureFormat, StructureIOError, default_comment_line
 
-__all__ = ['XYZReader', 'XYZWriter', 'XYZData',
-           'XYZ2DATAConverter', 'XYZFormat']
+__all__ = ['XYZReader', 'XYZWriter', 'XYZData', 'XYZFormat', 'XYZIOError',
+           'XYZ2DATAConverter']
 
 
 class XYZReader(StructureIO):
@@ -54,7 +54,7 @@ class XYZReader(StructureIO):
                 error_msg = '`xyz` data contained {} atoms '.format(
                     self.atoms.Natoms) + 'but should contain ' + \
                     '{}'.format(Natoms)
-                raise StructureIOError(error_msg)
+                raise XYZIOError(error_msg)
 
 
 class XYZWriter(object):
@@ -133,6 +133,10 @@ class XYZData(XYZReader):
 
         except (TypeError, ValueError) as e:
             print(e)
+
+
+class XYZIOError(StructureIOError):
+    pass
 
 
 class XYZ2DATAConverter(StructureConverter):
