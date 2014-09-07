@@ -15,8 +15,8 @@ def test_find_target_atom():
     atoms = generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=5)
     atoms.center_CM()
     atoms.assign_unique_ids()
-    atoms._update_coordination_numbers()
-    #atoms._update_nearest_neighbors()
+    atoms.update_coordination_numbers()
+    #atoms.update_nearest_neighbors()
     target_atom = find_target_atom(atoms, target_coords=[0.0, 5.0, 0.0],
                                    search_radius=2.0, nearest_target=True)
 
