@@ -45,5 +45,5 @@ class NeighborAtoms(AtomList):
         return "NeighborAtoms(atoms={!r})".format(self._data)
 
     @property
-    def NNN(self):
+    def Natoms(self):
         return len(self)
