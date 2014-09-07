@@ -15,7 +15,7 @@ def test1():
     infile = resource_filename('sknano', 'data/nanotubes/1005_5cells.data')
     data = DATAReader(infile)
     atoms = data.atoms
-    #atoms._update_nearest_neighbors()
+    #atoms.update_nearest_neighbors()
     #atoms.update_pyramidalization_angles()
     bonds = atoms.bonds
     assert_equal(bonds.Nbonds, atoms.coordination_numbers.sum())
@@ -42,7 +42,7 @@ def test3():
     atoms = SWNTGenerator(n=20, m=0, nz=2).atoms
     assert_equal(atoms.Natoms, 160)
     atoms.assign_unique_ids()
-    atoms._update_nearest_neighbors()
+    atoms.update_nearest_neighbors()
     #print(atoms.bonds.mean_length)
     #print(atoms.bonds.mean_angle)
     atom0 = atoms[0]

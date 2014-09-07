@@ -122,7 +122,7 @@ def test_pyramidalization_angles():
         generate_atoms(generator_class='SWNTGenerator', n=20, m=10, nz=2)
     atoms.assign_unique_ids()
     atoms.NNrc = 2.0
-    atoms._update_pyramidalization_angles()
+    atoms.update_pyramidalization_angles()
 
     for i, atom in enumerate(atoms):
         try:

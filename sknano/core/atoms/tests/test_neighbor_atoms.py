@@ -16,8 +16,11 @@ def test1():
     atoms.NNrc = 2.0
     NNlist = atoms.nearest_neighbors
     CNlist = atoms.coordination_numbers
+    print('NNlist: {}'.format(NNlist))
+    print('CNlist: {}'.format(CNlist))
     for i, NN in enumerate(NNlist):
-        assert_equals(NN.NNN, CNlist[i])
+        print('NN: {}'.format(NN))
+        assert_equals(NN.Natoms, CNlist[i])
 
 
 if __name__ == '__main__':
