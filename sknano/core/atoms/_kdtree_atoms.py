@@ -43,50 +43,38 @@ class KDTAtoms(XAtoms):
         self._NNrc = 2.0
 
     @property
+    def kNN(self):
+        """Number of nearest neighbors to return when querying the kd-tree."""
+        return self._kNN
+
+    @kNN.setter
+    def kNN(self, value):
+        """Set maximum number of nearest neighbors to return when querying
+        the kd-tree."""
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected an integer >= 0')
+        self._kNN = int(value)
+
+    @property
+    def NNrc(self):
+        """Only return neighbors within this distance when querying the
+        kd-tree."""
+        return self._NNrc
+
+    @NNrc.setter
+    def NNrc(self, value):
+        """Set the cutoff distance to check for neighest neighbors."""
+        if not (isinstance(value, numbers.Number) and value >= 0):
+            raise TypeError('Expected a real number greater >= 0')
+        self._NNrc = value
+
+    @property
     def atom_tree(self):
         """Return the :py:class:`~scipy:scipy.spatial.KDTree` of coords."""
         try:
             return KDTree(self.coords)
         except ValueError:
             return None
-
-    @property
-    def coordination_numbers(self):
-        """Return array of `KDTAtom` coordination numbers."""
-        self._update_coordination_numbers()
-        return np.asarray([atom.CN for atom in self])
-
-    def _update_coordination_numbers(self):
-        """Update `KDTAtom` coordination numbers."""
-        try:
-            NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
-            for i, atom in enumerate(self):
-                atom.CN = 0
-                for d in NNd[i]:
-                    if d < self.NNrc:
-                        atom.CN += 1
-        except ValueError:
-            pass
-
-    @property
-    def nearest_neighbors(self):
-        """Return array of nearest-neighbor atoms for each `KDTAtom`."""
-        self._update_nearest_neighbors()
-        return np.asarray([atom.NN for atom in self])
-
-    def _update_nearest_neighbors(self):
-        """Update `KDTAtom` nearest-neighbors."""
-        try:
-            NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
-            for j, atom in enumerate(self):
-                atom.NN = NeighborAtoms()
-                atom.bonds = Bonds()
-                for k, d in enumerate(NNd[j]):
-                    if d < self.NNrc:
-                        atom.NN.append(self[NNi[j][k]])
-                        atom.bonds.append(Bond(atom, atom.NN[-1]))
-        except ValueError:
-            pass
 
     def query_atom_tree(self, k=3, eps=0, p=2, rc=np.inf):
         """Query atom tree for nearest neighbors distances and indices.
@@ -126,49 +114,59 @@ class KDTAtoms(XAtoms):
             return d[:, 1:], i[:, 1:]
 
     @property
-    def kNN(self):
-        """Number of nearest neighbors to return when querying the kd-tree."""
-        return self._kNN
+    def nearest_neighbors(self):
+        """Return array of nearest-neighbor atoms for each `KDTAtom`."""
+        self.update_nearest_neighbors()
+        return np.asarray([atom.NN for atom in self])
 
-    @kNN.setter
-    def kNN(self, value):
-        """Set maximum number of nearest neighbors to return when querying
-        the kd-tree."""
-        if not isinstance(value, numbers.Number):
-            raise TypeError('Expected an integer >= 0')
-        self._kNN = int(value)
+    def update_nearest_neighbors(self):
+        """Update `KDTAtom` nearest-neighbors."""
+        try:
+            NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
+            for j, atom in enumerate(self):
+                atom.NN = NeighborAtoms()
+                for k, d in enumerate(NNd[j]):
+                    if d < self.NNrc:
+                        atom.NN.append(self[NNi[j][k]])
+        except ValueError:
+            pass
 
     @property
-    def NNrc(self):
-        """Only return neighbors within this distance when querying the
-        kd-tree."""
-        return self._NNrc
+    def coordination_numbers(self):
+        """Return array of `KDTAtom` coordination numbers."""
+        self.update_coordination_numbers()
+        return np.asarray([atom.CN for atom in self])
 
-    @NNrc.setter
-    def NNrc(self, value):
-        """Set the cutoff distance to check for neighest neighbors."""
-        if not (isinstance(value, numbers.Number) and value >= 0):
-            raise TypeError('Expected a real number greater >= 0')
-        self._NNrc = value
+    def update_coordination_numbers(self):
+        """Update `KDTAtom` coordination numbers."""
+        self.update_nearest_neighbors()
+        [setattr(atom, 'CN', atom.NN.Natoms) for atom in self]
 
     @property
     def bonds(self):
-        self._update_nearest_neighbors()
+        self.update_bonds()
         #return np.asarray([atom.bonds for atom in self])
         bonds = Bonds()
         [bonds.extend(atom.bonds) for atom in self]
         return bonds
 
+    def update_bonds(self):
+        """Update `KDTAtom` bonds."""
+        self.update_nearest_neighbors()
+        for atom in self:
+            atom.bonds = Bonds()
+            [atom.bonds.append(Bond(atom, nn)) for nn in atom.NN]
+
     @property
     def pyramidalization_angles(self):
-        self._update_pyramidalization_angles()
+        self.update_pyramidalization_angles()
         angles = []
         [angles.append(atom.pyramidalization_angle) for atom in self if
          atom.poav is not None]
         return np.asarray(angles)
 
-    def _update_pyramidalization_angles(self):
-        self._update_nearest_neighbors()
+    def update_pyramidalization_angles(self):
+        self.update_bonds()
         for atom in self:
             if atom.bonds.Nbonds == 3:
                 b1, b2, b3 = atom.bonds
@@ -201,15 +199,15 @@ class KDTAtoms(XAtoms):
 
     @property
     def poav_misalignment_angles(self):
-        self._update_poav_misalignment_angles()
+        self.update_poav_misalignment_angles()
         angles = []
         [angles.extend(angle) for angle in
          [atom.poav_misalignment_angles for atom in self
           if len(atom.poav_misalignment_angles) > 0]]
         return np.asarray(angles)
 
-    def _update_poav_misalignment_angles(self):
-        self._update_pyramidalization_angles()
+    def update_poav_misalignment_angles(self):
+        self.update_pyramidalization_angles()
         for atom in self:
             if atom.bonds.Nbonds == 3:
                 atom.poav_misalignment_angles = []
@@ -221,4 +219,4 @@ class KDTAtoms(XAtoms):
                             np.pi / 2 - vec.angle(NN.poav, nvec)
                         atom.poav_misalignment_angles.append(
                             misalignment_angle)
-                            #vec.angle(atom.poav, NN.poav))
+                        #vec.angle(atom.poav, NN.poav))
