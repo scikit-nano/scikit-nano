@@ -12,16 +12,15 @@ __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
 
-#from .atoms import PDBAtom, PDBAtoms
-from ..core import get_fpath
+from sknano.core import get_fpath
 
-from ._structure_io import StructureReader, StructureIOError, \
-    StructureWriter, StructureFormat, default_comment_line
+from ._base import StructureIO, StructureIOError, StructureFormat, \
+    default_comment_line
 
 __all__ = ['PDBData', 'PDBReader', 'PDBWriter', 'PDBFormat']
 
 
-class PDBReader(StructureReader):
+class PDBReader(StructureIO):
     """Class for reading pdb chemical file format.
 
     Parameters
@@ -30,7 +29,7 @@ class PDBReader(StructureReader):
         pdb structure file
 
     """
-    def __init__(self, fpath=None):
+    def __init__(self, fpath):
         super(PDBReader, self).__init__(fpath=fpath)
 
         if fpath is not None:
@@ -44,7 +43,7 @@ class PDBReader(StructureReader):
                 print(line)
 
 
-class PDBWriter(StructureWriter):
+class PDBWriter(object):
     """Class for writing pdb chemical file format."""
 
     @classmethod

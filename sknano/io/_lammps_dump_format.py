@@ -10,19 +10,19 @@ LAMMPS dump format (:mod:`sknano.io._lammps_dump_format`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
+import re
+
 import numpy as np
 
-from .atoms import LAMMPSAtom as Atom
-from ..core import get_fpath
+from sknano.core import get_fpath
 
-from ._structure_io import StructureReader, StructureWriter, \
-    StructureFormat, StructureIOError, default_comment_line
+from ._base import Atom, StructureIO, StructureFormat, StructureIOError, \
+    default_comment_line
 
-
-__all__ = ['DUMPReader', 'DUMPWriter', 'DUMPData', 'DUMPError', 'DUMPFormat']
+__all__ = ['DUMPData', 'DUMPReader', 'DUMPWriter', 'DUMPError', 'DUMPFormat']
 
 
-class DUMPReader(StructureReader):
+class DUMPReader(StructureIO):
     """Class for reading `LAMMPS dump` file format.
 
     Parameters
@@ -229,7 +229,7 @@ class DUMPReader(StructureReader):
             return section_data
 
 
-class DUMPWriter(StructureWriter):
+class DUMPWriter(object):
     """Class for writing LAMMPS dump chemical file format."""
 
     @classmethod
@@ -349,12 +349,134 @@ class DUMPWriter(StructureWriter):
                 f.write(line)
 
 
-class aselect(object):
+class Snap(object):
     pass
+
+
+class aselect(object):
+
+    def __init__(self, data):
+        self.data = data
+
+    def all(self, *args):
+        if len(args) == 0:
+            for s in self.data.snaps:
+                if not s.tselect:
+                    continue
+                for i in xrange(s.Natoms):
+                    s.aselect[i] = 1
+                s.nselect = s.Natoms
+        else:
+            s = self.data.snaps[self.data.findtime(args[0])]
+            for i in xrange(s.Natoms):
+                s.aselect[i] = 1
+            s.nselect = s.Natoms
+
+    def test(self, teststr, *args):
+        data = self.data
+        pattern = '\$\w*'
+        list = re.findall(pattern, teststr)
+        for item in list:
+            name = item[1:]
+            column = data.names[name]
+            insert = 'snap.atoms[i][{:d}]'.format(column)
+            teststr = teststr.replace(item, insert)
+        cmd = 'flag = ' + teststr
+        ccmd = compile(cmd, '', 'single')
+
+        if len(args) == 0:
+            for snap in data.snaps:
+                if not snap.tselect:
+                    continue
+                for i in xrange(snap.Natoms):
+                    if not snap.aselect[i]:
+                        continue
+                    exec ccmd
+                    if not flag:
+                        snap.aselect[i] = 0
+                        snap.nselect -= 1
+            for i in xrange(data.nsnaps):
+                if data.snaps[i].tselect:
+                    print('{}/{} atoms selected in first step {}'.format(
+                        data.snaps[i].nselect, data.snaps[i].natoms,
+                        data.snaps[i].time))
+                    break
+            for i in xrange(data.nsnaps - 1, -1, -1):
+                if data.snaps[i].tselect:
+                    print('{}/{} atoms selected in last step {}'.format(
+                        data.snaps[i].nselect, data.snaps[i].natoms,
+                        data.snaps[i].time))
+                    break
+        else:
+            n = data.findtime(args[0])
+            snap = data.snaps[n]
+            for i in xrange(snap.Natoms):
+                if not snap.aselect[i]:
+                    continue
+                exec ccmd
+                if not flag:
+                    snap.aselect[i] = 0
+                    snap.nselect -= 1
 
 
 class tselect(object):
-    pass
+    def __init__(self, data):
+        self.data = data
+
+    def all(self):
+        data = self.data
+        for snap in data.snaps:
+            snap.tselect = 1
+        data.nselect = len(data.snaps)
+        data.aselect.all()
+        print('{}/{} snapshots selected'.format(data.nselect, data.nsnaps))
+
+    def one(self, n):
+        data = self.data
+        for snap in data.snaps:
+            snap.tselect = 0
+        i = data.findtime(n)
+        data.snaps[i].tselect = 1
+        data.nselect = 1
+        data.aselect.all()
+        print('{}/{} snapshots selected'.format(data.nselect, data.nsnaps))
+
+    def none(self):
+        data = self.data
+        for snap in data.snaps:
+            snap.tselect = 0
+        data.nselect = 0
+        print('{}/{} snapshots selected'.format(data.nselect, data.nsnaps))
+
+    def skip(self, n):
+        data = self.data
+        count = n - 1
+        for snap in data.snaps:
+            if not snap.tselect:
+                continue
+            count += 1
+            if count == n:
+                count = 0
+                continue
+            snap.tselect = 0
+            data.nselect -= 1
+        data.aselect.all()
+        print('{}/{} snapshots selected'.format(data.nselect, data.nsnaps))
+
+    def test(self, teststr, *args):
+        data = self.data
+        snaps = data.snaps
+        cmd = 'flag = ' + teststr.replace('$t', 'snaps[i].time')
+        ccmd = compile(cmd, '', 'single')
+        for i in xrange(data.nsnaps):
+            if not snaps[i].tselect:
+                continue
+            exec ccmd
+            if not flag:
+                snaps[i].tselect = 0
+                data.nselect -= 1
+        data.aselect.all()
+        print('{}/{} snapshots selected'.format(data.nselect, data.nsnaps))
 
 
 class DUMPData(DUMPReader):

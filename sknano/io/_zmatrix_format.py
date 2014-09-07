@@ -12,17 +12,15 @@ __docformat__ = 'restructuredtext en'
 
 import os
 
-from .atoms import Atom
-from ..core import get_fpath
-
-from ._structure_io import StructureReader, StructureReaderError, \
-    StructureWriter, StructureConverter, default_comment_line
+from sknano.core import get_fpath
+from ._base import Atom, StructureIO, StructureConverter, \
+    StructureFormat, StructureIOError, default_comment_line
 
 __all__ = ['ZMATRIXDATA', 'ZMATRIXReader', 'ZMATRIXWriter',
            'ZMATRIX2DATAConverter']
 
 
-class ZMATRIXReader(StructureReader):
+class ZMATRIXReader(StructureIO):
     """Class for reading zmatrix chemical file format.
 
     Parameters
@@ -31,31 +29,17 @@ class ZMATRIXReader(StructureReader):
         zmatrix structure file
 
     """
-    def __init__(self, fpath=None):
+    def __init__(self, fpath):
         super(ZMATRIXReader, self).__init__(fpath=fpath)
 
         if fpath is not None:
             self.read()
 
     def read(self):
-        with open(self.fpath, 'r') as f:
-            Natoms = int(f.readline().strip())
-            self._comment_line = f.readline().strip()
-            lines = f.readlines()
-            for line in lines:
-                s = line.strip().split()
-                if len(s) != 0:
-                    atom = \
-                        Atom(s[0], x=float(s[1]), y=float(s[2]), z=float(s[3]))
-                    self.atoms.append(atom)
-            if self.atoms.Natoms != Natoms:
-                error_msg = '`zmatrixfile` contained {} atoms '.format(
-                    self.atoms.Natoms) + 'but should contain ' + \
-                    '{}'.format(Natoms)
-                raise StructureReaderError(error_msg)
+        pass
 
 
-class ZMATRIXWriter(StructureWriter):
+class ZMATRIXWriter(object):
     """Class for writing zmatrix chemical file format."""
 
     @classmethod
@@ -81,17 +65,12 @@ class ZMATRIXWriter(StructureWriter):
         if fpath is None:
             fpath = get_fpath(fname=fname, ext='zmatrix', outpath=outpath,
                               overwrite=True, add_fnum=False)
+            print('fpath: {}'.format(fpath))
+
         if comment_line is None:
             comment_line = default_comment_line
 
         atoms.rezero_coords()
-
-        with open(fpath, 'w') as f:
-            f.write('{:d}\n'.format(atoms.Natoms))
-            f.write('{}\n'.format(comment_line))
-            for atom in atoms:
-                f.write('{:>3s}{:15.8f}{:15.8f}{:15.8f}\n'.format(
-                    atom.symbol, atom.x, atom.y, atom.z))
 
 
 class ZMATRIXDATA(ZMATRIXReader):
@@ -126,7 +105,7 @@ class ZMATRIXDATA(ZMATRIXReader):
                 zmatrixfile = self.fpath
             ZMATRIXWriter.write(fname=zmatrixfile,
                                 atoms=self.atoms,
-                                comment_line=self._comment_line)
+                                comment_line=self.comment_line)
         except (TypeError, ValueError) as e:
             print(e)
 
@@ -207,32 +186,4 @@ class ZMATRIX2DATAConverter(StructureConverter):
         `DATAReader` (only if `return_reader` is True)
 
         """
-        from ._lammps_data_format import DATAReader, DATAWriter
-
-        zmatrixreader = ZMATRIXReader(fpath=self.infile)
-        atoms = zmatrixreader.atoms
-        comment_line = zmatrixreader.comment_line
-        if self._add_new_atoms:
-            atoms.extend(self._new_atoms)
-        if self._add_new_atomtypes:
-            atoms.add_atomtypes(self._new_atomtypes)
-
-        if self._boxbounds is None:
-
-            boxbounds = {'x': {'min': None, 'max': None},
-                         'y': {'min': None, 'max': None},
-                         'z': {'min': None, 'max': None}}
-
-            for i, dim in enumerate(('x', 'y', 'z')):
-                boxbounds[dim]['min'] = atoms.coords[:, i].min()
-                boxbounds[dim]['max'] = atoms.coords[:, i].max()
-        else:
-            boxbounds = self._boxbounds
-
-        DATAWriter.write(fname=self.outfile, atoms=atoms,
-                         boxbounds=boxbounds, comment_line=comment_line,
-                         pad_box=self._pad_box, xpad=self._xpad,
-                         ypad=self._ypad, zpad=self._zpad)
-
-        if return_reader:
-            return DATAReader(fpath=self.outfile)
+        pass

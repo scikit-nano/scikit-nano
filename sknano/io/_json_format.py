@@ -10,16 +10,14 @@ JSON format (:mod:`sknano.io._json_format`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from .atoms import Atom
-from ..core import get_fpath
+#from sknano.core import get_fpath
 
-from ._structure_io import StructureReader, StructureReaderError, \
-    StructureWriter, default_comment_line
+from ._base import StructureIO  # , default_comment_line
 
 __all__ = ['JSONDATA', 'JSONReader', 'JSONWriter']
 
 
-class JSONReader(StructureReader):
+class JSONReader(StructureIO):
     """Class for reading json file format.
 
     Parameters
@@ -28,31 +26,17 @@ class JSONReader(StructureReader):
         json file
 
     """
-    def __init__(self, fpath=None):
+    def __init__(self, fpath):
         super(JSONReader, self).__init__(fpath=fpath)
 
         if fpath is not None:
             self.read()
 
     def read(self):
-        with open(self.fpath, 'r') as f:
-            Natoms = int(f.readline().strip())
-            self._comment_line = f.readline().strip()
-            lines = f.readlines()
-            for line in lines:
-                s = line.strip().split()
-                if len(s) != 0:
-                    atom = \
-                        Atom(s[0], x=float(s[1]), y=float(s[2]), z=float(s[3]))
-                    self.atoms.append(atom)
-            if self.atoms.Natoms != Natoms:
-                error_msg = '`jsonfile` contained {} atoms '.format(
-                    self.atoms.Natoms) + 'but should contain ' + \
-                    '{}'.format(Natoms)
-                raise StructureReaderError(error_msg)
+        pass
 
 
-class JSONWriter(StructureWriter):
+class JSONWriter(object):
     """Class for writing json chemical file format."""
 
     @classmethod
@@ -71,17 +55,7 @@ class JSONWriter(StructureWriter):
             then it is set to the full path of the output `json` file.
 
         """
-        fpath = get_fpath(fname=fname, ext='json', outpath=outpath,
-                          overwrite=True, add_fnum=False)
-        if comment_line is None:
-            comment_line = default_comment_line
-
-        atoms.rezero_coords()
-
-        with open(fpath, 'w') as f:
-            for atom in atoms:
-                f.write('{:>3s}{:15.8f}{:15.8f}{:15.8f}\n'.format(
-                    atom.symbol, atom.x, atom.y, atom.z))
+        pass
 
 
 class JSONDATA(JSONReader):
@@ -103,18 +77,4 @@ class JSONDATA(JSONReader):
         jsonfile : {None, str}, optional
 
         """
-        try:
-            if (jsonfile is None or jsonfile == '') and \
-                    (self.fpath is None or self.fpath == ''):
-                error_msg = '`jsonfile` must be a string at least 1 ' + \
-                    'character long.'
-                if jsonfile is None:
-                    raise TypeError(error_msg)
-                else:
-                    raise ValueError(error_msg)
-            else:
-                jsonfile = self.fpath
-            JSONWriter.write(fname=jsonfile, atoms=self.atoms,
-                             comment_line=self._comment_line)
-        except (TypeError, ValueError) as e:
-            print(e)
+        pass

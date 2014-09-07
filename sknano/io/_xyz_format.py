@@ -41,7 +41,7 @@ class XYZReader(StructureIO):
         self.atoms.clear()
         with open(self.fpath, 'r') as f:
             Natoms = int(f.readline().strip())
-            self._comment_line = f.readline().strip()
+            self.comment_line = f.readline().strip()
             lines = f.readlines()
             for line in lines:
                 s = line.strip().split()
@@ -129,7 +129,7 @@ class XYZData(XYZReader):
                 xyzfile = self.fpath
 
             XYZWriter.write(fname=xyzfile, atoms=self.atoms,
-                            comment_line=self._comment_line, **kwargs)
+                            comment_line=self.comment_line, **kwargs)
 
         except (TypeError, ValueError) as e:
             print(e)
@@ -220,7 +220,7 @@ class XYZ2DATAConverter(StructureConverter):
 
         kwargs.update(self.kwargs)
 
-        xyzreader = XYZReader(fpath=self.infile, **kwargs)
+        xyzreader = XYZReader(self.infile, **kwargs)
         atoms = xyzreader.atoms
 
         if self._add_new_atoms:
@@ -232,7 +232,7 @@ class XYZ2DATAConverter(StructureConverter):
                          comment_line=xyzreader.comment_line, **kwargs)
 
         if return_reader:
-            return DATAReader(fpath=self.outfile, **kwargs)
+            return DATAReader(self.outfile, **kwargs)
 
 
 class XYZFormat(StructureFormat):

@@ -130,7 +130,7 @@ class DATAReader(StructureIO):
         """Read data file."""
         self.atoms.clear()
         with open(self.fpath, 'r') as f:
-            self._comment_line = f.readline().strip()
+            self.comment_line = f.readline().strip()
 
             while True:
                 line = f.readline().strip()
@@ -563,7 +563,7 @@ class DATAData(DATAReader):
                 datafile = self.fpath
 
             DATAWriter.write(fname=datafile, atoms=self.atoms,
-                             comment_line=self._comment_line, **kwargs)
+                             comment_line=self.comment_line, **kwargs)
 
         except (TypeError, ValueError) as e:
             print(e)
@@ -620,13 +620,13 @@ class DATA2XYZConverter(StructureConverter):
 
         kwargs.update(self.kwargs)
 
-        datareader = DATAReader(fpath=self.infile, **kwargs)
+        datareader = DATAReader(self.infile, **kwargs)
 
         XYZWriter.write(fpath=self.outfile, atoms=datareader.atoms,
                         comment_line=datareader.comment_line, **kwargs)
 
         if return_reader:
-            return XYZReader(fpath=self.outfile, **kwargs)
+            return XYZReader(self.outfile, **kwargs)
 
 LAMMPSDATA2XYZConverter = DATA2XYZConverter
 
