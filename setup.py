@@ -200,8 +200,10 @@ def setup_package():
         test_suite='nose.collector',
         install_requires=install_requires,
         entry_points={
-            'console_scripts': ['nanogen = sknano.scripts.nanogen:main',
-                                'nanogenui = sknano.scripts.nanogenui:main'],
+            'console_scripts': [
+                'analyze_structure = sknano.scripts.analyze_structure:main',
+                'nanogen = sknano.scripts.nanogen:main',
+                'nanogenui = sknano.scripts.nanogenui:main'],
         },
         packages=find_packages(),
         include_package_data=True,

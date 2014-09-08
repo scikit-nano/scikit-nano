@@ -12,6 +12,7 @@ Contents
 .. autosummary::
    :toctree: generated/
 
+   analyze_structure
    nanogen
    nanogenui
 
@@ -19,7 +20,8 @@ Contents
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-#from .nanogen import *
+from .analyze_structure import *
+from .nanogen import *
 #from .nanogenui import NanoGen
 
 __all__ = [s for s in dir() if not s.startswith('_')]
