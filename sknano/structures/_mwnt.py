@@ -141,7 +141,10 @@ class MWNT(StructureBase):
                                     nz=nz, **kwargs))
 
         self.fix_Lz = fix_Lz
-        self.nz = nz
+        if nz is not None:
+            self.nz = nz
+        else:
+            self.nz = 1
         self.L0 = self.Lz  # store initial value of Lz
 
         if self.verbose:

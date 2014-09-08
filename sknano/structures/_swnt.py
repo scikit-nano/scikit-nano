@@ -133,8 +133,10 @@ class SWNT(StructureBase):
         self.fix_Lz = fix_Lz
         if Lz is not None:
             self.nz = 10 * float(Lz) / self.T
-        else:
+        elif nz is not None:
             self.nz = nz
+        else:
+            self.nz = 1
 
         self.L0 = self.Lz  # store initial value of Lz
 
