@@ -145,7 +145,6 @@ class MWNT(StructureBase):
             self.nz = nz
         else:
             self.nz = 1
-        self.L0 = self.Lz  # store initial value of Lz
 
         if self.verbose:
             print(self.shells)
