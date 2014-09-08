@@ -21,7 +21,7 @@ Classes for creating abstract object representations of nanostructures
    :toctree: generated/
 
    StructureBase
-   NanotubeBundle
+   NanotubeBundleBase
 
    MWNTMixin
    NanotubeBundleMixin
