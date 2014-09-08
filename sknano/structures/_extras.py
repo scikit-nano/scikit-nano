@@ -436,6 +436,7 @@ def get_Ch_indices(Ch):
             return tuple([int(c) for c in re.split('[\(\),\s*]+', Ch)[1:-1]])
         except Exception as e:
             print(e)
+            return None
 
 
 def get_Ch_type(Ch):
