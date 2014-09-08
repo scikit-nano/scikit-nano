@@ -10,14 +10,14 @@ MWNT bundle structure class (:mod:`sknano.structures._mwnt_bundle`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from ._nanotube_bundle import NanotubeBundle
+from ._nanotube_bundle import NanotubeBundleBase
 from ._mwnt import MWNT
 #from ._swnt_bundle import SWNTBundle
 
 __all__ = ['MWNTBundle']
 
 
-class MWNTBundle(NanotubeBundle, MWNT):
+class MWNTBundle(NanotubeBundleBase, MWNT):
     def __init__(self, **kwargs):
 
         super(MWNTBundle, self).__init__(**kwargs)

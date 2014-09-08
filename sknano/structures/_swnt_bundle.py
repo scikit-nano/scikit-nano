@@ -11,13 +11,13 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 from ._compute_funcs import compute_bundle_density
-from ._nanotube_bundle import NanotubeBundle
+from ._nanotube_bundle import NanotubeBundleBase
 from ._swnt import SWNT
 
 __all__ = ['SWNTBundle']
 
 
-class SWNTBundle(NanotubeBundle, SWNT):
+class SWNTBundle(NanotubeBundleBase, SWNT):
 
     def __init__(self, **kwargs):
 
