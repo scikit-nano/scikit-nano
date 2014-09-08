@@ -194,8 +194,9 @@ class SWNTGenerator(SWNT, GeneratorMixin):
             fname = '_'.join(fname_wordlist)
 
         if self.L0 is not None and self.fix_Lz:
-            pmin = [-np.inf, -np.inf, 0]
-            pmax = [np.inf, np.inf, 10 * self.L0 + 0.25]
+            Lz_cutoff = 10 * self.L0 + 1
+            pmin = [-np.inf, -np.inf, -Lz_cutoff]
+            pmax = [np.inf, np.inf, Lz_cutoff]
             region_bounds = Cuboid(pmin=pmin, pmax=pmax)
             region_bounds.update_region_limits()
 
