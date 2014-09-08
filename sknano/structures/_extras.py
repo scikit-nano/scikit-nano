@@ -421,14 +421,21 @@ def get_Ch_indices(Ch):
     Parameters
     ----------
     Ch : str
+        string of the form 'NNMM' or "(n, m)". Extra spaces are acceptable.
 
     Returns
     -------
     sequence
-        list of chiral indices `n` and `m`
+        2-tuple of chiral indices `n` and `m`
 
     """
-    return [int(c) for c in re.split('[\(\),\s*]+', Ch)[1:-1]]
+    try:
+        return int(Ch[:2]), int(Ch[2:])
+    except ValueError:
+        try:
+            return tuple([int(c) for c in re.split('[\(\),\s*]+', Ch)[1:-1]])
+        except Exception as e:
+            print(e)
 
 
 def get_Ch_type(Ch):
@@ -471,3 +478,7 @@ def map_Ch(Ch, compute=None, **kwargs):
     except AttributeError as e:
         print(e)
         return None
+
+
+def get_Ch_map_from_data(Chlist, Chdata):
+    pass
