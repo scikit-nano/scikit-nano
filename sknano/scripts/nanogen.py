@@ -30,32 +30,61 @@ This module allows for easy structure generation from the command line.
 .. code-block:: python
 
    > nanogen --help
-   usage: nanogen [-h] [--element1 ELEMENT1] [--element2 ELEMENT2]
-                  [--bond BOND]
-                  {GrapheneGenerator,BilayerGrapheneGenerator,SWNTGenerator,
-   UnrolledSWNTGenerator,MWNTGenerator,SWNTBundleGenerator,MWNTBundleGenerator}
-                  ...
+     usage: nanogen [-h] [--element1 ELEMENT1] [--element2 ELEMENT2]
+                    [--bond BOND] [--fname FNAME]
+                    [--structure-format {data,xyz}] [--verbose]
+                    {graphene,BLG,swnt,unrolled_swnt,mwnt,swnt_bundle,
+                    mwnt_bundle}
+                    ...
 
-   optional arguments:
-     -h, --help            show this help message and exit
-     --element1 ELEMENT1   element symbol or atomic number of basis atom 1
-                           (default: C)
-     --element2 ELEMENT2   element symbol or atomic number of basis atom 2
-                           (default: C)
-     --bond BOND           Bond length between nearest neighbor atoms. Must in
-                           units of Angstroms. (default: 1.42)
+     optional arguments:
+       -h, --help            show this help message and exit
+       --element1 ELEMENT1   element symbol or atomic number of basis atom 1
+                             (default: C)
+       --element2 ELEMENT2   element symbol or atomic number of basis atom 2
+                             (default: C)
+       --bond BOND           Bond length between nearest neighbor atoms. Must
+                             in units of Angstroms. (default: 1.42)
+       --fname FNAME         structure file name
+       --structure-format {data,xyz}
+                             structure file format (default: xyz)
+       --verbose             verbose output
 
-   sub-commands:
+     sub-commands:
+       {graphene,BLG,swnt,unrolled_swnt,mwnt,swnt_bundle,mwnt_bundle}
 
 .. autofunction:: nanogen
 
 Examples
 --------
 
-::
+The following command generates a graphene sheet 10 nm long by 1 nm wide
+with an armchair edge pattern along its length and saves the data in the
+LAMMPS data format.::
 
-    > nanogen graphene 5 1 --edge ZZ
-    > nanogen swnt --n 10 --m 0 --nz 5
+    > nanogen --structure-format data graphene 10 1 --edge AC
+
+This command will generate a :math:`(20, 0)` SWNT, 5 unit cells
+long and saves the data in `xyz` format.::
+
+    > nanogen swnt -n 20 -m 0 --nz 5
+
+Notes
+-----
+The :mod:`nanogen` script calls the :func:`~sknano.scripts.nanogen.nanogen`
+function and neither the script nor the function allow for generating
+multiple structures per call. It's easy to do this using the scripting
+capabilities of the shell or from within an interactive Python session.
+
+For example, if you have a list of chiralities that you want structure data
+for, you can do something like this from within an interactive session::
+
+    >>> from sknano.structures import generate_Ch_list
+    >>> from sknano.generators import SWNTGenerator
+    >>> # Generate your list of (n, m) chiralities
+    >>> Ch_list = generate_Ch_list(ni=5, nf=25, mi=0, mf=25, handedness='right')
+    >>> for n, m in Ch_list:
+    ...     SWNTGenerator(n=n, m=m).save_data(structure_format='data')
 
 """
 from __future__ import absolute_import, division, print_function
