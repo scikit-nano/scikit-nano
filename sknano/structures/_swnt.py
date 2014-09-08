@@ -121,6 +121,8 @@ class SWNT(StructureBase):
         if tube_length is not None and Lz is None:
             Lz = tube_length
 
+        self.L0 = Lz  # store initial value of Lz
+
         # add each parameter in the order I want them to appear in
         # verbose output mode
         self._params = ['n', 'm', 't1', 't2', 'd', 'dR', 'N',
@@ -137,8 +139,6 @@ class SWNT(StructureBase):
             self.nz = nz
         else:
             self.nz = 1
-
-        self.L0 = self.Lz  # store initial value of Lz
 
     def __str__(self):
         """Return nice string representation of `SWNT`."""
