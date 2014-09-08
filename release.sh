@@ -38,17 +38,6 @@ paver dmg -p 2.7  # 32/64-bit version
 paver dmg -p 3.3  # 32/64-bit version
 
 paver bdist_superpack -p 2.7
-paver bdist_superpack -p 2.6
-paver bdist_superpack -p 3.2
 paver bdist_superpack -p 3.3
-
-
-#--------------------------------------------
-# Build 32-bit OS X installers (on OS X 10.5)
-#--------------------------------------------
-#export MACOSX_DEPLOYMENT_TARGET=10.3
-#paver dmg -p 2.6
-#paver dmg -p 2.7  # 32-bit version
-
 
 paver write_release_and_log
