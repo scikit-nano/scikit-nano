@@ -10,38 +10,47 @@ Fullerene structure classes (:mod:`sknano.structures._fullerenes`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-#import itertools
-
-#from fractions import gcd
-#from collections import OrderedDict
-
-#import numpy as np
+import numbers
 
 __all__ = ['Fullerene']
 
 
 class Fullerene(object):
-    u"""Class for creating interactive Fullerene objects.
+    u"""Class for generating interactive Fullerene objects.
 
-    .. note::
-
-       This class is under development and not functional! Attempting
-       to use it raises a `RuntimeError`.
-
-    The `fullerene isomer data
+    The `fullerene data
     <http://www.nanotube.msu.edu/fullerene/fullerene-isomers.html>`_
     were downloaded from the
-    `The Nanotube Site <http://www.nanotube.msu.edu>`_
-    at `Michigan State University <http://www.msu.edu>`_.
+    `The Nanotube Site <http://www.nanotube.msu.edu>`_.
 
     Parameters
     ----------
-    verbose : bool, optional
-        verbose output
+    N : int
+        The :math:`N` in :math:`C_N` where :math:`N` is the number
+        fullerene atoms. Always an even integer.
+    PG : str, optional
+        Symmetry
 
     Examples
     --------
 
     """
-    def __init__(self, N=None, verbose=False):
-        raise RuntimeError('This class is not yet implemented.')
+    def __init__(self, N, **kwargs):
+
+        # Check that N is a valid `N` and that `N` is
+        self.N = N
+
+    @property
+    def N(self):
+        return self._N
+
+    @N.setter
+    def N(self, value):
+        if not (isinstance(value, numbers.Integral) or
+                value > 0 or value % 2 == 0):
+            raise TypeError('Expected an even, positive integer.')
+        self._N = int(value)
+
+    @N.deleter
+    def N(self):
+        del self._N

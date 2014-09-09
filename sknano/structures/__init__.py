@@ -27,6 +27,8 @@ Classes for creating abstract object representations of nanostructures
    NanotubeBundleMixin
    UnrolledSWNTMixin
 
+   Fullerene
+
    GraphenePrimitiveCell
    Graphene
    BilayerGraphene
@@ -88,14 +90,11 @@ Helper functions and data structures related to :math:`(n, m)` chirality data
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from ._compute_funcs import *
-
 from ._base import *
-from ._nanotube_bundle import *
-from ._extras import *
 from ._mixins import *
+from ._nanotube_bundle import *
 
-#from ._fullerenes import *
+from ._fullerenes import *
 
 from ._bilayer_graphene import *
 from ._graphene import *
@@ -105,5 +104,8 @@ from ._swnt_bundle import *
 from ._mwnt import *
 from ._mwnt_bundle import *
 from ._unrolled_swnt import *
+
+from ._compute_funcs import *
+from ._extras import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
