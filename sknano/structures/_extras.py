@@ -19,7 +19,8 @@ from sknano.core.math import comparison_symbol_operator_mappings
 __all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'generate_Ch_list',
            'generate_Ch_property_grid', 'get_Ch_indices', 'get_Ch_type',
            'map_Ch', 'chiral_type_name_mappings', 'Ch_types', 'edge_types',
-           'filter_key_type_mappings']
+           'filter_key_type_mappings', 'param_units', 'param_symbols',
+           'param_strfmt']
 
 chiral_type_name_mappings = Ch_types = \
     {'achiral': 'aCh', 'armchair': 'AC', 'zigzag': 'ZZ', 'chiral': 'Ch'}
@@ -36,6 +37,27 @@ for k in ('min_index', 'max_index',
           'min_m', 'max_m',
           'n', 'm'):
     filter_key_type_mappings[k] = int
+
+param_units = {}
+param_units['dt'] = \
+    param_units['rt'] = \
+    param_units['Ch'] = \
+    param_units['T'] = \
+    param_units['bond'] = u' \u212B'
+param_units['chiral_angle'] = u'\u00b0'
+
+param_symbols = {}
+param_symbols['t1'] = u't\u2081'
+param_symbols['t2'] = u't\u2082'
+param_symbols['chiral_angle'] = u'\u03b8c'
+
+param_strfmt = {}
+param_strfmt['Ch'] = \
+    param_strfmt['T'] = \
+    param_strfmt['dt'] = \
+    param_strfmt['rt'] = \
+    param_strfmt['chiral_angle'] = '{:.2f}'
+param_strfmt['bond'] = '{:.3f}'
 
 
 def cmp_Ch(Ch1, Ch2):
