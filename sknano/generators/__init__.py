@@ -13,6 +13,7 @@ Contents
    :toctree: generated/
 
    GeneratorMixin
+   FullereneGenerator
    GrapheneGenerator
    BilayerGrapheneGenerator
    MWNTGenerator
@@ -29,6 +30,7 @@ __docformat__ = 'restructuredtext en'
 
 from ._base import *
 from ._mixins import *
+from ._fullerene_generator import *
 from ._graphene_generator import *
 from ._bilayer_graphene_generator import *
 from ._swnt_generator import *

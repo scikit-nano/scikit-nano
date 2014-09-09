@@ -10,14 +10,14 @@ Fullerene structure generators (:mod:`sknano.generators._fullerene_generators`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-#import copy
-#import itertools
-#import sys
-
+from pkg_resources import resource_filename
+import os
 #import numpy as np
 
-from ..core.atoms import Atoms
-from ..structures import Fullerene
+from sknano.structures import Fullerene
+#from sknano.utils.geometric_shapes import Cuboid
+
+from sknano.io import XYZReader
 from ._base import GeneratorMixin
 
 __all__ = ['FullereneGenerator']
@@ -26,50 +26,47 @@ __all__ = ['FullereneGenerator']
 class FullereneGenerator(Fullerene, GeneratorMixin):
     u"""Class for generating fullerene structures.
 
-    .. note::
-
-       This class is under development and not functional! Attempting
-       to use it raises a `RuntimeError`.
-
     Parameters
     ----------
-    bond : float, optional
-        :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
-        nearest neighbor atoms. Must be in units of **Angstroms**.
-    autogen : bool, optional
-        if `True`, automatically call
-        :py:meth:`~NanotubeGenerator.generate_unit_cell`,
-        followed by :py:meth:`~NanotubeGenerator.generate_structure_data`.
-    verbose : bool, optional
-        if `True`, show verbose output
 
     Raises
     ------
-    `RuntimeError`
-        If called. This class is under development and not yet functional.
 
     Examples
     --------
-    First, load the :py:class:`~sknano.generators.FullereneGenerator` class.
+    First, load the :class:`~sknano.generators.FullereneGenerator` class.
 
     >>> from sknano.generators import FullereneGenerator
     >>> fg = FullereneGenerator(N=60)
+    >>> fg.save_data(fname='C60.data')
 
     """
 
-    def __init__(self, N=int, PG=None, autogen=True, verbose=False):
+    def __init__(self, autogen=True, **kwargs):
 
-        raise RuntimeError('This class is not yet implemented.')
-
-        super(FullereneGenerator, self).__init__(with_units=False,
-                                                 verbose=verbose)
+        super(FullereneGenerator, self).__init__(**kwargs)
 
         if autogen:
             self.generate_structure_data()
 
     def generate_structure_data(self):
         """Generate structure data."""
-        self.atoms = Atoms()
+        CNdir = 'C' + str(self.N)
+        CNfile = 'C' + str(self.N)
+        if self.PG is not None:
+            CNfile += '-' + self.PG
+        if self.Ni is not None:
+            CNfile += '-{}'.format(self.Ni)
+        CNfile += '.xyz'
+
+        datadir = os.listdir(resource_filename('sknano', 'data/fullerenes/' +
+                                               CNdir))
+        files = [f for f in datadir]
+        if len(files) > 0:
+            if CNfile not in files:
+                #TODO: try to *intelligently* pick the best match
+                CNfile = files[0]
+            self.atoms = XYZReader(CNfile).atoms
 
     def save_data(self, fname=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
