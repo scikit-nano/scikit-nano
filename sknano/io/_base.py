@@ -27,6 +27,7 @@ supported_structure_formats = ('xyz', 'data')
 
 __all__ = ['Atom', 'Atoms',
            'StructureIO',
+           'StructureReader',
            'StructureWriter',
            'StructureConverter',
            'StructureFormat',
@@ -90,9 +91,21 @@ class StructureIO(object):
         del self._comment_line
 
 
+class StructureReader(object):
+    @classmethod
+    def read(cls, fpath, structure_format=None, **kwargs):
+        if fpath.endswith('.data') or structure_format == 'data':
+            from ._lammps_data_format import DATAReader
+            return DATAReader(fpath, **kwargs)
+        else:
+            from ._xyz_format import XYZReader
+            return XYZReader.read(fpath)
+
+
 class StructureWriter(object):
     @classmethod
-    def write(cls, fname, outpath, atoms, structure_format, **kwargs):
+    def write(cls, fname=None, outpath=None, atoms=None,
+              structure_format=None, **kwargs):
         if structure_format == 'data':
             from ._lammps_data_format import DATAWriter
             DATAWriter.write(fname=fname, outpath=outpath, atoms=atoms)
