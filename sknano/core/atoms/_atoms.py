@@ -17,6 +17,7 @@ import numpy as np
 
 from sknano.core import xyz
 from sknano.core.math import Vector, transformation_matrix
+from sknano.utils.geometric_shapes import Cuboid  # , Rectangle
 from ._base import AtomList
 
 __all__ = ['Atoms']
@@ -112,7 +113,19 @@ class Atoms(AtomList):
         """Return z coordinates of `Atom` objects as array."""
         return self.coords[:,2]
 
-    def center_CM(self):
+    @property
+    def bounds(self):
+        """Return bounds of `Atoms`."""
+        #dx = np.abs(self.x.max() - self.x.min())
+        #dy = np.abs(self.y.max() - self.y.min())
+        #dz = np.abs(self.z.max() - self.z.min())
+        #if np.close(dx, 0.0) or np.close(dy, 0.0) or np.close(dz, 0.0):
+        #    if np.close(dx, 0.0):
+        #    #bounds = Rectangle(
+        return Cuboid(pmin=[self.x.min(), self.y.min(), self.z.min()],
+                      pmax=[self.x.max(), self.y.max(), self.z.max()])
+
+    def center_CM(self, axes=None):
         """Center atoms on CM coordinates."""
         dr = -self.CM
         self.translate(dr)
