@@ -59,14 +59,14 @@ class FullereneGenerator(Fullerene, GeneratorMixin):
             CNfile += '-{}'.format(self.Ni)
         CNfile += '.xyz'
 
-        datadir = os.listdir(resource_filename('sknano', 'data/fullerenes/' +
-                                               CNdir))
-        files = [f for f in datadir]
+        datadir = os.path.join(resource_filename('sknano', 'data/fullerenes'),
+                               CNdir)
+        files = os.listdir(datadir)
         if len(files) > 0:
             if CNfile not in files:
                 #TODO: try to *intelligently* pick the best match
                 CNfile = files[0]
-            self.atoms = XYZReader(CNfile).atoms
+            self.atoms = XYZReader(os.path.join(datadir, CNfile)).atoms
 
     def save_data(self, fname=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
@@ -78,7 +78,7 @@ class FullereneGenerator(Fullerene, GeneratorMixin):
 
         """
         if fname is None:
-            fname = 'C{}'.format(self.Natoms)
+            fname = 'C{}'.format(self.N)
 
         super(FullereneGenerator, self).save_data(
             fname=fname, structure_format=structure_format,

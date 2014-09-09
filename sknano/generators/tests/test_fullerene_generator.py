@@ -9,7 +9,8 @@ from sknano.generators import FullereneGenerator
 
 def test1():
     buckyball = FullereneGenerator()
-    buckyball.save_data(fname='C60.data')
+    buckyball.save_data(fname='buckyball.xyz')
+    buckyball.save_data(fname='buckyball.data')
 
 
 def test2():
