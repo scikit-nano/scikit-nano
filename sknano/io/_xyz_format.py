@@ -14,8 +14,8 @@ import os
 
 from sknano.core import get_fpath
 
-from ._base import Atom, StructureIO, StructureConverter, \
-    StructureFormat, StructureIOError, default_comment_line
+from ._base import Atom, StructureIO, StructureIOError, StructureConverter, \
+    StructureFormat, default_comment_line
 
 __all__ = ['XYZReader', 'XYZWriter', 'XYZData', 'XYZFormat', 'XYZIOError',
            'XYZ2DATAConverter']

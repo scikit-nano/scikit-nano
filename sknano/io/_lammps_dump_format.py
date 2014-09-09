@@ -16,7 +16,7 @@ import numpy as np
 
 from sknano.core import get_fpath
 
-from ._base import Atom, StructureIO, StructureFormat, StructureIOError, \
+from ._base import Atom, StructureIO, StructureIOError, StructureFormat, \
     default_comment_line
 
 __all__ = ['DUMPData', 'DUMPReader', 'DUMPWriter', 'DUMPError', 'DUMPFormat']
