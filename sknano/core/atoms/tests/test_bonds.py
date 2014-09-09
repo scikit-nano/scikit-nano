@@ -15,27 +15,21 @@ def test1():
     infile = resource_filename('sknano', 'data/nanotubes/1005_5cells.data')
     data = DATAReader(infile)
     atoms = data.atoms
-    #atoms.update_nearest_neighbors()
-    #atoms.update_pyramidalization_angles()
     bonds = atoms.bonds
     assert_equal(bonds.Nbonds, atoms.coordination_numbers.sum())
     print(bonds.mean_length)
     print(bonds.atoms.Natoms)
-    #mean_angle = bonds.mean_angle
 
     #print('bonds.mean_angle: {}'.format(bonds.mean_angle))
 
 
 def test2():
     atoms = SWNTGenerator(n=10, m=10, nz=3).atoms
-    #assert_equal(atoms.Natoms, 80)
     atoms.assign_unique_ids()
-    #print(atoms.bonds.mean_length)
-    #print(atoms.bonds.mean_angle)
-    misalignment_angles = atoms.poav_misalignment_angles
-    print(len(misalignment_angles))
-    print(np.degrees(misalignment_angles))
-    print(np.degrees(atoms.pyramidalization_angles))
+    assert_true(atoms.Natoms, len(atoms.poma))
+    #print(np.asarray([np.degrees(poma) for poma in atoms.poma]).tolist())
+    print(np.degrees(atoms.mean_nonzero_poma))
+    print(np.degrees(np.mean(atoms.pyramidalization_angles)))
 
 
 def test3():
@@ -43,8 +37,8 @@ def test3():
     assert_equal(atoms.Natoms, 160)
     atoms.assign_unique_ids()
     atoms.update_nearest_neighbors()
-    #print(atoms.bonds.mean_length)
-    #print(atoms.bonds.mean_angle)
+    print(np.degrees(atoms.bonds.mean_length))
+    #print(np.degrees(atoms.bonds.mean_angle))
     atom0 = atoms[0]
     atom0bonds = atom0.bonds
     print('atom0: {}'.format(atom0))

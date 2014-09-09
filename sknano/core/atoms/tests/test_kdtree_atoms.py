@@ -86,6 +86,10 @@ def test_atom_selections():
     a200 = atoms.get_atom(atomID=200)
     assert_true(a200 is atoms[199])
     assert_true(a200 == atoms[199])
+    #coords = atoms.coords
+    atom_bounds = atoms.bounds
+    print('atom bounds: {}'.format(atom_bounds))
+
     #a200NN = atoms.select_within(Ellipsoid(center=a200.r, r=2.5))
     #assert_equals(a200NN.Natoms, 4)
 
@@ -121,7 +125,7 @@ def test_pyramidalization_angles():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=20, m=10, nz=2)
     atoms.assign_unique_ids()
-    atoms.NNrc = 2.0
+    #atoms.NNrc = 2.0
     atoms.update_pyramidalization_angles()
 
     for i, atom in enumerate(atoms):
@@ -133,6 +137,31 @@ def test_pyramidalization_angles():
                       '{}\n'.format(np.degrees(atom.pyramidalization_angle)))
         except AttributeError:
             continue
+
+
+def test_poma():
+    atoms = \
+        generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
+    atoms.assign_unique_ids()
+    #atoms.update_pyramidalization_angles()
+    print('misalignment_angles: {}'.format(np.degrees(
+        atoms.mean_nonzero_poma)))
+
+    #for i, atom in enumerate(atoms):
+    #    try:
+    #        if atom.poav is not None:
+    #            print('atom.poav:\n'
+    #                  '{}\n'.format(atom.poav))
+    #            print('atom.pyramidalization_angle: '
+    #                  '{}\n'.format(np.degrees(atom.pyramidalization_angle)))
+    #    except AttributeError:
+    #        continue
+
+
+def test_list_mods():
+    atoms = generate_atoms(elements='periodic_table')
+    atoms.assign_unique_ids()
+    print(atoms)
 
 
 if __name__ == '__main__':
