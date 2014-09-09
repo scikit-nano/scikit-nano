@@ -35,7 +35,7 @@ class Fullerene(object):
     --------
 
     """
-    def __init__(self, N, **kwargs):
+    def __init__(self, N=60, PG=None, **kwargs):
 
         # Check that N is a valid `N` and that `N` is
         self.N = N
