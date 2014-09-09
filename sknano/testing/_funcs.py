@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, print_function
 import importlib
 
 #import numpy as np
-from sknano.core.atoms import XAtom, XAtoms
+from sknano.core.atoms import KDTAtom as Atom, KDTAtoms as Atoms
 from sknano.core.refdata import element_symbols as periodic_table_of_elements
 from sknano.generators import STRUCTURE_GENERATORS
 
@@ -23,14 +23,14 @@ __all__ = ['generate_atoms']
 def generate_atoms(elements=None, generator_class=None, **kwargs):
     if elements is not None:
         if isinstance(elements, list):
-            atoms = XAtoms()
+            atoms = Atoms()
             for e in elements:
-                atoms.append(XAtom(e))
+                atoms.append(Atom(element=e))
             return atoms
         elif isinstance(elements, str) and elements == 'periodic_table':
-            atoms = XAtoms()
+            atoms = Atoms()
             for e in periodic_table_of_elements:
-                atoms.append(XAtom(e))
+                atoms.append(Atom(element=e))
             return atoms
     elif generator_class is not None and \
             generator_class in STRUCTURE_GENERATORS:
