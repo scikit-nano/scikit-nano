@@ -13,6 +13,10 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 import numbers
+import warnings
+warnings.filterwarnings('ignore', "Mean of empty slice.")
+warnings.filterwarnings('ignore',
+                        'invalid value encountered in double_scalars')
 
 import numpy as np
 
@@ -158,6 +162,38 @@ class KDTAtoms(XAtoms):
             [atom.bonds.append(Bond(atom, nn)) for nn in atom.NN]
 
     @property
+    def poma(self):
+        """Return per-atom list of POAV misalignment angles."""
+        self.update_poma()
+        return np.ma.asarray([np.ma.fix_invalid(atom.poma) for atom in self])
+
+    @property
+    def nonzero_poma(self):
+        self.update_poma()
+        return [np.ma.masked_values(np.ma.fix_invalid(atom.poma), 0)
+                for atom in self]
+
+    @property
+    def mean_nonzero_poma(self):
+        self.update_poma()
+        return np.ma.mean(np.ma.fix_invalid([np.ma.mean(np.ma.compressed(
+            np.ma.masked_values(np.ma.fix_invalid(atom.poma), 0)))
+            for atom in self]))
+
+    def update_poma(self):
+        self.update_pyramidalization_angles()
+        for atom in self:
+            poma = []
+            for i, NN in enumerate(atom.NN):
+                bond = atom.bonds[i]
+                if atom.poav is not None and NN.poav is not None:
+                    nvec = vec.cross(bond.vector, atom.poav)
+                    poma.append(np.abs(np.pi / 2 - vec.angle(NN.poav, nvec)))
+                else:
+                    poma.append(np.nan)
+            atom.poma = poma
+
+    @property
     def pyramidalization_angles(self):
         self.update_pyramidalization_angles()
         angles = []
@@ -172,51 +208,10 @@ class KDTAtoms(XAtoms):
                 b1, b2, b3 = atom.bonds
                 v21 = Vector(b2.vector - b1.vector, p0=b1.vector.p)
                 v31 = Vector(b3.vector - b1.vector, p0=b1.vector.p)
-                #poav = vec.cross(b2.vector - b1.vector, b3.vector - b1.vector)
                 poav = vec.cross(v21, v31)
                 atom.poav = poav.unit_vector
                 atom.sigma_bond_angle = vec.angle(atom.poav, b1.vector)
-                #print('angle(poav, b1): {}'.format(np.degrees(vec.angle(
-                #    atom.poav, b1.vector))))
-                #print('angle(poav, b2): {}'.format(np.degrees(vec.angle(
-                #    atom.poav, b2.vector))))
-                #print('angle(poav, b3): {}'.format(np.degrees(vec.angle(
-                #    atom.poav, b3.vector))))
-                #print(np.degrees(atom.sigma_bond_angle))
                 if atom.sigma_bond_angle < np.pi / 2:
                     atom.sigma_bond_angle = np.pi - atom.sigma_bond_angle
                     atom.poav = -atom.poav
-                    #print('angle(poav, b1): {}'.format(np.degrees(vec.angle(
-                    #    atom.poav, b1.vector))))
-                    #print('angle(poav, b2): {}'.format(np.degrees(vec.angle(
-                    #    atom.poav, b2.vector))))
-                    #print('angle(poav, b3): {}'.format(np.degrees(vec.angle(
-                    #    atom.poav, b3.vector))))
-
                 atom.pyramidalization_angle = atom.sigma_bond_angle - np.pi / 2
-                #print('atom.pyramidalization_angle: {}'.format(np.degrees(
-                #    atom.pyramidalization_angle)))
-
-    @property
-    def poav_misalignment_angles(self):
-        self.update_poav_misalignment_angles()
-        angles = []
-        [angles.extend(angle) for angle in
-         [atom.poav_misalignment_angles for atom in self
-          if len(atom.poav_misalignment_angles) > 0]]
-        return np.asarray(angles)
-
-    def update_poav_misalignment_angles(self):
-        self.update_pyramidalization_angles()
-        for atom in self:
-            if atom.bonds.Nbonds == 3:
-                atom.poav_misalignment_angles = []
-                for i, NN in enumerate(atom.NN):
-                    bond = atom.bonds[i]
-                    if NN.poav is not None:
-                        nvec = vec.cross(bond.vector, atom.poav)
-                        misalignment_angle = \
-                            np.pi / 2 - vec.angle(NN.poav, nvec)
-                        atom.poav_misalignment_angles.append(
-                            misalignment_angle)
-                        #vec.angle(atom.poav, NN.poav))

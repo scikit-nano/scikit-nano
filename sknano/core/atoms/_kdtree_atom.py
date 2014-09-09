@@ -39,11 +39,11 @@ class KDTAtom(XAtom):
         self._CN = 0
         self._NN = NeighborAtoms()
         self._bonds = Bonds()
-        self.poav = None
-        self.poav_misalignment_angles = []
-        self.mean_misalignment_angle = None
         self._pyramidalization_angle = None
         self._sigma_bond_angle = None
+        self.poav = None
+        self.poma = []
+        self.mean_poma = None
 
     def __str__(self):
         """Return a nice string representation of `KDTAtom`."""
