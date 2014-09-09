@@ -41,6 +41,7 @@ class KDTAtom(XAtom):
         self._bonds = Bonds()
         self.poav = None
         self.poav_misalignment_angles = []
+        self.mean_misalignment_angle = None
         self._pyramidalization_angle = None
         self._sigma_bond_angle = None
 
