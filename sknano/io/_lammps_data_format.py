@@ -63,41 +63,42 @@ class DATAReader(StructureIO):
                 if len(line) == 0:
                     continue
                 found = False
-                for key in self.header_specs.iterkeys():
-                    if key in line:
+                for header in self.header_specs.iterkeys():
+                    if header in line:
                         found = True
-                        self.header_data[key] = \
-                            [self.header_specs[key]['dtype'](float(s)) for s
+                        self.header_data[header] = \
+                            [self.header_specs[header]['dtype'](float(s)) for s
                              in [[ss for ss in line.split()][i] for i in
-                                 range(self.header_specs[key]['items'])]]
-                        if len(self.header_data[key]) == 1:
+                                 range(self.header_specs[header]['items'])]]
+                        if len(self.header_data[header]) == 1:
                             # since the list contains only one element,
                             # replace list value with element 0
-                            self.header_data[key] = self.header_data[key][0]
+                            self.header_data[header] = \
+                                self.header_data[header][0]
                         break
                 if not found:
                     break
 
             while True:
                 found = False
-                for section_key, header_key in self.section_specs.iteritems():
-                    if section_key in line:
+                for section, header in self.section_specs.iteritems():
+                    if section in line:
                         found = True
                         f.readline()
-                        Nitems = self.header_data[header_key]
+                        Nitems = self.header_data[header]
                         data = []
                         for n in xrange(Nitems):
                             tmp = []
                             line = f.readline().strip().split()
-                            for i, props in enumerate(
+                            for i, attrs in enumerate(
                                 self.section_attrs_specs[
-                                    section_key].itervalues()):
+                                    section].itervalues()):
                                 try:
-                                    tmp.append(props['dtype'](float(line[i])))
+                                    tmp.append(attrs['dtype'](float(line[i])))
                                 except IndexError:
                                     break
                             data.append(tmp)
-                        self.section_data[section_key] = data[:]
+                        self.section_data[section] = data[:]
                         break
                 f.readline()
                 line = f.readline().strip()
@@ -181,12 +182,12 @@ class DATAReader(StructureIO):
 
         self.kwargs['boxbounds'] = self.boxbounds
 
-    def get(self, section_key, colnum=None, colname=None, colindex=None):
-        """Return section with `section_key`.
+    def get(self, section, colnum=None, colname=None, colindex=None):
+        """Return section with `section`.
 
         Parameters
         ----------
-        section_key : str
+        section : str
         colnum : int, optional
         colname : str, optional
         colindex : int, optional
@@ -198,8 +199,8 @@ class DATAReader(StructureIO):
         """
         section_data = None
         try:
-            section_data = self.section_data[section_key]
-            section_attrs = self.section_attrs[section_key]
+            section_data = self.section_data[section]
+            section_attrs = self.section_attrs[section]
         except KeyError as e:
             print(e)
         else:
@@ -209,7 +210,7 @@ class DATAReader(StructureIO):
                     colidx = int(colnum - 1)
                 elif colname is not None:
                     colidx = \
-                        self.section_attrs_specs[section_key][colname]['index']
+                        self.section_attrs_specs[section][colname]['index']
                 elif colindex is not None:
                     colidx = int(colindex)
             except (KeyError, TypeError, ValueError) as e:
@@ -218,7 +219,7 @@ class DATAReader(StructureIO):
                 try:
                     colname = section_attrs[colidx]
                     coltype = \
-                        self.section_attrs_specs[section_key][colname]['dtype']
+                        self.section_attrs_specs[section][colname]['dtype']
                     section_data = \
                         np.asarray(
                             section_data, dtype=coltype)[:, colidx].tolist()
@@ -411,13 +412,13 @@ class DATAData(DATAReader):
     def reorder(self, colname, *order):
         pass
 
-    def replace(self, section_key, new_data, colnum=None,
+    def replace(self, section, new_data, colnum=None,
                 colname=None, colindex=None):
         """Replace section data.
 
         Parameters
         ----------
-        section_key : str
+        section : str
         new_data : sequence
         colnum : int, optional
         colname : str, optional
@@ -442,18 +443,18 @@ class DATAData(DATAReader):
                     colidx = int(colnum - 1)
                 elif colname is not None:
                     colidx = \
-                        self.section_attrs_specs[section_key][colname]['index']
+                        self.section_attrs_specs[section][colname]['index']
                 elif colindex is not None:
                     colidx = int(colindex)
             except (KeyError, TypeError, ValueError) as e:
                 raise DATAIOError(e)
-        atom_attr = self.section_attrs[section_key][colidx]
+        atom_attr = self.section_attrs[section][colidx]
         attr_dtype = \
-            self.section_attrs_specs[section_key][atom_attr]['dtype']
+            self.section_attrs_specs[section][atom_attr]['dtype']
         new_data = np.asarray(new_data, dtype=attr_dtype)
 
         for i, atom in enumerate(self.atoms):
-            self.section_data[section_key][i][colidx] = \
+            self.section_data[section][i][colidx] = \
                 attr_dtype(float(new_data[i]))
             setattr(atom, atom_attr, attr_dtype(float(new_data[i])))
 
@@ -608,18 +609,18 @@ class DATAFormatSpec(object):
              'nx': int, 'ny': int, 'nz': int,
              'vx': float, 'vy': float, 'vz': float}
 
-        section_keys = ['Atoms', 'Masses', 'Velocities']
+        sections = ['Atoms', 'Masses', 'Velocities']
         self.section_attrs = \
             {'Atoms': atoms_section_attrs[self._atom_style],
              'Masses': ['atomtype', 'mass'],
              'Velocities': velocities_section_attrs[self._atom_style]}
 
         self.section_attrs_specs = OrderedDict()
-        for section_key in section_keys:
-            self.section_attrs_specs[section_key] = OrderedDict()
-            section_attrs_list = self.section_attrs[section_key]
+        for section in sections:
+            self.section_attrs_specs[section] = OrderedDict()
+            section_attrs_list = self.section_attrs[section]
             for i, attr in enumerate(section_attrs_list):
-                self.section_attrs_specs[section_key][attr] = \
+                self.section_attrs_specs[section][attr] = \
                     {'dtype': attr_dtypes[attr],
                      'colnum': i+1,
                      'index': i}
