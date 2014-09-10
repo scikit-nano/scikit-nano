@@ -13,8 +13,7 @@ __docformat__ = 'restructuredtext en'
 import numpy as np
 
 from sknano.structures import Graphene
-from ._base import GeneratorAtom as Atom, GeneratorAtoms as Atoms, \
-    GeneratorMixin
+from ._base import Atom, Atoms, GeneratorMixin
 
 __all__ = ['GrapheneGenerator']
 

@@ -21,27 +21,12 @@ except ImportError:
 from sknano.io import StructureWriter, default_structure_format, \
     supported_structure_formats
 
-__all__ = ['GeneratorAtom', 'GeneratorAtoms', 'GeneratorMixin',
-           'STRUCTURE_GENERATORS']
+__all__ = ['Atom', 'Atoms', 'GeneratorMixin', 'STRUCTURE_GENERATORS']
 
 
 STRUCTURE_GENERATORS = ('SWNTGenerator', 'SWNTBundleGenerator',
                         'MWNTGenerator', 'MWNTBundleGenerator',
                         'GrapheneGenerator', 'BilayerGrapheneGenerator')
-
-
-GeneratorAtom = Atom
-GeneratorAtoms = Atoms
-#class GeneratorAtom(object):
-#
-#    def __init__(self, atomstyle=None, **kwargs):
-#        super(GeneratorAtom, self).__init__(**kwargs)
-
-
-#class GeneratorAtoms(object):
-#
-#    def __init__(self, atomstyle=None, **kwargs):
-#        super(GeneratorAtoms, self).__init__(**kwargs)
 
 
 class GeneratorMixin(object):

@@ -25,8 +25,7 @@ from sknano.core import pluralize
 from sknano.core.math import Vector
 from sknano.structures import SWNT, compute_chiral_angle
 from sknano.utils.geometric_shapes import Cuboid
-from ._base import GeneratorAtom as Atom, GeneratorAtoms as Atoms, \
-    GeneratorMixin
+from ._base import Atom, Atoms, GeneratorMixin
 
 __all__ = ['SWNTGenerator']
 

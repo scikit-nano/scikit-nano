@@ -27,7 +27,7 @@ __docformat__ = 'restructuredtext en'
 #from sknano.core.math import Vector
 from sknano.structures import MWNT
 #from sknano.utils.geometric_shapes import Cuboid
-from ._base import GeneratorAtoms as Atoms, GeneratorMixin
+from ._base import Atoms, GeneratorMixin
 from ._swnt_generator import SWNTGenerator
 
 __all__ = ['MWNTGenerator']

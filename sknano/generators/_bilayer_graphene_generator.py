@@ -15,7 +15,7 @@ import copy
 import numpy as np
 
 from sknano.structures import BilayerGraphene
-from ._base import GeneratorAtoms as Atoms, GeneratorMixin
+from ._base import Atoms, GeneratorMixin
 
 __all__ = ['BilayerGrapheneGenerator']
 
