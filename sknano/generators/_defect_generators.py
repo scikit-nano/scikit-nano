@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Generate structures with defects (:mod:`sknano.generators._defect_generators`)
+Defect generator classes (:mod:`sknano.generators._defect_generators`)
 ===============================================================================
 
 .. currentmodule:: sknano.generators._defect_generators
@@ -15,8 +15,8 @@ import os
 
 import numpy as np
 
-from ..core.atoms import Atoms
-from ..io import StructureIO, supported_structure_formats
+from sknano.io import StructureIO, supported_structure_formats
+from ._base import Atoms
 
 _vac_type_cluster_size_map = {'single': 1, 'double': 2, 'triple': 3}
 
@@ -70,7 +70,7 @@ class DefectGenerator(object):
 
         # parse structure data
         self._structure_data = \
-            StructureIO.read(fname, structure_format=self._structure_format)
+            StructureReader.read(fname, structure_format=self._structure_format)
         self._atoms = self._structure_data.atoms
         self._atom_ids = self._atoms.atom_ids
         self._atom_coords = self._atoms.get_coords(asdict=True)
