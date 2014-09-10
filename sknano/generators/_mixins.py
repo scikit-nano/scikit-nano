@@ -16,7 +16,12 @@ import copy
 from ._base import GeneratorAtoms as Atoms
 #from sknano.core.math import Vector
 
-__all__ = ['NanotubeBundleGeneratorMixin']
+__all__ = ['CappedNanotubeGeneratorMixin',
+           'NanotubeBundleGeneratorMixin']
+
+
+class CappedNanotubeGeneratorMixin(object):
+    pass
 
 
 class NanotubeBundleGeneratorMixin(object):
