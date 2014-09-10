@@ -23,7 +23,7 @@ import numpy as np
 
 from sknano.core import pluralize
 from sknano.core.math import Vector
-from sknano.structures import UnrolledSWNT, compute_chiral_angle
+from sknano.structures import UnrolledSWNT
 #from sknano.utils.geometric_shapes import Cuboid
 from ._base import Atom, Atoms, GeneratorMixin
 
@@ -102,26 +102,16 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
     def generate_unit_cell(self):
         """Generate the nanotube unit cell."""
         eps = 0.01
-        n = self.n
-        m = self.m
-        bond = self.bond
-        M = self.M
-        T = self.T
-        N = self.N
-        rt = self.rt
+
         e1 = self.element1
         e2 = self.element2
-        verbose = self.verbose
+        N = self.N
+        T = self.T
+        rt = self.rt
 
-        aCh = compute_chiral_angle(n=n, m=m, rad2deg=False)
+        psi, tau, dpsi, dtau = self.unit_cell_symmetry_params
 
-        tau = M * T / N
-        dtau = bond * np.sin(np.pi / 6 - aCh)
-
-        psi = 2 * np.pi / N
-        dpsi = bond * np.cos(np.pi / 6 - aCh) / rt
-
-        if verbose:
+        if self.verbose:
             print('dpsi: {}'.format(dpsi))
             print('dtau: {}\n'.format(dtau))
 
@@ -137,7 +127,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
             atom1 = Atom(element=e1, x=x1, z=z1)
             atom1.rezero()
 
-            if verbose:
+            if self.verbose:
                 print('Basis Atom 1:\n{}'.format(atom1))
 
             self.unit_cell.append(atom1)
@@ -150,7 +140,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
             atom2 = Atom(element=e2, x=x2, z=z2)
             atom2.rezero()
 
-            if verbose:
+            if self.verbose:
                 print('Basis Atom 2:\n{}'.format(atom2))
 
             self.unit_cell.append(atom2)
@@ -178,35 +168,20 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
         if fname is None:
             chirality = '{}{}'.format('{}'.format(self.n).zfill(2),
                                       '{}'.format(self.m).zfill(2))
-            nx = self.nx
-            ny = self.ny
-            fname_wordlist = None
-            if nx != 1 or ny != 1:
-                nx = ''.join(('{}'.format(self.nx),
-                              pluralize('cell', self.nx)))
-                ny = ''.join(('{}'.format(self.ny),
-                              pluralize('cell', self.ny)))
 
-                if self._assume_integer_unit_cells:
-                    nz = ''.join(('{}'.format(self.nz),
-                                  pluralize('cell', self.nz)))
-                else:
-                    nz = ''.join(('{:.2f}'.format(self.nz),
-                                  pluralize('cell', self.nz)))
+            nx = '{}' if self._assert_integer_nx else '{:.2f}'
+            nx = ''.join((nx.format(self.nx), pluralize('cell', self.nx)))
 
-                cells = 'x'.join((nx, ny, nz))
-                fname_wordlist = (chirality, cells)
-            else:
-                if self._assume_integer_unit_cells:
-                    nz = ''.join(('{}'.format(self.nz),
-                                  pluralize('cell', self.nz)))
-                else:
-                    nz = ''.join(('{:.2f}'.format(self.nz),
-                                  pluralize('cell', self.nz)))
+            nz = '{}' if self._assert_integer_nz else '{:.2f}'
+            nz = ''.join((nz.format(self.nz), pluralize('cell', self.nz)))
 
-                fname_wordlist = (chirality, nz)
+            cells = 'x'.join((nx, nz))
+            fname_wordlist = (chirality, cells)
 
             fname = 'unrolled_' + '_'.join(fname_wordlist)
+
+        if center_CM:
+            self.atoms.center_CM()
 
         super(UnrolledSWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
