@@ -155,18 +155,6 @@ class SWNT(NanotubeMixin, StructureBase):
                                  self.bond, self.nz)
 
     @property
-    def dt(self):
-        u"""Nanotube diameter :math:`d_t = \\frac{|\\mathbf{C}_h|}{\\pi}`
-        in \u212b."""
-        return compute_dt(self.n, self.m, bond=self.bond)
-
-    @property
-    def rt(self):
-        u"""Nanotube radius :math:`r_t = \\frac{|\\mathbf{C}_h|}{2\\pi}`
-        in \u212b."""
-        return compute_rt(self.n, self.m, bond=self.bond)
-
-    @property
     def Natoms_per_tube(self):
         """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
         return self.Natoms
