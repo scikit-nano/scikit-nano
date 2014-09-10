@@ -13,7 +13,7 @@ __docformat__ = 'restructuredtext en'
 import copy
 #import itertools
 
-from ._base import GeneratorAtoms as Atoms
+from ._base import Atoms
 #from sknano.core.math import Vector
 
 __all__ = ['CappedNanotubeGeneratorMixin',
@@ -21,7 +21,9 @@ __all__ = ['CappedNanotubeGeneratorMixin',
 
 
 class CappedNanotubeGeneratorMixin(object):
-    pass
+
+    def generate_endcaps(self):
+        pass
 
 
 class NanotubeBundleGeneratorMixin(object):
