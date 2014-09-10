@@ -15,9 +15,9 @@ import os
 from sknano.core import get_fpath
 
 from ._base import Atom, StructureIO, StructureIOError, StructureConverter, \
-    StructureFormat, default_comment_line
+    StructureFormatSpec, default_comment_line
 
-__all__ = ['XYZReader', 'XYZWriter', 'XYZData', 'XYZFormat', 'XYZIOError',
+__all__ = ['XYZReader', 'XYZWriter', 'XYZData', 'XYZFormatSpec', 'XYZIOError',
            'XYZ2DATAConverter']
 
 
@@ -239,6 +239,6 @@ class XYZ2DATAConverter(StructureConverter):
             return DATAReader(self.outfile, **kwargs)
 
 
-class XYZFormat(StructureFormat):
-    """`StructureFormat` class defining properties for `xyz` format."""
+class XYZFormatSpec(StructureFormatSpec):
+    """`StructureFormatSpec` class defining properties for `xyz` format."""
     pass

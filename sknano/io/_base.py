@@ -11,7 +11,6 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
-from collections import OrderedDict
 
 from sknano.version import short_version as version
 
@@ -30,8 +29,8 @@ __all__ = ['Atom', 'Atoms',
            'StructureReader',
            'StructureWriter',
            'StructureConverter',
-           'StructureFormat',
            'StructureIOError',
+           'StructureFormatSpec',
            'default_comment_line',
            'default_structure_format',
            'supported_structure_formats']
@@ -55,11 +54,12 @@ class StructureIO(object):
 
     @property
     def atoms(self):
-        """Alias for :attr:`~StructureIO.atoms`."""
+        """Return :class:`~sknano.core.atoms.Atoms` instance object."""
         return self._atoms
 
     @atoms.setter
     def atoms(self, value):
+        """Set :attr:`~StructureIO.atoms` attribute."""
         if not isinstance(value, Atoms):
             raise TypeError('Expected an `Atoms` instance.')
         self._atoms = value
@@ -104,14 +104,13 @@ class StructureReader(object):
 
 class StructureWriter(object):
     @classmethod
-    def write(cls, fname=None, outpath=None, atoms=None,
-              structure_format=None, **kwargs):
+    def write(cls, fname=None, atoms=None, structure_format=None, **kwargs):
         if structure_format == 'data':
             from ._lammps_data_format import DATAWriter
-            DATAWriter.write(fname=fname, outpath=outpath, atoms=atoms)
+            DATAWriter.write(fname=fname, atoms=atoms, **kwargs)
         else:
             from ._xyz_format import XYZWriter
-            XYZWriter.write(fname=fname, outpath=outpath, atoms=atoms)
+            XYZWriter.write(fname=fname, atoms=atoms, **kwargs)
 
 
 class StructureConverter(object):
@@ -137,11 +136,15 @@ class StructureConverter(object):
                                   'to implement the `convert` method.')
 
 
-class StructureFormat(object):
-    """Base class for containing structure format properties"""
+class StructureFormatSpec(object):
+    """Base class for defining a format specification.
+
+    Parameters
+    ----------
+
+    """
     def __init__(self, **kwargs):
-        self.properties = OrderedDict()
-        self.kwargs = kwargs
+        pass
 
 
 class StructureIOError(Exception):

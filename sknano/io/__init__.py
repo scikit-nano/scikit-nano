@@ -17,7 +17,7 @@ Base I/O classes to inherit from when creating new I/O classes
    StructureIO
    StructureReader
    StructureWriter
-   StructureFormat
+   StructureFormatSpec
    StructureIOError
    StructureConverter
 
@@ -29,7 +29,7 @@ I/O classes for the `LAMMPS data` structure data format
    DATAReader
    DATAWriter
    DATAData
-   DATAFormat
+   DATAFormatSpec
    DATAIOError
    DATA2XYZConverter
 
@@ -41,7 +41,7 @@ I/O classes for the `xyz` structure data format
    XYZReader
    XYZWriter
    XYZData
-   XYZFormat
+   XYZFormatSpec
    XYZIOError
    XYZ2DATAConverter
 
