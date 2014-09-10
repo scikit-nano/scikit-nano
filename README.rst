@@ -10,10 +10,9 @@ Currently, its primary utility is generating nanostructure data
 
     * Graphene:
 
-        * Single layer graphene
-        * Bi-layer graphene with layers rotated relative to each other
-          by any angle and different layer stacking arrangements
         * *N*-layer graphene
+        * Bilayer graphene with more fine control over relative layer
+          orientation, including relative rotation and stacking arrangements.
 
     * Nanotubes:
 
@@ -24,8 +23,10 @@ Currently, its primary utility is generating nanostructure data
 
 It currently supports saving structure data in the following formats:
 
-    * `LAMMPS data`
     * `xyz`
+    * `LAMMPS data` (*limited support for full format spec.*)
+
+      .. todo:: Provide notes on limitations of LAMMPS data format support
 
 Secondary to its structure generating functions are its
 *structure analysis tools* including:
