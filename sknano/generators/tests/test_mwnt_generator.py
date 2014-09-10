@@ -16,11 +16,10 @@ def test1():
 
 
 def test2():
-    mwnt = MWNTGenerator(Ch=[(10, 10), (20, 20), (30, 30), (40, 40), (50, 50)],
-                         Lz=1.0, fix_Lz=True)
+    mwnt = MWNTGenerator(Ch=[(10, 10), (50, 50)], Lz=1.0, fix_Lz=True)
     print(mwnt)
     print(mwnt.todict())
-    assert_equal(mwnt.Nwalls, 5)
+    assert_equal(mwnt.Nwalls, 2)
     assert_equal(mwnt.chiral_set, set(['armchair']))
     mwnt.save_data()
     mwnt.save_data(structure_format='data')
