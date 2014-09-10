@@ -173,7 +173,7 @@ class MWNTGenerator(MWNT, GeneratorMixin):
                                     Ch in self.Ch])
 
             fname_wordlist = None
-            #if self._assume_integer_unit_cells:
+            #if self._assert_integer_nz:
             #    nz = ''.join(('{}'.format(self.nz),
             #                  pluralize('cell', self.nz)))
             #else:

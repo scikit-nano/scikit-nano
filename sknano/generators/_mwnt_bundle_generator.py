@@ -132,7 +132,7 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
                 ny = ''.join(('{}'.format(self.ny),
                              pluralize('cell', self.ny)))
                 cells = 'x'.join((nx, ny))
-                #if self._assume_integer_unit_cells:
+                #if self._assert_integer_nz:
                 #    nz = ''.join(('{}'.format(self.nz),
                 #                  pluralize('cell', self.nz)))
                 #else:

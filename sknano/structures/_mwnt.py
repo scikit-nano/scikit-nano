@@ -180,7 +180,7 @@ class MWNT(StructureBase):
         if not (isinstance(value, numbers.Real) or value > 0):
             raise TypeError('Expected a real, positive number.')
         self._nz = value
-        if self._assume_integer_unit_cells:
+        if self._assert_integer_nz:
             self._nz = int(np.ceil(value))
 
     @property
@@ -199,9 +199,9 @@ class MWNT(StructureBase):
         if not isinstance(value, bool):
             raise TypeError('Expected `True` or `False`')
         self._fix_Lz = value
-        self._assume_integer_unit_cells = True
+        self._assert_integer_nz = True
         if self.fix_Lz:
-            self._assume_integer_unit_cells = False
+            self._assert_integer_nz = False
 
     @property
     def Nwalls(self):
