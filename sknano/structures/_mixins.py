@@ -143,6 +143,18 @@ class NanotubeMixin(object):
         return compute_Ch(self.n, self.m, bond=self.bond)
 
     @property
+    def dt(self):
+        u"""Nanotube diameter :math:`d_t = \\frac{|\\mathbf{C}_h|}{\\pi}`
+        in \u212b."""
+        return compute_dt(self.n, self.m, bond=self.bond)
+
+    @property
+    def rt(self):
+        u"""Nanotube radius :math:`r_t = \\frac{|\\mathbf{C}_h|}{2\\pi}`
+        in \u212b."""
+        return compute_rt(self.n, self.m, bond=self.bond)
+
+    @property
     def chiral_angle(self):
         """Chiral angle :math:`\\theta_c` in **degrees**.
 
@@ -200,7 +212,7 @@ class NanotubeMixin(object):
         if not (isinstance(value, numbers.Real) or value > 0):
             raise TypeError('Expected a real, positive number.')
         self._nz = value
-        if self._assume_integer_unit_cells:
+        if self._assert_integer_nz:
             self._nz = int(np.ceil(value))
 
     @property
@@ -305,9 +317,18 @@ class NanotubeMixin(object):
         if not isinstance(value, bool):
             raise TypeError('Expected `True` or `False`')
         self._fix_Lz = value
-        self._assume_integer_unit_cells = True
+        self._assert_integer_nz = True
         if self.fix_Lz:
-            self._assume_integer_unit_cells = False
+            self._assert_integer_nz = False
+
+    @property
+    def unit_cell_symmetry_params(self):
+        psi, tau = compute_symmetry_operation(self.n, self.m, bond=self.bond)
+        aCh = compute_chiral_angle(self.n, self.m, rad2deg=False)
+        dpsi = self.bond * np.cos(np.pi / 6 - aCh) / self.rt
+        dtau = self.bond * np.sin(np.pi / 6 - aCh)
+
+        return psi, tau, dpsi, dtau
 
 
 class MWNTMixin(object):
@@ -455,11 +476,11 @@ class UnrolledSWNTMixin(object):
 
     @property
     def Ly(self):
-        return self.ny * self.layer_spacing / 10
+        return self.Nlayers * self.layer_spacing / 10
 
     @property
     def nx(self):
-        """Number of nanotubes along the :math:`x`-axis."""
+        """Number of unit cells along the :math:`x`-axis."""
         return self._nx
 
     @nx.setter
@@ -470,13 +491,30 @@ class UnrolledSWNTMixin(object):
         self._nx = int(value)
 
     @property
-    def ny(self):
-        """Number of nanotubes along the :math:`y`-axis."""
-        return self._ny
+    def Nlayers(self):
+        """Number of layers."""
+        return self._Nlayers
 
-    @ny.setter
-    def ny(self, value):
-        """Set :math:`n_y`"""
+    @Nlayers.setter
+    def Nlayers(self, value):
+        """Set :attr:`Nlayers`."""
         if not (isinstance(value, numbers.Number) or value > 0):
             raise TypeError('Expected a real positive number.')
-        self._ny = int(value)
+        self._Nlayers = int(value)
+
+    @Nlayers.deleter
+    def Nlayers(self):
+        del self._Nlayers
+
+    @property
+    def fix_Lx(self):
+        return self._fix_Lx
+
+    @fix_Lx.setter
+    def fix_Lx(self, value):
+        if not isinstance(value, bool):
+            raise TypeError('Expected `True` or `False`')
+        self._fix_Lx = value
+        self._assert_integer_nx = True
+        if self.fix_Lx:
+            self._assert_integer_nx = False

@@ -20,13 +20,13 @@ from sknano.core.refdata import CCbond, grams_per_Da
 __all__ = ['compute_d', 'compute_dR', 'compute_N', 'compute_t1', 'compute_t2',
            'compute_Ch', 'compute_chiral_angle', 'compute_T', 'compute_dt',
            'compute_rt', 'compute_M', 'compute_R', 'compute_R_chiral_angle',
-           'compute_so', 'compute_psi', 'compute_tau', 'compute_Lz',
-           'compute_electronic_type', 'compute_Natoms',
+           'compute_symmetry_operation', 'compute_psi', 'compute_tau',
+           'compute_Lz', 'compute_electronic_type', 'compute_Natoms',
            'compute_Natoms_per_tube', 'compute_Natoms_per_unit_cell',
            'compute_unit_cell_mass', 'compute_linear_mass_density',
-           'compute_bundle_density',
-           'compute_symmetry_chiral_angle', 'compute_tube_diameter',
-           'compute_tube_radius', 'compute_tube_length', 'compute_tube_mass']
+           'compute_bundle_density', 'compute_symmetry_chiral_angle',
+           'compute_tube_diameter', 'compute_tube_radius',
+           'compute_tube_length', 'compute_tube_mass']
 
 
 def compute_d(n, m):
@@ -507,7 +507,7 @@ def compute_R_chiral_angle(n, m, rad2deg=True):
         return theta
 
 
-def compute_so(n, m, bond=None):
+def compute_symmetry_operation(n, m, bond=None):
     u"""Compute symmetry operation :math:`(\\psi|\\tau)`.
 
     The *symmetry vector* `R` represents a *symmetry

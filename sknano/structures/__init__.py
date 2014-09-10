@@ -56,7 +56,7 @@ Functions for computing nanostructure properties
    compute_M
    compute_R
    compute_R_chiral_angle
-   compute_so
+   compute_symmetry_operation
    compute_psi
    compute_tau
    compute_Lz
