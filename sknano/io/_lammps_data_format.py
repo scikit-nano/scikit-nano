@@ -52,6 +52,14 @@ class DATAReader(StructureIO):
         if self.fpath is not None:
             self.read()
 
+    @property
+    def headers(self):
+        return self.header_data
+
+    @property
+    def sections(self):
+        return self.section_data
+
     def read(self):
         """Read data file."""
         self.atoms.clear()
@@ -237,7 +245,7 @@ class DATAWriter(object):
     @classmethod
     def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
               atom_style='full', boxbounds=None, comment_line=None,
-              assume_unique_atoms=False, enforce_consecutive_atomIDs=True,
+              assert_unique_ids=False, enforce_consecutive_atomIDs=True,
               pad_box=True, xpad=10., ypad=10., zpad=10., pad_tol=0.01,
               verbose=False, **kwargs):
         """Write structure data to file.
@@ -257,13 +265,13 @@ class DATAWriter(object):
         comment_line : str, optional
             A string written to the first line of `data` file. If `None`,
             then it is set to the full path of the output `data` file.
-        assume_unique_atoms : bool, optional
+        assert_unique_ids : bool, optional
             Check that each :class:`~sknano.io.atoms.Atom` in `atoms`
             has a unique :attr:`~sknano.io.atoms.Atom.atomID`.
             If the check fails, then assign a unique
             :attr:`~sknano.io.atoms.Atom.atomID`.
             to each :class:`~sknano.io.atoms.Atom`.
-            If `assume_unique_atoms` is True, but the atomID's are not unique,
+            If `assert_unique_ids` is True, but the atomID's are not unique,
             LAMMPS will not be able to read the data file.
         enforce_consecutive_atomIDs : bool, optional
         pad_box : bool, optional
@@ -294,7 +302,7 @@ class DATAWriter(object):
 
         if (enforce_consecutive_atomIDs and
             atoms.atom_ids.max() != atoms.Natoms) or \
-                (not assume_unique_atoms and
+                (not assert_unique_ids and
                  len(set(atoms.atom_ids)) != atoms.Natoms):
             atoms.assign_unique_ids()
 
@@ -559,7 +567,7 @@ LAMMPSDATAIOError = DATAIOError
 
 
 class DATAFormatSpec(object):
-    """`StructureFormat` class defining properties for `LAMMPS data` format.
+    """`StructureFormatSpec` class the `LAMMPS data` format spec.
 
     Parameters
     ----------
@@ -569,7 +577,7 @@ class DATAFormatSpec(object):
     """
     def __init__(self, atom_style='full', **kwargs):
         super(DATAFormatSpec, self).__init__(**kwargs)
-        self._atom_style = atom_style
+        self.atom_style = atom_style
 
         self.headers = {'atoms': {'dtype': int, 'items': 1},
                         'bonds': {'dtype': int, 'items': 1},
@@ -601,7 +609,17 @@ class DATAFormatSpec(object):
                 atoms_section_attrs[atom_style].append(var.replace('-', ''))
 
         velocities_section_attrs = {}
-        velocities_section_attrs['full'] = ['atomID', 'vx', 'vy', 'vz']
+        velocities_section_attrs.update(dict.fromkeys(
+            lammps_atom_styles.keys(), ['atomID', 'vx', 'vy', 'vz']))
+
+        velocities_section_attrs['electron'] = \
+            ['atomID', 'vx', 'vy', 'vz', 'ervel']
+        velocities_section_attrs['ellipsoid'] = \
+            ['atomID', 'vx', 'vy', 'vz', 'lx', 'ly', 'lz']
+        velocities_section_attrs['sphere'] = \
+            ['atomID', 'vx', 'vy', 'vz', 'wx', 'wy', 'wz']
+        velocities_section_attrs['hybrid'] = \
+            ['atomID', 'vx', 'vy', 'vz', '...']
 
         attr_dtypes = \
             {'atomID': int, 'moleculeID': int, 'atomtype': int, 'q': float,
@@ -611,9 +629,9 @@ class DATAFormatSpec(object):
 
         sections = ['Atoms', 'Masses', 'Velocities']
         self.section_attrs = \
-            {'Atoms': atoms_section_attrs[self._atom_style],
+            {'Atoms': atoms_section_attrs[self.atom_style],
              'Masses': ['atomtype', 'mass'],
-             'Velocities': velocities_section_attrs[self._atom_style]}
+             'Velocities': velocities_section_attrs[self.atom_style]}
 
         self.section_attrs_specs = OrderedDict()
         for section in sections:
@@ -627,7 +645,7 @@ class DATAFormatSpec(object):
 
         # A LAMMPS data file is partitioned into sections identified
         # by a keyword string. The header data are used by one or
-        # more sections. The `section_header_map` maps each
+        # more sections. The `sections` dictionary maps each
         # section keyword to a specific header key.
 
         self.sections = {}
@@ -678,6 +696,20 @@ class DATAFormatSpec(object):
              'AngleAngleTorsion Coeffs', 'BondBond13 Coeffs'],
             'dihedral types'))
 
+    @property
+    def atom_style(self):
+        return self._atom_style
+
+    @atom_style.setter
+    def atom_style(self, value):
+        if value not in lammps_atom_styles:
+            raise ValueError("Allowed `atom_style`'s:\n{}".format(
+                lammps_atom_styles.keys()))
+
+    @atom_style.deleter
+    def atom_style(self):
+        del self._atom_style
+
 LAMMPSDATAFormatSpec = DATAFormatSpec
 
 
@@ -689,8 +721,8 @@ lammps_atom_styles['atomic'] = \
     ['atom-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
 lammps_atom_styles['body'] = \
-    ['atom-ID', 'atom-type', 'bodyflag', 'mass',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
+    ['atom-ID', 'atom-type', 'bodyflag', 'mass', 'x', 'y', 'z',
+     'nx', 'ny', 'nz']
 
 lammps_atom_styles['bond'] = \
     ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
@@ -719,8 +751,7 @@ lammps_atom_styles['line'] = \
      'x', 'y', 'z', 'nx', 'ny', 'nz']
 
 lammps_atom_styles['meso'] = \
-    ['atom-ID', 'atom-type', 'rho', 'e', 'cv',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
+    ['atom-ID', 'atom-type', 'rho', 'e', 'cv', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
 lammps_atom_styles['molecular'] = \
     ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
