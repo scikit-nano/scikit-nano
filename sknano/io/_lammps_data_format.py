@@ -17,76 +17,13 @@ import numpy as np
 
 from sknano.core import get_fpath
 from ._base import Atom, StructureIO, StructureIOError, StructureConverter, \
-    StructureFormat, default_comment_line
+    default_comment_line
 
-__all__ = ['DATAReader', 'DATAWriter', 'DATAData', 'DATAFormat', 'DATAIOError',
-           'DATA2XYZConverter', 'LAMMPSDATAReader', 'LAMMPSDATAWriter',
-           'LAMMPSDATA', 'LAMMPSDATAFormat', 'LAMMPSDATAIOError',
-           'LAMMPSDATA2XYZConverter', 'lammps_atom_styles']
-
-lammps_atom_styles = {}
-lammps_atom_styles['angle'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['atomic'] = \
-    ['atom-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['body'] = \
-    ['atom-ID', 'atom-type', 'bodyflag', 'mass',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['bond'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['charge'] = \
-    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['dipole'] = \
-    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z',
-     'mux', 'muy', 'muz', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['electron'] = \
-    ['atom-ID', 'atom-type', 'q', 'spin', 'eradius',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['ellipsoid'] = \
-    ['atom-ID', 'atom-type', 'ellipsoidflag', 'density',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['full'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'q',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['line'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'lineflag', 'density',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['meso'] = \
-    ['atom-ID', 'atom-type', 'rho', 'e', 'cv',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['molecular'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['peri'] = \
-    ['atom-ID', 'atom-type', 'volume', 'density',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['sphere'] = \
-    ['atom-ID', 'atom-type', 'diameter', 'density',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['template'] = \
-    ['atom-ID', 'molecule-ID', 'template-index', 'template-atom',
-     'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['tri'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'triangleflag', 'density',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-lammps_atom_styles['wavepacket'] = \
-    ['atom-ID', 'atom-type', 'charge', 'spin', 'eradius', 'etag',
-     'cs_re', 'cs_im', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+__all__ = ['DATAReader', 'DATAWriter', 'DATAData', 'DATAFormatSpec',
+           'DATAIOError', 'DATA2XYZConverter', 'LAMMPSDATAReader',
+           'LAMMPSDATAWriter', 'LAMMPSDATA', 'LAMMPSDATAFormatSpec',
+           'LAMMPSDATAIOError', 'LAMMPSDATA2XYZConverter',
+           'lammps_atom_styles']
 
 
 class DATAReader(StructureIO):
@@ -102,28 +39,18 @@ class DATAReader(StructureIO):
     def __init__(self, fpath, atom_style='full', **kwargs):
         super(DATAReader, self).__init__(fpath=fpath, **kwargs)
 
-        data_format = DATAFormat(atom_style=atom_style, **kwargs)
-        self._data_headers = data_format.properties['headers']
-        self._data_sections = data_format.properties['sections']
-        self._section_properties = data_format.section_properties
-        self._section_syntax_dict = data_format.section_syntax_dict
+        self.header_data = {}
+        self.section_data = {}
+        self.boxbounds = {}
 
-        self._headers = {}
-        self._sections = {}
-        self._boxbounds = {}
+        formatspec = DATAFormatSpec(atom_style=atom_style, **kwargs)
+        self.header_specs = formatspec.headers
+        self.section_specs = formatspec.sections
+        self.section_attrs = formatspec.section_attrs
+        self.section_attrs_specs = formatspec.section_attrs_specs
 
         if self.fpath is not None:
             self.read()
-
-    @property
-    def sections(self):
-        """LAMMPS data file sections."""
-        return self._sections
-
-    @property
-    def boxbounds(self):
-        """Box bounds."""
-        return self._boxbounds
 
     def read(self):
         """Read data file."""
@@ -136,47 +63,41 @@ class DATAReader(StructureIO):
                 if len(line) == 0:
                     continue
                 found = False
-                for key in self._data_headers.iterkeys():
+                for key in self.header_specs.iterkeys():
                     if key in line:
                         found = True
-                        self._headers[key] = \
-                            [self._data_headers[key]['dtype'](float(s)) for s
+                        self.header_data[key] = \
+                            [self.header_specs[key]['dtype'](float(s)) for s
                              in [[ss for ss in line.split()][i] for i in
-                                 range(self._data_headers[key]['items'])]]
-                        if len(self._headers[key]) == 1:
+                                 range(self.header_specs[key]['items'])]]
+                        if len(self.header_data[key]) == 1:
                             # since the list contains only one element,
                             # replace list value with element 0
-                            self._headers[key] = self._headers[key][0]
+                            self.header_data[key] = self.header_data[key][0]
                         break
                 if not found:
                     break
 
             while True:
                 found = False
-                for section_key, header_key in self._data_sections.iteritems():
+                for section_key, header_key in self.section_specs.iteritems():
                     if section_key in line:
                         found = True
                         f.readline()
-                        Nitems = self._headers[header_key]
-                        #self._sections[section_key] = \
-                        #    [[props['dtype'](s) for props in
-                        #        self._section_properties[
-                        #            section_key].itervalues() for
-                        #        s in f.readline().strip().split()] for n in
-                        #        xrange(Nitems)]
+                        Nitems = self.header_data[header_key]
                         data = []
                         for n in xrange(Nitems):
                             tmp = []
                             line = f.readline().strip().split()
                             for i, props in enumerate(
-                                self._section_properties[
+                                self.section_attrs_specs[
                                     section_key].itervalues()):
                                 try:
                                     tmp.append(props['dtype'](float(line[i])))
                                 except IndexError:
                                     break
                             data.append(tmp)
-                        self._sections[section_key] = data[:]
+                        self.section_data[section_key] = data[:]
                         break
                 f.readline()
                 line = f.readline().strip()
@@ -189,18 +110,18 @@ class DATAReader(StructureIO):
 
     def _parse_atoms(self):
         """Populate `Atoms` object with `Atom` objects"""
-        atoms_section = self._sections['Atoms']
-        atoms_section_syntax = self._section_syntax_dict['Atoms']
+        atoms_section = self.section_data['Atoms']
+        atoms_section_attrs = self.section_attrs['Atoms']
 
-        masses_section = self._sections['Masses']
-        masses_section_syntax = self._section_syntax_dict['Masses']
+        masses_section = self.section_data['Masses']
+        masses_section_attrs = self.section_attrs['Masses']
 
         try:
-            velocities_section = self._sections['Velocities']
-            velocities_section_syntax = self._section_syntax_dict['Velocities']
+            velocities_section = self.section_data['Velocities']
+            velocities_section_attrs = self.section_attrs['Velocities']
         except KeyError:
             velocities_section = []
-            velocities_section_syntax = {}
+            velocities_section_attrs = {}
 
         atom_kwargs = {'atomID': None, 'moleculeID': None,
                        'q': None, 'atomtype': None, 'mass': None,
@@ -209,31 +130,31 @@ class DATAReader(StructureIO):
 
         for lmps_atom in atoms_section:
             for kw in atom_kwargs.iterkeys():
-                if kw in atoms_section_syntax:
+                if kw in atoms_section_attrs:
                     atom_kwargs[kw] = \
                         lmps_atom[
-                            self._section_properties['Atoms'][kw]['index']]
-                elif kw in masses_section_syntax:
+                            self.section_attrs_specs['Atoms'][kw]['index']]
+                elif kw in masses_section_attrs:
                     atomtype = \
                         lmps_atom[
-                            self._section_properties[
+                            self.section_attrs_specs[
                                 'Atoms']['atomtype']['index']]
                     atom_kwargs[kw] = \
                         masses_section[atomtype-1][
-                            self._section_properties['Masses'][kw]['index']]
-                elif kw in velocities_section_syntax and \
+                            self.section_attrs_specs['Masses'][kw]['index']]
+                elif kw in velocities_section_attrs and \
                         len(velocities_section) == len(atoms_section):
                     atomID = \
                         lmps_atom[
-                            self._section_properties[
+                            self.section_attrs_specs[
                                 'Atoms']['atomID']['index']]
                     for velocity in velocities_section:
                         velocity_atomID = \
-                            velocity[self._section_properties[
+                            velocity[self.section_attrs_specs[
                                 'Velocities']['atomID']['index']]
                         if velocity_atomID == atomID:
                             atom_kwargs[kw] = \
-                                velocity[self._section_properties[
+                                velocity[self.section_attrs_specs[
                                     'Velocities'][kw]['index']]
                 #else:
                 #    print('unknown atom keyword: {}'.format(kw))
@@ -244,21 +165,21 @@ class DATAReader(StructureIO):
     def _parse_atomtypes(self):
         Ntypes = self.atoms.Ntypes
         atomtypes = self.atoms.atomtypes
-        if Ntypes != self._headers['atom types']:
-            for atomtype in xrange(1, self._headers['atom types'] + 1):
+        if Ntypes != self.header_data['atom types']:
+            for atomtype in xrange(1, self.header_data['atom types'] + 1):
                 if atomtype not in atomtypes:
-                    mass = self._sections['Masses'][atomtype - 1][
-                        self._section_properties['Masses']['mass']['index']]
+                    mass = self.section_data['Masses'][atomtype - 1][
+                        self.section_attrs_specs['Masses']['mass']['index']]
                     self.atoms.add_atomtype(
                         Atom(atomtype=atomtype, mass=mass))
 
     def _parse_boxbounds(self):
         for dim in ('x', 'y', 'z'):
             bounds = \
-                self._headers[' '.join([dim + lim for lim in ('lo', 'hi')])]
-            self._boxbounds[dim] = {'min': bounds[0], 'max': bounds[-1]}
+                self.header_data[' '.join([dim + lim for lim in ('lo', 'hi')])]
+            self.boxbounds[dim] = {'min': bounds[0], 'max': bounds[-1]}
 
-        self.kwargs['boxbounds'] = self._boxbounds
+        self.kwargs['boxbounds'] = self.boxbounds
 
     def get(self, section_key, colnum=None, colname=None, colindex=None):
         """Return section with `section_key`.
@@ -277,8 +198,8 @@ class DATAReader(StructureIO):
         """
         section_data = None
         try:
-            section_data = self._sections[section_key]
-            section_syntax = self._section_syntax_dict[section_key]
+            section_data = self.section_data[section_key]
+            section_attrs = self.section_attrs[section_key]
         except KeyError as e:
             print(e)
         else:
@@ -288,16 +209,16 @@ class DATAReader(StructureIO):
                     colidx = int(colnum - 1)
                 elif colname is not None:
                     colidx = \
-                        self._section_properties[section_key][colname]['index']
+                        self.section_attrs_specs[section_key][colname]['index']
                 elif colindex is not None:
                     colidx = int(colindex)
             except (KeyError, TypeError, ValueError) as e:
                 print(e)
             else:
                 try:
-                    colname = section_syntax[colidx]
+                    colname = section_attrs[colidx]
                     coltype = \
-                        self._section_properties[section_key][colname]['dtype']
+                        self.section_attrs_specs[section_key][colname]['dtype']
                     section_data = \
                         np.asarray(
                             section_data, dtype=coltype)[:, colidx].tolist()
@@ -468,10 +389,10 @@ class DATAData(DATAReader):
 
     def delete(self, key):
         try:
-            del self._headers[key]
+            del self.header_data[key]
         except KeyError:
             try:
-                del self._sections[key]
+                del self.section_data[key]
             except KeyError as e:
                 print(e)
 
@@ -521,18 +442,18 @@ class DATAData(DATAReader):
                     colidx = int(colnum - 1)
                 elif colname is not None:
                     colidx = \
-                        self._section_properties[section_key][colname]['index']
+                        self.section_attrs_specs[section_key][colname]['index']
                 elif colindex is not None:
                     colidx = int(colindex)
             except (KeyError, TypeError, ValueError) as e:
                 raise DATAIOError(e)
-        atom_attr = self._section_syntax_dict[section_key][colidx]
+        atom_attr = self.section_attrs[section_key][colidx]
         attr_dtype = \
-            self._section_properties[section_key][atom_attr]['dtype']
+            self.section_attrs_specs[section_key][atom_attr]['dtype']
         new_data = np.asarray(new_data, dtype=attr_dtype)
 
         for i, atom in enumerate(self.atoms):
-            self._sections[section_key][i][colidx] = \
+            self.section_data[section_key][i][colidx] = \
                 attr_dtype(float(new_data[i]))
             setattr(atom, atom_attr, attr_dtype(float(new_data[i])))
 
@@ -569,7 +490,7 @@ class DATAData(DATAReader):
 
     @classmethod
     def format_spec(cls, atom_style='full', **kwargs):
-        return DATAFormat(atom_style=atom_style, **kwargs)
+        return DATAFormatSpec(atom_style=atom_style, **kwargs)
 
 LAMMPSDATA = DATAData
 
@@ -636,7 +557,7 @@ class DATAIOError(StructureIOError):
 LAMMPSDATAIOError = DATAIOError
 
 
-class DATAFormat(StructureFormat):
+class DATAFormatSpec(object):
     """`StructureFormat` class defining properties for `LAMMPS data` format.
 
     Parameters
@@ -646,171 +567,179 @@ class DATAFormat(StructureFormat):
 
     """
     def __init__(self, atom_style='full', **kwargs):
-        super(DATAFormat, self).__init__(**kwargs)
+        super(DATAFormatSpec, self).__init__(**kwargs)
         self._atom_style = atom_style
-        self._section_properties = OrderedDict()
 
-        atoms_section_syntax = {}
+        self.headers = {'atoms': {'dtype': int, 'items': 1},
+                        'bonds': {'dtype': int, 'items': 1},
+                        'angles': {'dtype': int, 'items': 1},
+                        'dihedrals': {'dtype': int, 'items': 1},
+                        'impropers': {'dtype': int, 'items': 1},
+                        'atom types': {'dtype': int, 'items': 1},
+                        'bond types': {'dtype': int, 'items': 1},
+                        'angle types': {'dtype': int, 'items': 1},
+                        'dihedral types': {'dtype': int, 'items': 1},
+                        'improper types': {'dtype': int, 'items': 1},
+                        'extra bond per atom': {'dtype': int, 'items': 1},
+                        'extra angle per atom': {'dtype': int, 'items': 1},
+                        'extra dihedral per atom': {'dtype': int, 'items': 1},
+                        'extra improper per atom': {'dtype': int, 'items': 1},
+                        'ellipsoids': {'dtype': int, 'items': 1},
+                        'lines': {'dtype': int, 'items': 1},
+                        'triangles': {'dtype': int, 'items': 1},
+                        'bodies': {'dtype': int, 'items': 1},
+                        'xlo xhi': {'dtype': float, 'items': 2},
+                        'ylo yhi': {'dtype': float, 'items': 2},
+                        'zlo zhi': {'dtype': float, 'items': 2},
+                        'xy xz yz': {'dtype': float, 'items': 3}}
+
+        atoms_section_attrs = {}
         for atom_style, var_list in lammps_atom_styles.iteritems():
-            atoms_section_syntax[atom_style] = []
+            atoms_section_attrs[atom_style] = []
             for var in var_list:
-                atoms_section_syntax[atom_style].append(var.replace('-', ''))
+                atoms_section_attrs[atom_style].append(var.replace('-', ''))
 
-        velocities_section_syntax = {}
-        velocities_section_syntax['full'] = ['atomID', 'vx', 'vy', 'vz']
+        velocities_section_attrs = {}
+        velocities_section_attrs['full'] = ['atomID', 'vx', 'vy', 'vz']
 
-        syntax_dtypes = \
+        attr_dtypes = \
             {'atomID': int, 'moleculeID': int, 'atomtype': int, 'q': float,
              'mass': float, 'x': float, 'y': float, 'z': float,
              'nx': int, 'ny': int, 'nz': int,
              'vx': float, 'vy': float, 'vz': float}
 
         section_keys = ['Atoms', 'Masses', 'Velocities']
-        self._section_syntax_dict = \
-            {'Atoms': atoms_section_syntax[self._atom_style],
+        self.section_attrs = \
+            {'Atoms': atoms_section_attrs[self._atom_style],
              'Masses': ['atomtype', 'mass'],
-             'Velocities': velocities_section_syntax[self._atom_style]}
+             'Velocities': velocities_section_attrs[self._atom_style]}
 
+        self.section_attrs_specs = OrderedDict()
         for section_key in section_keys:
-            self._section_properties[section_key] = OrderedDict()
-            section_syntax_list = self._section_syntax_dict[section_key]
-            for i, syntax in enumerate(section_syntax_list):
-                self._section_properties[section_key][syntax] = \
-                    {'dtype': syntax_dtypes[syntax],
+            self.section_attrs_specs[section_key] = OrderedDict()
+            section_attrs_list = self.section_attrs[section_key]
+            for i, attr in enumerate(section_attrs_list):
+                self.section_attrs_specs[section_key][attr] = \
+                    {'dtype': attr_dtypes[attr],
                      'colnum': i+1,
                      'index': i}
-
-        self._header_keys = ['atoms',
-                             'bonds',
-                             'angles',
-                             'dihedrals',
-                             'impropers',
-                             'atom types',
-                             'bond types',
-                             'angle types',
-                             'dihedral types',
-                             'improper types',
-                             'extra bond per atom',
-                             'extra angle per atom',
-                             'extra dihedral per atom',
-                             'extra improper per atom',
-                             'ellipsoids',
-                             'lines',
-                             'triangles',
-                             'bodies',
-                             'xlo xhi',
-                             'ylo yhi',
-                             'zlo zhi',
-                             'xy xz yz']
-
-        self._headers = {'atoms': {'dtype': int, 'items': 1},
-                         'bonds': {'dtype': int, 'items': 1},
-                         'angles': {'dtype': int, 'items': 1},
-                         'dihedrals': {'dtype': int, 'items': 1},
-                         'impropers': {'dtype': int, 'items': 1},
-                         'atom types': {'dtype': int, 'items': 1},
-                         'bond types': {'dtype': int, 'items': 1},
-                         'angle types': {'dtype': int, 'items': 1},
-                         'dihedral types': {'dtype': int, 'items': 1},
-                         'improper types': {'dtype': int, 'items': 1},
-                         'extra bond per atom': {'dtype': int, 'items': 1},
-                         'extra angle per atom': {'dtype': int, 'items': 1},
-                         'extra dihedral per atom': {'dtype': int, 'items': 1},
-                         'extra improper per atom': {'dtype': int, 'items': 1},
-                         'ellipsoids': {'dtype': int, 'items': 1},
-                         'lines': {'dtype': int, 'items': 1},
-                         'triangles': {'dtype': int, 'items': 1},
-                         'bodies': {'dtype': int, 'items': 1},
-                         'xlo xhi': {'dtype': float, 'items': 2},
-                         'ylo yhi': {'dtype': float, 'items': 2},
-                         'zlo zhi': {'dtype': float, 'items': 2},
-                         'xy xz yz': {'dtype': float, 'items': 3}}
-
-        self.properties['headers'] = self._headers
 
         # A LAMMPS data file is partitioned into sections identified
         # by a keyword string. The header data are used by one or
         # more sections. The `section_header_map` maps each
         # section keyword to a specific header key.
 
-        self._section_header_map = {}
+        self.sections = {}
 
-        atoms_sections = ['Atoms', 'Velocities', 'Molecules']
-        self._section_header_map.update(
-            dict.fromkeys(atoms_sections, 'atoms'))
+        self.sections.update(dict.fromkeys(
+            ['Atoms', 'Velocities', 'Molecules'], 'atoms'))
 
-        bonds_sections = ['Bonds']
-        self._section_header_map.update(
-            dict.fromkeys(bonds_sections, 'bonds'))
+        self.sections.update(
+            dict.fromkeys(['Bonds'], 'bonds'))
 
-        lines_sections = ['Lines']
-        self._section_header_map.update(
-            dict.fromkeys(lines_sections, 'lines'))
+        self.sections.update(
+            dict.fromkeys(['Lines'], 'lines'))
 
-        ellipsoids_sections = ['Ellipsoids']
-        self._section_header_map.update(
-            dict.fromkeys(ellipsoids_sections, 'ellipsoids'))
+        self.sections.update(
+            dict.fromkeys(['Ellipsoids'], 'ellipsoids'))
 
-        triangles_sections = ['Triangles']
-        self._section_header_map.update(
-            dict.fromkeys(triangles_sections, 'triangles'))
+        self.sections.update(
+            dict.fromkeys(['Triangles'], 'triangles'))
 
-        bodies_sections = ['Bodies']
-        self._section_header_map.update(
-            dict.fromkeys(bodies_sections, 'bodies'))
+        self.sections.update(
+            dict.fromkeys(['Bodies'], 'bodies'))
 
-        angles_sections = ['Angles']
-        self._section_header_map.update(
-            dict.fromkeys(angles_sections, 'angles'))
+        self.sections.update(
+            dict.fromkeys(['Angles'], 'angles'))
 
-        dihedrals_sections = ['Dihedrals']
-        self._section_header_map.update(
-            dict.fromkeys(dihedrals_sections, 'dihedrals'))
+        self.sections.update(
+            dict.fromkeys(['Dihedrals'], 'dihedrals'))
 
-        impropers_sections = ['Impropers']
-        self._section_header_map.update(
-            dict.fromkeys(impropers_sections, 'impropers'))
+        self.sections.update(
+            dict.fromkeys(['Impropers'], 'impropers'))
 
-        atom_types_sections = ['Masses', 'Pair Coeffs']
-        self._section_header_map.update(
-            dict.fromkeys(atom_types_sections, 'atom types'))
+        self.sections.update(
+            dict.fromkeys(['Masses', 'Pair Coeffs'], 'atom types'))
 
-        bond_types_sections = ['Bond Coeffs']
-        self._section_header_map.update(
-            dict.fromkeys(bond_types_sections, 'bond types'))
+        self.sections.update(
+            dict.fromkeys(['Bond Coeffs'], 'bond types'))
 
-        angle_types_sections = \
-            ['Angle Coeffs', 'BondBond Coeffs', 'BondAngle Coeffs']
-        self._section_header_map.update(
-            dict.fromkeys(angle_types_sections, 'angle types'))
+        self.sections.update(dict.fromkeys(
+            ['Angle Coeffs', 'BondBond Coeffs', 'BondAngle Coeffs'],
+            'angle types'))
 
-        improper_types_sections = \
-            ['AngleAngle Coeffs', 'Improper Coeffs']
-        self._section_header_map.update(
-            dict.fromkeys(improper_types_sections, 'improper types'))
+        self.sections.update(dict.fromkeys(
+            ['AngleAngle Coeffs', 'Improper Coeffs'], 'improper types'))
 
-        dihedral_types_sections = \
+        self.sections.update(dict.fromkeys(
             ['Dihedral Coeffs', 'MiddleBondTorsion Coeffs',
              'EndBondTorsion Coeffs', 'AngleTorsion Coeffs',
-             'AngleAngleTorsion Coeffs', 'BondBond13 Coeffs']
-        self._section_header_map.update(
-            dict.fromkeys(dihedral_types_sections, 'dihedral types'))
+             'AngleAngleTorsion Coeffs', 'BondBond13 Coeffs'],
+            'dihedral types'))
 
-        self.properties['sections'] = self._section_header_map
+LAMMPSDATAFormatSpec = DATAFormatSpec
 
-    @property
-    def header_keys(self):
-        """List of header key names"""
-        return self._header_keys
 
-    @property
-    def section_properties(self):
-        """List of section properties"""
-        return self._section_properties
+lammps_atom_styles = {}
+lammps_atom_styles['angle'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-    @property
-    def section_syntax_dict(self):
-        """Section syntax dictionary."""
-        return self._section_syntax_dict
+lammps_atom_styles['atomic'] = \
+    ['atom-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-LAMMPSDATAFormat = DATAFormat
+lammps_atom_styles['body'] = \
+    ['atom-ID', 'atom-type', 'bodyflag', 'mass',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['bond'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['charge'] = \
+    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['dipole'] = \
+    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z',
+     'mux', 'muy', 'muz', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['electron'] = \
+    ['atom-ID', 'atom-type', 'q', 'spin', 'eradius',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['ellipsoid'] = \
+    ['atom-ID', 'atom-type', 'ellipsoidflag', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['full'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'q',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['line'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'lineflag', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['meso'] = \
+    ['atom-ID', 'atom-type', 'rho', 'e', 'cv',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['molecular'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['peri'] = \
+    ['atom-ID', 'atom-type', 'volume', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['sphere'] = \
+    ['atom-ID', 'atom-type', 'diameter', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['template'] = \
+    ['atom-ID', 'molecule-ID', 'template-index', 'template-atom',
+     'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['tri'] = \
+    ['atom-ID', 'molecule-ID', 'atom-type', 'triangleflag', 'density',
+     'x', 'y', 'z', 'nx', 'ny', 'nz']
+
+lammps_atom_styles['wavepacket'] = \
+    ['atom-ID', 'atom-type', 'charge', 'spin', 'eradius', 'etag',
+     'cs_re', 'cs_im', 'x', 'y', 'z', 'nx', 'ny', 'nz']
