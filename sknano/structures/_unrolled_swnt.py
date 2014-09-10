@@ -12,27 +12,39 @@ __docformat__ = 'restructuredtext en'
 
 from sknano.core.refdata import dVDW
 
-from ._mixins import UnrolledSWNTMixin
-from ._swnt import SWNT
-#from ._base import StructureBase
+from ._mixins import NanotubeMixin, UnrolledSWNTMixin
+from ._base import StructureBase
 
 __all__ = ['UnrolledSWNT']
 
 
-class UnrolledSWNT(UnrolledSWNTMixin, SWNT):
+class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
 
-    def __init__(self, nx=1, ny=1, Lx=None, Ly=None, nlayers=1,
-                 layer_spacing=dVDW, stacking_order='AB', **kwargs):
+    def __init__(self, n=10, m=0, nx=1, nz=1, Nlayers=1, layer_spacing=dVDW,
+                 stacking_order='AB', Lx=None, fix_Lx=False, Lz=None,
+                 fix_Lz=False, **kwargs):
 
         super(UnrolledSWNT, self).__init__(**kwargs)
 
-        self.nx = nx
-        self.ny = ny
+        self.n = n
+        self.m = m
 
-    @property
-    def Lx(self):
-        return self.nx * self.Ch / 10
+        self.fix_Lx = fix_Lx
+        if Lx is not None:
+            self.nx = 10 * float(Lx) / self.Ch
+        elif nx is not None:
+            self.nx = nx
+        else:
+            self.nx = 1
 
-    @property
-    def Ly(self):
-        return self.ny * dVDW / 10
+        self.fix_Lz = fix_Lz
+        if Lz is not None:
+            self.nz = 10 * float(Lz) / self.T
+        elif nz is not None:
+            self.nz = nz
+        else:
+            self.nz = 1
+
+        self.Nlayers = Nlayers
+        self.layer_spacing = layer_spacing
+        self.stacking_order = stacking_order
