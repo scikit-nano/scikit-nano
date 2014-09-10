@@ -23,7 +23,7 @@ import numpy as np
 
 from sknano.core import pluralize
 from sknano.core.math import Vector
-from sknano.structures import SWNT, UnrolledSWNT
+from sknano.structures import UnrolledSWNT, compute_chiral_angle
 #from sknano.utils.geometric_shapes import Cuboid
 from ._base import Atom, Atoms, GeneratorMixin
 
@@ -102,18 +102,18 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
     def generate_unit_cell(self):
         """Generate the nanotube unit cell."""
         eps = 0.01
-        n = self._n
-        m = self._m
-        bond = self._bond
-        M = self._M
-        T = self._T
-        N = self._N
-        rt = self._rt
-        e1 = self._element1
-        e2 = self._element2
-        verbose = self._verbose
+        n = self.n
+        m = self.m
+        bond = self.bond
+        M = self.M
+        T = self.T
+        N = self.N
+        rt = self.rt
+        e1 = self.element1
+        e2 = self.element2
+        verbose = self.verbose
 
-        aCh = SWNT.compute_chiral_angle(n=n, m=m, rad2deg=False)
+        aCh = compute_chiral_angle(n=n, m=m, rad2deg=False)
 
         tau = M * T / N
         dtau = bond * np.sin(np.pi / 6 - aCh)
@@ -176,8 +176,8 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
 
         """
         if fname is None:
-            chirality = '{}{}f'.format('{}'.format(self._n).zfill(2),
-                                       '{}'.format(self._m).zfill(2))
+            chirality = '{}{}'.format('{}'.format(self.n).zfill(2),
+                                      '{}'.format(self.m).zfill(2))
             nx = self.nx
             ny = self.ny
             fname_wordlist = None
@@ -206,7 +206,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
 
                 fname_wordlist = (chirality, nz)
 
-            fname = '_'.join(fname_wordlist)
+            fname = 'unrolled_' + '_'.join(fname_wordlist)
 
         super(UnrolledSWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,

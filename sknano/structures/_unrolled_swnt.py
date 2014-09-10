@@ -13,12 +13,13 @@ __docformat__ = 'restructuredtext en'
 from sknano.core.refdata import dVDW
 
 from ._mixins import UnrolledSWNTMixin
-from ._base import StructureBase
+from ._swnt import SWNT
+#from ._base import StructureBase
 
 __all__ = ['UnrolledSWNT']
 
 
-class UnrolledSWNT(UnrolledSWNTMixin, StructureBase):
+class UnrolledSWNT(UnrolledSWNTMixin, SWNT):
 
     def __init__(self, nx=1, ny=1, Lx=None, Ly=None, nlayers=1,
                  layer_spacing=dVDW, stacking_order='AB', **kwargs):
