@@ -185,7 +185,24 @@ def argparser():
 
     unrolled_swnt_parser = \
         subparsers.add_parser('unrolled_swnt',
-                              parents=[swnt_parent_parser])
+                              parents=[swnt_parent_parser,
+                                       nanotube_parent_parser])
+
+    unrolled_swnt_parser_group = \
+        unrolled_swnt_parser.add_mutually_exclusive_group()
+    unrolled_swnt_parser_group.add_argument(
+        '--nx', type=int, default=1,
+        help='Number of repeat unit cells along `x` axis '
+        '(default: %(default)s)')
+    unrolled_swnt_parser_group.add_argument(
+        '--Lx', type=float, default=None,
+        help='Length of unrolled nanotube along `x` axis in **nanometers**. '
+        '(default: %(default)s)')
+    unrolled_swnt_parser.add_argument(
+        '--fix-Lx', action='store_true', help='Generate the nanotube with '
+        'length as close to the specified `Lx` as possible. If `True`, then '
+        'non integer `nx` cells are permitted. (default: ' '%(default)s)')
+
     unrolled_swnt_parser.set_defaults(generator_class='UnrolledSWNTGenerator')
 
     mwnt_parser = \
