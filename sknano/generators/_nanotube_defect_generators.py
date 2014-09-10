@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-=============================================================================
-Nanotube defect generator (:mod:`sknano.generators._nanotube_defect_generators`)
-=============================================================================
+=================================================================================
+Nanotube defect generators (:mod:`sknano.generators._nanotube_defect_generators`)
+=================================================================================
 
 .. currentmodule:: sknano.generators._nanotube_defect_generators
 

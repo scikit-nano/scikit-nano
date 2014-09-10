@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-=============================================================================
-Graphene defect generator (:mod:`sknano.generators._graphene_defect_generators`)
-=============================================================================
+=================================================================================
+Graphene defect generators (:mod:`sknano.generators._graphene_defect_generators`)
+=================================================================================
 
 .. currentmodule:: sknano.generators._graphene_defect_generators
 
