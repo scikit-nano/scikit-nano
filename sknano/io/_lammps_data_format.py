@@ -63,55 +63,60 @@ class DATAReader(StructureIO):
     def read(self):
         """Read data file."""
         self.atoms.clear()
-        with open(self.fpath, 'r') as f:
-            self.comment_line = f.readline().strip()
+        try:
+            with open(self.fpath, 'r') as f:
+                self.comment_line = f.readline().strip()
 
-            while True:
-                line = f.readline().strip()
-                if len(line) == 0:
-                    continue
-                found = False
-                for header in self.header_specs.iterkeys():
-                    if header in line:
-                        found = True
-                        self.header_data[header] = \
-                            [self.header_specs[header]['dtype'](float(s)) for s
-                             in [[ss for ss in line.split()][i] for i in
-                                 range(self.header_specs[header]['items'])]]
-                        if len(self.header_data[header]) == 1:
-                            # since the list contains only one element,
-                            # replace list value with element 0
+                while True:
+                    line = f.readline().strip()
+                    if len(line) == 0:
+                        continue
+                    found = False
+                    for header in self.header_specs.iterkeys():
+                        if header in line:
+                            found = True
                             self.header_data[header] = \
-                                self.header_data[header][0]
+                                [self.header_specs[header]['dtype'](float(s))
+                                 for s in [[ss for ss in line.split()][i]
+                                           for i in range(self.header_specs[
+                                               header]['items'])]]
+                            if len(self.header_data[header]) == 1:
+                                # since the list contains only one element,
+                                # replace list value with element 0
+                                self.header_data[header] = \
+                                    self.header_data[header][0]
+                            break
+                    if not found:
                         break
-                if not found:
-                    break
 
-            while True:
-                found = False
-                for section, header in self.section_specs.iteritems():
-                    if section in line:
-                        found = True
-                        f.readline()
-                        Nitems = self.header_data[header]
-                        data = []
-                        for n in xrange(Nitems):
-                            tmp = []
-                            line = f.readline().strip().split()
-                            for i, attrs in enumerate(
-                                self.section_attrs_specs[
-                                    section].itervalues()):
-                                try:
-                                    tmp.append(attrs['dtype'](float(line[i])))
-                                except IndexError:
-                                    break
-                            data.append(tmp)
-                        self.section_data[section] = data[:]
+                while True:
+                    found = False
+                    for section, header in self.section_specs.iteritems():
+                        if section in line:
+                            found = True
+                            f.readline()
+                            Nitems = self.header_data[header]
+                            data = []
+                            for n in xrange(Nitems):
+                                tmp = []
+                                line = f.readline().strip().split()
+                                for i, attrs in enumerate(
+                                    self.section_attrs_specs[
+                                        section].itervalues()):
+                                    try:
+                                        tmp.append(
+                                            attrs['dtype'](float(line[i])))
+                                    except IndexError:
+                                        break
+                                data.append(tmp)
+                            self.section_data[section] = data[:]
+                            break
+                    f.readline()
+                    line = f.readline().strip()
+                    if len(line) == 0:
                         break
-                f.readline()
-                line = f.readline().strip()
-                if len(line) == 0:
-                    break
+        except IOError as e:
+            print(e)
 
         self._parse_atoms()
         self._parse_atomtypes()
@@ -705,6 +710,7 @@ class DATAFormatSpec(object):
         if value not in lammps_atom_styles:
             raise ValueError("Allowed `atom_style`'s:\n{}".format(
                 lammps_atom_styles.keys()))
+        self._atom_style = value
 
     @atom_style.deleter
     def atom_style(self):
