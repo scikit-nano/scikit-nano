@@ -47,15 +47,15 @@ class Atoms(AtomList):
 
     def __repr__(self):
         """Return canonical string representation of `Atoms`."""
-        return "Atoms(atoms={!r})".format(self._data)
+        return "Atoms(atoms={!r})".format(self.data)
 
     def sort(self, key=None, reverse=False):
 
         if key is None:
-            self._data.sort(key=attrgetter('element', 'Z', 'z'),
+            self.data.sort(key=attrgetter('element', 'Z', 'z'),
                             reverse=reverse)
         else:
-            self._data.sort(key=key, reverse=reverse)
+            self.data.sort(key=key, reverse=reverse)
 
     @property
     def Natoms(self):
@@ -137,7 +137,7 @@ class Atoms(AtomList):
             CM0 = self.CM
             self.translate(-CM0)
 
-        self._data = \
+        self.data = \
             np.asarray(self)[np.logical_and(
                 np.logical_and(
                     self.x <= region.limits['x']['max'],

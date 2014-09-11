@@ -42,18 +42,18 @@ class Bonds(BondList):
 
     def __str__(self):
         """Return a nice string representation of `Bonds`."""
-        return "Bonds({!s})".format(self._data)
+        return "Bonds({!s})".format(self.data)
 
     def __repr__(self):
         """Return the canonical string representation of `Bonds`."""
-        return "Bonds({!r})".format(self._data)
+        return "Bonds({!r})".format(self.data)
 
     def sort(self, key=None, reverse=False):
 
         if key is None:
-            self._data.sort(key=attrgetter('length'), reverse=reverse)
+            self.data.sort(key=attrgetter('length'), reverse=reverse)
         else:
-            self._data.sort(key=key, reverse=reverse)
+            self.data.sort(key=key, reverse=reverse)
 
     @property
     def Nbonds(self):

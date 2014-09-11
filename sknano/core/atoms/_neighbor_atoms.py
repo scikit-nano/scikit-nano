@@ -38,11 +38,11 @@ class NeighborAtoms(AtomList):
 
     def __str__(self):
         """Return a nice string representation of `NeighborAtoms`."""
-        return "NeighborAtoms(atoms={!s})".format(self._data)
+        return "NeighborAtoms(atoms={!s})".format(self.data)
 
     def __repr__(self):
         """Return the canonical string representation of `NeighborAtoms`."""
-        return "NeighborAtoms(atoms={!r})".format(self._data)
+        return "NeighborAtoms(atoms={!r})".format(self.data)
 
     @property
     def Natoms(self):

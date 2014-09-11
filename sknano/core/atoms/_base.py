@@ -35,16 +35,16 @@ class AtomList(MutableSequence):
     """
 
     def __init__(self, atoms=None, copylist=True, deepcopy=False):
-        self._data = []
+        self.data = []
 
         if atoms is not None:
             try:
                 if copylist and not deepcopy:
-                    self._data.extend(atoms[:])
+                    self.data.extend(atoms[:])
                 elif deepcopy:
-                    self._data.extend(copy.deepcopy(atoms))
+                    self.data.extend(copy.deepcopy(atoms))
                 else:
-                    self._data.extend(atoms)
+                    self.data.extend(atoms)
             except AttributeError:
                 raise TypeError('`atoms={!r}` '.format(atoms) +
                                 'is not a valid `AtomList` constructor '
@@ -69,7 +69,7 @@ class AtomList(MutableSequence):
             index of target list element
 
         """
-        del self._data[index]
+        del self.data[index]
 
     def __getitem__(self, index):
         """Concrete implementation of @abstractmethod.
@@ -87,7 +87,7 @@ class AtomList(MutableSequence):
             `Atom` instance at target `self[index]`
 
         """
-        return self._data[index]
+        return self.data[index]
 
     def __setitem__(self, index, atom):
         """Concrete implementation of @abstractmethod.
@@ -102,7 +102,7 @@ class AtomList(MutableSequence):
             `Atom` instance object to set target list element to.
 
         """
-        self._data[index] = atom
+        self.data[index] = atom
 
     def __len__(self):
         """Concrete implementation of @abstractmethod.
@@ -113,7 +113,7 @@ class AtomList(MutableSequence):
             length of `self` list.
 
         """
-        return len(self._data)
+        return len(self.data)
 
     def insert(self, index, atom):
         """Concrete implementation of @abstractmethod.
@@ -128,15 +128,10 @@ class AtomList(MutableSequence):
             `Atom` object instance to set target list element to
 
         """
-        self._data.insert(index, atom)
-
-    @property
-    def data(self):
-        """Return the list of `Atom` objects"""
-        return self._data
+        self.data.insert(index, atom)
 
     def clear(self):
-        self._data = []
+        self.data = []
 
 
 @total_ordering
@@ -154,16 +149,16 @@ class BondList(MutableSequence):
 
     """
     def __init__(self, bonds=None, copylist=True, deepcopy=False):
-        self._data = []
+        self.data = []
 
         if bonds is not None:
             try:
                 if copylist and not deepcopy:
-                    self._data.extend(bonds[:])
+                    self.data.extend(bonds[:])
                 elif deepcopy:
-                    self._data.extend(copy.deepcopy(bonds))
+                    self.data.extend(copy.deepcopy(bonds))
                 else:
-                    self._data.extend(bonds)
+                    self.data.extend(bonds)
             except AttributeError:
                 raise TypeError('`bonds={!r}` '.format(bonds) +
                                 'is not a valid `Bonds` constructor '
@@ -188,7 +183,7 @@ class BondList(MutableSequence):
             index of target list element
 
         """
-        del self._data[index]
+        del self.data[index]
 
     def __getitem__(self, index):
         """Concrete implementation of @abstractmethod.
@@ -206,7 +201,7 @@ class BondList(MutableSequence):
             `Bond` instance at target `self[index]`
 
         """
-        return self._data[index]
+        return self.data[index]
 
     def __setitem__(self, index, bond):
         """Concrete implementation of @abstractmethod.
@@ -221,7 +216,7 @@ class BondList(MutableSequence):
             `Bond` instance object to set target list element to.
 
         """
-        self._data[index] = bond
+        self.data[index] = bond
 
     def __len__(self):
         """Concrete implementation of @abstractmethod.
@@ -232,7 +227,7 @@ class BondList(MutableSequence):
             length of `self` list.
 
         """
-        return len(self._data)
+        return len(self.data)
 
     def insert(self, index, bond):
         """Concrete implementation of @abstractmethod.
@@ -247,15 +242,10 @@ class BondList(MutableSequence):
             `Bond` object instance to set target list element to
 
         """
-        self._data.insert(index, bond)
-
-    @property
-    def data(self):
-        """Return the list of `Bonds` objects"""
-        return self._data
+        self.data.insert(index, bond)
 
     def clear(self):
-        self._data = []
+        self.data = []
 
 
 class BondDict(OrderedDict):
