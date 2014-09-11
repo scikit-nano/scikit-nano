@@ -115,12 +115,15 @@ class DATAReader(StructureIO):
                     line = f.readline().strip()
                     if len(line) == 0:
                         break
-        except IOError as e:
+            self._parse_atoms()
+            self._parse_atomtypes()
+            self._parse_boxbounds()
+        except (IOError, OSError) as e:
             print(e)
-
-        self._parse_atoms()
-        self._parse_atomtypes()
-        self._parse_boxbounds()
+        except Exception:
+            raise DATAIOError('{} contains missing or malformed data that '
+                              'could not be parsed by DATAReader'.format(
+                                  self.fpath))
 
     def _parse_atoms(self):
         """Populate `Atoms` object with `Atom` objects"""
