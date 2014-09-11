@@ -148,16 +148,5 @@ class StructureFormatSpec(object):
 
 
 class StructureIOError(Exception):
-    """Base class for `StructureIO` errors.
-
-    Parameters
-    ----------
-    msg : str
-        Error message.
-
-    """
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return repr(self.msg)
+    """Base class for `StructureIO` errors."""
+    pass
