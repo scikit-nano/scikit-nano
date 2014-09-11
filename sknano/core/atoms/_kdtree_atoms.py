@@ -81,35 +81,6 @@ class KDTAtoms(XAtoms):
             return None
 
     @property
-    def nearest_neighbors(self):
-        """Return array of nearest-neighbor atoms for each `KDTAtom`."""
-        #self._update_nearest_neighbors()
-        return np.asarray([atom.NN for atom in self])
-
-    def _update_nearest_neighbors(self):
-        """Update `KDTAtom` nearest-neighbors."""
-        try:
-            NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
-            for j, atom in enumerate(self):
-                atom.NN = NeighborAtoms()
-                for k, d in enumerate(NNd[j]):
-                    if d < self.NNrc:
-                        atom.NN.append(self[NNi[j][k]])
-        except ValueError:
-            pass
-
-    @property
-    def coordination_numbers(self):
-        """Return array of `KDTAtom` coordination numbers."""
-        #self._update_coordination_numbers()
-        return np.asarray([atom.CN for atom in self])
-
-    def _update_coordination_numbers(self):
-        """Update `KDTAtom` coordination numbers."""
-        #self._update_nearest_neighbors()
-        [setattr(atom, 'CN', atom.NN.Natoms) for atom in self]
-
-    @property
     def bonds(self):
         #self._update_bonds()
         bonds = Bonds()
@@ -117,31 +88,17 @@ class KDTAtoms(XAtoms):
         return bonds
         #return np.asarray([atom.bonds for atom in self])
 
-    def _update_bonds(self):
-        """Update `KDTAtom` bonds."""
+    @property
+    def coordination_numbers(self):
+        """Return array of `KDTAtom` coordination numbers."""
+        #self._update_coordination_numbers()
+        return np.asarray([atom.CN for atom in self])
+
+    @property
+    def nearest_neighbors(self):
+        """Return array of nearest-neighbor atoms for each `KDTAtom`."""
         #self._update_nearest_neighbors()
-        for atom in self:
-            atom.bonds = Bonds()
-            [atom.bonds.append(Bond(atom, nn)) for nn in atom.NN]
-
-    @property
-    def poma(self):
-        """Return per-atom list of POAV misalignment angles."""
-        #self._update_poma()
-        return np.ma.asarray([np.ma.fix_invalid(atom.poma) for atom in self])
-
-    @property
-    def nonzero_poma(self):
-        #self._update_poma()
-        return [np.ma.masked_values(np.ma.fix_invalid(atom.poma), 0)
-                for atom in self]
-
-    def update_attrs(self):
-        self._update_nearest_neighbors()
-        self._update_coordination_numbers()
-        self._update_bonds()
-        self._update_pyramidalization_angles()
-        self._update_poma()
+        return np.asarray([atom.NN for atom in self])
 
     @property
     def mean_nonzero_poma(self):
@@ -150,18 +107,17 @@ class KDTAtoms(XAtoms):
             np.ma.masked_values(np.ma.fix_invalid(atom.poma), 0)))
             for atom in self]))
 
-    def _update_poma(self):
-        #self._update_pyramidalization_angles()
-        for atom in self:
-            poma = []
-            for i, NN in enumerate(atom.NN):
-                bond = atom.bonds[i]
-                if atom.poav is not None and NN.poav is not None:
-                    nvec = vec.cross(bond.vector, atom.poav)
-                    poma.append(np.abs(np.pi / 2 - vec.angle(NN.poav, nvec)))
-                else:
-                    poma.append(np.nan)
-            atom.poma = poma
+    @property
+    def nonzero_poma(self):
+        #self._update_poma()
+        return [np.ma.masked_values(np.ma.fix_invalid(atom.poma), 0)
+                for atom in self]
+
+    @property
+    def poma(self):
+        """Return per-atom list of POAV misalignment angles."""
+        #self._update_poma()
+        return np.ma.asarray([np.ma.fix_invalid(atom.poma) for atom in self])
 
     @property
     def pyramidalization_angles(self):
@@ -170,21 +126,6 @@ class KDTAtoms(XAtoms):
         [angles.append(atom.pyramidalization_angle) for atom in self if
          atom.poav is not None]
         return np.asarray(angles)
-
-    def _update_pyramidalization_angles(self):
-        #self._update_bonds()
-        for atom in self:
-            if atom.bonds.Nbonds == 3:
-                b1, b2, b3 = atom.bonds
-                v21 = Vector(b2.vector - b1.vector, p0=b1.vector.p)
-                v31 = Vector(b3.vector - b1.vector, p0=b1.vector.p)
-                poav = vec.cross(v21, v31)
-                atom.poav = poav.unit_vector
-                atom.sigma_bond_angle = vec.angle(atom.poav, b1.vector)
-                if atom.sigma_bond_angle < np.pi / 2:
-                    atom.sigma_bond_angle = np.pi - atom.sigma_bond_angle
-                    atom.poav = -atom.poav
-                atom.pyramidalization_angle = atom.sigma_bond_angle - np.pi / 2
 
     def query_atom_tree(self, k=3, eps=0, p=2, rc=np.inf):
         """Query atom tree for nearest neighbors distances and indices.
@@ -251,3 +192,62 @@ class KDTAtoms(XAtoms):
             NNi = atom_tree.query_ball_point(pts, r, p=p, eps=eps)
 
         return self.__class__(atoms=np.asarray(self)[NNi].tolist())
+
+    def update_attrs(self):
+        self._update_nearest_neighbors()
+        self._update_coordination_numbers()
+        self._update_bonds()
+        self._update_pyramidalization_angles()
+        self._update_poma()
+
+    def _update_bonds(self):
+        """Update `KDTAtom` bonds."""
+        #self._update_nearest_neighbors()
+        for atom in self:
+            atom.bonds = Bonds()
+            [atom.bonds.append(Bond(atom, nn)) for nn in atom.NN]
+
+    def _update_coordination_numbers(self):
+        """Update `KDTAtom` coordination numbers."""
+        #self._update_nearest_neighbors()
+        [setattr(atom, 'CN', atom.NN.Natoms) for atom in self]
+
+    def _update_nearest_neighbors(self):
+        """Update `KDTAtom` nearest-neighbors."""
+        try:
+            NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
+            for j, atom in enumerate(self):
+                atom.NN = NeighborAtoms()
+                for k, d in enumerate(NNd[j]):
+                    if d < self.NNrc:
+                        atom.NN.append(self[NNi[j][k]])
+        except ValueError:
+            pass
+
+    def _update_poma(self):
+        #self._update_pyramidalization_angles()
+        for atom in self:
+            poma = []
+            for i, NN in enumerate(atom.NN):
+                bond = atom.bonds[i]
+                if atom.poav is not None and NN.poav is not None:
+                    nvec = vec.cross(bond.vector, atom.poav)
+                    poma.append(np.abs(np.pi / 2 - vec.angle(NN.poav, nvec)))
+                else:
+                    poma.append(np.nan)
+            atom.poma = poma
+
+    def _update_pyramidalization_angles(self):
+        #self._update_bonds()
+        for atom in self:
+            if atom.bonds.Nbonds == 3:
+                b1, b2, b3 = atom.bonds
+                v21 = Vector(b2.vector - b1.vector, p0=b1.vector.p)
+                v31 = Vector(b3.vector - b1.vector, p0=b1.vector.p)
+                poav = vec.cross(v21, v31)
+                atom.poav = poav.unit_vector
+                atom.sigma_bond_angle = vec.angle(atom.poav, b1.vector)
+                if atom.sigma_bond_angle < np.pi / 2:
+                    atom.sigma_bond_angle = np.pi - atom.sigma_bond_angle
+                    atom.poav = -atom.poav
+                atom.pyramidalization_angle = atom.sigma_bond_angle - np.pi / 2
