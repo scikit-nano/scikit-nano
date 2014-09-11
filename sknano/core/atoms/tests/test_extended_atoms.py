@@ -58,13 +58,13 @@ def test_generator_atoms():
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
     assert_equals(atoms.Natoms, 400)
 
-    a100 = atoms.get_atom(atomID=100)
+    a100 = atoms.get_atom(100)
     assert_true(a100 is atoms[99])
     assert_equals(atoms.index(a100), 99)
-    a200 = atoms.get_atom(atomID=200)
+    a200 = atoms.get_atom(200)
     assert_true(a200 is atoms[199])
     assert_equals(atoms.index(a200), 199)
-    a300 = atoms.get_atom(atomID=300)
+    a300 = atoms.get_atom(300)
     assert_true(a300 is atoms[299])
     assert_equals(atoms.index(a300), 299)
 
@@ -72,11 +72,10 @@ def test_generator_atoms():
 def test_atom_selections():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    a200 = atoms.get_atom(atomID=200)
-    assert_true(a200 is atoms[199])
-    assert_true(a200 == atoms[199])
+    #assert_true(a200 is atoms[20])
     #a200NN = atoms.select_within(Ellipsoid(center=a200.r, r=2.5))
     #assert_equals(a200NN.Natoms, 4)
+    #atoms.select(
 
 
 if __name__ == '__main__':

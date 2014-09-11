@@ -60,7 +60,6 @@ def test_structure_analysis():
     atoms = KDTAtoms(atoms=atoms)
     assert_equals(atoms.Natoms, 400)
 
-    atoms.assign_unique_ids()
     atoms.kNN = 3
     atoms.NNrc = 2.0
     NNatoms = atoms.nearest_neighbors
@@ -69,13 +68,13 @@ def test_structure_analysis():
     atomCN = atoms.coordination_numbers
     assert_equals(len(atomCN), atoms.Natoms)
 
-    a100 = atoms.get_atom(atomID=100)
+    a100 = atoms.get_atom(100)
     assert_true(a100 is atoms[99])
     assert_equals(atoms.index(a100), 99)
-    a200 = atoms.get_atom(atomID=200)
+    a200 = atoms.get_atom(200)
     assert_true(a200 is atoms[199])
     assert_equals(atoms.index(a200), 199)
-    a300 = atoms.get_atom(atomID=300)
+    a300 = atoms.get_atom(300)
     assert_true(a300 is atoms[299])
     assert_equals(atoms.index(a300), 299)
 
@@ -83,7 +82,7 @@ def test_structure_analysis():
 def test_atom_selections():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    a200 = atoms.get_atom(atomID=200)
+    a200 = atoms.get_atom(200)
     assert_true(a200 is atoms[199])
     assert_true(a200 == atoms[199])
     #coords = atoms.coords
@@ -97,7 +96,6 @@ def test_atom_selections():
 def test_atom_bonds():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=20, m=10, nz=2)
-    atoms.assign_unique_ids()
     atoms.NNrc = 2.0
     bonds = atoms.bonds
     #print('bonds: {!s}'.format(bonds))
@@ -124,7 +122,6 @@ def test_structure_data():
 def test_pyramidalization_angles():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=20, m=10, nz=2)
-    atoms.assign_unique_ids()
     #atoms.NNrc = 2.0
     atoms.update_pyramidalization_angles()
 
@@ -142,7 +139,6 @@ def test_pyramidalization_angles():
 def test_poma():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    atoms.assign_unique_ids()
     #atoms.update_pyramidalization_angles()
     print('misalignment_angles: {}'.format(np.degrees(
         atoms.mean_nonzero_poma)))
@@ -160,7 +156,6 @@ def test_poma():
 
 def test_list_mods():
     atoms = generate_atoms(elements='periodic_table')
-    atoms.assign_unique_ids()
     print(atoms)
 
 
