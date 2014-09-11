@@ -14,13 +14,62 @@ import os
 import re
 import sys
 
-__all__ = ['get_fpath']
+__all__ = ['get_fname', 'get_fpath']
+
+
+def get_fname(fname=None, ext=None, outpath=os.getcwd(), overwrite=False,
+              add_fnum=True, fnum=None, verbose=False, **kwargs):
+    """Generate modified `fname` string based on chosen parameters.
+
+    Parameters
+    ----------
+    fname : str
+        Name of file, with or without an extension.
+    ext : str, optional
+        File extension to append to `fname`. If `ext` is None,
+        then `fname` is analyzed to see if it likely already has an
+        extension. An extension is set to the
+        last element in the list of strings returned by
+        `fname.split('.')` **if** this list has more than 1 element.
+        Otherwise, `ext` will be set to an empty string `''`.
+        If `ext` is not None and is a valid string,
+        then `fname` is analyzed to see if it already ends with `ext`.
+        If `fname.endswith(ext)` is `True` from the start, then `ext` will
+        not be duplicately appended.
+    outpath : str, optional
+        Absolute or relative path for generated output file.
+        Default is the absolute path returned by `os.getcwd()`.
+    overwrite : bool, optional
+        If `True`, overwrite an existing file if it has the same generated
+        file path.
+    add_fnum : bool, optional
+        Append integer number to output file name, starting with **1**.
+    fnum : {None, int}, optional
+        Starting file number to append if `add_fnum` is `True`.
+
+        .. note::
+
+        If the generated file path exists and `overwrite` is False,
+        setting this parameter has no effect.
+
+    verbose : bool, optional
+        Show verbose output.
+
+    Returns
+    -------
+    fname : str
+        Updated `fname`.
+
+    """
+    return get_fpath(fname=fname, ext=ext, outpath=outpath,
+                     overwrite=overwrite, add_fnum=add_fnum, fnum=fnum,
+                     fname_only=True, verbose=verbose)
 
 
 def get_fpath(fname=None, ext=None, outpath=os.getcwd(), overwrite=False,
               add_fnum=True, fnum=None, include_fname=False, fname_only=False,
               verbose=False):
-    """Generate modified `fname` string based on chosen parameters.
+    """Generate absolute path to modified `fname`.
 
     Parameters
     ----------
