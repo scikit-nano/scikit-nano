@@ -10,16 +10,160 @@ Base classes for atoms package (:mod:`sknano.core.atoms._base`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from collections import MutableSequence, OrderedDict
+from collections import MutableSequence
 from functools import total_ordering
 
 import copy
 
-__all__ = ['AtomList', 'BondList', 'BondDict']
+__all__ = ['UserList', 'AtomList', 'BondList']
 
 
 @total_ordering
-class AtomList(MutableSequence):
+class UserList(MutableSequence):
+    """Base class around list objects.
+
+    Modified implementation of :class:`~python:collections.UserList`.
+
+    Parameters
+    ----------
+    initlist : {None, sequence, UserList}, optional
+        if not `None`, then a list or an instance of `UserList`
+    copylist : bool, optional
+        perform shallow copy of list items
+    deepcopy : bool, optional
+        perform deepcopy of list items
+    """
+    def __init__(self, initlist=None, copylist=True, deepcopy=False):
+        self.data = []
+
+        if initlist is not None:
+            if type(initlist) == type(self.data):
+                if copylist and not deepcopy:
+                    self.data.extend(initlist[:])
+                elif deepcopy:
+                    self.data.extend(copy.deepcopy(initlist))
+                else:
+                    self.data.extend(initlist)
+            elif isinstance(initlist, UserList):
+                if copylist and not deepcopy:
+                    self.data.extend(initlist.data[:])
+                elif deepcopy:
+                    self.data.extend(copy.deepcopy(initlist.data))
+                else:
+                    self.data.extend(initlist.data)
+            else:
+                self.data = list(initlist)
+
+    def __repr__(self):
+        return repr(self.data)
+
+    def __lt__(self, other):
+        return self.data < self.__cast(other)
+
+    def __le__(self, other):
+        return self.data <= self.__cast(other)
+
+    def __eq__(self, other):
+        return self.data == self.__cast(other)
+
+    def __ne__(self, other):
+        return self.data != self.__cast(other)
+
+    def __gt__(self, other):
+        return self.data > self.__cast(other)
+
+    def __ge__(self, other):
+        return self.data >= self.__cast(other)
+
+    def __cast(self, other):
+        return other.data if isinstance(other, UserList) else other
+
+    def __contains__(self, item):
+        return item in self.data
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, i):
+        return self.data[i]
+
+    def __setitem__(self, i, item):
+        self.data[i] = item
+
+    def __delitem__(self, i):
+        del self.data[i]
+
+    def __add__(self, other):
+        if isinstance(other, UserList):
+            return self.__class__(self.data + other.data)
+        elif isinstance(other, type(self.data)):
+            return self.__class__(self.data + other)
+        return self.__class__(self.data + list(other))
+
+    def __radd__(self, other):
+        if isinstance(other, UserList):
+            return self.__class__(other.data + self.data)
+        elif isinstance(other, type(self.data)):
+            return self.__class__(other + self.data)
+        return self.__class__(list(other) + self.data)
+
+    def __iadd__(self, other):
+        if isinstance(other, UserList):
+            self.data += other.data
+        elif isinstance(other, type(self.data)):
+            self.data += other
+        else:
+            self.data += list(other)
+        return self
+
+    def __mul__(self, n):
+        return self.__class__(self.data*n)
+
+    __rmul__ = __mul__
+
+    def __imul__(self, n):
+        self.data *= n
+        return self
+
+    def append(self, item):
+        self.data.append(item)
+
+    def insert(self, i, item):
+        self.data.insert(i, item)
+
+    def pop(self, i=-1):
+        return self.data.pop(i)
+
+    def remove(self, item):
+        self.data.remove(item)
+
+    def clear(self):
+        #self.data.clear()
+        del self.data[:]
+
+    def copy(self):
+        return self.__class__(self)
+
+    def count(self, item):
+        return self.data.count(item)
+
+    def index(self, item, *args):
+        return self.data.index(item, *args)
+
+    def reverse(self):
+        self.data.reverse()
+
+    def sort(self, *args, **kwds):
+        self.data.sort(*args, **kwds)
+
+    def extend(self, other):
+        if isinstance(other, UserList):
+            self.data.extend(other.data)
+        else:
+            self.data.extend(other)
+
+
+class AtomList(UserList):
     """Base class for collection of `Atom` objects.
 
     Parameters
@@ -35,107 +179,12 @@ class AtomList(MutableSequence):
     """
 
     def __init__(self, atoms=None, copylist=True, deepcopy=False):
-        self.data = []
-
-        if atoms is not None:
-            try:
-                if copylist and not deepcopy:
-                    self.data.extend(atoms[:])
-                elif deepcopy:
-                    self.data.extend(copy.deepcopy(atoms))
-                else:
-                    self.data.extend(atoms)
-            except AttributeError:
-                raise TypeError('`atoms={!r}` '.format(atoms) +
-                                'is not a valid `AtomList` constructor '
-                                'argument.\n `atoms` must be `None`, a list '
-                                'of `Atom` objects, or an `AtomList` '
-                                'instance.')
-
-    def __eq__(self, other):
-        return self[:] == other[:]
-
-    def __lt__(self, other):
-        return self[:] < other[:]
-
-    def __delitem__(self, index):
-        """Concrete implementation of @abstractmethod.
-
-        Delete list element `self[index]`.
-
-        Parameters
-        ----------
-        index : int
-            index of target list element
-
-        """
-        del self.data[index]
-
-    def __getitem__(self, index):
-        """Concrete implementation of @abstractmethod.
-
-        Get `Atom` object instance at list element `self[index]`
-
-        Parameters
-        ----------
-        index : int
-            index of target list element
-
-        Returns
-        -------
-        `Atom`
-            `Atom` instance at target `self[index]`
-
-        """
-        return self.data[index]
-
-    def __setitem__(self, index, atom):
-        """Concrete implementation of @abstractmethod.
-
-        set target list element `self[index] = atom`
-
-        Parameters
-        ----------
-        index : int
-            index of target list element
-        atom : `Atom`
-            `Atom` instance object to set target list element to.
-
-        """
-        self.data[index] = atom
-
-    def __len__(self):
-        """Concrete implementation of @abstractmethod.
-
-        Returns
-        -------
-        int
-            length of `self` list.
-
-        """
-        return len(self.data)
-
-    def insert(self, index, atom):
-        """Concrete implementation of @abstractmethod.
-
-        insert `Atom` instance at target list `index`
-
-        Parameters
-        ----------
-        index : int
-            index of target list element
-        atom : `Atom`
-            `Atom` object instance to set target list element to
-
-        """
-        self.data.insert(index, atom)
-
-    def clear(self):
-        self.data = []
+        super(AtomList, self).__init__(initlist=atoms,
+                                       copylist=copylist,
+                                       deepcopy=deepcopy)
 
 
-@total_ordering
-class BondList(MutableSequence):
+class BondList(UserList):
     """Base class for collection of atom `Bonds`.
 
     Parameters
@@ -149,104 +198,6 @@ class BondList(MutableSequence):
 
     """
     def __init__(self, bonds=None, copylist=True, deepcopy=False):
-        self.data = []
-
-        if bonds is not None:
-            try:
-                if copylist and not deepcopy:
-                    self.data.extend(bonds[:])
-                elif deepcopy:
-                    self.data.extend(copy.deepcopy(bonds))
-                else:
-                    self.data.extend(bonds)
-            except AttributeError:
-                raise TypeError('`bonds={!r}` '.format(bonds) +
-                                'is not a valid `Bonds` constructor '
-                                'argument.\n bonds must be `None`, a list '
-                                'of `Bond` objects, or a `Bonds` object '
-                                'instance.')
-
-    def __eq__(self, other):
-        return self[:] == other[:]
-
-    def __lt__(self, other):
-        return self[:] < other[:]
-
-    def __delitem__(self, index):
-        """Concrete implementation of @abstractmethod.
-
-        Delete list element `self[index]`.
-
-        Parameters
-        ----------
-        index : int
-            index of target list element
-
-        """
-        del self.data[index]
-
-    def __getitem__(self, index):
-        """Concrete implementation of @abstractmethod.
-
-        Get `Bond` object instance at list element `self[index]`
-
-        Parameters
-        ----------
-        index : int
-            index of target list element
-
-        Returns
-        -------
-        `Bond`
-            `Bond` instance at target `self[index]`
-
-        """
-        return self.data[index]
-
-    def __setitem__(self, index, bond):
-        """Concrete implementation of @abstractmethod.
-
-        set target list element `self[index] = bond`
-
-        Parameters
-        ----------
-        index : int
-            index of target list element
-        bond : `Bond`
-            `Bond` instance object to set target list element to.
-
-        """
-        self.data[index] = bond
-
-    def __len__(self):
-        """Concrete implementation of @abstractmethod.
-
-        Returns
-        -------
-        int
-            length of `self` list.
-
-        """
-        return len(self.data)
-
-    def insert(self, index, bond):
-        """Concrete implementation of @abstractmethod.
-
-        insert `Bond` instance at target list `index`
-
-        Parameters
-        ----------
-        index : int
-            index of target list element
-        bond : `Bond`
-            `Bond` object instance to set target list element to
-
-        """
-        self.data.insert(index, bond)
-
-    def clear(self):
-        self.data = []
-
-
-class BondDict(OrderedDict):
-    pass
+        super(BondList, self).__init__(initlist=bonds,
+                                       copylist=copylist,
+                                       deepcopy=deepcopy)
