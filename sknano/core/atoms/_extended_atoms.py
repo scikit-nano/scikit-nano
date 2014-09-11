@@ -70,6 +70,8 @@ class XAtoms(Atoms):
     @property
     def atom_ids(self):
         """Return array of `XAtom` IDs."""
+        if len(set([atom.atomID for atom in self])) != self.Natoms:
+            self.assign_unique_ids()
         return np.asarray([atom.atomID for atom in self])
 
     @property
