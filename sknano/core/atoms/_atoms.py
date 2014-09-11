@@ -100,28 +100,22 @@ class Atoms(AtomList):
 
     @property
     def x(self):
-        """Return x coordinates of `Atom` objects as array."""
+        """Return :math:`x` coordinates of `Atom` objects as array."""
         return self.coords[:,0]
 
     @property
     def y(self):
-        """Return y coordinates of `Atom` objects as array."""
+        """Return :math:`y` coordinates of `Atom` objects as array."""
         return self.coords[:,1]
 
     @property
     def z(self):
-        """Return z coordinates of `Atom` objects as array."""
+        """Return :math:`z` coordinates of `Atom` objects as array."""
         return self.coords[:,2]
 
     @property
     def bounds(self):
         """Return bounds of `Atoms`."""
-        #dx = np.abs(self.x.max() - self.x.min())
-        #dy = np.abs(self.y.max() - self.y.min())
-        #dz = np.abs(self.z.max() - self.z.min())
-        #if np.close(dx, 0.0) or np.close(dy, 0.0) or np.close(dz, 0.0):
-        #    if np.close(dx, 0.0):
-        #    #bounds = Rectangle(
         return Cuboid(pmin=[self.x.min(), self.y.min(), self.z.min()],
                       pmax=[self.x.max(), self.y.max(), self.z.max()])
 
