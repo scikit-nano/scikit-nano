@@ -9,30 +9,27 @@ Core package code for development and general use (:mod:`sknano.core`)
 Contents
 ========
 
-Core package helper functions
+Core meta functions/classes
 ------------------------------
 .. autosummary::
    :toctree: generated/
 
    check_type
+   deprecated
    get_object_signature
    memoize
    method_function
+   timethis
+
    methodfunc
-
-Decorator functions
---------------------
-.. autosummary::
-   :toctree: generated/
-
-   deprecated
    with_doc
 
-Functions for file I/O
------------------------
+I/O functions
+--------------
 .. autosummary::
    :toctree: generated/
 
+   get_fname
    get_fpath
 
 Functions for string manipulation
@@ -40,7 +37,7 @@ Functions for string manipulation
 .. autosummary::
    :toctree: generated/
 
-   plural_word_check
+   pluralize
 
 Sub-packages
 ------------
