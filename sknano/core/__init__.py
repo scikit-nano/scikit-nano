@@ -55,11 +55,9 @@ Sub-packages
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from ._core import *
 from ._extras import *
-from ._decorators import *
-from ._iofuncs import *
-from ._strfuncs import *
-from ._warnings import *
+from ._io import *
+from ._meta import *
+from ._strings import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
