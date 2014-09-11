@@ -14,6 +14,7 @@ import itertools
 
 import numpy as np
 
+from sknano.core import xyz
 from sknano.core.refdata import CCbond
 
 from ._defect_generators import CrossLinkedDefectGenerator, \
@@ -378,6 +379,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
         self._vac_type = vac_type
         self._vmd_selection_radius = vmd_selection_radius
         self._show_vmd_selection_cmd = show_vmd_selection_cmd
+        bin_axis_index = xyz.index(bin_axis)
 
         if uniform:
             if Ntubes is None:
@@ -400,8 +402,8 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                 bin_sets.append(np.arange(n, Nvac_sites, Ntubes))
             bin_set_iter = itertools.cycle((bin_sets))
 
-            vac_bin_edges = np.linspace(self._atom_coords[bin_axis].min(),
-                                        self._atom_coords[bin_axis].max(),
+            vac_bin_edges = np.linspace(self._atom_coords.T[bin_axis].min(),
+                                        self._atom_coords.T[bin_axis].max(),
                                         num=nbins+1)
             vac_coords_along_bin_axis = \
                 vac_bin_edges[:-1] + np.diff(vac_bin_edges) / 2
@@ -427,9 +429,8 @@ class NanotubeVacancyGenerator(VacancyGenerator):
 
                 tube_atom_ids = self._atom_ids[tube_atom_indices]
 
-                tube_coords = self._atoms.get_filtered_coords(tube_atom_ids,
-                                                              asdict=True,
-                                                              invert=False)
+                tube_coords = self._atoms.filter_ids(tube_atom_ids,
+                                                     invert=False).coords
 
                 if self._verbose:
                     print('tube n: {:d}'.format(i + 1))
@@ -439,7 +440,8 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                 bin_set = bin_set_iter.next()
                 for vac_pos in vac_coords_along_bin_axis[bin_set]:
                     candidate_vac_atom_indices = \
-                        np.where(np.abs(tube_coords[bin_axis] - vac_pos) <= 1)
+                        np.where(np.abs(tube_coords.T[bin_axis_index] -
+                                        vac_pos) <= 1)
                     candidate_vac_atom_ids = \
                         tube_atom_ids[candidate_vac_atom_indices]
 

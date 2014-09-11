@@ -259,7 +259,7 @@ class VacancyGenerator(DefectGenerator):
 
     def _generate_single_vacancies(self):
         self._removed_atoms = \
-            self._atoms.filter_atoms(self._vac_ids, invert=False)
+            self._atoms.filter_ids(self._vac_ids, invert=False)
 
     def _generate_multi_vacancies(self):
         vac_type_properties = {'double': {'cluster_size': 2,
@@ -273,13 +273,13 @@ class VacancyGenerator(DefectGenerator):
 
         vac_atoms = Atoms()
         for vac_id in self._vac_ids:
-            vac_atom = self._atoms.get_atom(atomID=vac_id)
+            vac_atom = self._atoms.get_atom(vac_id)
             vac_atoms.append(vac_atom)
             vac_atoms.extend(np.random.choice(vac_atom.NN,
                                               size=self._cluster_size-1,
                                               replace=False).tolist())
         self._removed_atoms = \
-            self._atoms.filter_atoms(vac_atoms.atom_ids, invert=False)
+            self._atoms.filter_ids(vac_atoms.atom_ids, invert=False)
 
     def _generate_vacancy_structure(self):
         """Generate vacancy structure."""
@@ -294,7 +294,7 @@ class VacancyGenerator(DefectGenerator):
         self._Nvacs = self._removed_atoms.Natoms
 
         self._remaining_atoms = \
-            self._atoms.filter_atoms(self._removed_atoms.atom_ids, invert=True)
+            self._atoms.filter_ids(self._removed_atoms.atom_ids, invert=True)
         #remaining_atoms.assign_unique_ids()
 
         self._save_vacancy_structure_data()

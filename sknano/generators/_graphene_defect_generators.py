@@ -14,6 +14,7 @@ import itertools
 
 import numpy as np
 
+from sknano.core import xyz
 from sknano.core.refdata import CCbond
 
 from ._defect_generators import DefectGenerator, VacancyGenerator
@@ -262,6 +263,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
         self._vac_type = vac_type
         self._vmd_selection_radius = vmd_selection_radius
         self._show_vmd_selection_cmd = show_vmd_selection_cmd
+        bin_axis_index = xyz.index(bin_axis)
 
         if uniform:
             # find the coords of each layer
@@ -279,8 +281,8 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                 bin_sets.append(np.arange(n, nbins, Nlayers))
             bin_set_iter = itertools.cycle((bin_sets))
 
-            bin_edges = np.linspace(self._atom_coords[bin_axis].min(),
-                                    self._atom_coords[bin_axis].max(),
+            bin_edges = np.linspace(self._atom_coords.T[bin_axis_index].min(),
+                                    self._atom_coords.T[bin_axis_index].max(),
                                     num=nbins+1)
 
             bin_mid_pts = bin_edges[:-1] + np.diff(bin_edges) / 2
@@ -311,7 +313,8 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                             (self._atom_coords[ortho_axis] <=
                              (self._atom_coords[ortho_axis].max() - 2.5)) &
                             (np.abs(self._atom_coords['y'] - y) <= 0.5) &
-                            (np.abs(self._atom_coords[bin_axis] - vac_pos)
+                            (np.abs(self._atom_coords.T[bin_axis_index] -
+                                    vac_pos)
                                 <= 1))
                     candidate_vac_atom_ids = \
                         self._atom_ids[candidate_vac_atom_indices]
