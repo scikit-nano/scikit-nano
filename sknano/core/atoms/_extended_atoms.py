@@ -12,11 +12,9 @@ An "eXtended" `Atoms` class for structure analysis.
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from collections import OrderedDict
 from operator import attrgetter
 
 import numpy as np
-from sknano.core import xyz
 from ._atoms import Atoms
 
 __all__ = ['XAtoms']
@@ -43,8 +41,6 @@ class XAtoms(Atoms):
                                      copylist=copylist,
                                      deepcopy=deepcopy)
         self._atomtypes = {}
-        self._update_atomtypes()
-        self.assign_unique_ids()
 
     def sort(self, key=None, reverse=False):
         if key is None:
@@ -126,12 +122,12 @@ class XAtoms(Atoms):
         for i, atom in enumerate(self, start=starting_id):
             atom.atomID = i
 
-    def filter_atoms(self, filter_atom_ids, invert=False):
-        """Filter `XAtoms`.
+    def filter_ids(self, atom_ids, invert=False):
+        """Return `Atoms` by :attr:`XAtoms.atom_ids` in `atom_ids`.
 
         Parameters
         ----------
-        filter_atom_ids : array_like
+        filter_ids : array_like
         invert : bool, optional
 
         Returns
@@ -139,9 +135,10 @@ class XAtoms(Atoms):
         filtered_atoms : `XAtoms`
 
         """
-        filter_indices = \
-            np.in1d(self.atom_ids, filter_atom_ids, invert=invert).nonzero()
-        return XAtoms(np.asarray(self)[filter_indices].tolist())
+        filtered_atoms = \
+            np.asarray(self)[np.in1d(
+                self.atom_ids, atom_ids, invert=invert).nonzero()].tolist()
+        return self.__class__(atoms=filtered_atoms)
 
     def get_atom(self, atomID):
         try:
@@ -149,55 +146,6 @@ class XAtoms(Atoms):
         except TypeError:
             print('No atom with atomID = {}'.format(atomID))
             return None
-
-    def get_filtered_atom_ids(self, filter_atom_ids, invert=False):
-        """Return atom ids filtered by list of `filter_atom_ids`.
-
-        Parameters
-        ----------
-        invert : bool, optional
-
-        Returns
-        -------
-        ndarray
-
-        """
-        filter_indices = \
-            np.in1d(self.atom_ids, filter_atom_ids, invert=invert).nonzero()
-        return self.atom_ids[filter_indices]
-
-    def get_filtered_coords(self, filter_atom_ids, components=None,
-                            asdict=False, invert=False):
-        """Return filtered coordinates filtered by filter_atom_ids.
-
-        Parameters
-        ----------
-        filter_atom_ids : array_like
-        components : {None, sequence}, optional
-        asdict : bool, optional
-        invert : bool, optional
-
-        Returns
-        -------
-        filtered_coords : :py:class:`python:~collections.OrderedDict` or
-        ndarray
-
-        """
-        filter_indices = \
-            np.in1d(self.atom_ids, filter_atom_ids, invert=invert).nonzero()
-        filtered_coords = self.coords[filter_indices]
-
-        if components is None or components == 'r':
-            components = ('x', 'y', 'z')
-        elif isinstance(components, (str, unicode)):
-            components = (components,)
-
-        if asdict:
-            return OrderedDict(zip(components,
-                                   [filtered_coords[:, xyz.index(component)]
-                                    for component in components]))
-        else:
-            filtered_coords
 
     def select(self, **kwargs):
         pass

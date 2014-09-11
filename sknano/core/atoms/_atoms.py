@@ -53,7 +53,7 @@ class Atoms(AtomList):
 
         if key is None:
             self.data.sort(key=attrgetter('element', 'Z', 'z'),
-                            reverse=reverse)
+                           reverse=reverse)
         else:
             self.data.sort(key=key, reverse=reverse)
 
@@ -157,6 +157,21 @@ class Atoms(AtomList):
 
         if CM0 is not None:
             self.translate(CM0)
+
+    def filter(self, condition, invert=False):
+        """Filter `Atoms` by `condition`.
+
+        Parameters
+        ----------
+        condition : array_like, bool
+        invert : bool, optional
+
+        Returns
+        -------
+        filtered_atoms : `Atoms`
+
+        """
+        return self.__class__(atoms=np.asarray(self)[condition].tolist())
 
     def get_atoms(self, asarray=False):
         """Return list of `Atoms`.
