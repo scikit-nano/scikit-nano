@@ -139,14 +139,12 @@ class XAtoms(Atoms):
             np.in1d(self.atom_ids, filter_atom_ids, invert=invert).nonzero()
         return XAtoms(np.asarray(self)[filter_indices].tolist())
 
-    def get_atom(self, atomID=None, index=None):
+    def get_atom(self, atomID):
         try:
-            return self[atomID - 1]
-        except (TypeError, IndexError):
-            try:
-                return self[index]
-            except (TypeError, IndexError):
-                return None
+            return self[np.where(self.atom_ids == atomID)[0]]
+        except TypeError:
+            print('No atom with atomID = {}'.format(atomID))
+            return None
 
     def get_filtered_atom_ids(self, filter_atom_ids, invert=False):
         """Return atom ids filtered by list of `filter_atom_ids`.
