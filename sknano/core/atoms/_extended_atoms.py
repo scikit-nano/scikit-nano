@@ -43,14 +43,16 @@ class XAtoms(Atoms):
                                      copylist=copylist,
                                      deepcopy=deepcopy)
         self._atomtypes = {}
+        self._update_atomtypes()
+        self.assign_unique_ids()
 
     def sort(self, key=None, reverse=False):
         if key is None:
-            self._data.sort(key=attrgetter('element', 'Z', 'atomtype',
-                                           'moleculeID', 'atomID'),
-                            reverse=reverse)
+            self.data.sort(key=attrgetter('element', 'Z', 'atomtype',
+                                          'moleculeID', 'atomID'),
+                           reverse=reverse)
         else:
-            self._data.sort(key=key, reverse=reverse)
+            self.data.sort(key=key, reverse=reverse)
 
     @property
     def atomtypes(self):
