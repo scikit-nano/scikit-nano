@@ -12,6 +12,7 @@ def test1():
     atoms = generate_atoms(generator_class='SWNTGenerator', n=3, m=3, nz=5)
 
     atoms.assign_unique_ids()
+    atoms.update_attrs()
     atoms.kNN = 3
     atoms.NNrc = 2.0
     NNlist = atoms.nearest_neighbors

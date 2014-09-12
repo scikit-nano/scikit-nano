@@ -36,7 +36,7 @@ def test3():
     atoms = SWNTGenerator(n=20, m=0, nz=2).atoms
     assert_equal(atoms.Natoms, 160)
     atoms.assign_unique_ids()
-    atoms.update_nearest_neighbors()
+    atoms.update_attrs()
     print(np.degrees(atoms.bonds.mean_length))
     #print(np.degrees(atoms.bonds.mean_angle))
     atom0 = atoms[0]

@@ -55,6 +55,8 @@ def test_atom_tree():
 def test_structure_analysis():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
+    atoms.assign_unique_ids()
+    atoms.update_attrs()
     assert_equals(atoms.Natoms, 400)
 
     atoms = KDTAtoms(atoms=atoms)
@@ -82,6 +84,8 @@ def test_structure_analysis():
 def test_atom_selections():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
+    atoms.assign_unique_ids()
+    atoms.update_attrs()
     a200 = atoms.get_atom(200)
     assert_true(a200 is atoms[199])
     assert_true(a200 == atoms[199])
@@ -96,6 +100,8 @@ def test_atom_selections():
 def test_atom_bonds():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=20, m=10, nz=2)
+    atoms.assign_unique_ids()
+    atoms.update_attrs()
     atoms.NNrc = 2.0
     bonds = atoms.bonds
     #print('bonds: {!s}'.format(bonds))
@@ -116,14 +122,19 @@ def test_structure_data():
     swnt = SWNTGenerator(n=10, m=5, nz=5)
     #swnt.save_data(fname=fname, structure_format='data')
     data = DATAReader(fname)
+    atoms = data.atoms
+    atoms.assign_unique_ids()
+    atoms.update_attrs()
     assert_equals(swnt.atoms.Natoms, data.atoms.Natoms)
 
 
 def test_pyramidalization_angles():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=20, m=10, nz=2)
+    atoms.assign_unique_ids()
+    atoms.update_attrs()
     #atoms.NNrc = 2.0
-    atoms.update_pyramidalization_angles()
+    atoms.update_attrs()
 
     for i, atom in enumerate(atoms):
         try:
@@ -139,7 +150,8 @@ def test_pyramidalization_angles():
 def test_poma():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    #atoms.update_pyramidalization_angles()
+    atoms.assign_unique_ids()
+    atoms.update_attrs()
     print('misalignment_angles: {}'.format(np.degrees(
         atoms.mean_nonzero_poma)))
 
@@ -156,6 +168,8 @@ def test_poma():
 
 def test_list_mods():
     atoms = generate_atoms(elements='periodic_table')
+    atoms.assign_unique_ids()
+    #atoms.update_attrs()
     print(atoms)
 
 
