@@ -48,6 +48,9 @@ class XAtom(Atom):
         :math:`n_x, n_y, n_z` image flags
 
     """
+    attributes = Atom.attributes + \
+        ['atomID', 'moleculeID', 'atomtype', 'q', 'v', 'vx', 'vy', 'vz',
+         'n', 'nx', 'ny', 'nz']
 
     def __init__(self, element=None, atomID=0, moleculeID=0, atomtype=1,
                  q=0., m=None, mass=None, x=None, y=None, z=None,
@@ -65,8 +68,6 @@ class XAtom(Atom):
         self._moleculeID = int(moleculeID)
         self._atomtype = int(atomtype)
         self._q = q
-
-        self._attributes.extend(['q','v', 'atomID', 'moleculeID', 'atomtype'])
 
     def __repr__(self):
         """Return string representation of `XAtom`."""

@@ -17,13 +17,13 @@ import numpy as np
 
 from sknano.core.math import vector as vec
 from ._extended_atoms import XAtoms
-from ._base import BondList
+from ._base import UserList
 #from ._bond import Bond
 
 __all__ = ['Bonds']
 
 
-class Bonds(BondList):
+class Bonds(UserList):
     """Base class for collection of atom `Bonds`.
 
     Parameters
@@ -37,7 +37,7 @@ class Bonds(BondList):
 
     """
     def __init__(self, bonds=None, copylist=True, deepcopy=False):
-        super(Bonds, self).__init__(bonds=bonds, copylist=copylist,
+        super(Bonds, self).__init__(initlist=bonds, copylist=copylist,
                                     deepcopy=deepcopy)
 
     def __str__(self):

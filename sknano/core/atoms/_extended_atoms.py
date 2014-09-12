@@ -34,6 +34,9 @@ class XAtoms(Atoms):
         perform deepcopy of atoms list
 
     """
+    atomattrs = Atoms.atomattrs + \
+        ['atomID', 'moleculeID', 'atomtype', 'q', 'v', 'vx', 'vy', 'vz',
+         'n', 'nx', 'ny', 'nz']
 
     def __init__(self, atoms=None, copylist=True, deepcopy=False):
 
@@ -147,8 +150,19 @@ class XAtoms(Atoms):
             print('No atom with atomID = {}'.format(atomID))
             return None
 
-    def select(self, **kwargs):
-        pass
+    def getatomattr(self, attr):
+        if attr not in self.atomattrs:
+            errmsg = '{} not in list of allowed attributes:\n{}'
+            raise ValueError(errmsg.format(attr, self.atomattrs))
+        return np.asarray([getattr(atom, attr) for atom in self])
+
+    #def select(self, cmd):
+    #    cmdsplit =
+    #    if cmd.lower().startswith('with attr'):
+    #        if attr not in self.attributes:
+    #            errmsg = '{} not in list of allowed attributes:\n{}'
+    #            raise ValueError(errmsg.format(attr, self.attributes))
+    #        return np.asarray([getattr(atom, attr) for atom in self])
 
     def select_within(self, volume):
         pass

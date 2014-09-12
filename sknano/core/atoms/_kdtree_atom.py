@@ -32,6 +32,9 @@ class KDTAtom(XAtom):
         List of nearest-neighbor `KDTAtom` objects instances
 
     """
+    attributes = XAtom.attributes + \
+        ['CN', 'NN', 'bonds', 'pyramidalization_angle', 'sigma_bond_angle',
+         'poav', 'poma', 'mean_poma']
 
     def __init__(self, **kwargs):
         super(KDTAtom, self).__init__(**kwargs)

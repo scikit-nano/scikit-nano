@@ -38,6 +38,9 @@ __all__ = ['KDTAtoms']
 
 class KDTAtoms(XAtoms):
     """An `Atoms` class for KDTree analysis."""
+    atomattrs = XAtoms.atomattrs + \
+        ['CN', 'NN', 'bonds', 'pyramidalization_angle', 'sigma_bond_angle',
+         'poav', 'poma', 'mean_poma']
 
     def __init__(self, **kwargs):
 

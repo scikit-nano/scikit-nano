@@ -37,6 +37,7 @@ class Atom(object):
         :math:`x, y, z` coordinates of `Atom`.
 
     """
+    attributes = ['symbol', 'Z', 'm', 'r', 'x', 'y', 'z']
 
     def __init__(self, element=None, m=None, x=None, y=None, z=None):
 
@@ -76,8 +77,6 @@ class Atom(object):
         #self._p0 = Point([x, y, z])
         self._dr = Vector(np.zeros(3), p0=[x, y, z])
 
-        self._attributes = ['symbol', 'Z', 'm', 'r']
-
     def __str__(self):
         """Return string representation of atom."""
         return repr(self)
@@ -91,7 +90,7 @@ class Atom(object):
         if self is other:
             return True
         else:
-            for p in self._attributes:
+            for p in self.attributes:
                 if getattr(self, p) != getattr(other, p):
                     return False
             return True

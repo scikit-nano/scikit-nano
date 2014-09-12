@@ -18,12 +18,12 @@ import numpy as np
 from sknano.core import xyz
 from sknano.core.math import Vector, transformation_matrix
 from sknano.utils.geometric_shapes import Cuboid  # , Rectangle
-from ._base import AtomList
+from ._base import UserList
 
 __all__ = ['Atoms']
 
 
-class Atoms(AtomList):
+class Atoms(UserList):
     """Base class for collection of `Atom` objects.
 
     Parameters
@@ -37,9 +37,11 @@ class Atoms(AtomList):
         perform deepcopy of atoms list
 
     """
+    atomattrs = ['symbol', 'Z', 'm', 'r', 'x', 'y', 'z', 'dr']
 
     def __init__(self, atoms=None, copylist=True, deepcopy=False):
-        super(Atoms, self).__init__(atoms=atoms, copylist=copylist,
+        super(Atoms, self).__init__(initlist=atoms,
+                                    copylist=copylist,
                                     deepcopy=deepcopy)
 
     def __str__(self):
