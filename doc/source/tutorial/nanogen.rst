@@ -1,22 +1,26 @@
-================================
-Nanostructure Generator classes
-================================
+==========================================
+scikit-nano structure generator classes
+==========================================
 
 .. sectionauthor:: Andrew Merrill <androomerrill@gmail.com>
 
-The :py:mod:`~sknano.nanogen` module provides the following
+The :py:mod:`~sknano.generators` module provides the following
 classes for generating nanostructures:
 
+Fullerene Structure Generators
+=================================
+* :py:class:`~sknano.generators.FullereneGenerator`
+
 Graphene Structure Generators
-=============================
-* :py:class:`~sknano.nanogen.GrapheneGenerator`
-* :py:class:`~sknano.nanogen.BiLayerGrapheneGenerator`
+=================================
+* :py:class:`~sknano.generators.GrapheneGenerator`
+* :py:class:`~sknano.generators.BilayerGrapheneGenerator`
+* :py:class:`~sknano.generators.UnrolledSWNTGenerator`
 
 Nanotube Structure Generators
-=============================
+=================================
 
-* :py:class:`~sknano.nanogen.NanotubeGenerator`
-* :py:class:`~sknano.nanogen.NanotubeBundleGenerator`
-* :py:class:`~sknano.nanogen.MWNTGenerator`
-* :py:class:`~sknano.nanogen.MWNTBundleGenerator`
-* :py:class:`~sknano.nanogen.TubeGen`
+* :py:class:`~sknano.generators.SWNTGenerator`
+* :py:class:`~sknano.generators.SWNTBundleGenerator`
+* :py:class:`~sknano.generators.MWNTGenerator`
+* :py:class:`~sknano.generators.MWNTBundleGenerator`
