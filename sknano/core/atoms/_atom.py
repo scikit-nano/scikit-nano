@@ -37,7 +37,7 @@ class Atom(object):
         :math:`x, y, z` coordinates of `Atom`.
 
     """
-    attributes = ['symbol', 'Z', 'm', 'r', 'x', 'y', 'z']
+    _atomattrs = ['symbol', 'Z', 'm', 'r', 'x', 'y', 'z']
 
     def __init__(self, element=None, m=None, x=None, y=None, z=None):
 
@@ -90,7 +90,7 @@ class Atom(object):
         if self is other:
             return True
         else:
-            for p in self.attributes:
+            for p in self._atomattrs:
                 if getattr(self, p) != getattr(other, p):
                     return False
             return True

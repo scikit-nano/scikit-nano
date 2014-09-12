@@ -32,7 +32,7 @@ class KDTAtom(XAtom):
         List of nearest-neighbor `KDTAtom` objects instances
 
     """
-    attributes = XAtom.attributes + \
+    _atomattrs = XAtom._atomattrs + \
         ['CN', 'NN', 'bonds', 'pyramidalization_angle', 'sigma_bond_angle',
          'poav', 'poma']
 

@@ -48,7 +48,7 @@ class XAtom(Atom):
         :math:`n_x, n_y, n_z` image flags
 
     """
-    attributes = Atom.attributes + \
+    _atomattrs = Atom._atomattrs + \
         ['atomID', 'moleculeID', 'atomtype', 'q', 'v', 'vx', 'vy', 'vz',
          'n', 'nx', 'ny', 'nz']
 
