@@ -34,7 +34,7 @@ class KDTAtom(XAtom):
     """
     attributes = XAtom.attributes + \
         ['CN', 'NN', 'bonds', 'pyramidalization_angle', 'sigma_bond_angle',
-         'poav', 'poma', 'mean_poma']
+         'poav', 'poma']
 
     def __init__(self, **kwargs):
         super(KDTAtom, self).__init__(**kwargs)
@@ -46,7 +46,7 @@ class KDTAtom(XAtom):
         self._sigma_bond_angle = None
         self.poav = None
         self.poma = []
-        self.mean_poma = None
+        #self.mean_poma = None
 
     def __str__(self):
         """Return a nice string representation of `KDTAtom`."""
