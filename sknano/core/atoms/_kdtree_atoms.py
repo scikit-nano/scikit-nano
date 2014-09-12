@@ -38,7 +38,7 @@ __all__ = ['KDTAtoms']
 
 class KDTAtoms(XAtoms):
     """An `Atoms` class for KDTree analysis."""
-    atomattrs = XAtoms.atomattrs + \
+    _atomattrs = XAtoms._atomattrs + \
         ['CN', 'NN', 'bonds', 'pyramidalization_angle', 'sigma_bond_angle',
          'poav', 'poma']
 

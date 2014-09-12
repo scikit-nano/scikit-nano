@@ -36,8 +36,9 @@ class Atoms(UserList):
     deepcopy : bool, optional
         perform deepcopy of atoms list
 
+
     """
-    atomattrs = ['symbol', 'Z', 'm', 'r', 'x', 'y', 'z', 'dr']
+    _atomattrs = ['symbol', 'Z', 'm', 'r', 'x', 'y', 'z', 'dr']
 
     def __init__(self, atoms=None, copylist=True, deepcopy=False):
         super(Atoms, self).__init__(initlist=atoms,
