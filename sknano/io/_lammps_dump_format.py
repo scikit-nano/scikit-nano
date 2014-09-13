@@ -16,10 +16,11 @@ import numpy as np
 
 from sknano.core import get_fpath
 
-from ._base import Atom, StructureIO, StructureIOError, StructureFormat, \
+from ._base import Atom, StructureIO, StructureIOError, StructureFormatSpec, \
     default_comment_line
 
-__all__ = ['DUMPData', 'DUMPReader', 'DUMPWriter', 'DUMPError', 'DUMPFormat']
+__all__ = ['DUMPData', 'DUMPReader', 'DUMPWriter', 'DUMPIOError',
+           'DUMPFormatSpec']
 
 
 class DUMPReader(StructureIO):
@@ -29,204 +30,22 @@ class DUMPReader(StructureIO):
     ----------
     fpath : str
         LAMMPS dump file path
-    atom_style : {'full', 'atomic'}, optional
 
     """
-    def __init__(self, fpath=None, atom_style='full'):
-        super(DUMPReader, self).__init__(fpath=fpath)
+    def __init__(self, fpath=None, **kwargs):
+        super(DUMPReader, self).__init__(fpath=fpath, **kwargs)
 
-        dump_format = DUMPFormat(atom_style=atom_style)
-        self._dump_headers = dump_format.properties['headers']
-        self._dump_sections = dump_format.properties['sections']
-        self._section_properties = dump_format.section_properties
-        self._section_syntax_dict = dump_format.section_syntax_dict
-
-        self._headers = {}
-        self._sections = {}
-        self._boxbounds = {}
-
-        if fpath is not None:
+        if self.fpath is not None:
             self.read()
-
-    @property
-    def headers(self):
-        """DUMP file headers."""
-        return self._headers
-
-    @property
-    def sections(self):
-        """DUMP file sections."""
-        return self._sections
-
-    @property
-    def boxbounds(self):
-        """Box bounds."""
-        return self._boxbounds
 
     def read(self):
         """Read dump file."""
-        with open(self.fpath, 'r') as f:
-            self._comment_line = f.readline().strip()
-
-            while True:
-                line = f.readline().strip()
-                if len(line) == 0:
-                    continue
-                found = False
-                for key in self._dump_headers.iterkeys():
-                    if key in line:
-                        found = True
-                        self._headers[key] = \
-                            [self._dump_headers[key]['dtype'](s) for s in
-                                [[ss for ss in line.split()][i] for i in
-                                 range(self._dump_headers[key]['items'])]]
-                        if len(self._headers[key]) == 1:
-                            # since the list contains only one element,
-                            # replace list value with element 0
-                            self._headers[key] = self._headers[key][0]
-                        break
-                if not found:
-                    break
-
-            while True:
-                found = False
-                for section_key, header_key in self._dump_sections.iteritems():
-                    if section_key in line:
-                        found = True
-                        f.readline()
-                        Nitems = self._headers[header_key]
-                        dumpdata = []
-                        for n in xrange(Nitems):
-                            tmp = []
-                            line = f.readline().strip().split()
-                            for i, props in \
-                                enumerate(self._section_properties[
-                                    section_key].itervalues()):
-                                tmp.append(props['dtype'](line[i]))
-                            dumpdata.append(tmp)
-                        self._sections[section_key] = dumpdata[:]
-                        break
-                f.readline()
-                line = f.readline().strip()
-                if len(line) == 0:
-                    break
+        #with open(self.fpath, 'r') as f:
+        #    pass
 
         self._parse_atoms()
         self._parse_atomtypes()
         self._parse_boxbounds()
-
-    def _parse_atoms(self):
-        """Populate Atoms object with Atom objects"""
-        atoms_section = self._sections['Atoms']
-        atoms_section_syntax = self._section_syntax_dict['Atoms']
-
-        masses_section = self._sections['Masses']
-        masses_section_syntax = self._section_syntax_dict['Masses']
-
-        velocities_section = self._sections['Velocities']
-        velocities_section_syntax = self._section_syntax_dict['Velocities']
-
-        atom_kwargs = {'atomID': None, 'moleculeID': None,
-                       'q': None, 'atomtype': None, 'mass': None,
-                       'x': None, 'y': None, 'z': None,
-                       'vx': None, 'vy': None, 'vz': None}
-
-        for lmps_atom in atoms_section:
-            for kw in atom_kwargs.iterkeys():
-                if kw in atoms_section_syntax:
-                    atom_kwargs[kw] = \
-                        lmps_atom[
-                            self._section_properties['Atoms'][kw]['index']]
-                elif kw in masses_section_syntax:
-                    atomtype = \
-                        lmps_atom[
-                            self._section_properties[
-                                'Atoms']['atomtype']['index']]
-                    atom_kwargs[kw] = \
-                        masses_section[atomtype-1][
-                            self._section_properties['Masses'][kw]['index']]
-                elif kw in velocities_section_syntax and \
-                        len(velocities_section) == len(atoms_section):
-                    atomID = \
-                        lmps_atom[
-                            self._section_properties[
-                                'Atoms']['atomID']['index']]
-                    for velocity in velocities_section:
-                        velocity_atomID = \
-                            velocity[self._section_properties[
-                                'Velocities']['atomID']['index']]
-                        if velocity_atomID == atomID:
-                            atom_kwargs[kw] = \
-                                velocity[self._section_properties[
-                                    'Velocities'][kw]['index']]
-                else:
-                    print('unknown atom keyword: {}'.format(kw))
-
-            atom = Atom(**atom_kwargs)
-            self.atoms.append(atom)
-
-    def _parse_atomtypes(self):
-        Ntypes = self.atoms.Ntypes
-        atomtypes = self.atoms.atomtypes
-        if Ntypes != self._headers['atom types']:
-            for atomtype in xrange(1, self._headers['atom types'] + 1):
-                if atomtype not in atomtypes:
-                    mass = self._sections['Masses'][atomtype - 1][
-                        self._section_properties['Masses']['mass']['index']]
-                    self.atoms.add_atomtype(
-                        Atom(atomtype=atomtype, mass=mass))
-
-    def _parse_boxbounds(self):
-        for dim in ('x', 'y', 'z'):
-            bounds = \
-                self._headers[' '.join([dim + lim for lim in ('lo', 'hi')])]
-            self._boxbounds[dim] = {'min': bounds[0], 'max': bounds[-1]}
-
-    def get(self, section_key, colnum=None, colname=None, colindex=None):
-        """Return section with `section_key`.
-
-        Parameters
-        ----------
-        section_key : str
-        colnum : int, optional
-        colname : str, optional
-        colindex : int, optional
-
-        Returns
-        -------
-        sequence
-
-        """
-        section_data = None
-        try:
-            section_data = self._sections[section_key]
-            section_syntax = self._section_syntax_dict[section_key]
-        except KeyError as e:
-            print(e)
-        else:
-            try:
-                colidx = None
-                if colnum is not None:
-                    colidx = int(colnum - 1)
-                elif colname is not None:
-                    colidx = \
-                        self._section_properties[section_key][colname]['index']
-                elif colindex is not None:
-                    colidx = int(colindex)
-            except (KeyError, TypeError, ValueError) as e:
-                print(e)
-            else:
-                try:
-                    colname = section_syntax[colidx]
-                    coltype = \
-                        self._section_properties[section_key][colname]['dtype']
-                    section_data = \
-                        np.asarray(
-                            section_data, dtype=coltype)[:, colidx].tolist()
-                except TypeError:
-                    pass
-        finally:
-            return section_data
 
 
 class DUMPWriter(object):
@@ -234,8 +53,7 @@ class DUMPWriter(object):
 
     @classmethod
     def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
-              boxbounds=None, comment_line=None, assume_unique_atoms=False,
-              verbose=False):
+              comment_line=None, verbose=False, **kwargs):
         """Write structure dump to file.
 
         Parameters
@@ -253,10 +71,10 @@ class DUMPWriter(object):
         comment_line : str, optional
             A string written to the first line of `dump` file. If `None`,
             then it is set to the full path of the output `dump` file.
-        assume_unique_atoms : bool, optional
-            Check that each Atom in Atoms has a unique atomID. If the check
-            fails, then assign a unique atomID to each Atom.
-            If `assume_unique_atoms` is True, but the atomID's are not
+        assert_unique_ids : bool, optional
+            Check that each Atom in Atoms has a unique ID. If the check
+            fails, then assign a unique ID to each Atom.
+            If `assert_unique_ids` is True, but the ID's are not
             unique, LAMMPS will not be able to read the dump file.
         verbose : bool, optional
             verbose output
@@ -271,90 +89,12 @@ class DUMPWriter(object):
 
         atoms.rezero_coords()
 
-        atomtypes = atoms.atomtypes
-
-        Natoms = atoms.Natoms
-        Natoms_width = \
-            8 if len(str(Natoms)) <= 12 else len(str(Natoms)) + 4
-        Ntypes = atoms.Ntypes
-        Ntypes_width = Natoms_width
-
-        atomID_width = len(str(Natoms)) + 1
-        atomtype_width = len(str(Ntypes)) + 1
-
-        if not assume_unique_atoms and \
-                len(set(atoms.atom_ids)) != atoms.Natoms:
-            for atomID, atom in enumerate(atoms, start=1):
-                atom.atomID = atomID
-
-        if boxbounds is None:
-            boxbounds = {'x': {'min': None, 'max': None},
-                         'y': {'min': None, 'max': None},
-                         'z': {'min': None, 'max': None}}
-
-            for i, dim in enumerate(('x', 'y', 'z')):
-                boxbounds[dim]['min'] = atoms.coords[:, i].min()
-                boxbounds[dim]['max'] = atoms.coords[:, i].max()
-
-        lohi_width = 0
-        for dim in ('x', 'y', 'z'):
-            lohi_width = \
-                max(lohi_width, len('{:.6f} {:.6f}'.format(
-                    boxbounds[dim]['min'], boxbounds[dim]['max'])) + 4)
-
-        with open(fpath, 'w') as f:
-            f.write('# {}\n\n'.format(comment_line.lstrip('#').strip()))
-            f.write('{}atoms\n'.format(
-                '{:d}'.format(Natoms).ljust(Natoms_width)))
-            f.write('{}atom types\n\n'.format(
-                '{:d}'.format(Ntypes).ljust(Ntypes_width)))
-
-            for dim in ('x', 'y', 'z'):
-                f.write('{}{dim}lo {dim}hi\n'.format(
-                    '{:.6f} {:.6f}'.format(
-                        boxbounds[dim]['min'],
-                        boxbounds[dim]['max']).ljust(lohi_width),
-                    dim=dim))
-
-            f.write('\nMasses\n\n')
-            for atomtype, properties in atomtypes.iteritems():
-                f.write('{}{:.4f}\n'.format(
-                    '{:d}'.format(atomtype).ljust(Natoms_width),
-                    properties['mass']))
-
-            f.write('\nAtoms\n\n')
-            for atom in atoms:
-                line = ''
-                line += "{:>{}}".format(atom.atomID, atomID_width)
-                line += "{:>{}}".format(atom.moleculeID, 3)
-                line += "{:>{}}".format(atom.atomtype, atomtype_width)
-                line += "{:>{}}".format('{:.1f}'.format(atom.q), 4)
-                line += "{:>{}}".format('{:f}'.format(atom.x), 14)
-                line += "{:>{}}".format('{:f}'.format(atom.y), 14)
-                line += "{:>{}}".format('{:f}'.format(atom.z), 14)
-                line += "{:>{}}".format('{:d}'.format(atom.nx), 3)
-                line += "{:>{}}".format('{:d}'.format(atom.ny), 3)
-                line += "{:>{}}\n".format('{:d}'.format(atom.nz), 3)
-
-                f.write(line)
-
-            f.write('\nVelocities\n\n')
-            for atom in atoms:
-                line = ''
-                line += "{:>{}}".format(atom.atomID, atomID_width)
-                line += "{:>{}}".format('{:f}'.format(atom.vx), 14)
-                line += "{:>{}}".format('{:f}'.format(atom.vy), 14)
-                line += "{:>{}}\n".format('{:f}'.format(atom.vz), 14)
-
-                f.write(line)
-
 
 class Snap(object):
     pass
 
 
 class aselect(object):
-
     def __init__(self, data):
         self.data = data
 
@@ -371,52 +111,6 @@ class aselect(object):
             for i in xrange(s.Natoms):
                 s.aselect[i] = 1
             s.nselect = s.Natoms
-
-    def test(self, teststr, *args):
-        data = self.data
-        pattern = '\$\w*'
-        list = re.findall(pattern, teststr)
-        for item in list:
-            name = item[1:]
-            column = data.names[name]
-            insert = 'snap.atoms[i][{:d}]'.format(column)
-            teststr = teststr.replace(item, insert)
-        cmd = 'flag = ' + teststr
-        ccmd = compile(cmd, '', 'single')
-
-        if len(args) == 0:
-            for snap in data.snaps:
-                if not snap.tselect:
-                    continue
-                for i in xrange(snap.Natoms):
-                    if not snap.aselect[i]:
-                        continue
-                    exec ccmd
-                    if not flag:
-                        snap.aselect[i] = 0
-                        snap.nselect -= 1
-            for i in xrange(data.nsnaps):
-                if data.snaps[i].tselect:
-                    print('{}/{} atoms selected in first step {}'.format(
-                        data.snaps[i].nselect, data.snaps[i].natoms,
-                        data.snaps[i].time))
-                    break
-            for i in xrange(data.nsnaps - 1, -1, -1):
-                if data.snaps[i].tselect:
-                    print('{}/{} atoms selected in last step {}'.format(
-                        data.snaps[i].nselect, data.snaps[i].natoms,
-                        data.snaps[i].time))
-                    break
-        else:
-            n = data.findtime(args[0])
-            snap = data.snaps[n]
-            for i in xrange(snap.Natoms):
-                if not snap.aselect[i]:
-                    continue
-                exec ccmd
-                if not flag:
-                    snap.aselect[i] = 0
-                    snap.nselect -= 1
 
 
 class tselect(object):
@@ -463,21 +157,6 @@ class tselect(object):
         data.aselect.all()
         print('{}/{} snapshots selected'.format(data.nselect, data.nsnaps))
 
-    def test(self, teststr, *args):
-        data = self.data
-        snaps = data.snaps
-        cmd = 'flag = ' + teststr.replace('$t', 'snaps[i].time')
-        ccmd = compile(cmd, '', 'single')
-        for i in xrange(data.nsnaps):
-            if not snaps[i].tselect:
-                continue
-            exec ccmd
-            if not flag:
-                snaps[i].tselect = 0
-                data.nselect -= 1
-        data.aselect.all()
-        print('{}/{} snapshots selected'.format(data.nselect, data.nsnaps))
-
 
 class DUMPData(DUMPReader):
     """Class for reading and writing structure data in LAMMPS dump format.
@@ -487,21 +166,23 @@ class DUMPData(DUMPReader):
     fpath : str, optional
 
     """
-    def __init__(self, fpath=None):
-        super(DUMPData, self).__init__(fpath=fpath)
-        self._snaps = []
-        self._nsnaps = self._nselect = 0
-        self._names = {}
-        self._aselect = aselect(self)
-        self._tselect = tselect(self)
+    def __init__(self, files=None):
+        super(DUMPData, self).__init__()
+        self.snaps = []
+        self.nsnaps = self.nselect = 0
+        self.names = {}
+        self.aselect = aselect(self)
+        self.tselect = tselect(self)
 
-    def atom(self, n, l=[]):
+    def atom(self, n, fields=None):
         pass
 
     def read_all(self):
+        """Read all snapshots from each dump file."""
         pass
 
     def next(self):
+        """Read next snapshot from list of dump files."""
         pass
 
     def read_snapshot(self, f):
@@ -591,52 +272,6 @@ class DUMPData(DUMPReader):
     def maxtype(self):
         pass
 
-    def replace(self, section_key, new_data, colnum=None,
-                colname=None, colindex=None):
-        """Replace section data.
-
-        Parameters
-        ----------
-        section_key : str
-        new_data : sequence
-        colnum : int, optional
-        colname : str, optional
-        colindex : int, optional
-
-        """
-        colidx = None
-
-        # for backwards compatibility with the pizza.py dump module,
-        # first check positional arguments to see if this method was called
-        # using the pizza.py dump module signature which expects positional
-        # arguments of the following type:
-        #   data.replace(str, int, list)
-        if isinstance(new_data, (int, float)) and \
-                isinstance(colnum, (np.ndarray, list)):
-            colidx = int(new_data) - 1
-            new_data = np.asarray(colnum)
-        else:
-            try:
-                colidx = None
-                if colnum is not None:
-                    colidx = int(colnum - 1)
-                elif colname is not None:
-                    colidx = \
-                        self._section_properties[section_key][colname]['index']
-                elif colindex is not None:
-                    colidx = int(colindex)
-            except (KeyError, TypeError, ValueError) as e:
-                print(e)
-                raise DUMPError('replace called with invalid arguments')
-        atom_attr = self._section_syntax_dict[section_key][colidx]
-        attr_dtype = \
-            self._section_properties[section_key][atom_attr]['dtype']
-        new_data = np.asarray(new_data, dtype=attr_dtype)
-
-        for i, atom in enumerate(self.atoms):
-            self._sections[section_key][i][colidx] = attr_dtype(new_data[i])
-            setattr(atom, atom_attr, attr_dtype(new_data[i]))
-
     def write(self, dumpfile=None):
         """Write dump file.
 
@@ -657,28 +292,15 @@ class DUMPData(DUMPReader):
             else:
                 dumpfile = self.fpath
             DUMPWriter.write(fname=dumpfile, atoms=self.atoms,
-                             boxbounds=self._boxbounds,
-                             comment_line=self._comment_line)
+                             comment_line=self.comment_line)
         except (TypeError, ValueError) as e:
             print(e)
 
 
-class DUMPError(StructureIOError):
-    """Exception raised for failed method calls.
-
-    Parameters
-    ----------
-    msg : str
-        Error message
-
-    """
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return repr(self.msg)
+class DUMPIOError(StructureIOError):
+    pass
 
 
-class DUMPFormat(StructureFormat):
+class DUMPFormatSpec(StructureFormatSpec):
     """Class defining the structure file format for LAMMPS dump."""
     pass
