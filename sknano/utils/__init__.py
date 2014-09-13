@@ -6,9 +6,6 @@ Utility modules for analysis, testing, and general use (:mod:`sknano.utils`)
 
 .. currentmodule:: sknano.utils
 
-Contents
-========
-
 Sub-packages
 ============
 .. autosummary::
