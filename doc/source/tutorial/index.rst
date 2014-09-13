@@ -10,4 +10,5 @@ For now, please see the module doc pages for examples to help get you started.
 .. toctree::
    :maxdepth: 1
 
-   nanogen.rst
+   generators.rst
+   analysis.rst
