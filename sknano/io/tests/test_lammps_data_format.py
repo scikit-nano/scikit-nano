@@ -9,9 +9,11 @@ from sknano.io import DATAData, DATAReader, DATAWriter, DATA2XYZConverter
 
 
 def test_reader():
-    datafile = resource_filename('sknano', 'data/nanotubes/1010r_1cell.data')
+    datafile = resource_filename('sknano', 'data/nanotubes/1010_1cell.data')
     reader = DATAReader(datafile)
     atoms = reader.atoms
+    atoms.assign_unique_ids()
+    atoms.update_attrs()
     assert_not_equal(atoms.Natoms, 20)
     assert_equal(atoms.Natoms, 40)
 

@@ -15,6 +15,8 @@ def test1():
     infile = resource_filename('sknano', 'data/nanotubes/1005_5cells.data')
     data = DATAReader(infile)
     atoms = data.atoms
+    atoms.assign_unique_ids()
+    atoms.update_attrs()
     bonds = atoms.bonds
     assert_equal(bonds.Nbonds, atoms.coordination_numbers.sum())
     print(bonds.mean_length)
@@ -26,6 +28,7 @@ def test1():
 def test2():
     atoms = SWNTGenerator(n=10, m=10, nz=3).atoms
     atoms.assign_unique_ids()
+    atoms.update_attrs()
     assert_true(atoms.Natoms, len(atoms.poma))
     #print(np.asarray([np.degrees(poma) for poma in atoms.poma]).tolist())
     print(np.degrees(atoms.mean_nonzero_poma))

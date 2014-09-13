@@ -120,12 +120,15 @@ def test_atom_bonds():
 def test_structure_data():
     fname = resource_filename('sknano', 'data/nanotubes/1005_5cells.data')
     swnt = SWNTGenerator(n=10, m=5, nz=5)
+    swnt_atoms = swnt.atoms
+    swnt_atoms.assign_unique_ids()
+    swnt_atoms.update_attrs()
     #swnt.save_data(fname=fname, structure_format='data')
     data = DATAReader(fname)
     atoms = data.atoms
     atoms.assign_unique_ids()
     atoms.update_attrs()
-    assert_equals(swnt.atoms.Natoms, data.atoms.Natoms)
+    assert_equals(swnt_atoms.Natoms, atoms.Natoms)
 
 
 def test_pyramidalization_angles():
