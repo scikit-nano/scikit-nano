@@ -36,7 +36,7 @@ class XAtoms(Atoms):
     """
     _atomattrs = Atoms._atomattrs + \
         ['atomID', 'moleculeID', 'atomtype', 'q', 'v', 'vx', 'vy', 'vz',
-         'n', 'nx', 'ny', 'nz']
+         'f', 'fx', 'fy', 'fz', 'n', 'nx', 'ny', 'nz']
 
     def __init__(self, atoms=None, copylist=True, deepcopy=False):
 

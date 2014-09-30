@@ -50,18 +50,19 @@ class XAtom(Atom):
     """
     _atomattrs = Atom._atomattrs + \
         ['atomID', 'moleculeID', 'atomtype', 'q', 'v', 'vx', 'vy', 'vz',
-         'n', 'nx', 'ny', 'nz']
+         'f', 'fx', 'fy', 'fz', 'n', 'nx', 'ny', 'nz']
 
     def __init__(self, element=None, atomID=0, moleculeID=0, atomtype=1,
                  q=0., m=None, mass=None, x=None, y=None, z=None,
-                 vx=None, vy=None, vz=None, nx=None, ny=None, nz=None,
-                 **kwargs):
+                 vx=None, vy=None, vz=None, fx=None, fy=None, fz=None,
+                 nx=None, ny=None, nz=None, **kwargs):
         if m is None and mass is not None:
             m = mass
 
         super(XAtom, self).__init__(element=element, m=m, x=x, y=y, z=z)
 
         self._v = Vector([vx, vy, vz])
+        self._f = Vector([fx, fy, fz])
         self._n = Point([nx, ny, nz], dtype=int)
 
         self._atomID = int(atomID)
@@ -368,9 +369,101 @@ class XAtom(Atom):
             raise TypeError('Expected an array_like object')
         self._v = Vector(value)
 
+    @property
+    def fx(self):
+        """:math:`x` component of `XAtom` force vector"""
+        return self._f.x
+
+    @fx.setter
+    def fx(self, value):
+        """Set :math:`f_x`.
+
+        Set :math:`f_x`, the :math:`x` component of `XAtom` force vector.
+
+        Parameters
+        ----------
+        value : float
+            :math:`f_x` component of force vector.
+
+        """
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._f.x = value
+
+    @property
+    def fy(self):
+        """:math:`x` component of `XAtom` force vector"""
+        return self._f.y
+
+    @fy.setter
+    def fy(self, value):
+        """Set :math:`f_y`.
+
+        Set :math:`f_y`, the :math:`y` component of `XAtom` force vector.
+
+        Parameters
+        ----------
+        value : float
+            :math:`f_y` component of force vector.
+
+        """
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._f.y = value
+
+    @property
+    def fz(self):
+        """:math:`z` component of `XAtom` force vector"""
+        return self._f.z
+
+    @fz.setter
+    def fz(self, value):
+        """Set :math:`f_z`.
+
+        Set :math:`f_z`, the :math:`z` component of `XAtom` force vector.
+
+        Parameters
+        ----------
+        value : float
+            :math:`f_z` component of force vector.
+
+        """
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._f.z = value
+
+    @property
+    def f(self):
+        """:math:`f_x, f_y, f_z` array of force vector components.
+
+        Returns
+        -------
+        ndarray
+            3-element ndarray of [:math:`f_x`, :math:`f_y`, :math:`f_z`]
+            force vector components of `XAtom`.
+
+        """
+        return self._f
+
+    @f.setter
+    def f(self, value):
+        """Set :math:`x, y, z` components of `XAtom` force vector.
+
+        Parameters
+        ----------
+        value : array_like
+            3-element ndarray of [:math:`f_x`, :math:`f_y`, :math:`f_z`]
+            force components of `XAtom`.
+
+        """
+        if not isinstance(value, (list, np.ndarray)):
+            raise TypeError('Expected an array_like object')
+        self._f = Vector(value)
+
     def todict(self):
         return dict(element=self.element, atomID=self.atomID,
                     moleculeID=self.moleculeID, atomtype=self.atomtype,
                     q=self.q, m=self.m, x=self.x, y=self.y, z=self.z,
                     vx=self.vx, vy=self.vy, vz=self.vz,
+                    fx=self.fx, fy=self.fy, fz=self.fz,
                     nx=self.nx, ny=self.ny, nz=self.nz)
