@@ -26,7 +26,7 @@ __all__ = ['Atom']
 
 @total_ordering
 class Atom(object):
-    """Base class for structure data atom.
+    """Base class for abstract representation of structure atom.
 
     Parameters
     ----------
@@ -37,56 +37,32 @@ class Atom(object):
         :math:`x, y, z` coordinates of `Atom`.
 
     """
-    _atomattrs = ['symbol', 'Z', 'm', 'r', 'x', 'y', 'z']
+    _atomattrs = ['symbol', 'Z', 'm', 'r', 'x', 'y', 'z']  # private class var
 
     def __init__(self, element=None, m=None, x=None, y=None, z=None):
 
+        # set mass first because the element.setter method may check mass value
         if m is None:
             m = 0
+        self.m = m
 
-        if isinstance(element, numbers.Number):
-            try:
-                Z = int(element)
-                idx = Z - 1
-                symbol = element_symbols[idx]
-                m = atomic_masses[symbol]
-            except KeyError:
-                print('unrecognized element number: {}'.format(element))
-        else:
-            if element in element_symbols:
-                symbol = element
-            elif element in element_names:
-                symbol = element_symbols[element_names.index(element)]
-            elif m in atomic_mass_symbol_map:
-                symbol = atomic_mass_symbol_map[m]
-            elif int(m / 2) in atomic_number_symbol_map:
-                symbol = atomic_number_symbol_map[int(m / 2)]
-            else:
-                symbol = 'X'
+        self.element = element
 
-        try:
-            Z = atomic_numbers[symbol]
-            m = atomic_masses[symbol]
-        except KeyError:
-            Z = 0
-
-        self._symbol = symbol
-        self._Z = Z
-        self._m = m
-        self._r = Vector([x, y, z])
+        self.r = Vector([x, y, z])
         #self._p0 = Point([x, y, z])
-        self._dr = Vector(np.zeros(3), p0=[x, y, z])
+        self.dr = Vector(np.zeros(3), p0=[x, y, z])
 
     def __str__(self):
-        """Return string representation of atom."""
+        """Return nice string representation of `Atom`."""
         return repr(self)
 
     def __repr__(self):
-        """Return string representation of atom."""
+        """Return canonical string representation of `Atom`."""
         return "Atom(element={!r}, m={!r}, x={!r}, y={!r}, z={!r})".format(
             self.element, self.m, self.x, self.y, self.z)
 
     def __eq__(self, other):
+        """Test equality of two `Atom` object instances."""
         if self is other:
             return True
         else:
@@ -96,7 +72,11 @@ class Atom(object):
             return True
 
     def __lt__(self, other):
+        """Test if `self` is *less than* `other`."""
         return self.Z < other.Z
+
+    #def __mul__(self, other):
+    #    """Multiply atom
 
     @property
     def Z(self):
@@ -109,6 +89,30 @@ class Atom(object):
         """
         return self._Z
 
+    @Z.setter
+    def Z(self, value):
+        """Set atomic number :math:`Z`.
+
+        Parameters
+        ----------
+        value : int
+            Atomic number :math:`Z`.
+
+        """
+        if not (isinstance(value, numbers.Real) and int(value) > 0):
+            raise ValueError('Expected a real, positive integer.')
+        try:
+            Z = int(value)
+            idx = Z - 1
+            symbol = element_symbols[idx]
+            m = atomic_masses[symbol]
+        except KeyError:
+            print('unrecognized element number: {}'.format(value))
+        else:
+            self._Z = atomic_numbers[symbol]
+            self._m = m
+            self._symbol = symbol
+
     @property
     def element(self):
         """Element symbol.
@@ -118,7 +122,43 @@ class Atom(object):
         str
             Symbol of chemical element.
         """
-        return self.symbol
+        return self._symbol
+
+    @element.setter
+    def element(self, value):
+        """Set element symbol."""
+        if isinstance(value, numbers.Number):
+            try:
+                Z = int(value)
+                idx = Z - 1
+                symbol = element_symbols[idx]
+                m = atomic_masses[symbol]
+            except KeyError:
+                print('unrecognized element number: {}'.format(value))
+            else:
+                self._Z = atomic_numbers[symbol]
+                self._m = m
+        else:
+            m = self.m
+            int_half_m = int(m / 2)
+            if value in element_symbols:
+                symbol = value
+            elif value in element_names:
+                symbol = element_symbols[element_names.index(value)]
+            elif m in atomic_mass_symbol_map:
+                symbol = atomic_mass_symbol_map[m]
+            elif int_half_m in atomic_number_symbol_map:
+                symbol = atomic_number_symbol_map[int_half_m]
+            else:
+                symbol = 'X'
+
+            try:
+                self._Z = atomic_numbers[symbol]
+                self._m = atomic_masses[symbol]
+            except KeyError:
+                self._Z = 0
+
+        self._symbol = symbol
 
     @property
     def symbol(self):
@@ -141,6 +181,10 @@ class Atom(object):
             Atomic mass :math:`m_a` in atomic mass units.
         """
         return self._m
+
+    @m.setter
+    def m(self, value):
+        self._m = value
 
     @property
     def x(self):
@@ -274,6 +318,7 @@ class Atom(object):
         self._dr = Vector(value)
 
     def todict(self):
+        """Return `dict` of `Atom` constructor parameters."""
         return dict(element=self.element, m=self.m,
                     x=self.x, y=self.y, z=self.z)
 
