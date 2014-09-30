@@ -29,5 +29,12 @@ def test_comparisons():
     assert_true(B < N)
 
 
+def test_property_changes():
+    CAtom = Atom('C')
+    CAtom.Z = 54
+    XeAtom = Atom('Xe')
+    assert_equal(CAtom, XeAtom)
+
+
 if __name__ == '__main__':
     nose.runmodule()
