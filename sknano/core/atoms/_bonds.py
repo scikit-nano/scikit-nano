@@ -57,6 +57,7 @@ class Bonds(UserList):
 
     @property
     def Nbonds(self):
+        """Number of `Bond`s in `Bonds`."""
         return len(self)
 
     @property

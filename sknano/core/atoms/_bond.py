@@ -55,24 +55,35 @@ class Bond(object):
 
     @property
     def atoms(self):
+        """:class:`~sknano.core.atoms.XAtoms` in `Bond`."""
         return self._atoms
 
     @property
     def atom1(self):
+        """:class:`~sknano.core.atoms.Atom` 1 in `Bond`."""
         return self.atoms[0]
 
     @property
     def atom2(self):
+        """:class:`~sknano.core.atoms.Atom` 2 in `Bond`."""
         return self.atoms[1]
 
     @property
     def vector(self):
+        """`Bond` :class:`~sknano.core.math.Vector`.
+
+        `Bond` :class:`~sknano.core.math.Vector` points from
+        :attr:`Bond.atom1` to :attr:`Bond.atom2`.
+
+        """
         return self._vector
 
     @vector.setter
     def vector(self, value):
+        """Set `Bond` :class:`~sknano.core.math.Vector`."""
         self._vector = Vector(value)
 
     @property
     def length(self):
+        """`Bond` :attr:`~sknano.core.math.Vector.length`."""
         return self.vector.length
