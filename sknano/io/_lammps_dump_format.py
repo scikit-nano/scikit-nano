@@ -32,7 +32,7 @@ class DUMPReader(StructureIO):
         LAMMPS dump file path
 
     """
-    def __init__(self, fpath=None, **kwargs):
+    def __init__(self, fpath, **kwargs):
         super(DUMPReader, self).__init__(fpath=fpath, **kwargs)
 
         if self.fpath is not None:
@@ -40,12 +40,9 @@ class DUMPReader(StructureIO):
 
     def read(self):
         """Read dump file."""
+        pass
         #with open(self.fpath, 'r') as f:
         #    pass
-
-        self._parse_atoms()
-        self._parse_atomtypes()
-        self._parse_boxbounds()
 
 
 class DUMPWriter(object):
@@ -166,13 +163,14 @@ class DUMPData(DUMPReader):
     fpath : str, optional
 
     """
-    def __init__(self, files=None):
-        super(DUMPData, self).__init__()
+    def __init__(self, *files):
+        #super(DUMPData, self).__init__()
         self.snaps = []
         self.nsnaps = self.nselect = 0
         self.names = {}
         self.aselect = aselect(self)
         self.tselect = tselect(self)
+        print('files: {}'.format(files))
 
     def atom(self, n, fields=None):
         pass

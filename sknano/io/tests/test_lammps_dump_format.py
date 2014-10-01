@@ -9,11 +9,13 @@ from sknano.io import DUMPData, DUMPReader, DUMPWriter
 
 
 def test_reader():
-    datafile = resource_filename('sknano', 'data/nanotubes/1010_1cell.data')
+    datafile = resource_filename('sknano', 'data/lammpstrj/dump.peptide')
     reader = DUMPReader(datafile)
-    atoms = reader.atoms
-    assert_not_equal(atoms.Natoms, 20)
-    assert_equal(atoms.Natoms, 40)
+
+
+def test_dumpio():
+    datafile = resource_filename('sknano', 'data/lammpstrj/dump.peptide')
+    dump = DUMPData(datafile)
 
 
 if __name__ == '__main__':
