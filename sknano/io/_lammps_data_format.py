@@ -586,29 +586,22 @@ class DATAFormatSpec(object):
 
     """
 
-    _headers = {'atoms': {'dtype': int, 'items': 1},
-                'bonds': {'dtype': int, 'items': 1},
-                'angles': {'dtype': int, 'items': 1},
-                'dihedrals': {'dtype': int, 'items': 1},
-                'impropers': {'dtype': int, 'items': 1},
-                'atom types': {'dtype': int, 'items': 1},
-                'bond types': {'dtype': int, 'items': 1},
-                'angle types': {'dtype': int, 'items': 1},
-                'dihedral types': {'dtype': int, 'items': 1},
-                'improper types': {'dtype': int, 'items': 1},
-                'extra bond per atom': {'dtype': int, 'items': 1},
-                'extra angle per atom': {'dtype': int, 'items': 1},
-                'extra dihedral per atom': {'dtype': int, 'items': 1},
-                'extra improper per atom': {'dtype': int, 'items': 1},
-                'extra special per atom': {'dtype': int, 'items': 1},
-                'ellipsoids': {'dtype': int, 'items': 1},
-                'lines': {'dtype': int, 'items': 1},
-                'triangles': {'dtype': int, 'items': 1},
-                'bodies': {'dtype': int, 'items': 1},
-                'xlo xhi': {'dtype': float, 'items': 2},
-                'ylo yhi': {'dtype': float, 'items': 2},
-                'zlo zhi': {'dtype': float, 'items': 2},
-                'xy xz yz': {'dtype': float, 'items': 3}}
+    _headers = OrderedDict()
+    _headers.update(dict.fromkeys(['atoms', 'bonds', 'angles',
+                                   'dihedrals', 'impropers',
+                                   'atom types', 'bond types', 'angle types',
+                                   'dihedral types', 'improper types',
+                                   'extra bond per atom',
+                                   'extra angle per atom',
+                                   'extra dihedral per atom',
+                                   'extra improper per atom',
+                                   'extra special per atom',
+                                   'ellipsoids', 'lines',
+                                   'triangles', 'bodies'],
+                                  {'dtype': int, 'items': 1}))
+    _headers.update(dict.fromkeys(['xlo xhi', 'ylo yhi', 'zlo zhi'],
+                                  {'dtype': float, 'items': 2}))
+    _headers.update(dict.fromkeys(['xy xz yz'], {'dtype': float, 'items': 3}))
 
     # A LAMMPS data file is partitioned into sections identified
     # by a keyword string. The header data are used by one or
