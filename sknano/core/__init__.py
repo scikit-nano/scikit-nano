@@ -39,6 +39,14 @@ Functions for string manipulation
 
    pluralize
 
+Custom container classes
+--------------------------
+.. autosummary::
+   :toctree: generated/
+
+   UserList
+
+
 Sub-packages
 ------------
 .. autosummary::
@@ -46,6 +54,7 @@ Sub-packages
 
    atoms
    math
+   molecules
    refdata
 
 """
@@ -56,5 +65,6 @@ from ._extras import *
 from ._io import *
 from ._meta import *
 from ._strings import *
+from ._user_list import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
