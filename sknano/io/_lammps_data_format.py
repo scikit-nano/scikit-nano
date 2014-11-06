@@ -44,8 +44,6 @@ class DATAReader(StructureIO):
         self.boxbounds = {}
 
         formatspec = DATAFormatSpec(atom_style=atom_style, **kwargs)
-        self.header_specs = formatspec.headers
-        self.section_header_map = formatspec.sections
         self.section_attrs = formatspec.section_attrs
         self.section_attrs_specs = formatspec.section_attrs_specs
 
@@ -72,17 +70,17 @@ class DATAReader(StructureIO):
                     if len(line) == 0:
                         continue
                     found = False
-                    for header in self.header_specs.iterkeys():
+                    for header in header_specs.iterkeys():
                         if header in line:
                             found = True
                             self.header_data[header] = \
-                                [self.header_specs[header]['dtype'](float(s))
+                                [header_specs[header]['dtype'](float(s))
                                  for s in [[ss for ss in line.split()][i]
-                                           for i in range(self.header_specs[
+                                           for i in range(header_specs[
                                                header]['items'])]]
                             if len(self.header_data[header]) == 1:
-                                # since the list contains only one element,
-                                # replace list value with element 0
+                                # if the list contains only one element,
+                                # replace list with the first element
                                 self.header_data[header] = \
                                     self.header_data[header][0]
                     if not found:
@@ -90,7 +88,7 @@ class DATAReader(StructureIO):
 
                 while True:
                     found = False
-                    for section, header in self.section_header_map.iteritems():
+                    for section, header in section_header_map.iteritems():
                         if section in line:
                             found = True
                             f.readline()
@@ -586,56 +584,16 @@ class DATAFormatSpec(object):
 
     """
 
-    _headers = OrderedDict()
-    _headers.update(dict.fromkeys(['atoms', 'bonds', 'angles',
-                                   'dihedrals', 'impropers',
-                                   'atom types', 'bond types', 'angle types',
-                                   'dihedral types', 'improper types',
-                                   'extra bond per atom',
-                                   'extra angle per atom',
-                                   'extra dihedral per atom',
-                                   'extra improper per atom',
-                                   'extra special per atom',
-                                   'ellipsoids', 'lines',
-                                   'triangles', 'bodies'],
-                                  {'dtype': int, 'items': 1}))
-    _headers.update(dict.fromkeys(['xlo xhi', 'ylo yhi', 'zlo zhi'],
-                                  {'dtype': float, 'items': 2}))
-    _headers.update(dict.fromkeys(['xy xz yz'], {'dtype': float, 'items': 3}))
-
-    # A LAMMPS data file is partitioned into sections identified
-    # by a keyword string. The header data are used by one or
-    # more sections. The `sections` dictionary maps each
-    # section keyword to a specific header key.
-
-    _sections = OrderedDict()
-    _sections.update(dict.fromkeys(['Atoms', 'Velocities', 'Molecules'],
-                                   'atoms'))
-    _sections.update(dict.fromkeys(['Bonds'], 'bonds'))
-    _sections.update(dict.fromkeys(['Lines'], 'lines'))
-    _sections.update(dict.fromkeys(['Ellipsoids'], 'ellipsoids'))
-    _sections.update(dict.fromkeys(['Triangles'], 'triangles'))
-    _sections.update(dict.fromkeys(['Bodies'], 'bodies'))
-    _sections.update(dict.fromkeys(['Angles'], 'angles'))
-    _sections.update(dict.fromkeys(['Dihedrals'], 'dihedrals'))
-    _sections.update(dict.fromkeys(['Impropers'], 'impropers'))
-    _sections.update(dict.fromkeys(['Masses', 'Pair Coeffs'], 'atom types'))
-    _sections.update(dict.fromkeys(['Bond Coeffs'], 'bond types'))
-    _sections.update(dict.fromkeys(['Angle Coeffs', 'BondBond Coeffs',
-                                    'BondAngle Coeffs'], 'angle types'))
-    _sections.update(dict.fromkeys(['AngleAngle Coeffs', 'Improper Coeffs'],
-                                   'improper types'))
-    _sections.update(dict.fromkeys(['Dihedral Coeffs',
-                                    'MiddleBondTorsion Coeffs',
-                                    'EndBondTorsion Coeffs',
-                                    'AngleTorsion Coeffs',
-                                    'AngleAngleTorsion Coeffs',
-                                    'BondBond13 Coeffs'],
-                                   'dihedral types'))
-
-    def __init__(self, atom_style='full', **kwargs):
+    def __init__(self, atom_style='full', bond_style=None, angle_style=None,
+                 dihedral_style=None, improper_style=None, pair_style=None,
+                 **kwargs):
         super(DATAFormatSpec, self).__init__(**kwargs)
         self.atom_style = atom_style
+        self.bond_style = bond_style
+        self.angle_style = angle_style
+        self.dihedral_style = dihedral_style
+        self.improper_style = improper_style
+        self.pair_style = pair_style
 
         self.section_attrs = \
             {'Atoms': atoms_section_attrs[self.atom_style],
@@ -669,15 +627,58 @@ class DATAFormatSpec(object):
     def atom_style(self):
         del self._atom_style
 
-    @property
-    def headers(self):
-        return self._headers
-
-    @property
-    def sections(self):
-        return self._sections
-
 LAMMPSDATAFormatSpec = DATAFormatSpec
+
+header_specs = OrderedDict()
+header_specs.update(dict.fromkeys(['atoms', 'bonds', 'angles',
+                                   'dihedrals', 'impropers',
+                                   'atom types', 'bond types',
+                                   'angle types', 'dihedral types',
+                                   'improper types',
+                                   'extra bond per atom',
+                                   'extra angle per atom',
+                                   'extra dihedral per atom',
+                                   'extra improper per atom',
+                                   'extra special per atom',
+                                   'ellipsoids', 'lines',
+                                   'triangles', 'bodies'],
+                                  {'dtype': int, 'items': 1}))
+header_specs.update(dict.fromkeys(['xlo xhi', 'ylo yhi', 'zlo zhi'],
+                                  {'dtype': float, 'items': 2}))
+header_specs.update(dict.fromkeys(['xy xz yz'],
+                                  {'dtype': float, 'items': 3}))
+
+# A LAMMPS data file is partitioned into sections identified
+# by a keyword string. The header data are used by one or
+# more sections. The `sections` dictionary maps each
+# section keyword to a specific header key.
+
+section_header_map = OrderedDict()
+section_header_map.update(dict.fromkeys(['Atoms', 'Velocities', 'Molecules'],
+                                        'atoms'))
+section_header_map.update(dict.fromkeys(['Bonds'], 'bonds'))
+section_header_map.update(dict.fromkeys(['Lines'], 'lines'))
+section_header_map.update(dict.fromkeys(['Ellipsoids'], 'ellipsoids'))
+section_header_map.update(dict.fromkeys(['Triangles'], 'triangles'))
+section_header_map.update(dict.fromkeys(['Bodies'], 'bodies'))
+section_header_map.update(dict.fromkeys(['Angles'], 'angles'))
+section_header_map.update(dict.fromkeys(['Dihedrals'], 'dihedrals'))
+section_header_map.update(dict.fromkeys(['Impropers'], 'impropers'))
+section_header_map.update(dict.fromkeys(['Masses', 'Pair Coeffs'],
+                                        'atom types'))
+section_header_map.update(dict.fromkeys(['Bond Coeffs'], 'bond types'))
+section_header_map.update(dict.fromkeys(['Angle Coeffs', 'BondBond Coeffs',
+                                         'BondAngle Coeffs'], 'angle types'))
+section_header_map.update(dict.fromkeys(['AngleAngle Coeffs',
+                                         'Improper Coeffs'],
+                                        'improper types'))
+section_header_map.update(dict.fromkeys(['Dihedral Coeffs',
+                                         'MiddleBondTorsion Coeffs',
+                                         'EndBondTorsion Coeffs',
+                                         'AngleTorsion Coeffs',
+                                         'AngleAngleTorsion Coeffs',
+                                         'BondBond13 Coeffs'],
+                                        'dihedral types'))
 
 attr_dtypes = {'atomID': int, 'atomtype': int, 'bondID': int, 'bondtype': int,
                'moleculeID': int, 'q': float, 'ervel': float,
