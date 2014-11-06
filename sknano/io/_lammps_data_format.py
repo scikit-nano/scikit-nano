@@ -151,26 +151,23 @@ class DATAReader(StructureIO):
                        'x': None, 'y': None, 'z': None,
                        'vx': None, 'vy': None, 'vz': None}
 
-        for lmps_atom in atoms_section:
+        for line in atoms_section:
             for kw in atom_kwargs.iterkeys():
                 if kw in atoms_section_attrs:
                     atom_kwargs[kw] = \
-                        lmps_atom[
-                            self.section_attrs_specs['Atoms'][kw]['index']]
+                        line[self.section_attrs_specs['Atoms'][kw]['index']]
                 elif kw in masses_section_attrs:
                     atomtype = \
-                        lmps_atom[
-                            self.section_attrs_specs[
-                                'Atoms']['atomtype']['index']]
+                        line[self.section_attrs_specs[
+                            'Atoms']['atomtype']['index']]
                     atom_kwargs[kw] = \
                         masses_section[atomtype-1][
                             self.section_attrs_specs['Masses'][kw]['index']]
                 elif kw in velocities_section_attrs and \
                         len(velocities_section) == len(atoms_section):
                     atomID = \
-                        lmps_atom[
-                            self.section_attrs_specs[
-                                'Atoms']['atomID']['index']]
+                        line[self.section_attrs_specs[
+                            'Atoms']['atomID']['index']]
                     for velocity in velocities_section:
                         velocity_atomID = \
                             velocity[self.section_attrs_specs[
