@@ -22,7 +22,7 @@ except ImportError:
 default_comment_line = \
     'Structure data generated using scikit-nano version {}'.format(version)
 default_structure_format = 'xyz'
-supported_structure_formats = ('xyz', 'data')
+supported_structure_formats = ('xyz', 'data', 'dump')
 
 __all__ = ['Atom', 'Atoms',
            'StructureIO',
@@ -97,7 +97,10 @@ class StructureReader(object):
         if fpath.endswith('.data') or structure_format == 'data':
             from ._lammps_data_format import DATAReader
             return DATAReader(fpath, **kwargs)
-        else:
+        elif fpath.endswith('.dump') or structure_format == 'dump':
+            from ._lammps_dump_format import DUMPReader
+            return DUMPReader(fpath, **kwargs)
+        elif fpath.endswith('.xyz') or structure_format == 'xyz':
             from ._xyz_format import XYZReader
             return XYZReader.read(fpath)
 
@@ -108,7 +111,10 @@ class StructureWriter(object):
         if structure_format == 'data':
             from ._lammps_data_format import DATAWriter
             DATAWriter.write(fname=fname, atoms=atoms, **kwargs)
-        else:
+        elif structure_format == 'dump':
+            from ._lammps_dump_format import DUMPWriter
+            DUMPWriter.write(fname=fname, atoms=atoms, **kwargs)
+        elif structure_format == 'xyz':
             from ._xyz_format import XYZWriter
             XYZWriter.write(fname=fname, atoms=atoms, **kwargs)
 
