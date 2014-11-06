@@ -13,8 +13,8 @@ def test_atom_styles():
     print('atom_styles: {}\n'.format(atom_styles))
 
     formatspec = DATAFormatSpec(atom_style='full')
-    print('formatspec.header_specs: {}\n'.format(formatspec.headers))
-    print('formatspec.section_header_map: {}\n'.format(formatspec.sections))
+    #print('formatspec.header_specs: {}\n'.format(header_specs))
+    #print('formatspec.section_header_map: {}\n'.format(section_header_map))
     print('formatspec.section_attrs: {}\n'.format(formatspec.section_attrs))
     print('formatspec.section_attrs_specs: {}\n'.format(
         formatspec.section_attrs_specs))
