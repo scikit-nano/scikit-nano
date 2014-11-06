@@ -23,7 +23,7 @@ __all__ = ['DATAReader', 'DATAWriter', 'DATAData', 'DATAFormatSpec',
            'DATAIOError', 'DATA2XYZConverter', 'LAMMPSDATAReader',
            'LAMMPSDATAWriter', 'LAMMPSDATA', 'LAMMPSDATAFormatSpec',
            'LAMMPSDATAIOError', 'LAMMPSDATA2XYZConverter',
-           'lammps_atom_styles']
+           'atom_styles', 'lammps_atom_styles']
 
 
 class DATAReader(StructureIO):
@@ -603,6 +603,7 @@ class DATAFormatSpec(object):
                 'extra angle per atom': {'dtype': int, 'items': 1},
                 'extra dihedral per atom': {'dtype': int, 'items': 1},
                 'extra improper per atom': {'dtype': int, 'items': 1},
+                'extra special per atom': {'dtype': int, 'items': 1},
                 'ellipsoids': {'dtype': int, 'items': 1},
                 'lines': {'dtype': int, 'items': 1},
                 'triangles': {'dtype': int, 'items': 1},
@@ -670,9 +671,9 @@ class DATAFormatSpec(object):
 
     @atom_style.setter
     def atom_style(self, value):
-        if value not in lammps_atom_styles:
+        if value not in atom_styles:
             raise ValueError("Allowed `atom_style`'s:\n{}".format(
-                lammps_atom_styles.keys()))
+                atom_styles.keys()))
         self._atom_style = value
 
     @atom_style.deleter
@@ -703,80 +704,82 @@ attr_dtypes = {'atomID': int, 'atomtype': int, 'bondID': int, 'bondtype': int,
                'shapex': float, 'shapey': float, 'shapez': float,
                'quatw': float, 'quati': float, 'quatj': float, 'quatk': float}
 
-lammps_atom_styles = {}
-lammps_atom_styles['angle'] = \
+atom_styles = {}
+atom_styles['angle'] = \
     ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-lammps_atom_styles['atomic'] = \
+atom_styles['atomic'] = \
     ['atom-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-lammps_atom_styles['body'] = \
+atom_styles['body'] = \
     ['atom-ID', 'atom-type', 'bodyflag', 'mass', 'x', 'y', 'z',
      'nx', 'ny', 'nz']
 
-lammps_atom_styles['bond'] = \
+atom_styles['bond'] = \
     ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-lammps_atom_styles['charge'] = \
+atom_styles['charge'] = \
     ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-lammps_atom_styles['dipole'] = \
+atom_styles['dipole'] = \
     ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z',
      'mux', 'muy', 'muz', 'nx', 'ny', 'nz']
 
-lammps_atom_styles['electron'] = \
+atom_styles['electron'] = \
     ['atom-ID', 'atom-type', 'q', 'spin', 'eradius',
      'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-lammps_atom_styles['ellipsoid'] = \
+atom_styles['ellipsoid'] = \
     ['atom-ID', 'atom-type', 'ellipsoidflag', 'density',
      'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-lammps_atom_styles['full'] = \
+atom_styles['full'] = \
     ['atom-ID', 'molecule-ID', 'atom-type', 'q',
      'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-lammps_atom_styles['line'] = \
+atom_styles['line'] = \
     ['atom-ID', 'molecule-ID', 'atom-type', 'lineflag', 'density',
      'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-lammps_atom_styles['meso'] = \
+atom_styles['meso'] = \
     ['atom-ID', 'atom-type', 'rho', 'e', 'cv', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-lammps_atom_styles['molecular'] = \
+atom_styles['molecular'] = \
     ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-lammps_atom_styles['peri'] = \
+atom_styles['peri'] = \
     ['atom-ID', 'atom-type', 'volume', 'density',
      'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-lammps_atom_styles['sphere'] = \
+atom_styles['sphere'] = \
     ['atom-ID', 'atom-type', 'diameter', 'density',
      'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-lammps_atom_styles['template'] = \
+atom_styles['template'] = \
     ['atom-ID', 'molecule-ID', 'template-index', 'template-atom',
      'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-lammps_atom_styles['tri'] = \
+atom_styles['tri'] = \
     ['atom-ID', 'molecule-ID', 'atom-type', 'triangleflag', 'density',
      'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-lammps_atom_styles['wavepacket'] = \
+atom_styles['wavepacket'] = \
     ['atom-ID', 'atom-type', 'charge', 'spin', 'eradius', 'etag',
      'cs_re', 'cs_im', 'x', 'y', 'z', 'nx', 'ny', 'nz']
 
-#lammps_atom_styles['hybrid'] = ['atom-ID', 'atom-type', 'x', 'y', 'z', '...']
+#atom_styles['hybrid'] = ['atom-ID', 'atom-type', 'x', 'y', 'z', '...']
+
+lammps_atom_styles = atom_styles
 
 atoms_section_attrs = {}
-for atom_style, attrs in lammps_atom_styles.iteritems():
+for atom_style, attrs in atom_styles.iteritems():
     atoms_section_attrs[atom_style] = []
     for attr_name in attrs:
         atoms_section_attrs[atom_style].append(attr_name.replace('-', ''))
 
 velocities_section_attrs = {}
-velocities_section_attrs.update(dict.fromkeys(
-    lammps_atom_styles.keys(), ['atomID', 'vx', 'vy', 'vz']))
+velocities_section_attrs.update(dict.fromkeys(atom_styles.keys(),
+                                              ['atomID', 'vx', 'vy', 'vz']))
 velocities_section_attrs['electron'].append('ervel')
 velocities_section_attrs['ellipsoid'].extend(['lx', 'ly', 'lz'])
 velocities_section_attrs['sphere'].extend(['wx', 'wy', 'wz'])
