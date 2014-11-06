@@ -34,5 +34,6 @@ from ._kdtree_atom import *
 from ._kdtree_atoms import *
 from ._neighbor_atoms import *
 #from ._mixins import *
+from ._trajectory import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
