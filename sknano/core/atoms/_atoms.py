@@ -15,10 +15,9 @@ from operator import attrgetter
 
 import numpy as np
 
-from sknano.core import xyz
+from sknano.core import UserList, xyz
 from sknano.core.math import Vector, transformation_matrix
 from sknano.utils.geometric_shapes import Cuboid  # , Rectangle
-from ._base import UserList
 
 __all__ = ['Atoms']
 

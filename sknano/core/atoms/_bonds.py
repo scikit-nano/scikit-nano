@@ -15,9 +15,9 @@ from operator import attrgetter
 
 import numpy as np
 
+from sknano.core import UserList
 from sknano.core.math import vector as vec
 from ._extended_atoms import XAtoms
-from ._base import UserList
 #from ._bond import Bond
 
 __all__ = ['Bonds']
