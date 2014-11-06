@@ -660,10 +660,9 @@ class DATAFormatSpec(object):
         self.section_attrs_specs = OrderedDict()
         for section, attrs in self.section_attrs.iteritems():
             self.section_attrs_specs[section] = OrderedDict()
-            for i, attr_name in enumerate(attrs):
-                self.section_attrs_specs[section][attr_name] = \
-                    {'dtype': attr_dtypes[attr_name],
-                     'colnum': i+1, 'index': i}
+            for i, attr in enumerate(attrs):
+                self.section_attrs_specs[section][attr] = \
+                    {'dtype': attr_dtypes[attr], 'colnum': i+1, 'index': i}
 
     @property
     def atom_style(self):
@@ -705,77 +704,49 @@ attr_dtypes = {'atomID': int, 'atomtype': int, 'bondID': int, 'bondtype': int,
                'quatw': float, 'quati': float, 'quatj': float, 'quatk': float}
 
 atom_styles = {}
-atom_styles['angle'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_styles['atomic'] = \
-    ['atom-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
+atom_styles['angle'] = ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z']
+atom_styles['atomic'] = ['atom-ID', 'atom-type', 'x', 'y', 'z']
 atom_styles['body'] = \
-    ['atom-ID', 'atom-type', 'bodyflag', 'mass', 'x', 'y', 'z',
-     'nx', 'ny', 'nz']
-
-atom_styles['bond'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_styles['charge'] = \
-    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
+    ['atom-ID', 'atom-type', 'bodyflag', 'mass', 'x', 'y', 'z']
+atom_styles['bond'] = ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z']
+atom_styles['charge'] = ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z']
 atom_styles['dipole'] = \
-    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z',
-     'mux', 'muy', 'muz', 'nx', 'ny', 'nz']
-
+    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z', 'mux', 'muy', 'muz']
 atom_styles['electron'] = \
-    ['atom-ID', 'atom-type', 'q', 'spin', 'eradius',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
+    ['atom-ID', 'atom-type', 'q', 'spin', 'eradius', 'x', 'y', 'z']
 atom_styles['ellipsoid'] = \
-    ['atom-ID', 'atom-type', 'ellipsoidflag', 'density',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
+    ['atom-ID', 'atom-type', 'ellipsoidflag', 'density', 'x', 'y', 'z']
 atom_styles['full'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'q',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
+    ['atom-ID', 'molecule-ID', 'atom-type', 'q', 'x', 'y', 'z']
 atom_styles['line'] = \
     ['atom-ID', 'molecule-ID', 'atom-type', 'lineflag', 'density',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
-atom_styles['meso'] = \
-    ['atom-ID', 'atom-type', 'rho', 'e', 'cv', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
+     'x', 'y', 'z']
+atom_styles['meso'] = ['atom-ID', 'atom-type', 'rho', 'e', 'cv', 'x', 'y', 'z']
 atom_styles['molecular'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
+    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z']
 atom_styles['peri'] = \
-    ['atom-ID', 'atom-type', 'volume', 'density',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
+    ['atom-ID', 'atom-type', 'volume', 'density', 'x', 'y', 'z']
 atom_styles['sphere'] = \
-    ['atom-ID', 'atom-type', 'diameter', 'density',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
+    ['atom-ID', 'atom-type', 'diameter', 'density', 'x', 'y', 'z']
 atom_styles['template'] = \
-    ['atom-ID', 'molecule-ID', 'template-index', 'template-atom',
-     'atom-type', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
+    ['atom-ID', 'molecule-ID', 'template-index', 'template-atom', 'atom-type',
+     'x', 'y', 'z']
 atom_styles['tri'] = \
     ['atom-ID', 'molecule-ID', 'atom-type', 'triangleflag', 'density',
-     'x', 'y', 'z', 'nx', 'ny', 'nz']
-
+     'x', 'y', 'z']
 atom_styles['wavepacket'] = \
     ['atom-ID', 'atom-type', 'charge', 'spin', 'eradius', 'etag',
-     'cs_re', 'cs_im', 'x', 'y', 'z', 'nx', 'ny', 'nz']
-
+     'cs_re', 'cs_im', 'x', 'y', 'z']
 #atom_styles['hybrid'] = ['atom-ID', 'atom-type', 'x', 'y', 'z', '...']
 
 lammps_atom_styles = atom_styles
 
 atoms_section_attrs = {}
 for atom_style, attrs in atom_styles.iteritems():
-    atoms_section_attrs[atom_style] = []
-    for attr_name in attrs:
-        atoms_section_attrs[atom_style].append(attr_name.replace('-', ''))
+    atom_style_attrs = atoms_section_attrs[atom_style] = []
+    for attr in attrs:
+        atom_style_attrs.append(attr.replace('-', ''))
+    atom_style_attrs.extend(['nx', 'ny', 'nz'])
 
 velocities_section_attrs = {}
 velocities_section_attrs.update(dict.fromkeys(atom_styles.keys(),
