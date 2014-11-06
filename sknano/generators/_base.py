@@ -96,9 +96,13 @@ class GeneratorMixin(object):
 
         if not fname.endswith(structure_format):
             fname += '.' + structure_format
+        self.fname = fname
 
         if outpath is not None:
-            self.fpath = os.path.join(outpath, fname)
+            fpath = os.path.join(outpath, fname)
+        else:
+            fpath = os.path.join(os.getcwd(), fname)
+        self.fpath = fpath
 
         #self._structure_format = structure_format
 
