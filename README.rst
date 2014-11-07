@@ -5,35 +5,45 @@ scikit-nano
 *scikit-nano* is a python toolkit for generating and analyzing
 nanostructure data.
 
-Currently, its primary utility is generating nanostructure data
-(i.e. atomic coordinates) for the following nanostructure materials:
+*scikit-nano* can generate structure data (i.e., atomic coordinates)
+for the following classes of nanostructures:
 
-    * Graphene:
+    * Fullerenes
+    * Graphene
 
         * *N*-layer graphene
         * Bilayer graphene with more fine control over relative layer
           orientation, including relative rotation and stacking arrangements.
 
-    * Nanotubes:
+    * Nanotubes
 
         * Single-walled nanotubes (SWNTs)
         * SWNT *bundles*
         * Multi-walled nanotubes (MWNTs)
         * MWNT *bundles*
 
-It currently supports saving structure data in the following formats:
+
+The following structure data formats are supported:
 
     * `xyz`
     * `LAMMPS data` (*limited support for full format spec.*)
 
       .. todo:: Provide notes on limitations of LAMMPS data format support
 
+    * `LAMMPS data` (*limited support for full format spec.*)
+
+      .. todo:: Provide notes on limitations of LAMMPS dump format support
+
+
+Extending input/output capabilities with more structure data formats
+such as `pdb`, `json`, `zmatrix`, etc. is queued for development
+
 Secondary to its structure generating functions are its
 *structure analysis tools* including:
 
     * defect/vacancy structure analysis
     * nearest-neighbor analysis
-    * ...
+    * POAV analysis
 
 
 Important links
@@ -52,15 +62,8 @@ Required Dependencies
 ---------------------
 * `Python 2.7+ <http://python.org/download/>`_
 * `numpy 1.8+ <http://sourceforge.net/projects/numpy/files/NumPy/>`_
+* `scipy 0.13+ <http://sourceforge.net/projects/scipy/files/scipy/>`_
 
-Optional Dependencies
----------------------
-* `scipy 0.13+ <http://sourceforge.net/projects/scipy/files/scipy/>`_ (for
-  nearest-neighbor analysis)
-* `pint 0.4+ <https://pypi.python.org/pypi/Pint/>`_ (for physical units)
-* `VMD <http://www.ks.uiuc.edu/Research/vmd/>`_ (for visualizing structure data)
-* `Tachyon Ray Tracer <http://jedi.ks.uiuc.edu/~johns/raytracer/>`_ (for
-  rendering high quality images)
 
 Installation
 =============
