@@ -5,24 +5,31 @@ from __future__ import absolute_import, division, print_function
 import nose
 from nose.tools import *
 from sknano.generators import UnrolledSWNTGenerator
+from sknano.testing import GeneratorTestFixtures
 
 
-def test1():
-    unrolled_swnt = UnrolledSWNTGenerator(n=10, m=10)
-    unrolled_swnt.save_data()
-    unrolled_swnt.save_data(structure_format='data')
+class TestCase(GeneratorTestFixtures):
 
+    def test1(self):
+        unrolled_swnt = UnrolledSWNTGenerator(n=10, m=10)
+        unrolled_swnt.save_data()
+        self.tmpdata.append(unrolled_swnt.fname)
+        unrolled_swnt.save_data(structure_format='data')
+        self.tmpdata.append(unrolled_swnt.fname)
 
-def test2():
-    unrolled_swnt = UnrolledSWNTGenerator(n=10, m=0)
-    unrolled_swnt.save_data()
-    unrolled_swnt.save_data(structure_format='data')
+    def test2(self):
+        unrolled_swnt = UnrolledSWNTGenerator(n=10, m=0)
+        unrolled_swnt.save_data()
+        self.tmpdata.append(unrolled_swnt.fname)
+        unrolled_swnt.save_data(structure_format='data')
+        self.tmpdata.append(unrolled_swnt.fname)
 
-
-def test3():
-    unrolled_swnt = UnrolledSWNTGenerator(n=10, m=5)
-    unrolled_swnt.save_data()
-    unrolled_swnt.save_data(structure_format='data')
+    def test3(self):
+        unrolled_swnt = UnrolledSWNTGenerator(n=10, m=5)
+        unrolled_swnt.save_data()
+        self.tmpdata.append(unrolled_swnt.fname)
+        unrolled_swnt.save_data(structure_format='data')
+        self.tmpdata.append(unrolled_swnt.fname)
 
 
 if __name__ == '__main__':
