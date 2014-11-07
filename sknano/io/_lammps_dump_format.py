@@ -12,6 +12,7 @@ __docformat__ = 'restructuredtext en'
 
 #import glob
 #import re
+import sys
 from operator import attrgetter
 
 import numpy as np
@@ -218,7 +219,10 @@ class DUMPData(object):
                 snap = self.read_snapshot(f)
                 while snap is not None:
                     self.snaps.append(snap)
+                    print(snap.time, end=' ')
+                    sys.stdout.flush()
                     snap = self.read_snapshot(f)
+        print()
 
         self.snaps.sort(key=attrgetter('time'))
         self.cull()
@@ -313,11 +317,14 @@ class DUMPData(object):
                 self.attr_dtypes = [attr_dtypes[attr] if attr in attr_dtypes
                                     else float for attr in self.atomattrs]
 
-            atoms = Atoms()
+            #atoms = Atoms()
+            atoms = np.zeros((snap.natoms, len(self.atomattrs)), dtype=float)
             for n in xrange(snap.natoms):
-                line = [dtype(value) for dtype, value in
-                        zip(self.attr_dtypes, f.readline().strip().split())]
-                atoms.append(Atom(**dict(zip(self.atomattrs, line))))
+                #line = [dtype(value) for dtype, value in
+                #        zip(self.attr_dtypes, f.readline().strip().split())]
+                #atoms.append(Atom(**dict(zip(self.atomattrs, line))))
+                line = [float(attr) for attr in f.readline().strip().split()]
+                atoms[n] = line
 
             snap.atoms = atoms
             return snap
@@ -347,52 +354,51 @@ class DUMPData(object):
         pass
 
     def unscale(self, ts=None):
-        #if ts is None:
-        #    x = self.names['x']
-        #    y = self.names['y']
-        #    z = self.names['z']
-        #    for snap in self.snaps:
-        #        self.unscale_one(snap, x, y, z)
-        pass
+        if ts is None:
+            x = self.names['x']
+            y = self.names['y']
+            z = self.names['z']
+            for snap in self.snaps:
+                self.unscale_one(snap, x, y, z)
 
     def unscale_one(self, snap, x, y, z):
-        #if snap.xy == snap.xz == snap.yz == 0.0:
-        #    xprd = snap.xhi - snap.xlo
-        #    yprd = snap.yhi - snap.ylo
-        #    zprd = snap.zhi - snap.zlo
-        #    atoms = snap.atoms
-        #    if atoms is not None:
-        #        atoms.x = snap.xlo + atoms.x * xprd
-        #        atoms.y = snap.ylo + atoms.y * yprd
-        #        atoms.z = snap.zlo + atoms.z * zprd
-        #else:
-        #    xlo_bound = snap.xlo
-        #    xhi_bound = snap.xhi
-        #    ylo_bound = snap.ylo
-        #    yhi_bound = snap.yhi
-        #    zlo_bound = snap.zlo
-        #    zhi_bound = snap.zhi
-        #    xy = snap.xy
-        #    xz = snap.xz
-        #    yz = snap.yz
-        #    xlo = xlo_bound - min((0.0, xy, xz, xy + xz))
-        #    xhi = xhi_bound - max((0.0, xy, xz, xy + xz))
-        #    ylo = ylo_bound - min((0.0, yz))
-        #    yhi = yhi_bound - max((0.0, yz))
-        #    zlo = zlo_bound
-        #    zhi = zhi_bound
-        #    h0 = xhi - xlo
-        #    h1 = yhi - ylo
-        #    h2 = zhi - zlo
-        #    h3 = yz
-        #    h4 = xz
-        #    h5 = xy
-        #    atoms = snap.atoms
-        #    if atoms is not None:
-        #        atoms.x = snap.xlo + atoms.x * h0 + atoms.y * h5 + atoms.z * h4
-        #        atoms.y = snap.ylo + atoms.y * h1 + atoms.z * h3
-        #        atoms.z = snap.zlo + atoms.z * h2
-        pass
+        if snap.xy == snap.xz == snap.yz == 0.0:
+            xprd = snap.xhi - snap.xlo
+            yprd = snap.yhi - snap.ylo
+            zprd = snap.zhi - snap.zlo
+            atoms = snap.atoms
+            if atoms is not None:
+                atoms[:, x] = snap.xlo + atoms[:, x] * xprd
+                atoms[:, y] = snap.ylo + atoms[:, y] * yprd
+                atoms[:, z] = snap.zlo + atoms[:, z] * zprd
+        else:
+            xlo_bound = snap.xlo
+            xhi_bound = snap.xhi
+            ylo_bound = snap.ylo
+            yhi_bound = snap.yhi
+            zlo_bound = snap.zlo
+            zhi_bound = snap.zhi
+            xy = snap.xy
+            xz = snap.xz
+            yz = snap.yz
+            xlo = xlo_bound - min((0.0, xy, xz, xy + xz))
+            xhi = xhi_bound - max((0.0, xy, xz, xy + xz))
+            ylo = ylo_bound - min((0.0, yz))
+            yhi = yhi_bound - max((0.0, yz))
+            zlo = zlo_bound
+            zhi = zhi_bound
+            h0 = xhi - xlo
+            h1 = yhi - ylo
+            h2 = zhi - zlo
+            h3 = yz
+            h4 = xz
+            h5 = xy
+            atoms = snap.atoms
+            if atoms is not None:
+                atoms[:, x] = snap.xlo + \
+                    atoms[:, x] * h0 + atoms[:, y] * h5 + atoms[:, z] * h4
+                atoms[:, y] = snap.ylo + atoms[:, y] * h1 + atoms[:, z] * h3
+                atoms[:, z] = snap.zlo + atoms[:, z] * h2
 
     def wrap(self):
         pass
