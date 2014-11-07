@@ -12,12 +12,12 @@ __docformat__ = 'restructuredtext en'
 
 #import numpy as np
 
-from ._base import AtomList
+from sknano.core import UserList
 
 __all__ = ['NeighborAtoms']
 
 
-class NeighborAtoms(AtomList):
+class NeighborAtoms(UserList):
     """An eXtended `Atoms` class for structure analysis.
 
     Parameters
@@ -33,7 +33,8 @@ class NeighborAtoms(AtomList):
     """
 
     def __init__(self, atoms=None, copylist=True, deepcopy=False):
-        super(NeighborAtoms, self).__init__(atoms=atoms, copylist=copylist,
+        super(NeighborAtoms, self).__init__(initlist=atoms,
+                                            copylist=copylist,
                                             deepcopy=deepcopy)
 
     def __str__(self):
