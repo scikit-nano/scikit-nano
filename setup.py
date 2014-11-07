@@ -52,8 +52,8 @@ Topic :: Software Development :: Libraries :: Python Modules
 """
 
 MAJOR = 0
-MINOR = 2
-MICRO = 26
+MINOR = 3
+MICRO = 0
 ISRELEASED = False
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
@@ -172,7 +172,7 @@ def setup_package():
         if numpy_version < (1, 8):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
-        install_requires += ['numpy>=1.8']
+        install_requires += ['numpy>=1.9']
 
     try:
         import scipy
