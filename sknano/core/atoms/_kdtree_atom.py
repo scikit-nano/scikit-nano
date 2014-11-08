@@ -44,9 +44,9 @@ class KDTAtom(XAtom):
         self._bonds = Bonds()
         self._pyramidalization_angle = None
         self._sigma_bond_angle = None
+        self._misalignment_angles = None
         self.poav = None
         self.poma = []
-        #self.mean_poma = None
 
     def __str__(self):
         """Return a nice string representation of `KDTAtom`."""
@@ -101,6 +101,7 @@ class KDTAtom(XAtom):
 
     @property
     def bonds(self):
+        """Return atom `Bonds` instance."""
         return self._bonds
 
     @bonds.setter
@@ -121,6 +122,7 @@ class KDTAtom(XAtom):
 
     @property
     def pyramidalization_angle(self):
+        """Return the pyramidalization angle :math:`\\theta_P`"""
         return self._pyramidalization_angle
 
     @pyramidalization_angle.setter
