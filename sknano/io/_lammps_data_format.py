@@ -52,6 +52,7 @@ class DATAReader(StructureIO):
 
     @property
     def headers(self):
+        """:class:`python:dict` of dump file header values"""
         return self.header_data
 
     @property
