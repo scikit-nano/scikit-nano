@@ -16,7 +16,6 @@ __docformat__ = 'restructuredtext en'
 #import numpy as np
 
 #from sknano.core.math import Vector, vector as vec
-#from ._atom_bonds import AtomBonds
 #from ._bond import Bond
 #from ._bonds import Bonds
 #from ._extended_atoms import XAtoms

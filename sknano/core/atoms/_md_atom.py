@@ -14,9 +14,7 @@ __docformat__ = 'restructuredtext en'
 
 #import numbers
 
-#from ._bonds import Bonds
 from ._kdtree_atom import KDTAtom
-#from ._neighbor_atoms import NeighborAtoms
 
 __all__ = ['MDAtom']
 
