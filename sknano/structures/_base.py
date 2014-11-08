@@ -18,13 +18,10 @@ __all__ = ['StructureBase']
 
 
 class StructureBase(object):
-    u"""Base class for creating interactive nanostructure objects.
+    u"""Base class for creating abstract representation of nano structure.
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
-        :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
         :class:`~sknano.core.atoms.Atom` 1 and 2

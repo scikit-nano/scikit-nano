@@ -12,8 +12,6 @@ __docformat__ = 'restructuredtext en'
 
 from functools import total_ordering
 
-#import numpy as np
-
 from sknano.core.math import Vector
 from ._extended_atoms import XAtoms
 
@@ -22,17 +20,16 @@ __all__ = ['Bond']
 
 @total_ordering
 class Bond(object):
-    """Base class for `Atom`-`Atom` bond.
+    """Abstract representation of a "bond" between 2 `Atom` objects.
 
     Parameters
     ----------
+    atom1, atom2 : `~sknano.core.atoms.XAtom` instances
 
     """
-
     def __init__(self, atom1, atom2):
-
-        self._vector = Vector(atom2.r - atom1.r, p0=atom1.r.p)
         self._atoms = XAtoms(atoms=[atom1, atom2])
+        self._vector = Vector(atom2.r - atom1.r, p0=atom1.r.p)
 
     def __str__(self):
         """Return a nice string representation of atom."""
