@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Classes for abstract nanostructure objects (:mod:`sknano.structures`)
+Abstract nanostructure data structures (:mod:`sknano.structures`)
 ===============================================================================
 
 .. currentmodule:: sknano.structures

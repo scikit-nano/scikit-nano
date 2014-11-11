@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Utility modules for analysis, testing, and general use (:mod:`sknano.utils`)
+Utility package (:mod:`sknano.utils`)
 ===============================================================================
 
 .. currentmodule:: sknano.utils
@@ -12,12 +12,9 @@ Contents
 Sub-packages
 -------------
 
-.. autosummary::
-   :toctree: generated/
-
-   analysis
-   geometric_shapes
-   symmetry_groups
+* analysis (:mod:`sknano.utils.analysis`)
+* geometric_shapes (:mod:`sknano.utils.geometric_shapes`)
+* symmetry_groups (:mod:`sknano.utils.symmetry_groups`)
 
 """
 from __future__ import absolute_import, division, print_function

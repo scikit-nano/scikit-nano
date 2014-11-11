@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ======================================================================
-Classes for structure generator objects (:mod:`sknano.generators`)
+Structure generators (:mod:`sknano.generators`)
 ======================================================================
 
 .. currentmodule:: sknano.generators

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Core package code for development and general use (:mod:`sknano.core`)
+Core code for package development and general use (:mod:`sknano.core`)
 ===============================================================================
 
 .. currentmodule:: sknano.core
@@ -9,8 +9,11 @@ Core package code for development and general use (:mod:`sknano.core`)
 Contents
 ========
 
-Core meta functions/classes
-------------------------------
+Functions
+----------
+
+Meta functions:
+
 .. autosummary::
    :toctree: generated/
 
@@ -20,42 +23,38 @@ Core meta functions/classes
    memoize
    method_function
    timethis
-
    methodfunc
    with_doc
 
-I/O functions
---------------
+I/O functions:
+
 .. autosummary::
    :toctree: generated/
 
    get_fname
    get_fpath
 
-Functions for string manipulation
-----------------------------------
+String functions:
+
 .. autosummary::
    :toctree: generated/
 
    pluralize
 
-Custom container classes
---------------------------
+Classes
+-------
+
 .. autosummary::
    :toctree: generated/
 
    UserList
 
-
 Sub-packages
-------------
-.. autosummary::
-   :toctree: generated/
+-------------
 
-   atoms
-   math
-   molecules
-   refdata
+* atoms (:mod:`sknano.core.atoms`)
+* math (:mod:`sknano.core.math`)
+* refdata (:mod:`sknano.core.refdata`)
 
 """
 from __future__ import absolute_import, division, print_function

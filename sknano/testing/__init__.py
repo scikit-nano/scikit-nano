@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ============================================================================
-Helper functions for testing and development (:mod:`sknano.testing`)
+Testing package (:mod:`sknano.testing`)
 ============================================================================
 
 .. currentmodule:: sknano.testing
