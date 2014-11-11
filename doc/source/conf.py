@@ -334,6 +334,7 @@ texinfo_documents = [('index', 'scikit-nano',
 # -----------------------------------------------------------------------------
 intersphinx_mapping = {
     'python': ('http://docs.python.org/2', None),
+    'python3': ('http://docs.python.org/3', None),
     'numpy': ('http://docs.scipy.org/doc/numpy', None),
     'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
 }
