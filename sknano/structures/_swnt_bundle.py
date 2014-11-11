@@ -18,6 +18,7 @@ __all__ = ['SWNTBundle']
 
 
 class SWNTBundle(NanotubeBundleBase, SWNT):
+    """SWNT bundle structure class."""
 
     def __init__(self, **kwargs):
 

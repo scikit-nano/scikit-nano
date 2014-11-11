@@ -16,7 +16,7 @@ import numpy as np
 from ._point import Point
 from ._transforms import rotation_transform
 
-__all__ = ['Vector', 'cross', 'dot', 'scalar_triple_product',
+__all__ = ['Vector', 'angle', 'cross', 'dot', 'scalar_triple_product',
            'vector_triple_product']
 
 
@@ -538,8 +538,31 @@ def dot(u, v):
 
 
 def scalar_triple_product(u, v, w):
+    """Compute scalar triple product of three vectors.
+
+    Parameters
+    ----------
+    u, v, w : `Vector`
+
+    Returns
+    -------
+    float
+
+    """
     return dot(u, cross(v, w))
 
 
 def vector_triple_product(u, v, w):
+    """Compute vector triple product of three vectors.
+
+    Parameters
+    ----------
+    u, v, w : `Vector`
+
+    Returns
+    -------
+    `Vector`
+
+    """
+
     return cross(u, cross(v, w))

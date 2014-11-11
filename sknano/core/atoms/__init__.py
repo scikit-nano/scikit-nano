@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Abstract data structures for Atom objects (:mod:`sknano.core.atoms`)
+Class representations of nature's building blocks (:mod:`sknano.core.atoms`)
 ===============================================================================
 
 .. currentmodule:: sknano.core.atoms
@@ -9,26 +9,33 @@ Abstract data structures for Atom objects (:mod:`sknano.core.atoms`)
 Contents
 ========
 
+Single atom classes:
+
 .. autosummary::
    :toctree: generated/
 
    Atom
-   Atoms
-
    XAtom
-   XAtoms
-
    KDTAtom
-   KDTAtoms
-
    POAVAtom
-   POAVAtoms
-
    StructureAtom
-   StructureAtoms
 
    Bond
+
+Collections of Atom objects:
+
+.. autosummary::
+   :toctree: generated/
+
+   Atoms
+   XAtoms
+   KDTAtoms
+   POAVAtoms
+
    Bonds
+
+   NeighborAtoms
+   StructureAtoms
 
    Trajectory
    Snapshot

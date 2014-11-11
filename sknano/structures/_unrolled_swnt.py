@@ -19,6 +19,7 @@ __all__ = ['UnrolledSWNT']
 
 
 class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
+    """Unrolled SWNT structure class."""
 
     def __init__(self, n=10, m=0, nx=1, nz=1, Nlayers=1, layer_spacing=dVDW,
                  stacking_order='AB', Lx=None, fix_Lx=False, Lz=None,

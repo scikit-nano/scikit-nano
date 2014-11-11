@@ -24,6 +24,7 @@ __all__ = ['MWNT']
 
 
 class MWNT(StructureBase):
+    """MWNT structure class."""
     def __init__(self, Ch=None, Nwalls=None, Lz=None, fix_Lz=False, nz=1,
                  add_inner_shells=False, add_outer_shells=True,
                  max_shells=None, max_shell_diameter=np.inf,

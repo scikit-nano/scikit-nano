@@ -23,7 +23,7 @@ __all__ = ['MWNTMixin', 'NanotubeMixin', 'NanotubeBundleMixin',
 
 
 class NanotubeMixin(object):
-
+    """Mixin class for nanotube classes."""
     @property
     def n(self):
         """Chiral index :math:`n`.
@@ -332,10 +332,12 @@ class NanotubeMixin(object):
 
 
 class MWNTMixin(object):
+    """Mixin class for MWNTs."""
     pass
 
 
 class NanotubeBundleMixin(object):
+    """Mixin class for nanotube bundles."""
 
     def compute_bundle_params(self):
         """Compute/update nanotube bundle parameters."""
@@ -469,6 +471,7 @@ class NanotubeBundleMixin(object):
 
 
 class UnrolledSWNTMixin(object):
+    """Mixin class for unrolled nanotubes."""
 
     @property
     def Lx(self):

@@ -11,15 +11,14 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 from ._base import StructureBase
-from ._compute_funcs import compute_dt, compute_rt, compute_tube_mass, \
-    compute_linear_mass_density
+from ._compute_funcs import compute_tube_mass, compute_linear_mass_density
 from ._mixins import NanotubeMixin
 
 __all__ = ['SWNT', 'Nanotube']
 
 
 class SWNT(NanotubeMixin, StructureBase):
-    u"""Class for creating interactive SWNT objects.
+    u"""SWNT structure class.
 
     Parameters
     ----------

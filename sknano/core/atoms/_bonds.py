@@ -62,27 +62,43 @@ class Bonds(UserList):
 
     @property
     def vectors(self):
+        """Array of :attr:`~Bond.vector`\ s."""
         return np.asarray([bond.vector for bond in self])
 
     @property
+    def unit_vectors(self):
+        """Array of :attr:`~Bond.unit_vector`\ s."""
+        return np.asarray([bond.unit_vector for bond in self])
+
+    @property
     def lengths(self):
+        """`np.ndarray` of :attr:`~Bond.length`\ s."""
         return np.asarray([bond.length for bond in self])
 
     @property
     def mean_length(self):
+        """Mean bond length."""
         return np.mean(self.lengths)
 
     @property
+    def bond_angle_pairs(self):
+        """List of all 2-tuple bond pair combinations."""
+        return list(combinations(self, 2))
+
+    @property
     def angles(self):
+        """Angles between bond vectors."""
         return np.asarray([vec.angle(b1.vector, b2.vector) for (b1, b2) in
                            combinations(self, 2)])
 
     @property
     def mean_angle(self):
+        """Mean bond angle."""
         return np.mean(self.angles)
 
     @property
     def atoms(self):
+        """`Atoms` :class:`python:set` in `Bonds`."""
         atoms = XAtoms()
         [atoms.extend(bond.atoms) for bond in self]
         return XAtoms(atoms=list(set(atoms)))

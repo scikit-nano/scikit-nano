@@ -16,7 +16,7 @@ __all__ = ['Fullerene']
 
 
 class Fullerene(object):
-    u"""Class for generating interactive Fullerene objects.
+    """Fullerene structure class.
 
     The `fullerene data
     <http://www.nanotube.msu.edu/fullerene/fullerene-isomers.html>`_

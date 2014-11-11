@@ -148,6 +148,18 @@ class XAtoms(Atoms):
         return self.__class__(atoms=filtered_atoms)
 
     def get_atom(self, atomID):
+        """Get `XAtom` with :attr:`Xatom.atomID` == `atomID`.
+
+        Parameters
+        ----------
+        atomID : int
+
+        Returns
+        -------
+        `XAtom` instance with :attr:`XAtom.atomID` == `atomID` or
+        `None` if no :attr:`XAtom.atomID` == `atomID`.
+
+        """
         try:
             return self[np.where(self.atom_ids == atomID)[0]]
         except TypeError:
@@ -155,12 +167,49 @@ class XAtoms(Atoms):
             return None
 
     def getatomattr(self, attr):
+        """Get :class:`numpy:~numpy.ndarray` of atom attributes `attr`.
+
+        Parameters
+        ----------
+        attr : str
+            Name of attribute to pass to `getattr` from each `XAtom` in
+            `XAtoms`.
+
+        Returns
+        -------
+        :class:`numpy:~numpy.ndarray`
+
+        Raises
+        ------
+        `ValueError`
+            if `attr` not in list of class atomattrs.
+
+        """
         if attr not in self._atomattrs:
             errmsg = '{} not in list of allowed attributes:\n{}'
             raise ValueError(errmsg.format(attr, self._atomattrs))
         return np.asarray([getattr(atom, attr) for atom in self])
 
     def mapatomattr(self, attr, from_attr, attrmap):
+        """Set/update atom attribute from another atom attribute with dict.
+
+        Parameters
+        ----------
+        attr, from_attr : :class:`python:str`
+        attrmap : :class:`python:dict`
+
+        Examples
+        --------
+        Suppose you have an `XAtoms` instance named ``atoms`` that has
+        `XAtom` instances of two atomtypes `1` and `2` and we want to set
+        all `XAtom`\ s with `atomtype=1` to Nitrogen and all `XAtom`\ s with
+        `atomtype=2` to Argon.
+
+        We'd call this method like so::
+
+        >>> atoms.mapatomattr('element', 'atomtype', {1: 'N', 2: 'Ar'})
+
+        """
         [setattr(atom, attr, attrmap[getattr(atom, from_attr)])
          for atom in self if getattr(atom, from_attr) is not None]
 

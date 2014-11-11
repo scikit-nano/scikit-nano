@@ -18,6 +18,7 @@ __all__ = ['MWNTBundle']
 
 
 class MWNTBundle(NanotubeBundleBase, MWNT):
+    """MWNT bundle structure class."""
     def __init__(self, **kwargs):
 
         super(MWNTBundle, self).__init__(**kwargs)

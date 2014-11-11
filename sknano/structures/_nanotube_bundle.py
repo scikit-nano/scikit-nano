@@ -20,6 +20,7 @@ __all__ = ['NanotubeBundleBase']
 
 
 class NanotubeBundleBase(object):
+    """Nanotube bundle structure base class."""
 
     def __init__(self, nx=1, ny=1, Lx=None, Ly=None, vdw_spacing=dVDW,
                  bundle_packing=None, bundle_geometry=None, **kwargs):

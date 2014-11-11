@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Nanostructure class representations (:mod:`sknano.structures`)
+Nanostructure data structures (:mod:`sknano.structures`)
 ===============================================================================
 
 .. currentmodule:: sknano.structures
@@ -15,31 +15,63 @@ See the specific class doc pages below for detailed documentation on its use.
 Contents
 ========
 
-Classes for creating abstract object representations of nanostructures
---------------------------------------------------------------------------
+Classes
+--------
+
+Base structure classes:
+
 .. autosummary::
    :toctree: generated/
 
    StructureBase
    NanotubeBundleBase
 
+Mixin classes:
+
+.. autosummary::
+   :toctree: generated/
+
    MWNTMixin
    NanotubeBundleMixin
    UnrolledSWNTMixin
 
+Fullerene structure class:
+
+.. autosummary::
+   :toctree: generated/
+
    Fullerene
+
+Graphene structure classes:
+
+.. autosummary::
+   :toctree: generated/
 
    GraphenePrimitiveCell
    Graphene
    BilayerGraphene
 
+SWNT structure classes:
+
+.. autosummary::
+   :toctree: generated/
+
    SWNT
    SWNTBundle
+
+MWNT structure classes:
+
+.. autosummary::
+   :toctree: generated/
+
    MWNT
    MWNTBundle
 
-Functions for computing nanostructure properties
---------------------------------------------------------------------------
+Functions
+----------
+
+Nanotube compute functions:
+
 .. autosummary::
    :toctree: generated/
 
@@ -82,9 +114,12 @@ Helper functions and data structures related to :math:`(n, m)` chirality data
    get_Ch_indices
    get_Ch_type
    map_Ch
-   chiral_type_name_mappings
-   Ch_types
-   filter_key_type_mappings
+
+.. autodata:: chiral_type_name_mappings
+
+.. autodata:: Ch_types
+
+.. autodata:: filter_key_type_mappings
 
 """
 from __future__ import absolute_import, division, print_function
