@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Utility package (:mod:`sknano.utils`)
+Utility modules (:mod:`sknano.utils`)
 ===============================================================================
 
 .. currentmodule:: sknano.utils
