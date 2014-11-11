@@ -12,12 +12,8 @@ __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
 
+from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from sknano.version import short_version as version
-
-try:
-    from sknano.core.atoms import KDTAtom as Atom, KDTAtoms as Atoms
-except ImportError:
-    from sknano.core.atoms import XAtom as Atom, XAtoms as Atoms
 
 default_comment_line = \
     'Structure data generated using scikit-nano version {}'.format(version)

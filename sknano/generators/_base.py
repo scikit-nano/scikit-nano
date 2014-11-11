@@ -13,11 +13,7 @@ __docformat__ = 'restructuredtext en'
 import copy
 import os
 
-try:
-    from sknano.core.atoms import KDTAtom as Atom, KDTAtoms as Atoms
-except ImportError:
-    from sknano.core.atoms import XAtom as Atom, XAtoms as Atoms
-
+from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from sknano.io import StructureWriter, default_structure_format, \
     supported_structure_formats
 
