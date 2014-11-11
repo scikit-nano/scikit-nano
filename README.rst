@@ -30,7 +30,7 @@ The following structure data formats are supported:
 
       .. todo:: Provide notes on limitations of LAMMPS data format support
 
-    * `LAMMPS data` (*limited support for full format spec.*)
+    * `LAMMPS dump` (*limited support for full format spec.*)
 
       .. todo:: Provide notes on limitations of LAMMPS dump format support
 
