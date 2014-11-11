@@ -52,7 +52,7 @@ class Bond(object):
 
     @property
     def atoms(self):
-        """:class:`~sknano.core.atoms.XAtoms` in `Bond`."""
+        """:class:`~sknano.core.atoms.Atoms` in `Bond`."""
         return self._atoms
 
     @property
@@ -79,6 +79,10 @@ class Bond(object):
     def vector(self, value):
         """Set `Bond` :class:`~sknano.core.math.Vector`."""
         self._vector = Vector(value)
+
+    @property
+    def unit_vector(self):
+        return self.vector.unit_vector
 
     @property
     def length(self):
