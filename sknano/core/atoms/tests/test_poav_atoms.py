@@ -6,7 +6,7 @@ import nose
 from nose.tools import *
 from pkg_resources import resource_filename
 import numpy as np
-from sknano.core.atoms import KDTAtom, KDTAtoms
+from sknano.core.atoms import POAVAtom, POAVAtoms
 from sknano.generators import SWNTGenerator
 from sknano.io import DATAReader
 from sknano.testing import generate_atoms
@@ -14,9 +14,9 @@ from sknano.testing import generate_atoms
 
 
 def test_instantiation():
-    from sknano.core.atoms import Atoms, XAtoms
-    atoms = KDTAtoms()
-    assert_is_instance(atoms, (Atoms, XAtoms, KDTAtoms))
+    from sknano.core.atoms import Atoms, XAtoms, KDTAtoms
+    atoms = POAVAtoms()
+    assert_is_instance(atoms, (Atoms, XAtoms, KDTAtoms, POAVAtoms))
     swnt_atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=1)
     for atom in swnt_atoms:
@@ -24,31 +24,31 @@ def test_instantiation():
 
     assert_equal(len(atoms), len(swnt_atoms))
 
-    atoms = KDTAtoms(atoms=atoms)
+    atoms = POAVAtoms(atoms=atoms)
     assert_equal(len(atoms), len(swnt_atoms))
 
-    atoms = KDTAtoms(atoms=atoms.data)
+    atoms = POAVAtoms(atoms=atoms.data)
     assert_equal(len(atoms), len(swnt_atoms))
 
-    atoms = KDTAtoms(atoms=atoms)
+    atoms = POAVAtoms(atoms=atoms)
     assert_equal(len(atoms), len(swnt_atoms))
 
 
 def test_list_methods():
-    atoms1 = KDTAtoms()
+    atoms1 = POAVAtoms()
     for Z in range(100, 0, -1):
-        atoms1.append(KDTAtom(Z=Z))
+        atoms1.append(POAVAtom(Z=Z))
     atoms1.sort(key=lambda a: a.Z)
-    atoms2 = KDTAtoms()
+    atoms2 = POAVAtoms()
     for Z in range(1, 101):
-        atoms2.append(KDTAtom(Z=Z))
+        atoms2.append(POAVAtom(Z=Z))
     assert_equal(atoms1, atoms2)
 
 
 def test_atom_tree():
-    Catoms = KDTAtoms()
+    Catoms = POAVAtoms()
     for Z in range(1, 101):
-        Catoms.append(KDTAtom(Z=Z))
+        Catoms.append(POAVAtom(Z=Z))
     assert_equals(Catoms.Natoms, 100)
 
 
@@ -59,7 +59,7 @@ def test_structure_analysis():
     atoms.update_attrs()
     assert_equals(atoms.Natoms, 400)
 
-    atoms = KDTAtoms(atoms=atoms)
+    atoms = POAVAtoms(atoms=atoms)
     assert_equals(atoms.Natoms, 400)
 
     atoms.kNN = 3
@@ -129,6 +129,43 @@ def test_structure_data():
     atoms.assign_unique_ids()
     atoms.update_attrs()
     assert_equals(swnt_atoms.Natoms, atoms.Natoms)
+
+
+def test_pyramidalization_angles():
+    atoms = \
+        generate_atoms(generator_class='SWNTGenerator', n=20, m=10, nz=2)
+    atoms.assign_unique_ids()
+    atoms.update_attrs()
+    #atoms.NNrc = 2.0
+    atoms.update_attrs()
+
+    for i, atom in enumerate(atoms):
+        try:
+            if atom.poav is not None:
+                print('atom.poav:\n'
+                      '{}\n'.format(atom.poav))
+                print('atom.pyramidalization_angle: '
+                      '{}\n'.format(np.degrees(atom.pyramidalization_angle)))
+        except AttributeError:
+            continue
+
+
+def test_poma():
+    atoms = \
+        generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
+    atoms.assign_unique_ids()
+    atoms.update_attrs()
+    print('misalignment_angles: {}'.format(np.degrees(atoms.poma)))
+
+    #for i, atom in enumerate(atoms):
+    #    try:
+    #        if atom.poav is not None:
+    #            print('atom.poav:\n'
+    #                  '{}\n'.format(atom.poav))
+    #            print('atom.pyramidalization_angle: '
+    #                  '{}\n'.format(np.degrees(atom.pyramidalization_angle)))
+    #    except AttributeError:
+    #        continue
 
 
 def test_list_mods():

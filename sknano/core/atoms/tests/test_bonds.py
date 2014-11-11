@@ -29,10 +29,6 @@ def test2():
     atoms = SWNTGenerator(n=10, m=10, nz=3).atoms
     atoms.assign_unique_ids()
     atoms.update_attrs()
-    assert_true(atoms.Natoms, len(atoms.poma))
-    #print(np.asarray([np.degrees(poma) for poma in atoms.poma]).tolist())
-    print(np.degrees(atoms.mean_nonzero_poma))
-    print(np.degrees(np.mean(atoms.pyramidalization_angles)))
 
 
 def test3():
