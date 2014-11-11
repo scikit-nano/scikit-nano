@@ -21,7 +21,10 @@ __all__ = ['XAtoms']
 
 
 class XAtoms(Atoms):
-    """An eXtended `Atoms` class with more atom attributes.
+    """An eXtended `Atoms` class.
+
+    Sub-class of `Atoms` class, and a container class for lists of
+    :class:`~sknano.core.atoms.XAtom` instances.
 
     Parameters
     ----------

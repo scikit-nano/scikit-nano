@@ -27,7 +27,6 @@ except ImportError:
                       'nearest-neighbor queries between atoms.')
 
 from sknano.core.math import Vector, vector as vec
-#from ._atom_bonds import AtomBonds
 from ._bond import Bond
 from ._bonds import Bonds
 from ._extended_atoms import XAtoms
@@ -37,14 +36,30 @@ __all__ = ['KDTAtoms']
 
 
 class KDTAtoms(XAtoms):
-    """An `Atoms` class for KDTree analysis."""
+    """An `Atoms` sub-class for KDTree analysis.
+
+    Sub-class of `XAtoms` class, and a container class for lists of
+    :class:`~sknano.core.atoms.KDTAtom` instances.
+
+    Parameters
+    ----------
+    atoms : {None, sequence, `KDTAtoms`}, optional
+        if not `None`, then a list of `KDTAtom` instance objects or an
+        existing `KDTAtoms` instance object.
+    copylist : bool, optional
+        perform shallow copy of atoms list
+    deepcopy : bool, optional
+        perform deepcopy of atoms list
+
+    """
     _atomattrs = XAtoms._atomattrs + \
         ['CN', 'NN', 'bonds', 'pyramidalization_angle', 'sigma_bond_angle',
          'poav', 'poma']
 
-    def __init__(self, **kwargs):
-
-        super(KDTAtoms, self).__init__(**kwargs)
+    def __init__(self, atoms=None, copylist=True, deepcopy=False):
+        super(KDTAtoms, self).__init__(atoms=atoms,
+                                       copylist=copylist,
+                                       deepcopy=deepcopy)
 
         self._kNN = 3
         self._NNrc = 2.0
