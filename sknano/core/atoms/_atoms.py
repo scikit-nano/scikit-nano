@@ -173,7 +173,11 @@ class Atoms(UserList):
         filtered_atoms : `Atoms`
 
         """
-        return self.__class__(atoms=np.asarray(self)[condition].tolist())
+        filtered_atoms = \
+            np.asarray(self)[np.in1d(self.data,
+                                     np.asarray(self)[condition].tolist(),
+                                     invert=invert)].tolist()
+        return self.__class__(atoms=filtered_atoms)
 
     def get_atoms(self, asarray=False):
         """Return list of `Atoms`.
