@@ -166,18 +166,24 @@ class Atoms(UserList):
         Parameters
         ----------
         condition : array_like, bool
+            Boolean index array having same shape as the initial dimensions
+            of the list of `Atoms` being indexed.
         invert : bool, optional
+            If `True`, the boolean array `condition` is inverted element-wise.
 
         Returns
         -------
         filtered_atoms : `Atoms`
+            If `invert` is `False`, return the elements where `condition`
+            is `True`.
+
+            If `invert` is `True`, return the elements where `~condition`
+            (i.e., numpy.invert(condition)) is `True`.
 
         """
-        filtered_atoms = \
-            np.asarray(self)[np.in1d(self.data,
-                                     np.asarray(self)[condition].tolist(),
-                                     invert=invert)].tolist()
-        return self.__class__(atoms=filtered_atoms)
+        if invert:
+            condition = ~condition
+        return self.__class__(atoms=np.asarray(self)[condition].tolist())
 
     def get_atoms(self, asarray=False):
         """Return list of `Atoms`.
