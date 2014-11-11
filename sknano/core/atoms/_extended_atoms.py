@@ -135,7 +135,8 @@ class XAtoms(Atoms):
 
         Returns
         -------
-        filtered_atoms : `XAtoms`
+        filtered_atoms : `Atoms`
+            An instance of `Atoms` (sub)class.
 
         """
         filtered_atoms = \
@@ -155,6 +156,10 @@ class XAtoms(Atoms):
             errmsg = '{} not in list of allowed attributes:\n{}'
             raise ValueError(errmsg.format(attr, self._atomattrs))
         return np.asarray([getattr(atom, attr) for atom in self])
+
+    def mapatomattr(self, attr, from_attr, attrmap):
+        [setattr(atom, attr, attrmap[getattr(atom, from_attr)])
+         for atom in self if getattr(atom, from_attr) is not None]
 
     def select(self, cmd):
         pass
