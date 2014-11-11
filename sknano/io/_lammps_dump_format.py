@@ -18,16 +18,14 @@ from operator import attrgetter
 import numpy as np
 
 from sknano.core import get_fpath
-#from sknano.core.atoms import Trajectory
+from sknano.core.atoms import Trajectory, Snapshot
 
-from ._base import Atom, Atoms, \
-    StructureIO, StructureIOError, StructureFormatSpec, \
+from ._base import StructureIO, StructureIOError, StructureFormatSpec, \
     default_comment_line
 
 __all__ = ['DUMPData', 'DUMPReader', 'DUMPWriter', 'DUMPIOError',
            'DUMPFormatSpec']
 
-#attr_map = {'id': 'atomID'}
 attr_dtypes = {'atomID': int, 'atomtype': int, 'bondID': int, 'bondtype': int,
                'moleculeID': int, 'q': float, 'ervel': float,
                'm': float, 'mass': float,
@@ -108,74 +106,6 @@ class DUMPWriter(object):
         atoms.rezero_coords()
 
 
-class Snap(object):
-    pass
-
-
-class aselect(object):
-    def __init__(self, data):
-        self.data = data
-
-    def all(self, *args):
-        if len(args) == 0:
-            for s in self.data.snaps:
-                if not s.tselect:
-                    continue
-                for i in xrange(s.natoms):
-                    s.aselect[i] = 1
-                s.nselect = s.natoms
-        else:
-            s = self.data.snaps[self.data.findtime(args[0])]
-            for i in xrange(s.natoms):
-                s.aselect[i] = 1
-            s.nselect = s.natoms
-
-
-class tselect(object):
-    def __init__(self, data):
-        self.data = data
-
-    def all(self):
-        data = self.data
-        for snap in data.snaps:
-            snap.tselect = 1
-        data.nselect = len(data.snaps)
-        data.aselect.all()
-        print('{}/{} snapshots selected'.format(data.nselect, data.nsnaps))
-
-    def one(self, n):
-        data = self.data
-        for snap in data.snaps:
-            snap.tselect = 0
-        i = data.findtime(n)
-        data.snaps[i].tselect = 1
-        data.nselect = 1
-        data.aselect.all()
-        print('{}/{} snapshots selected'.format(data.nselect, data.nsnaps))
-
-    def none(self):
-        data = self.data
-        for snap in data.snaps:
-            snap.tselect = 0
-        data.nselect = 0
-        print('{}/{} snapshots selected'.format(data.nselect, data.nsnaps))
-
-    def skip(self, n):
-        data = self.data
-        count = n - 1
-        for snap in data.snaps:
-            if not snap.tselect:
-                continue
-            count += 1
-            if count == n:
-                count = 0
-                continue
-            snap.tselect = 0
-            data.nselect -= 1
-        data.aselect.all()
-        print('{}/{} snapshots selected'.format(data.nselect, data.nsnaps))
-
-
 class DUMPData(object):
     """Class for reading and writing structure data in LAMMPS dump format.
 
@@ -185,16 +115,8 @@ class DUMPData(object):
 
     """
     def __init__(self, *args):
-        #super(DUMPData, self).__init__()
-        #self.atoms = Atoms()
-        #self.dumpattrs = []
-        self.snaps = []
-        self.nsnaps = 0
-        self.nselect = 0
-        self.names = {}
-        self.aselect = aselect(self)
-        self.tselect = tselect(self)
-
+        self.trajectory = Trajectory()
+        self.dumpattrs = {}
         self.dumpfiles = []
         for fpath in args:
             self.dumpfiles.append(fpath)
@@ -202,44 +124,39 @@ class DUMPData(object):
         if len(self.dumpfiles) == 0:
             raise ValueError('No dump file specified.')
 
-        #if len(args) == 1:
-        #    self.increment = 0
-        #    self.read_all()
-        #else:
-        #    self.increment = 1
-        #    self.nextfile = 0
-        #    self.eof = 0
-
         self.read_all()
+
+    @property
+    def Nsnaps(self):
+        return self.trajectory.Nsnaps
 
     def read_all(self):
         """Read all snapshots from each dump file."""
         for dumpfile in self.dumpfiles:
             with open(dumpfile) as f:
-                snap = self.read_snapshot(f)
-                while snap is not None:
-                    self.snaps.append(snap)
-                    print(snap.time, end=' ')
+                snapshot = self.read_snapshot(f)
+                while snapshot is not None:
+                    self.trajectory.append(snapshot)
+                    print(snapshot.timestep, end=' ')
                     sys.stdout.flush()
-                    snap = self.read_snapshot(f)
+                    snapshot = self.read_snapshot(f)
         print()
 
-        self.snaps.sort(key=attrgetter('time'))
-        self.cull()
-        self.nsnaps = len(self.snaps)
+        self.trajectory.sort(key=attrgetter('timestep'))
+        self.trajectory.cull()
 
-        print("read {:d} snapshots".format(self.nsnaps))
+        print("read {:d} snapshots".format(self.Nsnaps))
 
-        self.tselect.all()
-        if self.names:
-            print('Dumped Atom attributes: {}'.format(self.names2str()))
+        self.trajectory.tselect.all()
+        if self.dumpattrs:
+            print('Dumped Atom attributes: {}'.format(self.dumpattrs2str()))
         else:
             print('No dump column assignments')
 
-        if 'x' not in self.names or 'y' not in self.names or \
-                'z' not in self.names:
+        if 'x' not in self.dumpattrs or 'y' not in self.dumpattrs or \
+                'z' not in self.dumpattrs:
             print('dump scaling status unknown')
-        elif self.nsnaps > 0:
+        elif self.Nsnaps > 0:
             if self.scale_original == 1:
                 self.unscale()
             elif self.scale_original == 0:
@@ -249,33 +166,33 @@ class DUMPData(object):
 
     def read_snapshot(self, f):
         try:
-            snap = Snap()
+            snapshot = Snapshot()
             f.readline()
-            snap.time = int(f.readline().strip().split()[0])
+            snapshot.timestep = int(f.readline().strip().split()[0])
             f.readline()
-            snap.natoms = int(f.readline().strip())
-            snap.aselect = np.zeros(snap.natoms)
+            snapshot.Natoms = int(f.readline().strip())
+            snapshot.aselect = np.zeros(snapshot.Natoms)
 
             item = f.readline().strip()
             try:
-                snap.boxstr = item.split('BOUNDS')[1].strip()
+                snapshot.boxstr = item.split('BOUNDS')[1].strip()
             except IndexError:
-                snap.boxstr = ''
+                snapshot.boxstr = ''
 
-            snap.triclinic = False
-            if 'xy' in snap.boxstr:
-                snap.triclinic = True
+            snapshot.triclinic = False
+            if 'xy' in snapshot.boxstr:
+                snapshot.triclinic = True
 
             for axis, sf in zip(('x', 'y', 'z'), ('xy', 'xz', 'yz')):
                 bounds = f.readline().strip().split()
-                setattr(snap, axis + 'lo', float(bounds[0]))
-                setattr(snap, axis + 'hi', float(bounds[1]))
+                setattr(snapshot, axis + 'lo', float(bounds[0]))
+                setattr(snapshot, axis + 'hi', float(bounds[1]))
                 try:
-                    setattr(snap, sf, float(bounds[-1]))
+                    setattr(snapshot, sf, float(bounds[-1]))
                 except IndexError:
-                    setattr(snap, sf, 0.0)
+                    setattr(snapshot, sf, 0.0)
 
-            if self.names:
+            if self.dumpattrs:
                 f.readline()
             else:
                 self.scale_original = -1
@@ -283,31 +200,32 @@ class DUMPData(object):
                 attrs = f.readline().strip().split()[2:]
                 for i, attr in enumerate(attrs):
                     if attr in ('x', 'xu', 'xs', 'xsu'):
-                        self.names['x'] = i
+                        self.dumpattrs['x'] = i
                         if attr in ('x', 'xu'):
                             xflag = 0
                         else:
                             xflag = 1
                     elif attr in ('y', 'yu', 'ys', 'ysu'):
-                        self.names['y'] = i
+                        self.dumpattrs['y'] = i
                         if attr in ('y', 'yu'):
                             yflag = 0
                         else:
                             yflag = 1
                     elif attr in ('z', 'zu', 'zs', 'zsu'):
-                        self.names['z'] = i
+                        self.dumpattrs['z'] = i
                         if attr in ('z', 'zu'):
                             zflag = 0
                         else:
                             zflag = 1
                     else:
-                        self.names[attr] = i
+                        self.dumpattrs[attr] = i
                 if xflag == yflag == zflag == 0:
                     self.scale_original = 0
                 if xflag == yflag == zflag == 1:
                     self.scale_original = 1
 
-                self.atomattrs = sorted(self.names, key=self.names.__getitem__)
+                self.atomattrs = \
+                    sorted(self.dumpattrs, key=self.dumpattrs.__getitem__)
                 if 'id' in self.atomattrs:
                     self.atomattrs[self.atomattrs.index('id')] = 'atomID'
 
@@ -317,19 +235,19 @@ class DUMPData(object):
                 self.attr_dtypes = [attr_dtypes[attr] if attr in attr_dtypes
                                     else float for attr in self.atomattrs]
 
-            #atoms = Atoms()
-            atoms = np.zeros((snap.natoms, len(self.atomattrs)), dtype=float)
-            for n in xrange(snap.natoms):
-                #line = [dtype(value) for dtype, value in
-                #        zip(self.attr_dtypes, f.readline().strip().split())]
-                #atoms.append(Atom(**dict(zip(self.atomattrs, line))))
+            snapshot.atomattrs = self.atomattrs
+            snapshot.attr_dtypes = self.attr_dtypes
+
+            atoms = \
+                np.zeros((snapshot.Natoms, len(self.atomattrs)), dtype=float)
+            for n in xrange(snapshot.Natoms):
                 line = [float(attr) for attr in f.readline().strip().split()]
                 atoms[n] = line
 
-            snap.atoms = atoms
-            return snap
+            snapshot.atoms = atoms
+            return snapshot
 
-        except Exception:
+        except IndexError:
             return None
 
     def next(self):
@@ -344,43 +262,43 @@ class DUMPData(object):
 
     def scale(self, ts=None):
         if ts is None:
-            x = self.names['x']
-            y = self.names['y']
-            z = self.names['z']
-            for snap in self.snaps:
-                self.scale_one(snap, x, y, z)
+            x = self.dumpattrs['x']
+            y = self.dumpattrs['y']
+            z = self.dumpattrs['z']
+            for snapshot in self.trajectory:
+                self.scale_one(snapshot, x, y, z)
 
     def scale_one(self, snap, x, y, z):
         pass
 
     def unscale(self, ts=None):
         if ts is None:
-            x = self.names['x']
-            y = self.names['y']
-            z = self.names['z']
-            for snap in self.snaps:
-                self.unscale_one(snap, x, y, z)
+            x = self.dumpattrs['x']
+            y = self.dumpattrs['y']
+            z = self.dumpattrs['z']
+            for snapshot in self.trajectory:
+                self.unscale_one(snapshot, x, y, z)
 
-    def unscale_one(self, snap, x, y, z):
-        if snap.xy == snap.xz == snap.yz == 0.0:
-            xprd = snap.xhi - snap.xlo
-            yprd = snap.yhi - snap.ylo
-            zprd = snap.zhi - snap.zlo
-            atoms = snap.atoms
+    def unscale_one(self, snapshot, x, y, z):
+        if snapshot.xy == snapshot.xz == snapshot.yz == 0.0:
+            xprd = snapshot.xhi - snapshot.xlo
+            yprd = snapshot.yhi - snapshot.ylo
+            zprd = snapshot.zhi - snapshot.zlo
+            atoms = snapshot.get_atoms(asarray=True)
             if atoms is not None:
-                atoms[:, x] = snap.xlo + atoms[:, x] * xprd
-                atoms[:, y] = snap.ylo + atoms[:, y] * yprd
-                atoms[:, z] = snap.zlo + atoms[:, z] * zprd
+                atoms[:, x] = snapshot.xlo + atoms[:, x] * xprd
+                atoms[:, y] = snapshot.ylo + atoms[:, y] * yprd
+                atoms[:, z] = snapshot.zlo + atoms[:, z] * zprd
         else:
-            xlo_bound = snap.xlo
-            xhi_bound = snap.xhi
-            ylo_bound = snap.ylo
-            yhi_bound = snap.yhi
-            zlo_bound = snap.zlo
-            zhi_bound = snap.zhi
-            xy = snap.xy
-            xz = snap.xz
-            yz = snap.yz
+            xlo_bound = snapshot.xlo
+            xhi_bound = snapshot.xhi
+            ylo_bound = snapshot.ylo
+            yhi_bound = snapshot.yhi
+            zlo_bound = snapshot.zlo
+            zhi_bound = snapshot.zhi
+            xy = snapshot.xy
+            xz = snapshot.xz
+            yz = snapshot.yz
             xlo = xlo_bound - min((0.0, xy, xz, xy + xz))
             xhi = xhi_bound - max((0.0, xy, xz, xy + xz))
             ylo = ylo_bound - min((0.0, yz))
@@ -393,12 +311,13 @@ class DUMPData(object):
             h3 = yz
             h4 = xz
             h5 = xy
-            atoms = snap.atoms
+            atoms = snapshot.get_atoms(asarray=True)
             if atoms is not None:
-                atoms[:, x] = snap.xlo + \
+                atoms[:, x] = snapshot.xlo + \
                     atoms[:, x] * h0 + atoms[:, y] * h5 + atoms[:, z] * h4
-                atoms[:, y] = snap.ylo + atoms[:, y] * h1 + atoms[:, z] * h3
-                atoms[:, z] = snap.zlo + atoms[:, z] * h2
+                atoms[:, y] = snapshot.ylo + \
+                    atoms[:, y] * h1 + atoms[:, z] * h3
+                atoms[:, z] = snapshot.zlo + atoms[:, z] * h2
 
     def wrap(self):
         pass
@@ -412,14 +331,14 @@ class DUMPData(object):
     def atom(self, n, fields=None):
         pass
 
-    def names2str(self):
+    def dumpattrs2str(self):
         #return self.dumpattrs
-        return ' '.join(sorted(self.names, key=self.names.__getitem__))
+        return ' '.join(sorted(self.dumpattrs, key=self.dumpattrs.__getitem__))
 
     def sort(self, *list):
         pass
 
-    def sort_one(self, snap, id):
+    def sort_one(self, snapshot, id):
         pass
 
     def scatter(self, root):
@@ -440,33 +359,16 @@ class DUMPData(object):
     def spread(self, old, n, new):
         pass
 
-    def time(self):
-        pass
-
     def vecs(self, n, *list):
         pass
 
     def newcolumn(self, str):
         pass
 
-    def cull(self):
-        i = 1
-        while i < len(self.snaps):
-            if self.snaps[i].time == self.snaps[i-1].time:
-                del self.snaps[i]
-            else:
-                i += 1
-
     def delete(self):
         pass
 
     def extra(self):
-        pass
-
-    def findtime(self, n):
-        pass
-
-    def map(self, *pairs):
         pass
 
     def maxbox(self):
