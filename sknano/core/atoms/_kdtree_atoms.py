@@ -187,19 +187,19 @@ class KDTAtoms(XAtoms):
         self._update_bonds()
 
     def _update_bonds(self):
-        """Update `KDTAtom` bonds."""
+        """Update :attr:`KDTAtom.bonds` list."""
         #self._update_nearest_neighbors()
         for atom in self:
             atom.bonds = Bonds()
             [atom.bonds.append(Bond(atom, nn)) for nn in atom.NN]
 
     def _update_coordination_numbers(self):
-        """Update `KDTAtom` coordination numbers."""
+        """Update :attr:`KDTAtom.CN`."""
         #self._update_nearest_neighbors()
         [setattr(atom, 'CN', atom.NN.Natoms) for atom in self]
 
     def _update_nearest_neighbors(self):
-        """Update `KDTAtom` nearest-neighbors."""
+        """Update :attr:`KDTAtom.NN`."""
         try:
             NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
             for j, atom in enumerate(self):

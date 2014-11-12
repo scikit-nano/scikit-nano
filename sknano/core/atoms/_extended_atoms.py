@@ -167,7 +167,7 @@ class XAtoms(Atoms):
             return None
 
     def getatomattr(self, attr):
-        """Get :class:`numpy:~numpy.ndarray` of atom attributes `attr`.
+        """Get :class:`~numpy:numpy.ndarray` of atom attributes `attr`.
 
         Parameters
         ----------
@@ -177,7 +177,7 @@ class XAtoms(Atoms):
 
         Returns
         -------
-        :class:`numpy:~numpy.ndarray`
+        :class:`~numpy:numpy.ndarray`
 
         Raises
         ------

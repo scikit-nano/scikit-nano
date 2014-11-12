@@ -43,6 +43,18 @@ class Vector(np.ndarray):
 
        add new methods for coordinate transformations
 
+    Examples
+    --------
+    I began writing my own `Point` and `Vector` classes while trying to
+    teach myself about subclassing :class:`~numpy:numpy.ndarray`.
+    I still don't completely understand the machinery of it, but I ended
+    up with some code that's been useful for handling math operations involving
+    points and vectors. It could use some more testing and there are
+    some math operations don't behave as expected on account of my
+    lack of understanding on how the who subclassing thing works.
+
+    Here are some examples of their use.
+
     """
     __array_priority__ = 15.0
     _verbosity = 0
@@ -454,6 +466,7 @@ class Vector(np.ndarray):
         self[:] = self / self.length
 
     def projection(self, v):
+        """Compute vector projection onto vector `v`."""
         u = self
         return dot(u, v) / dot(v, v) * v
 
@@ -477,6 +490,17 @@ class Vector(np.ndarray):
 
     def rotate(self, angle, rot_axis=None, anchor_point=None, deg2rad=False,
                verbose=False):
+        """Rotate `Vector` coordinates.
+
+        Parameters
+        ----------
+        angle : float
+        rot_axis : `Vector`
+        anchor_point : `Point`
+        deg2rad : bool
+        verbose : bool
+
+        """
         self.p0 = \
             rotation_transform(self.p0, angle=angle, rot_axis=rot_axis,
                                anchor_point=anchor_point, deg2rad=deg2rad)
@@ -488,6 +512,7 @@ class Vector(np.ndarray):
         return NotImplemented
 
     def translate(self, t, fix_tail=False, fix_head=False):
+        """Translate self by `Vector` `t`."""
         #if not fix_tail:
         #    self.p0.translate(t)
         #if not fix_head:
@@ -497,7 +522,17 @@ class Vector(np.ndarray):
 
 
 def angle(u, v):
-    """Compute the angle between two Cartesian vectors."""
+    """Compute the angle between two Cartesian vectors.
+
+    Parameters
+    ----------
+    u, v : `Vector`
+
+    Returns
+    -------
+    :class:`~numpy:numpy.number`
+
+    """
     return np.arccos(dot(u, v) / (u.norm * v.norm))
 
 
