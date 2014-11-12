@@ -88,8 +88,16 @@ class StructureIO(object):
 
 
 class StructureReader(object):
+    """Structure data reader base class."""
     @classmethod
     def read(cls, fpath, structure_format=None, **kwargs):
+        """Read structure data from file.
+
+        Parameters
+        ----------
+        fpath : str
+        structure_format : {None, str}
+        """
         if fpath.endswith('.data') or structure_format == 'data':
             from ._lammps_data_format import DATAReader
             return DATAReader(fpath, **kwargs)
@@ -102,8 +110,18 @@ class StructureReader(object):
 
 
 class StructureWriter(object):
+    """Structure data writer base class."""
     @classmethod
     def write(cls, fname=None, atoms=None, structure_format=None, **kwargs):
+        """Write structure data to file.
+
+        Parameters
+        ----------
+        fname : str, optional
+        atoms : `~sknano.core.atoms.Atoms` instance
+        structure_format : {None, str}, optional
+
+        """
         if structure_format == 'data':
             from ._lammps_data_format import DATAWriter
             DATAWriter.write(fname=fname, atoms=atoms, **kwargs)
