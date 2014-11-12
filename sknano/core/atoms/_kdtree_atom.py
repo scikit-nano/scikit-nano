@@ -28,18 +28,26 @@ class KDTAtom(XAtom):
     ----------
     CN : int, optional
         `KDTAtom` coordination number.
-    NN : sequence, optional
-        List of nearest-neighbor `KDTAtom` objects instances
+    NN : {sequence, `NeighborAtoms`}, optional
+        List of nearest-neighbor `KDTAtom`\ s or `NeighborAtoms` instance
+    bonds : {sequence, `Bonds`}, optional
+        List of atom `Bond`\ s or `Bonds` instance
 
     """
     _atomattrs = XAtom._atomattrs + ['CN', 'NN', 'bonds']
 
-    def __init__(self, **kwargs):
+    def __init__(self, CN=0, NN=None, bonds=None, **kwargs):
         super(KDTAtom, self).__init__(**kwargs)
 
-        self._CN = 0
-        self._NN = NeighborAtoms()
-        self._bonds = Bonds()
+        self.CN = CN
+
+        if NN is None:
+            NN = NeighborAtoms()
+        self.NN = NN
+
+        if bonds is None:
+            bonds = Bonds()
+        self._bonds = bonds
 
     def __str__(self):
         """Return a nice string representation of `KDTAtom`."""
