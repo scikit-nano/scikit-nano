@@ -12,18 +12,11 @@ An `Atoms` class for POAV analysis
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-#import numbers
-#import warnings
-#warnings.filterwarnings('ignore', "Mean of empty slice.")
-#warnings.filterwarnings('ignore',
-#                        'invalid value encountered in double_scalars')
-
 import numpy as np
 
-from sknano.core.math import Vector, vector as vec
-#from ._bond import Bond
-#from ._bonds import Bonds
+from sknano.core.math import vector as vec
 from ._kdtree_atoms import KDTAtoms
+from ._poav_atom import POAV1, POAV2, POAVR
 
 __all__ = ['POAVAtoms']
 
@@ -45,70 +38,57 @@ class POAVAtoms(KDTAtoms):
         perform deepcopy of atoms list
 
     """
-    _atomattrs = KDTAtoms._atomattrs + \
-        ['pyramidalization_angle', 'sigma_bond_angle', 'poav', 'poma']
+    _atomattrs = KDTAtoms._atomattrs + ['POAVlist', 'POAV1', 'POAV2', 'POAVR']
 
     def __init__(self, atoms=None, copylist=True, deepcopy=False):
         super(POAVAtoms, self).__init__(atoms=atoms,
                                         copylist=copylist,
                                         deepcopy=deepcopy)
 
-    #@property
-    #def mean_nonzero_poma(self):
-    #    #self._update_poma()
-    #    return np.ma.mean(np.ma.fix_invalid([np.ma.mean(np.ma.compressed(
-    #        np.ma.masked_values(np.ma.fix_invalid(atom.poma), 0)))
-    #        for atom in self]))
-
-    #@property
-    #def nonzero_poma(self):
-    #    #self._update_poma()
-    #    return [np.ma.masked_values(np.ma.fix_invalid(atom.poma), 0)
-    #            for atom in self]
-
-    @property
-    def poma(self):
-        """Return per-atom list of POAV misalignment angles."""
-        #self._update_poma()
-        return np.ma.asarray([np.ma.fix_invalid(atom.poma) for atom in self])
-
-    @property
-    def pyramidalization_angles(self):
-        #self._update_pyramidalization_angles()
-        angles = []
-        [angles.append(atom.pyramidalization_angle) for atom in self if
-         atom.poav is not None]
-        return np.asarray(angles)
-
     def update_attrs(self):
         super(POAVAtoms, self).update_attrs()
-        self._update_pyramidalization_angles()
-        self._update_poma()
+        self._update_POAVlist()
 
-    def _update_poma(self):
-        #self._update_pyramidalization_angles()
+    def _update_POAVlist(self):
+        """Compute `POAV1`, `POAV2`, `POAVR`."""
         for atom in self:
-            poma = []
-            for i, NN in enumerate(atom.NN):
-                bond = atom.bonds[i]
-                if atom.poav is not None and NN.poav is not None:
-                    nvec = vec.cross(bond.vector, atom.poav)
-                    poma.append(np.abs(np.pi / 2 - vec.angle(NN.poav, nvec)))
-                else:
-                    poma.append(np.nan)
-            atom.poma = poma
-
-    def _update_pyramidalization_angles(self):
-        #self._update_bonds()
-        for atom in self:
+            # the central atom must have 3 bonds
             if atom.bonds.Nbonds == 3:
-                b1, b2, b3 = atom.bonds
-                v21 = Vector(b2.vector - b1.vector, p0=b1.vector.p)
-                v31 = Vector(b3.vector - b1.vector, p0=b1.vector.p)
-                poav = vec.cross(v21, v31)
-                atom.poav = poav.unit_vector
-                atom.sigma_bond_angle = vec.angle(atom.poav, b1.vector)
-                if atom.sigma_bond_angle < np.pi / 2:
-                    atom.sigma_bond_angle = np.pi - atom.sigma_bond_angle
-                    atom.poav = -atom.poav
-                atom.pyramidalization_angle = atom.sigma_bond_angle - np.pi / 2
+                atom.POAVlist = [POAV1(atom.bonds), POAV2(atom.bonds),
+                                 POAVR(atom.bonds)]
+                for i, POAV in enumerate(atom.POAVlist):
+                    pyramidalization_angles = []
+                    misalignment_angles = []
+                    sigma_pi_angles = []
+                    for bond, NN in zip(atom.bonds, atom.NN):
+                        # first compute the pyramidalization angle
+                        sigma_pi_angle = vec.angle(POAV.Vpi, bond.vector)
+                        if sigma_pi_angle < np.pi / 2:
+                            sigma_pi_angle = np.pi - sigma_pi_angle
+                        sigma_pi_angles.append(sigma_pi_angle)
+                        pyramidalization_angles.append(
+                            sigma_pi_angle - np.pi / 2)
+
+                        # the bonded atom must have a POAV to compute the
+                        # misalignment angles
+                        if NN.POAVlist is not None:
+                            # compute vector that is orthogonal to the plane
+                            # defined by the bond vector and the POAV of the
+                            # center atom.
+                            nvec = vec.cross(bond.vector, POAV.Vpi)
+
+                            # the misalignment angle is the angle between the
+                            # nearest neighbor's POAV and the plane defined by
+                            # the bond vector and the POAV of the center atom,
+                            # which is pi/2 minus the angle between
+                            # the NN POAV and the normal vector to the plane
+                            # computed above.
+                            misalignment_angles.append(
+                                np.abs(np.pi / 2 -
+                                       vec.angle(NN.POAVlist[i].Vpi, nvec)))
+                        else:
+                            misalignment_angles.append(np.nan)
+
+                    POAV.pyramidalization_angles = pyramidalization_angles
+                    POAV.misalignment_angles = misalignment_angles
+                    POAV.sigma_pi_angles = sigma_pi_angles
