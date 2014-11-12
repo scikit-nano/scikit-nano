@@ -155,7 +155,7 @@ def test_poma():
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
     atoms.assign_unique_ids()
     atoms.update_attrs()
-    print('misalignment_angles: {}'.format(np.degrees(atoms.poma)))
+    #print('misalignment_angles: {}'.format(np.degrees(atoms.poma)))
 
     #for i, atom in enumerate(atoms):
     #    try:
