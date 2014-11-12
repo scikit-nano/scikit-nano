@@ -15,10 +15,8 @@ See the specific class doc pages below for detailed documentation on its use.
 Contents
 ========
 
-Classes
---------
-
-Base structure classes:
+Structure Classes
+------------------
 
 .. autosummary::
    :toctree: generated/
@@ -26,49 +24,24 @@ Base structure classes:
    StructureBase
    NanotubeBundleBase
 
-Mixin classes:
-
-.. autosummary::
-   :toctree: generated/
-
    MWNTMixin
    NanotubeBundleMixin
    UnrolledSWNTMixin
 
-Fullerene structure class:
-
-.. autosummary::
-   :toctree: generated/
-
    Fullerene
-
-Graphene structure classes:
-
-.. autosummary::
-   :toctree: generated/
 
    GraphenePrimitiveCell
    Graphene
    BilayerGraphene
 
-SWNT structure classes:
-
-.. autosummary::
-   :toctree: generated/
-
    SWNT
    SWNTBundle
-
-MWNT structure classes:
-
-.. autosummary::
-   :toctree: generated/
 
    MWNT
    MWNTBundle
 
-Functions
-----------
+Compute Functions
+------------------
 
 Nanotube compute functions:
 
@@ -101,8 +74,8 @@ Nanotube compute functions:
    compute_tube_mass
    compute_bundle_density
 
-Helper functions and data structures related to :math:`(n, m)` chirality data
--------------------------------------------------------------------------------
+Helper functions for working with :math:`(n, m)` chirality data
+-----------------------------------------------------------------
 .. autosummary::
    :toctree: generated/
 
@@ -114,12 +87,6 @@ Helper functions and data structures related to :math:`(n, m)` chirality data
    get_Ch_indices
    get_Ch_type
    map_Ch
-
-.. autodata:: chiral_type_name_mappings
-
-.. autodata:: Ch_types
-
-.. autodata:: filter_key_type_mappings
 
 """
 from __future__ import absolute_import, division, print_function

@@ -9,33 +9,61 @@ Class representations of nature's building blocks (:mod:`sknano.core.atoms`)
 Contents
 ========
 
-Single atom classes:
+The `Atom` class represents a single atom. The `Atoms` class is a container
+class for `Atom` class instances. Every new atom class has a corresponding
+container class.
+
+Base classes:
 
 .. autosummary::
    :toctree: generated/
 
    Atom
-   XAtom
-   KDTAtom
-   POAVAtom
-   StructureAtom
+   Atoms
 
-   Bond
-
-Collections of Atom objects:
+Atoms with an eXtended set of attributes:
 
 .. autosummary::
    :toctree: generated/
 
-   Atoms
+   XAtom
    XAtoms
+
+Atoms for nearest-neighbor structure analysis:
+
+.. autosummary::
+   :toctree: generated/
+
+   KDTAtom
    KDTAtoms
+
+Atoms for POAV structure analysis:
+
+.. autosummary::
+   :toctree: generated/
+
+   POAVAtom
    POAVAtoms
 
+Class representation of atom bonds.
+
+.. autosummary::
+   :toctree: generated/
+
+   Bond
    Bonds
 
+Classes for structure analysis
+
+.. autosummary::
+   :toctree: generated/
+
    NeighborAtoms
-   StructureAtoms
+
+Classes for molecular dynamics simulations:
+
+.. autosummary::
+   :toctree: generated/
 
    Trajectory
    Snapshot
