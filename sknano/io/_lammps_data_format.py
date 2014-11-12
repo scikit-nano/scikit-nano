@@ -117,10 +117,6 @@ class DATAReader(StructureIO):
             self._parse_boxbounds()
         except (IOError, OSError) as e:
             print(e)
-        except Exception:
-            raise DATAIOError('{} contains missing or malformed data that '
-                              'could not be parsed by DATAReader'.format(
-                                  self.fpath))
 
     def _parse_atoms(self):
         """Populate `Atoms` object with `Atom` objects"""
