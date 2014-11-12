@@ -45,8 +45,8 @@ class POAVAtoms(KDTAtoms):
                                         copylist=copylist,
                                         deepcopy=deepcopy)
 
-    def update_attrs(self):
-        super(POAVAtoms, self).update_attrs()
+    def analyze_structure(self):
+        super(POAVAtoms, self).analyze_structure()
         self._update_POAVlist()
 
     def _update_POAVlist(self):

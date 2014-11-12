@@ -181,7 +181,7 @@ class KDTAtoms(XAtoms):
 
         return self.__class__(atoms=np.asarray(self)[NNi].tolist())
 
-    def update_attrs(self):
+    def analyze_structure(self):
         self._update_nearest_neighbors()
         self._update_coordination_numbers()
         self._update_bonds()
