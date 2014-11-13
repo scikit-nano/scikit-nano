@@ -56,7 +56,7 @@ def test_structure_analysis():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
     atoms.assign_unique_ids()
-    atoms.analyze_structure()
+    atoms.update_attrs()
     assert_equals(atoms.Natoms, 400)
 
     atoms = POAVAtoms(atoms=atoms)
@@ -85,7 +85,7 @@ def test_atom_selections():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
     atoms.assign_unique_ids()
-    atoms.analyze_structure()
+    atoms.update_attrs()
     a200 = atoms.get_atom(200)
     assert_true(a200 is atoms[199])
     assert_true(a200 == atoms[199])
@@ -101,7 +101,7 @@ def test_atom_bonds():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=20, m=10, nz=2)
     atoms.assign_unique_ids()
-    atoms.analyze_structure()
+    atoms.update_attrs()
     atoms.NNrc = 2.0
     bonds = atoms.bonds
     #print('bonds: {!s}'.format(bonds))
@@ -122,12 +122,12 @@ def test_structure_data():
     swnt = SWNTGenerator(n=10, m=5, nz=5)
     swnt_atoms = swnt.atoms
     swnt_atoms.assign_unique_ids()
-    swnt_atoms.analyze_structure()
+    swnt_atoms.update_attrs()
     #swnt.save_data(fname=fname, structure_format='data')
     data = DATAReader(fname)
     atoms = data.atoms
     atoms.assign_unique_ids()
-    atoms.analyze_structure()
+    atoms.update_attrs()
     assert_equals(swnt_atoms.Natoms, atoms.Natoms)
 
 
@@ -135,9 +135,9 @@ def test_pyramidalization_angles():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=20, m=10, nz=2)
     atoms.assign_unique_ids()
-    atoms.analyze_structure()
+    atoms.update_attrs()
     #atoms.NNrc = 2.0
-    atoms.analyze_structure()
+    atoms.update_attrs()
 
     for i, atom in enumerate(atoms):
         try:
@@ -154,7 +154,7 @@ def test_poma():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
     atoms.assign_unique_ids()
-    atoms.analyze_structure()
+    atoms.update_attrs()
     #print('misalignment_angles: {}'.format(np.degrees(atoms.poma)))
 
     #for i, atom in enumerate(atoms):
@@ -171,7 +171,7 @@ def test_poma():
 def test_list_mods():
     atoms = generate_atoms(elements='periodic_table')
     atoms.assign_unique_ids()
-    #atoms.analyze_structure()
+    #atoms.update_attrs()
     print(atoms)
 
 

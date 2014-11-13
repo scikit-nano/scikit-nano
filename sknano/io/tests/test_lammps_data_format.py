@@ -24,7 +24,7 @@ def test_data():
     datafile = resource_filename('sknano', 'data/nanotubes/1010_1cell.data')
     atoms = DATAData(fpath=datafile).atoms
     atoms.assign_unique_ids()
-    atoms.analyze_structure()
+    atoms.update_attrs()
     assert_not_equal(atoms.Natoms, 20)
     assert_equal(atoms.Natoms, 40)
 
@@ -34,7 +34,7 @@ def test_reader():
     reader = DATAReader(datafile)
     atoms = reader.atoms
     atoms.assign_unique_ids()
-    atoms.analyze_structure()
+    atoms.update_attrs()
     assert_not_equal(atoms.Natoms, 20)
     assert_equal(atoms.Natoms, 40)
 

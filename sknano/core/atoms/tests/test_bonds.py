@@ -16,7 +16,7 @@ def test1():
     data = DATAReader(infile)
     atoms = data.atoms
     atoms.assign_unique_ids()
-    atoms.analyze_structure()
+    atoms.update_attrs()
     bonds = atoms.bonds
     assert_equal(bonds.Nbonds, atoms.coordination_numbers.sum())
     print(bonds.mean_length)
@@ -28,14 +28,14 @@ def test1():
 def test2():
     atoms = SWNTGenerator(n=10, m=10, nz=3).atoms
     atoms.assign_unique_ids()
-    atoms.analyze_structure()
+    atoms.update_attrs()
 
 
 def test3():
     atoms = SWNTGenerator(n=20, m=0, nz=2).atoms
     assert_equal(atoms.Natoms, 160)
     atoms.assign_unique_ids()
-    atoms.analyze_structure()
+    atoms.update_attrs()
     print(np.degrees(atoms.bonds.mean_length))
     #print(np.degrees(atoms.bonds.mean_angle))
     atom0 = atoms[0]
