@@ -17,7 +17,7 @@ from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from sknano.io import StructureData, StructureWriter, \
     default_structure_format, supported_structure_formats
 
-__all__ = ['Atom', 'Atoms', 'GeneratorMixin', 'STRUCTURE_GENERATORS']
+__all__ = ['Atom', 'Atoms', 'GeneratorBase', 'STRUCTURE_GENERATORS']
 
 
 STRUCTURE_GENERATORS = ('SWNTGenerator', 'SWNTBundleGenerator',
@@ -25,8 +25,11 @@ STRUCTURE_GENERATORS = ('SWNTGenerator', 'SWNTBundleGenerator',
                         'GrapheneGenerator', 'BilayerGrapheneGenerator')
 
 
-class GeneratorMixin(object):
-    """Base mixin class for generator classes"""
+class GeneratorBase(object):
+    """Base class for generator classes"""
+
+    def __init__(self):
+        self.structure_data = StructureData()
 
     @property
     def atoms(self):
@@ -61,12 +64,12 @@ class GeneratorMixin(object):
 
     @property
     def structure(self):
-        """Alias to :attr:`~GeneratorMixin.structure_data`."""
+        """Alias to :attr:`~GeneratorBase.structure_data`."""
         return self.structure_data
 
     @structure.setter
     def structure(self, value):
-        """Alias to :attr:`~GeneratorMixin.structure_data`."""
+        """Alias to :attr:`~GeneratorBase.structure_data`."""
         self.structure_data = value
 
     @structure.deleter
