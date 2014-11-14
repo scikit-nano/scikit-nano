@@ -12,7 +12,7 @@ Contents
 .. autosummary::
    :toctree: generated/
 
-   GeneratorMixin
+   GeneratorBase
    FullereneGenerator
    GrapheneGenerator
    BilayerGrapheneGenerator
