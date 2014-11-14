@@ -61,7 +61,7 @@ class DATAReader(StructureIO):
 
     def read(self):
         """Read data file."""
-        self.atoms.clear()
+        self.structure.clear()
         try:
             with open(self.fpath, 'r') as f:
                 self.comment_line = f.readline().strip()
@@ -175,17 +175,17 @@ class DATAReader(StructureIO):
                 #    print('unknown atom keyword: {}'.format(kw))
 
             atom = Atom(**atom_kwargs)
-            self.atoms.append(atom)
+            self.structure.atoms.append(atom)
 
     def _parse_atomtypes(self):
-        Ntypes = self.atoms.Ntypes
-        atomtypes = self.atoms.atomtypes
+        Ntypes = self.structure.atoms.Ntypes
+        atomtypes = self.structure.atoms.atomtypes
         if Ntypes != self.header_data['atom types']:
             for atomtype in xrange(1, self.header_data['atom types'] + 1):
                 if atomtype not in atomtypes:
                     mass = self.section_data['Masses'][atomtype - 1][
                         self.section_attrs_specs['Masses']['mass']['index']]
-                    self.atoms.add_atomtype(
+                    self.structure.atoms.add_atomtype(
                         Atom(atomtype=atomtype, mass=mass))
 
     def _parse_boxbounds(self):
@@ -264,19 +264,19 @@ class DATAWriter(object):
             Output file path.
         fpath : str, optional
             Full path (directory path + file name) to output data file.
-        atoms : :class:`~sknano.io.atoms.Atoms`
-            An :class:`~sknano.io.atoms.Atoms` instance.
+        atoms : :class:`~sknano.core.atoms.Atoms`
+            An :class:`~sknano.core.atoms.Atoms` instance.
         boxbounds : dict, optional
             If `None`, determined automatically from the `atoms` coordinates.
         comment_line : str, optional
             A string written to the first line of `data` file. If `None`,
             then it is set to the full path of the output `data` file.
         assert_unique_ids : bool, optional
-            Check that each :class:`~sknano.io.atoms.Atom` in `atoms`
-            has a unique :attr:`~sknano.io.atoms.Atom.atomID`.
+            Check that each :class:`~sknano.core.atoms.Atom` in `atoms`
+            has a unique :attr:`~sknano.core.atoms.Atom.atomID`.
             If the check fails, then assign a unique
-            :attr:`~sknano.io.atoms.Atom.atomID`.
-            to each :class:`~sknano.io.atoms.Atom`.
+            :attr:`~sknano.core.atoms.Atom.atomID`.
+            to each :class:`~sknano.core.atoms.Atom`.
             If `assert_unique_ids` is True, but the atomID's are not unique,
             LAMMPS will not be able to read the data file.
         enforce_consecutive_atomIDs : bool, optional
@@ -466,7 +466,7 @@ class DATAData(DATAReader):
         attr_dtype = self.section_attrs_specs[section][attr_name]['dtype']
         new_data = np.asarray(new_data, dtype=attr_dtype)
 
-        for i, atom in enumerate(self.atoms):
+        for i, atom in enumerate(self.structure.atoms):
             self.section_data[section][i][colidx] = \
                 attr_dtype(float(new_data[i]))
             setattr(atom, attr_name, attr_dtype(float(new_data[i])))
@@ -496,7 +496,7 @@ class DATAData(DATAReader):
             else:
                 datafile = self.fpath
 
-            DATAWriter.write(fname=datafile, atoms=self.atoms,
+            DATAWriter.write(fname=datafile, atoms=self.structure.atoms,
                              comment_line=self.comment_line, **kwargs)
 
         except (TypeError, ValueError) as e:
