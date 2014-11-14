@@ -38,7 +38,7 @@ class XYZReader(StructureIO):
 
     def read(self):
         """Read `xyz` file."""
-        self.atoms.clear()
+        self.structure.clear()
         with open(self.fpath, 'r') as f:
             Natoms = int(f.readline().strip())
             self.comment_line = f.readline().strip()
@@ -49,10 +49,10 @@ class XYZReader(StructureIO):
                     atom = \
                         Atom(element=s[0],
                              x=float(s[1]), y=float(s[2]), z=float(s[3]))
-                    self.atoms.append(atom)
-            if self.atoms.Natoms != Natoms:
+                    self.structure.atoms.append(atom)
+            if self.structure.atoms.Natoms != Natoms:
                 error_msg = '`xyz` data contained {} atoms '.format(
-                    self.atoms.Natoms) + 'but should contain ' + \
+                    self.structure.atoms.Natoms) + 'but should contain ' + \
                     '{}'.format(Natoms)
                 raise XYZIOError(error_msg)
 
@@ -61,7 +61,7 @@ class XYZWriter(object):
     """`StructureWriter` class for writing `xyz` chemical file format."""
 
     @classmethod
-    def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
+    def write(cls, fname=None, outpath=None, fpath=None, structure=None,
               comment_line=None, **kwargs):
         """Write structure data to file.
 
@@ -73,8 +73,8 @@ class XYZWriter(object):
             Output file path.
         fpath : str, optional
             Full path (directory path + file name) to output data file.
-        atoms : :class:`~sknano.io.atoms.Atoms`
-            An :class:`~sknano.io.atoms.Atoms` instance.
+        structure : :class:`~sknano.io.StructureData`
+            An :class:`~sknano.io.StructureData` instance.
         comment_line : str, optional
             A string written to the first line of `xyz` file. If `None`,
             then it is set to the full path of the output `xyz` file.
@@ -86,12 +86,12 @@ class XYZWriter(object):
         if comment_line is None:
             comment_line = default_comment_line
 
-        atoms.rezero_coords()
+        structure.atoms.rezero_coords()
 
         with open(fpath, 'w') as f:
-            f.write('{:d}\n'.format(atoms.Natoms))
+            f.write('{:d}\n'.format(structure.atoms.Natoms))
             f.write('{}\n'.format(comment_line))
-            for atom in atoms:
+            for atom in structure.atoms:
                 f.write('{:>3s}{:15.8f}{:15.8f}{:15.8f}\n'.format(
                     atom.symbol, atom.x, atom.y, atom.z))
 
@@ -128,7 +128,7 @@ class XYZData(XYZReader):
             else:
                 xyzfile = self.fpath
 
-            XYZWriter.write(fname=xyzfile, atoms=self.atoms,
+            XYZWriter.write(fname=xyzfile, structure=self.structure,
                             comment_line=self.comment_line, **kwargs)
 
         except (TypeError, ValueError) as e:
@@ -225,14 +225,14 @@ class XYZ2DATAConverter(StructureConverter):
         kwargs.update(self.kwargs)
 
         xyzreader = XYZReader(self.infile, **kwargs)
-        atoms = xyzreader.atoms
+        structure = xyzreader.structure
 
         if self._add_new_atoms:
-            atoms.extend(self._new_atoms)
+            structure.atoms.extend(self._new_atoms)
         if self._add_new_atomtypes:
-            atoms.add_atomtypes(self._new_atomtypes)
+            structure.atoms.add_atomtypes(self._new_atomtypes)
 
-        DATAWriter.write(fpath=self.outfile, atoms=atoms,
+        DATAWriter.write(fpath=self.outfile, structure=structure,
                          comment_line=xyzreader.comment_line, **kwargs)
 
         if return_reader:
