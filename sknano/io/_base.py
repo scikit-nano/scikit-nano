@@ -32,21 +32,10 @@ __all__ = ['Atom', 'Atoms',
            'supported_structure_formats']
 
 
-class StructureIO(object):
-    """Base class defining common properties for structure data.
-
-    Parameters
-    ----------
-    fpath : {None, str}, optional
-
-    """
-    def __init__(self, fpath=None, fname=None, **kwargs):
+class StructureData(object):
+    """Container class for structure data atoms."""
+    def __init__(self):
         self.atoms = Atoms()
-        self.comment_line = default_comment_line
-        if fpath is None and fname is not None:
-            fpath = fname
-        self.fpath = fpath
-        self.kwargs = kwargs
 
     @property
     def atoms(self):
@@ -63,6 +52,33 @@ class StructureIO(object):
     @atoms.deleter
     def atoms(self):
         del self._atoms
+
+    @property
+    def bonds(self):
+        return self.atoms.bonds
+
+    def analyze(self):
+        self.atoms.update_attrs()
+
+    def clear(self):
+        self.atoms.clear()
+
+
+class StructureIO(object):
+    """Base class for structure data file input and output.
+
+    Parameters
+    ----------
+    fpath : {None, str}, optional
+
+    """
+    def __init__(self, fpath=None, fname=None, **kwargs):
+        self.structure = StructureData()
+        self.comment_line = default_comment_line
+        if fpath is None and fname is not None:
+            fpath = fname
+        self.fpath = fpath
+        self.kwargs = kwargs
 
     @property
     def comment_line(self):
