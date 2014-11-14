@@ -61,7 +61,7 @@ class XYZWriter(object):
     """`StructureWriter` class for writing `xyz` chemical file format."""
 
     @classmethod
-    def write(cls, fname=None, outpath=None, fpath=None, structure=None,
+    def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
               comment_line=None, **kwargs):
         """Write structure data to file.
 
@@ -73,8 +73,8 @@ class XYZWriter(object):
             Output file path.
         fpath : str, optional
             Full path (directory path + file name) to output data file.
-        structure : :class:`~sknano.io.StructureData`
-            An :class:`~sknano.io.StructureData` instance.
+        atoms : :class:`~sknano.core.atoms.Atoms`
+            An :class:`~sknano.core.atoms.Atoms` instance.
         comment_line : str, optional
             A string written to the first line of `xyz` file. If `None`,
             then it is set to the full path of the output `xyz` file.
@@ -86,12 +86,12 @@ class XYZWriter(object):
         if comment_line is None:
             comment_line = default_comment_line
 
-        structure.atoms.rezero_coords()
+        atoms.rezero_coords()
 
         with open(fpath, 'w') as f:
-            f.write('{:d}\n'.format(structure.atoms.Natoms))
+            f.write('{:d}\n'.format(atoms.Natoms))
             f.write('{}\n'.format(comment_line))
-            for atom in structure.atoms:
+            for atom in atoms:
                 f.write('{:>3s}{:15.8f}{:15.8f}{:15.8f}\n'.format(
                     atom.symbol, atom.x, atom.y, atom.z))
 
@@ -128,7 +128,7 @@ class XYZData(XYZReader):
             else:
                 xyzfile = self.fpath
 
-            XYZWriter.write(fname=xyzfile, structure=self.structure,
+            XYZWriter.write(fname=xyzfile, atoms=self.structure.atoms,
                             comment_line=self.comment_line, **kwargs)
 
         except (TypeError, ValueError) as e:
@@ -232,7 +232,7 @@ class XYZ2DATAConverter(StructureConverter):
         if self._add_new_atomtypes:
             structure.atoms.add_atomtypes(self._new_atomtypes)
 
-        DATAWriter.write(fpath=self.outfile, structure=structure,
+        DATAWriter.write(fpath=self.outfile, atoms=structure.atoms,
                          comment_line=xyzreader.comment_line, **kwargs)
 
         if return_reader:
