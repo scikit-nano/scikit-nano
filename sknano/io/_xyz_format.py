@@ -38,7 +38,7 @@ class XYZReader(StructureIO):
 
     def read(self):
         """Read `xyz` file."""
-        self.structure.clear()
+        self.structure_data.clear()
         with open(self.fpath, 'r') as f:
             Natoms = int(f.readline().strip())
             self.comment_line = f.readline().strip()
@@ -49,10 +49,10 @@ class XYZReader(StructureIO):
                     atom = \
                         Atom(element=s[0],
                              x=float(s[1]), y=float(s[2]), z=float(s[3]))
-                    self.structure.atoms.append(atom)
-            if self.structure.atoms.Natoms != Natoms:
+                    self.atoms.append(atom)
+            if self.atoms.Natoms != Natoms:
                 error_msg = '`xyz` data contained {} atoms '.format(
-                    self.structure.atoms.Natoms) + 'but should contain ' + \
+                    self.atoms.Natoms) + 'but should contain ' + \
                     '{}'.format(Natoms)
                 raise XYZIOError(error_msg)
 
@@ -128,7 +128,7 @@ class XYZData(XYZReader):
             else:
                 xyzfile = self.fpath
 
-            XYZWriter.write(fname=xyzfile, atoms=self.structure.atoms,
+            XYZWriter.write(fname=xyzfile, atoms=self.atoms,
                             comment_line=self.comment_line, **kwargs)
 
         except (TypeError, ValueError) as e:

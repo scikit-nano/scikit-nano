@@ -61,7 +61,7 @@ class DATAReader(StructureIO):
 
     def read(self):
         """Read data file."""
-        self.structure.clear()
+        self.structure_data.clear()
         try:
             with open(self.fpath, 'r') as f:
                 self.comment_line = f.readline().strip()
@@ -175,17 +175,17 @@ class DATAReader(StructureIO):
                 #    print('unknown atom keyword: {}'.format(kw))
 
             atom = Atom(**atom_kwargs)
-            self.structure.atoms.append(atom)
+            self.atoms.append(atom)
 
     def _parse_atomtypes(self):
-        Ntypes = self.structure.atoms.Ntypes
-        atomtypes = self.structure.atoms.atomtypes
+        Ntypes = self.atoms.Ntypes
+        atomtypes = self.atoms.atomtypes
         if Ntypes != self.header_data['atom types']:
             for atomtype in xrange(1, self.header_data['atom types'] + 1):
                 if atomtype not in atomtypes:
                     mass = self.section_data['Masses'][atomtype - 1][
                         self.section_attrs_specs['Masses']['mass']['index']]
-                    self.structure.atoms.add_atomtype(
+                    self.atoms.add_atomtype(
                         Atom(atomtype=atomtype, mass=mass))
 
     def _parse_boxbounds(self):
@@ -466,7 +466,7 @@ class DATAData(DATAReader):
         attr_dtype = self.section_attrs_specs[section][attr_name]['dtype']
         new_data = np.asarray(new_data, dtype=attr_dtype)
 
-        for i, atom in enumerate(self.structure.atoms):
+        for i, atom in enumerate(self.atoms):
             self.section_data[section][i][colidx] = \
                 attr_dtype(float(new_data[i]))
             setattr(atom, attr_name, attr_dtype(float(new_data[i])))
@@ -496,7 +496,7 @@ class DATAData(DATAReader):
             else:
                 datafile = self.fpath
 
-            DATAWriter.write(fname=datafile, atoms=self.structure.atoms,
+            DATAWriter.write(fname=datafile, atoms=self.atoms,
                              comment_line=self.comment_line, **kwargs)
 
         except (TypeError, ValueError) as e:
