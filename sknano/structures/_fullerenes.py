@@ -37,6 +37,8 @@ class Fullerene(object):
     """
     def __init__(self, N=60, PG=None, Ni=None, **kwargs):
 
+        super(Fullerene, self).__init__(**kwargs)
+
         # Check that N is a valid `N` and that `N` is
         self.N = N
 
