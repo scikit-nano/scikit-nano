@@ -22,7 +22,7 @@ def test_atom_styles():
 
 def test_data():
     datafile = resource_filename('sknano', 'data/nanotubes/1010_1cell.data')
-    atoms = DATAData(fpath=datafile).atoms
+    atoms = DATAData(fpath=datafile).structure.atoms
     atoms.assign_unique_ids()
     atoms.update_attrs()
     assert_not_equal(atoms.Natoms, 20)
@@ -32,7 +32,7 @@ def test_data():
 def test_reader():
     datafile = resource_filename('sknano', 'data/nanotubes/1010_1cell.data')
     reader = DATAReader(datafile)
-    atoms = reader.atoms
+    atoms = reader.structure.atoms
     atoms.assign_unique_ids()
     atoms.update_attrs()
     assert_not_equal(atoms.Natoms, 20)
