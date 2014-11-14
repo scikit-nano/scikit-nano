@@ -44,7 +44,7 @@ class StructureData(object):
 
     @atoms.setter
     def atoms(self, value):
-        """Set :attr:`~StructureIO.atoms` attribute."""
+        """Set :attr:`~StructureData.atoms` attribute."""
         if not isinstance(value, Atoms):
             raise TypeError('Expected an `Atoms` instance.')
         self._atoms = value
