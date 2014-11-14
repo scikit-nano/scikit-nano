@@ -21,6 +21,7 @@ default_structure_format = 'xyz'
 supported_structure_formats = ('xyz', 'data', 'dump')
 
 __all__ = ['Atom', 'Atoms',
+           'StructureData',
            'StructureIO',
            'StructureReader',
            'StructureWriter',
