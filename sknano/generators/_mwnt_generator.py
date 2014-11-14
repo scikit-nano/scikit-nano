@@ -27,13 +27,13 @@ __docformat__ = 'restructuredtext en'
 #from sknano.core.math import Vector
 from sknano.structures import MWNT
 #from sknano.utils.geometric_shapes import Cuboid
-from ._base import Atoms, GeneratorMixin
+from ._base import Atoms, GeneratorBase
 from ._swnt_generator import SWNTGenerator
 
 __all__ = ['MWNTGenerator']
 
 
-class MWNTGenerator(MWNT, GeneratorMixin):
+class MWNTGenerator(MWNT, GeneratorBase):
     u"""Class for generating single, multi-walled nanotubes.
 
     .. versionchanged:: 0.2.20
@@ -132,7 +132,8 @@ class MWNTGenerator(MWNT, GeneratorMixin):
         """
 
         #self.atoms = Atoms(atoms=self.unit_cell)
-        self.atoms = Atoms()
+        #self.atoms = Atoms()
+        self.structure_data.clear()
         for swnt in self.shells:
             self.atoms.extend(SWNTGenerator(**swnt.todict()).atoms)
         #for n, m in self.Ch:
@@ -163,7 +164,7 @@ class MWNTGenerator(MWNT, GeneratorMixin):
                   anchor_point=None, center_CM=True, savecopy=True, **kwargs):
         """Save structure data.
 
-        See :meth:`~sknano.generators.GeneratorMixin.save_data` method
+        See :meth:`~sknano.generators.GeneratorBase.save_data` method
         for documentation.
 
         """

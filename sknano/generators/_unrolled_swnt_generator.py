@@ -25,12 +25,12 @@ from sknano.core import pluralize
 from sknano.core.math import Vector
 from sknano.structures import UnrolledSWNT
 #from sknano.utils.geometric_shapes import Cuboid
-from ._base import Atom, Atoms, GeneratorMixin
+from ._base import Atom, Atoms, GeneratorBase
 
 __all__ = ['UnrolledSWNTGenerator']
 
 
-class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
+class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
     u"""Class for generating unrolled nanotube structures.
 
     .. versionadded:: 0.2.23
@@ -147,7 +147,8 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
 
     def generate_structure_data(self):
         """Generate structure data."""
-        self.atoms = Atoms()
+        #self.atoms = Atoms()
+        self.structure_data.clear()
         for nx in xrange(self.nx):
             for nz in xrange(int(np.ceil(self.nz))):
                 dr = Vector([nx * self.Ch, 0.0, nz * self.T])
@@ -161,7 +162,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorMixin):
                   deg2rad=True, center_CM=True, savecopy=True, **kwargs):
         """Save structure data.
 
-        See :meth:`~sknano.generators.GeneratorMixin.save_data` method
+        See :meth:`~sknano.generators.GeneratorBase.save_data` method
         for documentation.
 
         """

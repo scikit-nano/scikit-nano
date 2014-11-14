@@ -25,12 +25,12 @@ from sknano.core import pluralize
 from sknano.core.math import Vector
 from sknano.structures import SWNT
 from sknano.utils.geometric_shapes import Cuboid
-from ._base import Atom, Atoms, GeneratorMixin
+from ._base import Atom, Atoms, GeneratorBase
 
 __all__ = ['SWNTGenerator']
 
 
-class SWNTGenerator(SWNT, GeneratorMixin):
+class SWNTGenerator(SWNT, GeneratorBase):
     u"""Class for generating nanotube structures.
 
     Parameters
@@ -153,7 +153,8 @@ class SWNTGenerator(SWNT, GeneratorMixin):
 
     def generate_structure_data(self):
         """Generate structure data."""
-        self.atoms = Atoms()
+        #self.atoms = Atoms()
+        self.structure_data.clear()
         for nz in xrange(int(np.ceil(self.nz))):
             dr = Vector([0.0, 0.0, nz * self.T])
             for uc_atom in self.unit_cell:
@@ -166,7 +167,7 @@ class SWNTGenerator(SWNT, GeneratorMixin):
                   deg2rad=True, center_CM=True, savecopy=True, **kwargs):
         """Save structure data.
 
-        See :meth:`~sknano.generators.GeneratorMixin.save_data` method
+        See :meth:`~sknano.generators.GeneratorBase.save_data` method
         for documentation.
 
         """

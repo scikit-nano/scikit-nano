@@ -13,12 +13,12 @@ __docformat__ = 'restructuredtext en'
 import numpy as np
 
 from sknano.structures import Graphene
-from ._base import Atom, Atoms, GeneratorMixin
+from ._base import Atom, Atoms, GeneratorBase
 
 __all__ = ['GrapheneGenerator']
 
 
-class GrapheneGenerator(Graphene, GeneratorMixin):
+class GrapheneGenerator(Graphene, GeneratorBase):
     """Class for generating `N`-layer graphene nanostructures.
 
     Parameters
@@ -172,7 +172,8 @@ class GrapheneGenerator(Graphene, GeneratorMixin):
 
     def generate_structure_data(self):
         """Generate the full structure coordinates."""
-        self.atoms = Atoms()
+        #self.atoms = Atoms()
+        self.structure_data.clear()
         for nlayer in xrange(self.nlayers):
             layer = Atoms()
             for nx in xrange(self.Nx):

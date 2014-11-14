@@ -15,12 +15,12 @@ import copy
 import numpy as np
 
 from sknano.structures import BilayerGraphene
-from ._base import Atoms, GeneratorMixin
+from ._base import Atoms, GeneratorBase
 
 __all__ = ['BilayerGrapheneGenerator']
 
 
-class BilayerGrapheneGenerator(BilayerGraphene, GeneratorMixin):
+class BilayerGrapheneGenerator(BilayerGraphene, GeneratorBase):
     """Class for generating bi-layer graphene structures.
 
     Parameters

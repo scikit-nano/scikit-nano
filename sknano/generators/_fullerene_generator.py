@@ -14,16 +14,15 @@ from pkg_resources import resource_filename
 import os
 #import numpy as np
 
+from sknano.io import XYZReader
 from sknano.structures import Fullerene
 #from sknano.utils.geometric_shapes import Cuboid
-
-from sknano.io import XYZReader
-from ._base import GeneratorMixin
+from ._base import GeneratorBase
 
 __all__ = ['FullereneGenerator']
 
 
-class FullereneGenerator(Fullerene, GeneratorMixin):
+class FullereneGenerator(Fullerene, GeneratorBase):
     u"""Class for generating fullerene structures.
 
     Parameters
@@ -73,7 +72,7 @@ class FullereneGenerator(Fullerene, GeneratorMixin):
                   center_CM=True, **kwargs):
         """Save structure data.
 
-        See :py:meth:`~sknano.generators.GeneratorMixin.save_data` method
+        See :py:meth:`~sknano.generators.GeneratorBase.save_data` method
         for documentation.
 
         """
