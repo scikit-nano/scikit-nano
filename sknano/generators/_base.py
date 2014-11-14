@@ -14,8 +14,8 @@ import copy
 import os
 
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
-from sknano.io import StructureWriter, default_structure_format, \
-    supported_structure_formats
+from sknano.io import StructureData, StructureWriter, \
+    default_structure_format, supported_structure_formats
 
 __all__ = ['Atom', 'Atoms', 'GeneratorMixin', 'STRUCTURE_GENERATORS']
 
@@ -31,17 +31,47 @@ class GeneratorMixin(object):
     @property
     def atoms(self):
         """Return structure :class:`~sknano.core.atoms.Atoms`."""
-        return self._atoms
+        return self.structure_data.atoms
 
     @atoms.setter
     def atoms(self, value):
         if not isinstance(value, Atoms):
             raise TypeError('Expected an `Atoms` object.')
-        self._atoms = value
+        self.structure_data.atoms = value
 
     @atoms.deleter
     def atoms(self):
-        del self._atoms
+        del self.structure_data.atoms
+
+    @property
+    def structure_data(self):
+        """Return :class:`~sknano.io.StructureData` instance."""
+        return self._structure_data
+
+    @structure_data.setter
+    def structure_data(self, value):
+        """Set :class:`~sknano.io.StructureData` instance."""
+        if not isinstance(value, StructureData):
+            raise TypeError('Expected a `StructureData` object.')
+        self._structure_data = value
+
+    @structure_data.deleter
+    def structure_data(self):
+        del self._structure_data
+
+    @property
+    def structure(self):
+        """Alias to :attr:`~GeneratorMixin.structure_data`."""
+        return self.structure_data
+
+    @structure.setter
+    def structure(self, value):
+        """Alias to :attr:`~GeneratorMixin.structure_data`."""
+        self.structure_data = value
+
+    @structure.deleter
+    def structure(self):
+        del self.structure_data
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, anchor_point=None,
