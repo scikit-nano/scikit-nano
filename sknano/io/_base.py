@@ -85,6 +85,17 @@ class StructureIO(object):
     def atoms(self):
         return self.structure_data.atoms
 
+    @atoms.setter
+    def atoms(self, value):
+        """Set :attr:`~StructureData.atoms` attribute."""
+        if not isinstance(value, Atoms):
+            raise TypeError('Expected an `Atoms` instance.')
+        self.structure_data.atoms = value
+
+    @atoms.deleter
+    def atoms(self):
+        del self.structure_data.atoms
+
     @property
     def comment_line(self):
         """Comment line."""
