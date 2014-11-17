@@ -1,26 +1,37 @@
-==========================================
-scikit-nano structure generator classes
-==========================================
+.. _generators_tutorial:
+
+==============================
+Structure generators tutorial
+==============================
 
 .. sectionauthor:: Andrew Merrill <androomerrill@gmail.com>
 
-The :py:mod:`~sknano.generators` module provides the following
+The :mod:`~sknano.generators` module provides the following
 classes for generating nanostructures:
 
 Fullerene Structure Generators
 =================================
-* :py:class:`~sknano.generators.FullereneGenerator`
+* :class:`~sknano.generators.FullereneGenerator`
 
 Graphene Structure Generators
 =================================
-* :py:class:`~sknano.generators.GrapheneGenerator`
-* :py:class:`~sknano.generators.BilayerGrapheneGenerator`
-* :py:class:`~sknano.generators.UnrolledSWNTGenerator`
+* :class:`~sknano.generators.GrapheneGenerator`
+* :class:`~sknano.generators.BilayerGrapheneGenerator`
+* :class:`~sknano.generators.UnrolledSWNTGenerator`
 
 Nanotube Structure Generators
 =================================
 
-* :py:class:`~sknano.generators.SWNTGenerator`
-* :py:class:`~sknano.generators.SWNTBundleGenerator`
-* :py:class:`~sknano.generators.MWNTGenerator`
-* :py:class:`~sknano.generators.MWNTBundleGenerator`
+* :class:`~sknano.generators.SWNTGenerator`
+* :class:`~sknano.generators.SWNTBundleGenerator`
+* :class:`~sknano.generators.MWNTGenerator`
+* :class:`~sknano.generators.MWNTBundleGenerator`
+
+
+.. ipython::
+
+   In [1]: from sknano.generators import SWNTBundleGenerator
+
+   In [2]: bundle = SWNTBundleGenerator(n=10, m=5, nz=2, bundle_geometry='hexagon')
+
+   In [3]: bundle.save_data()
