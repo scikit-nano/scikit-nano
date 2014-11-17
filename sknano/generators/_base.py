@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Structure Generator base classes (:mod:`sknano.generators._base`)
+Structure generator base module (:mod:`sknano.generators._base`)
 ===============================================================================
 
 .. currentmodule:: sknano.generators._base
@@ -20,16 +20,23 @@ from sknano.io import StructureData, StructureWriter, \
 __all__ = ['Atom', 'Atoms', 'GeneratorBase', 'STRUCTURE_GENERATORS']
 
 
-STRUCTURE_GENERATORS = ('SWNTGenerator', 'SWNTBundleGenerator',
-                        'MWNTGenerator', 'MWNTBundleGenerator',
-                        'GrapheneGenerator', 'BilayerGrapheneGenerator')
+#: Tuple of structure generator classes.
+STRUCTURE_GENERATORS = ('FullereneGenerator',
+                        'GrapheneGenerator',
+                        'BilayerGrapheneGenerator',
+                        'UnrolledSWNTGenerator',
+                        'SWNTGenerator',
+                        'SWNTBundleGenerator',
+                        'MWNTGenerator',
+                        'MWNTBundleGenerator')
 
 
 class GeneratorBase(object):
     """Base class for generator classes"""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.structure_data = StructureData()
+        super(GeneratorBase, self).__init__(**kwargs)
 
     @property
     def atoms(self):
