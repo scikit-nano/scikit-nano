@@ -1,0 +1,20 @@
+================================
+scikit-nano 0.3.0 Release Notes
+================================
+
+.. contents::
+
+scikit-nano 0.3.0 is the culmination of months of hard work
+to refactor the package code base from the ground up.
+One of the most frustrating aspects of the v0.2.25 and earlier releases
+was my confusing implementation of sub-classing and multiple inheritance
+in the :mod:`sknano.structures` and :mod:`sknano.generators` classes.
+I've reworked my approach to multiple inheritance in this release, and
+my hope is that these changes will make future development much easier for me
+and for others willing to contribute.
+
+Furthermore, I've moved and renamed several packages around and did so without
+much regard for backwards compatibility, which I hope you'll forgive.
+Of course the great thing about version control is that you'll always be able
+to checkout the v0.2.25 release should you require that code base.
+Add in virtualenv and you can work with both simultaneously!
