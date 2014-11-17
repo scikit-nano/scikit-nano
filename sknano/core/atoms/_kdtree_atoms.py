@@ -97,7 +97,7 @@ class KDTAtoms(XAtoms):
 
     @property
     def bonds(self):
-        #self._update_bonds()
+        """Return list of :attr:`~KDTAtom.bonds`."""
         bonds = Bonds()
         [bonds.extend(atom.bonds) for atom in self]
         return bonds
@@ -182,23 +182,34 @@ class KDTAtoms(XAtoms):
         return self.__class__(atoms=np.asarray(self)[NNi].tolist())
 
     def update_attrs(self):
-        self._update_nearest_neighbors()
-        self._update_coordination_numbers()
-        self._update_bonds()
+        """Update each :class:`KDTAtom`\ s attributes.
 
-    def _update_bonds(self):
+        This method calls the following methods in order:
+
+        #. :meth:`~KDTAtoms.update_nearest_neighbors`
+
+        #. :meth:`~KDTAtoms.update_coordination_numbers`
+
+        #. :meth:`~KDTAtoms.update_bonds`
+
+        """
+        self.update_nearest_neighbors()
+        self.update_coordination_numbers()
+        self.update_bonds()
+
+    def update_bonds(self):
         """Update :attr:`KDTAtom.bonds` list."""
         #self._update_nearest_neighbors()
         for atom in self:
             atom.bonds = Bonds()
             [atom.bonds.append(Bond(atom, nn)) for nn in atom.NN]
 
-    def _update_coordination_numbers(self):
+    def update_coordination_numbers(self):
         """Update :attr:`KDTAtom.CN`."""
         #self._update_nearest_neighbors()
         [setattr(atom, 'CN', atom.NN.Natoms) for atom in self]
 
-    def _update_nearest_neighbors(self):
+    def update_nearest_neighbors(self):
         """Update :attr:`KDTAtom.NN`."""
         try:
             NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)

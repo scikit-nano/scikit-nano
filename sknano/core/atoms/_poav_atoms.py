@@ -12,7 +12,7 @@ An `Atoms` class for POAV analysis
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-import importlib
+#import importlib
 import numpy as np
 
 from sknano.core.math import vector as vec
@@ -48,18 +48,18 @@ class POAVAtoms(KDTAtoms):
     def compute_POAVs(self):
         """Compute `POAV1`, `POAV2`, `POAVR`."""
         super(POAVAtoms, self).update_attrs()
+
+        from sknano.utils.analysis import POAV1, POAV2, POAVR
+        POAV_classes = {'POAV1': POAV1, 'POAV2': POAV2, 'POAVR': POAVR}
+
         for atom in self:
-            # the central atom must have 3 bonds
+            # the central atom must have 3 bonds for POAV analysis.
             if atom.bonds.Nbonds == 3:
-                for POAV_name in ('POAV1', 'POAV2', 'POAVR'):
-                    POAV_class = \
-                        getattr(
-                            importlib.import_module('sknano.utils.analysis'),
-                            POAV_name)
+                for POAV_name, POAV_class in POAV_classes.iteritems():
                     setattr(atom, POAV_name, POAV_class(atom.bonds))
 
         for atom in self:
-            # the central atom must have 3 bonds
+            # the central atom must have 3 bonds for POAV analysis.
             if atom.bonds.Nbonds == 3:
                 for POAV_name in ('POAV1', 'POAV2', 'POAVR'):
                     POAV = getattr(atom, POAV_name)
