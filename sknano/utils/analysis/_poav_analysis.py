@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Structure analysis module (:mod:`sknano.utils.analysis._poav_analysis`)
+POAV analysis (:mod:`sknano.utils.analysis._poav_analysis`)
 ==============================================================================
 
 .. currentmodule:: sknano.utils.analysis._poav_analysis
@@ -21,6 +21,14 @@ from sknano.core.math import vector as vec
 
 
 class POAV(object):
+    """Base class for POAV analysis.
+
+    Parameters
+    ----------
+    sigma_bonds : `~sknano.core.atoms.Bonds`
+        `~sknano.core.atoms.Bonds` instance.
+
+    """
     def __init__(self, sigma_bonds):
         self.bonds = sigma_bonds
         self.b1 = self.bonds[0].vector
@@ -144,6 +152,7 @@ class POAV(object):
 
 
 class POAV1(POAV):
+    """:class:`POAV` sub-class for POAV1 analysis."""
 
     def __init__(self, *args):
         super(POAV1, self).__init__(*args)
@@ -163,6 +172,7 @@ class POAV1(POAV):
 
 
 class POAV2(POAV):
+    """:class:`POAV` sub-class for POAV2 analysis."""
 
     def __init__(self, *args):
         super(POAV2, self).__init__(*args)
@@ -207,6 +217,7 @@ class POAV2(POAV):
 
 
 class POAVR(POAV):
+    """:class:`POAV` sub-class for POAVR analysis."""
 
     def __init__(self, *args):
         super(POAVR, self).__init__(*args)
