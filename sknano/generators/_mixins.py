@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Bundle Generators (:mod:`sknano.generators._nanotube_bundle_generators`)
+Generator mixin classes (:mod:`sknano.generators._mixins`)
 ==============================================================================
 
-.. currentmodule:: sknano.generators._nanotube_bundle_generators
+.. currentmodule:: sknano.generators._mixins
 
 """
 from __future__ import absolute_import, division, print_function
@@ -21,12 +21,14 @@ __all__ = ['CappedNanotubeGeneratorMixin',
 
 
 class CappedNanotubeGeneratorMixin(object):
+    """Mixin class for generating capped nanotubes."""
 
     def generate_endcaps(self):
         pass
 
 
 class NanotubeBundleGeneratorMixin(object):
+    """Mixin class for generating nanotube bundles."""
 
     def generate_bundle(self):
         self._atomsobj0 = copy.deepcopy(self.atoms)
