@@ -12,6 +12,7 @@ __docformat__ = 'restructuredtext en'
 
 from ._base import StructureBase
 from ._compute_funcs import compute_tube_mass, compute_linear_mass_density
+from ._extras import attr_strfmt, attr_symbols, attr_units
 from ._mixins import NanotubeMixin
 
 __all__ = ['SWNT', 'Nanotube']
@@ -60,7 +61,9 @@ class SWNT(NanotubeMixin, StructureBase):
 
     Create a SWNT with :math:`\\mathbf{C}_{h} = (10, 10)` chirality.
 
-    >>> nt = SWNT(n=10, m=10, verbose=True)
+    >>> swnt = SWNT(n=10, m=10, verbose=True)
+    >>> print(unicode(swnt))
+    SWNT(n=10, m=10, element1='C', element2='C', bond=1.42, nz=1)
     n: 10
     m: 10
     t₁: 1
@@ -70,14 +73,17 @@ class SWNT(NanotubeMixin, StructureBase):
     N: 20
     R: (1, 0)
     θc: 30.00°
-    Ch: 42.63 Å
+    Ch: 42.60 Å
     T: 2.46 Å
-    dt: 13.57 Å
+    dt: 13.56 Å
     rt: 6.78 Å
+    electronic_type: metallic
 
     Change the chirality to :math:`\\mathbf{C}_{h} = (20, 10)`.
 
-    >>> nt.n = 20
+    >>> swnt.n = 20
+    >>> print(unicode(swnt))
+    SWNT(n=20, m=10, element1='C', element2='C', bond=1.42, nz=1)
     n: 20
     m: 10
     t₁: 4
@@ -87,14 +93,17 @@ class SWNT(NanotubeMixin, StructureBase):
     N: 140
     R: (1, -1)
     θc: 19.11°
-    Ch: 65.12 Å
-    T: 11.28 Å
-    dt: 20.73 Å
+    Ch: 65.07 Å
+    T: 11.27 Å
+    dt: 20.71 Å
     rt: 10.36 Å
+    electronic_type: semiconducting, type 2
 
     Change the chirality to :math:`\\mathbf{C}_{h} = (20, 0)`.
 
-    >>> nt.m = 0
+    >>> swnt.m = 0
+    >>> print(unicode(swnt))
+    SWNT(n=20, m=0, element1='C', element2='C', bond=1.42, nz=1)
     n: 20
     m: 0
     t₁: 1
@@ -104,12 +113,19 @@ class SWNT(NanotubeMixin, StructureBase):
     N: 40
     R: (1, -1)
     θc: 0.00°
-    Ch: 49.22 Å
+    Ch: 49.19 Å
     T: 4.26 Å
-    dt: 15.67 Å
+    dt: 15.66 Å
     rt: 7.83 Å
+    electronic_type: semiconducting, type 1
 
     """
+    # add each attribute in the order I want them to appear in
+    # verbose output mode
+    _structure_attrs = ['n', 'm', 't1', 't2', 'd', 'dR', 'N', 'R',
+                        'chiral_angle', 'Ch', 'T', 'dt', 'rt',
+                        'electronic_type']
+
     def __init__(self, n=10, m=0, nz=1, tube_length=None, Lz=None,
                  fix_Lz=False, **kwargs):
 
@@ -119,12 +135,6 @@ class SWNT(NanotubeMixin, StructureBase):
             Lz = tube_length
 
         self.L0 = Lz  # store initial value of Lz
-
-        # add each parameter in the order I want them to appear in
-        # verbose output mode
-        self._params = ['n', 'm', 't1', 't2', 'd', 'dR', 'N',
-                        'R', 'chiral_angle', 'Ch', 'T', 'dt', 'rt',
-                        'electronic_type']
 
         self.n = n
         self.m = m
@@ -139,7 +149,32 @@ class SWNT(NanotubeMixin, StructureBase):
 
     def __str__(self):
         """Return nice string representation of `SWNT`."""
-        return repr(self)
+        if self.verbose:
+            strrep = repr(self) + '\n'
+            for attr in self._structure_attrs:
+                var = attr
+                if attr in attr_symbols:
+                    var = attr_symbols[attr]
+                if attr in attr_strfmt:
+                    if attr in attr_units:
+                        strrep += \
+                            u"{}: {}{}\n".format(var,
+                                                 attr_strfmt[attr].format(
+                                                     getattr(self, attr)),
+                                                 attr_units[attr])
+                    else:
+                        strrep += u"{}: {}\n".format(var,
+                                                     attr_strfmt[attr].format(
+                                                         getattr(self, attr)))
+                else:
+                    if attr in attr_units:
+                        strrep += u"{}: {}{}\n".format(var,
+                                                       getattr(self, attr),
+                                                       attr_units[attr])
+                    else:
+                        strrep += u"{}: {}\n".format(var, getattr(self, attr))
+
+        return strrep
 
     def __repr__(self):
         """Return canonical string representation of `SWNT`."""
@@ -183,6 +218,7 @@ class SWNT(NanotubeMixin, StructureBase):
                                  element2=self.element2)
 
     def todict(self):
+        """Return :class:`~python:dict` of `SWNT` attributes."""
         return dict(n=self.n, m=self.m, nz=self.nz, Lz=self.Lz,
                     fix_Lz=self.fix_Lz, element1=self.element1,
                     element2=self.element2, bond=self.bond)
