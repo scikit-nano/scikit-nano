@@ -19,8 +19,8 @@ from sknano.core.math import comparison_symbol_operator_mappings
 __all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'generate_Ch_list',
            'generate_Ch_property_grid', 'get_Ch_indices', 'get_Ch_type',
            'map_Ch', 'chiral_type_name_mappings', 'Ch_types', 'edge_types',
-           'filter_key_type_mappings', 'param_units', 'param_symbols',
-           'param_strfmt']
+           'filter_key_type_mappings', 'attr_units', 'attr_symbols',
+           'attr_strfmt']
 
 chiral_type_name_mappings = Ch_types = \
     {'achiral': 'aCh', 'armchair': 'AC', 'zigzag': 'ZZ', 'chiral': 'Ch'}
@@ -38,26 +38,26 @@ for k in ('min_index', 'max_index',
           'n', 'm'):
     filter_key_type_mappings[k] = int
 
-param_units = {}
-param_units['dt'] = \
-    param_units['rt'] = \
-    param_units['Ch'] = \
-    param_units['T'] = \
-    param_units['bond'] = u' \u212B'
-param_units['chiral_angle'] = u'\u00b0'
+attr_units = {}
+attr_units['dt'] = \
+    attr_units['rt'] = \
+    attr_units['Ch'] = \
+    attr_units['T'] = \
+    attr_units['bond'] = u' \u212B'
+attr_units['chiral_angle'] = u'\u00b0'
 
-param_symbols = {}
-param_symbols['t1'] = u't\u2081'
-param_symbols['t2'] = u't\u2082'
-param_symbols['chiral_angle'] = u'\u03b8c'
+attr_symbols = {}
+attr_symbols['t1'] = u't\u2081'
+attr_symbols['t2'] = u't\u2082'
+attr_symbols['chiral_angle'] = u'\u03b8c'
 
-param_strfmt = {}
-param_strfmt['Ch'] = \
-    param_strfmt['T'] = \
-    param_strfmt['dt'] = \
-    param_strfmt['rt'] = \
-    param_strfmt['chiral_angle'] = '{:.2f}'
-param_strfmt['bond'] = '{:.3f}'
+attr_strfmt = {}
+attr_strfmt['Ch'] = \
+    attr_strfmt['T'] = \
+    attr_strfmt['dt'] = \
+    attr_strfmt['rt'] = \
+    attr_strfmt['chiral_angle'] = '{:.2f}'
+attr_strfmt['bond'] = '{:.3f}'
 
 
 def cmp_Ch(Ch1, Ch2):
@@ -110,6 +110,7 @@ def filter_Ch(Ch, even_only=False, odd_only=False, Ch_type=None,
 
     Parameters
     ----------
+    Ch : {str, tuple}
     even_only, odd_only : bool, optional
     Ch_type : {None, 'armchair', 'zigzag', 'achiral', 'chiral'}, optional
     min_index, max_index : int, optional
@@ -489,6 +490,17 @@ def get_Ch_type(Ch):
 
 
 def map_Ch(Ch, compute=None, **kwargs):
+    """Map compute function using `Ch` as input.
+
+    Parameters
+    ----------
+    Ch : {str, tuple}
+    compute : str
+
+    Returns
+    -------
+    value of compute function.
+    """
     try:
         compute_func = \
             getattr(importlib.import_module('sknano.structures'), compute)
