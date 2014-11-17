@@ -57,13 +57,16 @@ class StructureData(object):
 
     @property
     def bonds(self):
+        """Return :attr:`~sknano.core.atoms.Atoms.bonds` attribute."""
         return self.atoms.bonds
 
     def analyze(self):
+        """Analyze structure data."""
         self.atoms.update_attrs()
-        StructureAnalyzer(self)
+        #StructureAnalyzer(self)
 
     def clear(self):
+        """Clear :class:`~sknano.core.atoms.Atoms` list."""
         self.atoms.clear()
 
 
