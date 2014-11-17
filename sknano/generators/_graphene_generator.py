@@ -19,7 +19,7 @@ __all__ = ['GrapheneGenerator']
 
 
 class GrapheneGenerator(Graphene, GeneratorBase):
-    """Class for generating `N`-layer graphene nanostructures.
+    """`N`-layer graphene generator class.
 
     Parameters
     ----------
@@ -51,9 +51,9 @@ class GrapheneGenerator(Graphene, GeneratorBase):
     The `GrapheneGenerator` class and its subclasses generate graphene with
     either an armchair or zigzag edge using a 4-atom conventional unit cell.
     If you want to generate graphene as an *unrolled nanotube*, see the
-    :class:`~sknano.generators.UnrolledNanotubeGenerator` class.
+    :class:`~sknano.generators.UnrolledSWNTGenerator` class.
 
-    .. seealso:: :class:`~sknano.generators.UnrolledNanotubeGenerator`
+    .. seealso:: :class:`~sknano.generators.UnrolledSWNTGenerator`
 
     Examples
     --------
@@ -203,7 +203,7 @@ class GrapheneGenerator(Graphene, GeneratorBase):
                   center_CM=True, **kwargs):
         """Save structure data.
 
-        See :meth:`~sknano.generators.StructureGenerator.save_data` method
+        See :meth:`~sknano.generators.GeneratorBase.save_data` method
         for documentation.
 
         """

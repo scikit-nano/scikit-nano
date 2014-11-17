@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Fullerene structure generators (:mod:`sknano.generators._fullerene_generators`)
+Fullerene generators (:mod:`sknano.generators._fullerene_generators`)
 ===============================================================================
 
 .. currentmodule:: sknano.generators._fullerene_generators
@@ -23,7 +23,7 @@ __all__ = ['FullereneGenerator']
 
 
 class FullereneGenerator(Fullerene, GeneratorBase):
-    u"""Class for generating fullerene structures.
+    """Fullerene structure generator class.
 
     Parameters
     ----------

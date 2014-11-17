@@ -18,13 +18,14 @@ from sknano.core import xyz
 from sknano.core.refdata import CCbond
 
 from ._defect_generators import DefectGenerator, VacancyGenerator
-from ._graphene_generators import GrapheneGenerator
-from ._nanotube_generators import UnrolledNanotubeGenerator
+from ._graphene_generator import GrapheneGenerator
+from ._unrolled_swnt_generator import UnrolledSWNTGenerator
 
 __all__ = ['GrapheneDefectGenerator', 'GrapheneVacancyGenerator']
 
 
 class GrapheneDefectGenerator(DefectGenerator):
+    """Graphene defect generator class."""
     pass
 
 
@@ -199,7 +200,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                     layer_spacing=layer_spacing, stacking_order=stacking_order,
                     verbose=verbose)
             elif isinstance(n, int) and isinstance(m, int):
-                gg = UnrolledNanotubeGenerator(
+                gg = UnrolledSWNTGenerator(
                     n=n, m=m, nx=nx, ny=ny, nz=nz,
                     element1=element1, element2=element2, bond=bond,
                     nlayers=nlayers, layer_spacing=layer_spacing,

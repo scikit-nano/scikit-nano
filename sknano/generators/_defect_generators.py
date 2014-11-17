@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Defect generator classes (:mod:`sknano.generators._defect_generators`)
+Defect generator base classes (:mod:`sknano.generators._defect_generators`)
 ===============================================================================
 
 .. currentmodule:: sknano.generators._defect_generators
@@ -45,7 +45,7 @@ class DefectGenerator(object):
         Verbose output
 
     """
-    def __init__(self, fname=str, outpath=None, structure_format=None,
+    def __init__(self, fname, outpath=None, structure_format=None,
                  verbose=False):
 
         if fname.endswith(supported_structure_formats) and \
@@ -89,11 +89,12 @@ class DefectGenerator(object):
 
 
 class CrossLinkedDefectGenerator(DefectGenerator):
+    """Cross-linked defect generator class."""
     pass
 
 
 class StoneWalesDefectGenerator(DefectGenerator):
-    """Class for generating Stone-Wales defects in structure data.
+    """Stone-Wales defect generator class.
 
     Parameters
     ----------

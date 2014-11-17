@@ -164,7 +164,7 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
                   deg2rad=True, center_CM=True, savecopy=True, **kwargs):
         """Save structure data.
 
-        See :meth:`~sknano.generators.GeneratorMixin.save_data` method
+        See :meth:`~sknano.generators.GeneratorBase.save_data` method
         for documentation.
 
         """

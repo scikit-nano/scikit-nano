@@ -21,7 +21,7 @@ __all__ = ['BilayerGrapheneGenerator']
 
 
 class BilayerGrapheneGenerator(BilayerGraphene, GeneratorBase):
-    """Class for generating bi-layer graphene structures.
+    """Bilayer graphene structure generator class.
 
     Parameters
     ----------
