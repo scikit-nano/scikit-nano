@@ -13,6 +13,7 @@ __docformat__ = 'restructuredtext en'
 from abc import ABCMeta, abstractmethod
 
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
+from sknano.utils.analysis import StructureAnalyzer
 from sknano.version import short_version as version
 
 default_comment_line = \
@@ -60,6 +61,7 @@ class StructureData(object):
 
     def analyze(self):
         self.atoms.update_attrs()
+        StructureAnalyzer(self)
 
     def clear(self):
         self.atoms.clear()
