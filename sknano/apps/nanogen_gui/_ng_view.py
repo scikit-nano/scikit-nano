@@ -184,17 +184,19 @@ class NGView(QMainWindow, Ui_NanoGen):
         if generator_tab == 'Nanotubes':
             kwargs['n'] = self.n_spinBox.value()
             kwargs['m'] = self.m_spinBox.value()
-            kwargs['nx'] = self.nx_spinBox.value()
-            kwargs['ny'] = self.ny_spinBox.value()
             kwargs['nz'] = self.nz_spinBox.value()
             kwargs['bond'] = self.nanotube_bond_doubleSpinBox.value()
             if self.nanotube_generator_radioButton.isChecked():
                 if self.bundle_generator_checkBox.isChecked():
+                    kwargs['nx'] = self.nx_spinBox.value()
+                    kwargs['ny'] = self.ny_spinBox.value()
                     generator_class = 'SWNTBundleGenerator'
                 else:
                     generator_class = 'SWNTGenerator'
             elif self.mwnt_generator_radioButton.isChecked():
                 if self.bundle_generator_checkBox.isChecked():
+                    kwargs['nx'] = self.nx_spinBox.value()
+                    kwargs['ny'] = self.ny_spinBox.value()
                     generator_class = 'MWNTBundleGenerator'
                 else:
                     generator_class = 'MWNTGenerator'
