@@ -23,6 +23,7 @@ Contents
    UnrolledSWNTGenerator
 
 .. autodata:: STRUCTURE_GENERATORS
+   :annotation: = tuple of recognized generator classes.
 
 """
 from __future__ import absolute_import, division, print_function
