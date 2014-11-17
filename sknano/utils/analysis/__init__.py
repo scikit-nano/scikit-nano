@@ -17,7 +17,7 @@ Classes for structure analysis
    POAV
    POAV1
    POAV2
-   POAV3
+   POAVR
 
    StructureAnalyzer
 
