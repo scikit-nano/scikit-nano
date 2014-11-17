@@ -12,11 +12,11 @@ An `Atoms` class for POAV analysis
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
+import importlib
 import numpy as np
 
 from sknano.core.math import vector as vec
 from ._kdtree_atoms import KDTAtoms
-from ._poav_atom import POAV1, POAV2, POAVR
 
 __all__ = ['POAVAtoms']
 
@@ -38,25 +38,31 @@ class POAVAtoms(KDTAtoms):
         perform deepcopy of atoms list
 
     """
-    _atomattrs = KDTAtoms._atomattrs + ['POAVlist', 'POAV1', 'POAV2', 'POAVR']
+    _atomattrs = KDTAtoms._atomattrs + ['POAV1', 'POAV2', 'POAVR']
 
     def __init__(self, atoms=None, copylist=True, deepcopy=False):
         super(POAVAtoms, self).__init__(atoms=atoms,
                                         copylist=copylist,
                                         deepcopy=deepcopy)
 
-    def update_attrs(self):
-        super(POAVAtoms, self).update_attrs()
-        self._update_POAVlist()
-
-    def _update_POAVlist(self):
+    def compute_POAVs(self):
         """Compute `POAV1`, `POAV2`, `POAVR`."""
+        super(POAVAtoms, self).update_attrs()
         for atom in self:
             # the central atom must have 3 bonds
             if atom.bonds.Nbonds == 3:
-                atom.POAVlist = [POAV1(atom.bonds), POAV2(atom.bonds),
-                                 POAVR(atom.bonds)]
-                for i, POAV in enumerate(atom.POAVlist):
+                for POAV_name in ('POAV1', 'POAV2', 'POAVR'):
+                    POAV_class = \
+                        getattr(
+                            importlib.import_module('sknano.utils.analysis'),
+                            POAV_name)
+                    setattr(atom, POAV_name, POAV_class(atom.bonds))
+
+        for atom in self:
+            # the central atom must have 3 bonds
+            if atom.bonds.Nbonds == 3:
+                for POAV_name in ('POAV1', 'POAV2', 'POAVR'):
+                    POAV = getattr(atom, POAV_name)
                     pyramidalization_angles = []
                     misalignment_angles = []
                     sigma_pi_angles = []
@@ -71,7 +77,8 @@ class POAVAtoms(KDTAtoms):
 
                         # the bonded atom must have a POAV to compute the
                         # misalignment angles
-                        if NN.POAVlist is not None:
+                        if getattr(NN, POAV_name) is not None:
+                            NN_POAV = getattr(NN, POAV_name)
                             # compute vector that is orthogonal to the plane
                             # defined by the bond vector and the POAV of the
                             # center atom.
@@ -83,9 +90,8 @@ class POAVAtoms(KDTAtoms):
                             # which is pi/2 minus the angle between
                             # the NN POAV and the normal vector to the plane
                             # computed above.
-                            misalignment_angles.append(
-                                np.abs(np.pi / 2 -
-                                       vec.angle(NN.POAVlist[i].Vpi, nvec)))
+                            misalignment_angles.append(np.abs(
+                                np.pi / 2 - vec.angle(NN_POAV.Vpi, nvec)))
                         else:
                             misalignment_angles.append(np.nan)
 
