@@ -36,7 +36,7 @@ The following structure data formats are supported:
 
 
 Extending input/output capabilities with more structure data formats
-such as `pdb`, `json`, `zmatrix`, etc. is queued for development
+such as *pdb*, *json*, *zmatrix*, etc. is queued for development
 
 Secondary to its structure generating functions are its
 *structure analysis tools* including:
@@ -49,7 +49,7 @@ Secondary to its structure generating functions are its
 Important links
 ===============
 
-* Documentation: http://projects.geekcode.io/scikit-nano/doc
+* Documentation: http://scikit-nano.org/doc
 * Source code repo: https://github.com/androomerrill/scikit-nano
 * Download releases: https://github.com/androomerrill/scikit-nano/releases
 * Issue tracker: https://github.com/androomerrill/scikit-nano/issues
