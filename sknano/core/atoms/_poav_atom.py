@@ -154,6 +154,12 @@ class POAV(object):
             raise TypeError('Expected a number')
         self._misalignment_angles = value
 
+    def todict(self):
+        return dict(sigma_pi_angles=self.sigma_pi_angles,
+                    pyramidalization_angles=self.pyramidalization_angles,
+                    misalignment_angles=self.misalignment_angles,
+                    T=self.T, H=self.H, A=self.A)
+
 
 class POAV1(POAV):
     """:class:`POAV` sub-class for POAV1 analysis."""
@@ -173,6 +179,11 @@ class POAV1(POAV):
     @property
     def n(self):
         return 3 * self.m + 2
+
+    def todict(self):
+        super_dict = super(POAV1, self).todict()
+        super_dict.update(dict(m=self.m, n=self.n))
+        return super_dict
 
 
 class POAV2(POAV):
@@ -197,8 +208,8 @@ class POAV2(POAV):
         self.cosa13 = np.cos(bond_angles[1])
         self.cosa23 = np.cos(bond_angles[2])
 
-        self._T = -functools.reduce(operator.mul, np.cos(bond_angles), 1) * \
-            self.T
+        self._T = \
+            -functools.reduce(operator.mul, np.cos(bond_angles), 1) * self.T
 
     @property
     def n1(self):
@@ -218,6 +229,11 @@ class POAV2(POAV):
         s2 = 1 / (1 + self.n2)
         s3 = 1 / (1 + self.n3)
         return 1 / sum([s1, s2, s3]) - 1
+
+    def todict(self):
+        super_dict = super(POAV2, self).todict()
+        super_dict.update(dict(m=self.m, n1=self.n1, n2=self.n2, n3=self.n3))
+        return super_dict
 
 
 class POAVR(POAV):
