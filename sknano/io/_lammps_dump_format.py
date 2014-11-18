@@ -51,70 +51,9 @@ class DUMPReader(StructureIO):
         LAMMPS dump file path
 
     """
-    def __init__(self, fpath, **kwargs):
-        super(DUMPReader, self).__init__(fpath=fpath, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(DUMPReader, self).__init__(**kwargs)
 
-        if self.fpath is not None:
-            self.read()
-
-    def read(self):
-        """Read dump file."""
-        pass
-        #with open(self.fpath, 'r') as f:
-        #    pass
-
-
-class DUMPWriter(object):
-    """Class for writing LAMMPS dump chemical file format."""
-
-    @classmethod
-    def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
-              comment_line=None, verbose=False, **kwargs):
-        """Write structure dump to file.
-
-        Parameters
-        ----------
-        fname : str, optional
-            Output file name.
-        outpath : str, optional
-            Output file path.
-        fpath : str, optional
-            Full path (directory path + file name) to output data file.
-        atoms : `Atoms`
-            An :py:class:`Atoms` instance.
-        boxbounds : dict, optional
-            If `None`, determined automatically from atom coordinates.
-        comment_line : str, optional
-            A string written to the first line of `dump` file. If `None`,
-            then it is set to the full path of the output `dump` file.
-        assert_unique_ids : bool, optional
-            Check that each Atom in Atoms has a unique ID. If the check
-            fails, then assign a unique ID to each Atom.
-            If `assert_unique_ids` is True, but the ID's are not
-            unique, LAMMPS will not be able to read the dump file.
-        verbose : bool, optional
-            verbose output
-
-        """
-        if fpath is None:
-            fpath = get_fpath(fname=fname, ext='dump', outpath=outpath,
-                              overwrite=True, add_fnum=False)
-
-        if comment_line is None:
-            comment_line = default_comment_line
-
-        atoms.rezero_coords()
-
-
-class DUMPData(object):
-    """Class for reading and writing structure data in LAMMPS dump format.
-
-    Parameters
-    ----------
-    *args : one or more dump files
-
-    """
-    def __init__(self, *args):
         self.trajectory = Trajectory()
         self.dumpattrs = {}
         self.dumpfiles = []
@@ -376,6 +315,60 @@ class DUMPData(object):
 
     def maxtype(self):
         pass
+
+
+class DUMPWriter(object):
+    """Class for writing LAMMPS dump chemical file format."""
+
+    @classmethod
+    def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
+              comment_line=None, verbose=False, **kwargs):
+        """Write structure dump to file.
+
+        Parameters
+        ----------
+        fname : str, optional
+            Output file name.
+        outpath : str, optional
+            Output file path.
+        fpath : str, optional
+            Full path (directory path + file name) to output data file.
+        atoms : `Atoms`
+            An :py:class:`Atoms` instance.
+        boxbounds : dict, optional
+            If `None`, determined automatically from atom coordinates.
+        comment_line : str, optional
+            A string written to the first line of `dump` file. If `None`,
+            then it is set to the full path of the output `dump` file.
+        assert_unique_ids : bool, optional
+            Check that each Atom in Atoms has a unique ID. If the check
+            fails, then assign a unique ID to each Atom.
+            If `assert_unique_ids` is True, but the ID's are not
+            unique, LAMMPS will not be able to read the dump file.
+        verbose : bool, optional
+            verbose output
+
+        """
+        if fpath is None:
+            fpath = get_fpath(fname=fname, ext='dump', outpath=outpath,
+                              overwrite=True, add_fnum=False)
+
+        if comment_line is None:
+            comment_line = default_comment_line
+
+        atoms.rezero_coords()
+
+
+class DUMPData(DUMPReader):
+    """Class for reading and writing structure data in LAMMPS dump format.
+
+    Parameters
+    ----------
+    *args : one or more dump files
+
+    """
+    def __init__(self, *args):
+        super(DUMPData, self).__init__(*args)
 
     def write(self, dumpfile=None):
         """Write dump file.
