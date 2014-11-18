@@ -36,5 +36,10 @@ def test_property_changes():
     assert_equal(CAtom, XeAtom)
 
 
+def test_str():
+    atom = Atom('C')
+    print(atom)
+
+
 if __name__ == '__main__':
     nose.runmodule()

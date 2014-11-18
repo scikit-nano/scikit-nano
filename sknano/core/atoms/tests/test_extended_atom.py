@@ -18,6 +18,12 @@ def test_attributes():
     for element in elements:
         xatom = XAtom(element=element)
         assert_equals(xatom.element, element)
+        assert_equals(xatom.m, xatom.mass)
+
+
+def test_str():
+    atom = XAtom('C')
+    print(atom)
 
 
 if __name__ == '__main__':
