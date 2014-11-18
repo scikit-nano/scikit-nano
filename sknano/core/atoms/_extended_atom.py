@@ -472,7 +472,7 @@ class XAtom(Atom):
     def todict(self):
         return dict(element=self.element, atomID=self.atomID,
                     moleculeID=self.moleculeID, atomtype=self.atomtype,
-                    q=self.q, m=self.m, x=self.x, y=self.y, z=self.z,
+                    q=self.q, mass=self.mass, x=self.x, y=self.y, z=self.z,
                     vx=self.vx, vy=self.vy, vz=self.vz,
                     fx=self.fx, fy=self.fy, fz=self.fz,
                     nx=self.nx, ny=self.ny, nz=self.nz)
