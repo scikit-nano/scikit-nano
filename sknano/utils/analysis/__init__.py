@@ -14,11 +14,6 @@ Classes for structure analysis
 .. autosummary::
    :toctree: generated/
 
-   POAV
-   POAV1
-   POAV2
-   POAVR
-
    StructureAnalyzer
 
 Helper functions
@@ -34,7 +29,6 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 from ._funcs import *
-from ._poav_analysis import *
 from ._structure_analyzer import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
