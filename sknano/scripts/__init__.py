@@ -12,7 +12,6 @@ Contents
 .. autosummary::
    :toctree: generated/
 
-   analyze_structure
    nanogen
    NanoGen
 
@@ -20,7 +19,7 @@ Contents
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from .analyze_structure import *
+#from .analyze_structure import *
 from .nanogen import *
 from .nanogenui import NanoGen
 
