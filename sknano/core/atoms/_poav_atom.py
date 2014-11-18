@@ -154,10 +154,31 @@ class POAV(object):
             raise TypeError('Expected a number')
         self._misalignment_angles = value
 
-    def todict(self):
-        return dict(sigma_pi_angles=self.sigma_pi_angles,
-                    pyramidalization_angles=self.pyramidalization_angles,
-                    misalignment_angles=self.misalignment_angles,
+    def todict(self, rad2deg=False):
+        #return dict(sigma_pi_angles=self.sigma_pi_angles,
+        #            pyramidalization_angles=self.pyramidalization_angles,
+        #            misalignment_angles=self.misalignment_angles,
+        #            T=self.T, H=self.H, A=self.A)
+        sigma_pi_angles = self.sigma_pi_angles
+        pyramidalization_angles = self.pyramidalization_angles
+        misalignment_angles = self.misalignment_angles
+        if rad2deg:
+            sigma_pi_angles = np.degrees(sigma_pi_angles)
+            pyramidalization_angles = np.degrees(pyramidalization_angles)
+            misalignment_angles = np.degrees(misalignment_angles)
+
+        return dict(bond1=self.b1.length,
+                    bond2=self.b2.length,
+                    bond3=self.b3.length,
+                    sigma_pi_angle1=sigma_pi_angles[0],
+                    sigma_pi_angle2=sigma_pi_angles[1],
+                    sigma_pi_angle3=sigma_pi_angles[2],
+                    pyramidalization_angle1=pyramidalization_angles[0],
+                    pyramidalization_angle2=pyramidalization_angles[1],
+                    pyramidalization_angle3=pyramidalization_angles[2],
+                    misalignment_angle1=misalignment_angles[0],
+                    misalignment_angle2=misalignment_angles[1],
+                    misalignment_angle3=misalignment_angles[2],
                     T=self.T, H=self.H, A=self.A)
 
 
@@ -180,8 +201,8 @@ class POAV1(POAV):
     def n(self):
         return 3 * self.m + 2
 
-    def todict(self):
-        super_dict = super(POAV1, self).todict()
+    def todict(self, rad2deg=False):
+        super_dict = super(POAV1, self).todict(rad2deg=rad2deg)
         super_dict.update(dict(m=self.m, n=self.n))
         return super_dict
 
@@ -230,8 +251,8 @@ class POAV2(POAV):
         s3 = 1 / (1 + self.n3)
         return 1 / sum([s1, s2, s3]) - 1
 
-    def todict(self):
-        super_dict = super(POAV2, self).todict()
+    def todict(self, rad2deg=False):
+        super_dict = super(POAV2, self).todict(rad2deg=rad2deg)
         super_dict.update(dict(m=self.m, n1=self.n1, n2=self.n2, n3=self.n3))
         return super_dict
 
