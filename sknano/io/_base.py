@@ -135,13 +135,16 @@ class StructureReader(object):
         fpath : str
         structure_format : {None, str}
         """
-        if fpath.endswith('.data') or structure_format == 'data':
+        if (structure_format is None and fpath.endswith('.data')) or \
+                structure_format == 'data':
             from ._lammps_data_format import DATAReader
             return DATAReader(fpath, **kwargs)
-        elif fpath.endswith('.dump') or structure_format == 'dump':
+        elif (structure_format is None and fpath.endswith('.dump')) or \
+                structure_format == 'dump':
             from ._lammps_dump_format import DUMPReader
             return DUMPReader(fpath, **kwargs)
-        elif fpath.endswith('.xyz') or structure_format == 'xyz':
+        elif (structure_format is None and fpath.endswith('.xyz')) or \
+                structure_format == 'xyz':
             from ._xyz_format import XYZReader
             return XYZReader.read(fpath)
 
