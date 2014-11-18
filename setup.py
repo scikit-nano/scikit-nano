@@ -201,7 +201,6 @@ def setup_package():
         install_requires=install_requires,
         entry_points={
             'console_scripts': [
-                'analyze_structure = sknano.scripts.analyze_structure:main',
                 'nanogen = sknano.scripts.nanogen:main',
                 'nanogenui = sknano.scripts.nanogenui:main'],
         },
