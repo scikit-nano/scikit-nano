@@ -56,7 +56,7 @@ def test_structure_analysis():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
     atoms.assign_unique_ids()
-    atoms.update_attrs()
+    atoms.compute_POAVs()
     assert_equals(atoms.Natoms, 400)
 
     atoms = POAVAtoms(atoms=atoms)
@@ -85,7 +85,7 @@ def test_atom_selections():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
     atoms.assign_unique_ids()
-    atoms.update_attrs()
+    atoms.compute_POAVs()
     a200 = atoms.get_atom(200)
     assert_true(a200 is atoms[199])
     assert_true(a200 == atoms[199])
@@ -101,7 +101,7 @@ def test_atom_bonds():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=20, m=10, nz=2)
     atoms.assign_unique_ids()
-    atoms.update_attrs()
+    atoms.compute_POAVs()
     atoms.NNrc = 2.0
     bonds = atoms.bonds
     #print('bonds: {!s}'.format(bonds))
@@ -122,57 +122,42 @@ def test_structure_data():
     swnt = SWNTGenerator(n=10, m=5, nz=5)
     swnt_atoms = swnt.atoms
     swnt_atoms.assign_unique_ids()
-    swnt_atoms.update_attrs()
+    swnt_atoms.compute_POAVs()
     #swnt.save_data(fname=fname, structure_format='data')
     data = DATAReader(fname)
     atoms = data.atoms
     atoms.assign_unique_ids()
-    atoms.update_attrs()
+    atoms.compute_POAVs()
     assert_equals(swnt_atoms.Natoms, atoms.Natoms)
 
 
-def test_pyramidalization_angles():
+def test_POAV_angles():
     atoms = \
-        generate_atoms(generator_class='SWNTGenerator', n=20, m=10, nz=2)
+        generate_atoms(generator_class='SWNTGenerator', n=10, m=0, nz=2)
     atoms.assign_unique_ids()
     atoms.update_attrs()
     #atoms.NNrc = 2.0
-    atoms.update_attrs()
+    #atoms.compute_POAVs()
 
     for i, atom in enumerate(atoms):
-        try:
-            if atom.poav is not None:
-                print('atom.poav:\n'
-                      '{}\n'.format(atom.poav))
-                print('atom.pyramidalization_angle: '
-                      '{}\n'.format(np.degrees(atom.pyramidalization_angle)))
-        except AttributeError:
-            continue
+        for POAV in ('POAV1', 'POAV2', 'POAVR'):
+            if getattr(atom, POAV) is not None:
+                atom_POAV = getattr(atom, POAV)
+                print('atom{}.{}.sigma_pi_angles:\n{}'.format(
+                    atom.atomID, POAV, np.degrees(atom_POAV.sigma_pi_angles)))
+                print('atom{}.{}.pyramidalization_angles:\n{}'.format(
+                    atom.atomID, POAV,
+                    np.degrees(atom_POAV.pyramidalization_angles)))
+                print('atom{}.{}.misalignment_angles:\n{}\n'.format(
+                    atom.atomID, POAV,
+                    np.degrees(atom_POAV.misalignment_angles)))
 
 
-def test_poma():
-    atoms = \
-        generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    atoms.assign_unique_ids()
-    atoms.update_attrs()
-    #print('misalignment_angles: {}'.format(np.degrees(atoms.poma)))
-
-    #for i, atom in enumerate(atoms):
-    #    try:
-    #        if atom.poav is not None:
-    #            print('atom.poav:\n'
-    #                  '{}\n'.format(atom.poav))
-    #            print('atom.pyramidalization_angle: '
-    #                  '{}\n'.format(np.degrees(atom.pyramidalization_angle)))
-    #    except AttributeError:
-    #        continue
-
-
-def test_list_mods():
-    atoms = generate_atoms(elements='periodic_table')
-    atoms.assign_unique_ids()
-    #atoms.update_attrs()
-    print(atoms)
+#def test_list_mods():
+#    atoms = generate_atoms(elements='periodic_table')
+#    atoms.assign_unique_ids()
+#    #atoms.compute_POAVs()
+#    #print(atoms)
 
 
 if __name__ == '__main__':
