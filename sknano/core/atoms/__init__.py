@@ -37,13 +37,18 @@ Atoms for nearest-neighbor structure analysis:
    KDTAtom
    KDTAtoms
 
-Atoms for POAV structure analysis:
+Atoms and data structures for POAV structure analysis:
 
 .. autosummary::
    :toctree: generated/
 
    POAVAtom
    POAVAtoms
+   POAVMixin
+   POAV
+   POAV1
+   POAV2
+   POAVR
 
 Class representation of atom bonds.
 
