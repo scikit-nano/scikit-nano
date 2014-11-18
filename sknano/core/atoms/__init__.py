@@ -44,7 +44,7 @@ Atoms and data structures for POAV structure analysis:
 
    POAVAtom
    POAVAtoms
-   POAVMixin
+   POAVAtomMixin
    POAV
    POAV1
    POAV2
