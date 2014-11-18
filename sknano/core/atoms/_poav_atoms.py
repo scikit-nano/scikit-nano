@@ -17,6 +17,7 @@ import numpy as np
 
 from sknano.core.math import vector as vec
 from ._kdtree_atoms import KDTAtoms
+from ._poav_atom import POAV1, POAV2, POAVR
 
 __all__ = ['POAVAtoms']
 
@@ -49,7 +50,6 @@ class POAVAtoms(KDTAtoms):
         """Compute `POAV1`, `POAV2`, `POAVR`."""
         super(POAVAtoms, self).update_attrs()
 
-        from sknano.utils.analysis import POAV1, POAV2, POAVR
         POAV_classes = {'POAV1': POAV1, 'POAV2': POAV2, 'POAVR': POAVR}
 
         for atom in self:
@@ -98,3 +98,6 @@ class POAVAtoms(KDTAtoms):
                     POAV.pyramidalization_angles = pyramidalization_angles
                     POAV.misalignment_angles = misalignment_angles
                     POAV.sigma_pi_angles = sigma_pi_angles
+
+    def update_attrs(self):
+        self.compute_POAVs()
