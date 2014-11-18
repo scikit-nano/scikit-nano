@@ -74,10 +74,11 @@ class XAtom(Atom):
         """Return string representation of `XAtom`."""
         reprstr = "Atom(element={element!r}, atomID={atomID!r}, " + \
             "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
-            "q={q!r}, m={m!r}, x={x:.6f}, y={y:.6f}, z={z:.6f})"
+            "q={q!r}, mass={mass!r}, x={x:.6f}, y={y:.6f}, z={z:.6f})"
         parameters = dict(element=self.element, atomID=self.atomID,
                           moleculeID=self.moleculeID, atomtype=self.atomtype,
-                          q=self.q, m=self.m, x=self.x, y=self.y, z=self.z)
+                          q=self.q, mass=self.mass,
+                          x=self.x, y=self.y, z=self.z)
 
         return reprstr.format(**parameters)
 
@@ -168,6 +169,14 @@ class XAtom(Atom):
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
         self._atomtype = int(value)
+
+    @property
+    def mass(self):
+        return self.m
+
+    @mass.setter
+    def mass(self, value):
+        self.m = value
 
     @property
     def nx(self):
