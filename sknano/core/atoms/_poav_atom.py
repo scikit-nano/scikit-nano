@@ -51,25 +51,58 @@ class POAV(object):
 
     @property
     def v1(self):
+        """:class:`~sknano.core.math.Vector` :math:`\\mathbf{v}_1` \
+            directed along the :math:`\\sigma`-orbital to the \
+            nearest-neighbor :class:`~sknano.core.atoms.Atom` \
+            in :class:`~sknano.core.atoms.Bond` 1."""
         return self._v1
 
     @property
     def v2(self):
+        """:class:`~sknano.core.math.Vector` :math:`\\mathbf{v}_2` \
+            directed along the :math:`\\sigma`-orbital to the \
+            nearest-neighbor :class:`~sknano.core.atoms.Atom` \
+            in :class:`~sknano.core.atoms.Bond` 2."""
         return self._v2
 
     @property
     def v3(self):
+        """:class:`~sknano.core.math.Vector` :math:`\\mathbf{v}_3` \
+            directed along the :math:`\\sigma`-orbital to the \
+            nearest-neighbor :class:`~sknano.core.atoms.Atom` \
+            in :class:`~sknano.core.atoms.Bond` 3."""
         return self._v3
 
     @property
-    def t(self):
-        return vec.scalar_triple_product(self.v1, self.v2, self.v3)
+    def Vv1v2v3(self):
+        """Volume of the parallelepiped defined by \
+            :class:`~sknano.core.math.Vector`\ s `v1`, `v2`, and `v3`.
+
+        Computes the scalar triple product of vectors :math:`\\mathbf{v}_1`,
+        :math:`\\mathbf{v}_2`, and :math:`\\mathbf{v}_3`:
+
+        .. math::
+
+           V_{v_1v_2v_3} =
+           |\\mathbf{v}_1\\cdot(\\mathbf{v}_2\\times\\mathbf{v}_3)|
+
+        """
+        return np.abs(vec.scalar_triple_product(self.v1, self.v2, self.v3))
 
     @property
     def vpi(self):
-        return (self.reciprocal_v1 +
-                self.reciprocal_v2 +
-                self.reciprocal_v3) / self.t
+        """General :math:`\\pi`-orbital axis vector \
+            (:math:`\\mathbf{v}_{\\pi}`) formed by the \
+            terminii of :class:`~sknano.core.math.Vector`\ s \
+            :class:`~sknano.core.math.Vector`\ s `v1`, `v2`, and `v3`.
+
+        .. math::
+
+           \\mathbf{v}_{\\pi} =
+           \\mathbf{v}_1 + \\mathbf{v}_2\\ + \\mathbf{v}_3
+
+        """
+        return self.reciprocal_v1 + self.reciprocal_v2 + self.reciprocal_v3
 
     @property
     def Vpi(self):
@@ -77,65 +110,139 @@ class POAV(object):
 
     @property
     def reciprocal_v1(self):
-        return vec.cross(self.v2, self.v3)
+        """Reciprocal :class:`~sknano.core.math.Vector` \
+            :math:`\\mathbf{v}_1^{*}`.
+
+        Defined as:
+
+        .. math::
+
+           \\mathbf{v}_1^{*} =
+           \\frac{\\mathbf{v}_2\\times\\mathbf{v}_3}
+           {|\\mathbf{v}_1\\cdot(\\mathbf{v}_2\\times\\mathbf{v}_3)|}
+
+        """
+        return vec.cross(self.v2, self.v3) / self.Vv1v2v3
 
     @property
     def reciprocal_v2(self):
-        return vec.cross(self.v3, self.v1)
+        """Reciprocal :class:`~sknano.core.math.Vector` \
+            :math:`\\mathbf{v}_2^{*}`.
+
+        Defined as:
+
+        .. math::
+
+           \\mathbf{v}_2^{*} =
+           \\frac{\\mathbf{v}_3\\times\\mathbf{v}_1}
+           {|\\mathbf{v}_1\\cdot(\\mathbf{v}_2\\times\\mathbf{v}_3)|}
+
+        """
+        return vec.cross(self.v3, self.v1) / self.Vv1v2v3
 
     @property
     def reciprocal_v3(self):
-        return vec.cross(self.v1, self.v2)
+        """Reciprocal :class:`~sknano.core.math.Vector` \
+            :math:`\\mathbf{v}_3^{*}`.
+
+        Defined as:
+
+        .. math::
+
+           \\mathbf{v}_3^{*} =
+           \\frac{\\mathbf{v}_1\\times\\mathbf{v}_2}
+           {|\\mathbf{v}_1\\cdot(\\mathbf{v}_2\\times\\mathbf{v}_3)|}
+
+        """
+        return vec.cross(self.v1, self.v2) / self.Vv1v2v3
 
     @property
     def V1(self):
+        """:math:`\\mathbf{v}_1` unit :class:`~sknano.core.math.Vector`
+
+        .. math::
+           \\mathbf{V}_1\\equiv\\frac{\\mathbf{v}_1}{|\\mathbf{v}_1|}
+
+        """
         return self.b1.unit_vector
 
     @property
     def V2(self):
+        """:math:`\\mathbf{v}_2` unit :class:`~sknano.core.math.Vector`
+
+        .. math::
+           \\mathbf{V}_2\\equiv\\frac{\\mathbf{v}_2}{|\\mathbf{v}_2|}
+
+        """
         return self.b2.unit_vector
 
     @property
     def V3(self):
+        """:math:`\\mathbf{v}_3` unit :class:`~sknano.core.math.Vector`
+
+        .. math::
+           \\mathbf{V}_3\\equiv\\frac{\\mathbf{v}_3}{|\\mathbf{v}_3|}
+
+        """
         return self.b3.unit_vector
 
     @property
     def R1(self):
+        """:class:`~sknano.core.atoms.Bond` 1 \
+            :class:`~sknano.core.math.Vector` \
+            :attr:`~sknano.core.math.Vector.length`.
+        """
         return self.b1.length
 
     @property
     def R2(self):
+        """:class:`~sknano.core.atoms.Bond` 2 \
+            :class:`~sknano.core.math.Vector` \
+            :attr:`~sknano.core.math.Vector.length`.
+        """
         return self.b2.length
 
     @property
     def R3(self):
+        """:class:`~sknano.core.atoms.Bond` 3 \
+            :class:`~sknano.core.math.Vector` \
+            :attr:`~sknano.core.math.Vector.length`.
+        """
         return self.b3.length
 
     @property
     def T(self):
+        """:math:`\\frac{1}{6}` the volume of the parallelepiped defined by \
+            :class:`~sknano.core.math.Vector`\ s \
+            :math:`\\mathbf{V}_1,\\mathbf{V}_2,\\mathbf{V}_3`.
+        """
         return self._T
 
     @property
     def A(self):
+        """Magnitude of :math:`\\mathbf{v}_{\\pi}`."""
         return self.vpi.magnitude
 
     @property
     def H(self):
+        """Altitude of tetrahedron."""
         return 3 * self.T / self.A
 
     @property
     def sigma_pi_angles(self):
+        """:math:`\\theta_{\\sigma-\\pi}` angles."""
         return self._sigma_pi_angles
 
     @sigma_pi_angles.setter
     def sigma_pi_angles(self, value):
+        """Set list of :math:`\\theta_{\\sigma-\\pi}` angles."""
         if not isinstance(value, list):
             raise TypeError('Expected a number')
         self._sigma_pi_angles = value
 
     @property
     def pyramidalization_angles(self):
-        """Return the pyramidalization angle :math:`\\theta_P`"""
+        """Pyramidalization :math:`\\theta_{P}` angles."""
         return self._pyramidalization_angles
 
     @pyramidalization_angles.setter
@@ -146,6 +253,7 @@ class POAV(object):
 
     @property
     def misalignment_angles(self):
+        """Misalignment :math:`\\phi_{i}` angles."""
         return self._misalignment_angles
 
     @misalignment_angles.setter
@@ -155,13 +263,11 @@ class POAV(object):
         self._misalignment_angles = value
 
     def todict(self, rad2deg=False):
-        #return dict(sigma_pi_angles=self.sigma_pi_angles,
-        #            pyramidalization_angles=self.pyramidalization_angles,
-        #            misalignment_angles=self.misalignment_angles,
-        #            T=self.T, H=self.H, A=self.A)
+        """Return dictionary of `POAV` class attributes."""
         sigma_pi_angles = self.sigma_pi_angles
         pyramidalization_angles = self.pyramidalization_angles
         misalignment_angles = self.misalignment_angles
+
         if rad2deg:
             sigma_pi_angles = np.degrees(sigma_pi_angles)
             pyramidalization_angles = np.degrees(pyramidalization_angles)
