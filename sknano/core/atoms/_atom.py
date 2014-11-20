@@ -39,6 +39,8 @@ class Atom(object):
     """
     _atomattrs = ['symbol', 'Z', 'm', 'r', 'x', 'y', 'z']  # private class var
 
+    __hash__ = object.__hash__
+
     def __init__(self, element=None, m=None, x=None, y=None, z=None):
 
         # set mass first because the element.setter method may check mass value

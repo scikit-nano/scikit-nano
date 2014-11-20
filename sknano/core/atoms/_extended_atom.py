@@ -52,6 +52,8 @@ class XAtom(Atom):
         ['atomID', 'moleculeID', 'atomtype', 'q', 'v', 'vx', 'vy', 'vz',
          'f', 'fx', 'fy', 'fz', 'n', 'nx', 'ny', 'nz']
 
+    __hash__ = Atom.__hash__
+
     def __init__(self, element=None, atomID=0, moleculeID=0, atomtype=1,
                  q=0., m=None, mass=None, x=None, y=None, z=None,
                  vx=None, vy=None, vz=None, fx=None, fy=None, fz=None,
