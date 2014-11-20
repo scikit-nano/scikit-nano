@@ -42,7 +42,7 @@ class Bond(object):
         return "Bond({!r}, {!r})".format(self.atom1, self.atom2)
 
     def __eq__(self, other):
-        if self is other or self.length == other.length:
+        if self is other or (self.atoms == other.atoms):
             return True
         else:
             return False
