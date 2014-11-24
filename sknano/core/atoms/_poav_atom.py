@@ -35,13 +35,13 @@ class POAV(object):
     """
     def __init__(self, sigma_bonds):
         self.bonds = sigma_bonds
-        self.b1 = self.bonds[0].vector
-        self.b2 = self.bonds[1].vector
-        self.b3 = self.bonds[2].vector
+        self.bond1 = self.bonds[0].vector
+        self.bond2 = self.bonds[1].vector
+        self.bond3 = self.bonds[2].vector
 
-        self._v1 = self.b1
-        self._v2 = self.b2
-        self._v3 = self.b3
+        self._v1 = self.bond1
+        self._v2 = self.bond2
+        self._v3 = self.bond3
 
         self._T = vec.scalar_triple_product(self.V1, self.V2, self.V3) / 6
 
@@ -164,7 +164,7 @@ class POAV(object):
            \\mathbf{V}_1\\equiv\\frac{\\mathbf{v}_1}{|\\mathbf{v}_1|}
 
         """
-        return self.b1.unit_vector
+        return self.bond1.unit_vector
 
     @property
     def V2(self):
@@ -174,7 +174,7 @@ class POAV(object):
            \\mathbf{V}_2\\equiv\\frac{\\mathbf{v}_2}{|\\mathbf{v}_2|}
 
         """
-        return self.b2.unit_vector
+        return self.bond2.unit_vector
 
     @property
     def V3(self):
@@ -184,7 +184,7 @@ class POAV(object):
            \\mathbf{V}_3\\equiv\\frac{\\mathbf{v}_3}{|\\mathbf{v}_3|}
 
         """
-        return self.b3.unit_vector
+        return self.bond3.unit_vector
 
     @property
     def R1(self):
@@ -192,7 +192,7 @@ class POAV(object):
             :class:`~sknano.core.math.Vector` \
             :attr:`~sknano.core.math.Vector.length`.
         """
-        return self.b1.length
+        return self.bond1.length
 
     @property
     def R2(self):
@@ -200,7 +200,7 @@ class POAV(object):
             :class:`~sknano.core.math.Vector` \
             :attr:`~sknano.core.math.Vector.length`.
         """
-        return self.b2.length
+        return self.bond2.length
 
     @property
     def R3(self):
@@ -208,7 +208,7 @@ class POAV(object):
             :class:`~sknano.core.math.Vector` \
             :attr:`~sknano.core.math.Vector.length`.
         """
-        return self.b3.length
+        return self.bond3.length
 
     @property
     def T(self):
@@ -262,6 +262,9 @@ class POAV(object):
             raise TypeError('Expected a number')
         self._misalignment_angles = value
 
+    def get_POAV_attr(self, attr):
+        return getattr(self, attr)
+
     def todict(self, rad2deg=False):
         """Return dictionary of `POAV` class attributes."""
         sigma_pi_angles = self.sigma_pi_angles
@@ -273,9 +276,9 @@ class POAV(object):
             pyramidalization_angles = np.degrees(pyramidalization_angles)
             misalignment_angles = np.degrees(misalignment_angles)
 
-        return dict(bond1=self.b1.length,
-                    bond2=self.b2.length,
-                    bond3=self.b3.length,
+        return dict(bond1=self.bond1.length,
+                    bond2=self.bond2.length,
+                    bond3=self.bond3.length,
                     sigma_pi_angle1=sigma_pi_angles[0],
                     sigma_pi_angle2=sigma_pi_angles[1],
                     sigma_pi_angle3=sigma_pi_angles[2],
@@ -306,6 +309,12 @@ class POAV1(POAV):
     @property
     def n(self):
         return 3 * self.m + 2
+
+    def get_POAV_attr(self, attr):
+        try:
+            return getattr(self, attr)
+        except AttributeError:
+            return super(POAV1, self).get_POAV_attr(attr)
 
     def todict(self, rad2deg=False):
         super_dict = super(POAV1, self).todict(rad2deg=rad2deg)
@@ -357,6 +366,12 @@ class POAV2(POAV):
         s3 = 1 / (1 + self.n3)
         return 1 / sum([s1, s2, s3]) - 1
 
+    def get_POAV_attr(self, attr):
+        try:
+            return getattr(self, attr)
+        except AttributeError:
+            return super(POAV1, self).get_POAV_attr(attr)
+
     def todict(self, rad2deg=False):
         super_dict = super(POAV2, self).todict(rad2deg=rad2deg)
         super_dict.update(dict(m=self.m, n1=self.n1, n2=self.n2, n3=self.n3))
@@ -378,6 +393,12 @@ class POAVR(POAV):
         self._v2 = vi[1]
         self._v3 = vi[2]
         self._T = self.R1 * self.R2 * self.R3 * self.T
+
+    def get_POAV_attr(self, attr):
+        try:
+            return getattr(self, attr)
+        except AttributeError:
+            return super(POAV1, self).get_POAV_attr(attr)
 
 
 class POAVAtomMixin(object):
