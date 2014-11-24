@@ -57,6 +57,7 @@ class Vector(np.ndarray):
 
     """
     __array_priority__ = 15.0
+    __hash__ = np.ndarray.__hash__
     _verbosity = 0
 
     def __new__(cls, v=None, nd=None, p0=None, p=None, dtype=None, copy=True):

@@ -32,6 +32,7 @@ class Point(np.ndarray):
 
     """
     __array_priority__ = 10.0
+    __hash__ = np.ndarray.__hash__
 
     def __new__(cls, p=None, nd=None, dtype=None, copy=True):
 
