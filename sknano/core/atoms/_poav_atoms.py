@@ -101,3 +101,19 @@ class POAVAtoms(KDTAtoms):
 
     def update_attrs(self):
         self.compute_POAVs()
+
+    @property
+    def POAV1(self):
+        return [atom.POAV1 for atom in self if atom.POAV1 is not None]
+
+    @property
+    def POAV2(self):
+        return [atom.POAV2 for atom in self if atom.POAV2 is not None]
+
+    @property
+    def POAVR(self):
+        return [atom.POAVR for atom in self if atom.POAVR is not None]
+
+    def get_POAV_attr(self, POAV_class, attr):
+        return [getattr(atom, POAV_class).get_POAV_attr(attr) for atom in self
+                if getattr(atom, POAV_class) is not None]
