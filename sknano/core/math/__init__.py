@@ -15,7 +15,9 @@ Abstract object representations for points and vectors
    :toctree: generated/
 
    Point
+   Points
    Vector
+   Vectors
 
 Linear algebra transforms
 ----------------------------
@@ -38,7 +40,9 @@ __docformat__ = 'restructuredtext en'
 
 from ._extras import *
 from ._point import *
+from ._points import *
 from ._vector import *
+from ._vectors import *
 from ._transforms import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
