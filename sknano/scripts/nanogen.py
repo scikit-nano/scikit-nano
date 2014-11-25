@@ -49,6 +49,7 @@ This module allows for easy structure generation from the command line.
        --structure-format {data,xyz}
                              structure file format (default: xyz)
        --verbose             verbose output
+       --debug               debug output
 
      sub-commands:
        {graphene,BLG,swnt,unrolled_swnt,mwnt,swnt_bundle,mwnt_bundle}
@@ -119,6 +120,8 @@ def argparser():
         help='structure file format (default: %(default)s)')
     parser.add_argument(
         '--verbose', action='store_true', help='verbose output')
+    parser.add_argument(
+        '--debug', action='store_true', help='debug output')
 
     graphene_parent_parser = argparse.ArgumentParser(add_help=False)
     graphene_parent_parser.add_argument(
