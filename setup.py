@@ -3,6 +3,7 @@
 """Python toolkit for generating and analyzing nanostructure data"""
 
 from __future__ import absolute_import, division, print_function
+from six.moves import map
 __docformat__ = 'restructuredtext en'
 
 import os
@@ -16,7 +17,7 @@ if sys.version_info[:2] < (2, 7) or (3, 0) <= sys.version_info[:2] < (3, 3):
 if sys.version_info[0] >= 3:
     import builtins
 else:
-    import __builtin__ as builtins
+    import six.moves.builtins as builtins
 
 DISTNAME = 'scikit-nano'
 DESCRIPTION = __doc__

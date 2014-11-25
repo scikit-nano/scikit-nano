@@ -17,6 +17,7 @@ MWNT structure generator (:mod:`sknano.generators._mwnt_generator`)
 
 """
 from __future__ import absolute_import, division, print_function
+import six
 __docformat__ = 'restructuredtext en'
 
 #import copy
@@ -34,7 +35,7 @@ __all__ = ['MWNTGenerator']
 
 
 class MWNTGenerator(MWNT, GeneratorBase):
-    u"""Class for generating single, multi-walled nanotubes.
+    six.u("""Class for generating single, multi-walled nanotubes.
 
     .. versionchanged:: 0.2.20
 
@@ -106,7 +107,7 @@ class MWNTGenerator(MWNT, GeneratorBase):
 
     .. image:: /images/5shell_mwnt_4040_outer_Ch_1cellx1cellx4.06cells-01.png
 
-    """
+    """)
     def __init__(self, autogen=True, **kwargs):
 
         super(MWNTGenerator, self).__init__(**kwargs)

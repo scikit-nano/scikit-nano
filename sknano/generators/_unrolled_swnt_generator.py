@@ -17,6 +17,8 @@ Unrolled SWNT generator (:mod:`sknano.generators._unrolled_swnt_generator`)
 
 """
 from __future__ import absolute_import, division, print_function
+import six
+from six.moves import range
 __docformat__ = 'restructuredtext en'
 
 import numpy as np
@@ -31,7 +33,7 @@ __all__ = ['UnrolledSWNTGenerator']
 
 
 class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
-    u"""Class for generating unrolled nanotube structures.
+    six.u("""Class for generating unrolled nanotube structures.
 
     .. versionadded:: 0.2.23
 
@@ -89,7 +91,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
 
     The rendered structure looks like:
 
-    """
+    """)
 
     def __init__(self, autogen=True, **kwargs):
 
@@ -117,7 +119,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
 
         self.unit_cell = Atoms()
 
-        for i in xrange(N):
+        for i in range(N):
             x1 = rt * i * psi
             z1 = i * tau
 
@@ -164,8 +166,8 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
         """Generate structure data."""
         #self.atoms = Atoms()
         self.structure_data.clear()
-        for nx in xrange(self.nx):
-            for nz in xrange(int(np.ceil(self.nz))):
+        for nx in range(self.nx):
+            for nz in range(int(np.ceil(self.nz))):
                 dr = Vector([nx * self.Ch, 0.0, nz * self.T])
                 for uc_atom in self.unit_cell:
                     nt_atom = Atom(element=uc_atom.symbol)

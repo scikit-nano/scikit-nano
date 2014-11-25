@@ -8,6 +8,7 @@ Functions for linear algebra transforms (:mod:`sknano.core.math._transforms`)
 
 """
 from __future__ import absolute_import, division, print_function
+import six
 __docformat__ = 'restructuredtext en'
 
 import numpy as np
@@ -174,7 +175,7 @@ def transformation_matrix(angle, rot_axis=None, anchor_point=None,
     # Handle N-D rotation about origin
     # Handle N-D rotation around the N-D rotation vector anchored at
     # an arbitrary N-D point.
-    if rot_axis is not None and isinstance(rot_axis, (str, unicode)):
+    if rot_axis is not None and isinstance(rot_axis, (str, six.text_type)):
         try:
             rot_axis = _str2array[rot_axis]
         except KeyError:

@@ -8,6 +8,7 @@ Nanotube bundle base class (:mod:`sknano.structures._nanotube_bundle`)
 
 """
 from __future__ import absolute_import, division, print_function
+from six.moves import range
 __docformat__ = 'restructuredtext en'
 
 import numbers
@@ -70,11 +71,11 @@ class NanotubeBundleBase(object):
             ntubes_per_row = nrows
             while ntubes_per_row >= ntubes_per_end_rows:
                 if row == 0:
-                    for n in xrange(ntubes_per_row):
+                    for n in range(ntubes_per_row):
                         dr = n * self.r1
                         self.bundle_coords.append(dr)
                 else:
-                    for nx in xrange(ntubes_per_row):
+                    for nx in range(ntubes_per_row):
                         for ny in (-row, row):
                             dr = Vector()
                             dr.x = abs(ny * self.r2.x)
@@ -86,8 +87,8 @@ class NanotubeBundleBase(object):
 
         elif self.bundle_geometry == 'rectangle':
             Lx = 10 * self.Lx
-            for nx in xrange(self.nx):
-                for ny in xrange(self.ny):
+            for nx in range(self.nx):
+                for ny in range(self.ny):
                     dr = nx * self.r1 + ny * self.r2
                     while dr.x < 0:
                         dr.x += Lx
@@ -98,8 +99,8 @@ class NanotubeBundleBase(object):
         elif self.bundle_geometry == 'triangle':
             pass
         else:
-            for nx in xrange(self.nx):
-                for ny in xrange(self.ny):
+            for nx in range(self.nx):
+                for ny in range(self.ny):
                     dr = nx * self.r1 + ny * self.r2
                     self.bundle_coords.append(dr)
 

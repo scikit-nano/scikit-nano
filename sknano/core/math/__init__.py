@@ -36,6 +36,7 @@ Number theory
    totient_func
 
 """
+from __future__ import absolute_import
 __docformat__ = 'restructuredtext en'
 
 from ._extras import *

@@ -8,6 +8,7 @@ MWNT Bundle Generator (:mod:`sknano.generators._mwnt_bundle_generator`)
 
 """
 from __future__ import absolute_import, division, print_function
+import six
 __docformat__ = 'restructuredtext en'
 
 from sknano.core import pluralize
@@ -20,7 +21,7 @@ __all__ = ['MWNTBundleGenerator']
 
 class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
                           MWNTGenerator):
-    u"""Class for generating multi-walled nanotube bundles.
+    six.u("""Class for generating multi-walled nanotube bundles.
 
     .. versionadded:: 0.2.20
 
@@ -95,7 +96,7 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
 
     .. image:: /images/5shell_mwnt_4040_outer_Ch_hcp_7tube_hexagon-01.png
 
-    """
+    """)
     def __init__(self, autogen=True, **kwargs):
 
         super(MWNTBundleGenerator, self).__init__(autogen=False, **kwargs)

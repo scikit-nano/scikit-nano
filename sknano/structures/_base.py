@@ -8,6 +8,7 @@ Base structure classes (:mod:`sknano.structures._base`)
 
 """
 from __future__ import absolute_import, division, print_function
+import six
 __docformat__ = 'restructuredtext en'
 
 import numbers
@@ -18,7 +19,7 @@ __all__ = ['StructureBase']
 
 
 class StructureBase(object):
-    u"""Base class for creating abstract representation of nano structure.
+    six.u("""Base class for creating abstract representation of nano structure.
 
     Parameters
     ----------
@@ -31,7 +32,7 @@ class StructureBase(object):
         the carbon-carbon bond length in graphite, approximately
         :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
 
-    """
+    """)
     def __init__(self, element1='C', element2='C', bond=CCbond, verbose=False,
                  debug=False, **kwargs):
 
@@ -49,12 +50,12 @@ class StructureBase(object):
 
     @property
     def bond(self):
-        u"""Bond length in **\u212b**."""
+        six.u("""Bond length in **\u212b**.""")
         return self._bond
 
     @bond.setter
     def bond(self, value):
-        u"""Set bond length in **\u212b**."""
+        six.u("""Set bond length in **\u212b**.""")
         if not (isinstance(value, numbers.Real) or value > 0):
             raise TypeError('Expected a real, positive number.')
         self._bond = float(value)

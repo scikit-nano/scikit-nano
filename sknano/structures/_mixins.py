@@ -8,6 +8,8 @@ Mixin structure classes (:mod:`sknano.structures._mixins`)
 
 """
 from __future__ import absolute_import, division, print_function
+import six
+from six.moves import range
 __docformat__ = 'restructuredtext en'
 
 import numbers
@@ -139,19 +141,19 @@ class NanotubeMixin(object):
 
     @property
     def Ch(self):
-        u"""SWNT circumference :math:`|\\mathbf{C}_h|` in **\u212b**"""
+        six.u("""SWNT circumference :math:`|\\mathbf{C}_h|` in **\u212b**""")
         return compute_Ch(self.n, self.m, bond=self.bond)
 
     @property
     def dt(self):
-        u"""Nanotube diameter :math:`d_t = \\frac{|\\mathbf{C}_h|}{\\pi}`
-        in \u212b."""
+        six.u("""Nanotube diameter :math:`d_t = \\frac{|\\mathbf{C}_h|}{\\pi}`
+        in \u212b.""")
         return compute_dt(self.n, self.m, bond=self.bond)
 
     @property
     def rt(self):
-        u"""Nanotube radius :math:`r_t = \\frac{|\\mathbf{C}_h|}{2\\pi}`
-        in \u212b."""
+        six.u("""Nanotube radius :math:`r_t = \\frac{|\\mathbf{C}_h|}{2\\pi}`
+        in \u212b.""")
         return compute_rt(self.n, self.m, bond=self.bond)
 
     @property
@@ -171,13 +173,13 @@ class NanotubeMixin(object):
 
     @property
     def T(self):
-        u"""Length of nanotube unit cell :math:`|\\mathbf{T}|` in \u212b.
+        six.u("""Length of nanotube unit cell :math:`|\\mathbf{T}|` in \u212b.
 
         .. math::
 
            |\\mathbf{T}| = \\frac{\\sqrt{3} |\\mathbf{C}_{h}|}{d_{R}}
 
-        """
+        """)
         return compute_T(self.n, self.m, bond=self.bond, length=True)
 
     @property
@@ -369,11 +371,11 @@ class NanotubeBundleMixin(object):
             ntubes_per_row = nrows
             while ntubes_per_row >= ntubes_per_end_rows:
                 if row == 0:
-                    for n in xrange(ntubes_per_row):
+                    for n in range(ntubes_per_row):
                         dr = n * self.r1
                         self.bundle_coords.append(dr)
                 else:
-                    for nx in xrange(ntubes_per_row):
+                    for nx in range(ntubes_per_row):
                         for ny in (-row, row):
                             dr = Vector()
                             dr.x = abs(ny * self.r2.x)
@@ -385,8 +387,8 @@ class NanotubeBundleMixin(object):
 
         elif self.bundle_geometry == 'rectangle':
             Lx = 10 * self.Lx
-            for nx in xrange(self.nx):
-                for ny in xrange(self.ny):
+            for nx in range(self.nx):
+                for ny in range(self.ny):
                     dr = nx * self.r1 + ny * self.r2
                     while dr.x < 0:
                         dr.x += Lx
@@ -397,8 +399,8 @@ class NanotubeBundleMixin(object):
         elif self.bundle_geometry == 'triangle':
             pass
         else:
-            for nx in xrange(self.nx):
-                for ny in xrange(self.ny):
+            for nx in range(self.nx):
+                for ny in range(self.ny):
                     dr = nx * self.r1 + ny * self.r2
                     self.bundle_coords.append(dr)
 

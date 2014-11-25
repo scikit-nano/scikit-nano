@@ -7,6 +7,7 @@ import numpy as np
 
 from sknano.core.math import rotation_matrix, transformation_matrix, \
     rotation_transform, Rx, Ry, Rz, Point, Vector
+from six.moves import zip
 
 
 def test_rotation_matrix():

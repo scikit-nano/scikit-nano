@@ -8,6 +8,7 @@
 
 """
 from __future__ import absolute_import, division, print_function
+import six
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractproperty
@@ -22,9 +23,8 @@ __all__ = ['Geometric3DRegion', 'Parallelepiped', 'Cuboid', 'Cube',
            'Ellipsoid', 'Spheroid', 'Sphere']
 
 
-class Geometric3DRegion(GeometricTransformsMixin, GeometricRegion):
+class Geometric3DRegion(six.with_metaclass(ABCMeta, GeometricTransformsMixin, GeometricRegion)):
     """Abstract base class for representing 3D geometric regions."""
-    __metaclass__ = ABCMeta
 
     @abstractproperty
     def volume(self):

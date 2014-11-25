@@ -79,8 +79,8 @@ def deprecated(replacement=None):
             warnings.warn_explicit(
                 "Call to deprecated function {}".format(func.__name__),
                 category=DeprecationWarning,
-                filename=func.func_code.co_filename,
-                lineno=func.func_code.co_firstlineno + 1
+                filename=func.__code__.co_filename,
+                lineno=func.__code__.co_firstlineno + 1
             )
             return func(*args, **kwargs)
         return wrapper
@@ -103,7 +103,7 @@ def memoize(f, cache={}):
     """memoization function to cache dict mapping"""
     @wraps(f)
     def g(*args, **kwargs):
-        key = (f, tuple(args), frozenset(kwargs.items()))
+        key = (f, tuple(args), frozenset(list(kwargs.items())))
         if key not in cache:
             cache[key] = f(*args, **kwargs)
         return cache[key].copy()

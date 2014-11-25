@@ -8,6 +8,7 @@ Base class for structure data atoms (:mod:`sknano.core.atoms._atoms`)
 
 """
 from __future__ import absolute_import, division, print_function
+from six.moves import zip
 __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
@@ -216,7 +217,7 @@ class Atoms(UserList):
         """
         coords = self.coords
         if asdict:
-            return OrderedDict(zip(xyz, coords.T))
+            return OrderedDict(list(zip(xyz, coords.T)))
         else:
             return coords
 

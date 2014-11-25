@@ -8,6 +8,7 @@ Graphene defect generators (:mod:`sknano.generators._graphene_defect_generators`
 
 """
 from __future__ import absolute_import, division, print_function
+from six.moves import range
 __docformat__ = 'restructuredtext en'
 
 import itertools
@@ -278,7 +279,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
             nbins = Nvac_sites_per_layer * Nlayers
 
             bin_sets = []
-            for n in xrange(Nlayers):
+            for n in range(Nlayers):
                 bin_sets.append(np.arange(n, nbins, Nlayers))
             bin_set_iter = itertools.cycle((bin_sets))
 
@@ -305,7 +306,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
             atoms_along_ortho_axis = {'+': [], '-': []}
 
             for y in layer_coords:
-                bin_set = bin_set_iter.next()
+                bin_set = next(bin_set_iter)
                 for vac_pos in bin_mid_pts[bin_set]:
                     candidate_vac_atom_indices = \
                         np.where(

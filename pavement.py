@@ -59,6 +59,8 @@ TODO
     - fix bdist_mpkg: we build the same source twice -> how to make sure we use
       the same underlying python for egg install in venv and for bdist_mpkg
 """
+from __future__ import absolute_import
+from __future__ import print_function
 
 import os
 import sys
@@ -436,14 +438,14 @@ def bdist_wininst_simple():
     """Simple wininst-based installer."""
     call_task("clean")
     env = os.environ.copy()
-    for k, v in SITECFG['nosse'].items():
+    for k, v in list(SITECFG['nosse'].items()):
         env[k] = v
     _bdist_wininst(options.bdist_wininst_simple.python_version, env)
 
 def _bdist_wininst(pyver, cfg_env=None):
     cmd = WINE_PYS[pyver] + ['setup.py', 'build', '-c', 'mingw32', 'bdist_wininst']
     if cfg_env:
-        for k, v in WINDOWS_ENV.items():
+        for k, v in list(WINDOWS_ENV.items()):
             cfg_env[k] = v
     else:
         cfg_env = WINDOWS_ENV

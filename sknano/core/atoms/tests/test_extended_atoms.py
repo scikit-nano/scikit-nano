@@ -6,6 +6,7 @@ import nose
 from nose.tools import *
 from sknano.core.atoms import XAtom, XAtoms
 from sknano.testing import generate_atoms
+from six.moves import range
 #from sknano.utils.geometric_shapes import Ellipsoid
 
 

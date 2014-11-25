@@ -8,6 +8,8 @@ Nanotube defect generators (:mod:`sknano.generators._nanotube_defect_generators`
 
 """
 from __future__ import absolute_import, division, print_function
+import six
+from six.moves import range
 __docformat__ = 'restructuredtext en'
 
 import itertools
@@ -398,7 +400,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
             nbins = Ntubes * Nvac_sites_per_tube
 
             bin_sets = []
-            for n in xrange(Ntubes):
+            for n in range(Ntubes):
                 bin_sets.append(np.arange(n, Nvac_sites, Ntubes))
             bin_set_iter = itertools.cycle((bin_sets))
 
@@ -422,7 +424,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                 print('vac_coords_along_bin_axis:'
                       '\n{}'.format(vac_coords_along_bin_axis))
 
-            for i in xrange(Ntubes):
+            for i in range(Ntubes):
                 tube_atom_indices = \
                     np.where((self._atom_ids > (Natoms_per_tube * i)) &
                              (self._atom_ids <= (Natoms_per_tube * (i + 1))))
@@ -437,7 +439,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                     print('tube_atom_ids:\n{}'.format(tube_atom_ids))
                     print('tube_atom_coords:\n{}'.format(tube_coords))
 
-                bin_set = bin_set_iter.next()
+                bin_set = next(bin_set_iter)
                 for vac_pos in vac_coords_along_bin_axis[bin_set]:
                     candidate_vac_atom_indices = \
                         np.where(np.abs(tube_coords.T[bin_axis_index] -
@@ -446,7 +448,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                         tube_atom_ids[candidate_vac_atom_indices]
 
                     if self._verbose:
-                        print(u'vac_pos along {}-axis: {:.2f} \u00c5'.format(
+                        print(six.u('vac_pos along {}-axis: {:.2f} \u00c5').format(
                             bin_axis, vac_pos))
                         print('N candidate_vac_atom_ids: '
                               '{}\n'.format(len(candidate_vac_atom_ids)))

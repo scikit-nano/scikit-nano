@@ -8,6 +8,7 @@ Base classes for geometric regions (:mod:`sknano.utils.geometric_shapes._base`)
 
 """
 from __future__ import absolute_import, division, print_function
+import six
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod, abstractproperty
@@ -38,9 +39,8 @@ class GeometricTransformsMixin(object):
             v.translate(t)
 
 
-class GeometricRegion(object):
+class GeometricRegion(six.with_metaclass(ABCMeta, object)):
     """Abstract base class for geometric regions."""
-    __metaclass__ = ABCMeta
 
     def __init__(self):
         self._points = []

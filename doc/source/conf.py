@@ -19,6 +19,7 @@ import sys
 
 # Check Sphinx version
 import sphinx
+import six
 if sphinx.__version__ < "1.1":
     raise RuntimeError("Sphinx 1.1 or newer required")
 
@@ -78,8 +79,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General substitutions.
-project = u'scikit-nano'
-copyright = u'2014, Andrew Merrill'
+project = six.u('scikit-nano')
+copyright = six.u('2014, Andrew Merrill')
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -303,8 +304,8 @@ latex_use_modindex = False
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'scikit-nano', u'scikit-nano Documentation',
-     [u'Andrew Merrill'], 1)
+    ('index', 'scikit-nano', six.u('scikit-nano Documentation'),
+     [six.u('Andrew Merrill')], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -318,8 +319,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [('index', 'scikit-nano',
-                      u'scikit-nano Documentation',
-                      u'Andrew Merrill', 'scikit-nano',
+                      six.u('scikit-nano Documentation'),
+                      six.u('Andrew Merrill'), 'scikit-nano',
                       'python toolkit',
                       'Miscellaneous')]
 

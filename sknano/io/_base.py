@@ -8,6 +8,7 @@ Base classes for structure data (:mod:`sknano.io._base`)
 
 """
 from __future__ import absolute_import, division, print_function
+import six
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
@@ -173,7 +174,7 @@ class StructureWriter(object):
             XYZWriter.write(fname=fname, atoms=atoms, **kwargs)
 
 
-class StructureConverter(object):
+class StructureConverter(six.with_metaclass(ABCMeta, object)):
     """Abstract base class for converting structure data.
 
     Parameters
@@ -182,7 +183,6 @@ class StructureConverter(object):
     outfile : str
 
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, infile=None, outfile=None, **kwargs):
         self.infile = infile

@@ -8,6 +8,8 @@ LAMMPS dump format (:mod:`sknano.io._lammps_dump_format`)
 
 """
 from __future__ import absolute_import, division, print_function
+from six.moves import range
+from six.moves import zip
 __docformat__ = 'restructuredtext en'
 
 #import glob
@@ -179,7 +181,7 @@ class DUMPReader(StructureIO):
 
             atoms = \
                 np.zeros((snapshot.Natoms, len(self.atomattrs)), dtype=float)
-            for n in xrange(snapshot.Natoms):
+            for n in range(snapshot.Natoms):
                 line = [float(attr) for attr in f.readline().strip().split()]
                 atoms[n] = line
 

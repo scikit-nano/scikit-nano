@@ -8,6 +8,8 @@ LAMMPS data format (:mod:`sknano.io._lammps_data_format`)
 
 """
 from __future__ import absolute_import, division, print_function
+import six
+from six.moves import range
 __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
@@ -71,7 +73,7 @@ class DATAReader(StructureIO):
                     if len(line) == 0:
                         continue
                     found = False
-                    for header in header_specs.iterkeys():
+                    for header in six.iterkeys(header_specs):
                         if header in line:
                             found = True
                             self.header_data[header] = \
@@ -89,18 +91,18 @@ class DATAReader(StructureIO):
 
                 while True:
                     found = False
-                    for section, header in section_header_map.iteritems():
+                    for section, header in six.iteritems(section_header_map):
                         if section in line:
                             found = True
                             f.readline()
                             Nitems = self.header_data[header]
                             data = []
-                            for n in xrange(Nitems):
+                            for n in range(Nitems):
                                 tmp = []
                                 line = f.readline().strip().split()
                                 for i, attrs in enumerate(
-                                    self.section_attrs_specs[
-                                        section].itervalues()):
+                                    six.itervalues(self.section_attrs_specs[
+                                        section])):
                                     try:
                                         tmp.append(
                                             attrs['dtype'](float(line[i])))
@@ -147,7 +149,7 @@ class DATAReader(StructureIO):
                        'vx': None, 'vy': None, 'vz': None}
 
         for line in atoms_section:
-            for kw in atom_kwargs.iterkeys():
+            for kw in six.iterkeys(atom_kwargs):
                 if kw in atoms_section_attrs:
                     atom_kwargs[kw] = \
                         line[self.section_attrs_specs['Atoms'][kw]['index']]
@@ -181,7 +183,7 @@ class DATAReader(StructureIO):
         Ntypes = self.atoms.Ntypes
         atomtypes = self.atoms.atomtypes
         if Ntypes != self.header_data['atom types']:
-            for atomtype in xrange(1, self.header_data['atom types'] + 1):
+            for atomtype in range(1, self.header_data['atom types'] + 1):
                 if atomtype not in atomtypes:
                     mass = self.section_data['Masses'][atomtype - 1][
                         self.section_attrs_specs['Masses']['mass']['index']]
@@ -355,7 +357,7 @@ class DATAWriter(object):
                     dim=dim))
 
             f.write('\nMasses\n\n')
-            for atomtype, properties in atomtypes.iteritems():
+            for atomtype, properties in six.iteritems(atomtypes):
                 f.write('{}{:.4f}\n'.format(
                     '{:d}'.format(atomtype).ljust(Natoms_width),
                     properties['mass']))
@@ -603,7 +605,7 @@ class DATAFormatSpec(object):
                             'quatw', 'quati', 'quatj', 'quatk']}
 
         self.section_attrs_specs = OrderedDict()
-        for section, attrs in self.section_attrs.iteritems():
+        for section, attrs in six.iteritems(self.section_attrs):
             self.section_attrs_specs[section] = OrderedDict()
             for i, attr in enumerate(attrs):
                 self.section_attrs_specs[section][attr] = \
@@ -617,7 +619,7 @@ class DATAFormatSpec(object):
     def atom_style(self, value):
         if value not in atom_styles:
             raise ValueError("Allowed `atom_style`'s:\n{}".format(
-                atom_styles.keys()))
+                list(atom_styles.keys())))
         self._atom_style = value
 
     @atom_style.deleter
@@ -731,14 +733,14 @@ atom_styles['wavepacket'] = \
 lammps_atom_styles = atom_styles
 
 atoms_section_attrs = {}
-for atom_style, attrs in atom_styles.iteritems():
+for atom_style, attrs in six.iteritems(atom_styles):
     atom_style_attrs = atoms_section_attrs[atom_style] = []
     for attr in attrs:
         atom_style_attrs.append(attr.replace('-', ''))
     atom_style_attrs.extend(['nx', 'ny', 'nz'])
 
 velocities_section_attrs = {}
-velocities_section_attrs.update(dict.fromkeys(atom_styles.keys(),
+velocities_section_attrs.update(dict.fromkeys(list(atom_styles.keys()),
                                               ['atomID', 'vx', 'vy', 'vz']))
 velocities_section_attrs['electron'].append('ervel')
 velocities_section_attrs['ellipsoid'].extend(['lx', 'ly', 'lz'])

@@ -10,6 +10,8 @@ An `Atoms` class for POAV analysis
 
 """
 from __future__ import absolute_import, division, print_function
+import six
+from six.moves import zip
 __docformat__ = 'restructuredtext en'
 
 #import importlib
@@ -55,7 +57,7 @@ class POAVAtoms(KDTAtoms):
         for atom in self:
             # the central atom must have 3 bonds for POAV analysis.
             if atom.bonds.Nbonds == 3:
-                for POAV_name, POAV_class in POAV_classes.iteritems():
+                for POAV_name, POAV_class in six.iteritems(POAV_classes):
                     setattr(atom, POAV_name, POAV_class(atom.bonds))
 
         for atom in self:

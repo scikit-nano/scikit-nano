@@ -8,6 +8,7 @@
 
 """
 from __future__ import absolute_import, division, print_function
+import six
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractproperty
@@ -21,9 +22,8 @@ __all__ = ['Geometric2DRegion', 'Parallelogram', 'Rectangle', 'Square',
            'Ellipse', 'Circle']
 
 
-class Geometric2DRegion(GeometricTransformsMixin, GeometricRegion):
+class Geometric2DRegion(six.with_metaclass(ABCMeta, GeometricTransformsMixin, GeometricRegion)):
     """Abstract base class for representing 2D geometric regions."""
-    __metaclass__ = ABCMeta
 
     @abstractproperty
     def area(self):

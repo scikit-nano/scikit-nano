@@ -8,6 +8,8 @@ Extra helper functions (:mod:`sknano.structures._extras`)
 
 """
 from __future__ import absolute_import, division, print_function
+import six
+from six.moves import range
 __docformat__ = 'restructuredtext en'
 
 import importlib
@@ -43,13 +45,13 @@ attr_units['dt'] = \
     attr_units['rt'] = \
     attr_units['Ch'] = \
     attr_units['T'] = \
-    attr_units['bond'] = u' \u212B'
-attr_units['chiral_angle'] = u'\u00b0'
+    attr_units['bond'] = six.u(' \u212B')
+attr_units['chiral_angle'] = six.u('\u00b0')
 
 attr_symbols = {}
-attr_symbols['t1'] = u't\u2081'
-attr_symbols['t2'] = u't\u2082'
-attr_symbols['chiral_angle'] = u'\u03b8c'
+attr_symbols['t1'] = six.u('t\u2081')
+attr_symbols['t2'] = six.u('t\u2082')
+attr_symbols['chiral_angle'] = six.u('\u03b8c')
 
 attr_strfmt = {}
 attr_strfmt['Ch'] = \
@@ -79,7 +81,7 @@ def cmp_Ch(Ch1, Ch2):
         Ch1_type = get_Ch_type(Ch1)
         n2, m2 = Ch2
         Ch2_type = get_Ch_type(Ch2)
-    elif isinstance(Ch1, (str, unicode)) and isinstance(Ch2, (str, unicode)):
+    elif isinstance(Ch1, (str, six.text_type)) and isinstance(Ch2, (str, six.text_type)):
         n1, m1 = get_Ch_indices(Ch1)
         Ch1_type = get_Ch_type(Ch1)
         n2, m2 = get_Ch_indices(Ch2)
@@ -296,7 +298,7 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
                             ns = [int(float(ni))]
         if (not ms or isinstance(ms, list) and ms[0] is None) and \
                 not mi and not mf:
-            if chiral_type in (Ch_types.keys() + Ch_types.values()):
+            if chiral_type in (list(Ch_types.keys()) + list(Ch_types.values())):
                 if chiral_type in ('achiral', 'aCh'):
                     for n in ns:
                         Ch_list.append((n, n))
@@ -429,8 +431,8 @@ def generate_Ch_property_grid(compute=str, imax=10, **kwargs):
         compute_func = \
             getattr(importlib.import_module('sknano.structures'), compute)
         grid = np.zeros((imax + 1, imax + 1)) - 1
-        for n in xrange(imax + 1):
-            for m in xrange(imax + 1):
+        for n in range(imax + 1):
+            for m in range(imax + 1):
                 grid[n, m] = compute_func(n, m, **kwargs)
         return grid
     except AttributeError as e:

@@ -6,6 +6,7 @@ import nose
 from nose.tools import *
 from pkg_resources import resource_filename
 from sknano.io import XYZData, XYZReader, XYZWriter, XYZ2DATAConverter
+from six.moves import range
 
 
 def test_reader():
@@ -15,7 +16,7 @@ def test_reader():
     assert_not_equal(atoms.Natoms, 20)
     assert_equal(atoms.Natoms, 40)
     atoms.assign_unique_ids()
-    assert_equal(list(set(atoms.atom_ids)), list(xrange(1, 41)))
+    assert_equal(list(set(atoms.atom_ids)), list(range(1, 41)))
 
 
 def test_dataio1():
@@ -27,7 +28,7 @@ def test_dataio1():
     assert_not_equal(atoms.Natoms, 20)
     assert_equal(atoms.Natoms, 40)
     atoms.assign_unique_ids()
-    assert_equal(list(set(atoms.atom_ids)), list(xrange(1, 41)))
+    assert_equal(list(set(atoms.atom_ids)), list(range(1, 41)))
 
 
 def test_dataio2():
@@ -37,7 +38,7 @@ def test_dataio2():
     assert_not_equal(atoms.Natoms, 20)
     assert_equal(atoms.Natoms, 40)
     atoms.assign_unique_ids()
-    assert_equal(list(set(atoms.atom_ids)), list(xrange(1, 41)))
+    assert_equal(list(set(atoms.atom_ids)), list(range(1, 41)))
 
 
 if __name__ == '__main__':

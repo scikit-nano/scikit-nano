@@ -17,6 +17,8 @@ SWNT structure generator (:mod:`sknano.generators._swnt_generator`)
 
 """
 from __future__ import absolute_import, division, print_function
+import six
+from six.moves import range
 __docformat__ = 'restructuredtext en'
 
 import numpy as np
@@ -31,7 +33,7 @@ __all__ = ['SWNTGenerator']
 
 
 class SWNTGenerator(SWNT, GeneratorBase):
-    u"""Class for generating nanotube structures.
+    six.u("""Class for generating nanotube structures.
 
     Parameters
     ----------
@@ -94,7 +96,7 @@ class SWNTGenerator(SWNT, GeneratorBase):
 
     .. image:: /images/10,5_unit_cell_perspective_view.png
 
-    """
+    """)
     def __init__(self, autogen=True, **kwargs):
 
         super(SWNTGenerator, self).__init__(**kwargs)
@@ -121,7 +123,7 @@ class SWNTGenerator(SWNT, GeneratorBase):
 
         self.unit_cell = Atoms()
 
-        for i in xrange(N):
+        for i in range(N):
             x1 = rt * np.cos(i * psi)
             y1 = rt * np.sin(i * psi)
             z1 = i * tau
@@ -170,7 +172,7 @@ class SWNTGenerator(SWNT, GeneratorBase):
         """Generate structure data."""
         #self.atoms = Atoms()
         self.structure_data.clear()
-        for nz in xrange(int(np.ceil(self.nz))):
+        for nz in range(int(np.ceil(self.nz))):
             dr = Vector([0.0, 0.0, nz * self.T])
             for uc_atom in self.unit_cell:
                 nt_atom = Atom(element=uc_atom.symbol)

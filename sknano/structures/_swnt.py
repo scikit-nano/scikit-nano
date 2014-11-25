@@ -8,6 +8,7 @@ SWNT structure class (:mod:`sknano.structures._swnt`)
 
 """
 from __future__ import absolute_import, division, print_function
+import six
 __docformat__ = 'restructuredtext en'
 
 from ._base import StructureBase
@@ -19,7 +20,7 @@ __all__ = ['SWNT', 'Nanotube']
 
 
 class SWNT(NanotubeMixin, StructureBase):
-    u"""SWNT structure class.
+    six.u("""SWNT structure class.
 
     Parameters
     ----------
@@ -119,7 +120,7 @@ class SWNT(NanotubeMixin, StructureBase):
     rt: 7.83 Å
     electronic_type: semiconducting, type 1
 
-    """
+    """)
     # add each attribute in the order I want them to appear in
     # verbose output mode
     _structure_attrs = ['n', 'm', 't1', 't2', 'd', 'dR', 'N', 'R',
@@ -158,21 +159,19 @@ class SWNT(NanotubeMixin, StructureBase):
                 if attr in attr_strfmt:
                     if attr in attr_units:
                         strrep += \
-                            u"{}: {}{}\n".format(var,
-                                                 attr_strfmt[attr].format(
-                                                     getattr(self, attr)),
-                                                 attr_units[attr])
+                            six.u("{}: {}{}\n").format(
+                                var, attr_strfmt[attr].format(
+                                    getattr(self, attr)), attr_units[attr])
                     else:
-                        strrep += u"{}: {}\n".format(var,
-                                                     attr_strfmt[attr].format(
-                                                         getattr(self, attr)))
+                        strrep += six.u("{}: {}\n").format(
+                            var, attr_strfmt[attr].format(getattr(self, attr)))
                 else:
                     if attr in attr_units:
-                        strrep += u"{}: {}{}\n".format(var,
-                                                       getattr(self, attr),
-                                                       attr_units[attr])
+                        strrep += six.u("{}: {}{}\n").format(
+                            var, getattr(self, attr), attr_units[attr])
                     else:
-                        strrep += u"{}: {}\n".format(var, getattr(self, attr))
+                        strrep += six.u("{}: {}\n").format(
+                            var, getattr(self, attr))
 
         return strrep
 

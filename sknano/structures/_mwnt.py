@@ -8,6 +8,8 @@ MWNT structure class (:mod:`sknano.structures._mwnt`)
 
 """
 from __future__ import absolute_import, division, print_function
+import six
+from six.moves import range
 __docformat__ = 'restructuredtext en'
 
 import numbers
@@ -58,8 +60,8 @@ class MWNT(StructureBase):
 
             Ch = []
             dt = []
-            for n in xrange(0, 501):
-                for m in xrange(0, 501):
+            for n in range(0, 501):
+                for m in range(0, 501):
                     if (n <= 2 and m <= 2):
                         continue
                     else:
@@ -217,14 +219,14 @@ class MWNT(StructureBase):
 
     @property
     def dt(self):
-        u"""`MWNT` diameter :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}`
-        in \u212b."""
+        six.u("""`MWNT` diameter :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}`
+        in \u212b.""")
         return np.asarray([swnt.dt for swnt in self.shells]).max()
 
     @property
     def rt(self):
-        u"""`MWNT` radius :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}`
-        in \u212b."""
+        six.u("""`MWNT` radius :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}`
+        in \u212b.""")
         return np.asarray([swnt.rt for swnt in self.shells]).max()
 
     @property

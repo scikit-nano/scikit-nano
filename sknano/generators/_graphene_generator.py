@@ -8,6 +8,7 @@ Graphene structure generator (:mod:`sknano.generators._graphene_generator`)
 
 """
 from __future__ import absolute_import, division, print_function
+from six.moves import range
 __docformat__ = 'restructuredtext en'
 
 import numpy as np
@@ -174,10 +175,10 @@ class GrapheneGenerator(Graphene, GeneratorBase):
         """Generate the full structure coordinates."""
         #self.atoms = Atoms()
         self.structure_data.clear()
-        for nlayer in xrange(self.nlayers):
+        for nlayer in range(self.nlayers):
             layer = Atoms()
-            for nx in xrange(self.Nx):
-                for ny in xrange(self.Ny):
+            for nx in range(self.Nx):
+                for ny in range(self.Ny):
                     dr = np.array([nx * self.cell.x,
                                    ny * self.cell.y,
                                    nlayer * self.layer_spacing])

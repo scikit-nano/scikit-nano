@@ -84,7 +84,7 @@ class XAtoms(Atoms):
     @property
     def Ntypes(self):
         """Number of atom types in `XAtoms`."""
-        return len(self.atomtypes.keys())
+        return len(list(self.atomtypes.keys()))
 
     @property
     def q(self):

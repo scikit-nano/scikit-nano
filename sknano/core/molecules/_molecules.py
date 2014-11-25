@@ -8,6 +8,7 @@ Base class for structure molecules (:mod:`sknano.core.molecules._molecules`)
 
 """
 from __future__ import absolute_import, division, print_function
+from six.moves import zip
 __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
@@ -202,7 +203,7 @@ class Molecules(UserList):
         """
         coords = self.coords
         if asdict:
-            return OrderedDict(zip(xyz, coords.T))
+            return OrderedDict(list(zip(xyz, coords.T)))
         else:
             return coords
 

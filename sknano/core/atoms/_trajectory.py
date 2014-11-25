@@ -10,6 +10,8 @@ Class for analyzing the trajectories of molecular dynamics `Atoms`.
 
 """
 from __future__ import absolute_import, division, print_function
+from six.moves import range
+from six.moves import zip
 __docformat__ = 'restructuredtext en'
 
 #import numbers
@@ -33,12 +35,12 @@ class aselect(object):
             for snapshot in self.traj:
                 if not snapshot.tselect:
                     continue
-                for i in xrange(snapshot.Natoms):
+                for i in range(snapshot.Natoms):
                     snapshot.aselect[i] = 1
                 snapshot.nselect = snapshot.Natoms
         else:
             snapshot = self.traj[self.traj.findtimestep(args[0])]
-            for i in xrange(snapshot.Natoms):
+            for i in range(snapshot.Natoms):
                 snapshot.aselect[i] = 1
             snapshot.nselect = snapshot.Natoms
 
@@ -105,7 +107,7 @@ class Snapshot(object):
         for atom in self._atoms:
             attrs = [dtype(value) for dtype, value in
                      zip(self.attr_dtypes, atom)]
-            atoms.append(Atom(**dict(zip(self.atomattrs, attrs))))
+            atoms.append(Atom(**dict(list(zip(self.atomattrs, attrs)))))
         return atoms
 
     @atoms.setter
