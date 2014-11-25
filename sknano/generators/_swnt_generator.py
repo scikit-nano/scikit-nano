@@ -121,7 +121,7 @@ class SWNTGenerator(SWNT, GeneratorBase):
 
         self.unit_cell = Atoms()
 
-        for i in xrange(1, N + 1):
+        for i in xrange(N):
             x1 = rt * np.cos(i * psi)
             y1 = rt * np.sin(i * psi)
             z1 = i * tau
