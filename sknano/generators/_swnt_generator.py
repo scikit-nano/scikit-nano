@@ -129,6 +129,13 @@ class SWNTGenerator(SWNT, GeneratorBase):
             while z1 > T - eps:
                 z1 -= T
 
+            if z1 < 0:
+                z1 += T
+
+            if self.debug:
+                print('i={}: x1, y1, z1 = ({:.6f}, {:.6f}, {:.6f})'.format(
+                    i, x1, y1, z1))
+
             atom1 = Atom(element=e1, x=x1, y=y1, z=z1)
             atom1.rezero()
 
@@ -140,8 +147,16 @@ class SWNTGenerator(SWNT, GeneratorBase):
             x2 = rt * np.cos(i * psi + dpsi)
             y2 = rt * np.sin(i * psi + dpsi)
             z2 = i * tau - dtau
+
             while z2 > T - eps:
                 z2 -= T
+
+            if z2 < 0:
+                z2 += T
+
+            if self.debug:
+                print('i={}: x2, y2, z2 = ({:.6f}, {:.6f}, {:.6f})'.format(
+                    i, x2, y2, z2))
 
             atom2 = Atom(element=e2, x=x2, y=y2, z=z2)
             atom2.rezero()

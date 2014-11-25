@@ -124,6 +124,13 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
             while z1 > T - eps:
                 z1 -= T
 
+            if z1 < 0:
+                z1 += T
+
+            if self.debug:
+                print('i={}: x1, z1 = ({:.6f}, {:.6f})'.format(
+                    i, x1, z1))
+
             atom1 = Atom(element=e1, x=x1, z=z1)
             atom1.rezero()
 
@@ -134,8 +141,16 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
 
             x2 = rt * (i * psi + dpsi)
             z2 = i * tau - dtau
+
             while z2 > T - eps:
                 z2 -= T
+
+            if z2 < 0:
+                z2 += T
+
+            if self.debug:
+                print('i={}: x2, z2 = ({:.6f}, {:.6f})'.format(
+                    i, x2, z2))
 
             atom2 = Atom(element=e2, x=x2, z=z2)
             atom2.rezero()
