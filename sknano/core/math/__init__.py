@@ -24,12 +24,13 @@ Linear algebra transforms
 .. autosummary::
    :toctree: generated/
 
+   transformation_matrix
    Rx
    Ry
    Rz
+   reflection_matrix
    rotation_matrix
-   transformation_matrix
-   rotation_transform
+   scaling_matrix
    rotate
    scale
    translate
