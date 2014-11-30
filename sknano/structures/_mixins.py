@@ -7,8 +7,8 @@ Mixin structure classes (:mod:`sknano.structures._mixins`)
 .. currentmodule:: sknano.structures._mixins
 
 """
-from __future__ import absolute_import, division, print_function
-import six
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 from six.moves import range
 __docformat__ = 'restructuredtext en'
 
@@ -141,19 +141,19 @@ class NanotubeMixin(object):
 
     @property
     def Ch(self):
-        six.u("""SWNT circumference :math:`|\\mathbf{C}_h|` in **\u212b**""")
+        """SWNT circumference :math:`|\\mathbf{C}_h|` in **\u212b**"""
         return compute_Ch(self.n, self.m, bond=self.bond)
 
     @property
     def dt(self):
-        six.u("""Nanotube diameter :math:`d_t = \\frac{|\\mathbf{C}_h|}{\\pi}`
-        in \u212b.""")
+        """Nanotube diameter :math:`d_t = \\frac{|\\mathbf{C}_h|}{\\pi}` \
+        in \u212b."""
         return compute_dt(self.n, self.m, bond=self.bond)
 
     @property
     def rt(self):
-        six.u("""Nanotube radius :math:`r_t = \\frac{|\\mathbf{C}_h|}{2\\pi}`
-        in \u212b.""")
+        """Nanotube radius :math:`r_t = \\frac{|\\mathbf{C}_h|}{2\\pi}` \
+        in \u212b."""
         return compute_rt(self.n, self.m, bond=self.bond)
 
     @property
@@ -173,13 +173,13 @@ class NanotubeMixin(object):
 
     @property
     def T(self):
-        six.u("""Length of nanotube unit cell :math:`|\\mathbf{T}|` in \u212b.
+        """Length of nanotube unit cell :math:`|\\mathbf{T}|` in \u212b.
 
         .. math::
 
            |\\mathbf{T}| = \\frac{\\sqrt{3} |\\mathbf{C}_{h}|}{d_{R}}
 
-        """)
+        """
         return compute_T(self.n, self.m, bond=self.bond, length=True)
 
     @property

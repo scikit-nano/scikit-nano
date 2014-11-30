@@ -7,8 +7,8 @@ MWNT structure class (:mod:`sknano.structures._mwnt`)
 .. currentmodule:: sknano.structures._mwnt
 
 """
-from __future__ import absolute_import, division, print_function
-import six
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 from six.moves import range
 __docformat__ = 'restructuredtext en'
 
@@ -219,14 +219,14 @@ class MWNT(StructureBase):
 
     @property
     def dt(self):
-        six.u("""`MWNT` diameter :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}`
-        in \u212b.""")
+        """`MWNT` diameter :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}` \
+        in \u212b."""
         return np.asarray([swnt.dt for swnt in self.shells]).max()
 
     @property
     def rt(self):
-        six.u("""`MWNT` radius :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}`
-        in \u212b.""")
+        """`MWNT` radius :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}` \
+        in \u212b."""
         return np.asarray([swnt.rt for swnt in self.shells]).max()
 
     @property

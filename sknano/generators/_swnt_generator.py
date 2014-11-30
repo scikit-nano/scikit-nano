@@ -16,8 +16,9 @@ SWNT structure generator (:mod:`sknano.generators._swnt_generator`)
    Handle different units in output coordinates.
 
 """
-from __future__ import absolute_import, division, print_function
-import six
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
+#import six
 from six.moves import range
 __docformat__ = 'restructuredtext en'
 
@@ -33,7 +34,7 @@ __all__ = ['SWNTGenerator']
 
 
 class SWNTGenerator(SWNT, GeneratorBase):
-    six.u("""Class for generating nanotube structures.
+    """Class for generating nanotube structures.
 
     Parameters
     ----------
@@ -96,7 +97,7 @@ class SWNTGenerator(SWNT, GeneratorBase):
 
     .. image:: /images/10,5_unit_cell_perspective_view.png
 
-    """)
+    """
     def __init__(self, autogen=True, **kwargs):
 
         super(SWNTGenerator, self).__init__(**kwargs)

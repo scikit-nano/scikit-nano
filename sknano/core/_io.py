@@ -7,8 +7,8 @@ I/O functions (:mod:`sknano.core._io`)
 .. currentmodule:: sknano.core._io
 
 """
-from __future__ import absolute_import, division, print_function
-import six
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 __docformat__ = 'restructuredtext en'
 
 import os
@@ -174,8 +174,7 @@ def get_fpath(fname=None, ext=None, outpath=os.getcwd(), overwrite=False,
                     sys.exit(1)
                 else:
                     if verbose:
-                        print(six.u('overwriting existing file: {}').format(
-                            fname))
+                        print('overwriting existing file: {}'.format(fname))
             else:
                 if add_fnum:
                     while os.path.isfile(fpath):
@@ -186,15 +185,15 @@ def get_fpath(fname=None, ext=None, outpath=os.getcwd(), overwrite=False,
                         fpath = os.path.join(outpath, f)
                     fname = f
                 else:
-                    print(six.u('file exists: {}\n').format(fpath))
-                    print(six.u('Set `add_fnum=True` to generate unique\n') +
-                          six.u('`fname` or `overwrite=True` to overwrite\n') +
-                          six.u('existing file.'))
+                    print('file exists: {}\n'.format(fpath))
+                    print('Set `add_fnum=True` to generate unique\n' +
+                          '`fname` or `overwrite=True` to overwrite\n' +
+                          'existing file.')
                     fpath = None
 
         if verbose:
-            print(six.u('Generated file name: {}').format(fname))
-            print(six.u('File path: {}').format(fpath))
+            print('Generated file name: {}'.format(fname))
+            print('File path: {}'.format(fpath))
 
         if fname_only:
             return fname

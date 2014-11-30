@@ -7,8 +7,8 @@ Nanotube defect generators (:mod:`sknano.generators._nanotube_defect_generators`
 .. currentmodule:: sknano.generators._nanotube_defect_generators
 
 """
-from __future__ import absolute_import, division, print_function
-import six
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 from six.moves import range
 __docformat__ = 'restructuredtext en'
 
@@ -448,7 +448,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                         tube_atom_ids[candidate_vac_atom_indices]
 
                     if self._verbose:
-                        print(six.u('vac_pos along {}-axis: {:.2f} \u00c5').format(
+                        print('vac_pos along {}-axis: {:.2f} \u00c5'.format(
                             bin_axis, vac_pos))
                         print('N candidate_vac_atom_ids: '
                               '{}\n'.format(len(candidate_vac_atom_ids)))

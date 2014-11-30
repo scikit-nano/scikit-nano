@@ -7,8 +7,8 @@ SWNT Bundle Generator (:mod:`sknano.generators._swnt_bundle_generator`)
 .. currentmodule:: sknano.generators._swnt_bundle_generator
 
 """
-from __future__ import absolute_import, division, print_function
-import six
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from sknano.core import pluralize
@@ -21,7 +21,7 @@ __all__ = ['SWNTBundleGenerator']
 
 class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
                           SWNTGenerator):
-    six.u("""Class for generating nanotube bundles.
+    """Class for generating nanotube bundles.
 
     .. versionadded:: 0.2.4
 
@@ -145,7 +145,7 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
 
     .. image:: /images/1010_ccp_3cellsx3cellsx5cells-01.png
 
-    """)
+    """
 
     def __init__(self, autogen=True, **kwargs):
 

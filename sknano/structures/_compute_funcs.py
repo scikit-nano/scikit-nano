@@ -7,8 +7,8 @@ Compute functions (:mod:`sknano.structures._compute_funcs`)
 .. currentmodule:: sknano.structures._compute_funcs
 
 """
-from __future__ import absolute_import, division, print_function
-import six
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 from six.moves import range
 __docformat__ = 'restructuredtext en'
 
@@ -182,7 +182,7 @@ def compute_t2(n, m):
 
 
 def compute_Ch(n, m, bond=None, **kwargs):
-    six.u("""Compute nanotube circumference :math:`|\\mathbf{C}_{h}|` in
+    """Compute nanotube circumference :math:`|\\mathbf{C}_{h}|` in \
     **\u212b**.
 
     .. math::
@@ -206,7 +206,7 @@ def compute_Ch(n, m, bond=None, **kwargs):
     float
         Nanotube circumference :math:`|\\mathbf{C}_h|` in \u212b.
 
-    """)
+    """
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -252,7 +252,7 @@ def compute_chiral_angle(n, m, rad2deg=True):
 
 
 def compute_T(n, m, bond=None, length=True, **kwargs):
-    six.u("""Compute length of nanotube unit cell :math:`|\\mathbf{T}|` in
+    """Compute length of nanotube unit cell :math:`|\\mathbf{T}|` in \
     \u212b.
 
     .. math::
@@ -284,7 +284,7 @@ def compute_T(n, m, bond=None, length=True, **kwargs):
         translation vector as a 2-tuple of ints
         (:math:`t_1`, :math:`t_2`).
 
-    """)
+    """
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -309,7 +309,7 @@ def compute_T(n, m, bond=None, length=True, **kwargs):
 
 
 def compute_dt(n, m, bond=None, **kwargs):
-    six.u("""Compute nanotube diameter :math:`d_t` in \u212b.
+    """Compute nanotube diameter :math:`d_t` in \u212b.
 
     .. math::
 
@@ -331,7 +331,7 @@ def compute_dt(n, m, bond=None, **kwargs):
     float
         Nanotube diameter :math:`d_t` in \u212b.
 
-    """)
+    """
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -342,7 +342,7 @@ def compute_dt(n, m, bond=None, **kwargs):
 
 
 def compute_rt(n, m, bond=None, **kwargs):
-    six.u("""Compute nanotube radius :math:`r_t` in \u212b.
+    """Compute nanotube radius :math:`r_t` in \u212b.
 
     .. math::
 
@@ -365,7 +365,7 @@ def compute_rt(n, m, bond=None, **kwargs):
     float
         Nanotube radius :math:`r_t` in \u212b.
 
-    """)
+    """
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -403,7 +403,7 @@ def compute_M(n, m):
 
 
 def compute_R(n, m, bond=None, length=False, **kwargs):
-    six.u("""Compute symmetry vector :math:`\\mathbf{R} = (p, q)`.
+    """Compute symmetry vector :math:`\\mathbf{R} = (p, q)`.
 
     The *symmetry vector* is any lattice vector of the unfolded graphene
     layer that represents a *symmetry operation* of the nanotube. The
@@ -444,7 +444,7 @@ def compute_R(n, m, bond=None, length=False, **kwargs):
         Length of :math:`\\mathbf{R}` (:math:`|\\mathbf{R}|`) if `length`
         is `True` in units of **\u212b**.
 
-    """)
+    """
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -510,7 +510,7 @@ def compute_R_chiral_angle(n, m, rad2deg=True):
 
 
 def compute_symmetry_operation(n, m, bond=None):
-    six.u("""Compute symmetry operation :math:`(\\psi|\\tau)`.
+    """Compute symmetry operation :math:`(\\psi|\\tau)`.
 
     The *symmetry vector* `R` represents a *symmetry
     operation* of the nanotube which arises as a *screw translation*, which
@@ -539,7 +539,7 @@ def compute_symmetry_operation(n, m, bond=None):
         2-tuple of floats -- :math:`\\psi` in radians and
         :math:`\\tau` in \u212b.
 
-    """)
+    """
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -551,7 +551,7 @@ def compute_symmetry_operation(n, m, bond=None):
 
 
 def compute_psi(n, m):
-    """Compute rotation component of symmetry operation
+    """Compute rotation component of symmetry operation \
     :math:`\\psi` in **radians**.
 
     .. math::
@@ -584,7 +584,7 @@ def compute_psi(n, m):
 
 
 def compute_tau(n, m, bond=None, **kwargs):
-    six.u("""Compute translation component of symmetry operation
+    """Compute translation component of symmetry operation \
     :math:`\\tau` in **\u212b**.
 
     .. math::
@@ -608,7 +608,7 @@ def compute_tau(n, m, bond=None, **kwargs):
         Translation component of symmetry operation :math:`\\tau`
         in **\u212b**.
 
-    """)
+    """
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -776,7 +776,8 @@ def compute_Natoms_per_unit_cell(n, m):
 
 
 def compute_unit_cell_mass(n, m, element1=None, element2=None, **kwargs):
-    """Compute nanotube unit cell mass in atomic mass units units.
+    """Compute nanotube unit cell mass in *Daltons*/*atomic mass units* (amu) \
+        units.
 
     Parameters
     ----------
@@ -819,7 +820,7 @@ def compute_unit_cell_mass(n, m, element1=None, element2=None, **kwargs):
 
 def compute_linear_mass_density(n, m, bond=None, element1=None, element2=None,
                                 **kwargs):
-    """Compute nanotube linear mass density (mass per unit length) in
+    """Compute nanotube linear mass density (mass per unit length) in \
     **grams/nm**.
 
     Parameters
@@ -862,7 +863,7 @@ def compute_linear_mass_density(n, m, bond=None, element1=None, element2=None,
 
 def compute_bundle_density(n, m, d_vdw=None, bond=None,
                            element1=None, element2=None):
-    six.u("""Compute nanotube bundle mass density
+    """Compute nanotube bundle mass density \
     :math:`\\rho_{\\mathrm{bundle}}(n, m)` in :math:`\\mathrm{g/cm^3}`.
 
     .. math::
@@ -888,7 +889,7 @@ def compute_bundle_density(n, m, d_vdw=None, bond=None,
         :math:`\\rho_{\\mathrm{bundle}}` in units of
         :math:`\\mathrm{\\frac{g}{cm^3}}`
 
-    """)
+    """
     if bond is None:
         bond = CCbond
 

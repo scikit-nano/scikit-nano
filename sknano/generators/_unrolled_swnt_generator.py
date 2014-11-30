@@ -16,8 +16,8 @@ Unrolled SWNT generator (:mod:`sknano.generators._unrolled_swnt_generator`)
    Handle different units in output coordinates.
 
 """
-from __future__ import absolute_import, division, print_function
-import six
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 from six.moves import range
 __docformat__ = 'restructuredtext en'
 
@@ -33,7 +33,7 @@ __all__ = ['UnrolledSWNTGenerator']
 
 
 class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
-    six.u("""Class for generating unrolled nanotube structures.
+    """Class for generating unrolled nanotube structures.
 
     .. versionadded:: 0.2.23
 
@@ -91,7 +91,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
 
     The rendered structure looks like:
 
-    """)
+    """
 
     def __init__(self, autogen=True, **kwargs):
 

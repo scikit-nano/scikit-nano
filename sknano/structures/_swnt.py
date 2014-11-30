@@ -7,8 +7,8 @@ SWNT structure class (:mod:`sknano.structures._swnt`)
 .. currentmodule:: sknano.structures._swnt
 
 """
-from __future__ import absolute_import, division, print_function
-import six
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._base import StructureBase
@@ -20,7 +20,7 @@ __all__ = ['SWNT', 'Nanotube']
 
 
 class SWNT(NanotubeMixin, StructureBase):
-    six.u("""SWNT structure class.
+    """SWNT structure class.
 
     Parameters
     ----------
@@ -120,7 +120,7 @@ class SWNT(NanotubeMixin, StructureBase):
     rt: 7.83 Å
     electronic_type: semiconducting, type 1
 
-    """)
+    """
     # add each attribute in the order I want them to appear in
     # verbose output mode
     _structure_attrs = ['n', 'm', 't1', 't2', 'd', 'dR', 'N', 'R',
@@ -159,18 +159,18 @@ class SWNT(NanotubeMixin, StructureBase):
                 if attr in attr_strfmt:
                     if attr in attr_units:
                         strrep += \
-                            six.u("{}: {}{}\n").format(
+                            "{}: {}{}\n".format(
                                 var, attr_strfmt[attr].format(
                                     getattr(self, attr)), attr_units[attr])
                     else:
-                        strrep += six.u("{}: {}\n").format(
+                        strrep += "{}: {}\n".format(
                             var, attr_strfmt[attr].format(getattr(self, attr)))
                 else:
                     if attr in attr_units:
-                        strrep += six.u("{}: {}{}\n").format(
+                        strrep += "{}: {}{}\n".format(
                             var, getattr(self, attr), attr_units[attr])
                     else:
-                        strrep += six.u("{}: {}\n").format(
+                        strrep += "{}: {}\n".format(
                             var, getattr(self, attr))
 
         return strrep
