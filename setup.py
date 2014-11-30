@@ -17,7 +17,7 @@ if sys.version_info[:2] < (2, 7) or (3, 0) <= sys.version_info[:2] < (3, 3):
 if sys.version_info[0] >= 3:
     import builtins
 else:
-    import six.moves.builtins as builtins
+    import __builtin__ as builtins
 
 DISTNAME = 'scikit-nano'
 DESCRIPTION = __doc__
@@ -35,12 +35,13 @@ Development Status :: 4 - Beta
 Intended Audience :: Science/Research
 Intended Audience :: Developers
 License :: OSI Approved :: BSD License
-Operating System :: MacOS :: MacOS X
 Operating System :: Microsoft :: Windows
 Operating System :: POSIX
 Operating System :: Unix
+Operating System :: MacOS
 Programming Language :: Python
 Programming Language :: Python :: 2.7
+Programming Language :: Python :: 3.3
 Programming Language :: Python :: 3.4
 Topic :: Scientific/Engineering
 Topic :: Scientific/Engineering :: Chemistry
@@ -169,7 +170,7 @@ def setup_package():
         import numpy
         numpy_version = \
             tuple(list(map(int, numpy.version.short_version.split('.')))[:2])
-        if numpy_version < (1, 8):
+        if numpy_version < (1, 9):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
         install_requires += ['numpy>=1.9']
@@ -182,6 +183,9 @@ def setup_package():
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
         install_requires += ['scipy>=0.14']
+
+    # Add six module to install_requires
+    install_requires += ['six>=1.8']
 
     metadata = dict(
         name=DISTNAME,
