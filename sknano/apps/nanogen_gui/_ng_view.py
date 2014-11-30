@@ -12,10 +12,13 @@ __docformat__ = 'restructuredtext en'
 
 import importlib
 
-from PyQt4.QtCore import pyqtSlot
-from PyQt4.QtGui import QMainWindow
+try:
+    from PyQt4.QtCore import pyqtSlot
+    from PyQt4.QtGui import QMainWindow
 
-from ._ui_nanogen import Ui_NanoGen
+    from ._ui_nanogen import Ui_NanoGen
+except ImportError as e:
+    print(e)
 
 __all__ = ['NGView']
 

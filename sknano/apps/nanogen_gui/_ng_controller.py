@@ -10,9 +10,13 @@ NanoGen controller (:mod:`sknano.apps.nanogen_gui._ng_controller`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from PyQt4.QtGui import QApplication
 
-from ._ng_view import NGView
+try:
+    from PyQt4.QtGui import QApplication
+
+    from ._ng_view import NGView
+except ImportError as e:
+    print(e)
 
 __all__ = ['NGController']
 
