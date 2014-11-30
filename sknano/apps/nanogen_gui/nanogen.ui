@@ -129,7 +129,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="bundle_generator_checkBox_2">
+             <widget class="QCheckBox" name="fix_Lz_checkBox">
               <property name="font">
                <font>
                 <pointsize>16</pointsize>
