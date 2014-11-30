@@ -117,6 +117,17 @@ class Atoms(UserList):
         return self.coords[:,2]
 
     @property
+    def inertia_tensor(self):
+        """Return the inertia tensor."""
+        Ixx = (self.masses * (self.y**2 + self.z**2)).sum()
+        Iyy = (self.masses * (self.x**2 + self.z**2)).sum()
+        Izz = (self.masses * (self.x**2 + self.y**2)).sum()
+        Ixy = Iyx = (-self.masses * self.x * self.y).sum()
+        Ixz = Izx = (-self.masses * self.x * self.z).sum()
+        Iyz = Izy = (-self.masses * self.y * self.z).sum()
+        return np.array([[Ixx, Ixy, Ixz], [Iyx, Iyy, Iyz], [Izx, Izy, Izz]])
+
+    @property
     def bounds(self):
         """Return bounds of `Atoms`."""
         return Cuboid(pmin=[self.x.min(), self.y.min(), self.z.min()],
@@ -226,6 +237,7 @@ class Atoms(UserList):
         self.rezero(epsilon=epsilon)
 
     def rezero_xyz(self, epsilon=1.0e-10):
+        """Alias for :meth:`Atoms.rezero`."""
         self.rezero(epsilon=epsilon)
 
     def rezero(self, epsilon=1.0e-10):
