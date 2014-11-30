@@ -13,11 +13,15 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-__all__ = ['Rx', 'Ry', 'Rz',
-           'rotation_matrix',
-           'transformation_matrix',
+__all__ = ['transformation_matrix',
            'affine_transform',
+           'reflection_transform',
            'rotation_transform',
+           'scaling_transform',
+           'Rx', 'Ry', 'Rz',
+           'reflection_matrix',
+           'rotation_matrix',
+           'scaling_matrix',
            'rotate', 'scale', 'translate']
 
 I = np.identity(4)
@@ -25,200 +29,6 @@ I = np.identity(4)
 _str2array = {}
 for i, axis in enumerate(('x', 'y', 'z')):
     _str2array[axis] = I[:3, i]
-
-
-def Rx(angle, deg2rad=False):
-    """Generate the :math:`3\\times3` rotation matrix :math:`R_x(\\theta)` \
-        for a rotation about the :math:`x` axis by an angle :math:`\\theta`.
-
-    Parameters
-    ----------
-    angle : float
-        The rotation angle :math:`\\theta` in *radians*. If the angle is
-        given in *degrees*, then you must set `deg2rad=True` to correctly
-        calculate the rotation matrix.
-    deg2rad : bool, optional
-        if `True`, then `angle` is converted from degrees to radians.
-
-    Returns
-    -------
-    :func:`~numpy:numpy.array`
-        :math:`3\\times3` rotation matrix :math:`R_x(\\theta)` for a
-        rotation about the :math:`x` axis by an angle :math:`\\theta`.
-
-    .. math::
-
-       R_x = \\begin{pmatrix}
-       1 & 0 & 0\\\\
-       0 & \\cos\\theta & -\\sin\\theta\\\\
-       0 & \\sin\\theta & \\cos\\theta
-       \\end{pmatrix}
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> from sknano.core.math import Rx
-    >>> Rx(np.pi/4)
-    array([[ 1.        ,  0.        ,  0.        ],
-           [ 0.        ,  0.70710678, -0.70710678],
-           [ 0.        ,  0.70710678,  0.70710678]])
-    >>> np.alltrue(Rx(np.pi/4) == Rx(45, deg2rad=True))
-    True
-
-    """
-    if deg2rad:
-        angle = np.radians(angle)
-    cosa = np.cos(angle)
-    sina = np.sin(angle)
-
-    Rmat = np.array([[1.0, 0.0, 0.0], [0.0, cosa, -sina], [0.0, sina, cosa]])
-    Rmat[np.where(np.abs(Rmat) <= np.finfo(float).eps)] = 0.0
-    return Rmat
-
-
-def Ry(angle, deg2rad=False):
-    """Generate the :math:`3\\times3` rotation matrix :math:`R_y(\\theta)` \
-        for a rotation about the :math:`y` axis by an angle :math:`\\theta`.
-
-    Parameters
-    ----------
-    angle : float
-        The rotation angle :math:`\\theta` in *radians*. If the angle is
-        given in *degrees*, then you must set `deg2rad=True` to correctly
-        calculate the rotation matrix.
-    deg2rad : bool, optional
-        if `True`, then `angle` is converted from degrees to radians.
-
-    Returns
-    -------
-    :func:`~numpy:numpy.array`
-        :math:`3\\times3` rotation matrix :math:`R_y(\\theta)` for a
-        rotation about the :math:`y` axis by an angle :math:`\\theta`:
-
-    .. math::
-
-       R_y = \\begin{pmatrix}
-       \\cos\\theta & 0 & \\sin\\theta\\\\
-       0 & 1 & 0\\\\
-       -\\sin\\theta & 0 & \\cos\\theta
-       \\end{pmatrix}
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> from sknano.core.math import Ry
-    >>> Ry(np.pi/4)
-    array([[ 0.70710678,  0.        ,  0.70710678],
-           [ 0.        ,  1.        ,  0.        ],
-           [-0.70710678,  0.        ,  0.70710678]])
-    >>> np.alltrue(Ry(np.pi/4) == Ry(45, deg2rad=True))
-    True
-
-    """
-    if deg2rad:
-        angle = np.radians(angle)
-    cosa = np.cos(angle)
-    sina = np.sin(angle)
-
-    Rmat = np.array([[cosa, 0.0, sina], [0.0, 1.0, 0.0], [-sina, 0.0, cosa]])
-    Rmat[np.where(np.abs(Rmat) <= np.finfo(float).eps)] = 0.0
-    return Rmat
-
-
-def Rz(angle, deg2rad=False):
-    """Generate the :math:`3\\times3` rotation matrix :math:`R_z(\\theta)` \
-        for a rotation about the :math:`z` axis by an angle :math:`\\theta`.
-
-    Parameters
-    ----------
-    angle : float
-        The rotation angle :math:`\\theta` in *radians*. If the angle is
-        given in *degrees*, then you must set `deg2rad=True` to correctly
-        calculate the rotation matrix.
-    deg2rad : bool, optional
-        if `True`, then `angle` is converted from degrees to radians.
-
-    Returns
-    -------
-    :func:`~numpy:numpy.array`
-        :math:`3\\times3` rotation matrix :math:`R_z(\\theta)` for a
-        rotation about the :math:`z` axis by an angle :math:`\\theta`.
-
-    .. math::
-
-       R_z = \\begin{pmatrix}
-       \\cos\\theta & -\\sin\\theta & 0\\\\
-       \\sin\\theta & \\cos\\theta & 0\\\\
-       0 & 0 & 1
-       \\end{pmatrix}
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> from sknano.core.math import Rz
-    >>> Rz(np.pi/4)
-    array([[ 0.70710678, -0.70710678,  0.        ],
-           [ 0.70710678,  0.70710678,  0.        ],
-           [ 0.        ,  0.        ,  1.        ]])
-    >>> np.alltrue(Rz(np.pi/4) == Rz(45, deg2rad=True))
-    True
-
-    """
-    if deg2rad:
-        angle = np.radians(angle)
-    cosa = np.cos(angle)
-    sina = np.sin(angle)
-
-    Rmat = np.array([[cosa, -sina, 0.0], [sina, cosa, 0.0], [0.0, 0.0, 1.0]])
-    Rmat[np.where(np.abs(Rmat) <= np.finfo(float).eps)] = 0.0
-    return Rmat
-
-
-def rotation_matrix(angle=None, rot_axis=None, anchor_point=None,
-                    rot_point=None, from_vector=None, to_vector=None,
-                    deg2rad=False, verbose=False):
-    """Generate an :math:`n\\times n` rotation matrix.
-
-    .. versionadded:: 0.3.0
-
-    Parameters
-    ----------
-    angle : float
-        Rotation angle in **radians**. If `deg2rad` is `True`, `angle` will be
-        converted to radians from degrees.  The *sense* of the rotation is
-        defined by the *right hand rule*: If your right-hand's thumb points
-        along the `rot_axis`, then your fingers wrap around the axis in the
-        *positive sense* of the rotation angle.
-    rot_axis : {None, array_like, str}, optional
-        An :math:`n`-element array_like sequence defining the :math:`n`
-        components of the rotation axis or the string `x`, `y`, or `z`
-        representing the :math:`x, y, z` axes of a Cartesian coordinate
-        system in 3D with unit vectors
-        :math:`\\mathbf{v}_x=\\mathbf{\\hat{x}}`,
-        :math:`\\mathbf{v}_y=\\mathbf{\\hat{y}}`, and
-        :math:`\\mathbf{v}_z=\\mathbf{\\hat{z}}`, respectively.
-    anchor_point : :class:`~sknano.core.math.Point`, optional
-    rot_point : :class:`~sknano.core.math.Point`, optional
-    from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
-    deg2rad : bool, optional
-        If `True`, convert `angle` from degrees to radians.
-
-    Returns
-    -------
-    Rmat : :class:`~numpy:numpy.ndarray`
-        If `rot_axis` is `None` then `Rmat` will be a :math:`2D`
-        rotation matrix :math:`R(\\theta)` that rotates :math:`2D` vectors
-        counterclockwise by `angle` :math:`\\theta`.
-
-        If `rot_axis` is not `None` then `Rmat` will be a rotation matrix that
-        gives a rotation around the direction of the vector `rot_axis`.
-
-    """
-    Rmat = transformation_matrix(angle=angle, rot_axis=rot_axis,
-                                 anchor_point=anchor_point, rot_point=rot_point,
-                                 from_vector=from_vector, to_vector=to_vector,
-                                 deg2rad=deg2rad, verbose=verbose)
-    return Rmat[:-1,:-1]
 
 
 def transformation_matrix(angle=None, rot_axis=None, anchor_point=None,
@@ -373,20 +183,272 @@ def transformation_matrix(angle=None, rot_axis=None, anchor_point=None,
     return Tmat
 
 
-def affine_transform(obj, angle=None, rot_axis=None, anchor_point=None,
+def affine_transform(angle=None, rot_axis=None, anchor_point=None,
                      rot_point=None, from_vector=None, to_vector=None,
-                     deg2rad=False, transform_matrix=None, verbose=False):
+                     deg2rad=False, verbose=False):
     raise NotImplementedError("Not implemented")
 
 
 def reflection_transform():
-    pass
+    raise NotImplementedError("Not implemented")
 
 
 def rotation_transform(angle=None, rot_axis=None, anchor_point=None,
                        rot_point=None, from_vector=None, to_vector=None,
                        deg2rad=False, verbose=False):
+    raise NotImplementedError("Not implemented")
+
+
+def scaling_transform():
+    raise NotImplementedError("Not implemented")
+
+
+def Rx(angle, deg2rad=False):
+    """Generate the :math:`3\\times3` rotation matrix :math:`R_x(\\theta)` \
+        for a rotation about the :math:`x` axis by an angle :math:`\\theta`.
+
+    Parameters
+    ----------
+    angle : float
+        The rotation angle :math:`\\theta` in *radians*. If the angle is
+        given in *degrees*, then you must set `deg2rad=True` to correctly
+        calculate the rotation matrix.
+    deg2rad : bool, optional
+        if `True`, then `angle` is converted from degrees to radians.
+
+    Returns
+    -------
+    :class:`~numpy:numpy.ndarray`
+        :math:`3\\times3` rotation matrix :math:`R_x(\\theta)` for a
+        rotation about the :math:`x` axis by an angle :math:`\\theta`.
+
+    .. math::
+
+       R_x = \\begin{pmatrix}
+       1 & 0 & 0\\\\
+       0 & \\cos\\theta & -\\sin\\theta\\\\
+       0 & \\sin\\theta & \\cos\\theta
+       \\end{pmatrix}
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from sknano.core.math import Rx
+    >>> Rx(np.pi/4)
+    array([[ 1.        ,  0.        ,  0.        ],
+           [ 0.        ,  0.70710678, -0.70710678],
+           [ 0.        ,  0.70710678,  0.70710678]])
+    >>> np.alltrue(Rx(np.pi/4) == Rx(45, deg2rad=True))
+    True
+
+    """
+    if deg2rad:
+        angle = np.radians(angle)
+    cosa = np.cos(angle)
+    sina = np.sin(angle)
+
+    Rmat = np.array([[1.0, 0.0, 0.0], [0.0, cosa, -sina], [0.0, sina, cosa]])
+    Rmat[np.where(np.abs(Rmat) <= np.finfo(float).eps)] = 0.0
+    return Rmat
+
+
+def Ry(angle, deg2rad=False):
+    """Generate the :math:`3\\times3` rotation matrix :math:`R_y(\\theta)` \
+        for a rotation about the :math:`y` axis by an angle :math:`\\theta`.
+
+    Parameters
+    ----------
+    angle : float
+        The rotation angle :math:`\\theta` in *radians*. If the angle is
+        given in *degrees*, then you must set `deg2rad=True` to correctly
+        calculate the rotation matrix.
+    deg2rad : bool, optional
+        if `True`, then `angle` is converted from degrees to radians.
+
+    Returns
+    -------
+    :class:`~numpy:numpy.ndarray`
+        :math:`3\\times3` rotation matrix :math:`R_y(\\theta)` for a
+        rotation about the :math:`y` axis by an angle :math:`\\theta`:
+
+    .. math::
+
+       R_y = \\begin{pmatrix}
+       \\cos\\theta & 0 & \\sin\\theta\\\\
+       0 & 1 & 0\\\\
+       -\\sin\\theta & 0 & \\cos\\theta
+       \\end{pmatrix}
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from sknano.core.math import Ry
+    >>> Ry(np.pi/4)
+    array([[ 0.70710678,  0.        ,  0.70710678],
+           [ 0.        ,  1.        ,  0.        ],
+           [-0.70710678,  0.        ,  0.70710678]])
+    >>> np.alltrue(Ry(np.pi/4) == Ry(45, deg2rad=True))
+    True
+
+    """
+    if deg2rad:
+        angle = np.radians(angle)
+    cosa = np.cos(angle)
+    sina = np.sin(angle)
+
+    Rmat = np.array([[cosa, 0.0, sina], [0.0, 1.0, 0.0], [-sina, 0.0, cosa]])
+    Rmat[np.where(np.abs(Rmat) <= np.finfo(float).eps)] = 0.0
+    return Rmat
+
+
+def Rz(angle, deg2rad=False):
+    """Generate the :math:`3\\times3` rotation matrix :math:`R_z(\\theta)` \
+        for a rotation about the :math:`z` axis by an angle :math:`\\theta`.
+
+    Parameters
+    ----------
+    angle : float
+        The rotation angle :math:`\\theta` in *radians*. If the angle is
+        given in *degrees*, then you must set `deg2rad=True` to correctly
+        calculate the rotation matrix.
+    deg2rad : bool, optional
+        if `True`, then `angle` is converted from degrees to radians.
+
+    Returns
+    -------
+    :class:`~numpy:numpy.ndarray`
+        :math:`3\\times3` rotation matrix :math:`R_z(\\theta)` for a
+        rotation about the :math:`z` axis by an angle :math:`\\theta`.
+
+    .. math::
+
+       R_z = \\begin{pmatrix}
+       \\cos\\theta & -\\sin\\theta & 0\\\\
+       \\sin\\theta & \\cos\\theta & 0\\\\
+       0 & 0 & 1
+       \\end{pmatrix}
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from sknano.core.math import Rz
+    >>> Rz(np.pi/4)
+    array([[ 0.70710678, -0.70710678,  0.        ],
+           [ 0.70710678,  0.70710678,  0.        ],
+           [ 0.        ,  0.        ,  1.        ]])
+    >>> np.alltrue(Rz(np.pi/4) == Rz(45, deg2rad=True))
+    True
+
+    """
+    if deg2rad:
+        angle = np.radians(angle)
+    cosa = np.cos(angle)
+    sina = np.sin(angle)
+
+    Rmat = np.array([[cosa, -sina, 0.0], [sina, cosa, 0.0], [0.0, 0.0, 1.0]])
+    Rmat[np.where(np.abs(Rmat) <= np.finfo(float).eps)] = 0.0
+    return Rmat
+
+
+def reflection_matrix():
     pass
+
+
+def rotation_matrix(angle=None, rot_axis=None, anchor_point=None,
+                    rot_point=None, from_vector=None, to_vector=None,
+                    deg2rad=False, verbose=False):
+    """Generate an :math:`n\\times n` rotation matrix.
+
+    .. versionadded:: 0.3.0
+
+    Parameters
+    ----------
+    angle : float
+        Rotation angle in **radians**. If `deg2rad` is `True`, `angle` will be
+        converted to radians from degrees.  The *sense* of the rotation is
+        defined by the *right hand rule*: If your right-hand's thumb points
+        along the `rot_axis`, then your fingers wrap around the axis in the
+        *positive sense* of the rotation angle.
+    rot_axis : {None, array_like, str}, optional
+        An :math:`n`-element array_like sequence defining the :math:`n`
+        components of the rotation axis or the string `x`, `y`, or `z`
+        representing the :math:`x, y, z` axes of a Cartesian coordinate
+        system in 3D with unit vectors
+        :math:`\\mathbf{v}_x=\\mathbf{\\hat{x}}`,
+        :math:`\\mathbf{v}_y=\\mathbf{\\hat{y}}`, and
+        :math:`\\mathbf{v}_z=\\mathbf{\\hat{z}}`, respectively.
+    anchor_point : :class:`~sknano.core.math.Point`, optional
+    rot_point : :class:`~sknano.core.math.Point`, optional
+    from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
+    deg2rad : bool, optional
+        If `True`, convert `angle` from degrees to radians.
+
+    Returns
+    -------
+    Rmat : :class:`~numpy:numpy.ndarray`
+        If `rot_axis` is `None` then `Rmat` will be a :math:`2D`
+        rotation matrix :math:`R(\\theta)` that rotates :math:`2D` vectors
+        counterclockwise by `angle` :math:`\\theta`.
+
+        If `rot_axis` is not `None` then `Rmat` will be a rotation matrix that
+        gives a rotation around the direction of the vector `rot_axis`.
+
+    """
+    Rmat = transformation_matrix(angle=angle, rot_axis=rot_axis,
+                                 anchor_point=anchor_point, rot_point=rot_point,
+                                 from_vector=from_vector, to_vector=to_vector,
+                                 deg2rad=deg2rad, verbose=verbose)
+    return Rmat[:-1,:-1]
+
+
+def scaling_matrix(s=None, v=None):
+    """Return scaling matrix.
+
+    Parameters
+    ----------
+    s : {list, float}
+    v : {None, :class:`~sknano.core.math.Vector`}, optional
+
+    Returns
+    -------
+    :class:`~numpy:numpy.ndarray`
+
+    """
+    if not isinstance(s, (list, float)):
+        raise TypeError('Expected `s` to be a list or a float.')
+    if isinstance(s, float) and not isinstance(v, (list, np.ndarray)):
+        raise TypeError('Expected `v` to be a list or numpy array')
+
+    if isinstance(s, list):
+        return np.diag(s)
+    else:
+        from ._vector import Vector
+        v = Vector(v)
+
+        Smat = np.zeros((v.nd, v.nd))
+
+        if v.nd == 2:
+            s11 = s * v.x**2 + v.y**2
+            s22 = v.x**2 + s * v.y**2
+            s12 = s21 = (s - 1) * v.x * v.y
+            Smat[:, :] = 1 / v.norm**2 * np.array([[s11, s12],
+                                                   [s21, s22]])
+        else:
+
+            s11 = 1 + (s - 1) * v.x**2 / v.norm**2
+            s22 = 1 + (s - 1) * v.y**2 / v.norm**2
+            s33 = 1 + (s - 1) * v.z**2 / v.norm**2
+
+            s12 = s21 = (s - 1) * v.x * v.y / v.norm**2
+            s13 = s31 = (s - 1) * v.x * v.z / v.norm**2
+            s23 = s32 = (s - 1) * v.y * v.z / v.norm**2
+
+            Smat[:,:] = np.array([[s11, s12, s13],
+                                  [s21, s22, s23],
+                                  [s31, s32, s33]])
+
+        Smat[np.where(np.abs(Smat) <= np.finfo(float).eps)] = 0.0
+        return Smat
 
 
 def rotate(obj, angle=None, rot_axis=None, anchor_point=None, rot_point=None,
