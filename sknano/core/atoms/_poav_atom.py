@@ -44,8 +44,6 @@ class POAV(object):
         self._v2 = self.bond2
         self._v3 = self.bond3
 
-        self._T = vec.scalar_triple_product(self.V1, self.V2, self.V3) / 6
-
         self._pyramidalization_angles = None
         self._sigma_pi_angles = None
         self._misalignment_angles = None
@@ -107,6 +105,17 @@ class POAV(object):
 
     @property
     def Vpi(self):
+        """:math:`\\mathbf{v}_{\\pi}` unit :class:`~sknano.core.math.Vector`
+
+        Returns the :math:`\\pi`-orbital axis vector
+        (:math:`\\mathbf{v}_{\\pi}`) unit vector.
+
+        .. math::
+
+           \\mathbf{V}_{\\pi} =
+           \\frac{\\mathbf{v}_{\\pi}}{|\\mathbf{v}_{\\pi}|}
+
+        """
         return self.vpi.unit_vector
 
     @property
@@ -212,12 +221,28 @@ class POAV(object):
         return self.bond3.length
 
     @property
-    def T(self):
-        """:math:`\\frac{1}{6}` the volume of the parallelepiped defined by \
-            :class:`~sknano.core.math.Vector`\ s \
-            :math:`\\mathbf{V}_1,\\mathbf{V}_2,\\mathbf{V}_3`.
+    def t(self):
+        """:math:`\\frac{1}{6}` the volume of the tetrahedron defined by \
+            :class:`~sknano.core.math.Vector`\ s `v1`, `v2`, and `v3`.
+
+        .. math::
+           t =
+           \\frac{|\\mathbf{v}_1\\cdot(\\mathbf{v}_2\\times\\mathbf{v}_3)|}{6}
+
         """
-        return self._T
+        return self.Vv1v2v3 / 6
+
+    @property
+    def T(self):
+        """:math:`\\frac{1}{6}` the volume of the tetrahedron defined by \
+            :class:`~sknano.core.math.Vector`\ s `V1`, `V2`, and `V3`.
+
+        .. math::
+           T =
+           \\frac{|\\mathbf{V}_1\\cdot(\\mathbf{V}_2\\times\\mathbf{V}_3)|}{6}
+
+        """
+        return np.abs(vec.scalar_triple_product(self.V1, self.V2, self.V3) / 6)
 
     @property
     def A(self):
@@ -231,40 +256,39 @@ class POAV(object):
 
     @property
     def sigma_pi_angles(self):
-        """:math:`\\theta_{\\sigma-\\pi}` angles."""
+        """List of :math:`\\theta_{\\sigma-\\pi}` angles."""
         return self._sigma_pi_angles
 
     @sigma_pi_angles.setter
     def sigma_pi_angles(self, value):
         """Set list of :math:`\\theta_{\\sigma-\\pi}` angles."""
         if not isinstance(value, list):
-            raise TypeError('Expected a number')
+            raise TypeError('Expected a list')
         self._sigma_pi_angles = value
 
     @property
     def pyramidalization_angles(self):
-        """Pyramidalization :math:`\\theta_{P}` angles."""
+        """List of pyramidalization :math:`\\theta_{P}` angles."""
         return self._pyramidalization_angles
 
     @pyramidalization_angles.setter
     def pyramidalization_angles(self, value):
+        """Set list of :math:`\\theta_{P}` angles."""
         if not isinstance(value, list):
-            raise TypeError('Expected a number')
+            raise TypeError('Expected a list')
         self._pyramidalization_angles = value
 
     @property
     def misalignment_angles(self):
-        """Misalignment :math:`\\phi_{i}` angles."""
+        """List of misalignment :math:`\\phi_{i}` angles."""
         return self._misalignment_angles
 
     @misalignment_angles.setter
     def misalignment_angles(self, value):
+        """Set list of :math:`\\phi` angles."""
         if not isinstance(value, list):
-            raise TypeError('Expected a number')
+            raise TypeError('Expected a list')
         self._misalignment_angles = value
-
-    def get_POAV_attr(self, attr):
-        return getattr(self, attr)
 
     def todict(self, rad2deg=False):
         """Return dictionary of `POAV` class attributes."""
@@ -304,20 +328,19 @@ class POAV1(POAV):
 
     @property
     def m(self):
+        """:math:`s` character content of the :math:`\\pi`-orbital \
+            (:math:`s^mp`) for :math:`sp^3` normalized hybridization."""
         cos2sigmapi = np.cos(np.mean(self.sigma_pi_angles))**2
         return 2 * cos2sigmapi / (1 - 3 * cos2sigmapi)
 
     @property
     def n(self):
+        """:math:`p` character content of the :math:`\\sigma`-orbitals \
+            (:math:`sp^n`) for :math:`sp^3` normalized hybridization."""
         return 3 * self.m + 2
 
-    def get_POAV_attr(self, attr):
-        try:
-            return getattr(self, attr)
-        except AttributeError:
-            return super(POAV1, self).get_POAV_attr(attr)
-
     def todict(self, rad2deg=False):
+        """Return dictionary of `POAV1` class attributes."""
         super_dict = super(POAV1, self).todict(rad2deg=rad2deg)
         super_dict.update(dict(m=self.m, n=self.n))
         return super_dict
@@ -345,35 +368,50 @@ class POAV2(POAV):
         self.cosa13 = np.cos(bond_angles[1])
         self.cosa23 = np.cos(bond_angles[2])
 
-        self._T = \
-            -functools.reduce(operator.mul, np.cos(bond_angles), 1) * self.T
+    @property
+    def T(self):
+        """:math:`\\frac{1}{6}` the volume of the tetrahedron defined by \
+            :class:`~sknano.core.math.Vector`\ s `V1`, `V2`, and `V3`.
+
+        .. math::
+           T =
+           \\cos\\theta_{12}\\cos\\theta_{13}\\cos\\theta_{23}\\times
+           \\frac{|\\mathbf{V}_1\\cdot(\\mathbf{V}_2\\times\\mathbf{V}_3)|}{6}
+
+        """
+        return -functools.reduce(operator.mul,
+                                 np.cos(self.bonds.angles), 1) * \
+            super(POAV2, self).T
 
     @property
     def n1(self):
+        """:math:`p` character content of the :math:`\\sigma`-orbital \
+            hybridization for :math:`\\sigma_1` bond."""
         return -self.cosa23 / (self.cosa12 * self.cosa13)
 
     @property
     def n2(self):
+        """:math:`p` character content of the :math:`\\sigma`-orbital \
+            hybridization for :math:`\\sigma_2` bond."""
         return -self.cosa13 / (self.cosa12 * self.cosa23)
 
     @property
     def n3(self):
+        """:math:`p` character content of the :math:`\\sigma`-orbital \
+            hybridization for :math:`\\sigma_3` bond."""
         return -self.cosa12 / (self.cosa23 * self.cosa13)
 
     @property
     def m(self):
+        """:math:`s` character content of the :math:`\\pi`-orbital \
+            (:math:`s^mp`) for :math:`sp^3` normalized hybridization."""
         s1 = 1 / (1 + self.n1)
         s2 = 1 / (1 + self.n2)
         s3 = 1 / (1 + self.n3)
         return 1 / sum([s1, s2, s3]) - 1
 
-    def get_POAV_attr(self, attr):
-        try:
-            return getattr(self, attr)
-        except AttributeError:
-            return super(POAV1, self).get_POAV_attr(attr)
-
     def todict(self, rad2deg=False):
+        """Return dictionary of `POAV2` class attributes."""
         super_dict = super(POAV2, self).todict(rad2deg=rad2deg)
         super_dict.update(dict(m=self.m, n1=self.n1, n2=self.n2, n3=self.n3))
         return super_dict
@@ -393,13 +431,19 @@ class POAVR(POAV):
         self._v1 = vi[0]
         self._v2 = vi[1]
         self._v3 = vi[2]
-        self._T = self.R1 * self.R2 * self.R3 * self.T
 
-    def get_POAV_attr(self, attr):
-        try:
-            return getattr(self, attr)
-        except AttributeError:
-            return super(POAV1, self).get_POAV_attr(attr)
+    @property
+    def T(self):
+        """:math:`\\frac{1}{6}` the volume of the tetrahedron defined by \
+            :class:`~sknano.core.math.Vector`\ s `V1`, `V2`, and `V3`.
+
+        .. math::
+           T =
+           R_1 R_2 R_3 \\times
+           \\frac{|\\mathbf{V}_1\\cdot(\\mathbf{V}_2\\times\\mathbf{V}_3)|}{6}
+
+        """
+        return self.R1 * self.R2 * self.R3 * super(POAVR, self).T
 
 
 class POAVAtomMixin(object):
