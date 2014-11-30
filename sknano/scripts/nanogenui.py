@@ -13,7 +13,11 @@ __docformat__ = 'restructuredtext en'
 
 import sys
 
-from ..apps.nanogen_gui import NGController, NGModel
+try:
+    from ..apps.nanogen_gui import NGController, NGModel
+except ImportError as e:
+    print(e)
+
 
 __all__ = ['NanoGen']
 
