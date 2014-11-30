@@ -14,7 +14,7 @@ import numbers
 import numpy as np
 
 from ._point import Point
-from ._transforms import rotation_transform
+from ._transforms import rotate, transformation_matrix
 
 __all__ = ['Vector', 'angle', 'cross', 'dot', 'scalar_triple_product',
            'vector_triple_product']
@@ -489,37 +489,49 @@ class Vector(np.ndarray):
         """
         self[np.where(np.abs(self.__array__()) <= epsilon)] = 0.0
 
-    def rotate(self, angle, rot_axis=None, anchor_point=None, deg2rad=False,
-               verbose=False):
+    def rotate(self, angle=None, rot_axis=None, anchor_point=None,
+               rot_point=None, from_vector=None, to_vector=None,
+               deg2rad=False, transform_matrix=None, verbose=False):
         """Rotate `Vector` coordinates.
 
         Parameters
         ----------
         angle : float
-        rot_axis : `Vector`
-        anchor_point : `Point`
-        deg2rad : bool
-        verbose : bool
+        rot_axis : :class:`~sknano.core.math.Vector`, optional
+        anchor_point : :class:`~sknano.core.math.Point`, optional
+        rot_point : :class:`~sknano.core.math.Point`, optional
+        from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
+        deg2rad : bool, optional
+        transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
-        self.p0 = \
-            rotation_transform(self.p0, angle=angle, rot_axis=rot_axis,
-                               anchor_point=anchor_point, deg2rad=deg2rad)
-        self.p = \
-            rotation_transform(self.p, angle=angle, rot_axis=rot_axis,
-                               anchor_point=anchor_point, deg2rad=deg2rad)
+        if transform_matrix is None:
+            transform_matrix = \
+                transformation_matrix(angle=angle, rot_axis=rot_axis,
+                                      anchor_point=anchor_point,
+                                      rot_point=rot_point,
+                                      from_vector=from_vector,
+                                      to_vector=to_vector, deg2rad=deg2rad,
+                                      verbose=verbose)
+
+        self.p0 = rotate(self.p0, transform_matrix=transform_matrix)
+        self.p = rotate(self.p, transform_matrix=transform_matrix)
 
     def scale(self):
         return NotImplemented
 
-    def translate(self, t, fix_tail=False, fix_head=False):
-        """Translate self by `Vector` `t`."""
-        #if not fix_tail:
-        #    self.p0.translate(t)
-        #if not fix_head:
-        #    self.p.translate(t)
-        self.p0 += t
+    def translate(self, t, fix_anchor_point=False):
+        """Translate `Vector` coordinates by :class:`Vector` `t`.
+
+        Parameters
+        ----------
+        t : :class:`Vector`
+        fix_anchor_point : bool, optional
+
+        """
         self.p += t
+        if not fix_anchor_point:
+            self.p0 += t
 
 
 def angle(u, v):

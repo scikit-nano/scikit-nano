@@ -13,7 +13,7 @@ __docformat__ = 'restructuredtext en'
 import numbers
 import numpy as np
 
-from ._transforms import rotation_transform
+from ._transforms import rotate
 
 __all__ = ['Point']
 
@@ -179,10 +179,35 @@ class Point(np.ndarray):
         """
         self[np.where(np.abs(self.__array__()) <= epsilon)] = 0.0
 
-    def rotate(self, angle, rot_axis=None, anchor_point=None, deg2rad=False):
-        self[:] = rotation_transform(self, angle=angle, rot_axis=rot_axis,
-                                     anchor_point=anchor_point,
-                                     deg2rad=deg2rad)
+    def rotate(self, angle=None, rot_axis=None, anchor_point=None,
+               rot_point=None, from_vector=None, to_vector=None, deg2rad=False,
+               transform_matrix=None, verbose=False):
+        """Rotate `Point` coordinates.
+
+        Parameters
+        ----------
+        angle : float
+        rot_axis : :class:`~sknano.core.math.Vector`, optional
+        anchor_point : :class:`~sknano.core.math.Point`, optional
+        rot_point : :class:`~sknano.core.math.Point`, optional
+        from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
+        deg2rad : bool, optional
+        transform_matrix : :class:`~numpy:numpy.ndarray`
+
+        """
+        self[:] = rotate(self, angle=angle, rot_axis=rot_axis,
+                         anchor_point=anchor_point, rot_point=rot_point,
+                         from_vector=from_vector, to_vector=to_vector,
+                         transform_matrix=transform_matrix, deg2rad=deg2rad,
+                         verbose=verbose)
 
     def translate(self, t):
+        """Translate `Point` coordinates by :class:`~sknano.core.math.Vector` \
+            `t`.
+
+        Parameters
+        ----------
+        t : :class:`~sknano.core.math.Vector`
+
+        """
         self += t

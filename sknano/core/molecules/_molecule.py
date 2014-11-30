@@ -17,7 +17,7 @@ from functools import total_ordering
 #import numpy as np
 
 #from sknano.core import xyz
-#from sknano.core.math import Vector, rotation_transform
+#from sknano.core.math import Vector
 
 __all__ = ['Molecule']
 

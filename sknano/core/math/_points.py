@@ -15,6 +15,7 @@ from operator import attrgetter
 import numpy as np
 
 from sknano.core import UserList
+from ._transforms import transformation_matrix
 #from sknano.utils.geometric_shapes import Cuboid  # , Rectangle
 
 __all__ = ['Points']
@@ -111,24 +112,37 @@ class Points(UserList):
         [point.rezero(epsilon=epsilon) for point in self]
 
     def rotate(self, angle=None, rot_axis=None, anchor_point=None,
-               deg2rad=False, transform_matrix=None):
-        """Rotate point coordinates about arbitrary axis.
+               rot_point=None, from_vector=None, to_vector=None,
+               deg2rad=False, transform_matrix=None, verbose=False):
+        """Rotate `Point`\ s coordinates.
 
         Parameters
         ----------
         angle : float
+        rot_axis : :class:`~sknano.core.math.Vector`, optional
+        anchor_point : :class:`~sknano.core.math.Point`, optional
+        rot_point : :class:`~sknano.core.math.Point`, optional
+        from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
+        deg2rad : bool, optional
+        transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
-        [point.rotate(angle=angle, rot_axis=rot_axis,
-                      anchor_point=anchor_point, deg2rad=deg2rad,
-                      transform_matrix=transform_matrix) for point in self]
+        if transform_matrix is None:
+            transform_matrix = \
+                transformation_matrix(angle=angle, rot_axis=rot_axis,
+                                      anchor_point=anchor_point,
+                                      rot_point=rot_point,
+                                      from_vector=from_vector,
+                                      to_vector=to_vector, deg2rad=deg2rad,
+                                      verbose=verbose)
+        [point.rotate(transform_matrix=transform_matrix) for point in self]
 
     def translate(self, t):
-        """Translate point coordinates.
+        """Translate `Point`\ s by :class:`Vector` `t`.
 
         Parameters
         ----------
-        t : array_like
-            3-elment array of :math:`x,y,z` components of translation vector
+        v : :class:`Vector`
+
         """
         [point.translate(t) for point in self]

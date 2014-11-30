@@ -18,7 +18,7 @@ import numbers
 import numpy as np
 
 from sknano.core import xyz
-from sknano.core.math import Vector, rotation_transform
+from sknano.core.math import Vector
 from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols, element_names
 
@@ -361,15 +361,36 @@ class Atom(object):
         self.rezero(epsilon=epsilon)
 
     def rotate(self, angle=None, rot_axis=None, anchor_point=None,
-               deg2rad=False, transform_matrix=None):
-        try:
-            self.r = rotation_transform(self.r,
-                                        transform_matrix=transform_matrix)
-        except ValueError:
-            self.r.rotate(angle, rot_axis=rot_axis, anchor_point=anchor_point,
-                          deg2rad=deg2rad)
+               rot_point=None, from_vector=None, to_vector=None, deg2rad=False,
+               transform_matrix=None, verbose=False):
+        """Rotate `Atom` position vector.
 
-    def translate(self, t):
+        Parameters
+        ----------
+        angle : float
+        rot_axis : :class:`~sknano.core.math.Vector`, optional
+        anchor_point : :class:`~sknano.core.math.Point`, optional
+        rot_point : :class:`~sknano.core.math.Point`, optional
+        from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
+        deg2rad : bool, optional
+        transform_matrix : :class:`~numpy:numpy.ndarray`
+
+        """
+        self.r.rotate(angle=angle, rot_axis=rot_axis,
+                      anchor_point=anchor_point,
+                      rot_point=rot_point, from_vector=from_vector,
+                      to_vector=to_vector, transform_matrix=transform_matrix,
+                      deg2rad=deg2rad, verbose=verbose)
+
+    def translate(self, t, fix_anchor_point=True):
+        """Translate `Atom` position vector by :class:`Vector` `t`.
+
+        Parameters
+        ----------
+        t : :class:`Vector`
+        fix_anchor_point : bool, optional
+
+        """
         #TODO compare timing benchmarks for translation of position vector.
-        #self.r.translate(t, fix_tail=True)
-        self.r += t
+        self.r.translate(t, fix_anchor_point=fix_anchor_point)
+        #self.r += t

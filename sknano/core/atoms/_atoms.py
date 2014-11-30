@@ -255,27 +255,39 @@ class Atoms(UserList):
         [atom.rezero(epsilon=epsilon) for atom in self]
 
     def rotate(self, angle=None, rot_axis=None, anchor_point=None,
-               deg2rad=False, transform_matrix=None):
-        """Rotate atom coordinates about arbitrary axis.
+               rot_point=None, from_vector=None, to_vector=None,
+               deg2rad=False, transform_matrix=None, verbose=False):
+        """Rotate `Atom` position vectors.
 
         Parameters
         ----------
         angle : float
+        rot_axis : :class:`~sknano.core.math.Vector`, optional
+        anchor_point : :class:`~sknano.core.math.Point`, optional
+        rot_point : :class:`~sknano.core.math.Point`, optional
+        from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
+        deg2rad : bool, optional
+        transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
         if transform_matrix is None:
             transform_matrix = \
-                transformation_matrix(angle, rot_axis=rot_axis,
+                transformation_matrix(angle=angle, rot_axis=rot_axis,
                                       anchor_point=anchor_point,
-                                      deg2rad=deg2rad)
+                                      rot_point=rot_point,
+                                      from_vector=from_vector,
+                                      to_vector=to_vector, deg2rad=deg2rad,
+                                      verbose=verbose)
         [atom.rotate(transform_matrix=transform_matrix) for atom in self]
 
-    def translate(self, t):
-        """Translate atom coordinates.
+    def translate(self, t, fix_anchor_points=True):
+        """Translate `Atom` position vectors by :class:`Vector` `t`.
 
         Parameters
         ----------
-        t : array_like
-            3-elment array of :math:`x,y,z` components of translation vector
+        t : :class:`Vector`
+        fix_anchor_points : bool, optional
+
         """
-        [atom.translate(t) for atom in self]
+        [atom.translate(t, fix_anchor_point=fix_anchor_points)
+         for atom in self]

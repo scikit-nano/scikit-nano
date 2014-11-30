@@ -15,6 +15,7 @@ from operator import attrgetter
 import numpy as np
 
 from sknano.core import UserList
+from ._transforms import transformation_matrix
 #from sknano.utils.geometric_shapes import Cuboid  # , Rectangle
 
 __all__ = ['Vectors']
@@ -100,24 +101,40 @@ class Vectors(UserList):
         """
         [vector.rezero(epsilon=epsilon) for vector in self]
 
-    def rotate(self, angle, rot_axis=None, anchor_vector=None,
-               deg2rad=False):
-        """Rotate vector coordinates about arbitrary axis.
+    def rotate(self, angle=None, rot_axis=None, anchor_point=None,
+               rot_point=None, from_vector=None, to_vector=None,
+               deg2rad=False, transform_matrix=None, verbose=False):
+        """Rotate `Vector`\ s coordinates.
 
         Parameters
         ----------
         angle : float
+        rot_axis : :class:`~sknano.core.math.Vector`, optional
+        anchor_point : :class:`~sknano.core.math.Point`, optional
+        rot_point : :class:`~sknano.core.math.Point`, optional
+        from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
+        deg2rad : bool, optional
+        transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
-        [vector.rotate(angle, rot_axis=rot_axis, anchor_vector=anchor_vector,
-                       deg2rad=deg2rad) for vector in self]
+        if transform_matrix is None:
+            transform_matrix = \
+                transformation_matrix(angle=angle, rot_axis=rot_axis,
+                                      anchor_point=anchor_point,
+                                      rot_point=rot_point,
+                                      from_vector=from_vector,
+                                      to_vector=to_vector, deg2rad=deg2rad,
+                                      verbose=verbose)
+        [vector.rotate(transform_matrix=transform_matrix) for vector in self]
 
-    def translate(self, t):
-        """Translate vector coordinates.
+    def translate(self, t, fix_anchor_points=False):
+        """Translate `Vector`\ s by :class:`Vector` `t`.
 
         Parameters
         ----------
-        t : array_like
-            3-elment array of :math:`x,y,z` components of translation vector
+        t : :class:`Vector`
+        fix_anchor_points : bool, optional
+
         """
-        [vector.translate(t) for vector in self]
+        [vector.translate(t, fix_anchor_point=fix_anchor_points)
+         for vector in self]
