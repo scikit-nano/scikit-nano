@@ -555,6 +555,7 @@ def cross(u, v, p0=None):
     Parameters
     ----------
     u, v : `Vector`
+    p0 : `Point`, optional
 
     Returns
     -------
