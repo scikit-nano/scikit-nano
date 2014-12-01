@@ -528,7 +528,14 @@ def rotate(obj, angle=None, rot_axis=None, anchor_point=None, rot_point=None,
               'anchor_point: {}\n'.format(anchor_point) +
               'transform_matrix: {}\n'.format(transform_matrix))
 
+    if transform_matrix is not None and \
+            isinstance(transform_matrix, np.ndarray):
+        if transform_matrix.shape == (3, 3):
+            I4x4 = np.eye(4)
+            I4x4[:3, :3] = transform_matrix
+            transform_matrix = I4x4
     t = np.append(np.asarray(obj), 1)
+
     try:
         rot_obj = np.dot(transform_matrix, t)[:-1]
     except TypeError:
