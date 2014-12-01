@@ -54,6 +54,7 @@ Sub-packages
 
 * atoms (:mod:`sknano.core.atoms`)
 * math (:mod:`sknano.core.math`)
+* physics (:mod:`sknano.core.physics`)
 * refdata (:mod:`sknano.core.refdata`)
 
 """
