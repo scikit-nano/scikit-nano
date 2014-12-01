@@ -45,7 +45,7 @@ def test_transforms():
     assert_true(np.allclose(p, np.array([0, -1, 0])))
     p.rotate(np.pi/2, rot_axis='z')
     assert_true(np.allclose(p, np.array([1, 0, 0])))
-    p.rotate(np.pi/2, rot_axis=[0, 0, 1], anchor_point=[1, 1, 0])
+    p.rotate(np.pi/2, rot_axis=[0, 0, 1], rot_point=[1, 1, 0])
     assert_true(np.allclose(p, np.array([2, 1, 0])))
 
 

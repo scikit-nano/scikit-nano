@@ -31,10 +31,30 @@ def test_rotation_matrix():
         for angle in np.linspace(0.0, 2 * np.pi, np.pi / 4)]
         for Rmat, axis in zip((Rx, Ry, Rz), ('x', 'y', 'z'))]
 
+    assert_true(np.allclose(rotation_matrix(angle=np.pi / 2),
+                            rotation_matrix(from_vector=[1, 0],
+                                            to_vector=[0, 1])))
+
+    assert_true(np.allclose(rotation_matrix(angle=-np.pi / 2),
+                            rotation_matrix(from_vector=[0, 1],
+                                            to_vector=[1, 0])))
+
+    assert_true(np.allclose(
+        rotation_matrix(angle=np.pi / 2, rot_axis=[0, 0, 1]),
+        rotation_matrix(from_vector=[1, 0, 0], to_vector=[0, 1, 0])))
+
+    assert_true(np.allclose(
+        rotation_matrix(angle=-np.pi / 2, rot_axis=[0, 0, 1]),
+        rotation_matrix(from_vector=[0, 1, 0], to_vector=[1, 0, 0])))
+
 
 def test_transformation_matrix():
+    [[assert_true(np.allclose(
+        Rz(angle=angle), transformation_matrix(angle=angle, rot_axis=axis)))
+        for angle in np.linspace(0.0, 2 * np.pi, np.pi / 4)]
+        for Rmat, axis in zip((Rx, Ry, Rz), ('x', 'y', 'z'))]
     assert_true(np.allclose(
-        transformation_matrix(angle=np.pi/2, rot_axis=Point([1.0, 1.0])),
+        transformation_matrix(angle=np.pi/2, rot_point=Point([1.0, 1.0])),
         np.array([[0.0, -1.0, 2.0], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])))
 
 
