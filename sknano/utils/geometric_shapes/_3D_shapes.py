@@ -23,7 +23,8 @@ __all__ = ['Geometric3DRegion', 'Parallelepiped', 'Cuboid', 'Cube',
            'Ellipsoid', 'Spheroid', 'Sphere']
 
 
-class Geometric3DRegion(six.with_metaclass(ABCMeta, GeometricTransformsMixin, GeometricRegion)):
+class Geometric3DRegion(six.with_metaclass(ABCMeta, GeometricTransformsMixin,
+                                           GeometricRegion)):
     """Abstract base class for representing 3D geometric regions."""
 
     @abstractproperty
@@ -170,12 +171,12 @@ class Parallelepiped(Geometric3DRegion):
             d3 >= 0 and d3 <= 1
 
     def update_region_limits(self):
-        self._limits['x']['min'] = self.xmin
-        self._limits['x']['max'] = self.xmax
-        self._limits['y']['min'] = self.ymin
-        self._limits['y']['max'] = self.ymax
-        self._limits['z']['min'] = self.zmin
-        self._limits['z']['max'] = self.zmax
+        self.limits['x']['min'] = self.xmin
+        self.limits['x']['max'] = self.xmax
+        self.limits['y']['min'] = self.ymin
+        self.limits['y']['max'] = self.ymax
+        self.limits['z']['min'] = self.zmin
+        self.limits['z']['max'] = self.zmax
 
 
 class Cuboid(Geometric3DRegion):
@@ -334,12 +335,12 @@ class Cuboid(Geometric3DRegion):
             (p.z >= self.zmin) and (p.z <= self.zmax)
 
     def update_region_limits(self):
-        self._limits['x']['min'] = self.xmin
-        self._limits['x']['max'] = self.xmax
-        self._limits['y']['min'] = self.ymin
-        self._limits['y']['max'] = self.ymax
-        self._limits['z']['min'] = self.zmin
-        self._limits['z']['max'] = self.zmax
+        self.limits['x']['min'] = self.xmin
+        self.limits['x']['max'] = self.xmax
+        self.limits['y']['min'] = self.ymin
+        self.limits['y']['max'] = self.ymax
+        self.limits['z']['min'] = self.zmin
+        self.limits['z']['max'] = self.zmax
 
 
 class Cube(Geometric3DRegion):
@@ -408,12 +409,12 @@ class Cube(Geometric3DRegion):
             (p.z >= zmin) and (p.z <= zmax)
 
     def update_region_limits(self):
-        self._limits['x']['min'] = self.xmin
-        self._limits['x']['max'] = self.xmax
-        self._limits['y']['min'] = self.ymin
-        self._limits['y']['max'] = self.ymax
-        self._limits['z']['min'] = self.zmin
-        self._limits['z']['max'] = self.zmax
+        self.limits['x']['min'] = self.xmin
+        self.limits['x']['max'] = self.xmax
+        self.limits['y']['min'] = self.ymin
+        self.limits['y']['max'] = self.ymax
+        self.limits['z']['min'] = self.zmin
+        self.limits['z']['max'] = self.zmax
 
 
 class Ellipsoid(Geometric3DRegion):
@@ -501,12 +502,12 @@ class Ellipsoid(Geometric3DRegion):
     def update_region_limits(self):
         c = self.center
         r = self.r
-        self._limits['x']['min'] = c.x - r
-        self._limits['x']['max'] = c.x + r
-        self._limits['y']['min'] = c.y - r
-        self._limits['y']['max'] = c.y + r
-        self._limits['z']['min'] = c.z - r
-        self._limits['z']['max'] = c.z + r
+        self.limits['x']['min'] = c.x - r
+        self.limits['x']['max'] = c.x + r
+        self.limits['y']['min'] = c.y - r
+        self.limits['y']['max'] = c.y + r
+        self.limits['z']['min'] = c.z - r
+        self.limits['z']['max'] = c.z + r
 
 
 class Spheroid(Geometric3DRegion):
@@ -587,12 +588,12 @@ class Spheroid(Geometric3DRegion):
     def update_region_limits(self):
         c = self.center
         r = self.r
-        self._limits['x']['min'] = c.x - r
-        self._limits['x']['max'] = c.x + r
-        self._limits['y']['min'] = c.y - r
-        self._limits['y']['max'] = c.y + r
-        self._limits['z']['min'] = c.z - r
-        self._limits['z']['max'] = c.z + r
+        self.limits['x']['min'] = c.x - r
+        self.limits['x']['max'] = c.x + r
+        self.limits['y']['min'] = c.y - r
+        self.limits['y']['max'] = c.y + r
+        self.limits['z']['min'] = c.z - r
+        self.limits['z']['max'] = c.z + r
 
 
 class Sphere(Geometric3DRegion):
@@ -658,9 +659,9 @@ class Sphere(Geometric3DRegion):
     def update_region_limits(self):
         c = self.center
         r = self.r
-        self._limits['x']['min'] = c.x - r
-        self._limits['x']['max'] = c.x + r
-        self._limits['y']['min'] = c.y - r
-        self._limits['y']['max'] = c.y + r
-        self._limits['z']['min'] = c.z - r
-        self._limits['z']['max'] = c.z + r
+        self.limits['x']['min'] = c.x - r
+        self.limits['x']['max'] = c.x + r
+        self.limits['y']['min'] = c.y - r
+        self.limits['y']['max'] = c.y + r
+        self.limits['z']['min'] = c.z - r
+        self.limits['z']['max'] = c.z + r
