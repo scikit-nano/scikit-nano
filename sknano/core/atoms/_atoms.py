@@ -69,22 +69,52 @@ class Atoms(UserList):
     def CM(self):
         """Center-of-Mass coordinates of `Atoms`.
 
+        Computes the position vector of the center-of-mass coordinates:
+
+        .. math::
+
+           \\mathbf{R}_{CM} = \\frac{1}{M}\\sum_{i=1}^{N_{\\mathrm{atoms}}}
+           m_i\\mathbf{r}_i
+
         Returns
         -------
-        ndarray
-            3-element ndarray specifying center-of-mass coordinates of `Atoms`.
+        CM : :class:`~sknano.core.math.Vector`
+            The position vector of the center of mass coordinates.
 
         """
         masses = np.asarray([self.masses])
         coords = self.coords
         MxR = masses.T * coords
-        return Vector(np.sum(MxR, axis=0) / np.sum(masses))
+        CM = Vector(np.sum(MxR, axis=0) / np.sum(masses))
+        CM.rezero()
+        return CM
 
     @property
     def M(self):
         """Total mass of `Atoms`."""
         #return math.fsum(self.masses)
         return self.masses.sum()
+
+    @property
+    def centroid(self):
+        """Centroid of `Atoms`.
+
+        Computes the position vector of the centroid of the `Atoms`
+        coordinates.
+
+        .. math::
+           \\mathbf{C} =
+           \\frac{\\sum_{i=1}^{N_{\\mathrm{atoms}}}
+           m_i\\mathbf{r}_i}{\\sum_{i=1}^{N_{\\mathrm{atoms}}}m_i}
+
+        Returns
+        -------
+        C : `~sknano.core.math.Vector`
+            The position vector of the centroid coordinates.
+        """
+        C = Vector(np.mean(self.coords, axis=0))
+        C.rezero()
+        return C
 
     @property
     def coords(self):
