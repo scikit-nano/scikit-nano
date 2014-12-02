@@ -19,227 +19,20 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-__all__ = ['transformation_matrix',
-           'affine_transform',
-           'reflection_transform',
-           'rotation_transform',
-           'scaling_transform',
-           'Rx', 'Ry', 'Rz',
+__all__ = ['Rx', 'Ry', 'Rz',
            'reflection_matrix',
            'rotation_matrix',
            'scaling_matrix',
-           'rotate', 'scale', 'translate']
+           'transformation_matrix',
+           'rotate',
+           'scale',
+           'translate']
 
 I = np.identity(4)
 
 _str2array = {}
 for i, axis in enumerate(('x', 'y', 'z')):
     _str2array[axis] = I[:3, i]
-
-
-def transformation_matrix(angle=None, rot_axis=None, anchor_point=None,
-                          rot_point=None, from_vector=None, to_vector=None,
-                          deg2rad=False, verbose=False):
-    """Generate an :math:`(n+1)\\times(n+1)` transformation matrix for an \
-        affine transformation in :math:`n` dimensions.
-
-    .. versionadded:: 0.3.0
-
-    Parameters
-    ----------
-    angle : float
-        Rotation angle in **radians**. If `deg2rad` is `True`, `angle` will be
-        converted to radians from degrees.  The *sense* of the rotation is
-        defined by the *right hand rule*: If your right-hand's thumb points
-        along the `rot_axis`, then your fingers wrap around the axis in the
-        *positive sense* of the rotation angle.
-    rot_axis : {None, array_like, str}, optional
-        An :math:`n`-element array_like sequence defining the :math:`n`
-        components of the rotation axis or the string `x`, `y`, or `z`
-        representing the :math:`x, y, z` axes of a Cartesian coordinate
-        system in 3D with unit vectors
-        :math:`\\mathbf{v}_x=\\mathbf{\\hat{x}}`,
-        :math:`\\mathbf{v}_y=\\mathbf{\\hat{y}}`, and
-        :math:`\\mathbf{v}_z=\\mathbf{\\hat{z}}`, respectively.
-    anchor_point : {None, array_like}, optional
-        An :math:`n`-element list or ndarray or
-        :class:`~sknano.core.math.Point` defining
-        the origin of the rotation axis.
-
-        If `anchor_point` is not `None` and `rot_axis` is a `Vector` instance,
-        then the origin of the vector defined by :attr:`Vector.p0` will be
-        changed to `anchor_point`.
-
-        If `anchor_point` is `None`, then it defaults to an
-        :math:`n`-element array of zeros.
-    deg2rad : bool, optional
-        If `True`, convert `angle` from degrees to radians.
-
-    Returns
-    -------
-    Tmat : ndarray
-        :math:`n+1\\times n+1` transformation matrix for an affine transform
-        in :math:`n` dimensions.
-
-        If `rot_axis` is `None` and `anchor_point` is `None`,
-        then `Tmat` will be a :math:`2D` rotation matrix :math:`R(\\theta)`
-        that rotates :math:`2D` vectors counterclockwise by `angle`
-        :math:`\\theta`.
-
-        If `rot_axis` is `None` and `anchor_point` is a 2-element sequence,
-        then `Rmat` will be a :math:`2D` rotation matrix :math:`R(\\theta)`
-        about the :math:`2D` `Point` `anchor_point` by `angle`
-        :math:`\\theta`.
-
-        If `rot_axis` is not `None` and `anchor_point` is `None`,
-        then `Rmat` will be a rotation matrix that gives a rotation around
-        the direction of the vector `rot_axis`.
-
-    Notes
-    -----
-
-    """
-    if angle is None and from_vector is None and to_vector is None:
-        raise TypeError('Expected `angle` or `from_vector` and `to_vector` '
-                        'set to values with valid types.')
-
-    from . import vector, Vector, Point
-
-    if angle is None and not (from_vector is None and to_vector is None):
-        from_vector = Vector(from_vector)
-        to_vector = Vector(to_vector)
-        if from_vector.nd != to_vector.nd:
-            raise ValueError('`from_vector` and `to_vector` must have same '
-                             'dimensions.')
-        angle = vector.angle(from_vector, to_vector)
-        if from_vector.nd == 2:
-            if not np.allclose(Vector(np.dot(Rz(angle)[:2,:2], from_vector)),
-                               to_vector):
-                angle = -angle
-
-            return transformation_matrix(angle=angle, rot_point=rot_point)
-
-        elif from_vector.nd == 3:
-            rot_axis = vector.cross(from_vector, to_vector)
-
-            return transformation_matrix(angle=angle, rot_axis=rot_axis,
-                                         anchor_point=anchor_point,
-                                         rot_point=rot_point)
-        else:
-            raise ValueError('currently, transformation_matrices can only '
-                             'be computed for rotation transformations in '
-                             '2D and 3D.')
-    else:
-        if deg2rad:
-            angle = np.radians(angle)
-
-        cosa = np.cos(angle)
-        sina = np.sin(angle)
-
-        if rot_axis is None:
-
-            if rot_point is not None and \
-                    isinstance(rot_point, (list, np.ndarray)) and \
-                    len(rot_point) == 2:
-                p = Point(rot_point)
-            else:
-                p = Point(nd=2)
-
-            Tmat = Rz(angle)
-
-            if not np.allclose(p, np.zeros(2)):
-                for i in range(2):
-                    j, = list(set(range(2)) - {i})
-                    Tmat[i, 2] = p[i] - p[i] * cosa + (-1)**i * p[j] * sina
-
-        else:
-            # Handle 3D rotation about origin
-            # Handle 3D rotation around the rotation vector
-            # Handle N-D rotation about origin
-            # Handle N-D rotation around the N-D rotation vector anchored at
-            # an arbitrary N-D point.
-
-            if isinstance(rot_axis, (str, six.text_type)):
-                try:
-                    rot_axis = _str2array[rot_axis]
-                except KeyError:
-                    raise ValueError(
-                        'Invalid `rot_axis` string: {}'.format(rot_axis))
-            elif not isinstance(rot_axis, (tuple, list, np.ndarray)):
-                raise ValueError('`rot_axis` must be a sequence')
-
-            if anchor_point is None and rot_point is not None:
-                anchor_point = rot_point
-
-            if anchor_point is not None and \
-                    isinstance(anchor_point, (list, np.ndarray)) and \
-                    len(anchor_point) == 3:
-                anchor_point = Point(anchor_point)
-            else:
-                anchor_point = Point()
-
-            v = Vector(np.asarray(rot_axis), p0=anchor_point)
-
-            Tmat = np.zeros((4, 4))
-
-            if np.allclose(v, I[:3, 0]):
-                Tmat[:3,:3] = Rx(angle)
-            elif np.allclose(v, I[:3, 1]):
-                Tmat[:3,:3] = Ry(angle)
-            elif np.allclose(v, I[:3, 2]):
-                Tmat[:3,:3] = Rz(angle)
-            else:
-                for i in range(3):
-                    Tmat[i, i] = (v[i]**2 +
-                                  (v[(i + 1) % 3]**2 +
-                                   v[(i + 2) % 3]**2) * cosa) / v.norm**2
-
-                for i, j in combinations(list(range(3)), 2):
-                    k = list(set(range(3)) - {i, j})[0]
-                    Tmat[i, j] = \
-                        (v[i] * v[j] * (1 - cosa) +
-                         (-1)**(i + j) * v[k] * v.norm * sina) / v.norm**2
-                    Tmat[j, i] = \
-                        (v[i] * v[j] * (1 - cosa) -
-                         (-1)**(i + j) * v[k] * v.norm * sina) / v.norm**2
-
-            if not np.allclose(v.p0, np.zeros(3)):
-
-                p = v.p0
-
-                for i in range(3):
-                    j, k = list(set(range(3)) - {i})
-                    Tmat[i, 3] = ((p[i] * (v[j]**2 + v[k]**2) -
-                                   v[i] * (p[j] * v[j] + p[k] * v[k])) *
-                                  (1 - cosa) + (-1)**i *
-                                  (p[j] * v[k] - p[k] * v[j]) *
-                                  v.norm * sina) / v.norm**2
-
-            Tmat[3, 3] = 1.0
-
-        Tmat[np.where(np.abs(Tmat) <= np.finfo(float).eps)] = 0.0
-
-        return Tmat
-
-
-def affine_transform(angle=None, rot_axis=None, anchor_point=None,
-                     rot_point=None, from_vector=None, to_vector=None,
-                     deg2rad=False, verbose=False):
-    raise NotImplementedError("Not implemented")
-
-
-def reflection_transform():
-    raise NotImplementedError("Not implemented")
-
-
-def rotation_transform(angle=None, rot_axis=None, anchor_point=None,
-                       rot_point=None, from_vector=None, to_vector=None,
-                       deg2rad=False, verbose=False):
-    raise NotImplementedError("Not implemented")
-
-
-def scaling_transform():
-    raise NotImplementedError("Not implemented")
 
 
 def Rx(angle, deg2rad=False):
@@ -564,3 +357,188 @@ def scale():
 def translate(obj, t):
     """Translate object points by a vector `t`."""
     pass
+
+
+def transformation_matrix(angle=None, rot_axis=None, anchor_point=None,
+                          rot_point=None, from_vector=None, to_vector=None,
+                          deg2rad=False, verbose=False):
+    """Generate an :math:`(n+1)\\times(n+1)` transformation matrix for an \
+        affine transformation in :math:`n` dimensions.
+
+    .. versionadded:: 0.3.0
+
+    Parameters
+    ----------
+    angle : float
+        Rotation angle in **radians**. If `deg2rad` is `True`, `angle` will be
+        converted to radians from degrees.  The *sense* of the rotation is
+        defined by the *right hand rule*: If your right-hand's thumb points
+        along the `rot_axis`, then your fingers wrap around the axis in the
+        *positive sense* of the rotation angle.
+    rot_axis : {None, array_like, str}, optional
+        An :math:`n`-element array_like sequence defining the :math:`n`
+        components of the rotation axis or the string `x`, `y`, or `z`
+        representing the :math:`x, y, z` axes of a Cartesian coordinate
+        system in 3D with unit vectors
+        :math:`\\mathbf{v}_x=\\mathbf{\\hat{x}}`,
+        :math:`\\mathbf{v}_y=\\mathbf{\\hat{y}}`, and
+        :math:`\\mathbf{v}_z=\\mathbf{\\hat{z}}`, respectively.
+    anchor_point : {None, array_like}, optional
+        An :math:`n`-element list or ndarray or
+        :class:`~sknano.core.math.Point` defining
+        the origin of the rotation axis.
+
+        If `anchor_point` is not `None` and `rot_axis` is a `Vector` instance,
+        then the origin of the vector defined by :attr:`Vector.p0` will be
+        changed to `anchor_point`.
+
+        If `anchor_point` is `None`, then it defaults to an
+        :math:`n`-element array of zeros.
+    deg2rad : bool, optional
+        If `True`, convert `angle` from degrees to radians.
+
+    Returns
+    -------
+    Tmat : ndarray
+        :math:`n+1\\times n+1` transformation matrix for an affine transform
+        in :math:`n` dimensions.
+
+        If `rot_axis` is `None` and `anchor_point` is `None`,
+        then `Tmat` will be a :math:`2D` rotation matrix :math:`R(\\theta)`
+        that rotates :math:`2D` vectors counterclockwise by `angle`
+        :math:`\\theta`.
+
+        If `rot_axis` is `None` and `anchor_point` is a 2-element sequence,
+        then `Rmat` will be a :math:`2D` rotation matrix :math:`R(\\theta)`
+        about the :math:`2D` `Point` `anchor_point` by `angle`
+        :math:`\\theta`.
+
+        If `rot_axis` is not `None` and `anchor_point` is `None`,
+        then `Rmat` will be a rotation matrix that gives a rotation around
+        the direction of the vector `rot_axis`.
+
+    Notes
+    -----
+
+    """
+    if angle is None and from_vector is None and to_vector is None:
+        raise TypeError('Expected `angle` or `from_vector` and `to_vector` '
+                        'set to values with valid types.')
+
+    from . import vector, Vector, Point
+
+    if angle is None and not (from_vector is None and to_vector is None):
+        from_vector = Vector(from_vector)
+        to_vector = Vector(to_vector)
+        if from_vector.nd != to_vector.nd:
+            raise ValueError('`from_vector` and `to_vector` must have same '
+                             'dimensions.')
+        angle = vector.angle(from_vector, to_vector)
+        if from_vector.nd == 2:
+            if not np.allclose(Vector(np.dot(Rz(angle)[:2,:2], from_vector)),
+                               to_vector):
+                angle = -angle
+
+            return transformation_matrix(angle=angle, rot_point=rot_point)
+
+        elif from_vector.nd == 3:
+            rot_axis = vector.cross(from_vector, to_vector)
+
+            return transformation_matrix(angle=angle, rot_axis=rot_axis,
+                                         anchor_point=anchor_point,
+                                         rot_point=rot_point)
+        else:
+            raise ValueError('currently, transformation_matrices can only '
+                             'be computed for rotation transformations in '
+                             '2D and 3D.')
+    else:
+        if deg2rad:
+            angle = np.radians(angle)
+
+        cosa = np.cos(angle)
+        sina = np.sin(angle)
+
+        if rot_axis is None:
+
+            if rot_point is not None and \
+                    isinstance(rot_point, (list, np.ndarray)) and \
+                    len(rot_point) == 2:
+                p = Point(rot_point)
+            else:
+                p = Point(nd=2)
+
+            Tmat = Rz(angle)
+
+            if not np.allclose(p, np.zeros(2)):
+                for i in range(2):
+                    j, = list(set(range(2)) - {i})
+                    Tmat[i, 2] = p[i] - p[i] * cosa + (-1)**i * p[j] * sina
+
+        else:
+            # Handle 3D rotation about origin
+            # Handle 3D rotation around the rotation vector
+            # Handle N-D rotation about origin
+            # Handle N-D rotation around the N-D rotation vector anchored at
+            # an arbitrary N-D point.
+
+            if isinstance(rot_axis, (str, six.text_type)):
+                try:
+                    rot_axis = _str2array[rot_axis]
+                except KeyError:
+                    raise ValueError(
+                        'Invalid `rot_axis` string: {}'.format(rot_axis))
+            elif not isinstance(rot_axis, (tuple, list, np.ndarray)):
+                raise ValueError('`rot_axis` must be a sequence')
+
+            if anchor_point is None and rot_point is not None:
+                anchor_point = rot_point
+
+            if anchor_point is not None and \
+                    isinstance(anchor_point, (list, np.ndarray)) and \
+                    len(anchor_point) == 3:
+                anchor_point = Point(anchor_point)
+            else:
+                anchor_point = Point()
+
+            v = Vector(np.asarray(rot_axis), p0=anchor_point)
+
+            Tmat = np.zeros((4, 4))
+
+            if np.allclose(v, I[:3, 0]):
+                Tmat[:3,:3] = Rx(angle)
+            elif np.allclose(v, I[:3, 1]):
+                Tmat[:3,:3] = Ry(angle)
+            elif np.allclose(v, I[:3, 2]):
+                Tmat[:3,:3] = Rz(angle)
+            else:
+                for i in range(3):
+                    Tmat[i, i] = (v[i]**2 +
+                                  (v[(i + 1) % 3]**2 +
+                                   v[(i + 2) % 3]**2) * cosa) / v.norm**2
+
+                for i, j in combinations(list(range(3)), 2):
+                    k = list(set(range(3)) - {i, j})[0]
+                    Tmat[i, j] = \
+                        (v[i] * v[j] * (1 - cosa) +
+                         (-1)**(i + j) * v[k] * v.norm * sina) / v.norm**2
+                    Tmat[j, i] = \
+                        (v[i] * v[j] * (1 - cosa) -
+                         (-1)**(i + j) * v[k] * v.norm * sina) / v.norm**2
+
+            if not np.allclose(v.p0, np.zeros(3)):
+
+                p = v.p0
+
+                for i in range(3):
+                    j, k = list(set(range(3)) - {i})
+                    Tmat[i, 3] = ((p[i] * (v[j]**2 + v[k]**2) -
+                                   v[i] * (p[j] * v[j] + p[k] * v[k])) *
+                                  (1 - cosa) + (-1)**i *
+                                  (p[j] * v[k] - p[k] * v[j]) *
+                                  v.norm * sina) / v.norm**2
+
+            Tmat[3, 3] = 1.0
+
+        Tmat[np.where(np.abs(Tmat) <= np.finfo(float).eps)] = 0.0
+
+        return Tmat
