@@ -13,12 +13,14 @@ Functions
 ----------
 
 Array functions:
+
 .. autosummary::
    :toctree: generated/
 
    rezero_array
 
 Meta functions:
+
 .. autosummary::
    :toctree: generated/
 
@@ -32,6 +34,7 @@ Meta functions:
    with_doc
 
 I/O functions:
+
 .. autosummary::
    :toctree: generated/
 
@@ -39,6 +42,7 @@ I/O functions:
    get_fpath
 
 String functions:
+
 .. autosummary::
    :toctree: generated/
 
