@@ -566,6 +566,11 @@ def axis_angle_from_rotation_matrix(rmatrix):
     axis : :class:`~sknano.core.math.Vector`
     angle : :class:`~numpy:numpy.float`
 
+    .. todo::
+
+       Fix code to compute the correct sense of the rotation or
+       direction of rotation axis vector.
+
     """
     if not isinstance(rmatrix, np.ndarray):
         raise TypeError('Expected matrix to be a 3x3 numpy array.')
