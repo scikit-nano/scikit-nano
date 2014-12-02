@@ -12,8 +12,13 @@ Contents
 Functions
 ----------
 
-Meta functions:
+Array functions:
+.. autosummary::
+   :toctree: generated/
 
+   rezero_array
+
+Meta functions:
 .. autosummary::
    :toctree: generated/
 
@@ -27,7 +32,6 @@ Meta functions:
    with_doc
 
 I/O functions:
-
 .. autosummary::
    :toctree: generated/
 
@@ -35,7 +39,6 @@ I/O functions:
    get_fpath
 
 String functions:
-
 .. autosummary::
    :toctree: generated/
 
@@ -58,7 +61,8 @@ Sub-packages
 * refdata (:mod:`sknano.core.refdata`)
 
 """
-from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._extras import *
