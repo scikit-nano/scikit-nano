@@ -14,7 +14,8 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-__all__ = ['components', 'dimensions', 'xyz', 'xyz_axes', 'AttrDict']
+__all__ = ['components', 'dimensions', 'xyz', 'xyz_axes', 'AttrDict',
+           'rezero_array']
 
 components = dimensions = xyz = xyz_axes = ('x', 'y', 'z')
 
