@@ -5,8 +5,10 @@ import nose
 from nose.tools import *
 import numpy as np
 
-from sknano.core.math import rotation_matrix, transformation_matrix, \
-    rotate, Rx, Ry, Rz, Point, Vector
+from sknano.core.math import Point, Vector, rotate, scale, translate, \
+    Rx, Ry, Rz, reflection_matrix, rotation_matrix, transformation_matrix, \
+    axis_angle_from_rotation_matrix
+
 from six.moves import zip
 
 
@@ -77,6 +79,16 @@ def test_point_rotation():
         rotate(Point([0.0, 1.0, 0.0]), angle=np.pi / 2,
                rot_axis=Vector([1.0, 0.0, 0.0])),
         np.array([0.0, 0.0, 1.0])))
+
+
+def test_axis_angle_from_rotation_matrix():
+    for angle in np.linspace(0.0, 2 * np.pi, np.pi / 4):
+        for rmatrix in (Rx, Ry, Rz):
+            rot_axis, rot_angle = \
+                axis_angle_from_rotation_matrix(rmatrix(angle))
+            assert_true(np.allclose(rotation_matrix(angle=rot_angle,
+                                                    axis=rot_axis),
+                                    rmatrix(angle)))
 
 
 if __name__ == '__main__':

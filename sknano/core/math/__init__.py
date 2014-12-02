@@ -24,6 +24,9 @@ Linear algebra transforms
 .. autosummary::
    :toctree: generated/
 
+   rotate
+   scale
+   translate
    Rx
    Ry
    Rz
@@ -31,9 +34,7 @@ Linear algebra transforms
    rotation_matrix
    scaling_matrix
    transformation_matrix
-   rotate
-   scale
-   translate
+   axis_angle_from_rotation_matrix
 
 Number theory
 ---------------
