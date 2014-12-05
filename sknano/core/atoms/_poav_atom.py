@@ -15,8 +15,10 @@ __docformat__ = 'restructuredtext en'
 
 import functools
 import operator
+import warnings
 
 import numpy as np
+np.seterr(all='warn')
 
 from sknano.core.math import vector as vec
 
@@ -39,6 +41,17 @@ class POAV(object):
         self.bond1 = self.bonds[0].vector
         self.bond2 = self.bonds[1].vector
         self.bond3 = self.bonds[2].vector
+
+        self.bond_angles = self.bonds.angles
+        self.bond_angle_pairs = self.bonds.bond_angle_pairs
+
+        self.sigma_bond_angle12 = self.bond_angles[0]
+        self.sigma_bond_angle13 = self.bond_angles[1]
+        self.sigma_bond_angle23 = self.bond_angles[2]
+
+        self.cosa12 = np.cos(self.bond_angles[0])
+        self.cosa13 = np.cos(self.bond_angles[1])
+        self.cosa23 = np.cos(self.bond_angles[2])
 
         self._v1 = self.bond1
         self._v2 = self.bond2
@@ -132,7 +145,12 @@ class POAV(object):
            {|\\mathbf{v}_1\\cdot(\\mathbf{v}_2\\times\\mathbf{v}_3)|}
 
         """
-        return vec.cross(self.v2, self.v3) / self.Vv1v2v3
+        with warnings.catch_warnings():
+            warnings.filterwarnings('error')
+            try:
+                return vec.cross(self.v2, self.v3) / self.Vv1v2v3
+            except Warning:
+                return vec.cross(self.v2, self.v3)
 
     @property
     def reciprocal_v2(self):
@@ -148,7 +166,12 @@ class POAV(object):
            {|\\mathbf{v}_1\\cdot(\\mathbf{v}_2\\times\\mathbf{v}_3)|}
 
         """
-        return vec.cross(self.v3, self.v1) / self.Vv1v2v3
+        with warnings.catch_warnings():
+            warnings.filterwarnings('error')
+            try:
+                return vec.cross(self.v3, self.v1) / self.Vv1v2v3
+            except Warning:
+                return vec.cross(self.v3, self.v1)
 
     @property
     def reciprocal_v3(self):
@@ -164,7 +187,12 @@ class POAV(object):
            {|\\mathbf{v}_1\\cdot(\\mathbf{v}_2\\times\\mathbf{v}_3)|}
 
         """
-        return vec.cross(self.v1, self.v2) / self.Vv1v2v3
+        with warnings.catch_warnings():
+            warnings.filterwarnings('error')
+            try:
+                return vec.cross(self.v1, self.v2) / self.Vv1v2v3
+            except Warning:
+                return vec.cross(self.v1, self.v2)
 
     @property
     def V1(self):
@@ -352,21 +380,16 @@ class POAV2(POAV):
     def __init__(self, *args):
         super(POAV2, self).__init__(*args)
 
-        bond_angles = self.bonds.angles
-        bond_angle_pairs = self.bonds.bond_angle_pairs
-
         vi = []
-        for bond, pair in zip(self.bonds, bond_angle_pairs):
-            cosa = np.cos(bond_angles[np.in1d(self.bonds, pair, invert=True)])
+        for bond, pair in zip(self.bonds, self.bond_angle_pairs):
+            cosa = \
+                np.cos(self.bond_angles[
+                    np.in1d(self.bonds, pair, invert=True)])
             vi.append(cosa * bond.vector.unit_vector)
 
         self._v1 = vi[0]
         self._v2 = vi[1]
         self._v3 = vi[2]
-
-        self.cosa12 = np.cos(bond_angles[0])
-        self.cosa13 = np.cos(bond_angles[1])
-        self.cosa23 = np.cos(bond_angles[2])
 
     @property
     def T(self):

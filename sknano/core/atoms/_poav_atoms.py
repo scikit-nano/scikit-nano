@@ -65,9 +65,9 @@ class POAVAtoms(KDTAtoms):
             if atom.bonds.Nbonds == 3:
                 for POAV_name in ('POAV1', 'POAV2', 'POAVR'):
                     POAV = getattr(atom, POAV_name)
+                    sigma_pi_angles = []
                     pyramidalization_angles = []
                     misalignment_angles = []
-                    sigma_pi_angles = []
                     for bond, NN in zip(atom.bonds, atom.NN):
                         # first compute the pyramidalization angle
                         sigma_pi_angle = vec.angle(POAV.Vpi, bond.vector)
