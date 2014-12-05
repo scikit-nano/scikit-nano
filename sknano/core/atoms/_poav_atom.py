@@ -46,12 +46,12 @@ class POAV(object):
         self.bond_angle_pairs = self.bonds.bond_angle_pairs
 
         self.sigma_bond_angle12 = self.bond_angles[0]
-        self.sigma_bond_angle13 = self.bond_angles[1]
-        self.sigma_bond_angle23 = self.bond_angles[2]
+        self.sigma_bond_angle23 = self.bond_angles[1]
+        self.sigma_bond_angle31 = self.bond_angles[2]
 
         self.cosa12 = np.cos(self.bond_angles[0])
-        self.cosa13 = np.cos(self.bond_angles[1])
-        self.cosa23 = np.cos(self.bond_angles[2])
+        self.cosa23 = np.cos(self.bond_angles[1])
+        self.cosa31 = np.cos(self.bond_angles[2])
 
         self._v1 = self.bond1
         self._v2 = self.bond2
@@ -398,7 +398,7 @@ class POAV2(POAV):
 
         .. math::
            T =
-           \\cos\\theta_{12}\\cos\\theta_{13}\\cos\\theta_{23}\\times
+           \\cos\\theta_{12}\\cos\\theta_{23}\\cos\\theta_{31}\\times
            \\frac{|\\mathbf{V}_1\\cdot(\\mathbf{V}_2\\times\\mathbf{V}_3)|}{6}
 
         """
@@ -410,19 +410,19 @@ class POAV2(POAV):
     def n1(self):
         """:math:`p` character content of the :math:`\\sigma`-orbital \
             hybridization for :math:`\\sigma_1` bond."""
-        return -self.cosa23 / (self.cosa12 * self.cosa13)
+        return -self.cosa23 / (self.cosa12 * self.cosa31)
 
     @property
     def n2(self):
         """:math:`p` character content of the :math:`\\sigma`-orbital \
             hybridization for :math:`\\sigma_2` bond."""
-        return -self.cosa13 / (self.cosa12 * self.cosa23)
+        return -self.cosa31 / (self.cosa12 * self.cosa23)
 
     @property
     def n3(self):
         """:math:`p` character content of the :math:`\\sigma`-orbital \
             hybridization for :math:`\\sigma_3` bond."""
-        return -self.cosa12 / (self.cosa23 * self.cosa13)
+        return -self.cosa12 / (self.cosa31 * self.cosa23)
 
     @property
     def m(self):
