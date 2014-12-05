@@ -12,6 +12,13 @@ Contents
 Functions
 ----------
 
+Custom iterators:
+
+.. autosummary::
+   :toctree: generated/
+
+   cyclic_pairs
+
 Array functions:
 
 .. autosummary::
