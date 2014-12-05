@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Container class for collection of `Bond`s (:mod:`sknano.core.atoms._bonds`)
+Container class for collection of `Bond`\ s (:mod:`sknano.core.atoms._bonds`)
 ===============================================================================
 
 .. currentmodule:: sknano.core.atoms._bonds
@@ -10,12 +10,12 @@ Container class for collection of `Bond`s (:mod:`sknano.core.atoms._bonds`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from itertools import combinations
+#from itertools import combinations
 from operator import attrgetter
 
 import numpy as np
 
-from sknano.core import UserList
+from sknano.core import UserList, cyclic_pairs
 from sknano.core.math import vector as vec
 from ._extended_atoms import XAtoms
 #from ._bond import Bond
@@ -24,7 +24,7 @@ __all__ = ['Bonds']
 
 
 class Bonds(UserList):
-    """Base class for collection of atom `Bonds`.
+    """Base class for collection of atom `Bond`\ s.
 
     Parameters
     ----------
@@ -57,22 +57,22 @@ class Bonds(UserList):
 
     @property
     def Nbonds(self):
-        """Number of `Bond`s in `Bonds`."""
+        """Number of `Bond`\ s in `Bonds`."""
         return len(self)
 
     @property
     def vectors(self):
-        """Array of :attr:`~Bond.vector`\ s."""
+        """:class:`~numpy:numpy.ndarray` of :attr:`~Bond.vector`\ s."""
         return np.asarray([bond.vector for bond in self])
 
     @property
     def unit_vectors(self):
-        """Array of :attr:`~Bond.unit_vector`\ s."""
+        """:class:`~numpy:numpy.ndarray` of :attr:`~Bond.unit_vector`\ s."""
         return np.asarray([bond.unit_vector for bond in self])
 
     @property
     def lengths(self):
-        """`np.ndarray` of :attr:`~Bond.length`\ s."""
+        """:class:`~numpy:numpy.ndarray` of :attr:`~Bond.length`\ s."""
         return np.asarray([bond.length for bond in self])
 
     @property
@@ -82,14 +82,14 @@ class Bonds(UserList):
 
     @property
     def bond_angle_pairs(self):
-        """List of all 2-tuple bond pair combinations."""
-        return list(combinations(self, 2))
+        """`cyclic_pairs` of `Bond`\ s."""
+        return cyclic_pairs(self)
 
     @property
     def angles(self):
-        """Angles between bond vectors."""
+        """:class:`~numpy:numpy.ndarray` of `Bond` pair angles."""
         return np.asarray([vec.angle(b1.vector, b2.vector) for (b1, b2) in
-                           combinations(self, 2)])
+                           cyclic_pairs(self)])
 
     @property
     def mean_angle(self):
