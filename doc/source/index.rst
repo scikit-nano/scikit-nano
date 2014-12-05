@@ -49,3 +49,17 @@ Reference
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
+.. _versions:
+
+Other versions
+===============
+
+.. ifconfig:: 'dev' in release
+
+   |stable| `documentation <http://scikit-nano.org/doc>`_
+
+.. ifconfig:: 'dev' not in release
+
+   `scikit-nano development documentation <http://scikit-nano.org/doc/dev>`_

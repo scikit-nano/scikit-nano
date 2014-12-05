@@ -20,10 +20,10 @@ import sys
 # Check Sphinx version
 import sphinx
 import six
-if sphinx.__version__ < "1.1":
-    raise RuntimeError("Sphinx 1.1 or newer required")
+if sphinx.__version__ < "1.2":
+    raise RuntimeError("Sphinx 1.2 or newer required")
 
-needs_sphinx = '1.1'
+needs_sphinx = '1.2'
 
 # -- General configuration ----------------------------------------------------
 
@@ -39,6 +39,7 @@ sys.path.insert(0, os.path.abspath('../sphinxext/numpydoc'))
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.autosummary',
               'sphinx.ext.mathjax',
+              'sphinx.ext.ifconfig',
               'sphinx.ext.intersphinx',
               'sphinx.ext.coverage',
               'sphinx.ext.inheritance_diagram',
@@ -89,6 +90,13 @@ version = re.sub(r'\.dev-.*$', r'.dev', sknano.__version__)
 release = sknano.__version__
 
 print("scikit-nano (VERSION {})".format(version))
+
+stable_release = """
+.. |stable| replace:: scikit-nano {}
+""".format(sknano.version.stable_version)
+
+rst_prolog = stable_release
+
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
