@@ -58,6 +58,13 @@ MICRO = 5
 ISRELEASED = False
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
+STABLEVERSION = None
+if STABLEVERSION is None:
+    if ISRELEASED:
+        STABLEVERSION = VERSION
+    else:
+        STABLEVERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO-1)
+
 
 # Return the GIT version as a string
 def git_version():
@@ -125,6 +132,7 @@ version = '%(version)s'
 full_version = '%(full_version)s'
 git_revision = '%(git_revision)s'
 release = %(isrelease)s
+stable_version = '%(stable_version)s'
 
 if not release:
     version = full_version
@@ -136,7 +144,8 @@ if not release:
         a.write(cnt % {'version': VERSION,
                        'full_version': FULLVERSION,
                        'git_revision': GIT_REVISION,
-                       'isrelease': str(ISRELEASED)})
+                       'isrelease': str(ISRELEASED),
+                       'stable_version': STABLEVERSION})
     finally:
         a.close()
 
