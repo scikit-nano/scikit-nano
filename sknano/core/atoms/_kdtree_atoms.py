@@ -27,7 +27,8 @@ except ImportError:
                       'nearest-neighbor queries between atoms.')
 
 from ._extended_atoms import XAtoms
-from ._neighbor_atoms import NeighborAtoms
+from ._bond import Bond
+from ._bonds import Bonds
 
 __all__ = ['KDTAtoms']
 
@@ -96,7 +97,6 @@ class KDTAtoms(XAtoms):
     @property
     def bonds(self):
         """Return list of :attr:`~KDTAtom.bonds`."""
-        from ._bonds import Bonds
         bonds = Bonds()
         [bonds.extend(atom.bonds) for atom in self]
         return bonds
@@ -199,8 +199,6 @@ class KDTAtoms(XAtoms):
     def update_bonds(self):
         """Update :attr:`KDTAtom.bonds` list."""
         #self._update_nearest_neighbors()
-        from ._bond import Bond
-        from ._bonds import Bonds
         for atom in self:
             atom.bonds = Bonds()
             [atom.bonds.append(Bond(atom, nn)) for nn in atom.NN]
@@ -215,7 +213,7 @@ class KDTAtoms(XAtoms):
         try:
             NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
             for j, atom in enumerate(self):
-                atom.NN = NeighborAtoms()
+                atom.NN = self.__class__()
                 for k, d in enumerate(NNd[j]):
                     if d < self.NNrc:
                         atom.NN.append(self[NNi[j][k]])

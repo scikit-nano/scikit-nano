@@ -14,9 +14,9 @@ __docformat__ = 'restructuredtext en'
 
 import numbers
 
+import sknano.core.atoms
 from ._bonds import Bonds
 from ._extended_atom import XAtom
-from ._neighbor_atoms import NeighborAtoms
 
 __all__ = ['KDTAtom']
 
@@ -28,8 +28,8 @@ class KDTAtom(XAtom):
     ----------
     CN : int, optional
         `KDTAtom` coordination number.
-    NN : {sequence, `NeighborAtoms`}, optional
-        List of nearest-neighbor `KDTAtom`\ s or `NeighborAtoms` instance
+    NN : {sequence, `Atoms`}, optional
+        List of nearest-neighbor `Atoms`
     bonds : {sequence, `Bonds`}, optional
         List of atom `Bond`\ s or `Bonds` instance
 
@@ -42,12 +42,12 @@ class KDTAtom(XAtom):
         self.CN = CN
 
         if NN is None:
-            NN = NeighborAtoms()
+            NN = sknano.core.atoms.StructureAtoms()
         self.NN = NN
 
         if bonds is None:
             bonds = Bonds()
-        self._bonds = bonds
+        self.bonds = bonds
 
     def __str__(self):
         """Return a nice string representation of `KDTAtom`."""
@@ -90,14 +90,14 @@ class KDTAtom(XAtom):
 
     @property
     def NN(self):
-        """Return `KDTAtom` `NeighborAtoms` object."""
+        """Nearest-neighbor `Atoms`."""
         return self._NN
 
     @NN.setter
     def NN(self, value):
-        """Set `KDTAtom` `NeighborAtoms`."""
-        if not isinstance(value, NeighborAtoms):
-            raise TypeError('Expected `NeighborAtoms`.')
+        """Set nearest-neighbor `Atoms`."""
+        if not isinstance(value, sknano.core.atoms.Atoms):
+            raise TypeError('Expected an `Atoms` object.')
         self._NN = value
 
     @property
