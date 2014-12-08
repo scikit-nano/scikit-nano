@@ -26,8 +26,6 @@ except ImportError:
     raise ImportError('Install scipy version >= 0.13.0 to allow '
                       'nearest-neighbor queries between atoms.')
 
-from ._bond import Bond
-from ._bonds import Bonds
 from ._extended_atoms import XAtoms
 from ._neighbor_atoms import NeighborAtoms
 
@@ -98,6 +96,7 @@ class KDTAtoms(XAtoms):
     @property
     def bonds(self):
         """Return list of :attr:`~KDTAtom.bonds`."""
+        from ._bonds import Bonds
         bonds = Bonds()
         [bonds.extend(atom.bonds) for atom in self]
         return bonds
@@ -200,6 +199,8 @@ class KDTAtoms(XAtoms):
     def update_bonds(self):
         """Update :attr:`KDTAtom.bonds` list."""
         #self._update_nearest_neighbors()
+        from ._bond import Bond
+        from ._bonds import Bonds
         for atom in self:
             atom.bonds = Bonds()
             [atom.bonds.append(Bond(atom, nn)) for nn in atom.NN]

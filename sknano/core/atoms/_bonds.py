@@ -17,7 +17,6 @@ import numpy as np
 
 from sknano.core import UserList, cyclic_pairs
 from sknano.core.math import vector as vec
-from ._structure_atoms import StructureAtoms
 #from ._bond import Bond
 
 __all__ = ['Bonds']
@@ -99,6 +98,7 @@ class Bonds(UserList):
     @property
     def atoms(self):
         """`Atoms` :class:`python:set` in `Bonds`."""
+        from ._structure_atoms import StructureAtoms
         atoms = StructureAtoms()
         [atoms.extend(bond.atoms) for bond in self]
         return StructureAtoms(atoms=list(set(atoms)))
