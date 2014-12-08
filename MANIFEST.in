@@ -1,13 +1,21 @@
 include MANIFEST.in
 include *.rst
 include *.txt
-include setup.py
+# Top-level build scripts
+include setup.py setupegg.py
+# All source files
 recursive-include sknano *
+# All documentation
 recursive-include doc *
+# Add build and testing tools
+include tox.ini
+# Exclude what we don't want to include
+prune */__pycache__
+prune */.ropeproject
 prune doc/build
 prune doc/source/generated
 prune doc/source/sknano
 prune doc/source/images
 prune doc/source/_static
 prune doc/source/_templates
-global-exclude *.pyc *~ *.bak *.xlsx *.swp *.pyo *.ropeproject
+global-exclude *.pyc *~ *.bak *.xlsx *.swp *.pyo
