@@ -20,6 +20,9 @@ def test_attributes():
         assert_equals(xatom.element, element)
         assert_equals(xatom.m, xatom.mass)
 
+    for c in ('x', 'y', 'z'):
+        assert_equals(getattr(atom, c), 0.0)
+
 
 def test_str():
     atom = XAtom('C')

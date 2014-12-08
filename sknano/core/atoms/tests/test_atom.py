@@ -15,8 +15,6 @@ def test_instantiation():
 def test_attributes():
     atom = Atom('C')
     assert_equals(atom.element, 'C')
-    for c in ('x', 'y', 'z'):
-        assert_equals(getattr(atom, c), 0.0)
     assert_equals(atom.Z, 6)
 
 
