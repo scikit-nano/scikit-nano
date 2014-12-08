@@ -7,6 +7,8 @@ def configuration(parent_package='', top_path=None):
     config = Configuration('core', parent_package, top_path)
     config.add_subpackage('atoms')
     config.add_subpackage('math')
+    config.add_subpackage('molecules')
+    config.add_subpackage('physics')
     config.add_subpackage('refdata')
     #config.add_subpackage('units')
     config.add_data_dir('tests')

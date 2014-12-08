@@ -7,6 +7,7 @@ def configuration(parent_package='', top_path=None):
     config = Configuration('utils', parent_package, top_path)
     config.add_subpackage('analysis')
     config.add_subpackage('geometric_shapes')
+    #config.add_subpackage('md_tools')
     config.add_subpackage('symmetry_groups')
     return config
 
