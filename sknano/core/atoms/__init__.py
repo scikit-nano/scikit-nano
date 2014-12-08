@@ -58,13 +58,6 @@ Class representation of atom bonds.
    Bond
    Bonds
 
-Classes for structure analysis
-
-.. autosummary::
-   :toctree: generated/
-
-   NeighborAtoms
-
 Classes for molecular dynamics simulations:
 
 .. autosummary::
@@ -78,16 +71,15 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 #from ._base import *
-from ._structure_atoms import *
 from ._atom import *
 from ._atoms import *
 from ._extended_atom import *
 from ._extended_atoms import *
 from ._kdtree_atom import *
 from ._kdtree_atoms import *
-from ._neighbor_atoms import *
 from ._poav_atom import *
 from ._poav_atoms import *
+from ._structure_atoms import *
 
 from ._bond import *
 from ._bonds import *
