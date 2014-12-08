@@ -88,7 +88,7 @@ class KDTAtoms(XAtoms):
 
     @property
     def atom_tree(self):
-        """Return the :py:class:`~scipy:scipy.spatial.KDTree` of coords."""
+        """:class:`~scipy:scipy.spatial.KDTree` of :attr:`~XAtoms.coords.`"""
         try:
             return KDTree(self.coords)
         except ValueError:

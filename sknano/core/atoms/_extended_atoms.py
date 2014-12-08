@@ -88,6 +88,11 @@ class XAtoms(Atoms):
         return CM
 
     @property
+    def Ntypes(self):
+        """Number of :attr:`~XAtoms.atomtypes`."""
+        return len(list(self.atomtypes.keys()))
+
+    @property
     def centroid(self):
         """Centroid of `Atoms`.
 
@@ -101,7 +106,7 @@ class XAtoms(Atoms):
 
         Returns
         -------
-        C : `~sknano.core.math.Vector`
+        C : :class:`~sknano.core.math.Vector`
             The position vector of the centroid coordinates.
         """
         C = Vector(np.mean(self.coords, axis=0))
@@ -110,28 +115,33 @@ class XAtoms(Atoms):
 
     @property
     def bounds(self):
-        """Return bounds of `Atoms`."""
+        """Bounds of `Atoms`.
+
+        Returns
+        -------
+        :class:`~sknano.utils.geometric_shapes.Cuboid`"""
         return Cuboid(pmin=[self.x.min(), self.y.min(), self.z.min()],
                       pmax=[self.x.max(), self.y.max(), self.z.max()])
 
     @property
     def coords(self):
-        """Return list of `Atom` coordinates."""
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s \
+            :math:`x, y, z` coordinates."""
         return np.asarray([atom.r for atom in self])
 
     @property
     def x(self):
-        """Return :math:`x` coordinates of `Atom` objects as array."""
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`x` coordinates."""
         return self.coords[:,0]
 
     @property
     def y(self):
-        """Return :math:`y` coordinates of `Atom` objects as array."""
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`y` coordinates."""
         return self.coords[:,1]
 
     @property
     def z(self):
-        """Return :math:`z` coordinates of `Atom` objects as array."""
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`z` coordinates."""
         return self.coords[:,2]
 
     @property
@@ -147,7 +157,7 @@ class XAtoms(Atoms):
 
     @property
     def atomtypes(self):
-        """Return the atom type dictionary."""
+        """:attr:`~XAtoms.atomtypes` :class:`python:dict`."""
         self._update_atomtypes()
         return self._atomtypes
 
@@ -169,11 +179,6 @@ class XAtoms(Atoms):
     def charges(self):
         """Return array of `XAtom` charges."""
         return np.asarray([atom.q for atom in self])
-
-    @property
-    def Ntypes(self):
-        """Number of atom types in `XAtoms`."""
-        return len(list(self.atomtypes.keys()))
 
     @property
     def q(self):
@@ -214,8 +219,8 @@ class XAtoms(Atoms):
 
     def assign_unique_ids(self, starting_id=1):
         """Assign unique ID to each `XAtom` in `XAtoms`."""
-        for i, atom in enumerate(self, start=starting_id):
-            atom.atomID = i
+        [setattr(atom, 'atomID', i)
+         for i, atom in enumerate(self, start=starting_id)]
 
     def center_CM(self, axes=None):
         """Center atoms on CM coordinates."""
