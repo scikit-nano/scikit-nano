@@ -8,8 +8,8 @@ __docformat__ = 'restructuredtext en'
 
 import os
 import sys
+import shutil
 import subprocess
-from setuptools import find_packages, setup
 
 if sys.version_info[:2] < (2, 7) or (3, 0) <= sys.version_info[:2] < (3, 3):
     raise RuntimeError("Python version 2.7 or >= 3.3 required.")
@@ -65,6 +65,20 @@ if STABLEVERSION is None:
     else:
         STABLEVERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO-1)
 
+# For some commands, use setuptools
+if len(set(('develop', 'release', 'bdist_egg', 'bdist_rpm', 'bdist_wininst',
+            'install_egg_info', 'build_sphinx', 'egg_info', 'easy_install',
+            'upload', 'bdist_wheel', '--single-version-externally-managed',
+            )).intersection(sys.argv)) > 0:
+    import setuptools
+    extra_setuptools_args = dict(
+        packages=setuptools.find_packages(exclude=['doc']),
+        zip_safe=False,  # the package can run out of an .egg file
+        include_package_data=True,
+    )
+else:
+    extra_setuptools_args = dict()
+
 
 # Return the GIT version as a string
 def git_version():
@@ -100,6 +114,30 @@ if os.path.exists('MANIFEST'):
 # sknano __init__ can detect if it is being loaded by the setup routine, to
 # avoid attempting to load components that aren't built yet.
 builtins.__SKNANO_SETUP__ = True
+
+
+from distutils.command.clean import clean as Clean
+class CleanCommand(Clean):
+    description = \
+        "Remove build directories, __pycache__ directories, " \
+        ".ropeproject directories, and compiled files in the source tree."
+
+    def run(self):
+        Clean.run(self)
+        if os.path.exists('build'):
+            shutil.rmtree('build')
+        for dirpath, dirnames, filenames in os.walk('sknano'):
+            for filename in filenames:
+                if filename.endswith(('.so', '.pyd', '.pyc', '.dll')):
+                    os.unlink(os.path.join(dirpath, filename))
+            for dirname in dirnames:
+                if dirname in ('__pycache__', '.ropeproject'):
+                    shutil.rmtree(os.path.join(dirpath, dirname))
+
+        for dirpath, dirnames, filenames in os.walk('doc'):
+            for dirname in dirnames:
+                if dirname in ('__pycache__', '.ropeproject'):
+                    shutil.rmtree(os.path.join(dirpath, dirname))
 
 
 def get_version_info():
@@ -217,33 +255,30 @@ def setup_package():
                 'nanogen = sknano.scripts.nanogen:main',
                 'nanogenui = sknano.scripts.nanogenui:main'],
         },
-        packages=find_packages(),
-        include_package_data=True,
-        zip_safe=False,
+        cmdclass={'clean': CleanCommand},
     )
 
-    if len(sys.argv) >= 2 and ('--help' in sys.argv[1:] or
-                               sys.argv[1] in ('--help-commands', 'egg_info',
-                                               '--version', 'clean')):
+    if len(sys.argv) >= 2 and \
+            ('--help' in sys.argv[1:] or sys.argv[1]
+             in ('--help-commands', 'egg_info', '--version', 'clean')):
 
         # For these actions, NumPy/SciPy are not required.
         # They are required to succeed without them when, for example,
         # pip is used to install Scipy when Numpy is not yet present in
         # the system.
-        #try:
-        #    from setuptools import setup
-        #except ImportError:
-        #    from distutils.core import setup
+        try:
+            from setuptools import setup
+        except ImportError:
+            from distutils.core import setup
 
         FULLVERSION, GIT_REVISION = get_version_info()
         metadata['version'] = FULLVERSION
     else:
-        FULLVERSION, GIT_REVISION = get_version_info()
-        metadata['version'] = FULLVERSION
-        #import setuptools
-        #from numpy.distutils.core import setup
+        #FULLVERSION, GIT_REVISION = get_version_info()
+        #metadata['version'] = FULLVERSION
 
-        #metadata['configuration'] = configuration
+        from numpy.distutils.core import setup
+        metadata['configuration'] = configuration
 
     setup(**metadata)
 
