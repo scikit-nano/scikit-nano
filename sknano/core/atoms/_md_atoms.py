@@ -19,7 +19,6 @@ __docformat__ = 'restructuredtext en'
 #from ._bond import Bond
 #from ._bonds import Bonds
 #from ._extended_atoms import XAtoms
-#from ._neighbor_atoms import NeighborAtoms
 from ._kdtree_atoms import KDTAtoms
 
 __all__ = ['MDAtoms']
