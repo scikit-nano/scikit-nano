@@ -13,7 +13,7 @@ __docformat__ = 'restructuredtext en'
 from functools import total_ordering
 
 from sknano.core.math import Vector
-from ._extended_atoms import XAtoms
+from ._structure_atoms import StructureAtoms
 
 __all__ = ['Bond']
 
@@ -28,7 +28,7 @@ class Bond(object):
 
     """
     def __init__(self, atom1, atom2):
-        self._atoms = XAtoms(atoms=[atom1, atom2])
+        self._atoms = StructureAtoms(atoms=[atom1, atom2])
         self._vector = Vector(atom2.r - atom1.r, p0=atom1.r.p)
 
     def __str__(self):
