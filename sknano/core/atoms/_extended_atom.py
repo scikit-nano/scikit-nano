@@ -55,7 +55,8 @@ class XAtom(Atom):
     _atomattrs = Atom._atomattrs + \
         ['atomID', 'moleculeID', 'atomtype', 'q', 'dr',
          'r', 'x', 'y', 'z', 'v', 'vx', 'vy', 'vz',
-         'f', 'fx', 'fy', 'fz', 'n', 'nx', 'ny', 'nz']
+         'f', 'fx', 'fy', 'fz', 'n', 'nx', 'ny', 'nz',
+         'pe', 'ke', 'etotal']
 
     __hash__ = Atom.__hash__
 
@@ -81,6 +82,10 @@ class XAtom(Atom):
         self._moleculeID = int(moleculeID)
         self._atomtype = int(atomtype)
         self._q = q
+
+        self._pe = pe
+        self._ke = ke
+        self._etotal = etotal
 
     def __repr__(self):
         """Return string representation of `XAtom`."""
@@ -628,6 +633,33 @@ class XAtom(Atom):
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
         self._f = Vector(value)
+
+    @property
+    def pe(self):
+        """`Atom` potential energy."""
+        return self._pe
+
+    @pe.setter
+    def pe(self, value):
+        self._pe = value
+
+    @property
+    def ke(self):
+        """`Atom` kinetic energy."""
+        return self._ke
+
+    @ke.setter
+    def ke(self, value):
+        self._ke = value
+
+    @property
+    def etotal(self):
+        """`Atom` total energy (:attr:`~XAtoms.pe` + :attr:`~XAtoms.ke`)."""
+        return self._etotal
+
+    @etotal.setter
+    def etotal(self, value):
+        self._etotal = value
 
     def rezero(self, epsilon=1.0e-10):
         """Re-zero position vector components.

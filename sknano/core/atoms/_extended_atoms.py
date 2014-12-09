@@ -46,7 +46,8 @@ class XAtoms(Atoms):
     _atomattrs = Atoms._atomattrs + \
         ['atomID', 'moleculeID', 'atomtype', 'q', 'dr',
          'r', 'x', 'y', 'z', 'v', 'vx', 'vy', 'vz',
-         'f', 'fx', 'fy', 'fz', 'n', 'nx', 'ny', 'nz']
+         'f', 'fx', 'fy', 'fz', 'n', 'nx', 'ny', 'nz',
+         'pe', 'ke', 'etotal']
 
     def __init__(self, atoms=None, copylist=True, deepcopy=False):
 
@@ -186,8 +187,23 @@ class XAtoms(Atoms):
         return self.charges.sum()
 
     @property
+    def kinetic_energies(self):
+        """:class:`~numpy:numpy.ndarray` of `XAtom.ke`."""
+        return np.asarray([atom.ke for atom in self])
+
+    @property
+    def potential_energies(self):
+        """:class:`~numpy:numpy.ndarray` of `XAtom.pe`."""
+        return np.asarray([atom.pe for atom in self])
+
+    @property
+    def total_energies(self):
+        """:class:`~numpy:numpy.ndarray` of `XAtom.etotal`."""
+        return np.asarray([atom.etotal for atom in self])
+
+    @property
     def velocities(self):
-        """Return array of `XAtom` velocities."""
+        """:class:`~numpy:numpy.ndarray` of `XAtom` velocities."""
         return np.asarray([atom.v for atom in self])
 
     def add_atomtype(self, atom):
