@@ -21,7 +21,7 @@ else:
 
 DISTNAME = 'scikit-nano'
 DESCRIPTION = __doc__
-LONG_DESCRIPTION = open('README.rst').read()
+LONG_DESCRIPTION = ''.join(open('README.rst').readlines()[6:])
 AUTHOR = 'Andrew Merrill'
 AUTHOR_EMAIL = 'androomerrill@gmail.com'
 MAINTAINER = AUTHOR
