@@ -96,13 +96,13 @@ import importlib
 import sys
 
 from sknano.core.refdata import CCbond, dVDW
+from sknano.version import short_version as version
 
 __all__ = ['nanogen']
 
 
 def argparser():
     parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(title='sub-commands')
 
     parser.add_argument(
         '--element1', default='C', help='element symbol or atomic number of '
@@ -122,6 +122,11 @@ def argparser():
         '--verbose', action='store_true', help='verbose output')
     parser.add_argument(
         '--debug', action='store_true', help='debug output')
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s {}'.format(version),
+                        help="show %(prog)s's version number and exit")
+
+    subparsers = parser.add_subparsers(title='sub-commands')
 
     graphene_parent_parser = argparse.ArgumentParser(add_help=False)
     graphene_parent_parser.add_argument(
@@ -148,7 +153,8 @@ def argparser():
     graphene_parser.set_defaults(generator_class='GrapheneGenerator')
 
     bilayer_graphene_parser = \
-        subparsers.add_parser('BLG', parents=[graphene_parent_parser])
+        subparsers.add_parser('bilayer_graphene',
+                              parents=[graphene_parent_parser])
     bilayer_graphene_parser.add_argument(
         '--layer-rotation-angle', type=float, help='Rotation angle of second '
         'layer in **degrees.** (default: %(default)s)')
@@ -263,9 +269,12 @@ def nanogen(generator_class=None, element1='C', element2='C', bond=CCbond,
 
 
 def main():
-
     args = argparser().parse_args()
-    nanogen(**vars(args))
+    if hasattr(args, 'generator_class'):
+        nanogen(**vars(args))
+    else:
+        argparser().print_help()
+
 
 if __name__ == '__main__':
     sys.exit(main())
