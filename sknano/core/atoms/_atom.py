@@ -32,16 +32,19 @@ class Atom(object):
         an element atomic number :math:`\\boldsymbol{Z}`.
 
     """
-    _atomattrs = ['symbol', 'Z', 'm']  # private class var
+    _atomattrs = ['symbol', 'Z', 'mass']  # private class var
 
     __hash__ = object.__hash__
 
-    def __init__(self, element=None, m=None):
+    def __init__(self, element=None, mass=None, **kwargs):
 
         # set mass first because the element.setter method may check mass value
-        if m is None:
-            m = 0
-        self.m = m
+        if mass is None and 'm' in kwargs:
+            mass = kwargs['m']
+
+        if mass is None:
+            mass = 0
+        self.mass = mass
 
         self.element = element
 
@@ -51,7 +54,7 @@ class Atom(object):
 
     def __repr__(self):
         """Return canonical string representation of `Atom`."""
-        return "Atom(element={!r}, m={!r})".format(self.element, self.m)
+        return "Atom(element={!r}, mass={!r})".format(self.element, self.mass)
 
     def __eq__(self, other):
         """Test equality of two `Atom` object instances."""
@@ -97,12 +100,12 @@ class Atom(object):
             Z = int(value)
             idx = Z - 1
             symbol = element_symbols[idx]
-            m = atomic_masses[symbol]
+            mass = atomic_masses[symbol]
         except KeyError:
             print('unrecognized element number: {}'.format(value))
         else:
             self._Z = atomic_numbers[symbol]
-            self._m = m
+            self._mass = mass
             self._symbol = symbol
 
     @property
@@ -124,29 +127,28 @@ class Atom(object):
                 Z = int(value)
                 idx = Z - 1
                 symbol = element_symbols[idx]
-                m = atomic_masses[symbol]
+                mass = atomic_masses[symbol]
             except KeyError:
                 print('unrecognized element number: {}'.format(value))
             else:
                 self._Z = atomic_numbers[symbol]
-                self._m = m
+                self._mass = mass
         else:
-            m = self.m
-            int_half_m = int(m / 2)
+            mass = self.mass
             if value in element_symbols:
                 symbol = value
             elif value in element_names:
                 symbol = element_symbols[element_names.index(value)]
-            elif m in atomic_mass_symbol_map:
-                symbol = atomic_mass_symbol_map[m]
-            elif int_half_m in atomic_number_symbol_map:
-                symbol = atomic_number_symbol_map[int_half_m]
+            elif mass in atomic_mass_symbol_map:
+                symbol = atomic_mass_symbol_map[mass]
+            elif int(mass / 2) in atomic_number_symbol_map:
+                symbol = atomic_number_symbol_map[int(mass / 2)]
             else:
                 symbol = 'X'
 
             try:
                 self._Z = atomic_numbers[symbol]
-                self._m = atomic_masses[symbol]
+                self._mass = atomic_masses[symbol]
             except KeyError:
                 self._Z = 0
 
@@ -164,7 +166,7 @@ class Atom(object):
         return self._symbol
 
     @property
-    def m(self):
+    def mass(self):
         """Atomic mass :math:`m_a` in atomic mass units.
 
         Returns
@@ -172,12 +174,20 @@ class Atom(object):
         float
             Atomic mass :math:`m_a` in atomic mass units.
         """
-        return self._m
+        return self._mass
+
+    @mass.setter
+    def mass(self, value):
+        self._mass = value
+
+    @property
+    def m(self):
+        return self.mass
 
     @m.setter
     def m(self, value):
-        self._m = value
+        self.mass = value
 
     def todict(self):
         """Return `dict` of `Atom` constructor parameters."""
-        return dict(element=self.element, m=self.m)
+        return dict(element=self.element, mass=self.mass)

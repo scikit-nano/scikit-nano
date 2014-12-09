@@ -60,13 +60,14 @@ class XAtom(Atom):
     __hash__ = Atom.__hash__
 
     def __init__(self, element=None, atomID=0, moleculeID=0, atomtype=1,
-                 q=0., m=None, mass=None, x=None, y=None, z=None,
+                 q=0., mass=None, x=None, y=None, z=None,
                  vx=None, vy=None, vz=None, fx=None, fy=None, fz=None,
-                 nx=None, ny=None, nz=None, **kwargs):
-        if m is None and mass is not None:
-            m = mass
+                 nx=None, ny=None, nz=None, pe=None, ke=None, etotal=None,
+                 **kwargs):
+        if mass is None and 'm' in kwargs:
+            mass = kwargs['m']
 
-        super(XAtom, self).__init__(element=element, m=m)
+        super(XAtom, self).__init__(element=element, mass=mass)
 
         self.r = Vector([x, y, z])
         #self._p0 = Point([x, y, z])

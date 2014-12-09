@@ -34,7 +34,7 @@ class Atoms(UserList):
 
 
     """
-    _atomattrs = ['symbol', 'Z', 'm']
+    _atomattrs = ['symbol', 'Z', 'mass']
 
     def __init__(self, atoms=None, copylist=True, deepcopy=False):
         super(Atoms, self).__init__(initlist=atoms,
@@ -70,7 +70,7 @@ class Atoms(UserList):
     @property
     def masses(self):
         """Return list of `Atom` masses."""
-        return np.asarray([atom.m for atom in self])
+        return np.asarray([atom.mass for atom in self])
 
     @property
     def symbols(self):

@@ -165,7 +165,7 @@ class XAtoms(Atoms):
         for atom in self:
             if atom.atomtype not in self._atomtypes:
                 self._atomtypes[atom.atomtype] = {}
-                self._atomtypes[atom.atomtype]['mass'] = atom.m
+                self._atomtypes[atom.atomtype]['mass'] = atom.mass
                 self._atomtypes[atom.atomtype]['q'] = atom.q
 
     @property
@@ -201,7 +201,7 @@ class XAtoms(Atoms):
         """
         if atom.atomtype not in self._atomtypes:
             self._atomtypes[atom.atomtype] = {}
-            self._atomtypes[atom.atomtype]['mass'] = atom.m
+            self._atomtypes[atom.atomtype]['mass'] = atom.mass
             self._atomtypes[atom.atomtype]['q'] = atom.q
 
     def add_atomtypes(self, atoms=None):
