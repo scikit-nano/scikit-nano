@@ -1,4 +1,10 @@
+.. image:: https://travis-ci.org/androomerrill/scikit-nano.svg?branch=master
+   :target: https://travis-ci.org/androomerrill/scikit-nano
 
+.. image:: https://coveralls.io/repos/androomerrill/scikit-nano/badge.png
+   :target: https://coveralls.io/r/androomerrill/scikit-nano
+
+===========
 scikit-nano
 ===========
 
@@ -27,12 +33,7 @@ The following structure data formats are supported:
 
     * `xyz`
     * `LAMMPS data` (*limited support for full format spec.*)
-
-      .. todo:: Provide notes on limitations of LAMMPS data format support
-
     * `LAMMPS dump` (*limited support for full format spec.*)
-
-      .. todo:: Provide notes on limitations of LAMMPS dump format support
 
 
 Extending input/output capabilities with more structure data formats
@@ -58,9 +59,7 @@ Important links
 Dependencies
 ============
 
-Required Dependencies
----------------------
-* `Python 2.7+ <http://python.org/download/>`_
+* `Python 2.7+/3.3+ <http://python.org/download/>`_
 * `numpy 1.8+ <http://sourceforge.net/projects/numpy/files/NumPy/>`_
 * `scipy 0.13+ <http://sourceforge.net/projects/scipy/files/scipy/>`_
 
