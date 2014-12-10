@@ -119,14 +119,6 @@ class Snapshot(object):
             return self._atoms
         return self.atoms
 
-    #@property
-    #def Natoms(self):
-    #    return len(self._atoms)
-
-    #@Natoms.setter
-    #def Natoms(self, value):
-    #    self._Natoms = value
-
 
 class Trajectory(UserList):
     """Base class for trajectory analysis."""
