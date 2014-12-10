@@ -188,14 +188,6 @@ class XAtom(Atom):
         self._atomtype = int(value)
 
     @property
-    def mass(self):
-        return self.m
-
-    @mass.setter
-    def mass(self, value):
-        self.m = value
-
-    @property
     def x(self):
         """:math:`x`-coordinate in units of **Angstroms**.
 
