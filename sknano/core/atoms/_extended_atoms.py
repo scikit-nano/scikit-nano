@@ -315,6 +315,24 @@ class XAtoms(Atoms):
             print('No atom with atomID = {}'.format(atomID))
             return None
 
+    def get_atomtypes(self, asdict=False):
+        """Return list of `XAtom` :attr:`XAtom.atomtypes`.
+
+        Parameters
+        ----------
+        asdict : :class:`python:bool`, optional
+
+        Returns
+        -------
+        :class:`python:list` if `asdict` is `False`
+        :class:`python:dict` if `asdict` is `True`
+
+        """
+        if asdict:
+            return self.atomtypes
+        else:
+            return [atom.atomtype for atom in self]
+
     def get_coords(self, asdict=False):
         """Return atom coords.
 
