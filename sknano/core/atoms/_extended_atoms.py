@@ -305,8 +305,9 @@ class XAtoms(Atoms):
 
         Returns
         -------
-        `XAtom` instance with :attr:`XAtom.atomID` == `atomID` or
-        `None` if no :attr:`XAtom.atomID` == `atomID`.
+        atom : `XAtom` or `None`
+            `XAtom` instance if `XAtoms` contains `XAtom` with
+            :attr:`XAtom.atomID` == `atomID`, otherwise `None`
 
         """
         try:
@@ -338,11 +339,12 @@ class XAtoms(Atoms):
 
         Parameters
         ----------
-        asdict : bool, optional
+        asdict : :class:`~python:bool`, optional
 
         Returns
         -------
-        coords : :py:class:`python:~collections.OrderedDict` or ndarray
+        coords : :class:`~python:collections.OrderedDict` or \
+            :class:`~numpy:numpy.ndarray`
 
         """
         coords = self.coords
