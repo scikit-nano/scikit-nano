@@ -99,7 +99,6 @@ class Snapshot(object):
         self.timestep = None
 
         self._atoms = None
-        #self._Natoms = 0
 
     @property
     def atoms(self):
