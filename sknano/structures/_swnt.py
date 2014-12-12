@@ -127,7 +127,7 @@ class SWNT(NanotubeMixin, StructureBase):
                         'chiral_angle', 'Ch', 'T', 'dt', 'rt',
                         'electronic_type']
 
-    def __init__(self, n=10, m=0, nz=1, tube_length=None, Lz=None,
+    def __init__(self, n=10, m=0, nz=None, tube_length=None, Lz=None,
                  fix_Lz=False, **kwargs):
 
         super(SWNT, self).__init__(**kwargs)

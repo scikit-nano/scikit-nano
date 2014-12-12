@@ -27,7 +27,7 @@ __all__ = ['MWNT']
 
 class MWNT(StructureBase):
     """MWNT structure class."""
-    def __init__(self, Ch=None, Nwalls=None, Lz=None, fix_Lz=False, nz=1,
+    def __init__(self, Ch=None, Nwalls=None, Lz=None, fix_Lz=False, nz=None,
                  add_inner_shells=False, add_outer_shells=True,
                  max_shells=None, max_shell_diameter=np.inf,
                  min_shells=None, min_shell_diameter=0.0,
@@ -140,7 +140,7 @@ class MWNT(StructureBase):
                     break
 
         for Ch in self.Ch:
-            self.shells.append(SWNT(Ch[0], Ch[-1], Lz=Lz, fix_Lz=fix_Lz,
+            self.shells.append(SWNT(n=Ch[0], m=Ch[-1], Lz=Lz, fix_Lz=fix_Lz,
                                     nz=nz, **kwargs))
 
         self.fix_Lz = fix_Lz
