@@ -83,19 +83,30 @@ class XAtom(Atom):
         self._atomtype = int(atomtype)
         self._q = q
 
-        self._pe = pe
-        self._ke = ke
-        self._etotal = etotal
+        self.pe = pe
+        self.ke = ke
+        self.etotal = etotal
+
+    def __str__(self):
+        """Return nice string representation of `XAtom`."""
+        strrep = "Atom(element={element!r}, atomID={atomID!r}, " + \
+            "moleculeID={moleculeID!r}, atomtype={atomtype!r})"
+        parameters = dict(element=self.element, atomID=self.atomID,
+                          moleculeID=self.moleculeID, atomtype=self.atomtype)
+
+        return strrep.format(**parameters)
 
     def __repr__(self):
-        """Return string representation of `XAtom`."""
+        """Return canonical string representation of `XAtom`."""
         reprstr = "Atom(element={element!r}, atomID={atomID!r}, " + \
             "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
-            "q={q!r}, mass={mass!r}, x={x:.6f}, y={y:.6f}, z={z:.6f})"
+            "q={q!r}, mass={mass!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " \
+            "pe={pe!r}, ke={ke!r}, etotal={etotal!r})"
         parameters = dict(element=self.element, atomID=self.atomID,
                           moleculeID=self.moleculeID, atomtype=self.atomtype,
                           q=self.q, mass=self.mass,
-                          x=self.x, y=self.y, z=self.z)
+                          x=self.x, y=self.y, z=self.z,
+                          pe=self.pe, ke=self.ke, etotal=self.etotal)
 
         return reprstr.format(**parameters)
 
@@ -633,6 +644,10 @@ class XAtom(Atom):
 
     @pe.setter
     def pe(self, value):
+        if not isinstance(value, (float, type(None))):
+            raise TypeError('Expected a number')
+        if value is None:
+            value = 0.0
         self._pe = value
 
     @property
@@ -642,6 +657,10 @@ class XAtom(Atom):
 
     @ke.setter
     def ke(self, value):
+        if not isinstance(value, (float, type(None))):
+            raise TypeError('Expected a number')
+        if value is None:
+            value = 0.0
         self._ke = value
 
     @property
@@ -651,6 +670,13 @@ class XAtom(Atom):
 
     @etotal.setter
     def etotal(self, value):
+        if not isinstance(value, (float, type(None))):
+            raise TypeError('Expected a number')
+        if value is None:
+            try:
+                value = self.pe + self.ke
+            except TypeError:
+                value = 0.0
         self._etotal = value
 
     def rezero(self, epsilon=1.0e-10):
@@ -713,4 +739,5 @@ class XAtom(Atom):
                     x=self.x, y=self.y, z=self.z,
                     vx=self.vx, vy=self.vy, vz=self.vz,
                     fx=self.fx, fy=self.fy, fz=self.fz,
-                    nx=self.nx, ny=self.ny, nz=self.nz)
+                    nx=self.nx, ny=self.ny, nz=self.nz,
+                    pe=self.pe, ke=self.ke, etotal=self.etotal)
