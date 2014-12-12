@@ -8,6 +8,7 @@ LAMMPS dump format (:mod:`sknano.io._lammps_dump_format`)
 
 """
 from __future__ import absolute_import, division, print_function
+import six
 from six.moves import range
 from six.moves import zip
 __docformat__ = 'restructuredtext en'
@@ -191,132 +192,60 @@ class DUMPReader(StructureIO):
         except IndexError:
             return None
 
-    def next(self):
-        """Read next snapshot from list of dump files."""
-        #if not self.increment:
-        #    raise DUMPIOError('cannot read dump incrementally')
+    def remap_atomattr_names(self, attrmap):
+        """Rename attributes in the :attr:`DUMPReader.atomattrs` list.
 
-        #while True:
-        #    with open(self.dumpfiles[self.nextfile]) as f:
-        #        f.seek
-        pass
+        Parameters
+        ----------
+        attrmap : :class:`~python:dict`
+            :class:`~python:dict` mapping atom attribute name to new
+            attribute name.
 
-    def scale(self, ts=None):
-        if ts is None:
-            x = self.dumpattrs['x']
-            y = self.dumpattrs['y']
-            z = self.dumpattrs['z']
-            for snapshot in self.trajectory:
-                self.scale_one(snapshot, x, y, z)
+        """
+        for k, v in six.iteritems(attrmap):
+            self.atomattrs[self.atomattrs.index(k)] = v
 
-    def scale_one(self, snap, x, y, z):
-        pass
-
-    def unscale(self, ts=None):
-        if ts is None:
-            x = self.dumpattrs['x']
-            y = self.dumpattrs['y']
-            z = self.dumpattrs['z']
-            for snapshot in self.trajectory:
-                self.unscale_one(snapshot, x, y, z)
-
-    def unscale_one(self, snapshot, x, y, z):
-        if snapshot.xy == snapshot.xz == snapshot.yz == 0.0:
-            xprd = snapshot.xhi - snapshot.xlo
-            yprd = snapshot.yhi - snapshot.ylo
-            zprd = snapshot.zhi - snapshot.zlo
+    def unscale(self):
+        x = self.dumpattrs['x']
+        y = self.dumpattrs['y']
+        z = self.dumpattrs['z']
+        for snapshot in self.trajectory:
             atoms = snapshot.get_atoms(asarray=True)
             if atoms is not None:
-                atoms[:, x] = snapshot.xlo + atoms[:, x] * xprd
-                atoms[:, y] = snapshot.ylo + atoms[:, y] * yprd
-                atoms[:, z] = snapshot.zlo + atoms[:, z] * zprd
-        else:
-            xlo_bound = snapshot.xlo
-            xhi_bound = snapshot.xhi
-            ylo_bound = snapshot.ylo
-            yhi_bound = snapshot.yhi
-            zlo_bound = snapshot.zlo
-            zhi_bound = snapshot.zhi
-            xy = snapshot.xy
-            xz = snapshot.xz
-            yz = snapshot.yz
-            xlo = xlo_bound - min((0.0, xy, xz, xy + xz))
-            xhi = xhi_bound - max((0.0, xy, xz, xy + xz))
-            ylo = ylo_bound - min((0.0, yz))
-            yhi = yhi_bound - max((0.0, yz))
-            zlo = zlo_bound
-            zhi = zhi_bound
-            h0 = xhi - xlo
-            h1 = yhi - ylo
-            h2 = zhi - zlo
-            h3 = yz
-            h4 = xz
-            h5 = xy
-            atoms = snapshot.get_atoms(asarray=True)
-            if atoms is not None:
-                atoms[:, x] = snapshot.xlo + \
-                    atoms[:, x] * h0 + atoms[:, y] * h5 + atoms[:, z] * h4
-                atoms[:, y] = snapshot.ylo + \
-                    atoms[:, y] * h1 + atoms[:, z] * h3
-                atoms[:, z] = snapshot.zlo + atoms[:, z] * h2
+                xlo = snapshot.xlo
+                xhi = snapshot.xhi
+                ylo = snapshot.ylo
+                yhi = snapshot.yhi
+                zlo = snapshot.zlo
+                zhi = snapshot.zhi
+                xy = snapshot.xy
+                xz = snapshot.xz
+                yz = snapshot.yz
+                lx = xhi - xlo
+                ly = yhi - ylo
+                lz = zhi - zlo
+                if xy == xz == yz == 0.0:
+                    atoms[:, x] = snapshot.xlo + atoms[:, x] * lx
+                    atoms[:, y] = snapshot.ylo + atoms[:, y] * ly
+                    atoms[:, z] = snapshot.zlo + atoms[:, z] * lz
+                else:
+                    xlo = xlo - min((0.0, xy, xz, xy + xz))
+                    xhi = xhi - max((0.0, xy, xz, xy + xz))
+                    lx = xhi - xlo
 
-    def wrap(self):
-        pass
+                    ylo = ylo - min((0.0, yz))
+                    yhi = yhi - max((0.0, yz))
+                    ly = yhi - ylo
 
-    def unwrap(self):
-        pass
-
-    def owrap(self):
-        pass
-
-    def atom(self, n, fields=None):
-        pass
+                    atoms[:, x] = snapshot.xlo + \
+                        atoms[:, x] * lx + atoms[:, y] * xy + atoms[:, z] * xz
+                    atoms[:, y] = snapshot.ylo + \
+                        atoms[:, y] * ly + atoms[:, z] * yz
+                    atoms[:, z] = snapshot.zlo + atoms[:, z] * lz
 
     def dumpattrs2str(self):
         #return self.dumpattrs
         return ' '.join(sorted(self.dumpattrs, key=self.dumpattrs.__getitem__))
-
-    def sort(self, *list):
-        pass
-
-    def sort_one(self, snapshot, id):
-        pass
-
-    def scatter(self, root):
-        pass
-
-    def minmax(self, colname):
-        pass
-
-    def set(self, eq):
-        pass
-
-    def setv(self, colname, vec):
-        pass
-
-    def clone(self, nstep, col):
-        pass
-
-    def spread(self, old, n, new):
-        pass
-
-    def vecs(self, n, *list):
-        pass
-
-    def newcolumn(self, str):
-        pass
-
-    def delete(self):
-        pass
-
-    def extra(self):
-        pass
-
-    def maxbox(self):
-        pass
-
-    def maxtype(self):
-        pass
 
 
 class DUMPWriter(object):
