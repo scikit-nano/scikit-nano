@@ -34,7 +34,7 @@ __all__ = ['SWNTGenerator']
 
 
 class SWNTGenerator(SWNT, GeneratorBase):
-    """Class for generating nanotube structures.
+    """Class for generating `SWNT` structures.
 
     Parameters
     ----------

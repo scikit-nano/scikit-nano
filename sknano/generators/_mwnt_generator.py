@@ -35,7 +35,7 @@ __all__ = ['MWNTGenerator']
 
 
 class MWNTGenerator(MWNT, GeneratorBase):
-    """Class for generating single, multi-walled nanotubes.
+    """Class for generating single, `MWNT`.
 
     .. versionchanged:: 0.2.20
 
@@ -47,20 +47,21 @@ class MWNTGenerator(MWNT, GeneratorBase):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
-        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
-    nx, ny, nz : int, optional
-        Number of repeat unit cells in the :math:`x, y, z` dimensions.
+    Ch : :class:`python:list`, optional
+        List of `MWNT` `SWNT` shell chiralities.
+    nz : int, optional
+        Number of repeat unit cells in the :math:`z` dimension.
+    Nwalls : int, optional
+        Number of `SWNT` shells in `MWNT`.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
         :class:`~sknano.core.Atom` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
-    Lx, Ly, Lz : float, optional
-        length of bundle in :math:`x, y, z` dimensions in **nanometers**.
-        Overrides the :math:`n_x, n_y, n_z` cell values.
+    Lz : float, optional
+        length of bundle in :math:`z` dimension in **nanometers**.
+        Overrides the :math:`n_z` value.
     fix_Lz : bool, optional
         Generate the nanotube with length as close to the specified
         :math:`L_z` as possible. If `True`, then

@@ -164,10 +164,12 @@ class MWNT(StructureBase):
 
     @property
     def chiral_types(self):
+        """List of chiral types for each `MWNT` shell."""
         return [swnt.chiral_type for swnt in self.shells]
 
     @property
     def chiral_set(self):
+        """Set of all chiral types in `MWNT`."""
         return set(self.chiral_types)
 
     @property
