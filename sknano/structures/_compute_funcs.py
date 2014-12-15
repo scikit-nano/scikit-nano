@@ -31,7 +31,7 @@ __all__ = ['compute_d', 'compute_dR', 'compute_N', 'compute_t1', 'compute_t2',
            'compute_tube_length', 'compute_tube_mass']
 
 
-def compute_d(n, m):
+def compute_d(*Ch):
     """Compute :math:`d=\\gcd{(n, m)}`
 
     :math:`d` is the **G**\ reatest **C**\ ommon **D**\ ivisor of
@@ -39,16 +39,22 @@ def compute_d(n, m):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
 
     Returns
     -------
-    int
+    gcd : :class:`python:int`
         Greatest Common Divisor of :math:`n` and :math:`m`
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -56,7 +62,7 @@ def compute_d(n, m):
     return gcd(n, m)
 
 
-def compute_dR(n, m):
+def compute_dR(*Ch):
     """Compute :math:`d_R=\\gcd{(2n + m, 2m + n)}`
 
     :math:`d_R` is the **G**\ reatest **C**\ ommon **D**\ ivisor of
@@ -64,8 +70,9 @@ def compute_dR(n, m):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
 
     Returns
@@ -74,6 +81,11 @@ def compute_dR(n, m):
         greatest common divisor of :math:`2n+m` and :math:`2m+n`
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -81,7 +93,7 @@ def compute_dR(n, m):
     return gcd(2 * m + n, 2 * n + m)
 
 
-def compute_N(n, m):
+def compute_N(*Ch):
     """Compute :math:`N = \\frac{2(n^2+m^2+nm)}{d_R}`.
 
     :math:`N` is the number of graphene hexagons mapped to a nanotube
@@ -89,8 +101,9 @@ def compute_N(n, m):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
 
     Returns
@@ -100,6 +113,11 @@ def compute_N(n, m):
         :math:`N = \\frac{2(n^2+m^2+nm)}{d_R}`.
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -111,7 +129,7 @@ def compute_N(n, m):
         return 0
 
 
-def compute_t1(n, m):
+def compute_t1(*Ch):
     """Compute :math:`t_1 = \\frac{2m + n}{d_R}`
 
     where :math:`d_R = \\gcd{(2n + m, 2m + n)}`.
@@ -125,8 +143,9 @@ def compute_t1(n, m):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
 
     Returns
@@ -135,6 +154,11 @@ def compute_t1(n, m):
         :math:`t_1`
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -146,7 +170,7 @@ def compute_t1(n, m):
         return 0
 
 
-def compute_t2(n, m):
+def compute_t2(*Ch):
     """Compute :math:`t_2 = -\\frac{2n + m}{d_R}`
 
     where :math:`d_R = \\gcd{(2n + m, 2m + n)}`.
@@ -160,8 +184,9 @@ def compute_t2(n, m):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
 
     Returns
@@ -170,6 +195,11 @@ def compute_t2(n, m):
         :math:`t_2`
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -181,19 +211,20 @@ def compute_t2(n, m):
         return 0
 
 
-def compute_Ch(n, m, bond=None, **kwargs):
+def compute_Ch(*Ch, bond=None, **kwargs):
     """Compute nanotube circumference :math:`|\\mathbf{C}_{h}|` in \
     **\u212b**.
 
     .. math::
 
-        |\\mathbf{C}_h| = a\\sqrt{n^2 + m^2 + nm} =
-        \\sqrt{3}a_{\\mathrm{CC}}\\sqrt{n^2 + m^2 + nm}
+       |\\mathbf{C}_h| = a\\sqrt{n^2 + m^2 + nm} =
+       \\sqrt{3}a_{\\mathrm{CC}}\\sqrt{n^2 + m^2 + nm}
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     bond : float, optional
         Distance between nearest neighbor atoms (i.e., bond length).
@@ -207,6 +238,11 @@ def compute_Ch(n, m, bond=None, **kwargs):
         Nanotube circumference :math:`|\\mathbf{C}_h|` in \u212b.
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -217,17 +253,18 @@ def compute_Ch(n, m, bond=None, **kwargs):
     return bond * np.sqrt(3 * (n**2 + m**2 + n * m))
 
 
-def compute_chiral_angle(n, m, rad2deg=True):
+def compute_chiral_angle(*Ch, rad2deg=True):
     """Compute chiral angle :math:`\\theta_c`.
 
     .. math::
 
-        \\theta_c = \\tan^{-1}\\left(\\frac{\\sqrt{3} m}{2n + m}\\right)
+       \\theta_c = \\tan^{-1}\\left(\\frac{\\sqrt{3} m}{2n + m}\\right)
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     rad2deg : bool, optional
         If `True`, return angle in degrees.
@@ -239,6 +276,11 @@ def compute_chiral_angle(n, m, rad2deg=True):
         degrees (default) or radians (if `rad2deg=False`).
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -251,20 +293,21 @@ def compute_chiral_angle(n, m, rad2deg=True):
         return theta
 
 
-def compute_T(n, m, bond=None, length=True, **kwargs):
+def compute_T(*Ch, bond=None, length=True, **kwargs):
     """Compute length of nanotube unit cell :math:`|\\mathbf{T}|` in \
     \u212b.
 
     .. math::
 
-        |\\mathbf{T}| = \\frac{\\sqrt{3} |\\mathbf{C}_{h}|}{d_{R}}
-        = \\frac{\\sqrt{3}a\\sqrt{n^2 + m^2 + nm}}{d_{R}}
-        = \\frac{3a_{\\mathrm{CC}}\\sqrt{n^2 + m^2 + nm}}{d_{R}}
+       |\\mathbf{T}| = \\frac{\\sqrt{3} |\\mathbf{C}_{h}|}{d_{R}}
+       = \\frac{\\sqrt{3}a\\sqrt{n^2 + m^2 + nm}}{d_{R}}
+       = \\frac{3a_{\\mathrm{CC}}\\sqrt{n^2 + m^2 + nm}}{d_{R}}
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     bond : float, optional
         Distance between nearest neighbor atoms (i.e., bond length).
@@ -285,6 +328,11 @@ def compute_T(n, m, bond=None, length=True, **kwargs):
         (:math:`t_1`, :math:`t_2`).
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -294,7 +342,7 @@ def compute_T(n, m, bond=None, length=True, **kwargs):
         if bond is None:
             bond = CCbond
 
-        Ch = compute_Ch(n, m, bond=bond, **kwargs)
+        Ch = compute_Ch(n, m, bond=bond)
         dR = compute_dR(n, m)
 
         try:
@@ -308,17 +356,18 @@ def compute_T(n, m, bond=None, length=True, **kwargs):
         return (t1, t2)
 
 
-def compute_dt(n, m, bond=None, **kwargs):
+def compute_dt(*Ch, bond=None, **kwargs):
     """Compute nanotube diameter :math:`d_t` in \u212b.
 
     .. math::
 
-        d_t = \\frac{|\\mathbf{C}_h|}{\\pi}
+       d_t = \\frac{|\\mathbf{C}_h|}{\\pi}
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     bond : float, optional
         Distance between nearest neighbor atoms (i.e., bond length).
@@ -332,6 +381,11 @@ def compute_dt(n, m, bond=None, **kwargs):
         Nanotube diameter :math:`d_t` in \u212b.
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -341,7 +395,7 @@ def compute_dt(n, m, bond=None, **kwargs):
     return Ch / np.pi
 
 
-def compute_rt(n, m, bond=None, **kwargs):
+def compute_rt(*Ch, bond=None, **kwargs):
     """Compute nanotube radius :math:`r_t` in \u212b.
 
     .. math::
@@ -351,8 +405,9 @@ def compute_rt(n, m, bond=None, **kwargs):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     bond : float, optional
         Distance between nearest neighbor atoms (i.e., bond length).
@@ -366,16 +421,21 @@ def compute_rt(n, m, bond=None, **kwargs):
         Nanotube radius :math:`r_t` in \u212b.
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
         raise TypeError('Expected an integer')
 
-    Ch = compute_Ch(n, m, bond=bond, **kwargs)
+    Ch = compute_Ch(n, m, bond=bond)
     return Ch / (2 * np.pi)
 
 
-def compute_M(n, m):
+def compute_M(*Ch):
     """Compute :math:`M = mp - nq`
 
     :math:`M` is the number of multiples of the translation vector
@@ -383,8 +443,9 @@ def compute_M(n, m):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
 
     Returns
@@ -393,6 +454,11 @@ def compute_M(n, m):
         :math:`M = mp - nq`
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -402,7 +468,7 @@ def compute_M(n, m):
     return m * p - n * q
 
 
-def compute_R(n, m, bond=None, length=False, **kwargs):
+def compute_R(*Ch, bond=None, length=False, **kwargs):
     """Compute symmetry vector :math:`\\mathbf{R} = (p, q)`.
 
     The *symmetry vector* is any lattice vector of the unfolded graphene
@@ -425,8 +491,9 @@ def compute_R(n, m, bond=None, length=False, **kwargs):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     bond : float, optional
         Distance between nearest neighbor atoms (i.e., bond length).
@@ -445,6 +512,11 @@ def compute_R(n, m, bond=None, length=False, **kwargs):
         is `True` in units of **\u212b**.
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -473,7 +545,7 @@ def compute_R(n, m, bond=None, length=False, **kwargs):
         return (p, q)
 
 
-def compute_R_chiral_angle(n, m, rad2deg=True):
+def compute_R_chiral_angle(*Ch, rad2deg=True):
     """Compute "chiral angle" of symmetry vector :math:`\\theta_R`.
 
     .. math::
@@ -482,8 +554,9 @@ def compute_R_chiral_angle(n, m, rad2deg=True):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     rad2deg : bool, optional
         If `True`, return angle in degrees
@@ -496,6 +569,11 @@ def compute_R_chiral_angle(n, m, rad2deg=True):
 
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -509,7 +587,7 @@ def compute_R_chiral_angle(n, m, rad2deg=True):
         return theta
 
 
-def compute_symmetry_operation(n, m, bond=None):
+def compute_symmetry_operation(*Ch, bond=None):
     """Compute symmetry operation :math:`(\\psi|\\tau)`.
 
     The *symmetry vector* `R` represents a *symmetry
@@ -524,8 +602,9 @@ def compute_symmetry_operation(n, m, bond=None):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     bond : float, optional
         Distance between nearest neighbor atoms (i.e., bond length).
@@ -540,6 +619,11 @@ def compute_symmetry_operation(n, m, bond=None):
         :math:`\\tau` in \u212b.
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -550,7 +634,7 @@ def compute_symmetry_operation(n, m, bond=None):
     return (psi, tau)
 
 
-def compute_psi(n, m):
+def compute_psi(*Ch):
     """Compute rotation component of symmetry operation \
     :math:`\\psi` in **radians**.
 
@@ -560,8 +644,9 @@ def compute_psi(n, m):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
 
     Returns
@@ -571,6 +656,11 @@ def compute_psi(n, m):
         in **radians**.
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -583,7 +673,7 @@ def compute_psi(n, m):
         return 0
 
 
-def compute_tau(n, m, bond=None, **kwargs):
+def compute_tau(*Ch, bond=None, **kwargs):
     """Compute translation component of symmetry operation \
     :math:`\\tau` in **\u212b**.
 
@@ -593,8 +683,9 @@ def compute_tau(n, m, bond=None, **kwargs):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     bond : float, optional
         Distance between nearest neighbor atoms (i.e., bond length).
@@ -609,6 +700,11 @@ def compute_tau(n, m, bond=None, **kwargs):
         in **\u212b**.
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -616,14 +712,14 @@ def compute_tau(n, m, bond=None, **kwargs):
 
     M = compute_M(n, m)
     N = compute_N(n, m)
-    T = compute_T(n, m, bond=bond, **kwargs)
+    T = compute_T(n, m, bond=bond)
     try:
         return M * T / N
     except ZeroDivisionError:
         return 0
 
 
-def compute_electronic_type(n, m):
+def compute_electronic_type(*Ch):
     """Compute nanotube electronic type.
 
     .. versionadded:: 0.2.7
@@ -666,8 +762,9 @@ def compute_electronic_type(n, m):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
 
     Returns
@@ -675,6 +772,11 @@ def compute_electronic_type(n, m):
     str
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -688,7 +790,7 @@ def compute_electronic_type(n, m):
         return 'metallic'
 
 
-def compute_Natoms(n, m, nz):
+def compute_Natoms(*Ch, nz=1):
     """Compute :math:`N_{\\mathrm{atoms/tube}}`
 
     .. math::
@@ -698,8 +800,9 @@ def compute_Natoms(n, m, nz):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     nz : {int, float}
         Number of nanotube unit cells
@@ -709,6 +812,17 @@ def compute_Natoms(n, m, nz):
     int
         :math:`N_{\\mathrm{atoms/tube}}`
     """
+    if len(Ch) == 3:
+        n, m, nz = Ch
+    elif len(Ch) == 2 and isinstance(Ch[0], tuple):
+        n, m = Ch[0]
+        nz = Ch[-1]
+    else:
+        try:
+            n, m = Ch
+        except ValueError:
+            n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -718,7 +832,7 @@ def compute_Natoms(n, m, nz):
     return int(Natoms_per_unit_cell * nz)
 
 
-def compute_Natoms_per_tube(n, m, nz):
+def compute_Natoms_per_tube(*Ch, nz=1):
     """Compute :math:`N_{\\mathrm{atoms/tube}}`
 
     .. math::
@@ -728,8 +842,9 @@ def compute_Natoms_per_tube(n, m, nz):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     nz : {int, float}
         Number of nanotube unit cells
@@ -739,10 +854,10 @@ def compute_Natoms_per_tube(n, m, nz):
     int
         :math:`N_{\\mathrm{atoms/tube}}`
     """
-    return compute_Natoms(n, m, nz)
+    return compute_Natoms(*Ch, nz=nz)
 
 
-def compute_Natoms_per_unit_cell(n, m):
+def compute_Natoms_per_unit_cell(*Ch):
     """Compute :math:`N_{\mathrm{atoms/cell}} = 2N`.
 
     .. math::
@@ -754,8 +869,9 @@ def compute_Natoms_per_unit_cell(n, m):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
 
     Returns
@@ -766,6 +882,11 @@ def compute_Natoms_per_unit_cell(n, m):
 
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -775,14 +896,15 @@ def compute_Natoms_per_unit_cell(n, m):
     return 2 * N
 
 
-def compute_unit_cell_mass(n, m, element1=None, element2=None, **kwargs):
+def compute_unit_cell_mass(*Ch, element1=None, element2=None, **kwargs):
     """Compute nanotube unit cell mass in *Daltons*/*atomic mass units* (amu) \
         units.
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
@@ -802,6 +924,11 @@ def compute_unit_cell_mass(n, m, element1=None, element2=None, **kwargs):
         determining number of atoms of each element.
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -818,15 +945,16 @@ def compute_unit_cell_mass(n, m, element1=None, element2=None, **kwargs):
     return mass
 
 
-def compute_linear_mass_density(n, m, bond=None, element1=None, element2=None,
+def compute_linear_mass_density(*Ch, bond=None, element1=None, element2=None,
                                 **kwargs):
     """Compute nanotube linear mass density (mass per unit length) in \
     **grams/nm**.
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
@@ -843,6 +971,11 @@ def compute_linear_mass_density(n, m, bond=None, element1=None, element2=None,
         Linear mass density in units of **g/nm**.
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -861,7 +994,7 @@ def compute_linear_mass_density(n, m, bond=None, element1=None, element2=None,
         return 0
 
 
-def compute_bundle_density(n, m, d_vdw=None, bond=None,
+def compute_bundle_density(*Ch, d_vdw=None, bond=None,
                            element1=None, element2=None):
     """Compute nanotube bundle mass density \
     :math:`\\rho_{\\mathrm{bundle}}(n, m)` in :math:`\\mathrm{g/cm^3}`.
@@ -875,8 +1008,9 @@ def compute_bundle_density(n, m, d_vdw=None, bond=None,
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     d_vdw : int
         van der Waals distance between nearest-neighbor tubes
@@ -890,6 +1024,11 @@ def compute_bundle_density(n, m, d_vdw=None, bond=None,
         :math:`\\mathrm{\\frac{g}{cm^3}}`
 
     """
+    try:
+        n, m = Ch
+    except ValueError:
+        n, m = Ch[0]
+
     if bond is None:
         bond = CCbond
 
@@ -920,7 +1059,7 @@ def compute_bundle_density(n, m, d_vdw=None, bond=None,
     return bundle_density
 
 
-def compute_Lz(n, m, nz, bond=None, **kwargs):
+def compute_Lz(*Ch, nz=1, bond=None, **kwargs):
     """Compute :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**.
 
     .. math::
@@ -930,8 +1069,9 @@ def compute_Lz(n, m, nz, bond=None, **kwargs):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     nz : {int, float}
         Number of nanotube unit cells
@@ -947,6 +1087,17 @@ def compute_Lz(n, m, nz, bond=None, **kwargs):
         :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**
 
     """
+    if len(Ch) == 3:
+        n, m, nz = Ch
+    elif len(Ch) == 2 and isinstance(Ch[0], tuple):
+        n, m = Ch[0]
+        nz = Ch[-1]
+    else:
+        try:
+            n, m = Ch
+        except ValueError:
+            n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -958,33 +1109,34 @@ def compute_Lz(n, m, nz, bond=None, **kwargs):
     return nz * T / 10
 
 
-def compute_symmetry_chiral_angle(n, m, rad2deg=True):
+def compute_symmetry_chiral_angle(*Ch, rad2deg=True):
     """Alias for :func:`compute_R_chiral_angle`."""
-    return compute_R_chiral_angle(n, m, rad2deg=rad2deg)
+    return compute_R_chiral_angle(*Ch, rad2deg=rad2deg)
 
 
-def compute_tube_diameter(n, m, bond=None, **kwargs):
+def compute_tube_diameter(*Ch, bond=None, **kwargs):
     """Alias for :func:`compute_dt`"""
-    return compute_dt(n, m, bond=bond, **kwargs)
+    return compute_dt(*Ch, bond=bond, **kwargs)
 
 
-def compute_tube_radius(n, m, bond=None, **kwargs):
+def compute_tube_radius(*Ch, bond=None, **kwargs):
     """Alias for :func:`compute_rt`"""
-    return compute_rt(n, m, bond=bond, **kwargs)
+    return compute_rt(*Ch, bond=bond, **kwargs)
 
 
-def compute_tube_length(n, m, nz, bond=None, **kwargs):
+def compute_tube_length(*Ch, nz=1, bond=None, **kwargs):
     """Alias for :func:`compute_Lz`"""
-    return compute_Lz(n, m, nz, bond=bond, **kwargs)
+    return compute_Lz(*Ch, nz=nz, bond=bond, **kwargs)
 
 
-def compute_tube_mass(n, m, nz, element1=None, element2=None, **kwargs):
+def compute_tube_mass(*Ch, nz=1, element1=None, element2=None):
     """Compute nanotube mass in **grams**.
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     nz : {int, float}
         Number of nanotube unit cells
@@ -1006,6 +1158,17 @@ def compute_tube_mass(n, m, nz, element1=None, element2=None, **kwargs):
         determining number of atoms of each element.
 
     """
+    if len(Ch) == 3:
+        n, m, nz = Ch
+    elif len(Ch) == 2 and isinstance(Ch[0], tuple):
+        n, m = Ch[0]
+        nz = Ch[-1]
+    else:
+        try:
+            n, m = Ch
+        except ValueError:
+            n, m = Ch[0]
+
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
@@ -1013,7 +1176,7 @@ def compute_tube_mass(n, m, nz, element1=None, element2=None, **kwargs):
     if not (isinstance(nz, numbers.Real) or nz > 0):
         raise TypeError('Expected a real, positive number')
 
-    Natoms = compute_Natoms(n, m, nz)
+    Natoms = compute_Natoms(n, m, nz=nz)
 
     if element1 is None:
         element1 = 'C'
