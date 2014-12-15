@@ -10,6 +10,7 @@ import os
 import sys
 import shutil
 import subprocess
+from distutils.command.clean import clean as Clean
 
 if sys.version_info[:2] < (2, 7) or (3, 0) <= sys.version_info[:2] < (3, 4):
     raise RuntimeError("Python version 2.7 or 3.4+ required.")
@@ -71,7 +72,6 @@ if len(set(('develop', 'release', 'bdist_egg', 'bdist_rpm', 'bdist_wininst',
             )).intersection(sys.argv)) > 0:
     import setuptools
     extra_setuptools_args = dict(
-        packages=setuptools.find_packages(exclude=['doc']),
         zip_safe=False,  # the package can run out of an .egg file
         include_package_data=True,
     )
@@ -115,7 +115,6 @@ if os.path.exists('MANIFEST'):
 builtins.__SKNANO_SETUP__ = True
 
 
-from distutils.command.clean import clean as Clean
 class CleanCommand(Clean):
     description = \
         "Remove build directories, __pycache__ directories, " \
@@ -156,7 +155,8 @@ def get_version_info():
         GIT_REVISION = "Unknown"
 
     if not ISRELEASED:
-        FULLVERSION += '.dev-' + GIT_REVISION[:7]
+        FULLVERSION += '.dev'
+    #    FULLVERSION += '.dev-' + GIT_REVISION[:7]
 
     return FULLVERSION, GIT_REVISION
 
@@ -255,12 +255,12 @@ def setup_package():
                 'nanogenui = sknano.scripts.nanogenui:main'],
         },
         cmdclass={'clean': CleanCommand},
+        **extra_setuptools_args
     )
 
     if len(sys.argv) >= 2 and \
             ('--help' in sys.argv[1:] or sys.argv[1]
-             in ('--help-commands', 'egg_info', '--version',
-                 'develop', 'clean', 'sdist')):
+             in ('--help-commands', 'egg_info', '--version', 'clean')):
 
         # For these actions, NumPy/SciPy are not required.
         # They are required to succeed without them when, for example,
