@@ -11,8 +11,8 @@ import sys
 import shutil
 import subprocess
 
-if sys.version_info[:2] < (2, 7) or (3, 0) <= sys.version_info[:2] < (3, 3):
-    raise RuntimeError("Python version 2.7 or >= 3.3 required.")
+if sys.version_info[:2] < (2, 7) or (3, 0) <= sys.version_info[:2] < (3, 4):
+    raise RuntimeError("Python version 2.7 or 3.4+ required.")
 
 if sys.version_info[0] >= 3:
     import builtins
@@ -41,7 +41,6 @@ Operating System :: Unix
 Operating System :: MacOS
 Programming Language :: Python
 Programming Language :: Python :: 2.7
-Programming Language :: Python :: 3.3
 Programming Language :: Python :: 3.4
 Topic :: Scientific/Engineering
 Topic :: Scientific/Engineering :: Chemistry

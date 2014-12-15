@@ -59,7 +59,7 @@ Important links
 Dependencies
 ============
 
-* `Python 2.7+/3.3+ <http://python.org/download/>`_
+* `Python 2.7+/3.4+ <http://python.org/download/>`_
 * `numpy 1.8+ <http://sourceforge.net/projects/numpy/files/NumPy/>`_
 * `scipy 0.13+ <http://sourceforge.net/projects/scipy/files/scipy/>`_
 
