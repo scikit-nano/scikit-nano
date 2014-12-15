@@ -15,6 +15,10 @@ from distutils.command.clean import clean as Clean
 if sys.version_info[:2] < (2, 7) or (3, 0) <= sys.version_info[:2] < (3, 4):
     raise RuntimeError("Python version 2.7 or 3.4+ required.")
 
+if sys.version_info[0] < 3:
+    print('Python 2 support requires running `3to2` on source directory.')
+    #raise RuntimeError("Python version 3.4+ required.")
+
 if sys.version_info[0] >= 3:
     import builtins
 else:
@@ -41,7 +45,6 @@ Operating System :: POSIX
 Operating System :: Unix
 Operating System :: MacOS
 Programming Language :: Python
-Programming Language :: Python :: 2.7
 Programming Language :: Python :: 3.4
 Topic :: Scientific/Engineering
 Topic :: Scientific/Engineering :: Chemistry
