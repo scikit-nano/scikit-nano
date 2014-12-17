@@ -232,7 +232,7 @@ def filter_Ch_list(Ch_list, property_filters=None, **kwargs):
 
 def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
                      ms=None, mi=None, mf=None, dm=None,
-                     chiral_type=None, handedness=None,
+                     imax=None, chiral_type=None, handedness=None,
                      echo_zsh_str=False):
     """Generate a list of :math:`(n, m)` chiralities.
 
@@ -250,6 +250,8 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
         `step` parameters passed to the numpy function `np.arange`,
         to generate an array of evenly spaced :math:`m` chiral indices.
         `mi` only required if `ms` sequence kwarg is `None`.
+    imax : int, optional
+        maximum chiral index :math:`n = m = i_{max}`.
     chiral_type : {'all', 'achiral', 'chiral', 'armchair', 'zigzag'}, optional
     handedness : {'all', 'left', 'right'}, optional
     echo_zsh_str : bool, optional
@@ -261,6 +263,9 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
 
     """
     Ch_list = []
+    if imax is not None:
+        nf = mf = imax
+
     try:
         if (not ns or (isinstance(ns, list) and ns[0] is None)) \
                 and not ni and not nf and \
