@@ -27,11 +27,10 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
-        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
-    nx, ny, nz : int, optional
-        Number of repeat unit cells in the :math:`x, y, z` dimensions.
+    Ch : :class:`python:list`, optional
+        List of `MWNT` `SWNT` shell chiralities.
+    nx, ny : int, optional
+        Number of repeat unit cells in the :math:`x, y` dimensions.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
         :class:`~sknano.core.Atom` 1 and 2
@@ -47,11 +46,6 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
         non integer :math:`n_z` cells are permitted.
     add_outer_shells : bool, optional
         Build the MWNT by adding outer shells
-
-        .. versionadded:: 0.2.23
-
-    add_inner_shells : bool, optional
-        Build the MWNT by adding inner shells
 
         .. versionadded:: 0.2.23
 
