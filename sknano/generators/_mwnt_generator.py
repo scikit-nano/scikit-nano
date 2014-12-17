@@ -22,12 +22,12 @@ __docformat__ = 'restructuredtext en'
 
 #import copy
 
-#import numpy as np
+import numpy as np
 
 #from sknano.core import pluralize
 #from sknano.core.math import Vector
 from sknano.structures import MWNT
-#from sknano.utils.geometric_shapes import Cuboid
+from sknano.utils.geometric_shapes import Cuboid
 from ._base import Atoms, GeneratorBase
 from ._swnt_generator import SWNTGenerator
 
@@ -49,8 +49,6 @@ class MWNTGenerator(MWNT, GeneratorBase):
     ----------
     Ch : :class:`python:list`, optional
         List of `MWNT` `SWNT` shell chiralities.
-    nz : int, optional
-        Number of repeat unit cells in the :math:`z` dimension.
     Nwalls : int, optional
         Number of `SWNT` shells in `MWNT`.
     element1, element2 : {str, int}, optional
@@ -68,11 +66,6 @@ class MWNTGenerator(MWNT, GeneratorBase):
         non integer :math:`n_z` cells are permitted.
     add_outer_shells : bool, optional
         Build the MWNT by adding outer shells
-
-        .. versionadded:: 0.2.23
-
-    add_inner_shells : bool, optional
-        Build the MWNT by adding inner shells
 
         .. versionadded:: 0.2.23
 
@@ -103,7 +96,8 @@ class MWNTGenerator(MWNT, GeneratorBase):
     --------
 
     >>> from sknano.generators import MWNTGenerator
-    >>> mwnt = MWNTGenerator(n=40, m=40, max_shells=5, Lz=1.0, fix_Lz=True)
+    >>> mwnt = MWNTGenerator(Nwalls=5, max_shell_diameter=50,
+    ...                      Lz=1.0, fix_Lz=True)
     >>> mwnt.save_data()
 
     .. image:: /images/5shell_mwnt_4040_outer_Ch_1cellx1cellx4.06cells-01.png
@@ -186,8 +180,20 @@ class MWNTGenerator(MWNT, GeneratorBase):
             fname_wordlist = (Nshells, chiralities)
             fname = '_'.join(fname_wordlist)
 
+        if self.L0 is not None and self.fix_Lz:
+            Lz_cutoff = 10 * self.L0 + 1
+            pmin = [-np.inf, -np.inf, -Lz_cutoff]
+            pmax = [np.inf, np.inf, Lz_cutoff]
+            region_bounds = Cuboid(pmin=pmin, pmax=pmax)
+            region_bounds.update_region_limits()
+
+            self.atoms.clip_bounds(region_bounds, center_before_clipping=True)
+
+        if center_CM:
+            self.atoms.center_CM()
+
         super(MWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
-            anchor_point=anchor_point, deg2rad=deg2rad, center_CM=center_CM,
+            anchor_point=anchor_point, deg2rad=deg2rad, center_CM=False,
             savecopy=savecopy, **kwargs)
