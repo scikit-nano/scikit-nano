@@ -20,6 +20,9 @@ def test_generate_Ch_list():
     Ch_list = generate_Ch_list(ni=5, nf=20, mi=0, mf=20, handedness='right')
     assert_equal(len(Ch_list), 216)
 
+    Ch_list = generate_Ch_list(ni=5, imax=20, handedness='right')
+    assert_equal(len(Ch_list), 216)
+
 
 def test_generate_Ch_property_grid():
     Ch_grid = generate_Ch_property_grid(compute='compute_dt', imax=20)
