@@ -30,6 +30,9 @@ class MWNT(MWNTMixin, StructureBase):
                  min_shell_diameter=None, max_shell_diameter=None,
                  max_shells=None, chiral_type=None, shell_spacing=dVDW,
                  **kwargs):
+        if Ch_list is None and 'Ch' in kwargs:
+            Ch_list = kwargs['Ch']
+            del kwargs['Ch']
 
         super(MWNT, self).__init__(**kwargs)
 
