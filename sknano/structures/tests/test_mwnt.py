@@ -41,7 +41,7 @@ def test3():
 
 def test4():
     mwnt = MWNT(Ch=[(5, 0), (5, 5), (10, 5), (10, 0), (10, 10), (20, 10)],
-                nz=5.0)
+                Lz=1.0, fix_Lz=True)
     print(mwnt)
     print(mwnt.todict())
     print(mwnt.chiral_types)
