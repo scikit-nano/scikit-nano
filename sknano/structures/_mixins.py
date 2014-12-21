@@ -514,7 +514,7 @@ class NanotubeBundleMixin(object):
             self.r2.x = self.r1.x * np.cos(2 * np.pi / 3)
             self.r2.y = self.r1.x * np.sin(2 * np.pi / 3)
             if self.bundle_packing is None:
-                self.bundle_packing = 'hcp'
+                self._bundle_packing = 'hcp'
 
         if self.bundle_geometry == 'hexagon':
             nrows = max(self.nx, self.ny, 3)
