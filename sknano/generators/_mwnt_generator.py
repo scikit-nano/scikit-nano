@@ -6,15 +6,6 @@ MWNT structure generator (:mod:`sknano.generators._mwnt_generator`)
 
 .. currentmodule:: sknano.generators._mwnt_generator
 
-.. todo::
-
-   Add methods to perform fractional translation and cartesian translation
-   before structure generation.
-
-.. todo::
-
-   Handle different units in output coordinates.
-
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
@@ -64,20 +55,13 @@ class MWNTGenerator(MWNT, GeneratorBase):
         Generate the nanotube with length as close to the specified
         :math:`L_z` as possible. If `True`, then
         non integer :math:`n_z` cells are permitted.
-    add_outer_shells : bool, optional
-        Build the MWNT by adding outer shells
-
-        .. versionadded:: 0.2.23
-
-    max_shells : int, optional
-        Maximum number of shells per MWNT.
-    max_shell_diameter : float, optional
-        Maximum shell diameter, in units of **Angstroms**.
-    min_shells : int, optional
-        Minimum number of shells per MWNT.
     min_shell_diameter : float, optional
         Minimum shell diameter, in units of **Angstroms**.
-    new_shell_type : {None, 'AC', 'ZZ', 'achiral', 'chiral'}, optional
+    max_shell_diameter : float, optional
+        Maximum shell diameter, in units of **Angstroms**.
+    max_shells : int, optional
+        Maximum number of shells per MWNT.
+    chiral_type : {None, 'AC', 'ZZ', 'achiral', 'chiral'}, optional
         If `None`, the chiralities of the new shells are constrained only
         by their diameter and will be chosen randomly if more than one
         candidate chirality exists. If not `None`, then the
@@ -108,14 +92,7 @@ class MWNTGenerator(MWNT, GeneratorBase):
         super(MWNTGenerator, self).__init__(**kwargs)
 
         if autogen:
-            self.generate_unit_cell()
             self.generate_structure_data()
-
-    def generate_unit_cell(self):
-        """Generate the `MWNT` unit cell."""
-        self.unit_cell = Atoms()
-        for swnt in self.shells:
-            self.unit_cell.extend(SWNTGenerator(**swnt.todict()).unit_cell)
 
     def generate_structure_data(self):
         """Generate structure data.
@@ -127,33 +104,9 @@ class MWNTGenerator(MWNT, GeneratorBase):
 
         """
 
-        #self.atoms = Atoms(atoms=self.unit_cell)
-        #self.atoms = Atoms()
         self.structure_data.clear()
         for swnt in self.shells:
             self.atoms.extend(SWNTGenerator(**swnt.todict()).atoms)
-        #for n, m in self.Ch:
-        #for nz in xrange(int(np.ceil(self.nz))):
-        #    dr = Vector([0.0, 0.0, nz * self.T])
-        #    for uc_atom in self.unit_cell:
-        #        nt_atom = Atom(element=uc_atom.symbol)
-        #        nt_atom.r = uc_atom.r + dr
-        #        self.atoms.append(nt_atom)
-
-        #Lzmin = self.atoms
-        #pmin = [-np.inf, -np.inf, -np.inf]
-        #pmax = [np.inf, np.inf, np.inf]
-        #region_bounds = Cuboid(pmin=pmin, pmax=pmax)
-        #if self.L0 is not None and self.fix_Lz:
-        #    region_bounds.zmax = (10 * self.L0 + 1) / 2
-        #else:
-        #    region_bounds.zmax = (10 * Lzmin + 1) / 2
-
-        #region_bounds.zmin = -region_bounds.zmax
-        #region_bounds.update_region_limits()
-
-        #self.atoms.clip_bounds(region_bounds,
-        #                                 center_before_clipping=True)
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, deg2rad=True,
@@ -167,24 +120,15 @@ class MWNTGenerator(MWNT, GeneratorBase):
         if fname is None:
             Nshells = '{}shell_mwnt'.format(self.Nshells)
             chiralities = '@'.join([str(Ch).replace(' ', '') for
-                                    Ch in self.Ch])
+                                    Ch in self.Ch_list])
 
-            fname_wordlist = None
-            #if self._assert_integer_nz:
-            #    nz = ''.join(('{}'.format(self.nz),
-            #                  pluralize('cell', self.nz)))
-            #else:
-            #    nz = ''.join(('{:.2f}'.format(self.nz),
-            #                  pluralize('cell', self.nz)))
-            #fname_wordlist = (Nshells, chiralities, nz)
-            fname_wordlist = (Nshells, chiralities)
-            fname = '_'.join(fname_wordlist)
+            fname = '_'.join((Nshells, chiralities))
 
         if self.L0 is not None and self.fix_Lz:
-            Lz_cutoff = 10 * self.L0 + 1
-            pmin = [-np.inf, -np.inf, -Lz_cutoff]
-            pmax = [np.inf, np.inf, Lz_cutoff]
-            region_bounds = Cuboid(pmin=pmin, pmax=pmax)
+            Lz_cutoff = (10 * self.L0 + 1) / 2
+            pmax = np.asarray([np.inf, np.inf, Lz_cutoff])
+            pmin = -pmax
+            region_bounds = Cuboid(pmin=pmin.tolist(), pmax=pmax.tolist())
             region_bounds.update_region_limits()
 
             self.atoms.clip_bounds(region_bounds, center_before_clipping=True)
