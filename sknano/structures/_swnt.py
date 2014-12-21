@@ -188,35 +188,6 @@ class SWNT(SWNTMixin, StructureBase):
             return strrep.format(self.n, self.m, self.element1, self.element2,
                                  self.bond, self.nz)
 
-    @property
-    def Natoms_per_tube(self):
-        """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
-        return self.Natoms
-
-    @property
-    def linear_mass_density(self):
-        """Linear mass density of nanotube in g/nm."""
-        return compute_linear_mass_density(self.n, self.m, bond=self.bond,
-                                           element1=self.element1,
-                                           element2=self.element2)
-
-    @property
-    def Ntubes(self):
-        """Number of nanotubes."""
-        return 1
-
-    @property
-    def tube_length(self):
-        """Alias for :attr:`SWNT.Lz`"""
-        return self.Lz
-
-    @property
-    def tube_mass(self):
-        """SWNT mass in **grams**."""
-        return compute_tube_mass(self.n, self.m, self.nz,
-                                 element1=self.element1,
-                                 element2=self.element2)
-
     def todict(self):
         """Return :class:`~python:dict` of `SWNT` attributes."""
         return dict(n=self.n, m=self.m, nz=self.nz, Lz=self.Lz,
