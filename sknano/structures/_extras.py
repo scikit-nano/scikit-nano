@@ -190,7 +190,7 @@ def filter_Ch(Ch, even_only=False, odd_only=False, Ch_type=None,
 
 
 def filter_Ch_list(Ch_list, property_filters=None, **kwargs):
-    """Filter list of chiralities by properties.
+    """Filter list of chiralities.
 
     Parameters
     ----------
@@ -202,12 +202,13 @@ def filter_Ch_list(Ch_list, property_filters=None, **kwargs):
 
     Returns
     -------
-    sequence
-        list of chiralities which passed conditions
+    :class:`python:list`
+        filtered `Ch_list`
 
     """
-    from ._swnt import SWNT
+    #Ch_list = np.asarray(Ch_list)
     if property_filters is not None:
+        from ._swnt import SWNT
         filtered_list = Ch_list[:]
         try:
             for filter_index, (prop, cmp_symbol, value) in \
@@ -305,7 +306,8 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
                             ns = [int(float(ni))]
         if (not ms or isinstance(ms, list) and ms[0] is None) and \
                 not mi and not mf:
-            if chiral_type in (list(Ch_types.keys()) + list(Ch_types.values())):
+            if chiral_type in \
+                    (list(Ch_types.keys()) + list(Ch_types.values())):
                 if chiral_type in ('achiral', 'aCh'):
                     for n in ns:
                         Ch_list.append((n, n))
