@@ -14,12 +14,12 @@ __docformat__ = 'restructuredtext en'
 from ._base import StructureBase
 from ._compute_funcs import compute_tube_mass, compute_linear_mass_density
 from ._extras import attr_strfmt, attr_symbols, attr_units
-from ._mixins import NanotubeMixin
+from ._mixins import SWNTMixin
 
 __all__ = ['SWNT', 'Nanotube']
 
 
-class SWNT(NanotubeMixin, StructureBase):
+class SWNT(SWNTMixin, StructureBase):
     """SWNT structure class.
 
     Parameters
@@ -150,8 +150,9 @@ class SWNT(NanotubeMixin, StructureBase):
 
     def __str__(self):
         """Return nice string representation of `SWNT`."""
+        strrep = repr(self)
         if self.verbose:
-            strrep = repr(self) + '\n'
+            strrep += '\n'
             for attr in self._structure_attrs:
                 var = attr
                 if attr in attr_symbols:
