@@ -44,20 +44,13 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
         Generate the nanotube with length as close to the specified
         :math:`L_z` as possible. If `True`, then
         non integer :math:`n_z` cells are permitted.
-    add_outer_shells : bool, optional
-        Build the MWNT by adding outer shells
-
-        .. versionadded:: 0.2.23
-
     max_shells : int, optional
         Maximum number of shells per MWNT.
     max_shell_diameter : float, optional
         Maximum shell diameter, in units of **Angstroms**.
-    min_shells : int, optional
-        Minimum number of shells per MWNT.
     min_shell_diameter : float, optional
         Minimum shell diameter, in units of **Angstroms**.
-    new_shell_type : {None, 'AC', 'ZZ', 'achiral', 'chiral'}, optional
+    chiral_type : {None, 'AC', 'ZZ', 'achiral', 'chiral'}, optional
         If `None`, the chiralities of the new shells are constrained only
         by their diameter and will be chosen randomly if more than one
         candidate chirality exists. If not `None`, then the
@@ -96,7 +89,6 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
         super(MWNTBundleGenerator, self).__init__(autogen=False, **kwargs)
 
         if autogen:
-            super(MWNTBundleGenerator, self).generate_unit_cell()
             self.generate_structure_data()
 
     def generate_structure_data(self):
@@ -127,13 +119,6 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
                 ny = ''.join(('{}'.format(self.ny),
                              pluralize('cell', self.ny)))
                 cells = 'x'.join((nx, ny))
-                #if self._assert_integer_nz:
-                #    nz = ''.join(('{}'.format(self.nz),
-                #                  pluralize('cell', self.nz)))
-                #else:
-                #    nz = ''.join(('{:.2f}'.format(self.nz),
-                #                  pluralize('cell', self.nz)))
-                #cells = 'x'.join((nx, ny, nz))
 
                 if self.nx == 1 and self.ny == 1:
                     fname_wordlist = (Nshells, chiralities, cells)
