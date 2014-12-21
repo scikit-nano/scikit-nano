@@ -20,11 +20,11 @@ from sknano.core.math import Vector
 from ._compute_funcs import *
 from ._extras import get_Ch_type
 
-__all__ = ['MWNTMixin', 'NanotubeMixin', 'NanotubeBundleMixin',
+__all__ = ['MWNTMixin', 'NanotubeMixin', 'SWNTMixin', 'NanotubeBundleMixin',
            'UnrolledSWNTMixin']
 
 
-class NanotubeMixin(object):
+class SWNTMixin(object):
     """Mixin class for nanotube classes."""
     @property
     def n(self):
@@ -140,6 +140,11 @@ class NanotubeMixin(object):
         return compute_t2(self.n, self.m)
 
     @property
+    def Ch_vec(self):
+        """SWNT chiral vector."""
+        return (self.n, self.m)
+
+    @property
     def Ch(self):
         """SWNT circumference :math:`|\\mathbf{C}_h|` in **\u212b**"""
         return compute_Ch(self.n, self.m, bond=self.bond)
@@ -169,7 +174,13 @@ class NanotubeMixin(object):
 
     @property
     def chiral_type(self):
+        """`SWNT` chiral type."""
         return get_Ch_type((self.n, self.m))
+
+    @property
+    def Tvec(self):
+        """`SWNT` translation vector."""
+        return (self.t1, self.t2)
 
     @property
     def T(self):
@@ -263,6 +274,24 @@ class NanotubeMixin(object):
         return compute_electronic_type(self.n, self.m)
 
     @property
+    def Lz(self):
+        """SWNT length :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**."""
+        return self.nz * self.T / 10
+
+    @property
+    def fix_Lz(self):
+        return self._fix_Lz
+
+    @fix_Lz.setter
+    def fix_Lz(self, value):
+        if not isinstance(value, bool):
+            raise TypeError('Expected `True` or `False`')
+        self._fix_Lz = value
+        self._assert_integer_nz = True
+        if self.fix_Lz:
+            self._assert_integer_nz = False
+
+    @property
     def Natoms(self):
         """Number of atoms in nanotube.
 
@@ -298,6 +327,35 @@ class NanotubeMixin(object):
         return compute_Natoms_per_unit_cell(self.n, self.m)
 
     @property
+    def Natoms_per_tube(self):
+        """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
+        return self.Natoms
+
+    @property
+    def Ntubes(self):
+        """Number of nanotubes."""
+        return 1
+
+    @property
+    def linear_mass_density(self):
+        """Linear mass density of nanotube in g/nm."""
+        return compute_linear_mass_density(self.n, self.m, bond=self.bond,
+                                           element1=self.element1,
+                                           element2=self.element2)
+
+    @property
+    def tube_length(self):
+        """Alias for :attr:`SWNT.Lz`"""
+        return self.Lz
+
+    @property
+    def tube_mass(self):
+        """SWNT mass in **grams**."""
+        return compute_tube_mass(self.n, self.m, self.nz,
+                                 element1=self.element1,
+                                 element2=self.element2)
+
+    @property
     def unit_cell_mass(self):
         """Unit cell mass in atomic mass units."""
         return compute_unit_cell_mass(self.n, self.m,
@@ -305,26 +363,8 @@ class NanotubeMixin(object):
                                       element2=self.element2)
 
     @property
-    def Lz(self):
-        """SWNT length :math:`L_z = L_{\\mathrm{tube}}` in
-        **nanometers**."""
-        return self.nz * self.T
-
-    @property
-    def fix_Lz(self):
-        return self._fix_Lz
-
-    @fix_Lz.setter
-    def fix_Lz(self, value):
-        if not isinstance(value, bool):
-            raise TypeError('Expected `True` or `False`')
-        self._fix_Lz = value
-        self._assert_integer_nz = True
-        if self.fix_Lz:
-            self._assert_integer_nz = False
-
-    @property
     def unit_cell_symmetry_params(self):
+        """Tuple of `SWNT` unit cell *symmetry parameters*."""
         psi, tau = compute_symmetry_operation(self.n, self.m, bond=self.bond)
         aCh = compute_chiral_angle(self.n, self.m, rad2deg=False)
         dpsi = self.bond * np.cos(np.pi / 6 - aCh) / self.rt
@@ -332,33 +372,149 @@ class NanotubeMixin(object):
 
         return psi, tau, dpsi, dtau
 
+NanotubeMixin = SWNTMixin
+
 
 class MWNTMixin(object):
     """Mixin class for MWNTs."""
-    pass
+
+    @property
+    def chiral_types(self):
+        """List of chiral types for each `MWNT` shell."""
+        return [swnt.chiral_type for swnt in self.shells]
+
+    @property
+    def chiral_set(self):
+        """Set of all chiral types in `MWNT`."""
+        return set(self.chiral_types)
+
+    @property
+    def nz(self):
+        """Number of nanotube unit cells along the :math:`z`-axis."""
+        if len(self.chiral_set) == 1:
+            return self.shells[-1].nz
+        return [swnt.nz for swnt in self.shells]
+
+    @property
+    def Lz(self):
+        """MWNT length :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**."""
+        if len(self.chiral_set) == 1:
+            return self.shells[-1].Lz
+        return [swnt.Lz for swnt in self.shells]
+
+    @property
+    def T(self):
+        """Length of `MWNT` unit cell :math:`|\\mathbf{T}|` in \u212b."""
+        if len(self.chiral_set) == 1:
+            return self.shells[-1].T
+        return [swnt.T for swnt in self.shells]
+
+    @property
+    def dt_walls(self):
+        """`MWNT` shell diameters :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}` \
+        in \u212b."""
+        return [swnt.dt for swnt in self.shells]
+
+    @property
+    def rt_walls(self):
+        """`MWNT` shell radii :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}` \
+        in \u212b."""
+        return [swnt.rt for swnt in self.shells]
+
+    @property
+    def dt(self):
+        """`MWNT` shell diameters :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}` \
+        in \u212b."""
+        return self.shells[-1].dt
+
+    @property
+    def rt(self):
+        """`MWNT` shell radii :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}` \
+        in \u212b."""
+        return self.shells[-1].rt
+
+    @property
+    def Natoms(self):
+        """Number of atoms in nanotube.
+
+        .. versionchanged:: 0.3.0
+
+           **Returns total number of atoms per nanotube.**
+           Use :attr:`~MWNT.Natoms_per_unit_cell` to get the number of
+           atoms per unit cell.
+
+        .. math::
+
+           N_{\\mathrm{atoms}} = 2N\\times n_z =
+           \\frac{4(n^2 + m^2 + nm)}{d_R}\\times n_z
+
+        where :math:`N` is the number of graphene hexagons mapped to the
+        nanotube unit cell and :math:`n_z` is the number of unit cells.
+
+        """
+        return np.asarray([swnt.Natoms for swnt in self.shells]).sum()
+
+    @property
+    def Natoms_per_tube(self):
+        """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
+        return self.Natoms
+
+    @property
+    def Ntubes(self):
+        """Number of `MWNT`."""
+        return 1
+
+    @property
+    def Nwalls(self):
+        """Number of `MWNT` walls."""
+        return len(self.shells)
+
+    @property
+    def Nshells(self):
+        return self.Nwalls
+
+    @property
+    def tube_mass(self):
+        """MWNT mass in **grams**."""
+        return np.asarray([swnt.tube_mass for swnt in self.shells]).sum()
+
+    def generate_dt_mask(self, dt, max_dt_diff=0.5):
+        """Generate boolean mask array.
+
+        Parameters
+        ----------
+        dt : float
+        max_dt_diff : float, optional
+
+        Returns
+        -------
+        dt_mask : :class:`~numpy:numpy.ndarray`
+
+        """
+        dt_mask = np.abs(self._dt_pool - dt) <= max_dt_diff
+        while not np.any(dt_mask):
+            max_dt_diff += max_dt_diff
+            dt_mask = np.abs(self._dt_pool - dt) <= max_dt_diff
+        return dt_mask
 
 
 class NanotubeBundleMixin(object):
     """Mixin class for nanotube bundles."""
 
-    def compute_bundle_params(self):
-        """Compute/update nanotube bundle parameters."""
+    def generate_bundle_coords(self):
+        """Generate coordinates of bundle tubes."""
+        self.r1 = Vector()
+        self.r2 = Vector()
+        self.bundle_coords = []
 
         self.r1.x = self.dt + self.vdw_spacing
-        if self.bundle_packing is None and \
-                self.bundle_geometry in ('square', 'rectangle'):
-            self._bundle_packing = 'ccp'
-        elif self.bundle_packing is None and \
-                self.bundle_geometry in ('triangle', 'hexagon'):
-            self._bundle_packing = 'hcp'
-
         if self.bundle_packing in ('cubic', 'ccp'):
             self.r2.y = self.r1.x
         else:
             self.r2.x = self.r1.x * np.cos(2 * np.pi / 3)
             self.r2.y = self.r1.x * np.sin(2 * np.pi / 3)
             if self.bundle_packing is None:
-                self._bundle_packing = 'hcp'
+                self.bundle_packing = 'hcp'
 
         if self.bundle_geometry == 'hexagon':
             nrows = max(self.nx, self.ny, 3)
@@ -453,7 +609,7 @@ class NanotubeBundleMixin(object):
         if value not in ('ccp', 'hcp'):
             raise ValueError('Expected value to be `hcp` or `ccp`')
         self._bundle_packing = value
-        self.compute_bundle_params()
+        self.generate_bundle_coords()
 
     @bundle_packing.deleter
     def bundle_packing(self):
