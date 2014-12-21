@@ -108,7 +108,7 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
         if fname is None:
             Nshells = '{}shell_mwnt'.format(self.Nshells)
             chiralities = '@'.join([str(Ch).replace(' ', '')
-                                    for Ch in self.Ch])
+                                    for Ch in self.Ch_list])
             packing = '{}cp'.format(self.bundle_packing[0])
             Ntubes = '{}tube'.format(self.Ntubes)
 
