@@ -22,5 +22,3 @@ class MWNTBundle(NanotubeBundleBase, MWNT):
     def __init__(self, **kwargs):
 
         super(MWNTBundle, self).__init__(**kwargs)
-
-        #self.shell_bundles = [SWNTBundle(**swnt.todict()
