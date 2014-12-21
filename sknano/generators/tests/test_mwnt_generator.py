@@ -31,7 +31,8 @@ class TestCase(GeneratorTestFixtures):
         self.tmpdata.append(mwnt.fname)
 
     def test3(self):
-        mwnt = MWNTGenerator(Ch=[(5, 5), (10, 10), (20, 20)], nz=5.0)
+        mwnt = MWNTGenerator(Ch=[(5, 5), (10, 10), (20, 20)],
+                             Lz=1.0, fix_Lz=True)
         print(mwnt)
         print(mwnt.todict())
         assert_equal(mwnt.Nwalls, 3)
