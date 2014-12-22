@@ -19,7 +19,7 @@ import numpy as np
 #from sknano.core.math import Vector
 from sknano.structures import MWNT
 from sknano.utils.geometric_shapes import Cuboid
-from ._base import Atoms, GeneratorBase
+from ._base import GeneratorBase
 from ._swnt_generator import SWNTGenerator
 
 __all__ = ['MWNTGenerator']
@@ -38,41 +38,35 @@ class MWNTGenerator(MWNT, GeneratorBase):
 
     Parameters
     ----------
-    Ch : :class:`python:list`, optional
-        List of `MWNT` `SWNT` shell chiralities.
+    Ch_list : :class:`python:list`, optional
+        (:attr:`~SWNT.n`, :attr:`~SWNT.m`) for each `SWNT` wall in `MWNT`.
     Nwalls : int, optional
-        Number of `SWNT` shells in `MWNT`.
+        Number of `SWNT` walls in `MWNT`.
+    Lz : float, optional
+        `MWNT` length in **nanometers**.
+    min_shell_diameter : float, optional
+        Minimum `MWNT` wall diameter, in units of **Angstroms**.
+    max_shell_diameter : float, optional
+        Maximum `MWNT` wall diameter, in units of **Angstroms**.
+    max_shells : int, optional
+        Maximum number of `MWNT` walls.
+    chiral_types : {None, 'armchair', 'zigzag', 'achiral', 'chiral'}, optional
+        If `None`, the :attr:`~SWNT.chiral_type` of each `MWNT` walls
+        will be random and determined by the set of randomly selected
+        chiral indices (:attr:`~SWNT.n`, :attr:`~SWNT.m`).
+    shell_spacing : float, optional
+        Inter-wall spacing in units of **Angstroms**.
+        Default value is the van der Waals interaction distance of 3.4
+        Angstroms.
+    autogen : bool, optional
+        if `True`, automatically call
+        :meth:`~MWNTGenerator.generate_structure_data`.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
         :class:`~sknano.core.Atom` 1 and 2
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
-        nearest neighbor atoms. Must be in units of **Angstroms**.
-    Lz : float, optional
-        length of bundle in :math:`z` dimension in **nanometers**.
-        Overrides the :math:`n_z` value.
-    fix_Lz : bool, optional
-        Generate the nanotube with length as close to the specified
-        :math:`L_z` as possible. If `True`, then
-        non integer :math:`n_z` cells are permitted.
-    min_shell_diameter : float, optional
-        Minimum shell diameter, in units of **Angstroms**.
-    max_shell_diameter : float, optional
-        Maximum shell diameter, in units of **Angstroms**.
-    max_shells : int, optional
-        Maximum number of shells per MWNT.
-    chiral_type : {None, 'AC', 'ZZ', 'achiral', 'chiral'}, optional
-        If `None`, the chiralities of the new shells are constrained only
-        by their diameter and will be chosen randomly if more than one
-        candidate chirality exists. If not `None`, then the
-        `new_shell_type` will be added as a constraint.
-    shell_spacing : float, optional
-        Shell spacing in units of **Angstroms**. Default
-        value is the van der Waals interaction distance of 3.4 Angstroms.
-    autogen : bool, optional
-        if `True`, automatically call
-        :meth:`~MWNTGenerator.generate_unit_cell`,
-        followed by :meth:`~MWNTGenerator.generate_structure_data`.
+        nearest neighbor atoms, in units of **Angstroms**.
     verbose : bool, optional
         if `True`, show verbose output
 
@@ -124,14 +118,13 @@ class MWNTGenerator(MWNT, GeneratorBase):
 
             fname = '_'.join((Nshells, chiralities))
 
-        if self.L0 is not None and self.fix_Lz:
-            Lz_cutoff = (10 * self.L0 + 1) / 2
-            pmax = np.asarray([np.inf, np.inf, Lz_cutoff])
-            pmin = -pmax
-            region_bounds = Cuboid(pmin=pmin.tolist(), pmax=pmax.tolist())
-            region_bounds.update_region_limits()
+        Lz_cutoff = (10 * self.L0 + 1) / 2
+        pmax = np.asarray([np.inf, np.inf, Lz_cutoff])
+        pmin = -pmax
+        region_bounds = Cuboid(pmin=pmin.tolist(), pmax=pmax.tolist())
+        region_bounds.update_region_limits()
 
-            self.atoms.clip_bounds(region_bounds, center_before_clipping=True)
+        self.atoms.clip_bounds(region_bounds, center_before_clipping=True)
 
         if center_CM:
             self.atoms.center_CM()
