@@ -389,39 +389,6 @@ class MWNTMixin(object):
         return set(self.chiral_types)
 
     @property
-    def nz(self):
-        """Number of nanotube unit cells along the :math:`z`-axis."""
-        if len(self.chiral_set) == 1:
-            return self.shells[-1].nz
-        return [swnt.nz for swnt in self.shells]
-
-    @property
-    def Lz(self):
-        """MWNT length :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**."""
-        if len(self.chiral_set) == 1:
-            return self.shells[-1].Lz
-        return [swnt.Lz for swnt in self.shells]
-
-    @property
-    def T(self):
-        """Length of `MWNT` unit cell :math:`|\\mathbf{T}|` in \u212b."""
-        if len(self.chiral_set) == 1:
-            return self.shells[-1].T
-        return [swnt.T for swnt in self.shells]
-
-    @property
-    def dt_walls(self):
-        """`MWNT` shell diameters :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}` \
-        in \u212b."""
-        return [swnt.dt for swnt in self.shells]
-
-    @property
-    def rt_walls(self):
-        """`MWNT` shell radii :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}` \
-        in \u212b."""
-        return [swnt.rt for swnt in self.shells]
-
-    @property
     def dt(self):
         """`MWNT` shell diameters :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}` \
         in \u212b."""
@@ -497,9 +464,122 @@ class MWNTMixin(object):
             dt_mask = np.abs(self._dt_pool - dt) <= max_dt_diff
         return dt_mask
 
+    @property
+    def nz(self):
+        """Number of nanotube unit cells along the :math:`z`-axis."""
+        return [swnt.nz for swnt in self.shells]
+
+    @property
+    def Lz(self):
+        """MWNT length :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**."""
+        return [swnt.Lz for swnt in self.shells]
+
+    @property
+    def T(self):
+        """Length of `MWNT` unit cell :math:`|\\mathbf{T}|` in \u212b."""
+        return [swnt.T for swnt in self.shells]
+
+    @property
+    def wall_diameters(self):
+        """`MWNT` shell diameters :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}` \
+        in \u212b."""
+        return [swnt.dt for swnt in self.shells]
+
+    @property
+    def wall_radii(self):
+        """`MWNT` shell radii :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}` \
+        in \u212b."""
+        return [swnt.rt for swnt in self.shells]
+
 
 class NanotubeBundleMixin(object):
     """Mixin class for nanotube bundles."""
+
+    @property
+    def nx(self):
+        """Number of nanotubes along the :math:`x`-axis."""
+        return self._nx
+
+    @nx.setter
+    def nx(self, value):
+        """Set :math:`n_x`"""
+        if not (isinstance(value, numbers.Number) or value > 0):
+            raise TypeError('Expected a positive integer.')
+        self._nx = int(value)
+
+    @nx.deleter
+    def nx(self):
+        del self._nx
+
+    @property
+    def ny(self):
+        """Number of nanotubes along the :math:`y`-axis."""
+        return self._ny
+
+    @ny.setter
+    def ny(self, value):
+        """Set :math:`n_y`"""
+        if not (isinstance(value, numbers.Number) or value > 0):
+            raise TypeError('Expected a positive integer.')
+        self._ny = int(value)
+
+    @ny.deleter
+    def ny(self):
+        del self._ny
+
+    @property
+    def Lx(self):
+        return self.nx * (self.dt + self.vdw_spacing) / 10
+
+    @property
+    def Ly(self):
+        return self.ny * (self.dt + self.vdw_spacing) / 10
+
+    @property
+    def bundle_geometry(self):
+        return self._bundle_geometry
+
+    @bundle_geometry.setter
+    def bundle_geometry(self, value):
+        if value is not None and value not in self._bundle_geometries:
+            print('Unrecognized `bundle_geometry`: {!r}'.format(value))
+            value = None
+        self._bundle_geometry = value
+
+    @property
+    def bundle_packing(self):
+        return self._bundle_packing
+
+    @bundle_packing.setter
+    def bundle_packing(self, value):
+        if value is None and \
+                self.bundle_geometry in ('square', 'rectangle'):
+            value = 'ccp'
+        elif value is None and \
+                self.bundle_geometry in ('triangle', 'hexagon'):
+            value = 'hcp'
+
+        if value is not None and value not in ('ccp', 'hcp'):
+            raise ValueError('Expected value to be `hcp` or `ccp`')
+
+        self._bundle_packing = value
+        self.generate_bundle_coords()
+
+    @bundle_packing.deleter
+    def bundle_packing(self):
+        del self._bundle_packing
+
+    @property
+    def bundle_mass(self):
+        return self.Ntubes * self.tube_mass
+
+    @property
+    def Natoms_per_bundle(self):
+        return self.Ntubes * self.Natoms_per_tube
+
+    @property
+    def Ntubes(self):
+        return len(self.bundle_coords)
 
     def generate_bundle_coords(self):
         """Generate coordinates of bundle tubes."""
@@ -559,73 +639,6 @@ class NanotubeBundleMixin(object):
                 for ny in range(self.ny):
                     dr = nx * self.r1 + ny * self.r2
                     self.bundle_coords.append(dr)
-
-    @property
-    def nx(self):
-        """Number of nanotubes along the :math:`x`-axis."""
-        return self._nx
-
-    @nx.setter
-    def nx(self, value):
-        """Set :math:`n_x`"""
-        if not (isinstance(value, numbers.Number) or value > 0):
-            raise TypeError('Expected a positive integer.')
-        self._nx = int(value)
-
-    @nx.deleter
-    def nx(self):
-        del self._nx
-
-    @property
-    def ny(self):
-        """Number of nanotubes along the :math:`y`-axis."""
-        return self._ny
-
-    @ny.setter
-    def ny(self, value):
-        """Set :math:`n_y`"""
-        if not (isinstance(value, numbers.Number) or value > 0):
-            raise TypeError('Expected a positive integer.')
-        self._ny = int(value)
-
-    @ny.deleter
-    def ny(self):
-        del self._ny
-
-    @property
-    def Lx(self):
-        return self.nx * (self.dt + self.vdw_spacing) / 10
-
-    @property
-    def Ly(self):
-        return self.ny * (self.dt + self.vdw_spacing) / 10
-
-    @property
-    def bundle_packing(self):
-        return self._bundle_packing
-
-    @bundle_packing.setter
-    def bundle_packing(self, value):
-        if value not in ('ccp', 'hcp'):
-            raise ValueError('Expected value to be `hcp` or `ccp`')
-        self._bundle_packing = value
-        self.generate_bundle_coords()
-
-    @bundle_packing.deleter
-    def bundle_packing(self):
-        del self._bundle_packing
-
-    @property
-    def bundle_mass(self):
-        return self.Ntubes * self.tube_mass
-
-    @property
-    def Natoms_per_bundle(self):
-        return self.Ntubes * self.Natoms_per_tube
-
-    @property
-    def Ntubes(self):
-        return len(self.bundle_coords)
 
 
 class UnrolledSWNTMixin(object):
