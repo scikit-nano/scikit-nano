@@ -310,7 +310,7 @@ class SWNTMixin(object):
         nanotube unit cell and :math:`n_z` is the number of unit cells.
 
         """
-        return compute_Natoms(self.n, self.m, self.nz)
+        return self.Natoms_per_tube
 
     @property
     def Natoms_per_unit_cell(self):
@@ -329,7 +329,7 @@ class SWNTMixin(object):
     @property
     def Natoms_per_tube(self):
         """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
-        return self.Natoms
+        return compute_Natoms(self.n, self.m, nz=self.nz)
 
     @property
     def Ntubes(self):
@@ -351,7 +351,7 @@ class SWNTMixin(object):
     @property
     def tube_mass(self):
         """SWNT mass in **grams**."""
-        return compute_tube_mass(self.n, self.m, self.nz,
+        return compute_tube_mass(self.n, self.m, nz=self.nz,
                                  element1=self.element1,
                                  element2=self.element2)
 
@@ -419,16 +419,16 @@ class MWNTMixin(object):
         nanotube unit cell and :math:`n_z` is the number of unit cells.
 
         """
-        return np.asarray([swnt.Natoms for swnt in self.shells]).sum()
+        return self.Natoms_per_tube
 
     @property
     def Natoms_per_tube(self):
-        """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
-        return self.Natoms
+        """Number of atoms in `MWNT`."""
+        return np.asarray([swnt.Natoms for swnt in self.shells]).sum()
 
     @property
     def Ntubes(self):
-        """Number of `MWNT`."""
+        """Number of `MWNT`\ s."""
         return 1
 
     @property
@@ -563,7 +563,7 @@ class NanotubeBundleMixin(object):
             raise ValueError('Expected value to be `hcp` or `ccp`')
 
         self._bundle_packing = value
-        self.generate_bundle_coords()
+        #self.generate_bundle_coords()
 
     @bundle_packing.deleter
     def bundle_packing(self):
@@ -572,6 +572,15 @@ class NanotubeBundleMixin(object):
     @property
     def bundle_mass(self):
         return self.Ntubes * self.tube_mass
+
+    @property
+    def Natoms(self):
+        return self.Natoms_per_bundle
+
+    @property
+    def Natoms_per_tube(self):
+        """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
+        return super(NanotubeBundleMixin, self).Natoms_per_tube
 
     @property
     def Natoms_per_bundle(self):
