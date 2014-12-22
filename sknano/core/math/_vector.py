@@ -10,6 +10,7 @@ Custom NumPy Vector class (:mod:`sknano.core.math._vector`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
+import copy
 import numbers
 import numpy as np
 
@@ -395,6 +396,17 @@ class Vector(np.ndarray):
 
     def __ne__(self, other):
         return not self == other
+
+    #def __copy__(self):
+    #    pass
+
+    def __deepcopy__(self, memo):
+        cp = self.__class__(self.__array__(), p0=self.p0)
+        #memo[id(self)] = cp
+        #for attr in dir(self):
+        #    if not attr.startswith('_'):
+        #        setattr(cp, attr, copy.deepcopy(getattr(self, attr), memo))
+        return cp
 
     def _update_p(self):
         self._p[:] = self._p0[:] + self.__array__()
