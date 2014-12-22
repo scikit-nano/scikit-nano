@@ -34,9 +34,9 @@ STRUCTURE_GENERATORS = ('FullereneGenerator',
 class GeneratorBase(object):
     """Base class for generator classes"""
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         self.structure_data = StructureData()
-        super(GeneratorBase, self).__init__(**kwargs)
+        super(GeneratorBase, self).__init__(*args, **kwargs)
 
     @property
     def atoms(self):

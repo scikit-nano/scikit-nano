@@ -20,9 +20,9 @@ __all__ = ['SWNTBundle']
 class SWNTBundle(NanotubeBundleBase, SWNT):
     """SWNT bundle structure class."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, *Ch, **kwargs):
 
-        super(SWNTBundle, self).__init__(**kwargs)
+        super(SWNTBundle, self).__init__(*Ch, **kwargs)
 
     @property
     def bundle_density(self):

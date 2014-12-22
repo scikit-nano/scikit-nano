@@ -71,9 +71,7 @@ class SWNTGenerator(SWNT, GeneratorBase):
         .. versionadded:: 0.2.6
 
     autogen : bool, optional
-        if `True`, automatically call
-        :meth:`~SWNTGenerator.generate_unit_cell`,
-        followed by :meth:`~SWNTGenerator.generate_structure_data`.
+        if `True`, automatically generate structure data.
     verbose : bool, optional
         if `True`, show verbose output
 
@@ -98,9 +96,9 @@ class SWNTGenerator(SWNT, GeneratorBase):
     .. image:: /images/10,5_unit_cell_perspective_view.png
 
     """
-    def __init__(self, autogen=True, **kwargs):
+    def __init__(self, *Ch, autogen=True, **kwargs):
 
-        super(SWNTGenerator, self).__init__(**kwargs)
+        super(SWNTGenerator, self).__init__(*Ch, **kwargs)
 
         if autogen:
             self.generate_unit_cell()
@@ -198,19 +196,16 @@ class SWNTGenerator(SWNT, GeneratorBase):
             fname = '_'.join(fname_wordlist)
 
         if self.L0 is not None and self.fix_Lz:
-            Lz_cutoff = 10 * self.L0 + 1
-            pmin = [-np.inf, -np.inf, -Lz_cutoff]
-            pmax = [np.inf, np.inf, Lz_cutoff]
-            region_bounds = Cuboid(pmin=pmin, pmax=pmax)
+            Lz_cutoff = (10 * self.L0 + 1) / 2
+            pmax = np.asarray([np.inf, np.inf, Lz_cutoff])
+            pmin = -pmax
+            region_bounds = Cuboid(pmin=pmin.tolist(), pmax=pmax.tolist())
             region_bounds.update_region_limits()
 
             self.atoms.clip_bounds(region_bounds, center_before_clipping=True)
 
-        if center_CM:
-            self.atoms.center_CM()
-
         super(SWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
-            anchor_point=anchor_point, deg2rad=deg2rad, center_CM=False,
+            anchor_point=anchor_point, deg2rad=deg2rad, center_CM=center_CM,
             savecopy=savecopy, **kwargs)

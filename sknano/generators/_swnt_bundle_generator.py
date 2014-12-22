@@ -57,9 +57,9 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
 
         .. versionadded:: 0.2.5
 
-    Lx, Ly, Lz : float, optional
-        length of bundle in :math:`x, y, z` dimensions in **nanometers**.
-        Overrides the :math:`n_x, n_y, n_z` cell values.
+    Lz : float, optional
+        length of bundle in :math:`z` dimension in **nanometers**.
+        Overrides `nz` value.
 
         .. versionadded:: 0.2.5
 
@@ -71,9 +71,7 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
         .. versionadded:: 0.2.6
 
     autogen : bool, optional
-        if `True`, automatically call
-        :meth:`~NanotubeGenerator.generate_unit_cell`,
-        followed by :meth:`~NanotubeGenerator.generate_structure_data`.
+        if `True`, automatically generate structure data.
     verbose : bool, optional
         if `True`, show verbose output
 
@@ -147,9 +145,9 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
 
     """
 
-    def __init__(self, autogen=True, **kwargs):
+    def __init__(self, *Ch, autogen=True, **kwargs):
 
-        super(SWNTBundleGenerator, self).__init__(autogen=False, **kwargs)
+        super(SWNTBundleGenerator, self).__init__(*Ch, autogen=False, **kwargs)
 
         if autogen:
             super(SWNTBundleGenerator, self).generate_unit_cell()

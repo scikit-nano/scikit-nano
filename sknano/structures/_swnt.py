@@ -127,8 +127,19 @@ class SWNT(SWNTMixin, StructureBase):
                         'chiral_angle', 'Ch', 'T', 'dt', 'rt',
                         'electronic_type']
 
-    def __init__(self, n=10, m=0, nz=None, tube_length=None, Lz=None,
+    def __init__(self, *Ch, nz=None, tube_length=None, Lz=None,
                  fix_Lz=False, **kwargs):
+
+        try:
+            n, m = Ch
+        except ValueError:
+            try:
+                n, m = Ch[0]
+            except IndexError:
+                n = kwargs['n']
+                del kwargs['n']
+                m = kwargs['m']
+                del kwargs['m']
 
         super(SWNT, self).__init__(**kwargs)
 
@@ -178,14 +189,15 @@ class SWNT(SWNTMixin, StructureBase):
 
     def __repr__(self):
         """Return canonical string representation of `SWNT`."""
-        strrep = "SWNT(n={!r}, m={!r}, element1={!r}, element2={!r}, bond={!r}"
+        strrep = "SWNT({!r}, element1={!r}, element2={!r}, bond={!r}"
+        Ch = (self.n, self.m)
         if self.fix_Lz:
             strrep += ", Lz={!r}, fix_Lz={!r})"
-            return strrep.format(self.n, self.m, self.element1, self.element2,
+            return strrep.format(Ch, self.element1, self.element2,
                                  self.bond, self.Lz, self.fix_Lz)
         else:
             strrep += ", nz={!r})"
-            return strrep.format(self.n, self.m, self.element1, self.element2,
+            return strrep.format(Ch, self.element1, self.element2,
                                  self.bond, self.nz)
 
     def todict(self):
