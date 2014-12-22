@@ -26,9 +26,9 @@ __all__ = ['MWNT']
 
 class MWNT(MWNTMixin, StructureBase):
     """MWNT structure class."""
-    def __init__(self, Ch_list=None, Nwalls=None, Lz=None, fix_Lz=False,
+    def __init__(self, Ch_list=None, Nwalls=None, Lz=None,
                  min_shell_diameter=None, max_shell_diameter=None,
-                 max_shells=None, chiral_type=None, shell_spacing=dVDW,
+                 max_shells=None, chiral_types=None, shell_spacing=dVDW,
                  **kwargs):
         if Ch_list is None and 'Ch' in kwargs:
             Ch_list = kwargs['Ch']
@@ -58,7 +58,7 @@ class MWNT(MWNTMixin, StructureBase):
             #                if not n == m == 0])
             self._Ch_pool = \
                 np.asarray(generate_Ch_list(imax=imax,
-                                            chiral_type=chiral_type))
+                                            chiral_type=chiral_types))
             self._dt_pool = np.asarray([compute_dt(_Ch, bond=self.bond) for _Ch
                                        in self._Ch_pool])
 
@@ -85,13 +85,15 @@ class MWNT(MWNTMixin, StructureBase):
                 for _mask in dt_masks]
 
         self.Ch_list = Ch_list[:]
-        self.shells = \
-            [SWNT(n=_Ch[0], m=_Ch[-1], Lz=Lz, fix_Lz=fix_Lz, **kwargs)
-             for _Ch in self.Ch_list]
 
+        if Lz is None:
+            Lz = 1.0
         self.L0 = Lz
 
-        self.fix_Lz = fix_Lz
+        self.shells = \
+            [SWNT(n=_Ch[0], m=_Ch[-1], Lz=Lz, fix_Lz=True, **kwargs)
+             for _Ch in self.Ch_list]
+
         #if Lz is not None:
         #    self.nz = 10 * float(Lz) / min([shell.T for shell in self.shells])
         #elif nz is not None:
@@ -104,13 +106,13 @@ class MWNT(MWNTMixin, StructureBase):
 
     def __repr__(self):
         """Return canonical string representation of `MWNT`."""
-        strrep = "MWNT(Ch_list={!r}, Nwalls={!r}, Lz={!r}, fix_Lz={!r}, " + \
+        strrep = "MWNT(Ch_list={!r}, Nwalls={!r}, Lz={!r}, " + \
             "element1={!r}, element2={!r}, bond={!r})"
-        return strrep.format(self.Ch_list, self.Nwalls, self.Lz, self.fix_Lz,
+        return strrep.format(self.Ch_list, self.Nwalls, self.Lz,
                              self.element1, self.element2, self.bond)
 
     def todict(self):
         """Return :class:`~python:dict` of `MWNT` attributes."""
         return dict(Ch_list=self.Ch_list, Nwalls=self.Nwalls, Lz=self.Lz,
-                    fix_Lz=self.fix_Lz, element1=self.element1,
-                    element2=self.element2, bond=self.bond)
+                    element1=self.element1, element2=self.element2,
+                    bond=self.bond)

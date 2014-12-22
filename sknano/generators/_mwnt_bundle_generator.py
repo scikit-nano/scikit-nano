@@ -27,37 +27,28 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
 
     Parameters
     ----------
-    Ch : :class:`python:list`, optional
-        List of `MWNT` `SWNT` shell chiralities.
+    Ch_list : :class:`python:list`, optional
+        (:attr:`~SWNT.n`, :attr:`~SWNT.m`) for each `SWNT` wall in `MWNT`.
+    Nwalls : int, optional
+        Number of `SWNT` walls in `MWNT`.
+    Lz : float, optional
+        `MWNT` length in **nanometers**.
+    min_shell_diameter : float, optional
+        Minimum `MWNT` wall diameter, in units of **Angstroms**.
+    max_shell_diameter : float, optional
+        Maximum `MWNT` wall diameter, in units of **Angstroms**.
+    max_shells : int, optional
+        Maximum number of `MWNT` walls.
+    chiral_types : {None, 'armchair', 'zigzag', 'achiral', 'chiral'}, optional
+        If `None`, the :attr:`~SWNT.chiral_type` of each `MWNT` walls
+        will be random and determined by the set of randomly selected
+        chiral indices (:attr:`~SWNT.n`, :attr:`~SWNT.m`).
+    shell_spacing : float, optional
+        Inter-wall spacing in units of **Angstroms**.
+        Default value is the van der Waals interaction distance of 3.4
+        Angstroms.
     nx, ny : int, optional
         Number of repeat unit cells in the :math:`x, y` dimensions.
-    element1, element2 : {str, int}, optional
-        Element symbol or atomic number of basis
-        :class:`~sknano.core.Atom` 1 and 2
-    bond : float, optional
-        :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
-        nearest neighbor atoms. Must be in units of **Angstroms**.
-    Lx, Ly, Lz : float, optional
-        length of bundle in :math:`x, y, z` dimensions in **nanometers**.
-        Overrides the :math:`n_x, n_y, n_z` cell values.
-    fix_Lz : bool, optional
-        Generate the nanotube with length as close to the specified
-        :math:`L_z` as possible. If `True`, then
-        non integer :math:`n_z` cells are permitted.
-    max_shells : int, optional
-        Maximum number of shells per MWNT.
-    max_shell_diameter : float, optional
-        Maximum shell diameter, in units of **Angstroms**.
-    min_shell_diameter : float, optional
-        Minimum shell diameter, in units of **Angstroms**.
-    chiral_type : {None, 'AC', 'ZZ', 'achiral', 'chiral'}, optional
-        If `None`, the chiralities of the new shells are constrained only
-        by their diameter and will be chosen randomly if more than one
-        candidate chirality exists. If not `None`, then the
-        `new_shell_type` will be added as a constraint.
-    shell_spacing : float, optional
-        Shell spacing in units of **Angstroms**. Default
-        value is the van der Waals interaction distance of 3.4 Angstroms.
     vdw_spacing : float, optional
         van der Waals distance between nearest neighbor tubes
     bundle_packing : {'hcp', 'ccp'}, optional
@@ -68,8 +59,13 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
     bundle_geometry : {'triangle', 'hexagon', 'square', 'rectangle'}, optional
     autogen : bool, optional
         if `True`, automatically call
-        :meth:`~MWNTGenerator.generate_unit_cell`,
-        followed by :meth:`~MWNTGenerator.generate_structure_data`.
+        :meth:`~MWNTBundleGenerator.generate_structure_data`.
+    element1, element2 : {str, int}, optional
+        Element symbol or atomic number of basis
+        :class:`~sknano.core.Atom` 1 and 2
+    bond : float, optional
+        :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
+        nearest neighbor atoms, in units of **Angstroms**.
     verbose : bool, optional
         if `True`, show verbose output
 
