@@ -13,7 +13,7 @@ __docformat__ = 'restructuredtext en'
 import copy
 #import itertools
 
-from ._base import Atoms
+#from ._base import Atoms
 #from sknano.core.math import Vector
 
 __all__ = ['CappedNanotubeGeneratorMixin',
@@ -31,11 +31,10 @@ class NanotubeBundleGeneratorMixin(object):
     """Mixin class for generating nanotube bundles."""
 
     def generate_bundle(self):
-        self._atomsobj0 = copy.deepcopy(self.atoms)
+        atomsobj0 = copy.deepcopy(self.atoms)
+        atomsobj0.center_CM()
         self.structure_data.clear()
-        #self.atoms = Atoms()
         for dr in self.bundle_coords:
-            atomsobj = Atoms(atoms=self._atomsobj0, deepcopy=True)
-            atomsobj.center_CM()
+            atomsobj = copy.deepcopy(atomsobj0)
             atomsobj.translate(dr)
             self.atoms.extend(atomsobj)
