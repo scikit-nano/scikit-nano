@@ -91,8 +91,7 @@ class MWNT(MWNTMixin, StructureBase):
         self.L0 = Lz
 
         self.shells = \
-            [SWNT(n=_Ch[0], m=_Ch[-1], Lz=Lz, fix_Lz=True, **kwargs)
-             for _Ch in self.Ch_list]
+            [SWNT(Ch, Lz=Lz, fix_Lz=True, **kwargs) for Ch in self.Ch_list]
 
         #if Lz is not None:
         #    self.nz = 10 * float(Lz) / min([shell.T for shell in self.shells])
