@@ -27,9 +27,10 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
-        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
+        :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     nx, ny, nz : int, optional
         Number of repeat unit cells in the :math:`x, y, z` dimensions.
     element1, element2 : {str, int}, optional
