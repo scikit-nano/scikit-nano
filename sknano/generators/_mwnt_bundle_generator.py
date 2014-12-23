@@ -77,7 +77,7 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
     ...                                  bundle_geometry='hexagon')
     >>> mwntbundle.save_data()
 
-    .. image:: /images/5shell_mwnt_(1,6)@(11,7)@(18,9)@(31,2)@(41,0)_hcp_7tube_hexagon-perspective_view-03.png
+    .. image:: /images/5shell_mwnt_(1,6)@(11,7)@(18,9)@(31,2)@(41,0)_hcp_7tube_hexagon-perspective_view-01.png
 
     """
     def __init__(self, autogen=True, **kwargs):
