@@ -73,11 +73,11 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
     --------
 
     >>> from sknano.generators import MWNTBundleGenerator
-    >>> mwntbundle = MWNTBundleGenerator(max_shells=5, Lz=1.0, fix_Lz=True,
+    >>> mwntbundle = MWNTBundleGenerator(Nwalls=5, min_shell_diameter=5, Lz=5,
     ...                                  bundle_geometry='hexagon')
     >>> mwntbundle.save_data()
 
-    .. image:: /images/5shell_mwnt_4040_outer_Ch_hcp_7tube_hexagon-01.png
+    .. image:: /images/5shell_mwnt_(1,6)@(11,7)@(18,9)@(31,2)@(41,0)_hcp_7tube_hexagon-perspective_view-03.png
 
     """
     def __init__(self, autogen=True, **kwargs):
