@@ -42,7 +42,7 @@ class SWNTGenerator(SWNT, GeneratorBase):
         Either a 2-tuple of ints or 2 integers giving the chiral indices
         of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-        nz : :class:`python:int`, optional
+    nz : :class:`python:int`, optional
         Number of repeat unit cells in the :math:`z` direction, along
         the *length* of the nanotube.
     element1, element2 : {str, int}, optional
