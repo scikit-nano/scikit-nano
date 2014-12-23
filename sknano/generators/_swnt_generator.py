@@ -25,7 +25,7 @@ __docformat__ = 'restructuredtext en'
 import numpy as np
 
 from sknano.core import pluralize
-from sknano.core.math import Vector
+from sknano.core.math import Point, Vector
 from sknano.structures import SWNT
 from sknano.utils.geometric_shapes import Cuboid
 from ._base import Atom, Atoms, GeneratorBase
@@ -38,10 +38,11 @@ class SWNTGenerator(SWNT, GeneratorBase):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
-        :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
-    nz : int, optional
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
+        :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+        nz : :class:`python:int`, optional
         Number of repeat unit cells in the :math:`z` direction, along
         the *length* of the nanotube.
     element1, element2 : {str, int}, optional
@@ -82,18 +83,18 @@ class SWNTGenerator(SWNT, GeneratorBase):
     >>> from sknano.generators import SWNTGenerator
 
     Now let's generate a :math:`\\mathbf{C}_{\\mathrm{h}} = (10, 5)`
-    SWCNT unit cell.
+    SWNT unit cell.
 
-    >>> nt = SWNTGenerator(n=10, m=5)
+    >>> swnt = SWNTGenerator((10, 5))
     >>> nt.save_data(fname='10,5_unit_cell.xyz')
+    >>> # note that there are two other alternative, but equivalent
+    >>> # means of passing arguments to SWNTGenerator constructor:
+    >>> # SWNTGenerator(10, 5) and SWNTGenerator(n=10, m=5)
 
-    The rendered structure looks like (orhographic view):
+    Here's a nice ray traced rendering of the generated
+    :math:`(10, 5)` `SWNT` unit cell.
 
-    .. image:: /images/10,5_unit_cell_orthographic_view.png
-
-    and the perspective view:
-
-    .. image:: /images/10,5_unit_cell_perspective_view.png
+    .. image:: /images/10,5_unit_cell-01.png
 
     """
     def __init__(self, *Ch, autogen=True, **kwargs):
@@ -178,6 +179,13 @@ class SWNTGenerator(SWNT, GeneratorBase):
                 nt_atom.r = uc_atom.r + dr
                 self.atoms.append(nt_atom)
 
+        if self.L0 is not None and self.fix_Lz:
+            Lz_cutoff = 10 * self.L0 + 1
+            region_bounds = Cuboid(pmin=Point([-np.inf, -np.inf, 0]),
+                                   pmax=Point([np.inf, np.inf, Lz_cutoff]))
+            region_bounds.update_region_limits()
+            self.atoms.clip_bounds(region_bounds)
+
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   rotation_angle=None, rot_axis=None, anchor_point=None,
                   deg2rad=True, center_CM=True, savecopy=True, **kwargs):
@@ -194,15 +202,6 @@ class SWNTGenerator(SWNT, GeneratorBase):
             nz = ''.join((nz.format(self.nz), pluralize('cell', self.nz)))
             fname_wordlist = (chirality, nz)
             fname = '_'.join(fname_wordlist)
-
-        if self.L0 is not None and self.fix_Lz:
-            Lz_cutoff = (10 * self.L0 + 1) / 2
-            pmax = np.asarray([np.inf, np.inf, Lz_cutoff])
-            pmin = -pmax
-            region_bounds = Cuboid(pmin=pmin.tolist(), pmax=pmax.tolist())
-            region_bounds.update_region_limits()
-
-            self.atoms.clip_bounds(region_bounds, center_before_clipping=True)
 
         super(SWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
