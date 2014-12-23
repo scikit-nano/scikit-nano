@@ -13,12 +13,12 @@ __docformat__ = 'restructuredtext en'
 
 #import copy
 
-import numpy as np
+#import numpy as np
 
 #from sknano.core import pluralize
 #from sknano.core.math import Vector
 from sknano.structures import MWNT
-from sknano.utils.geometric_shapes import Cuboid
+#from sknano.utils.geometric_shapes import Cuboid
 from ._base import GeneratorBase
 from ._swnt_generator import SWNTGenerator
 
@@ -74,11 +74,22 @@ class MWNTGenerator(MWNT, GeneratorBase):
     --------
 
     >>> from sknano.generators import MWNTGenerator
-    >>> mwnt = MWNTGenerator(Nwalls=5, max_shell_diameter=50,
-    ...                      Lz=1.0, fix_Lz=True)
-    >>> mwnt.save_data()
+    >>> MWNTGenerator(Nwalls=5, min_shell_diameter=10, Lz=5).save_data()
 
-    .. image:: /images/5shell_mwnt_4040_outer_Ch_1cellx1cellx4.06cells-01.png
+    The above command generated a 5 wall,  10 **nanometer** long `MWNT`.
+    The only constraints on the `MWNT` shell chiralities were the diameter
+    constraints imposed by the `min_shell_diameter` parameter,
+    which set the minimum shell diameter to 10 Angstroms,
+    as well as the minimum wall-to-wall separation, which
+    defaults to the van der Waals distance of 3.4 Angstroms.
+
+    This `MWNT` chirality may be written as:
+
+    :math:`\\mathbf{C}_{\\mathrm{h}} = (8,7)@(17,8)@(9,24)@(27,18)@(22,32)`
+
+    Here's a colorful rendering of the generated `MWNT` structure:
+
+    .. image:: /images/5shell_mwnt_(8,7)@(17,8)@(9,24)@(27,18)@(22,32)-04.png
 
     """
     def __init__(self, autogen=True, **kwargs):
@@ -118,19 +129,8 @@ class MWNTGenerator(MWNT, GeneratorBase):
 
             fname = '_'.join((Nshells, chiralities))
 
-        Lz_cutoff = (10 * self.L0 + 1) / 2
-        pmax = np.asarray([np.inf, np.inf, Lz_cutoff])
-        pmin = -pmax
-        region_bounds = Cuboid(pmin=pmin.tolist(), pmax=pmax.tolist())
-        region_bounds.update_region_limits()
-
-        self.atoms.clip_bounds(region_bounds, center_before_clipping=True)
-
-        if center_CM:
-            self.atoms.center_CM()
-
         super(MWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
             rotation_angle=rotation_angle, rot_axis=rot_axis,
-            anchor_point=anchor_point, deg2rad=deg2rad, center_CM=False,
+            anchor_point=anchor_point, deg2rad=deg2rad, center_CM=center_CM,
             savecopy=savecopy, **kwargs)
