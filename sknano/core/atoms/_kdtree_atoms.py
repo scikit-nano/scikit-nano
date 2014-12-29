@@ -215,7 +215,7 @@ class KDTAtoms(XAtoms):
             for j, atom in enumerate(self):
                 atom.NN = self.__class__()
                 for k, d in enumerate(NNd[j]):
-                    if d < self.NNrc:
+                    if d <= self.NNrc:
                         atom.NN.append(self[NNi[j][k]])
         except ValueError:
             pass
