@@ -11,10 +11,6 @@ from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
 import copy
-#import itertools
-
-#from ._base import Atoms
-#from sknano.core.math import Vector
 
 __all__ = ['CappedNanotubeGeneratorMixin',
            'NanotubeBundleGeneratorMixin']
