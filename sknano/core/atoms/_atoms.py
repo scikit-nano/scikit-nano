@@ -42,7 +42,8 @@ class Atoms(UserList):
                                     deepcopy=deepcopy)
 
     def __str__(self):
-        return repr(self)
+        """Return a nice string representation of `Atoms`."""
+        return '\n'.join([str(atom) for atom in self])
 
     def __repr__(self):
         """Return canonical string representation of `Atoms`."""

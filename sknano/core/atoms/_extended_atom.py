@@ -87,14 +87,8 @@ class XAtom(Atom):
         self.ke = ke
         self.etotal = etotal
 
-    def __str__(self):
-        """Return nice string representation of `XAtom`."""
-        strrep = "Atom(element={element!r}, atomID={atomID!r}, " + \
+        self.strrep = "Atom(element={element!r}, atomID={atomID!r}, " + \
             "moleculeID={moleculeID!r}, atomtype={atomtype!r})"
-        parameters = dict(element=self.element, atomID=self.atomID,
-                          moleculeID=self.moleculeID, atomtype=self.atomtype)
-
-        return strrep.format(**parameters)
 
     def __repr__(self):
         """Return canonical string representation of `XAtom`."""
@@ -102,13 +96,8 @@ class XAtom(Atom):
             "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
             "q={q!r}, mass={mass!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " \
             "pe={pe!r}, ke={ke!r}, etotal={etotal!r})"
-        parameters = dict(element=self.element, atomID=self.atomID,
-                          moleculeID=self.moleculeID, atomtype=self.atomtype,
-                          q=self.q, mass=self.mass,
-                          x=self.x, y=self.y, z=self.z,
-                          pe=self.pe, ke=self.ke, etotal=self.etotal)
 
-        return reprstr.format(**parameters)
+        return reprstr.format(**self.todict())
 
     def __eq__(self, other):
         return super(XAtom, self).__eq__(other)

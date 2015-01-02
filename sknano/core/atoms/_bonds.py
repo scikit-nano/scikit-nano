@@ -43,7 +43,7 @@ class Bonds(UserList):
 
     def __str__(self):
         """Return a nice string representation of `Bonds`."""
-        return "Bonds({!s})".format(self.data)
+        return '\n'.join([str(bond) for bond in self])
 
     def __repr__(self):
         """Return the canonical string representation of `Bonds`."""

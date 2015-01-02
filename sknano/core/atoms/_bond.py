@@ -21,25 +21,28 @@ __all__ = ['Bond']
 
 @total_ordering
 class Bond(object):
-    """Abstract representation of a "bond" between 2 `Atom` objects.
+    """Abstract representation of bond between 2 `Atom` objects.
 
     Parameters
     ----------
-    atom1, atom2 : `~sknano.core.atoms.XAtom` instances
+    atom1, atom2 : `~sknano.core.atoms.Atom` instances
 
     """
+    __hash__ = object.__hash__
+
     def __init__(self, atom1, atom2):
         self._atoms = sknano.core.atoms.StructureAtoms(atoms=[atom1, atom2])
         self._vector = Vector(atom2.r - atom1.r, p0=atom1.r.p)
 
     def __str__(self):
-        """Return a nice string representation of atom."""
-        strrep = "{!s}={!s}\nv={!s}\n|v|={!s}"
-        return strrep.format(self.atom1.element, self.atom2.element,
-                             self.vector, self.length)
+        """Return nice string representation of `Bond`."""
+        #strrep = "{!s}={!s}\nv={!s}\n|v|={!s}"
+        #return strrep.format(self.atom1.element, self.atom2.element,
+        #                     self.vector, self.length)
+        return "Bond({!r}->{!r})".format(self.atom1.atomID, self.atom2.atomID)
 
     def __repr__(self):
-        """Return canonical string representation of atom."""
+        """Return canonical string representation of `Bond`."""
         return "Bond({!r}, {!r})".format(self.atom1, self.atom2)
 
     def __eq__(self, other):
@@ -83,6 +86,7 @@ class Bond(object):
 
     @property
     def unit_vector(self):
+        """`Bond` :attr:`~sknano.core.math.Vector.unit_vector`."""
         return self.vector.unit_vector
 
     @property
