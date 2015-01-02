@@ -27,7 +27,6 @@ except ImportError:
                       'nearest-neighbor queries between atoms.')
 
 from ._extended_atoms import XAtoms
-from ._bond import Bond
 from ._bonds import Bonds
 
 __all__ = ['KDTAtoms']
@@ -199,14 +198,12 @@ class KDTAtoms(XAtoms):
     def update_bonds(self):
         """Update :attr:`KDTAtom.bonds` list."""
         #self._update_nearest_neighbors()
-        for atom in self:
-            atom.bonds = Bonds()
-            [atom.bonds.append(Bond(atom, nn)) for nn in atom.NN]
+        [atom.update_bonds() for atom in self]
 
     def update_coordination_numbers(self):
         """Update :attr:`KDTAtom.CN`."""
         #self._update_nearest_neighbors()
-        [setattr(atom, 'CN', atom.NN.Natoms) for atom in self]
+        [atom.update_CN() for atom in self]
 
     def update_nearest_neighbors(self):
         """Update :attr:`KDTAtom.NN`."""

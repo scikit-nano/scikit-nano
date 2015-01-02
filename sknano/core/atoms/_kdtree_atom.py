@@ -15,6 +15,7 @@ __docformat__ = 'restructuredtext en'
 import numbers
 
 import sknano.core.atoms
+from ._bond import Bond
 from ._bonds import Bonds
 from ._extended_atom import XAtom
 
@@ -49,32 +50,18 @@ class KDTAtom(XAtom):
             bonds = Bonds()
         self.bonds = bonds
 
-    def __str__(self):
-        """Return a nice string representation of `KDTAtom`."""
-        strrep = "Atom(element={element!r}, atomID={atomID!r}, " + \
-            "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
-            "q={q!r}, m={m!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
-            "CN={CN!r}, NN={NN!s}, bonds={bonds!s})"
-
-        parameters = dict(element=self.element, atomID=self.atomID,
-                          moleculeID=self.moleculeID, atomtype=self.atomtype,
-                          q=self.q, m=self.m, x=self.x, y=self.y, z=self.z,
-                          CN=self.CN, NN=self.NN, bonds=self.bonds)
-
-        return strrep.format(**parameters)
-
-    def __repr__(self):
-        """Return canonical string representation of `KDTAtom`."""
-        #strrep = "Atom(element={element!r}, atomID={atomID!r}, " + \
+        #self.strrep = "Atom(element={element!r}, atomID={atomID!r}, " + \
         #    "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
-        #    "q={q!r}, m={m!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
-        #    "CN={CN!r}, NN={NN!r})"
-        #parameters = dict(element=self.element, atomID=self.atomID,
-        #                  moleculeID=self.moleculeID, atomtype=self.atomtype,
-        #                  q=self.q, m=self.m, x=self.x, y=self.y, z=self.z,
-        #                  CN=self.CN, NN=self.NN)
-        #return strrep.format(**parameters)
-        return super(KDTAtom, self).__repr__()
+        #    "q={q!r}, mass={mass!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
+        #    "CN={CN!r}, NN={NN!s}, bonds={bonds!s})"
+
+    #def __repr__(self):
+    #    """Return canonical string representation of `KDTAtom`."""
+    #    reprstr = "Atom(element={element!r}, atomID={atomID!r}, " + \
+    #        "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
+    #        "q={q!r}, mass={mass!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
+    #        "CN={CN!r}, NN={NN!r})"
+    #    return reprstr.format(**self.todict())
 
     @property
     def CN(self):
@@ -110,3 +97,21 @@ class KDTAtom(XAtom):
         if not isinstance(value, Bonds):
             raise TypeError('Expected a `Bonds` object.')
         self._bonds = value
+
+    def update_bonds(self):
+        self.bonds.clear()
+        [self.bonds.append(Bond(self, nn)) for nn in self.NN]
+
+    def update_CN(self):
+        self.CN = self.NN.Natoms
+
+    #def todict(self):
+    #    return dict(element=self.element, atomID=self.atomID,
+    #                moleculeID=self.moleculeID, atomtype=self.atomtype,
+    #                q=self.q, mass=self.mass,
+    #                x=self.x, y=self.y, z=self.z,
+    #                vx=self.vx, vy=self.vy, vz=self.vz,
+    #                fx=self.fx, fy=self.fy, fz=self.fz,
+    #                nx=self.nx, ny=self.ny, nz=self.nz,
+    #                pe=self.pe, ke=self.ke, etotal=self.etotal,
+    #                CN=self.CN, NN=self.NN, bonds=self.bonds)
