@@ -66,13 +66,13 @@ class DUMPReader(StructureIO):
         if len(self.dumpfiles) == 0:
             raise ValueError('No dump file specified.')
 
-        self.read_all()
+        self.read()
 
     @property
     def Nsnaps(self):
         return self.trajectory.Nsnaps
 
-    def read_all(self):
+    def read(self):
         """Read all snapshots from each dump file."""
         for dumpfile in self.dumpfiles:
             with open(dumpfile) as f:
@@ -108,7 +108,7 @@ class DUMPReader(StructureIO):
 
     def read_snapshot(self, f):
         try:
-            snapshot = Snapshot()
+            snapshot = Snapshot(self.trajectory)
             f.readline()
             snapshot.timestep = int(f.readline().strip().split()[0])
             f.readline()
