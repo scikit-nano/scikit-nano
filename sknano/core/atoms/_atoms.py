@@ -36,10 +36,11 @@ class Atoms(UserList):
     """
     _atomattrs = ['symbol', 'Z', 'mass']
 
-    def __init__(self, atoms=None, copylist=True, deepcopy=False):
+    def __init__(self, atoms=None, copylist=True, deepcopy=False, **kwargs):
         super(Atoms, self).__init__(initlist=atoms,
                                     copylist=copylist,
                                     deepcopy=deepcopy)
+        self.kwargs = kwargs
 
     def __str__(self):
         """Return a nice string representation of `Atoms`."""
@@ -101,7 +102,8 @@ class Atoms(UserList):
         """
         if invert:
             condition = ~condition
-        return self.__class__(atoms=np.asarray(self)[condition].tolist())
+        return self.__class__(atoms=np.asarray(self)[condition].tolist(),
+                              **self.kwargs)
 
     def get_atoms(self, asarray=False):
         """Return list of `Atoms`.

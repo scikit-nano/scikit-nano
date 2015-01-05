@@ -49,11 +49,13 @@ class XAtoms(Atoms):
          'f', 'fx', 'fy', 'fz', 'n', 'nx', 'ny', 'nz',
          'pe', 'ke', 'etotal']
 
-    def __init__(self, atoms=None, copylist=True, deepcopy=False):
+    def __init__(self, atoms=None, copylist=True, deepcopy=False, **kwargs):
 
         super(XAtoms, self).__init__(atoms=atoms,
                                      copylist=copylist,
-                                     deepcopy=deepcopy)
+                                     deepcopy=deepcopy,
+                                     **kwargs)
+
         self._atomtypes = {}
 
     def sort(self, key=None, reverse=False):
@@ -294,7 +296,7 @@ class XAtoms(Atoms):
         filtered_atoms = \
             np.asarray(self)[np.in1d(
                 self.atom_ids, atom_ids, invert=invert).nonzero()].tolist()
-        return self.__class__(atoms=filtered_atoms)
+        return self.__class__(atoms=filtered_atoms, **self.kwargs)
 
     def get_atom(self, atomID):
         """Get `XAtom` with :attr:`Xatom.atomID` == `atomID`.

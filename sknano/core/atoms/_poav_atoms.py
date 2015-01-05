@@ -43,10 +43,11 @@ class POAVAtoms(KDTAtoms):
     """
     _atomattrs = KDTAtoms._atomattrs + ['POAV1', 'POAV2', 'POAVR']
 
-    def __init__(self, atoms=None, copylist=True, deepcopy=False):
+    def __init__(self, atoms=None, copylist=True, deepcopy=False, **kwargs):
         super(POAVAtoms, self).__init__(atoms=atoms,
                                         copylist=copylist,
-                                        deepcopy=deepcopy)
+                                        deepcopy=deepcopy,
+                                        **kwargs)
 
     def compute_POAVs(self):
         """Compute `POAV1`, `POAV2`, `POAVR`."""

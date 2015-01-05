@@ -51,13 +51,16 @@ class KDTAtoms(XAtoms):
     """
     _atomattrs = XAtoms._atomattrs + ['CN', 'NN', 'bonds']
 
-    def __init__(self, atoms=None, copylist=True, deepcopy=False):
+    def __init__(self, atoms=None, copylist=True, deepcopy=False,
+                 kNN=3, NNrc=2.0, **kwargs):
+
         super(KDTAtoms, self).__init__(atoms=atoms,
                                        copylist=copylist,
-                                       deepcopy=deepcopy)
+                                       deepcopy=deepcopy,
+                                       **kwargs)
 
-        self._kNN = 3
-        self._NNrc = 2.0
+        self.kNN = kNN
+        self.NNrc = NNrc
 
     @property
     def kNN(self):
@@ -70,7 +73,7 @@ class KDTAtoms(XAtoms):
         the kd-tree."""
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected an integer >= 0')
-        self._kNN = int(value)
+        self._kNN = self.kwargs['kNN'] = int(value)
 
     @property
     def NNrc(self):
@@ -83,7 +86,7 @@ class KDTAtoms(XAtoms):
         """Set the cutoff distance to check for neighest neighbors."""
         if not (isinstance(value, numbers.Number) and value >= 0):
             raise TypeError('Expected a real number greater >= 0')
-        self._NNrc = value
+        self._NNrc = self.kwargs['NNrc'] = value
 
     @property
     def atom_tree(self):
@@ -177,7 +180,8 @@ class KDTAtoms(XAtoms):
         if atom_tree is not None:
             NNi = atom_tree.query_ball_point(pts, r, p=p, eps=eps)
 
-        return self.__class__(atoms=np.asarray(self)[NNi].tolist())
+        return self.__class__(atoms=np.asarray(self)[NNi].tolist(),
+                              **self.kwargs)
 
     def update_attrs(self):
         """Update each :class:`KDTAtom`\ s attributes.
@@ -210,7 +214,7 @@ class KDTAtoms(XAtoms):
         try:
             NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
             for j, atom in enumerate(self):
-                atom.NN = self.__class__()
+                atom.NN = self.__class__(**self.kwargs)
                 for k, d in enumerate(NNd[j]):
                     if d <= self.NNrc:
                         atom.NN.append(self[NNi[j][k]])
