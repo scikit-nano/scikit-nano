@@ -41,13 +41,8 @@ class POAVAtoms(KDTAtoms):
         perform deepcopy of atoms list
 
     """
-    _atomattrs = KDTAtoms._atomattrs + ['POAV1', 'POAV2', 'POAVR']
-
-    def __init__(self, atoms=None, copylist=True, deepcopy=False, **kwargs):
-        super(POAVAtoms, self).__init__(atoms=atoms,
-                                        copylist=copylist,
-                                        deepcopy=deepcopy,
-                                        **kwargs)
+    def __init__(self, **kwargs):
+        super(POAVAtoms, self).__init__(**kwargs)
 
     def compute_POAVs(self):
         """Compute `POAV1`, `POAV2`, `POAVR`."""

@@ -34,8 +34,6 @@ class Atoms(UserList):
 
 
     """
-    _atomattrs = ['symbol', 'Z', 'mass']
-
     def __init__(self, atoms=None, copylist=True, deepcopy=False, **kwargs):
         super(Atoms, self).__init__(initlist=atoms,
                                     copylist=copylist,

@@ -49,15 +49,9 @@ class KDTAtoms(XAtoms):
         perform deepcopy of atoms list
 
     """
-    _atomattrs = XAtoms._atomattrs + ['CN', 'NN', 'bonds']
+    def __init__(self, kNN=3, NNrc=2.0, **kwargs):
 
-    def __init__(self, atoms=None, copylist=True, deepcopy=False,
-                 kNN=3, NNrc=2.0, **kwargs):
-
-        super(KDTAtoms, self).__init__(atoms=atoms,
-                                       copylist=copylist,
-                                       deepcopy=deepcopy,
-                                       **kwargs)
+        super(KDTAtoms, self).__init__(**kwargs)
 
         self.kNN = kNN
         self.NNrc = NNrc
@@ -103,12 +97,6 @@ class KDTAtoms(XAtoms):
         [bonds.extend(atom.bonds) for atom in self]
         return bonds
         #return np.asarray([atom.bonds for atom in self])
-
-    @property
-    def coordination_numbers(self):
-        """Return array of `KDTAtom` coordination numbers."""
-        #self._update_coordination_numbers()
-        return np.asarray([atom.CN for atom in self])
 
     @property
     def nearest_neighbors(self):
@@ -184,39 +172,18 @@ class KDTAtoms(XAtoms):
                               **self.kwargs)
 
     def update_attrs(self):
-        """Update each :class:`KDTAtom`\ s attributes.
-
-        This method calls the following methods in order:
-
-        #. :meth:`~KDTAtoms.update_nearest_neighbors`
-
-        #. :meth:`~KDTAtoms.update_coordination_numbers`
-
-        #. :meth:`~KDTAtoms.update_bonds`
-
-        """
+        """Update :class:`KDTAtom`\ s attributes."""
         self.update_nearest_neighbors()
-        self.update_coordination_numbers()
-        self.update_bonds()
-
-    def update_bonds(self):
-        """Update :attr:`KDTAtom.bonds` list."""
-        #self._update_nearest_neighbors()
-        [atom.update_bonds() for atom in self]
-
-    def update_coordination_numbers(self):
-        """Update :attr:`KDTAtom.CN`."""
-        #self._update_nearest_neighbors()
-        [atom.update_CN() for atom in self]
 
     def update_nearest_neighbors(self):
         """Update :attr:`KDTAtom.NN`."""
         try:
             NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
             for j, atom in enumerate(self):
-                atom.NN = self.__class__(**self.kwargs)
+                NN = self.__class__(**self.kwargs)
                 for k, d in enumerate(NNd[j]):
                     if d <= self.NNrc:
-                        atom.NN.append(self[NNi[j][k]])
+                        NN.append(self[NNi[j][k]])
+                atom.NN = NN
         except ValueError:
             pass

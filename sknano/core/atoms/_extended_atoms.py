@@ -43,18 +43,9 @@ class XAtoms(Atoms):
         perform deepcopy of atoms list
 
     """
-    _atomattrs = Atoms._atomattrs + \
-        ['atomID', 'moleculeID', 'atomtype', 'q', 'dr',
-         'r', 'x', 'y', 'z', 'v', 'vx', 'vy', 'vz',
-         'f', 'fx', 'fy', 'fz', 'n', 'nx', 'ny', 'nz',
-         'pe', 'ke', 'etotal']
+    def __init__(self, **kwargs):
 
-    def __init__(self, atoms=None, copylist=True, deepcopy=False, **kwargs):
-
-        super(XAtoms, self).__init__(atoms=atoms,
-                                     copylist=copylist,
-                                     deepcopy=deepcopy,
-                                     **kwargs)
+        super(XAtoms, self).__init__(**kwargs)
 
         self._atomtypes = {}
 
@@ -202,6 +193,11 @@ class XAtoms(Atoms):
     def total_energies(self):
         """:class:`~numpy:numpy.ndarray` of `XAtom.etotal`."""
         return np.asarray([atom.etotal for atom in self])
+
+    @property
+    def coordination_numbers(self):
+        """:class:`~numpy:numpy.ndarray` of `XAtom.CN`."""
+        return np.asarray([atom.CN for atom in self])
 
     @property
     def velocities(self):
@@ -368,16 +364,11 @@ class XAtoms(Atoms):
         -------
         :class:`~numpy:numpy.ndarray`
 
-        Raises
-        ------
-        `ValueError`
-            if `attr` not in list of class atomattrs.
-
         """
-        if attr not in self._atomattrs:
-            errmsg = '{} not in list of allowed attributes:\n{}'
-            raise ValueError(errmsg.format(attr, self._atomattrs))
-        return np.asarray([getattr(atom, attr) for atom in self])
+        try:
+            return np.asarray([getattr(atom, attr) for atom in self])
+        except AttributeError:
+            return None
 
     def mapatomattr(self, attr, from_attr, attrmap):
         """Set/update atom attribute from another atom attribute with dict.
