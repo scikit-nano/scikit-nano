@@ -13,6 +13,7 @@ from __future__ import absolute_import, division, print_function
 from six.moves import zip
 __docformat__ = 'restructuredtext en'
 
+from collections import OrderedDict
 import functools
 import operator
 import warnings
@@ -60,6 +61,15 @@ class POAV(object):
         self._pyramidalization_angles = None
         self._sigma_pi_angles = None
         self._misalignment_angles = None
+
+    def __str__(self):
+        strrep = '{}\n=====\n'.format(self.__class__.__name__)
+        for k, v in self.todict(rad2deg=True).items():
+            strrep += '{}: {}\n'.format(k, v)
+        return strrep
+
+    def __repr__(self):
+        return '{!r}({!r})'.format(self.__class__.__name__, self.bonds)
 
     @property
     def v1(self):
@@ -329,22 +339,24 @@ class POAV(object):
             pyramidalization_angles = np.degrees(pyramidalization_angles)
             misalignment_angles = np.degrees(misalignment_angles)
 
-        return dict(bond1=self.bond1.length,
-                    bond2=self.bond2.length,
-                    bond3=self.bond3.length,
-                    sigma_bond_angle12=self.sigma_bond_angle12,
-                    sigma_bond_angle23=self.sigma_bond_angle23,
-                    sigma_bond_angle31=self.sigma_bond_angle31,
-                    sigma_pi_angle1=sigma_pi_angles[0],
-                    sigma_pi_angle2=sigma_pi_angles[1],
-                    sigma_pi_angle3=sigma_pi_angles[2],
-                    pyramidalization_angle1=pyramidalization_angles[0],
-                    pyramidalization_angle2=pyramidalization_angles[1],
-                    pyramidalization_angle3=pyramidalization_angles[2],
-                    misalignment_angle1=misalignment_angles[0],
-                    misalignment_angle2=misalignment_angles[1],
-                    misalignment_angle3=misalignment_angles[2],
-                    T=self.T, H=self.H, A=self.A)
+        od = OrderedDict(
+            [('bond1', self.bond1.length),
+             ('bond2', self.bond2.length),
+             ('bond3', self.bond3.length),
+             ('sigma_bond_angle12', self.sigma_bond_angle12),
+             ('sigma_bond_angle23', self.sigma_bond_angle23),
+             ('sigma_bond_angle31', self.sigma_bond_angle31),
+             ('sigma_pi_angle1', sigma_pi_angles[0]),
+             ('sigma_pi_angle2', sigma_pi_angles[1]),
+             ('sigma_pi_angle3', sigma_pi_angles[2]),
+             ('pyramidalization_angle1', pyramidalization_angles[0]),
+             ('pyramidalization_angle2', pyramidalization_angles[1]),
+             ('pyramidalization_angle3', pyramidalization_angles[2]),
+             ('misalignment_angle1', misalignment_angles[0]),
+             ('misalignment_angle2', misalignment_angles[1]),
+             ('misalignment_angle3', misalignment_angles[2]),
+             ('T', self.T), ('H', self.H), ('A', self.A)])
+        return od
 
 
 class POAV1(POAV):
@@ -373,7 +385,7 @@ class POAV1(POAV):
     def todict(self, rad2deg=False):
         """Return dictionary of `POAV1` class attributes."""
         super_dict = super(POAV1, self).todict(rad2deg=rad2deg)
-        super_dict.update(dict(m=self.m, n=self.n))
+        super_dict.update([('m', self.m), ('n', self.n)])
         return super_dict
 
 
@@ -439,7 +451,8 @@ class POAV2(POAV):
     def todict(self, rad2deg=False):
         """Return dictionary of `POAV2` class attributes."""
         super_dict = super(POAV2, self).todict(rad2deg=rad2deg)
-        super_dict.update(dict(m=self.m, n1=self.n1, n2=self.n2, n3=self.n3))
+        super_dict.update(
+            [('m', self.m), ('n1', self.n1), ('n2', self.n2), ('n3', self.n3)])
         return super_dict
 
 
