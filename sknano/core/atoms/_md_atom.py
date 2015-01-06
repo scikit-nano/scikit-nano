@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Atom class for MD analysis (:mod:`sknano.core.atoms._md_atom`)
+Atom class for MD trajectory analysis (:mod:`sknano.core.atoms._md_atom`)
 ===============================================================================
 
-An `Atom` class for molecular dynamics structure analysis.
+An `Atom` class for molecular dynamics trajectory analysis.
 
 .. currentmodule:: sknano.core.atoms._md_atom
 
@@ -12,36 +12,42 @@ An `Atom` class for molecular dynamics structure analysis.
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-#import numbers
+import numpy as np
 
-from ._kdtree_atom import KDTAtom
+import sknano.core.atoms
+
+from ._structure_atoms import StructureAtom as Atom
 
 __all__ = ['MDAtom']
 
 
-class MDAtom(KDTAtom):
-    """An `Atom` class for molecular dynamics structure analysis.
-
-    Parameters
-    ----------
+class MDAtom(Atom):
+    """An `Atom` class for molecular dynamics trajectory analysis.
 
     """
-    def __init__(self, **kwargs):
+    def __init__(self, reference_atom=None, **kwargs):
         super(MDAtom, self).__init__(**kwargs)
+        self.reference_atom = reference_atom
 
-    def __str__(self):
-        """Return a nice string representation of `MDAtom`."""
-        return super(MDAtom, self).__str__()
+    @property
+    def NN(self):
+        """Nearest-neighbor `Atoms`."""
+        if self.reference_atom is not None:
+            NN = self._NN
+            try:
+                if not np.allclose(NN.atom_ids,
+                                   self.reference_atom.NN.atom_ids):
+                    self.NN = sknano.core.atoms.MDAtoms(
+                        atoms=[NN[NN.atom_ids.tolist().index(atom_id)] for
+                               atom_id in self.reference_atom.NN.atom_ids])
+            except ValueError:
+                pass
 
-    def __repr__(self):
-        """Return canonical string representation of `MDAtom`."""
-        #strrep = "Atom(element={element!r}, atomID={atomID!r}, " + \
-        #    "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
-        #    "q={q!r}, m={m!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
-        #    "CN={CN!r}, NN={NN!r})"
-        #parameters = dict(element=self.element, atomID=self.atomID,
-        #                  moleculeID=self.moleculeID, atomtype=self.atomtype,
-        #                  q=self.q, m=self.m, x=self.x, y=self.y, z=self.z,
-        #                  CN=self.CN, NN=self.NN)
-        #return strrep.format(**parameters)
-        return super(MDAtom, self).__repr__()
+        return self._NN
+
+    @NN.setter
+    def NN(self, value):
+        """Set nearest-neighbor `Atoms`."""
+        if not isinstance(value, sknano.core.atoms.Atoms):
+            raise TypeError('Expected an `Atoms` object.')
+        self._NN = value
