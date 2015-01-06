@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Trajectory class for MD Atoms analysis (:mod:`sknano.core.atoms._trajectory`)
+Trajectory class for MD simulations (:mod:`sknano.core.atoms._trajectory`)
 ===============================================================================
 
-Class for analyzing the trajectories of molecular dynamics `Atoms`.
+Classes for analyzing the atom trajectories of molecular dynamics simulations.
 
 .. currentmodule:: sknano.core.atoms._trajectory
 
@@ -21,7 +21,8 @@ import numpy as np
 from operator import attrgetter
 
 from sknano.core import UserList
-from ._structure_atoms import StructureAtom as Atom, StructureAtoms as Atoms
+from ._md_atom import MDAtom as Atom
+from ._md_atoms import MDAtoms as Atoms
 
 __all__ = ['Snapshot', 'Trajectory']
 
@@ -92,7 +93,9 @@ class tselect(object):
 
 class Snapshot(object):
     """Container class for MD data at single timestep"""
-    def __init__(self):
+    def __init__(self, trajectory=None):
+
+        self.trajectory = trajectory
 
         self.atomattrs = None
         self.attr_dtypes = None
@@ -104,9 +107,17 @@ class Snapshot(object):
     def atoms(self):
         atoms = Atoms()
         for atom in self._atoms:
+            try:
+                reference_atom = \
+                    self.trajectory.reference_atoms.get_atom(
+                        int(atom[self.atomattrs.index('atomID')]))
+            except AttributeError:
+                reference_atom = None
+
             attrs = [dtype(value) for dtype, value in
                      zip(self.attr_dtypes, atom)]
-            atoms.append(Atom(**dict(list(zip(self.atomattrs, attrs)))))
+            atoms.append(Atom(reference_atom=reference_atom,
+                              **dict(list(zip(self.atomattrs, attrs)))))
         return atoms
 
     @atoms.setter
@@ -129,6 +140,8 @@ class Trajectory(UserList):
         self.tselect = tselect(self)
         self.aselect = aselect(self)
         self.nselect = 0
+        self.reference_atoms = None
+        self._reference_snapshot = None
 
     @property
     def Nsnaps(self):
@@ -148,8 +161,22 @@ class Trajectory(UserList):
             else:
                 i += 1
 
+    @property
+    def reference_snapshot(self):
+        return self._reference_snapshot
+
+    @reference_snapshot.setter
+    def reference_snapshot(self, value):
+        if not isinstance(value, Snapshot):
+            raise TypeError('Expected a `Snapshot` instance.')
+        self._reference_snapshot = value
+        self.reference_atoms = self.reference_snapshot.atoms
+        self.reference_atoms.update_attrs()
+
+    @property
     def timesteps(self):
         v = np.zeros(self.nselect, dtype=int)
         for i, snapshot in enumerate(self.data):
             if snapshot.tselect:
                 v[i] = snapshot.timestep
+        return v
