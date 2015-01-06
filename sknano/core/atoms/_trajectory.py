@@ -27,7 +27,7 @@ from ._md_atoms import MDAtoms as Atoms
 __all__ = ['Snapshot', 'Trajectory']
 
 
-class aselect(object):
+class aselect:
     def __init__(self, traj):
         self.traj = traj
 
@@ -46,7 +46,7 @@ class aselect(object):
             snapshot.nselect = snapshot.Natoms
 
 
-class tselect(object):
+class tselect:
     def __init__(self, traj):
         self.traj = traj
 
@@ -91,7 +91,7 @@ class tselect(object):
         print('{}/{} snapshots selected'.format(traj.nselect, traj.Nsnaps))
 
 
-class Snapshot(object):
+class Snapshot:
     """Container class for MD data at single timestep"""
     def __init__(self, trajectory=None):
 
@@ -134,9 +134,8 @@ class Trajectory(UserList):
     """Base class for trajectory analysis."""
 
     def __init__(self, snapshots=None, copylist=True, deepcopy=False):
-        super(Trajectory, self).__init__(initlist=snapshots,
-                                         copylist=copylist,
-                                         deepcopy=deepcopy)
+        super().__init__(initlist=snapshots, copylist=copylist,
+                         deepcopy=deepcopy)
         self.tselect = tselect(self)
         self.aselect = aselect(self)
         self.nselect = 0

@@ -20,7 +20,7 @@ __all__ = ['Bond']
 
 
 @total_ordering
-class Bond(object):
+class Bond:
     """Abstract representation of bond between 2 `Atom` objects.
 
     Parameters

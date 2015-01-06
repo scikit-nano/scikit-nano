@@ -60,7 +60,7 @@ class XAtom(Atom):
                  nx=None, ny=None, nz=None, pe=None, ke=None, etotal=None,
                  CN=0, **kwargs):
 
-        super(XAtom, self).__init__(element=element, mass=mass, **kwargs)
+        super().__init__(element=element, mass=mass, **kwargs)
 
         self.r = Vector([x, y, z])
         #self._p0 = Point([x, y, z])
@@ -93,13 +93,13 @@ class XAtom(Atom):
         return reprstr.format(**self.todict())
 
     def __eq__(self, other):
-        return super(XAtom, self).__eq__(other)
+        return super().__eq__(other)
 
     def __lt__(self, other):
         if self.atomID < other.atomID:
             return True
         else:
-            return super(XAtom, self).__lt__(other)
+            return super().__lt__(other)
 
     def __dir__(self):
         attrs = super().__dir__()

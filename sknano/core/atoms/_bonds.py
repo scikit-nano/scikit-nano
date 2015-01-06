@@ -38,8 +38,7 @@ class Bonds(UserList):
 
     """
     def __init__(self, bonds=None, copylist=True, deepcopy=False):
-        super(Bonds, self).__init__(initlist=bonds, copylist=copylist,
-                                    deepcopy=deepcopy)
+        super().__init__(initlist=bonds, copylist=copylist, deepcopy=deepcopy)
 
     def __str__(self):
         """Return a nice string representation of `Bonds`."""

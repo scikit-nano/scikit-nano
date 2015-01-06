@@ -42,4 +42,4 @@ class MDAtoms(Atoms):
 
     """
     def __init__(self, **kwargs):
-        super(MDAtoms, self).__init__(**kwargs)
+        super().__init__(**kwargs)

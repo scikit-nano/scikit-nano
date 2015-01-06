@@ -25,7 +25,7 @@ __all__ = ['KDTAtom']
 class KDTAtom(XAtom):
     """An `Atom` class for KDTree analysis."""
     def __init__(self, **kwargs):
-        super(KDTAtom, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         #self.strrep = "Atom(element={element!r}, atomID={atomID!r}, " + \
         #    "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
@@ -80,7 +80,7 @@ class KDTAtom(XAtom):
         """Return atom `Bonds` instance."""
         try:
             return Bonds(bonds=[Bond(self, nn) for nn in self.NN])
-        except AttributeError:
+        except (AttributeError, TypeError):
             return Bonds()
 
     #def todict(self):

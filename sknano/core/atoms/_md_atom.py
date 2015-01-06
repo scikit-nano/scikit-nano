@@ -26,7 +26,7 @@ class MDAtom(Atom):
 
     """
     def __init__(self, reference_atom=None, **kwargs):
-        super(MDAtom, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.reference_atom = reference_atom
 
     @property

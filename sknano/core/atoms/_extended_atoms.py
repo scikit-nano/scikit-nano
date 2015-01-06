@@ -45,7 +45,7 @@ class XAtoms(Atoms):
     """
     def __init__(self, **kwargs):
 
-        super(XAtoms, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self._atomtypes = {}
 

@@ -42,11 +42,11 @@ class POAVAtoms(KDTAtoms):
 
     """
     def __init__(self, **kwargs):
-        super(POAVAtoms, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def compute_POAVs(self):
         """Compute `POAV1`, `POAV2`, `POAVR`."""
-        super(POAVAtoms, self).update_attrs()
+        super().update_attrs()
 
         POAV_classes = {'POAV1': POAV1, 'POAV2': POAV2, 'POAVR': POAVR}
 

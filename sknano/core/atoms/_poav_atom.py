@@ -28,7 +28,7 @@ from ._kdtree_atom import KDTAtom
 __all__ = ['POAV', 'POAV1', 'POAV2', 'POAVR', 'POAVAtomMixin', 'POAVAtom']
 
 
-class POAV(object):
+class POAV:
     """Base class for POAV analysis.
 
     Parameters
@@ -363,7 +363,7 @@ class POAV1(POAV):
     """:class:`POAV` sub-class for POAV1 analysis."""
 
     def __init__(self, *args):
-        super(POAV1, self).__init__(*args)
+        super().__init__(*args)
 
         self._v1 = self.V1
         self._v2 = self.V2
@@ -384,7 +384,7 @@ class POAV1(POAV):
 
     def todict(self, rad2deg=False):
         """Return dictionary of `POAV1` class attributes."""
-        super_dict = super(POAV1, self).todict(rad2deg=rad2deg)
+        super_dict = super().todict(rad2deg=rad2deg)
         super_dict.update([('m', self.m), ('n', self.n)])
         return super_dict
 
@@ -393,7 +393,7 @@ class POAV2(POAV):
     """:class:`POAV` sub-class for POAV2 analysis."""
 
     def __init__(self, *args):
-        super(POAV2, self).__init__(*args)
+        super().__init__(*args)
 
         vi = []
         for bond, pair in zip(self.bonds, self.bond_angle_pairs):
@@ -419,7 +419,7 @@ class POAV2(POAV):
         """
         return -functools.reduce(operator.mul,
                                  np.cos(self.bonds.angles), 1) * \
-            super(POAV2, self).T
+            super().T
 
     @property
     def n1(self):
@@ -450,7 +450,7 @@ class POAV2(POAV):
 
     def todict(self, rad2deg=False):
         """Return dictionary of `POAV2` class attributes."""
-        super_dict = super(POAV2, self).todict(rad2deg=rad2deg)
+        super_dict = super().todict(rad2deg=rad2deg)
         super_dict.update(
             [('m', self.m), ('n1', self.n1), ('n2', self.n2), ('n3', self.n3)])
         return super_dict
@@ -460,7 +460,7 @@ class POAVR(POAV):
     """:class:`POAV` sub-class for POAVR analysis."""
 
     def __init__(self, *args):
-        super(POAVR, self).__init__(*args)
+        super().__init__(*args)
 
         vi = []
         for R, V in zip([self.R1, self.R2, self.R3],
@@ -482,10 +482,10 @@ class POAVR(POAV):
            \\frac{|\\mathbf{V}_1\\cdot(\\mathbf{V}_2\\times\\mathbf{V}_3)|}{6}
 
         """
-        return self.R1 * self.R2 * self.R3 * super(POAVR, self).T
+        return self.R1 * self.R2 * self.R3 * super().T
 
 
-class POAVAtomMixin(object):
+class POAVAtomMixin:
     """Mixin class for `POAVAtom`."""
     @property
     def POAV1(self):
@@ -528,7 +528,7 @@ class POAVAtom(POAVAtomMixin, KDTAtom):
     """An `Atom` sub-class for POAV analysis."""
 
     def __init__(self, **kwargs):
-        super(POAVAtom, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self._POAV1 = None
         self._POAV2 = None
         self._POAVR = None

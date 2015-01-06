@@ -35,9 +35,7 @@ class Atoms(UserList):
 
     """
     def __init__(self, atoms=None, copylist=True, deepcopy=False, **kwargs):
-        super(Atoms, self).__init__(initlist=atoms,
-                                    copylist=copylist,
-                                    deepcopy=deepcopy)
+        super().__init__(initlist=atoms, copylist=copylist, deepcopy=deepcopy)
         self.kwargs = kwargs
 
     def __str__(self):

@@ -22,7 +22,7 @@ __all__ = ['Atom']
 
 
 @total_ordering
-class Atom(object):
+class Atom:
     """Base class for abstract representation of structure atom.
 
     Parameters
