@@ -10,7 +10,7 @@ Custom NumPy Vector class (:mod:`sknano.core.math._vector`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-import copy
+#import copy
 import numbers
 import numpy as np
 
@@ -475,8 +475,9 @@ class Vector(np.ndarray):
         return self.__array__().dot(other.__array__())
 
     def normalize(self):
-        """Normalize the `Vector`."""
-        self[:] = self / self.length
+        """Normalize the `Vector` to a :attr:`~Vector.unit_vector`."""
+        #self[:] = self / self.length
+        self[:] = self.unit_vector
 
     def projection(self, v):
         """Compute vector projection onto vector `v`."""
