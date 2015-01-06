@@ -10,7 +10,7 @@ import numpy as np
 from sknano.core.math import Point, Vector, vector as vec
 
 
-def test_instantiation():
+def test1():
     v = Vector()
     assert_true(np.allclose(v, np.zeros(3)))
     assert_true(np.allclose(v.p0, np.zeros(3)))
@@ -37,7 +37,7 @@ def test_instantiation():
     assert_true(np.allclose(v.p, np.ones(3)))
 
 
-def test_property_changes():
+def test2():
     v = Vector()
     v.p0 = np.ones(3)
     assert_true(np.allclose(v, -np.ones(3)))
@@ -68,7 +68,7 @@ def test_property_changes():
     assert_equal(v.p0.z, 2.5)
 
 
-def test_math_ops():
+def test3():
     v = Vector(np.zeros(3))
     assert_true(np.allclose(v.p0, np.zeros(3)))
 
@@ -107,7 +107,7 @@ def test_math_ops():
     assert_true(np.allclose(v3.p, np.array([7.0, 6.0])))
 
 
-def test_2D_dot():
+def test4():
     v1 = Vector([1.0, 0.0])
     v2 = Vector([1.0, 1.0])
 
@@ -118,7 +118,7 @@ def test_2D_dot():
     assert_equal(c, 1.0)
 
 
-def test_2D_cross():
+def test5():
     v1 = Vector([1.0, 0.0])
     v2 = Vector([1.0, 1.0])
 
@@ -138,7 +138,7 @@ def test_2D_cross():
     assert_true(np.allclose(v3, np.cross(np.asarray(v1), np.asarray(v2))))
 
 
-def test_3D_dot():
+def test6():
     v1 = Vector([1.0, 0.0, 0.0])
     v2 = Vector([1.0, 1.0, 0.0])
 
@@ -149,7 +149,7 @@ def test_3D_dot():
     assert_equal(c, 1.0)
 
 
-def test_3D_cross():
+def test7():
     v1 = Vector([1, 0, 0])
     v2 = Vector([0, 1, 0])
     v3 = vec.cross(v1, v2)
@@ -185,7 +185,7 @@ def test_3D_cross():
     assert_false(np.allclose(v3.p0, v2.p0))
 
 
-def test_unit_vector_cross():
+def test8():
     e1 = Vector([1, 0, 0])
     e2 = Vector([0, 1, 0])
     e3 = Vector([0, 0, 1])
@@ -200,7 +200,7 @@ def test_unit_vector_cross():
     assert_equal(vec.cross(e2, e3), e1)
 
 
-def test_transforms():
+def test9():
     v = Vector([1.0, 0.0, 0.0])
     v.rotate(np.pi/2, rot_axis='z')
     assert_true(np.allclose(v, np.array([0, 1, 0])))
@@ -252,7 +252,7 @@ def test_transforms():
     assert_is_instance(v.p, Point)
 
 
-def test_rotations():
+def test10():
     v = Vector(p0=[1, 1, 1])
     assert_true(np.allclose(v, -np.ones(3)))
     assert_true(np.allclose(v.p0, np.ones(3)))
@@ -265,7 +265,7 @@ def test_rotations():
     assert_true(np.allclose(v.p, np.array([2, 0, 0])))
 
 
-def test_translations():
+def test11():
     v = Vector()
     v += np.ones(3)
     assert_true(np.allclose(v, np.ones(3)))
@@ -287,7 +287,7 @@ def test_translations():
     assert_true(np.allclose(v2.p, np.ones(3)))
 
 
-def test_iadd():
+def test12():
 
     v1 = Vector()
     dr = Vector(np.ones(3))
@@ -301,7 +301,7 @@ def test_iadd():
     assert_true(np.allclose(v3.p, np.ones(3)))
 
 
-def test_projection():
+def test13():
 
     u = Vector([5, 6, 7])
     assert_true(np.allclose(
@@ -310,32 +310,32 @@ def test_projection():
         u.projection(Vector([1, 1, 1])), Vector([6, 6, 6])))
 
 
-def test_properties():
+def test14():
     v = Vector([5, 5, 0])
     assert_almost_equal(v.unit_vector.length, 1.0)
 
 
-def test_vector_angle():
+def test15():
     u = Vector([1, 0])
     v = Vector([1, 1])
     assert_almost_equal(vec.angle(u, v), np.pi/4)
 
 
-def test_scalar_triple_product():
+def test16():
     u = Vector([1, 0, 0])
     v = Vector([1, 1, 0])
     w = Vector([0, 1, 1])
     assert_equals(vec.scalar_triple_product(u, v, w), 1)
 
 
-def test_vector_triple_product():
+def test17():
     u = Vector([1, 0, 0])
     v = Vector([1, 1, 0])
     w = Vector([0, 1, 1])
     assert_is_instance(vec.vector_triple_product(u, v, w), Vector)
 
 
-def test_comparison_operators():
+def test18():
     u = Vector([1, 2, 3])
     v = Vector([1, 2, 3])
     w = Vector([1, 1, 1])
@@ -343,6 +343,14 @@ def test_comparison_operators():
     assert_true(u == v)
     assert_not_equals(u, w)
     assert_false(u == w)
+
+
+def test19():
+    u = Vector([10, 10, 17])
+    v = Vector([10, 10, 17])
+    assert_true(u == v)
+    v.normalize()
+    assert_true(np.allclose(u.unit_vector, v))
 
 
 if __name__ == '__main__':
