@@ -118,6 +118,20 @@ def test_atom_bonds():
                 assert_equal(bond.length, atom.bonds.lengths[j])
 
 
+def test_NN_parameters():
+    atoms = generate_atoms(generator_class='SWNTGenerator', n=3, m=3, nz=10)
+    atoms.assign_unique_ids()
+    atoms.center_CM()
+    #atoms.update_attrs()
+    atoms.kNN = 6
+    atoms.NNrc = 9.0
+    new_atoms = atoms.filter((atoms.z >= -5) & (atoms.z <= 5))
+    assert_equal(atoms.kNN, 6)
+    assert_equal(atoms.NNrc, 9.0)
+    assert_equal(atoms.kNN, new_atoms.kNN)
+    assert_equal(atoms.NNrc, new_atoms.NNrc)
+
+
 def test_structure_data():
     fname = resource_filename('sknano', 'data/nanotubes/1005_5cells.data')
     swnt = SWNTGenerator(n=10, m=5, nz=5)
