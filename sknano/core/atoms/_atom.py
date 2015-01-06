@@ -32,18 +32,19 @@ class Atom(object):
         an element atomic number :math:`\\boldsymbol{Z}`.
 
     """
-    _atomattrs = ['symbol', 'Z', 'mass']  # private class var
-
     __hash__ = object.__hash__
 
     def __init__(self, element=None, mass=None, **kwargs):
 
-        # set mass first because the element.setter method may check mass value
         if mass is None and 'm' in kwargs:
             mass = kwargs['m']
+            del kwargs['m']
 
         if mass is None:
             mass = 0
+
+        # set mass first because the element.setter method
+        # may check mass value
         self.mass = mass
 
         self.element = element
@@ -66,8 +67,8 @@ class Atom(object):
         if self is other:
             return True
         else:
-            for p in self._atomattrs:
-                if getattr(self, p) != getattr(other, p):
+            for attr in self.__dir__():
+                if getattr(self, attr) != getattr(other, attr):
                     return False
             return True
 
@@ -77,6 +78,9 @@ class Atom(object):
 
     #def __mul__(self, other):
     #    """Multiply atom
+
+    def __dir__(self):
+        return ['element', 'Z', 'mass']
 
     @property
     def Z(self):

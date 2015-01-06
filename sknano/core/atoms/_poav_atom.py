@@ -513,10 +513,14 @@ class POAVAtomMixin(object):
 
 class POAVAtom(POAVAtomMixin, KDTAtom):
     """An `Atom` sub-class for POAV analysis."""
-    _atomattrs = KDTAtom._atomattrs + ['POAV1', 'POAV2', 'POAVR']
 
     def __init__(self, **kwargs):
         super(POAVAtom, self).__init__(**kwargs)
         self._POAV1 = None
         self._POAV2 = None
         self._POAVR = None
+
+    def __dir__(self):
+        attrs = super().__dir__()
+        attrs.extend(['POAV1', 'POAV2', 'POAVR'])
+        return attrs

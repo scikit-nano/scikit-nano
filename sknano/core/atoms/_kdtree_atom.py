@@ -23,32 +23,9 @@ __all__ = ['KDTAtom']
 
 
 class KDTAtom(XAtom):
-    """An `Atom` class for KDTree analysis.
-
-    Parameters
-    ----------
-    CN : int, optional
-        `KDTAtom` coordination number.
-    NN : {sequence, `Atoms`}, optional
-        List of nearest-neighbor `Atoms`
-    bonds : {sequence, `Bonds`}, optional
-        List of atom `Bond`\ s or `Bonds` instance
-
-    """
-    _atomattrs = XAtom._atomattrs + ['CN', 'NN', 'bonds']
-
-    def __init__(self, CN=0, NN=None, bonds=None, **kwargs):
+    """An `Atom` class for KDTree analysis."""
+    def __init__(self, **kwargs):
         super(KDTAtom, self).__init__(**kwargs)
-
-        self.CN = CN
-
-        if NN is None:
-            NN = sknano.core.atoms.StructureAtoms()
-        self.NN = NN
-
-        if bonds is None:
-            bonds = Bonds()
-        self.bonds = bonds
 
         #self.strrep = "Atom(element={element!r}, atomID={atomID!r}, " + \
         #    "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
@@ -63,10 +40,18 @@ class KDTAtom(XAtom):
     #        "CN={CN!r}, NN={NN!r})"
     #    return reprstr.format(**self.todict())
 
+    def __dir__(self):
+        attrs = super().__dir__()
+        attrs.extend(['NN', 'bonds'])
+        return attrs
+
     @property
     def CN(self):
         """Return `KDTAtom` coordination number."""
-        return self._CN
+        try:
+            return self.NN.Natoms
+        except AttributeError:
+            return self._CN
 
     @CN.setter
     def CN(self, value):
@@ -78,7 +63,10 @@ class KDTAtom(XAtom):
     @property
     def NN(self):
         """Nearest-neighbor `Atoms`."""
-        return self._NN
+        try:
+            return self._NN
+        except AttributeError:
+            return None
 
     @NN.setter
     def NN(self, value):
@@ -90,20 +78,10 @@ class KDTAtom(XAtom):
     @property
     def bonds(self):
         """Return atom `Bonds` instance."""
-        return self._bonds
-
-    @bonds.setter
-    def bonds(self, value):
-        if not isinstance(value, Bonds):
-            raise TypeError('Expected a `Bonds` object.')
-        self._bonds = value
-
-    def update_bonds(self):
-        self.bonds.clear()
-        [self.bonds.append(Bond(self, nn)) for nn in self.NN]
-
-    def update_CN(self):
-        self.CN = self.NN.Natoms
+        try:
+            return Bonds(bonds=[Bond(self, nn) for nn in self.NN])
+        except AttributeError:
+            return Bonds()
 
     #def todict(self):
     #    return dict(element=self.element, atomID=self.atomID,

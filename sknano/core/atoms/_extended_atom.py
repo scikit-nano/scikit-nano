@@ -52,23 +52,15 @@ class XAtom(Atom):
         :math:`n_x, n_y, n_z` image flags
 
     """
-    _atomattrs = Atom._atomattrs + \
-        ['atomID', 'moleculeID', 'atomtype', 'q', 'dr',
-         'r', 'x', 'y', 'z', 'v', 'vx', 'vy', 'vz',
-         'f', 'fx', 'fy', 'fz', 'n', 'nx', 'ny', 'nz',
-         'pe', 'ke', 'etotal']
-
     __hash__ = Atom.__hash__
 
     def __init__(self, element=None, atomID=0, moleculeID=0, atomtype=1,
                  q=0., mass=None, x=None, y=None, z=None,
                  vx=None, vy=None, vz=None, fx=None, fy=None, fz=None,
                  nx=None, ny=None, nz=None, pe=None, ke=None, etotal=None,
-                 **kwargs):
-        if mass is None and 'm' in kwargs:
-            mass = kwargs['m']
+                 CN=0, **kwargs):
 
-        super(XAtom, self).__init__(element=element, mass=mass)
+        super(XAtom, self).__init__(element=element, mass=mass, **kwargs)
 
         self.r = Vector([x, y, z])
         #self._p0 = Point([x, y, z])
@@ -86,6 +78,7 @@ class XAtom(Atom):
         self.pe = pe
         self.ke = ke
         self.etotal = etotal
+        self.CN = CN
 
         self.strrep = "Atom(element={element!r}, atomID={atomID!r}, " + \
             "moleculeID={moleculeID!r}, atomtype={atomtype!r})"
@@ -95,7 +88,7 @@ class XAtom(Atom):
         reprstr = "Atom(element={element!r}, atomID={atomID!r}, " + \
             "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
             "q={q!r}, mass={mass!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " \
-            "pe={pe!r}, ke={ke!r}, etotal={etotal!r})"
+            "pe={pe!r}, ke={ke!r}, etotal={etotal!r}, CN={CN!r})"
 
         return reprstr.format(**self.todict())
 
@@ -107,6 +100,14 @@ class XAtom(Atom):
             return True
         else:
             return super(XAtom, self).__lt__(other)
+
+    def __dir__(self):
+        attrs = super().__dir__()
+        attrs.extend(['atomID', 'moleculeID', 'atomtype', 'q', 'dr',
+                      'r', 'x', 'y', 'z', 'v', 'vx', 'vy', 'vz',
+                      'f', 'fx', 'fy', 'fz', 'n', 'nx', 'ny', 'nz',
+                      'pe', 'ke', 'etotal', 'CN'])
+        return attrs
 
     @property
     def q(self):
@@ -668,6 +669,18 @@ class XAtom(Atom):
                 value = 0.0
         self._etotal = value
 
+    @property
+    def CN(self):
+        """Return `XAtom` coordination number."""
+        return self._CN
+
+    @CN.setter
+    def CN(self, value):
+        """Set `XAtom` coordination number."""
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number.')
+        self._CN = int(value)
+
     def rezero(self, epsilon=1.0e-10):
         """Re-zero position vector components.
 
@@ -729,4 +742,5 @@ class XAtom(Atom):
                     vx=self.vx, vy=self.vy, vz=self.vz,
                     fx=self.fx, fy=self.fy, fz=self.fz,
                     nx=self.nx, ny=self.ny, nz=self.nz,
-                    pe=self.pe, ke=self.ke, etotal=self.etotal)
+                    pe=self.pe, ke=self.ke, etotal=self.etotal,
+                    CN=self.CN)
