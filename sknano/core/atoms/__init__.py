@@ -65,6 +65,8 @@ Classes for molecular dynamics simulations:
 
    Trajectory
    Snapshot
+   MDAtom
+   MDAtoms
 
 """
 from __future__ import absolute_import, division, print_function
@@ -84,6 +86,8 @@ from ._structure_atoms import *
 from ._bond import *
 from ._bonds import *
 
+from ._md_atom import *
+from ._md_atoms import *
 from ._trajectory import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
