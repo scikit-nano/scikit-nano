@@ -32,17 +32,6 @@ class MDAtom(Atom):
     @property
     def NN(self):
         """Nearest-neighbor `Atoms`."""
-        if self.reference_atom is not None:
-            NN = self._NN
-            try:
-                if not np.allclose(NN.atom_ids,
-                                   self.reference_atom.NN.atom_ids):
-                    self.NN = sknano.core.atoms.MDAtoms(
-                        atoms=[NN[NN.atom_ids.tolist().index(atom_id)] for
-                               atom_id in self.reference_atom.NN.atom_ids])
-            except ValueError:
-                pass
-
         return self._NN
 
     @NN.setter
@@ -51,3 +40,15 @@ class MDAtom(Atom):
         if not isinstance(value, sknano.core.atoms.Atoms):
             raise TypeError('Expected an `Atoms` object.')
         self._NN = value
+
+        if self.reference_atom is not None:
+            self._NN = sknano.core.atoms.MDAtoms(
+                atoms=[self.NN[self.NN.atom_ids.tolist().index(atom.atomID)]
+                       if atom.atomID in self.NN.atom_ids else
+                       self.__class__(reference_atom=atom.reference_atom,
+                                      element=atom.element,
+                                      atomID=atom.atomID,
+                                      moleculeID=atom.moleculeID,
+                                      atomtype=atom.atomtype, mass=atom.mass,
+                                      q=atom.q, x=np.inf, y=np.inf, z=np.inf)
+                       for atom in self.reference_atom.NN])
