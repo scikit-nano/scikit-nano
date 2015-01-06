@@ -12,7 +12,10 @@ __docformat__ = 'restructuredtext en'
 
 #import copy
 import numbers
+import warnings
+
 import numpy as np
+np.seterr(all='warn')
 
 from ._point import Point
 from ._transforms import rotate, transformation_matrix
@@ -419,7 +422,9 @@ class Vector(np.ndarray):
     @property
     def unit_vector(self):
         """Unit vector for `Vector`."""
-        return self / self.norm
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore')
+            return self / self.norm
 
     @property
     def magnitude(self):
@@ -476,7 +481,6 @@ class Vector(np.ndarray):
 
     def normalize(self):
         """Normalize the `Vector` to a :attr:`~Vector.unit_vector`."""
-        #self[:] = self / self.length
         self[:] = self.unit_vector
 
     def projection(self, v):
