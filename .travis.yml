@@ -30,6 +30,6 @@ install:
   #- pip install mpmath
   #- pip install argparse
   #- pip install gmpy2
-  - travis_wait pip -v install scipy
+  - travis_wait pip install scipy
   - python setup.py install
 script: nosetests
