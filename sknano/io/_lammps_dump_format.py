@@ -29,20 +29,16 @@ from ._base import StructureIO, StructureIOError, StructureFormatSpec, \
 __all__ = ['DUMPData', 'DUMPReader', 'DUMPWriter', 'DUMPIOError',
            'DUMPFormatSpec']
 
-attr_dtypes = {'atomID': int, 'atomtype': int, 'bondID': int, 'bondtype': int,
-               'moleculeID': int, 'q': float, 'ervel': float,
-               'm': float, 'mass': float,
+attr_dtypes = {'id': int, 'type': int, 'mol': int, 'q': float, 'mass': float,
                'x': float, 'y': float, 'z': float,
-               'nx': int, 'ny': int, 'nz': int,
+               'ix': int, 'iy': int, 'iz': int,
                'vx': float, 'vy': float, 'vz': float,
+               'fx': float, 'fy': float, 'fz': float,
                'lx': float, 'ly': float, 'lz': float,
                'wx': float, 'wy': float, 'wz': float,
-               'fx': float, 'fy': float, 'fz': float,
-               'atom_id': int, 'molecule_id': int, 'bond_id': int,
-               'atom1': int, 'atom2': int, 'atom3': int, 'atom4': int,
-               'dihedral_id': int, 'dihedraltype': int,
                'shapex': float, 'shapey': float, 'shapez': float,
-               'quatw': float, 'quati': float, 'quatj': float, 'quatk': float}
+               'quatw': float, 'quati': float, 'quatj': float, 'quatk': float,
+               'atom1': int, 'atom2': int, 'atom3': int, 'atom4': int}
 
 
 class DUMPReader(StructureIO):
@@ -168,11 +164,6 @@ class DUMPReader(StructureIO):
 
                 self.atomattrs = \
                     sorted(self.dumpattrs, key=self.dumpattrs.__getitem__)
-                if 'id' in self.atomattrs:
-                    self.atomattrs[self.atomattrs.index('id')] = 'atomID'
-
-                if 'type' in self.atomattrs:
-                    self.atomattrs[self.atomattrs.index('type')] = 'atomtype'
 
                 self.attr_dtypes = [attr_dtypes[attr] if attr in attr_dtypes
                                     else float for attr in self.atomattrs]

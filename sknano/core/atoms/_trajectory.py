@@ -110,7 +110,7 @@ class Snapshot:
             try:
                 reference_atom = \
                     self.trajectory.reference_atoms.get_atom(
-                        int(atom[self.atomattrs.index('atomID')]))
+                        int(atom[self.atomattrs.index('id')]))
             except AttributeError:
                 reference_atom = None
 

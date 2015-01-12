@@ -27,15 +27,15 @@ class KDTAtom(XAtom):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        #self.strrep = "Atom(element={element!r}, atomID={atomID!r}, " + \
-        #    "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
+        #self.strrep = "Atom(element={element!r}, id={id!r}, " + \
+        #    "mol={mol!r}, type={type!r}, " + \
         #    "q={q!r}, mass={mass!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
         #    "CN={CN!r}, NN={NN!s}, bonds={bonds!s})"
 
     #def __repr__(self):
     #    """Return canonical string representation of `KDTAtom`."""
-    #    reprstr = "Atom(element={element!r}, atomID={atomID!r}, " + \
-    #        "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
+    #    reprstr = "Atom(element={element!r}, id={id!r}, " + \
+    #        "mol={mol!r}, type={type!r}, " + \
     #        "q={q!r}, mass={mass!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
     #        "CN={CN!r}, NN={NN!r})"
     #    return reprstr.format(**self.todict())
@@ -84,8 +84,8 @@ class KDTAtom(XAtom):
             return Bonds()
 
     #def todict(self):
-    #    return dict(element=self.element, atomID=self.atomID,
-    #                moleculeID=self.moleculeID, atomtype=self.atomtype,
+    #    return dict(element=self.element, id=self.id,
+    #                mol=self.mol, type=self.type,
     #                q=self.q, mass=self.mass,
     #                x=self.x, y=self.y, z=self.z,
     #                vx=self.vx, vy=self.vy, vz=self.vz,

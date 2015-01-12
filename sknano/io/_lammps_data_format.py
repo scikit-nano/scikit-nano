@@ -115,7 +115,7 @@ class DATAReader(StructureIO):
                     if len(line) == 0:
                         break
             self._parse_atoms()
-            self._parse_atomtypes()
+            self._parse_types()
             self._parse_boxbounds()
         except (IOError, OSError) as e:
             print(e)
@@ -143,33 +143,30 @@ class DATAReader(StructureIO):
             velocities_section = []
             velocities_section_attrs = {}
 
-        atom_kwargs = {'atomID': None, 'moleculeID': None,
-                       'q': None, 'atomtype': None, 'mass': None,
-                       'x': None, 'y': None, 'z': None,
-                       'vx': None, 'vy': None, 'vz': None}
-
         for line in atoms_section:
+            atom_kwargs = {'id': None, 'mol': None, 'q': None, 'type': None,
+                           'mass': None, 'x': None, 'y': None, 'z': None,
+                           'vx': None, 'vy': None, 'vz': None}
+
             for kw in six.iterkeys(atom_kwargs):
                 if kw in atoms_section_attrs:
                     atom_kwargs[kw] = \
                         line[self.section_attrs_specs['Atoms'][kw]['index']]
                 elif kw in masses_section_attrs:
-                    atomtype = \
+                    type = \
                         line[self.section_attrs_specs[
-                            'Atoms']['atomtype']['index']]
+                            'Atoms']['type']['index']]
                     atom_kwargs[kw] = \
-                        masses_section[atomtype-1][
+                        masses_section[type-1][
                             self.section_attrs_specs['Masses'][kw]['index']]
                 elif kw in velocities_section_attrs and \
                         len(velocities_section) == len(atoms_section):
-                    atomID = \
-                        line[self.section_attrs_specs[
-                            'Atoms']['atomID']['index']]
+                    id = line[self.section_attrs_specs['Atoms']['id']['index']]
                     for velocity in velocities_section:
-                        velocity_atomID = \
+                        atom_id = \
                             velocity[self.section_attrs_specs[
-                                'Velocities']['atomID']['index']]
-                        if velocity_atomID == atomID:
+                                'Velocities']['id']['index']]
+                        if atom_id == id:
                             atom_kwargs[kw] = \
                                 velocity[self.section_attrs_specs[
                                     'Velocities'][kw]['index']]
@@ -179,16 +176,15 @@ class DATAReader(StructureIO):
             atom = Atom(**atom_kwargs)
             self.atoms.append(atom)
 
-    def _parse_atomtypes(self):
+    def _parse_types(self):
         Ntypes = self.atoms.Ntypes
-        atomtypes = self.atoms.atomtypes
+        atomtypes = self.atoms.types
         if Ntypes != self.header_data['atom types']:
             for atomtype in range(1, self.header_data['atom types'] + 1):
                 if atomtype not in atomtypes:
                     mass = self.section_data['Masses'][atomtype - 1][
                         self.section_attrs_specs['Masses']['mass']['index']]
-                    self.atoms.add_atomtype(
-                        Atom(atomtype=atomtype, mass=mass))
+                    self.atoms.add_type(Atom(type=atomtype, mass=mass))
 
     def _parse_boxbounds(self):
         for dim in ('x', 'y', 'z'):
@@ -253,7 +249,7 @@ class DATAWriter(object):
     @classmethod
     def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
               atom_style='full', boxbounds=None, comment_line=None,
-              assert_unique_ids=False, enforce_consecutive_atomIDs=True,
+              assert_unique_ids=False, enforce_consecutive_ids=True,
               pad_box=True, xpad=10., ypad=10., zpad=10., pad_tol=0.01,
               verbose=False, **kwargs):
         """Write structure data to file.
@@ -275,13 +271,13 @@ class DATAWriter(object):
             then it is set to the full path of the output `data` file.
         assert_unique_ids : bool, optional
             Check that each :class:`~sknano.core.atoms.Atom` in `atoms`
-            has a unique :attr:`~sknano.core.atoms.Atom.atomID`.
+            has a unique :attr:`~sknano.core.atoms.Atom.id`.
             If the check fails, then assign a unique
-            :attr:`~sknano.core.atoms.Atom.atomID`.
+            :attr:`~sknano.core.atoms.Atom.id`.
             to each :class:`~sknano.core.atoms.Atom`.
-            If `assert_unique_ids` is True, but the atomID's are not unique,
+            If `assert_unique_ids` is True, but the id's are not unique,
             LAMMPS will not be able to read the data file.
-        enforce_consecutive_atomIDs : bool, optional
+        enforce_consecutive_ids : bool, optional
         pad_box : bool, optional
         xpad, ypad, zpad : float, optional
         pad_tol : float, optional
@@ -297,7 +293,7 @@ class DATAWriter(object):
 
         atoms.rezero()
 
-        atomtypes = atoms.atomtypes
+        types = atoms.types
 
         Natoms = atoms.Natoms
         Natoms_width = \
@@ -305,13 +301,13 @@ class DATAWriter(object):
         Ntypes = atoms.Ntypes
         Ntypes_width = Natoms_width
 
-        atomID_width = len(str(Natoms)) + 1
-        atomtype_width = len(str(Ntypes)) + 1
+        id_width = len(str(Natoms)) + 1
+        type_width = len(str(Ntypes)) + 1
 
-        if (enforce_consecutive_atomIDs and
-            atoms.atom_ids.max() != atoms.Natoms) or \
+        if (enforce_consecutive_ids and
+            atoms.ids.max() != atoms.Natoms) or \
                 (not assert_unique_ids and
-                 len(set(atoms.atom_ids)) != atoms.Natoms):
+                 len(set(atoms.ids)) != atoms.Natoms):
             atoms.assign_unique_ids()
 
         if boxbounds is None:
@@ -357,24 +353,24 @@ class DATAWriter(object):
                     dim=dim))
 
             f.write('\nMasses\n\n')
-            for atomtype, properties in six.iteritems(atomtypes):
+            for type, properties in six.iteritems(types):
                 f.write('{}{:.4f}\n'.format(
-                    '{:d}'.format(atomtype).ljust(Natoms_width),
+                    '{:d}'.format(type).ljust(Natoms_width),
                     properties['mass']))
 
             f.write('\nAtoms\n\n')
             for atom in atoms:
                 line = ''
-                line += "{:>{}}".format(atom.atomID, atomID_width)
-                line += "{:>{}}".format(atom.moleculeID, 3)
-                line += "{:>{}}".format(atom.atomtype, atomtype_width)
+                line += "{:>{}}".format(atom.id, id_width)
+                line += "{:>{}}".format(atom.mol, 3)
+                line += "{:>{}}".format(atom.type, type_width)
                 line += "{:>{}}".format('{:.1f}'.format(atom.q), 4)
                 line += "{:>{}}".format('{:f}'.format(atom.x), 14)
                 line += "{:>{}}".format('{:f}'.format(atom.y), 14)
                 line += "{:>{}}".format('{:f}'.format(atom.z), 14)
-                line += "{:>{}}".format('{:d}'.format(atom.nx), 3)
-                line += "{:>{}}".format('{:d}'.format(atom.ny), 3)
-                line += "{:>{}}".format('{:d}'.format(atom.nz), 3)
+                line += "{:>{}}".format('{:d}'.format(atom.ix), 3)
+                line += "{:>{}}".format('{:d}'.format(atom.iy), 3)
+                line += "{:>{}}".format('{:d}'.format(atom.iz), 3)
                 line += '\n'
 
                 f.write(line)
@@ -382,7 +378,7 @@ class DATAWriter(object):
             f.write('\nVelocities\n\n')
             for atom in atoms:
                 line = ''
-                line += "{:>{}}".format(atom.atomID, atomID_width)
+                line += "{:>{}}".format(atom.id, id_width)
                 line += "{:>{}}".format('{:f}'.format(atom.vx), 14)
                 line += "{:>{}}".format('{:f}'.format(atom.vy), 14)
                 line += "{:>{}}".format('{:f}'.format(atom.vz), 14)
@@ -596,13 +592,10 @@ class DATAFormatSpec(object):
 
         self.section_attrs = \
             {'Atoms': atoms_section_attrs[self.atom_style],
-             'Masses': ['atomtype', 'mass'],
+             'Masses': ['type', 'mass'],
              'Velocities': velocities_section_attrs[self.atom_style],
-             'Bonds': ['bond_id', 'bondtype', 'atom1', 'atom2'],
-             'Dihedrals': ['dihedral_id', 'dihedraltype',
-                           'atom1', 'atom2', 'atom3', 'atom4'],
-             'Ellipsoids': ['atomID', 'shapex', 'shapey', 'shapez',
-                            'quatw', 'quati', 'quatj', 'quatk']}
+             'Bonds': bonds_section_attrs,
+             'Dihedrals': dihedrals_section_attrs}
 
         self.section_attrs_specs = OrderedDict()
         for section, attrs in six.iteritems(self.section_attrs):
@@ -679,20 +672,17 @@ section_header_map.update(dict.fromkeys(['Dihedral Coeffs',
                                          'BondBond13 Coeffs'],
                                         'dihedral types'))
 
-attr_dtypes = {'atomID': int, 'atomtype': int, 'bondID': int, 'bondtype': int,
-               'moleculeID': int, 'q': float, 'ervel': float,
-               'm': float, 'mass': float,
+attr_dtypes = {'id': int, 'type': int, 'mol': int, 'q': float, 'mass': float,
                'x': float, 'y': float, 'z': float,
-               'nx': int, 'ny': int, 'nz': int,
+               'ix': int, 'iy': int, 'iz': int,
                'vx': float, 'vy': float, 'vz': float,
+               'fx': float, 'fy': float, 'fz': float,
                'lx': float, 'ly': float, 'lz': float,
                'wx': float, 'wy': float, 'wz': float,
-               'fx': float, 'fy': float, 'fz': float,
-               'atom_id': int, 'molecule_id': int, 'bond_id': int,
-               'atom1': int, 'atom2': int, 'atom3': int, 'atom4': int,
-               'dihedral_id': int, 'dihedraltype': int,
+               'ervel': float,
                'shapex': float, 'shapey': float, 'shapez': float,
-               'quatw': float, 'quati': float, 'quatj': float, 'quatk': float}
+               'quatw': float, 'quati': float, 'quatj': float, 'quatk': float,
+               'atom1': int, 'atom2': int, 'atom3': int, 'atom4': int}
 
 atom_styles = {}
 atom_styles['angle'] = ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z']
@@ -736,13 +726,22 @@ atoms_section_attrs = {}
 for atom_style, attrs in six.iteritems(atom_styles):
     atom_style_attrs = atoms_section_attrs[atom_style] = []
     for attr in attrs:
-        atom_style_attrs.append(attr.replace('-', ''))
-    atom_style_attrs.extend(['nx', 'ny', 'nz'])
+        attr = attr.replace('atom-', '').replace('molecule-ID', 'mol').lower()
+        #attr = attr.replace('-', '_')
+        atom_style_attrs.append(attr)
+    atom_style_attrs.extend(['ix', 'iy', 'iz'])
 
 velocities_section_attrs = {}
 velocities_section_attrs.update(dict.fromkeys(list(atom_styles.keys()),
-                                              ['atomID', 'vx', 'vy', 'vz']))
+                                              ['id', 'vx', 'vy', 'vz']))
 velocities_section_attrs['electron'].append('ervel')
 velocities_section_attrs['ellipsoid'].extend(['lx', 'ly', 'lz'])
 velocities_section_attrs['sphere'].extend(['wx', 'wy', 'wz'])
 #velocities_section_attrs['hybrid'].append('...')
+
+bonds_section_attrs = ['id', 'type', 'atom1', 'atom2']
+angles_section_attrs = ['id', 'type', 'atom1', 'atom2', 'atom3']
+dihedrals_section_attrs = ['id', 'type', 'atom1', 'atom2', 'atom3', 'atom4']
+impropers_section_attrs = ['id', 'type', 'atom1', 'atom2', 'atom3', 'atom4']
+ellipsoids_section_attrs = ['id', 'shapex', 'shapey', 'shapez',
+                            'quatw', 'quati', 'quatj', 'quatk']

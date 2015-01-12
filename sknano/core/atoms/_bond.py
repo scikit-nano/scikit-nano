@@ -36,10 +36,9 @@ class Bond:
 
     def __str__(self):
         """Return nice string representation of `Bond`."""
-        #strrep = "{!s}={!s}\nv={!s}\n|v|={!s}"
         #return strrep.format(self.atom1.element, self.atom2.element,
         #                     self.vector, self.length)
-        return "Bond({!r}->{!r})".format(self.atom1.atomID, self.atom2.atomID)
+        return "Bond({!r}->{!r})".format(self.atom1.id, self.atom2.id)
 
     def __repr__(self):
         """Return canonical string representation of `Bond`."""

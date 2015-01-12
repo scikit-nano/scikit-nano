@@ -47,12 +47,12 @@ class XAtoms(Atoms):
 
         super().__init__(**kwargs)
 
-        self._atomtypes = {}
+        self._types = {}
 
     def sort(self, key=None, reverse=False):
         if key is None:
-            self.data.sort(key=attrgetter('element', 'Z', 'atomtype',
-                                          'moleculeID', 'atomID', 'z'),
+            self.data.sort(key=attrgetter('element', 'Z', 'type',
+                                          'mol', 'id', 'z'),
                            reverse=reverse)
         else:
             self.data.sort(key=key, reverse=reverse)
@@ -83,8 +83,8 @@ class XAtoms(Atoms):
 
     @property
     def Ntypes(self):
-        """Number of :attr:`~XAtoms.atomtypes`."""
-        return len(list(self.atomtypes.keys()))
+        """Number of :attr:`~XAtoms.types`."""
+        return len(list(self.types.keys()))
 
     @property
     def centroid(self):
@@ -150,24 +150,28 @@ class XAtoms(Atoms):
         return np.array([[Ixx, Ixy, Ixz], [Iyx, Iyy, Iyz], [Izx, Izy, Izz]])
 
     @property
-    def atomtypes(self):
-        """:attr:`~XAtoms.atomtypes` :class:`python:dict`."""
-        self._update_atomtypes()
-        return self._atomtypes
+    def types(self):
+        """:class:`python:dict` of :attr:`XAtom.type`\ s."""
+        self._update_types()
+        return self._types
 
-    def _update_atomtypes(self):
-        for atom in self:
-            if atom.atomtype not in self._atomtypes:
-                self._atomtypes[atom.atomtype] = {}
-                self._atomtypes[atom.atomtype]['mass'] = atom.mass
-                self._atomtypes[atom.atomtype]['q'] = atom.q
+    @property
+    def atomtypes(self):
+        return self.types
+
+    def _update_types(self):
+        [self.add_type(atom) for atom in self]
+
+    @property
+    def ids(self):
+        """Return array of `XAtom` IDs."""
+        if len(set([atom.id for atom in self])) != self.Natoms:
+            self.assign_unique_ids()
+        return np.asarray([atom.id for atom in self])
 
     @property
     def atom_ids(self):
-        """Return array of `XAtom` IDs."""
-        if len(set([atom.atomID for atom in self])) != self.Natoms:
-            self.assign_unique_ids()
-        return np.asarray([atom.atomID for atom in self])
+        return self.ids
 
     @property
     def charges(self):
@@ -204,8 +208,8 @@ class XAtoms(Atoms):
         """:class:`~numpy:numpy.ndarray` of `XAtom` velocities."""
         return np.asarray([atom.v for atom in self])
 
-    def add_atomtype(self, atom):
-        """Add atom type to :attr:`~XAtoms.atomtypes`.
+    def add_type(self, atom):
+        """Add atom type to :attr:`~XAtoms.types`.
 
         Parameters
         ----------
@@ -213,28 +217,36 @@ class XAtoms(Atoms):
             A :class:`~sknano.core.atoms.XAtom` instance.
 
         """
-        if atom.atomtype not in self._atomtypes:
-            self._atomtypes[atom.atomtype] = {}
-            self._atomtypes[atom.atomtype]['mass'] = atom.mass
-            self._atomtypes[atom.atomtype]['q'] = atom.q
+        if atom.type not in self._types:
+            self._types[atom.type] = {}
+            self._types[atom.type]['mass'] = atom.mass
+            self._types[atom.type]['q'] = atom.q
 
-    def add_atomtypes(self, atoms=None):
-        """Add atomtype for each atom in atoms to atomtypes dictionary.
+    def add_atomtype(self, atom):
+        self.add_type(atom)
+
+    def add_types(self, atoms=None):
+        """Add atom type for each atom in atoms to :attr:`XAtom.types` \
+            dictionary.
+
         Parameters
         ----------
         atoms : sequence
-            a list of `XAtom` object instances
+            a list of `Atom` object instances
 
         """
         try:
-            [self.add_atomtype(atom) for atom in atoms]
+            [self.add_type(atom) for atom in atoms]
         except TypeError:
-            print('Expected an iterable sequence of `XAtom` objects.')
+            print('Expected an iterable sequence of `Atom` objects.')
+
+    def add_atomtypes(self, atoms=None):
+        self.add_types(atoms=atoms)
 
     def assign_unique_ids(self, starting_id=1):
         """Assign unique ID to each `XAtom` in `XAtoms`."""
-        [setattr(atom, 'atomID', i)
-         for i, atom in enumerate(self, start=starting_id)]
+        [setattr(atom, 'id', i) for i, atom in
+         enumerate(self, start=starting_id)]
 
     def center_CM(self, axes=None):
         """Center atoms on CM coordinates."""
@@ -276,11 +288,11 @@ class XAtoms(Atoms):
             self.translate(CM0)
 
     def filter_ids(self, atom_ids, invert=False):
-        """Return `Atoms` by :attr:`XAtoms.atom_ids` in `atom_ids`.
+        """Return `Atoms` by :attr:`XAtoms.ids` in `atom_ids`.
 
         Parameters
         ----------
-        filter_ids : array_like
+        atom_ids : array_like
         invert : bool, optional
 
         Returns
@@ -290,32 +302,33 @@ class XAtoms(Atoms):
 
         """
         filtered_atoms = \
-            np.asarray(self)[np.in1d(
-                self.atom_ids, atom_ids, invert=invert).nonzero()].tolist()
+            np.asarray(self)[np.in1d(self.ids,
+                                     atom_ids,
+                                     invert=invert).nonzero()].tolist()
         return self.__class__(atoms=filtered_atoms, **self.kwargs)
 
-    def get_atom(self, atomID):
-        """Get `XAtom` with :attr:`Xatom.atomID` == `atomID`.
+    def get_atom(self, id):
+        """Get `XAtom` with :attr:`Xatom.id` == `id`.
 
         Parameters
         ----------
-        atomID : int
+        id : int
 
         Returns
         -------
         atom : `XAtom` or `None`
             `XAtom` instance if `XAtoms` contains `XAtom` with
-            :attr:`XAtom.atomID` == `atomID`, otherwise `None`
+            :attr:`XAtom.id` == `id`, otherwise `None`
 
         """
         try:
-            return self[np.where(self.atom_ids == atomID)[0]]
+            return self[np.where(self.ids == id)[0]]
         except TypeError:
-            print('No atom with atomID = {}'.format(atomID))
+            print('No atom with id = {}'.format(id))
             return None
 
-    def get_atomtypes(self, asdict=False):
-        """Return list of `XAtom` :attr:`XAtom.atomtypes`.
+    def get_types(self, asdict=False):
+        """Return list of `XAtom` :attr:`XAtom.type`\ s.
 
         Parameters
         ----------
@@ -328,9 +341,12 @@ class XAtoms(Atoms):
 
         """
         if asdict:
-            return self.atomtypes
+            return self.types
         else:
-            return [atom.atomtype for atom in self]
+            return [atom.type for atom in self]
+
+    def get_atomtypes(self, asdict=False):
+        return self.get_types(asdict=asdict)
 
     def get_coords(self, asdict=False):
         """Return atom coords.
@@ -381,13 +397,13 @@ class XAtoms(Atoms):
         Examples
         --------
         Suppose you have an `XAtoms` instance named ``atoms`` that has
-        `XAtom` instances of two atomtypes `1` and `2` and we want to set
-        all `XAtom`\ s with `atomtype=1` to Nitrogen and all `XAtom`\ s with
-        `atomtype=2` to Argon.
+        `XAtom` instances of two atom types `1` and `2` and we want to set
+        all `XAtom`\ s with `type=1` to Nitrogen and all `XAtom`\ s with
+        `type=2` to Argon.
 
         We'd call this method like so::
 
-        >>> atoms.mapatomattr('element', 'atomtype', {1: 'N', 2: 'Ar'})
+        >>> atoms.mapatomattr('element', 'type', {1: 'N', 2: 'Ar'})
 
         """
         [setattr(atom, attr, attrmap[getattr(atom, from_attr)])

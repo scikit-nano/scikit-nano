@@ -43,12 +43,11 @@ class MDAtom(Atom):
 
         if self.reference_atom is not None:
             self._NN = sknano.core.atoms.MDAtoms(
-                atoms=[self.NN[self.NN.atom_ids.tolist().index(atom.atomID)]
-                       if atom.atomID in self.NN.atom_ids else
+                atoms=[self.NN[self.NN.ids.tolist().index(atom.id)]
+                       if atom.id in self.NN.ids else
                        self.__class__(reference_atom=atom.reference_atom,
-                                      element=atom.element,
-                                      atomID=atom.atomID,
-                                      moleculeID=atom.moleculeID,
-                                      atomtype=atom.atomtype, mass=atom.mass,
-                                      q=atom.q, x=np.inf, y=np.inf, z=np.inf)
+                                      element=atom.element, id=atom.id,
+                                      mol=atom.mol, type=atom.type,
+                                      mass=atom.mass, q=atom.q,
+                                      x=np.inf, y=np.inf, z=np.inf)
                        for atom in self.reference_atom.NN])

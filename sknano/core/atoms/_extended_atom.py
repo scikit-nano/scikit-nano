@@ -38,11 +38,11 @@ class XAtom(Atom):
     x, y, z : float, optional
         :math:`x, y, z` components of `XAtom` position vector relative to
         origin.
-    atomID : int, optional
+    id : int, optional
         atom ID
-    moleculeID : int, optional
+    mol : int, optional
         molecule ID
-    atomtype : int, optional
+    type : int, optional
         atom type
     q : {int, float}, optional
         Net charge of `XAtom`.
@@ -52,38 +52,50 @@ class XAtom(Atom):
     """
     __hash__ = Atom.__hash__
 
-    def __init__(self, element=None, atomID=0, moleculeID=0, atomtype=1,
+    def __init__(self, element=None, id=0, mol=0, type=1,
                  q=0., mass=None, x=None, y=None, z=None,
+                 ix=None, iy=None, iz=None,
                  vx=None, vy=None, vz=None, fx=None, fy=None, fz=None,
                  pe=None, ke=None, etotal=None, CN=0, **kwargs):
 
+        if 'atomID' in kwargs:
+            id = kwargs['atomID']
+            del kwargs['atomID']
+
+        if 'moleculeID' in kwargs:
+            mol = kwargs['moleculeID']
+            del kwargs['moleculeID']
+
+        if 'atomtype' in kwargs:
+            type = kwargs['atomtype']
+            del kwargs['atomtype']
+
         super().__init__(element=element, mass=mass, **kwargs)
 
-        self.r = Vector([x, y, z])
-        #self._p0 = Point([x, y, z])
         self.dr = Vector(np.zeros(3), p0=[x, y, z])
+        self.r = Vector([x, y, z])
+        self.v = Vector([vx, vy, vz])
+        self.f = Vector([fx, fy, fz])
+        self.i = Point([ix, iy, iz], dtype=int)
 
-        self._v = Vector([vx, vy, vz])
-        self._f = Vector([fx, fy, fz])
-
-        self._atomID = int(atomID)
-        self._moleculeID = int(moleculeID)
-        self._atomtype = int(atomtype)
-        self._q = q
+        self.id = id
+        self.mol = mol
+        self.type = type
+        self.q = q
 
         self.pe = pe
         self.ke = ke
         self.etotal = etotal
         self.CN = CN
 
-        self.strrep = "Atom(element={element!r}, atomID={atomID!r}, " + \
-            "moleculeID={moleculeID!r}, atomtype={atomtype!r})"
+        self.strrep = "Atom(element={element!r}, id={id!r}, " + \
+            "mol={mol!r}, type={type!r})"
 
     def __repr__(self):
         """Return canonical string representation of `XAtom`."""
-        reprstr = "Atom(element={element!r}, atomID={atomID!r}, " + \
-            "moleculeID={moleculeID!r}, atomtype={atomtype!r}, " + \
-            "q={q!r}, mass={mass!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " \
+        reprstr = "Atom(element={element!r}, id={id!r}, mol={mol!r}, " + \
+            "type={type!r}, q={q!r}, mass={mass!r}, " + \
+            "x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
             "pe={pe!r}, ke={ke!r}, etotal={etotal!r}, CN={CN!r})"
 
         return reprstr.format(**self.todict())
@@ -92,14 +104,14 @@ class XAtom(Atom):
         return super().__eq__(other)
 
     def __lt__(self, other):
-        if self.atomID < other.atomID:
+        if self.id < other.id:
             return True
         else:
             return super().__lt__(other)
 
     def __dir__(self):
         attrs = super().__dir__()
-        attrs.extend(['atomID', 'moleculeID', 'atomtype', 'q', 'dr',
+        attrs.extend(['id', 'mol', 'type', 'q', 'dr',
                       'r', 'x', 'y', 'z', 'v', 'vx', 'vy', 'vz',
                       'f', 'fx', 'fy', 'fz', 'pe', 'ke', 'etotal', 'CN'])
         return attrs
@@ -127,13 +139,13 @@ class XAtom(Atom):
         self._q = value
 
     @property
-    def atomID(self):
-        """:attr:`~XAtom.atomID`."""
-        return self._atomID
+    def id(self):
+        """:attr:`~XAtom.id`."""
+        return self._id
 
-    @atomID.setter
-    def atomID(self, value):
-        """Set atom ID of atom.
+    @id.setter
+    def id(self, value):
+        """Set atom id.
 
         Parameters
         ----------
@@ -143,16 +155,16 @@ class XAtom(Atom):
         """
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self._atomID = int(value)
+        self._id = int(value)
 
     @property
-    def moleculeID(self):
-        """:attr:`~XAtom.moleculeID`."""
-        return self._moleculeID
+    def mol(self):
+        """:attr:`~XAtom.mol`."""
+        return self._mol
 
-    @moleculeID.setter
-    def moleculeID(self, value):
-        """Set :attr:`~XAtom.moleculeID` attribute.
+    @mol.setter
+    def mol(self, value):
+        """Set :attr:`~XAtom.mol`.
 
         Parameters
         ----------
@@ -162,16 +174,16 @@ class XAtom(Atom):
         """
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self._moleculeID = int(value)
+        self._mol = int(value)
 
     @property
-    def atomtype(self):
-        """:attr:`~XAtom.atomtype`."""
-        return self._atomtype
+    def type(self):
+        """:attr:`~XAtom.type`."""
+        return self._type
 
-    @atomtype.setter
-    def atomtype(self, value):
-        """Set :attr:`~XAtom.atomtype` attribute.
+    @type.setter
+    def type(self, value):
+        """Set :attr:`~XAtom.type`.
 
         Parameters
         ----------
@@ -181,7 +193,7 @@ class XAtom(Atom):
         """
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self._atomtype = int(value)
+        self._type = int(value)
 
     @property
     def x(self):
@@ -323,7 +335,7 @@ class XAtom(Atom):
 
         Returns
         -------
-        coords : :class:`python:~collections.OrderedDict` or ndarray
+        coords : :class:`~python:collections.OrderedDict` or ndarray
 
         """
         if asdict:
@@ -624,11 +636,89 @@ class XAtom(Atom):
         #self.r += t
 
     def todict(self):
-        return dict(element=self.element, atomID=self.atomID,
-                    moleculeID=self.moleculeID, atomtype=self.atomtype,
-                    q=self.q, mass=self.mass,
-                    x=self.x, y=self.y, z=self.z,
-                    vx=self.vx, vy=self.vy, vz=self.vz,
-                    fx=self.fx, fy=self.fy, fz=self.fz,
-                    pe=self.pe, ke=self.ke, etotal=self.etotal,
-                    CN=self.CN)
+        return dict(element=self.element, id=self.id, mol=self.mol,
+                    type=self.type, q=self.q, mass=self.mass, x=self.x,
+                    y=self.y, z=self.z, vx=self.vx, vy=self.vy, vz=self.vz,
+                    fx=self.fx, fy=self.fy, fz=self.fz, pe=self.pe, ke=self.ke,
+                    etotal=self.etotal, CN=self.CN)
+
+    @property
+    def atomID(self):
+        return self.id
+
+    @atomID.setter
+    def atomID(self, value):
+        self.id = value
+
+    @property
+    def atomtype(self):
+        return self.type
+
+    @atomtype.setter
+    def atomtype(self, value):
+        self.type = value
+
+    @property
+    def moleculeID(self):
+        return self.mol
+
+    @moleculeID.setter
+    def moleculeID(self, value):
+        self.mol = value
+
+    @property
+    def ix(self):
+        """:math:`i_x` image flag."""
+        return self.i.x
+
+    @ix.setter
+    def ix(self, value):
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self.i.x = int(value)
+
+    @property
+    def iy(self):
+        """:math:`i_y` image flag."""
+        return self.i.y
+
+    @iy.setter
+    def iy(self, value):
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self.i.y = int(value)
+
+    @property
+    def iz(self):
+        """:math:`i_z` image flag."""
+        return self.i.z
+
+    @iz.setter
+    def iz(self, value):
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self.i.z = value
+
+    @property
+    def i(self):
+        """:math:`i_x, i_y, i_z` image flags
+
+        Returns
+        -------
+        `Point`
+
+        """
+        return self._i
+
+    @i.setter
+    def i(self, value):
+        """Set :math:`i_x, i_y, i_z` image flags.
+
+        Parameters
+        ----------
+        value : array_like
+
+        """
+        if not isinstance(value, (list, np.ndarray)):
+            raise TypeError('Expected an array_like object')
+        self._i = Point(value, dtype=int)

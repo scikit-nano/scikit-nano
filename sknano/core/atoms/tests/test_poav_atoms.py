@@ -145,12 +145,12 @@ def test_POAV_angles():
             if getattr(atom, POAV) is not None:
                 atom_POAV = getattr(atom, POAV)
                 print('atom{}.{}.sigma_pi_angles:\n{}'.format(
-                    atom.atomID, POAV, np.degrees(atom_POAV.sigma_pi_angles)))
+                    atom.id, POAV, np.degrees(atom_POAV.sigma_pi_angles)))
                 print('atom{}.{}.pyramidalization_angles:\n{}'.format(
-                    atom.atomID, POAV,
+                    atom.id, POAV,
                     np.degrees(atom_POAV.pyramidalization_angles)))
                 print('atom{}.{}.misalignment_angles:\n{}\n'.format(
-                    atom.atomID, POAV,
+                    atom.id, POAV,
                     np.degrees(atom_POAV.misalignment_angles)))
 
 

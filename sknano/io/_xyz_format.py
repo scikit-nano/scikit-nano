@@ -170,8 +170,8 @@ class XYZ2DATAConverter(StructureConverter):
         self._new_atoms = []
         self._add_new_atoms = False
 
-        self._new_atomtypes = []
-        self._add_new_atomtypes = False
+        self._new_types = []
+        self._add_new_types = False
 
     @property
     def xyzfile(self):
@@ -195,7 +195,7 @@ class XYZ2DATAConverter(StructureConverter):
         if not self._add_new_atoms:
             self._add_new_atoms = True
 
-    def add_atomtype(self, atom=None):
+    def add_type(self, atom=None):
         """Add new atom type to atom type dictionary.
 
         Parameters
@@ -203,9 +203,9 @@ class XYZ2DATAConverter(StructureConverter):
         atom : `Atom`
 
         """
-        self._new_atomtypes.append(atom)
-        if not self._add_new_atomtypes:
-            self._add_new_atomtypes = True
+        self._new_types.append(atom)
+        if not self._add_new_types:
+            self._add_new_types = True
 
     def convert(self, return_reader=False, **kwargs):
         """Convert `xyz` to `LAMMPS data` chemical file format.
@@ -229,8 +229,8 @@ class XYZ2DATAConverter(StructureConverter):
 
         if self._add_new_atoms:
             structure.atoms.extend(self._new_atoms)
-        if self._add_new_atomtypes:
-            structure.atoms.add_atomtypes(self._new_atomtypes)
+        if self._add_new_types:
+            structure.atoms.add_types(self._new_types)
 
         DATAWriter.write(fpath=self.outfile, atoms=structure.atoms,
                          comment_line=xyzreader.comment_line, **kwargs)

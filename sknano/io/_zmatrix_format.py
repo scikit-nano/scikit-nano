@@ -137,8 +137,8 @@ class ZMATRIX2DATAConverter(StructureConverter):
         self._new_atoms = []
         self._add_new_atoms = False
 
-        self._new_atomtypes = []
-        self._add_new_atomtypes = False
+        self._new_types = []
+        self._add_new_types = False
 
     @property
     def zmatrixfile(self):
@@ -161,7 +161,7 @@ class ZMATRIX2DATAConverter(StructureConverter):
         if not self._add_new_atoms:
             self._add_new_atoms = True
 
-    def add_atomtype(self, atom=None):
+    def add_type(self, atom=None):
         """Add new atom type to atom type dictionary.
 
         Parameters
@@ -169,9 +169,9 @@ class ZMATRIX2DATAConverter(StructureConverter):
         atom : :class:`~sknano.io.atoms.Atom`
 
         """
-        self._new_atomtypes.append(atom)
-        if not self._add_new_atomtypes:
-            self._add_new_atomtypes = True
+        self._new_types.append(atom)
+        if not self._add_new_types:
+            self._add_new_types = True
 
     def convert(self, return_reader=False):
         """Convert zmatrix to LAMMPS data chemical file format.
