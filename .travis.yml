@@ -19,15 +19,15 @@ before_install:
   - popd
   # End install gmpy2 dependencies
   - pip install --upgrade pip setuptools
-  - pip install numpy
-  - pip install coverage
-  - pip install coveralls
-  - pip install nose
-  - pip install six
-  - pip install mpmath
-  - pip install argparse
-  - pip install gmpy2
-  - pip install scipy
+  - pip -v install numpy
+  - pip -v install coverage
+  - pip -v install coveralls
+  - pip -v install nose
+  - pip -v install six
+  - pip -v install mpmath
+  - pip -v install argparse
+  - pip -v install gmpy2
+  - pip -v install scipy
   - popd
 install:
   - python setup.py install
