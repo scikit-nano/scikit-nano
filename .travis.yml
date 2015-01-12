@@ -30,6 +30,7 @@ before_install:
   #- travis_wait pip install scipy
   #- popd
   - sudo apt-get install -qq python3-scipy python3-nose python3-six
+  - toggleglobalsitepackages
 install:
   - python setup.py install
 script: nosetests
