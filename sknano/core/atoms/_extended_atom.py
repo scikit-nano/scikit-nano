@@ -48,8 +48,6 @@ class XAtom(Atom):
         Net charge of `XAtom`.
     vx, vy, vz : float, optional
         :math:`v_x, v_y, v_z` components of `XAtom` velocity.
-    nx, ny, nz : int, optional
-        :math:`n_x, n_y, n_z` image flags
 
     """
     __hash__ = Atom.__hash__
@@ -57,8 +55,7 @@ class XAtom(Atom):
     def __init__(self, element=None, atomID=0, moleculeID=0, atomtype=1,
                  q=0., mass=None, x=None, y=None, z=None,
                  vx=None, vy=None, vz=None, fx=None, fy=None, fz=None,
-                 nx=None, ny=None, nz=None, pe=None, ke=None, etotal=None,
-                 CN=0, **kwargs):
+                 pe=None, ke=None, etotal=None, CN=0, **kwargs):
 
         super().__init__(element=element, mass=mass, **kwargs)
 
@@ -68,7 +65,6 @@ class XAtom(Atom):
 
         self._v = Vector([vx, vy, vz])
         self._f = Vector([fx, fy, fz])
-        self._n = Point([nx, ny, nz], dtype=int)
 
         self._atomID = int(atomID)
         self._moleculeID = int(moleculeID)
@@ -105,8 +101,7 @@ class XAtom(Atom):
         attrs = super().__dir__()
         attrs.extend(['atomID', 'moleculeID', 'atomtype', 'q', 'dr',
                       'r', 'x', 'y', 'z', 'v', 'vx', 'vy', 'vz',
-                      'f', 'fx', 'fy', 'fz', 'n', 'nx', 'ny', 'nz',
-                      'pe', 'ke', 'etotal', 'CN'])
+                      'f', 'fx', 'fy', 'fz', 'pe', 'ke', 'etotal', 'CN'])
         return attrs
 
     @property
@@ -335,112 +330,6 @@ class XAtom(Atom):
             return OrderedDict(list(zip(xyz, self.r)))
         else:
             return self.r
-
-    @property
-    def nx(self):
-        """:math:`n_x` image flag.
-
-        Returns
-        -------
-        int
-            :math:`n_x` image flag.
-
-        """
-        return self._n.x
-
-    @nx.setter
-    def nx(self, value):
-        """Set :math:`n_x` image flag.
-
-        Parameters
-        ----------
-        value : float
-            :math:`n_x` image flag.
-
-        """
-        if not isinstance(value, numbers.Number):
-            raise TypeError('Expected a number')
-        self._n.x = int(value)
-
-    @property
-    def ny(self):
-        """:math:`n_y` image flag.
-
-        Returns
-        -------
-        int
-            :math:`n_y` image flag.
-
-        """
-        return self._n.y
-
-    @ny.setter
-    def ny(self, value):
-        """Set :math:`n_y` image flag.
-
-        Parameters
-        ----------
-        value : float
-            :math:`n_y` image flag.
-
-        """
-        if not isinstance(value, numbers.Number):
-            raise TypeError('Expected a number')
-        self._n.y = int(value)
-
-    @property
-    def nz(self):
-        """:math:`n_z` image flag.
-
-        Returns
-        -------
-        int
-            :math:`n_z` image flag.
-
-        """
-        return self._n.z
-
-    @nz.setter
-    def nz(self, value):
-        """Set `XAtom` :math:`n_z` image flag.
-
-        Parameters
-        ----------
-        value : float
-            :math:`n_z` image flag.
-
-        """
-        if not isinstance(value, numbers.Number):
-            raise TypeError('Expected a number')
-        self._n.z = int(value)
-
-    @property
-    def n(self):
-        """:math:`n_x, n_y, n_z` image flags of `XAtom`.
-
-        Returns
-        -------
-        ndarray
-            3-element ndarray of [:math:`n_x`, :math:`n_y`, :math:`n_z`]
-            image flags of `XAtom`.
-
-        """
-        return self._n
-
-    @n.setter
-    def n(self, value):
-        """Set :math:`n_x, n_y, n_z` image flags of `XAtom`.
-
-        Parameters
-        ----------
-        value : array_like
-            3-element ndarray of [:math:`n_x`, :math:`n_y`, :math:`n_z`]
-            image flags of `XAtom`.
-
-        """
-        if not isinstance(value, (list, np.ndarray)):
-            raise TypeError('Expected an array_like object')
-        self._n = Point(value, dtype=int)
 
     @property
     def vx(self):
@@ -741,6 +630,5 @@ class XAtom(Atom):
                     x=self.x, y=self.y, z=self.z,
                     vx=self.vx, vy=self.vy, vz=self.vz,
                     fx=self.fx, fy=self.fy, fz=self.fz,
-                    nx=self.nx, ny=self.ny, nz=self.nz,
                     pe=self.pe, ke=self.ke, etotal=self.etotal,
                     CN=self.CN)
