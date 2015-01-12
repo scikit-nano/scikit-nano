@@ -29,7 +29,7 @@ before_install:
   #- pip install gmpy2
   #- travis_wait pip install scipy
   #- popd
-  - sudo apt-get install -qq python3-scipy python3-nose
+  - sudo apt-get install -qq python3-scipy python3-nose python3-six
 install:
   - python setup.py install
 script: nosetests
