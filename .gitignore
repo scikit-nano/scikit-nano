@@ -11,8 +11,8 @@
 
 # Python files #
 ################
+sknano/version.py
 .ipynb_checkpoints
-.ropeproject
 # setup.py working directory
 build
 # sphinx build directory
@@ -24,10 +24,12 @@ doc/source/generated
 dist
 # Egg metadata
 *.egg-info
-# tox testing tool
+# tox testing directory
 .tox
-sknano/version.py
-
+# coverage test data
+.coverage
+# rope generated directory
+.ropeproject
 
 # Packages #
 ############
