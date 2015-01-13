@@ -235,7 +235,7 @@ def setup_package():
         install_requires += ['scipy>=0.14']
 
     # Add six module to install_requires
-    install_requires += ['six>=1.8']
+    install_requires += ['six>=1.9']
 
     metadata = dict(
         name=DISTNAME,
