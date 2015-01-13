@@ -6,6 +6,8 @@ source = sknano
 include = */sknano/*
 omit =
     */setup.py
+    */sknano/version.py
+    */tests/*
 
 [report]
 exclude_lines =
