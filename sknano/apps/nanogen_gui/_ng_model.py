@@ -185,7 +185,5 @@ class NGModel(object):
         self._observers.remove(observer)
 
     def notify_observers(self):
-        self.swntbundle.compute_bundle_params()
-        #self.graphene.compute_layer_params()
         for observer in self._observers[:]:
             observer.update_app_view()
