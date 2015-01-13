@@ -12,6 +12,12 @@ import shutil
 import subprocess
 from distutils.command.clean import clean as Clean
 
+try:
+    import setuptools
+except ImportError:
+    sys.exit("setuptools required for Python3 install.\n"
+             "`pip install --upgrade setuptools`")
+
 #if sys.version_info[0] < 3:
 #    print('Python 2 support requires running `3to2` on source directory.')
 #    #raise RuntimeError("Python version 3.4+ required.")
@@ -68,19 +74,6 @@ if STABLEVERSION is None:
         STABLEVERSION = VERSION
     else:
         STABLEVERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO-1)
-
-# For some commands, use setuptools
-if len(set(('develop', 'release', 'bdist_egg', 'bdist_rpm', 'bdist_wininst',
-            'install_egg_info', 'build_sphinx', 'egg_info', 'easy_install',
-            'upload', 'bdist_wheel', '--single-version-externally-managed',
-            )).intersection(sys.argv)) > 0:
-    import setuptools
-    extra_setuptools_args = dict(
-        zip_safe=False,  # the package can run out of an .egg file
-        include_package_data=True,
-    )
-else:
-    extra_setuptools_args = dict()
 
 
 # Return the GIT version as a string
@@ -259,7 +252,8 @@ def setup_package():
                 'nanogenui = sknano.scripts.nanogenui:main'],
         },
         cmdclass={'clean': CleanCommand},
-        **extra_setuptools_args
+        zip_safe=False,  # the package can run out of an .egg file
+        include_package_data=True,
     )
 
     if len(sys.argv) >= 2 and \
@@ -278,9 +272,6 @@ def setup_package():
         FULLVERSION, GIT_REVISION = get_version_info()
         metadata['version'] = FULLVERSION
     else:
-        #FULLVERSION, GIT_REVISION = get_version_info()
-        #metadata['version'] = FULLVERSION
-
         from numpy.distutils.core import setup
         metadata['configuration'] = configuration
 
