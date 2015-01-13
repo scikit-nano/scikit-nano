@@ -15,7 +15,6 @@ import importlib
 try:
     from PyQt4.QtCore import pyqtSlot
     from PyQt4.QtGui import QMainWindow
-
     from ._ui_nanogen import Ui_NanoGen
 except ImportError as e:
     print(e)
@@ -39,9 +38,9 @@ class NGView(QMainWindow, Ui_NanoGen):
         self.controller = controller
         self.model = model
         model.register_observer(self)
-        super(NGView, self).__init__()
+        super().__init__()
         self.setupUi(self)
-        self.nanogen_statusBar.showMessage('Ready')
+        self.nanogen_statusBar.showMessage('Ready.')
 
     # Nanotube Generator slots/signals
 
