@@ -12,7 +12,6 @@ from __future__ import absolute_import, division, print_function, \
 __docformat__ = 'restructuredtext en'
 
 from ._base import StructureBase
-from ._compute_funcs import compute_tube_mass, compute_linear_mass_density
 from ._extras import attr_strfmt, attr_symbols, attr_units
 from ._mixins import SWNTMixin
 
@@ -24,28 +23,29 @@ class SWNT(SWNTMixin, StructureBase):
 
     Parameters
     ----------
-    n, m : int
-        Chiral indices defining the nanotube chiral vector
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of integers (i.e., *Ch = [(n, m)]) or
+        2 integers (i.e., *Ch = [n, m]) specifying the chiral indices
+        of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-    nz : int, optional
-        Number of repeat unit cells along the :math:`z` dimension
+    nz : :class:`python:int`, optional
+        Number of repeat unit cells in the :math:`z` direction, along
+        the *length* of the nanotube.
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.core.atoms.Atom` 1 and 2
+        :class:`~sknano.core.Atom` 1 and 2
     bond : float, optional
-        Distance between nearest neighbor atoms (i.e., bond length).
-        Must be in units of **\u212b**. Default value is
-        the carbon-carbon bond length in graphite, approximately
-        :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
+        :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
+        nearest neighbor atoms. Must be in units of **Angstroms**.
     Lz : float, optional
-        Length of the nanotube in **nanometers**.
-        Overrides the :math:`n_z` cell values.
+        Length of nanotube in units of **nanometers**.
+        Overrides the `nz` value.
 
         .. versionadded:: 0.2.5
 
     tube_length : float, optional
         Length of nanotube in units of **nanometers**.
-        Overrides `nz` value.
+        Overrides the `nz` value.
 
         .. deprecated:: 0.2.5
            Use `Lz` instead
@@ -54,6 +54,11 @@ class SWNT(SWNTMixin, StructureBase):
         Generate the nanotube with length as close to the specified
         :math:`L_z` as possible. If `True`, then
         non integer :math:`n_z` cells are permitted.
+
+        .. versionadded:: 0.2.6
+
+    verbose : bool, optional
+        if `True`, show verbose output
 
     Examples
     --------

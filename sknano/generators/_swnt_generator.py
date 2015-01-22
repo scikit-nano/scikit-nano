@@ -18,10 +18,11 @@ SWNT structure generator (:mod:`sknano.generators._swnt_generator`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-#import six
-from six.moves import range
+
 __docformat__ = 'restructuredtext en'
 
+#import six
+from six.moves import range
 import numpy as np
 
 from sknano.core import pluralize
@@ -39,7 +40,8 @@ class SWNTGenerator(SWNT, GeneratorBase):
     Parameters
     ----------
     *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
-        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        Either a 2-tuple of integers (i.e., *Ch = [(n, m)]) or
+        2 integers (i.e., *Ch = [n, m]) specifying the chiral indices
         of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     nz : :class:`python:int`, optional
