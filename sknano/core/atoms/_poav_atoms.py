@@ -93,10 +93,6 @@ class POAVAtoms(KDTAtoms):
                     POAV.misalignment_angles = misalignment_angles
                     POAV.sigma_pi_angles = sigma_pi_angles
 
-    def update_attrs(self):
-        """Alisas for :meth:`POAVAtoms.compute_POAVs`"""
-        self.compute_POAVs()
-
     @property
     def POAV1(self):
         """List of :class:`~sknano.core.atoms.POAVAtom` :class:`POAV1` \
