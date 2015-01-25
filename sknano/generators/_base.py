@@ -84,8 +84,7 @@ class GeneratorBase(object):
         del self.structure_data
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
-                  rotation_angle=None, rot_axis=None, anchor_point=None,
-                  deg2rad=True, center_CM=True, savecopy=True, **kwargs):
+                  center_CM=True, **kwargs):
         """Save structure data.
 
         .. todo::
@@ -106,14 +105,6 @@ class GeneratorBase(object):
 
             If `None`, then guess based on `fname` file extension or
             default to `xyz` format.
-        rotation_angle : {None, float}, optional
-            Angle of rotation
-        rot_axis : {'x', 'y', 'z'}, optional
-            Rotation axis
-        anchor_point : array_like, optional
-            Rotation axis origin
-        deg2rad : bool, optional
-            Convert `rotation_angle` from degrees to radians.
         center_CM : bool, optional
             Center center-of-mass on origin.
 
@@ -142,17 +133,13 @@ class GeneratorBase(object):
 
         #self._structure_format = structure_format
 
-        if savecopy:
-            atoms = copy.deepcopy(self.atoms)
-        else:
-            atoms = self.atoms
+        atoms = copy.deepcopy(self.atoms)
 
         if center_CM:
             atoms.center_CM()
 
-        if rotation_angle is not None:
-            atoms.rotate(angle=rotation_angle, rot_axis=rot_axis,
-                         anchor_point=anchor_point, deg2rad=deg2rad)
+        if kwargs:
+            atoms.rotate(**kwargs)
 
         StructureWriter.write(fname=fname, outpath=outpath, atoms=atoms,
                               structure_format=structure_format)
