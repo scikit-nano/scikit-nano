@@ -31,19 +31,12 @@ class Molecules(UserList):
     molecules : {None, sequence, `Molecules`}, optional
         if not `None`, then a list of `Molecule` instance objects or an
         existing `Molecules` instance object.
-    copylist : bool, optional
-        perform shallow copy of molecules list
-    deepcopy : bool, optional
-        perform deepcopy of molecules list
-
 
     """
     _moleculeattrs = []
 
-    def __init__(self, molecules=None, copylist=True, deepcopy=False):
-        super(Molecules, self).__init__(initlist=molecules,
-                                        copylist=copylist,
-                                        deepcopy=deepcopy)
+    def __init__(self, molecules=None):
+        super().__init__(initlist=molecules)
 
     def __str__(self):
         return repr(self)
@@ -52,13 +45,8 @@ class Molecules(UserList):
         """Return canonical string representation of `Molecules`."""
         return "Molecules(molecules={!r})".format(self.data)
 
-    def sort(self, key=None, reverse=False):
-
-        if key is None:
-            self.data.sort(key=attrgetter('element', 'Z', 'z'),
-                           reverse=reverse)
-        else:
-            self.data.sort(key=key, reverse=reverse)
+    def sort(self, key=attrgetter('id'), reverse=False):
+        super().sort(key=key, reverse=reverse)
 
     @property
     def Nmolecules(self):
@@ -230,7 +218,7 @@ class Molecules(UserList):
 
     def rotate(self, angle=None, axis=None, anchor_point=None,
                rot_point=None, from_vector=None, to_vector=None,
-               deg2rad=False, transform_matrix=None, verbose=False, **kwargs):
+               degrees=False, transform_matrix=None, verbose=False, **kwargs):
         """Rotate `Molecule` position vectors.
 
         Parameters
@@ -240,7 +228,7 @@ class Molecules(UserList):
         anchor_point : :class:`~sknano.core.math.Point`, optional
         rot_point : :class:`~sknano.core.math.Point`, optional
         from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
-        deg2rad : bool, optional
+        degrees : bool, optional
         transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
@@ -250,7 +238,7 @@ class Molecules(UserList):
                                       anchor_point=anchor_point,
                                       rot_point=rot_point,
                                       from_vector=from_vector,
-                                      to_vector=to_vector, deg2rad=deg2rad,
+                                      to_vector=to_vector, degrees=degrees,
                                       verbose=verbose, **kwargs)
         [molecule.rotate(transform_matrix=transform_matrix)
          for molecule in self]
