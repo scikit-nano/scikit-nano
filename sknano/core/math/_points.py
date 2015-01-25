@@ -29,18 +29,11 @@ class Points(UserList):
     points : {None, sequence, `Points`}, optional
         if not `None`, then a list of `Point` instance objects or an
         existing `Points` instance object.
-    copylist : bool, optional
-        perform shallow copy of points list
-    deepcopy : bool, optional
-        perform deepcopy of points list
-
 
     """
 
-    def __init__(self, points=None, copylist=True, deepcopy=False):
-        super(Points, self).__init__(initlist=points,
-                                     copylist=copylist,
-                                     deepcopy=deepcopy)
+    def __init__(self, points=None):
+        super().__init__(initlist=points)
 
     def __str__(self):
         return repr(self)
@@ -49,13 +42,8 @@ class Points(UserList):
         """Return canonical string representation of `Points`."""
         return "Points(points={!r})".format(self.data)
 
-    def sort(self, key=None, reverse=False):
-
-        if key is None:
-            self.data.sort(key=attrgetter('x', 'y', 'z'),
-                           reverse=reverse)
-        else:
-            self.data.sort(key=key, reverse=reverse)
+    def sort(self, key=attrgetter('x', 'y', 'z'), reverse=False):
+        super().sort(key=key, reverse=reverse)
 
     @property
     def x(self):
@@ -111,30 +99,30 @@ class Points(UserList):
         """
         [point.rezero(epsilon=epsilon) for point in self]
 
-    def rotate(self, angle=None, rot_axis=None, anchor_point=None,
+    def rotate(self, angle=None, axis=None, anchor_point=None,
                rot_point=None, from_vector=None, to_vector=None,
-               deg2rad=False, transform_matrix=None, verbose=False):
+               degrees=False, transform_matrix=None, verbose=False, **kwargs):
         """Rotate `Point`\ s coordinates.
 
         Parameters
         ----------
         angle : float
-        rot_axis : :class:`~sknano.core.math.Vector`, optional
+        axis : :class:`~sknano.core.math.Vector`, optional
         anchor_point : :class:`~sknano.core.math.Point`, optional
         rot_point : :class:`~sknano.core.math.Point`, optional
         from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
-        deg2rad : bool, optional
+        degrees : bool, optional
         transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
         if transform_matrix is None:
             transform_matrix = \
-                transformation_matrix(angle=angle, rot_axis=rot_axis,
+                transformation_matrix(angle=angle, axis=axis,
                                       anchor_point=anchor_point,
                                       rot_point=rot_point,
                                       from_vector=from_vector,
-                                      to_vector=to_vector, deg2rad=deg2rad,
-                                      verbose=verbose)
+                                      to_vector=to_vector, degrees=degrees,
+                                      verbose=verbose, **kwargs)
         [point.rotate(transform_matrix=transform_matrix) for point in self]
 
     def translate(self, t):

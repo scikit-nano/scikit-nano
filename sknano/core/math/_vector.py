@@ -61,7 +61,6 @@ class Vector(np.ndarray):
 
     """
     __array_priority__ = 15.0
-    __hash__ = np.ndarray.__hash__
     _verbosity = 0
 
     def __new__(cls, v=None, nd=None, p0=None, p=None, dtype=None, copy=True):
@@ -506,30 +505,30 @@ class Vector(np.ndarray):
         """
         self[np.where(np.abs(self.__array__()) <= epsilon)] = 0.0
 
-    def rotate(self, angle=None, rot_axis=None, anchor_point=None,
+    def rotate(self, angle=None, axis=None, anchor_point=None,
                rot_point=None, from_vector=None, to_vector=None,
-               deg2rad=False, transform_matrix=None, verbose=False):
+               degrees=False, transform_matrix=None, verbose=False, **kwargs):
         """Rotate `Vector` coordinates.
 
         Parameters
         ----------
         angle : float
-        rot_axis : :class:`~sknano.core.math.Vector`, optional
+        axis : :class:`~sknano.core.math.Vector`, optional
         anchor_point : :class:`~sknano.core.math.Point`, optional
         rot_point : :class:`~sknano.core.math.Point`, optional
         from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
-        deg2rad : bool, optional
+        degrees : bool, optional
         transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
         if transform_matrix is None:
             transform_matrix = \
-                transformation_matrix(angle=angle, rot_axis=rot_axis,
+                transformation_matrix(angle=angle, axis=axis,
                                       anchor_point=anchor_point,
                                       rot_point=rot_point,
                                       from_vector=from_vector,
-                                      to_vector=to_vector, deg2rad=deg2rad,
-                                      verbose=verbose)
+                                      to_vector=to_vector, degrees=degrees,
+                                      verbose=verbose, **kwargs)
 
         self.p0 = rotate(self.p0, transform_matrix=transform_matrix)
         self.p = rotate(self.p, transform_matrix=transform_matrix)
