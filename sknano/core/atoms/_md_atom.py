@@ -29,25 +29,18 @@ class MDAtom(Atom):
         super().__init__(**kwargs)
         self.reference_atom = reference_atom
 
-    @property
-    def NN(self):
-        """Nearest-neighbor `Atoms`."""
-        return self._NN
-
-    @NN.setter
+    @Atom.NN.setter
     def NN(self, value):
         """Set nearest-neighbor `Atoms`."""
-        if not isinstance(value, sknano.core.atoms.Atoms):
-            raise TypeError('Expected an `Atoms` object.')
-        self._NN = value
-
         if self.reference_atom is not None:
-            self._NN = sknano.core.atoms.MDAtoms(
-                atoms=[self.NN[self.NN.ids.tolist().index(atom.id)]
-                       if atom.id in self.NN.ids else
+            value = sknano.core.atoms.MDAtoms(
+                atoms=[value[value.ids.tolist().index(atom.id)]
+                       if atom.id in value.ids else
                        self.__class__(reference_atom=atom.reference_atom,
                                       element=atom.element, id=atom.id,
                                       mol=atom.mol, type=atom.type,
                                       mass=atom.mass, q=atom.q,
                                       x=np.inf, y=np.inf, z=np.inf)
                        for atom in self.reference_atom.NN])
+
+        super(MDAtom, MDAtom).NN.__set__(self, value)
