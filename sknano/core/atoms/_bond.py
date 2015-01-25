@@ -28,8 +28,6 @@ class Bond:
     atom1, atom2 : `~sknano.core.atoms.Atom` instances
 
     """
-    __hash__ = object.__hash__
-
     def __init__(self, atom1, atom2):
         self._atoms = sknano.core.atoms.StructureAtoms(atoms=[atom1, atom2])
         self._vector = Vector(atom2.r - atom1.r, p0=atom1.r.p)

@@ -32,8 +32,6 @@ class Atom:
         an element atomic number :math:`\\boldsymbol{Z}`.
 
     """
-    __hash__ = object.__hash__
-
     def __init__(self, element=None, mass=None, **kwargs):
 
         if mass is None and 'm' in kwargs:
