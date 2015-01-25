@@ -10,45 +10,29 @@ Custom list class (:mod:`sknano.core._user_list`)
 from __future__ import absolute_import, division, print_function
 __docformat__ = 'restructuredtext en'
 
-from collections import MutableSequence
-from functools import total_ordering
-
-import copy
+try:
+    from collections.abc import MutableSequence
+except ImportError:
+    from collections import MutableSequence
 
 __all__ = ['UserList']
 
 
-@total_ordering
-class UserList(MutableSequence):
+class _UserList(MutableSequence):
     """Modified implementation of :class:`~python:collections.UserList`.
 
     Parameters
     ----------
     initlist : {None, sequence, UserList}, optional
         if not `None`, then a list or an instance of `UserList`
-    copylist : bool, optional
-        perform shallow copy of list items
-    deepcopy : bool, optional
-        perform deepcopy of list items
     """
-    def __init__(self, initlist=None, copylist=True, deepcopy=False):
+    def __init__(self, initlist=None):
         self.data = []
-
         if initlist is not None:
             if type(initlist) == type(self.data):
-                if copylist and not deepcopy:
-                    self.data.extend(initlist[:])
-                elif deepcopy:
-                    self.data.extend(copy.deepcopy(initlist))
-                else:
-                    self.data.extend(initlist)
+                self.data[:] = initlist
             elif isinstance(initlist, UserList):
-                if copylist and not deepcopy:
-                    self.data.extend(initlist.data[:])
-                elif deepcopy:
-                    self.data.extend(copy.deepcopy(initlist.data))
-                else:
-                    self.data.extend(initlist.data)
+                self.data[:] = initlist.data[:]
             else:
                 self.data = list(initlist)
 
@@ -159,3 +143,8 @@ class UserList(MutableSequence):
             self.data.extend(other.data)
         else:
             self.data.extend(other)
+
+try:
+    from collections import UserList
+except ImportError:
+    UserList = _UserList
