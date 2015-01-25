@@ -35,43 +35,32 @@ __all__ = ['Atom', 'Atoms',
            'supported_structure_formats']
 
 
-class StructureData(object):
-    """Container class for structure data atoms."""
+class StructureData:
+    """Container class for structure data."""
     def __init__(self):
-        self.atoms = Atoms()
+        self._atoms = Atoms()
 
     @property
     def atoms(self):
-        """Return :class:`~sknano.core.atoms.Atoms` instance object."""
         return self._atoms
 
-    @atoms.setter
-    def atoms(self, value):
-        """Set :attr:`~StructureData.atoms` attribute."""
-        if not isinstance(value, Atoms):
-            raise TypeError('Expected an `Atoms` instance.')
-        self._atoms = value
+    def __getattr__(self, name):
+        return getattr(self._atoms, name)
 
-    @atoms.deleter
-    def atoms(self):
-        del self._atoms
+    def __setattr__(self, name, value):
+        if name.startswith('_'):
+            super().__setattr__(name, value)
+        else:
+            setattr(self._atoms, name, value)
 
-    @property
-    def bonds(self):
-        """Return :attr:`~sknano.core.atoms.Atoms.bonds` attribute."""
-        return self.atoms.bonds
-
-    def analyze(self):
-        """Analyze structure data."""
-        self.atoms.update_attrs()
-        #StructureAnalyzer(self)
-
-    def clear(self):
-        """Clear :class:`~sknano.core.atoms.Atoms` list."""
-        self.atoms.clear()
+    def __delattr__(self, name):
+        if name.startswith('_'):
+            super().__delattr__(name)
+        else:
+            delattr(self._atoms, name)
 
 
-class StructureIO(object):
+class StructureIO:
     """Base class for structure data file input and output.
 
     Parameters
@@ -86,21 +75,6 @@ class StructureIO(object):
             fpath = fname
         self.fpath = fpath
         self.kwargs = kwargs
-
-    @property
-    def atoms(self):
-        return self.structure_data.atoms
-
-    @atoms.setter
-    def atoms(self, value):
-        """Set :attr:`~StructureData.atoms` attribute."""
-        if not isinstance(value, Atoms):
-            raise TypeError('Expected an `Atoms` instance.')
-        self.structure_data.atoms = value
-
-    @atoms.deleter
-    def atoms(self):
-        del self.structure_data.atoms
 
     @property
     def comment_line(self):
@@ -124,8 +98,11 @@ class StructureIO(object):
     def comment_line(self):
         del self._comment_line
 
+    def __getattr__(self, name):
+        return getattr(self.structure_data, name)
 
-class StructureReader(object):
+
+class StructureReader:
     """Structure data reader base class."""
     @classmethod
     def read(cls, fpath, structure_format=None, **kwargs):
@@ -150,7 +127,7 @@ class StructureReader(object):
             return XYZReader.read(fpath)
 
 
-class StructureWriter(object):
+class StructureWriter:
     """Structure data writer base class."""
     @classmethod
     def write(cls, fname=None, atoms=None, structure_format=None, **kwargs):
@@ -196,7 +173,7 @@ class StructureConverter(six.with_metaclass(ABCMeta, object)):
                                   'to implement the `convert` method.')
 
 
-class StructureFormatSpec(object):
+class StructureFormatSpec:
     """Base class for defining a format specification.
 
     Parameters

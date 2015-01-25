@@ -141,5 +141,5 @@ class GeneratorBase(object):
         if kwargs:
             atoms.rotate(**kwargs)
 
-        StructureWriter.write(fname=fname, outpath=outpath, atoms=atoms,
+        StructureWriter.write(fname=fname, atoms=atoms,
                               structure_format=structure_format)
