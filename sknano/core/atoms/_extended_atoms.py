@@ -293,8 +293,9 @@ class XAtoms(Atoms):
             An instance of `Atoms` (sub)class.
 
         """
-        return self.__class__(atoms=np.asarray(self)[
-            np.in1d(self.ids, atom_ids, invert=invert).nonzero()].tolist())
+        mask = np.in1d(self.ids, atom_ids, invert=invert).nonzero()
+        return self.__class__(atoms=np.asarray(self)[mask].tolist(),
+                              **self.kwargs)
 
     def get_atom(self, id):
         """Get `XAtom` with :attr:`Xatom.id` == `id`.

@@ -31,6 +31,7 @@ class Atoms(UserList):
     """
     def __init__(self, atoms=None):
         super().__init__(initlist=atoms)
+        self.kwargs = {}
 
     def __str__(self):
         """Return a nice string representation of `Atoms`."""
@@ -87,7 +88,8 @@ class Atoms(UserList):
         """
         if invert:
             condition = ~condition
-        return self.__class__(atoms=np.asarray(self)[condition].tolist())
+        return self.__class__(atoms=np.asarray(self)[condition].tolist(),
+                              **self.kwargs)
 
     def get_atoms(self, asarray=False):
         """Return list of `Atoms`.

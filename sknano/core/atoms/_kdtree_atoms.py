@@ -49,8 +49,6 @@ class KDTAtoms(XAtoms):
 
         super().__init__(atoms=atoms)
 
-        self.kwargs = {}
-
         self.kNN = kNN
         self.NNrc = NNrc
 
