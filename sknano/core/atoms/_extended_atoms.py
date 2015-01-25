@@ -45,13 +45,9 @@ class XAtoms(Atoms):
 
         self._types = {}
 
-    def sort(self, key=None, reverse=False):
-        if key is None:
-            self.data.sort(key=attrgetter('element', 'Z', 'type',
-                                          'mol', 'id', 'z'),
-                           reverse=reverse)
-        else:
-            self.data.sort(key=key, reverse=reverse)
+    def sort(self, key=attrgetter('element', 'Z', 'type', 'mol', 'id', 'z'),
+             reverse=False):
+        super().sort(key=key, reverse=reverse)
 
     @property
     def CM(self):
