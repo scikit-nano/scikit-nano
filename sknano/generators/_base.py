@@ -31,43 +31,15 @@ STRUCTURE_GENERATORS = ('FullereneGenerator',
                         'MWNTBundleGenerator')
 
 
-class GeneratorBase(object):
+class GeneratorBase:
     """Base class for generator classes"""
 
     def __init__(self, *args, **kwargs):
         self.structure_data = StructureData()
         super(GeneratorBase, self).__init__(*args, **kwargs)
 
-    @property
-    def atoms(self):
-        """Return structure :class:`~sknano.core.atoms.Atoms`."""
-        return self.structure_data.atoms
-
-    @atoms.setter
-    def atoms(self, value):
-        if not isinstance(value, Atoms):
-            raise TypeError('Expected an `Atoms` object.')
-        self.structure_data.atoms = value
-
-    @atoms.deleter
-    def atoms(self):
-        del self.structure_data.atoms
-
-    @property
-    def structure_data(self):
-        """Return :class:`~sknano.io.StructureData` instance."""
-        return self._structure_data
-
-    @structure_data.setter
-    def structure_data(self, value):
-        """Set :class:`~sknano.io.StructureData` instance."""
-        if not isinstance(value, StructureData):
-            raise TypeError('Expected a `StructureData` object.')
-        self._structure_data = value
-
-    @structure_data.deleter
-    def structure_data(self):
-        del self._structure_data
+    def __getattr__(self, name):
+        return getattr(self.structure_data, name)
 
     @property
     def structure(self):
@@ -141,5 +113,5 @@ class GeneratorBase(object):
         if kwargs:
             atoms.rotate(**kwargs)
 
-        StructureWriter.write(fname=fname, atoms=atoms,
-                              structure_format=structure_format)
+        StructureWriter.write(fname=fname, structure_format=structure_format,
+                              atoms=atoms)

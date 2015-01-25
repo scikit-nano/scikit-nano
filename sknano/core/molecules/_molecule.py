@@ -23,12 +23,12 @@ __all__ = ['Molecule']
 
 
 @total_ordering
-class Molecule(object):
+class Molecule:
     """Base class for abstract representation of molecule.
 
     Parameters
     ----------
-    moleculeID : int, optional
+    id : int, optional
     atoms : {None, sequence, `Atoms`}, optional
         if not `None`, then a list of `Atom` instances or an
         `Atoms` instance.
@@ -37,8 +37,8 @@ class Molecule(object):
     # private class var
     #_molecule_attrs = ['Xc', 'Yc', 'Zc']
 
-    def __init__(self, moleculeID=0, atoms=None):
-        self.moleculeID = moleculeID
+    def __init__(self, id=0, atoms=None):
+        self.id = id
         self.atoms = atoms
 
     def __str__(self):
@@ -47,18 +47,17 @@ class Molecule(object):
 
     def __repr__(self):
         """Return canonical string representation of `Molecule`."""
-        return "Molecule(moleculeID={!r}, atoms={!r})".format(
-            self.moleculeID, self.atoms)
+        return "Molecule(id={!r}, atoms={!r})".format(self.id, self.atoms)
 
     def __eq__(self, other):
         """Test equality of two `Molecule` object instances."""
-        if self is other or (self.moleculeID == other.moleculeID and
+        if self is other or (self.id == other.id and
                              self.atoms == other.atoms):
             return True
         return False
 
     def __lt__(self, other):
         """Test if `self` is *less than* `other`."""
-        if self.moleculeID == other.moleculeID:
+        if self.id == other.id:
             return self.atoms < other.atoms
-        return self.moleculeID < other.moleculeID
+        return self.id < other.id

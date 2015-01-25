@@ -43,8 +43,8 @@ class BilayerGrapheneGenerator(BilayerGraphene, GeneratorBase):
         Stacking order of graphene layers
     layer_rotation_angle : {None, float}, optional
         Rotation angle of second layer specified in degrees.
-        If specified in radians, then you must set `deg2rad=False`
-    deg2rad : bool, optional
+        If specified in degrees, then you must set `degrees=True`
+    degrees : bool, optional
         The `layer_rotation_angle` is specified in degrees and needs to be
         converted to radians.
     autogen : bool, optional
@@ -77,7 +77,8 @@ class BilayerGrapheneGenerator(BilayerGraphene, GeneratorBase):
 
     >>> rotated_bilayer = BilayerGrapheneGenerator(length=10, width=10,
     ...                                            edge='armchair',
-    ...                                            layer_rotation_angle=45)
+    ...                                            layer_rotation_angle=45,
+                                                   degrees=True)
     >>> rotated_bilayer.save_data(fname='rotated_bilayer.xyz')
 
     The rendered structure looks like:
@@ -90,7 +91,8 @@ class BilayerGrapheneGenerator(BilayerGraphene, GeneratorBase):
     ...                                               edge='zigzag',
     ...                                               element1='B',
     ...                                               element2='N',
-    ...                                               layer_rotation_angle=45)
+    ...                                               layer_rotation_angle=45,
+                                                      degrees=True)
     >>> rotated_BN_bilayer.save_data(fname='BN_bilayer_rotated_45deg.xyz')
 
     The rendered structure looks like:
@@ -124,6 +126,6 @@ class BilayerGrapheneGenerator(BilayerGraphene, GeneratorBase):
                     np.where(np.abs(z_coords - z) < epsilon)].tolist(),
                     deepcopy=True)
                 if (n % 2) != 0:
-                    layer.rotate(angle=self.layer_rotation_angle, rot_axis='z')
+                    layer.rotate(angle=self.layer_rotation_angle, axis='z')
 
                 self.atoms.extend(layer.atoms)

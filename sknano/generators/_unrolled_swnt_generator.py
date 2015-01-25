@@ -175,8 +175,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
                     self.atoms.append(nt_atom)
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
-                  rotation_angle=None, rot_axis=None, anchor_point=None,
-                  deg2rad=True, center_CM=True, savecopy=True, **kwargs):
+                  center_CM=True, **kwargs):
         """Save structure data.
 
         See :meth:`~sknano.generators.GeneratorBase.save_data` method
@@ -203,6 +202,4 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
 
         super(UnrolledSWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
-            rotation_angle=rotation_angle, rot_axis=rot_axis,
-            anchor_point=anchor_point, deg2rad=deg2rad, center_CM=False,
-            savecopy=savecopy, **kwargs)
+            center_CM=False, **kwargs)

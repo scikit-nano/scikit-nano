@@ -114,8 +114,7 @@ class MWNTGenerator(MWNT, GeneratorBase):
             self.atoms.extend(SWNTGenerator(**swnt.todict()).atoms)
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
-                  rotation_angle=None, rot_axis=None, deg2rad=True,
-                  anchor_point=None, center_CM=True, savecopy=True, **kwargs):
+                  center_CM=True, **kwargs):
         """Save structure data.
 
         See :meth:`~sknano.generators.GeneratorBase.save_data` method
@@ -131,6 +130,4 @@ class MWNTGenerator(MWNT, GeneratorBase):
 
         super(MWNTGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
-            rotation_angle=rotation_angle, rot_axis=rot_axis,
-            anchor_point=anchor_point, deg2rad=deg2rad, center_CM=center_CM,
-            savecopy=savecopy, **kwargs)
+            center_CM=center_CM, **kwargs)

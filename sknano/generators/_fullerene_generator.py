@@ -67,8 +67,7 @@ class FullereneGenerator(Fullerene, GeneratorBase):
                 CNfile = files[0]
             self.atoms = XYZReader(os.path.join(datadir, CNfile)).atoms
 
-    def save_data(self, fname=None, structure_format=None,
-                  rotation_angle=None, rot_axis=None, deg2rad=True,
+    def save_data(self, fname=None, outpath=None, structure_format=None,
                   center_CM=True, **kwargs):
         """Save structure data.
 
@@ -80,6 +79,5 @@ class FullereneGenerator(Fullerene, GeneratorBase):
             fname = 'C{}'.format(self.N)
 
         super(FullereneGenerator, self).save_data(
-            fname=fname, structure_format=structure_format,
-            rotation_angle=rotation_angle, rot_axis=rot_axis,
-            deg2rad=deg2rad, center_CM=center_CM, **kwargs)
+            fname=fname, outpath=outpath, structure_format=structure_format,
+            center_CM=center_CM, **kwargs)

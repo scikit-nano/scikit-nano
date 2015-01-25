@@ -93,8 +93,7 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
         super(MWNTBundleGenerator, self).generate_bundle()
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
-                  rotation_angle=None, rot_axis=None, anchor_point=None,
-                  deg2rad=True, center_CM=True, savecopy=True, **kwargs):
+                  center_CM=True, **kwargs):
         """Save structure data.
 
         See :meth:`~sknano.generators.GeneratorBase.save_data` method
@@ -129,6 +128,4 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
 
         super(MWNTBundleGenerator, self).save_data(
             fname=fname, outpath=outpath, structure_format=structure_format,
-            rotation_angle=rotation_angle, rot_axis=rot_axis,
-            anchor_point=anchor_point, deg2rad=deg2rad, center_CM=center_CM,
-            savecopy=savecopy, **kwargs)
+            center_CM=center_CM, **kwargs)

@@ -15,7 +15,7 @@ import numbers
 __all__ = ['Fullerene']
 
 
-class Fullerene(object):
+class Fullerene:
     """Fullerene structure class.
 
     The `fullerene data

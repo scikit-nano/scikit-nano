@@ -19,32 +19,32 @@ import numpy as np
 __all__ = ['GeometricRegion', 'GeometricTransformsMixin']
 
 
-class GeometricTransformsMixin(object):
+class GeometricTransformsMixin:
 
-    def rotate(self, angle=None, rot_axis=None, anchor_point=None,
+    def rotate(self, angle=None, axis=None, anchor_point=None,
                rot_point=None, from_vector=None, to_vector=None,
-               deg2rad=False, transform_matrix=None, verbose=False):
+               degrees=False, transform_matrix=None, verbose=False, **kwargs):
         """Rotate `GeometricRegion` `Points` and `Vectors`.
 
         Parameters
         ----------
         angle : float
-        rot_axis : :class:`~sknano.core.math.Vector`, optional
+        axis : :class:`~sknano.core.math.Vector`, optional
         anchor_point : :class:`~sknano.core.math.Point`, optional
         rot_point : :class:`~sknano.core.math.Point`, optional
         from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
-        deg2rad : bool, optional
+        degrees : bool, optional
         transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
         if transform_matrix is None:
             transform_matrix = \
-                transformation_matrix(angle=angle, rot_axis=rot_axis,
+                transformation_matrix(angle=angle, axis=axis,
                                       anchor_point=anchor_point,
                                       rot_point=rot_point,
                                       from_vector=from_vector,
-                                      to_vector=to_vector, deg2rad=deg2rad,
-                                      verbose=verbose)
+                                      to_vector=to_vector, degrees=degrees,
+                                      verbose=verbose, **kwargs)
 
         self.points.rotate(transform_matrix=transform_matrix)
         self.vectors.rotate(transform_matrix=transform_matrix)
@@ -63,7 +63,7 @@ class GeometricTransformsMixin(object):
         self.vectors.translate(t, fix_anchor_points=fix_anchor_points)
 
 
-class GeometricRegion(six.with_metaclass(ABCMeta, object)):
+class GeometricRegion(six.with_metaclass(ABCMeta)):
     """Abstract base class for geometric regions."""
 
     def __init__(self):

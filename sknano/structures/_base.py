@@ -18,7 +18,7 @@ from sknano.core.refdata import CCbond
 __all__ = ['StructureBase']
 
 
-class StructureBase(object):
+class StructureBase:
     """Base class for creating abstract representation of nano structure.
 
     Parameters
@@ -63,31 +63,3 @@ class StructureBase(object):
     @bond.deleter
     def bond(self):
         del self._bond
-
-    @property
-    def element1(self):
-        """Element symbol of :class:`~sknano.core.atoms.Atom` 1."""
-        return self._element1
-
-    @element1.setter
-    def element1(self, value):
-        """Set element symbol of :class:`~sknano.core.atoms.Atom` 1."""
-        self._element1 = value
-
-    @element1.deleter
-    def element1(self):
-        del self._element1
-
-    @property
-    def element2(self):
-        """Element symbol of :class:`~sknano.core.atoms.Atom` 2."""
-        return self._element2
-
-    @element2.setter
-    def element2(self, value):
-        """Set element symbol of :class:`~sknano.core.atoms.Atom` 2."""
-        self._element2 = value
-
-    @element2.deleter
-    def element2(self):
-        del self._element2

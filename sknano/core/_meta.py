@@ -126,7 +126,7 @@ def method_function(module, classobj):
         setattr(moduleobj, method, func)
 
 
-class methodfunc(object):
+class methodfunc:
     """Define functions from existing class methods.
 
     This class is based off of the the `numpy`
@@ -204,12 +204,12 @@ def timethis(func):
         start = time.time()
         result = func(*args, **kwargs)
         end = time.time()
-        print(func.__name__, end-start)
+        print(func.__name__, end - start)
         return result
     return wrapper
 
 
-class with_doc(object):
+class with_doc:
     """Decorator class to combine class method docstrings.
 
     Parameters
