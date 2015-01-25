@@ -32,13 +32,13 @@ __all__ = ['rotate',
 I = np.identity(4)
 
 _str2array = {}
-for i, axis in enumerate(('x', 'y', 'z')):
-    _str2array[axis] = I[:3, i]
+for i, axis_ in enumerate(('x', 'y', 'z')):
+    _str2array[axis_] = I[:3, i]
 
 
-def rotate(obj, angle=None, axis=None, rot_axis=None, anchor_point=None,
-           rot_point=None, from_vector=None, to_vector=None, deg2rad=False,
-           transform_matrix=None, verbose=False):
+def rotate(obj, angle=None, axis=None, anchor_point=None, rot_point=None,
+           from_vector=None, to_vector=None, degrees=False,
+           transform_matrix=None, verbose=False, **kwargs):
     """Rotate object.
 
     .. versionadded:: 0.3.0
@@ -47,11 +47,13 @@ def rotate(obj, angle=None, axis=None, rot_axis=None, anchor_point=None,
     ----------
     obj : array_like
     angle : float, optional
+        Rotation angle in **radians** *unless* `degrees` is `True`.
     axis : {array_like, str, :class:`~sknano.core.math.Vector`}
+        Rotation axis.
     anchor_point : {array_like, :class:`~sknano.core.math.Point`}
     rot_point : :class:`~sknano.core.math.Point`, optional
     from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
-    deg2rad : bool, optional
+    degrees : bool, optional
     transform_matrix : array_like, optional
 
     Returns
@@ -59,8 +61,9 @@ def rotate(obj, angle=None, axis=None, rot_axis=None, anchor_point=None,
     rotated object : array_like
 
     """
-    if axis is None and rot_axis is not None:
-        axis = rot_axis
+    if axis is None and 'rot_axis' in kwargs:
+        axis = kwargs['rot_axis']
+        del kwargs['rot_axis']
 
     if verbose:
         print('In rotate\n'
@@ -80,14 +83,15 @@ def rotate(obj, angle=None, axis=None, rot_axis=None, anchor_point=None,
     try:
         rot_obj = np.dot(transform_matrix, t)[:-1]
     except TypeError:
-        if axis is None and len(obj) > 2:
-            raise TypeError('Expected `axis` to be a 3D Vector.')
+        if axis is None and from_vector is None and to_vector is None and \
+                len(obj) > 2:
+            raise ValueError('Expected `axis` to be a 3D `Vector`.')
         tmatrix = \
             transformation_matrix(angle=angle, axis=axis,
                                   anchor_point=anchor_point,
                                   rot_point=rot_point, from_vector=from_vector,
-                                  to_vector=to_vector, deg2rad=deg2rad,
-                                  verbose=verbose)
+                                  to_vector=to_vector, degrees=degrees,
+                                  verbose=verbose, **kwargs)
 
         rot_obj = np.dot(tmatrix, t)[:-1]
 
@@ -106,7 +110,7 @@ def translate(obj, t):
     pass
 
 
-def Rx(angle, deg2rad=False):
+def Rx(angle, degrees=False):
     """Generate the :math:`3\\times3` rotation matrix :math:`R_x(\\theta)` \
         for a rotation about the :math:`x` axis by an angle :math:`\\theta`.
 
@@ -114,9 +118,9 @@ def Rx(angle, deg2rad=False):
     ----------
     angle : float
         The rotation angle :math:`\\theta` in *radians*. If the angle is
-        given in *degrees*, then you must set `deg2rad=True` to correctly
+        given in *degrees*, then you must set `degrees=True` to correctly
         calculate the rotation matrix.
-    deg2rad : bool, optional
+    degrees : bool, optional
         if `True`, then `angle` is converted from degrees to radians.
 
     Returns
@@ -141,11 +145,11 @@ def Rx(angle, deg2rad=False):
     array([[ 1.        ,  0.        ,  0.        ],
            [ 0.        ,  0.70710678, -0.70710678],
            [ 0.        ,  0.70710678,  0.70710678]])
-    >>> np.alltrue(Rx(np.pi/4) == Rx(45, deg2rad=True))
+    >>> np.alltrue(Rx(np.pi/4) == Rx(45, degrees=True))
     True
 
     """
-    if deg2rad:
+    if degrees:
         angle = np.radians(angle)
     cosa = np.cos(angle)
     sina = np.sin(angle)
@@ -155,7 +159,7 @@ def Rx(angle, deg2rad=False):
     return Rmat
 
 
-def Ry(angle, deg2rad=False):
+def Ry(angle, degrees=False):
     """Generate the :math:`3\\times3` rotation matrix :math:`R_y(\\theta)` \
         for a rotation about the :math:`y` axis by an angle :math:`\\theta`.
 
@@ -163,9 +167,9 @@ def Ry(angle, deg2rad=False):
     ----------
     angle : float
         The rotation angle :math:`\\theta` in *radians*. If the angle is
-        given in *degrees*, then you must set `deg2rad=True` to correctly
+        given in *degrees*, then you must set `degrees=True` to correctly
         calculate the rotation matrix.
-    deg2rad : bool, optional
+    degrees : bool, optional
         if `True`, then `angle` is converted from degrees to radians.
 
     Returns
@@ -190,11 +194,11 @@ def Ry(angle, deg2rad=False):
     array([[ 0.70710678,  0.        ,  0.70710678],
            [ 0.        ,  1.        ,  0.        ],
            [-0.70710678,  0.        ,  0.70710678]])
-    >>> np.alltrue(Ry(np.pi/4) == Ry(45, deg2rad=True))
+    >>> np.alltrue(Ry(np.pi/4) == Ry(45, degrees=True))
     True
 
     """
-    if deg2rad:
+    if degrees:
         angle = np.radians(angle)
     cosa = np.cos(angle)
     sina = np.sin(angle)
@@ -204,7 +208,7 @@ def Ry(angle, deg2rad=False):
     return Rmat
 
 
-def Rz(angle, deg2rad=False):
+def Rz(angle, degrees=False):
     """Generate the :math:`3\\times3` rotation matrix :math:`R_z(\\theta)` \
         for a rotation about the :math:`z` axis by an angle :math:`\\theta`.
 
@@ -212,9 +216,9 @@ def Rz(angle, deg2rad=False):
     ----------
     angle : float
         The rotation angle :math:`\\theta` in *radians*. If the angle is
-        given in *degrees*, then you must set `deg2rad=True` to correctly
+        given in *degrees*, then you must set `degrees=True` to correctly
         calculate the rotation matrix.
-    deg2rad : bool, optional
+    degrees : bool, optional
         if `True`, then `angle` is converted from degrees to radians.
 
     Returns
@@ -239,11 +243,11 @@ def Rz(angle, deg2rad=False):
     array([[ 0.70710678, -0.70710678,  0.        ],
            [ 0.70710678,  0.70710678,  0.        ],
            [ 0.        ,  0.        ,  1.        ]])
-    >>> np.alltrue(Rz(np.pi/4) == Rz(45, deg2rad=True))
+    >>> np.alltrue(Rz(np.pi/4) == Rz(45, degrees=True))
     True
 
     """
-    if deg2rad:
+    if degrees:
         angle = np.radians(angle)
     cosa = np.cos(angle)
     sina = np.sin(angle)
@@ -280,9 +284,9 @@ def reflection_matrix(v):
     return Rmat
 
 
-def rotation_matrix(angle=None, axis=None, rot_axis=None, anchor_point=None,
+def rotation_matrix(angle=None, axis=None, anchor_point=None,
                     rot_point=None, from_vector=None, to_vector=None,
-                    deg2rad=False, verbose=False):
+                    degrees=False, verbose=False, **kwargs):
     """Generate an :math:`n\\times n` rotation matrix.
 
     .. versionadded:: 0.3.0
@@ -290,7 +294,7 @@ def rotation_matrix(angle=None, axis=None, rot_axis=None, anchor_point=None,
     Parameters
     ----------
     angle : float
-        Rotation angle in **radians**. If `deg2rad` is `True`, `angle` will be
+        Rotation angle in **radians**. If `degrees` is `True`, `angle` will be
         converted to radians from degrees.  The *sense* of the rotation is
         defined by the *right hand rule*: If your right-hand's thumb points
         along the `axis`, then your fingers wrap around the axis in the
@@ -306,7 +310,7 @@ def rotation_matrix(angle=None, axis=None, rot_axis=None, anchor_point=None,
     anchor_point : :class:`~sknano.core.math.Point`, optional
     rot_point : :class:`~sknano.core.math.Point`, optional
     from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
-    deg2rad : bool, optional
+    degrees : bool, optional
         If `True`, convert `angle` from degrees to radians.
 
     Returns
@@ -320,14 +324,15 @@ def rotation_matrix(angle=None, axis=None, rot_axis=None, anchor_point=None,
         gives a rotation around the direction of the vector `axis`.
 
     """
-    if axis is None and rot_axis is not None:
-        axis = rot_axis
+    if axis is None and 'rot_axis' in kwargs:
+        axis = kwargs['rot_axis']
+        del kwargs['rot_axis']
 
     Rmat = transformation_matrix(angle=angle, axis=axis,
                                  anchor_point=anchor_point,
                                  rot_point=rot_point, from_vector=from_vector,
-                                 to_vector=to_vector, deg2rad=deg2rad,
-                                 verbose=verbose)
+                                 to_vector=to_vector, degrees=degrees,
+                                 verbose=verbose, **kwargs)
     return Rmat[:-1,:-1]
 
 
@@ -366,9 +371,9 @@ def scaling_matrix(s=None, v=None):
         return Smat
 
 
-def transformation_matrix(angle=None, axis=None, rot_axis=None,
-                          anchor_point=None, rot_point=None, from_vector=None,
-                          to_vector=None, deg2rad=False, verbose=False):
+def transformation_matrix(angle=None, axis=None, anchor_point=None,
+                          rot_point=None, from_vector=None, to_vector=None,
+                          degrees=False, verbose=False, **kwargs):
     """Generate an :math:`(n+1)\\times(n+1)` transformation matrix for an \
         affine transformation in :math:`n` dimensions.
 
@@ -377,7 +382,7 @@ def transformation_matrix(angle=None, axis=None, rot_axis=None,
     Parameters
     ----------
     angle : float
-        Rotation angle in **radians**. If `deg2rad` is `True`, `angle` will be
+        Rotation angle in **radians**. If `degrees` is `True`, `angle` will be
         converted to radians from degrees.  The *sense* of the rotation is
         defined by the *right hand rule*: If your right-hand's thumb points
         along the `axis`, then your fingers wrap around the axis in the
@@ -401,7 +406,7 @@ def transformation_matrix(angle=None, axis=None, rot_axis=None,
 
         If `anchor_point` is `None`, then it defaults to an
         :math:`n`-element array of zeros.
-    deg2rad : bool, optional
+    degrees : bool, optional
         If `True`, convert `angle` from degrees to radians.
 
     Returns
@@ -432,8 +437,12 @@ def transformation_matrix(angle=None, axis=None, rot_axis=None,
         raise TypeError('Expected `angle` or `from_vector` and `to_vector` '
                         'set to values with valid types.')
 
-    if axis is None and rot_axis is not None:
-        axis = rot_axis
+    if angle is not None and degrees:
+        angle = np.radians(angle)
+
+    if axis is None and 'rot_axis' in kwargs:
+        axis = kwargs['rot_axis']
+        del kwargs['rot_axis']
 
     from . import vector, Vector, Point
 
@@ -462,9 +471,6 @@ def transformation_matrix(angle=None, axis=None, rot_axis=None,
                              'be computed for rotation transformations in '
                              '2D and 3D.')
     else:
-        if deg2rad:
-            angle = np.radians(angle)
-
         cosa = np.cos(angle)
         sina = np.sin(angle)
 
