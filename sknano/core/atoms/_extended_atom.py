@@ -87,7 +87,9 @@ class XAtom(Atom):
         self.CN = CN
 
         self.strrep = "Atom(element={element!r}, id={id!r}, " + \
-            "mol={mol!r}, type={type!r})"
+            "mol={mol!r}, type={type!r}, q={q!r}, mass={mass!r}, " + \
+            "x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
+            "pe={pe!r}, ke={ke!r}, etotal={etotal!r}, CN={CN!r})"
 
     def __repr__(self):
         """Return canonical string representation of `XAtom`."""
