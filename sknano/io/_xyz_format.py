@@ -57,7 +57,7 @@ class XYZReader(StructureIO):
                 raise XYZIOError(error_msg)
 
 
-class XYZWriter(object):
+class XYZWriter:
     """`StructureWriter` class for writing `xyz` chemical file format."""
 
     @classmethod

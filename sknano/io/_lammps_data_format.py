@@ -243,7 +243,7 @@ class DATAReader(StructureIO):
 LAMMPSDATAReader = DATAReader
 
 
-class DATAWriter(object):
+class DATAWriter:
     """`StructureWriter` class for writing `LAMMPS data` file format."""
 
     @classmethod
@@ -569,7 +569,7 @@ class DATAIOError(StructureIOError):
 LAMMPSDATAIOError = DATAIOError
 
 
-class DATAFormatSpec(object):
+class DATAFormatSpec:
     """`StructureFormatSpec` class the `LAMMPS data` format spec.
 
     Parameters

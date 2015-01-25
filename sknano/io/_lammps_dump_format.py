@@ -239,7 +239,7 @@ class DUMPReader(StructureIO):
         return ' '.join(sorted(self.dumpattrs, key=self.dumpattrs.__getitem__))
 
 
-class DUMPWriter(object):
+class DUMPWriter:
     """Class for writing LAMMPS dump chemical file format."""
 
     @classmethod

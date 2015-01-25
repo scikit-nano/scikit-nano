@@ -151,7 +151,7 @@ class StructureWriter:
             XYZWriter.write(fname=fname, atoms=atoms, **kwargs)
 
 
-class StructureConverter(six.with_metaclass(ABCMeta, object)):
+class StructureConverter(six.with_metaclass(ABCMeta)):
     """Abstract base class for converting structure data.
 
     Parameters
