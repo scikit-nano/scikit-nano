@@ -228,29 +228,41 @@ class Molecules(UserList):
         """
         [molecule.rezero(epsilon=epsilon) for molecule in self]
 
-    def rotate(self, angle=None, rot_axis=None, anchor_point=None,
-               deg2rad=False, transform_matrix=None):
-        """Rotate molecule coordinates about arbitrary axis.
+    def rotate(self, angle=None, axis=None, anchor_point=None,
+               rot_point=None, from_vector=None, to_vector=None,
+               deg2rad=False, transform_matrix=None, verbose=False, **kwargs):
+        """Rotate `Molecule` position vectors.
 
         Parameters
         ----------
         angle : float
+        axis : :class:`~sknano.core.math.Vector`, optional
+        anchor_point : :class:`~sknano.core.math.Point`, optional
+        rot_point : :class:`~sknano.core.math.Point`, optional
+        from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
+        deg2rad : bool, optional
+        transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
         if transform_matrix is None:
             transform_matrix = \
-                transformation_matrix(angle, rot_axis=rot_axis,
+                transformation_matrix(angle=angle, axis=axis,
                                       anchor_point=anchor_point,
-                                      deg2rad=deg2rad)
+                                      rot_point=rot_point,
+                                      from_vector=from_vector,
+                                      to_vector=to_vector, deg2rad=deg2rad,
+                                      verbose=verbose, **kwargs)
         [molecule.rotate(transform_matrix=transform_matrix)
          for molecule in self]
 
-    def translate(self, t):
-        """Translate molecule coordinates.
+    def translate(self, t, fix_anchor_points=True):
+        """Translate `Molecule` position vectors by :class:`Vector` `t`.
 
         Parameters
         ----------
-        t : array_like
-            3-elment array of :math:`x,y,z` components of translation vector
+        t : :class:`Vector`
+        fix_anchor_points : bool, optional
+
         """
-        [molecule.translate(t) for molecule in self]
+        [molecule.translate(t, fix_anchor_point=fix_anchor_points)
+         for molecule in self]
