@@ -27,16 +27,10 @@ class Atoms(UserList):
     atoms : {None, sequence, `Atoms`}, optional
         if not `None`, then a list of `Atom` instance objects or an
         existing `Atoms` instance object.
-    copylist : bool, optional
-        perform shallow copy of atoms list
-    deepcopy : bool, optional
-        perform deepcopy of atoms list
-
 
     """
-    def __init__(self, atoms=None, copylist=True, deepcopy=False, **kwargs):
-        super().__init__(initlist=atoms, copylist=copylist, deepcopy=deepcopy)
-        self.kwargs = kwargs
+    def __init__(self, atoms=None):
+        super().__init__(initlist=atoms)
 
     def __str__(self):
         """Return a nice string representation of `Atoms`."""
@@ -46,13 +40,8 @@ class Atoms(UserList):
         """Return canonical string representation of `Atoms`."""
         return "Atoms(atoms={!r})".format(self.data)
 
-    def sort(self, key=None, reverse=False):
-
-        if key is None:
-            self.data.sort(key=attrgetter('element', 'Z'),
-                           reverse=reverse)
-        else:
-            self.data.sort(key=key, reverse=reverse)
+    def sort(self, key=attrgetter('element', 'Z'), reverse=False):
+        super().sort(key=key, reverse=reverse)
 
     @property
     def Natoms(self):
@@ -98,8 +87,7 @@ class Atoms(UserList):
         """
         if invert:
             condition = ~condition
-        return self.__class__(atoms=np.asarray(self)[condition].tolist(),
-                              **self.kwargs)
+        return self.__class__(atoms=np.asarray(self)[condition].tolist())
 
     def get_atoms(self, asarray=False):
         """Return list of `Atoms`.
@@ -114,6 +102,6 @@ class Atoms(UserList):
 
         """
         if asarray:
-            return np.asarray(self)
+            return np.asarray(self.data)
         else:
-            return self
+            return self.data

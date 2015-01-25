@@ -15,7 +15,7 @@ from operator import attrgetter
 
 import numpy as np
 
-from sknano.core import UserList, cyclic_pairs
+from sknano.core import UserList, cyclic_pairs, dedupe
 from sknano.core.math import vector as vec
 
 import sknano.core.atoms
@@ -31,14 +31,10 @@ class Bonds(UserList):
     ----------
     bonds : {None, sequence, `Bonds`}, optional
         if not `None`, then a list of `Bond` instance objects
-    copylist : bool, optional
-        perform shallow copy of bonds list
-    deepcopy : bool, optional
-        perform deepcopy of bonds list
 
     """
-    def __init__(self, bonds=None, copylist=True, deepcopy=False):
-        super().__init__(initlist=bonds, copylist=copylist, deepcopy=deepcopy)
+    def __init__(self, bonds=None):
+        super().__init__(initlist=bonds)
 
     def __str__(self):
         """Return a nice string representation of `Bonds`."""
@@ -48,12 +44,8 @@ class Bonds(UserList):
         """Return the canonical string representation of `Bonds`."""
         return "Bonds({!r})".format(self.data)
 
-    def sort(self, key=None, reverse=False):
-
-        if key is None:
-            self.data.sort(key=attrgetter('length'), reverse=reverse)
-        else:
-            self.data.sort(key=key, reverse=reverse)
+    def sort(self, key=attrgetter('length'), reverse=False):
+        super().sort(key=key, reverse=reverse)
 
     @property
     def Nbonds(self):
@@ -99,6 +91,7 @@ class Bonds(UserList):
     @property
     def atoms(self):
         """`Atoms` :class:`python:set` in `Bonds`."""
-        atoms = sknano.core.atoms.StructureAtoms()
+        atoms = []
         [atoms.extend(bond.atoms) for bond in self]
-        return sknano.core.atoms.StructureAtoms(atoms=list(set(atoms)))
+        atoms = dedupe(atoms, key=attrgetter('id', 'x', 'y', 'z'))
+        return sknano.core.atoms.StructureAtoms(atoms=list(atoms))

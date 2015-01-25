@@ -35,10 +35,6 @@ class POAVAtoms(KDTAtoms):
     atoms : {None, sequence, `POAVAtoms`}, optional
         if not `None`, then a list of `POAVAtom` instance objects or an
         existing `POAVAtoms` instance object.
-    copylist : bool, optional
-        perform shallow copy of atoms list
-    deepcopy : bool, optional
-        perform deepcopy of atoms list
 
     """
     def __init__(self, **kwargs):

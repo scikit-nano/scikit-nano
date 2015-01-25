@@ -15,10 +15,9 @@ from six.moves import zip
 __docformat__ = 'restructuredtext en'
 
 #import numbers
+from operator import attrgetter
 
 import numpy as np
-
-from operator import attrgetter
 
 from sknano.core import UserList
 from ._md_atom import MDAtom as Atom
@@ -133,9 +132,8 @@ class Snapshot:
 class Trajectory(UserList):
     """Base class for trajectory analysis."""
 
-    def __init__(self, snapshots=None, copylist=True, deepcopy=False):
-        super().__init__(initlist=snapshots, copylist=copylist,
-                         deepcopy=deepcopy)
+    def __init__(self, snapshots=None):
+        super().__init__(initlist=snapshots)
         self.tselect = tselect(self)
         self.aselect = aselect(self)
         self.nselect = 0
@@ -146,11 +144,8 @@ class Trajectory(UserList):
     def Nsnaps(self):
         return len(self.data)
 
-    def sort(self, key=None, reverse=False):
-        if key is None:
-            self.data.sort(key=attrgetter('timestep'), reverse=reverse)
-        else:
-            self.data.sort(key=key, reverse=reverse)
+    def sort(self, key=attrgetter('timestep'), reverse=False):
+        super().sort(key=key, reverse=reverse)
 
     def cull(self):
         i = 1

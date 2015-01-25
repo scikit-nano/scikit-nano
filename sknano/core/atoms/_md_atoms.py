@@ -35,10 +35,6 @@ class MDAtoms(Atoms):
     atoms : {None, sequence, `MDAtoms`}, optional
         if not `None`, then a list of `MDAtom` instance objects or an
         existing `MDAtoms` instance object.
-    copylist : bool, optional
-        perform shallow copy of atoms list
-    deepcopy : bool, optional
-        perform deepcopy of atoms list
 
     """
     def __init__(self, **kwargs):

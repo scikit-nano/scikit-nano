@@ -37,15 +37,11 @@ class XAtoms(Atoms):
     atoms : {None, sequence, `XAtoms`}, optional
         if not `None`, then a list of `XAtom` instance objects or an
         existing `XAtoms` instance object.
-    copylist : bool, optional
-        perform shallow copy of atoms list
-    deepcopy : bool, optional
-        perform deepcopy of atoms list
 
     """
-    def __init__(self, **kwargs):
+    def __init__(self, atoms=None):
 
-        super().__init__(**kwargs)
+        super().__init__(atoms=atoms)
 
         self._types = {}
 
@@ -301,11 +297,8 @@ class XAtoms(Atoms):
             An instance of `Atoms` (sub)class.
 
         """
-        filtered_atoms = \
-            np.asarray(self)[np.in1d(self.ids,
-                                     atom_ids,
-                                     invert=invert).nonzero()].tolist()
-        return self.__class__(atoms=filtered_atoms, **self.kwargs)
+        return self.__class__(atoms=np.asarray(self)[
+            np.in1d(self.ids, atom_ids, invert=invert).nonzero()].tolist())
 
     def get_atom(self, id):
         """Get `XAtom` with :attr:`Xatom.id` == `id`.
@@ -431,30 +424,30 @@ class XAtoms(Atoms):
         """
         [atom.rezero(epsilon=epsilon) for atom in self]
 
-    def rotate(self, angle=None, rot_axis=None, anchor_point=None,
+    def rotate(self, angle=None, axis=None, anchor_point=None,
                rot_point=None, from_vector=None, to_vector=None,
-               deg2rad=False, transform_matrix=None, verbose=False):
+               degrees=False, transform_matrix=None, verbose=False, **kwargs):
         """Rotate `Atom` position vectors.
 
         Parameters
         ----------
         angle : float
-        rot_axis : :class:`~sknano.core.math.Vector`, optional
+        axis : :class:`~sknano.core.math.Vector`, optional
         anchor_point : :class:`~sknano.core.math.Point`, optional
         rot_point : :class:`~sknano.core.math.Point`, optional
         from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
-        deg2rad : bool, optional
+        degrees : bool, optional
         transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
         if transform_matrix is None:
             transform_matrix = \
-                transformation_matrix(angle=angle, rot_axis=rot_axis,
+                transformation_matrix(angle=angle, axis=axis,
                                       anchor_point=anchor_point,
                                       rot_point=rot_point,
                                       from_vector=from_vector,
-                                      to_vector=to_vector, deg2rad=deg2rad,
-                                      verbose=verbose)
+                                      to_vector=to_vector, degrees=degrees,
+                                      verbose=verbose, **kwargs)
         [atom.rotate(transform_matrix=transform_matrix) for atom in self]
 
     def select(self, cmd):

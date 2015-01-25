@@ -43,18 +43,21 @@ class KDTAtoms(XAtoms):
     atoms : {None, sequence, `KDTAtoms`}, optional
         if not `None`, then a list of `KDTAtom` instance objects or an
         existing `KDTAtoms` instance object.
-    copylist : bool, optional
-        perform shallow copy of atoms list
-    deepcopy : bool, optional
-        perform deepcopy of atoms list
 
     """
-    def __init__(self, kNN=3, NNrc=2.0, **kwargs):
+    def __init__(self, kNN=3, NNrc=2.0, atoms=None):
 
-        super().__init__(**kwargs)
+        super().__init__(atoms=atoms)
+
+        self.kwargs = {}
 
         self.kNN = kNN
         self.NNrc = NNrc
+
+        try:
+            self.bonds = atoms.bonds
+        except AttributeError:
+            self.bonds = Bonds()
 
     @property
     def kNN(self):
@@ -89,14 +92,6 @@ class KDTAtoms(XAtoms):
             return KDTree(self.coords)
         except ValueError:
             return None
-
-    @property
-    def bonds(self):
-        """Return list of :attr:`~KDTAtom.bonds`."""
-        bonds = Bonds()
-        [bonds.extend(atom.bonds) for atom in self]
-        return bonds
-        #return np.asarray([atom.bonds for atom in self])
 
     @property
     def nearest_neighbors(self):
@@ -174,6 +169,7 @@ class KDTAtoms(XAtoms):
     def update_attrs(self):
         """Update :class:`KDTAtom`\ s attributes."""
         self.update_nearest_neighbors()
+        self.update_bonds()
 
     def update_nearest_neighbors(self):
         """Update :attr:`KDTAtom.NN`."""
@@ -187,3 +183,8 @@ class KDTAtoms(XAtoms):
                 atom.NN = NN
         except ValueError:
             pass
+
+    def update_bonds(self):
+        """Update :attr:`KDTAtom.bonds`."""
+        self.bonds.clear()
+        [self.bonds.extend(atom.bonds) for atom in self]

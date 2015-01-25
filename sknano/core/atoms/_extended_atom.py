@@ -50,8 +50,6 @@ class XAtom(Atom):
         :math:`v_x, v_y, v_z` components of `XAtom` velocity.
 
     """
-    __hash__ = Atom.__hash__
-
     def __init__(self, element=None, id=0, mol=0, type=1,
                  q=0., mass=None, x=None, y=None, z=None,
                  ix=None, iy=None, iz=None,
@@ -600,27 +598,27 @@ class XAtom(Atom):
         """Alias for :meth:`Atom.rezero`."""
         self.rezero(epsilon=epsilon)
 
-    def rotate(self, angle=None, rot_axis=None, anchor_point=None,
-               rot_point=None, from_vector=None, to_vector=None, deg2rad=False,
-               transform_matrix=None, verbose=False):
+    def rotate(self, angle=None, axis=None, anchor_point=None,
+               rot_point=None, from_vector=None, to_vector=None, degrees=False,
+               transform_matrix=None, verbose=False, **kwargs):
         """Rotate `Atom` position vector.
 
         Parameters
         ----------
         angle : float
-        rot_axis : :class:`~sknano.core.math.Vector`, optional
+        axis : :class:`~sknano.core.math.Vector`, optional
         anchor_point : :class:`~sknano.core.math.Point`, optional
         rot_point : :class:`~sknano.core.math.Point`, optional
         from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
-        deg2rad : bool, optional
+        degrees : bool, optional
         transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
-        self.r.rotate(angle=angle, rot_axis=rot_axis,
+        self.r.rotate(angle=angle, axis=axis,
                       anchor_point=anchor_point,
                       rot_point=rot_point, from_vector=from_vector,
                       to_vector=to_vector, transform_matrix=transform_matrix,
-                      deg2rad=deg2rad, verbose=verbose)
+                      degrees=degrees, verbose=verbose, **kwargs)
 
     def translate(self, t, fix_anchor_point=True):
         """Translate `Atom` position vector by :class:`Vector` `t`.
