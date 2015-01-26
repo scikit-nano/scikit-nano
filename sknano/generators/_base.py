@@ -35,11 +35,28 @@ class GeneratorBase:
     """Base class for generator classes"""
 
     def __init__(self, *args, **kwargs):
-        self.structure_data = StructureData()
         super(GeneratorBase, self).__init__(*args, **kwargs)
+        self.structure_data = StructureData()
 
     def __getattr__(self, name):
-        return getattr(self.structure_data, name)
+        if name != '_structure_data':
+            return getattr(self._structure_data, name)
+
+    @property
+    def structure_data(self):
+        """Return :class:`~sknano.io.StructureData` instance."""
+        return self._structure_data
+
+    @structure_data.setter
+    def structure_data(self, value):
+        """Set :class:`~sknano.io.StructureData` instance."""
+        if not isinstance(value, StructureData):
+            raise TypeError('Expected a `StructureData` object.')
+        self._structure_data = value
+
+    @structure_data.deleter
+    def structure_data(self):
+        del self._structure_data
 
     @property
     def structure(self):
@@ -113,5 +130,5 @@ class GeneratorBase:
         if kwargs:
             atoms.rotate(**kwargs)
 
-        StructureWriter.write(fname=fname, structure_format=structure_format,
-                              atoms=atoms)
+        StructureWriter.write(fname=fname, outpath=outpath,
+                              structure_format=structure_format, atoms=atoms)
