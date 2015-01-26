@@ -14,7 +14,7 @@ __docformat__ = 'restructuredtext en'
 from abc import ABCMeta, abstractmethod
 
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
-from sknano.utils.analysis import StructureAnalyzer
+#from sknano.utils.analysis import StructureAnalyzer
 from sknano.version import short_version as version
 
 default_comment_line = \
@@ -45,7 +45,8 @@ class StructureData:
         return self._atoms
 
     def __getattr__(self, name):
-        return getattr(self._atoms, name)
+        if name != '_atoms':
+            return getattr(self._atoms, name)
 
     def __setattr__(self, name, value):
         if name.startswith('_'):
@@ -69,12 +70,12 @@ class StructureIO:
 
     """
     def __init__(self, fpath=None, fname=None, **kwargs):
-        self.structure_data = StructureData()
         self.comment_line = default_comment_line
         if fpath is None and fname is not None:
             fpath = fname
         self.fpath = fpath
         self.kwargs = kwargs
+        self.structure_data = StructureData()
 
     @property
     def comment_line(self):
@@ -100,6 +101,15 @@ class StructureIO:
 
     def __getattr__(self, name):
         return getattr(self.structure_data, name)
+
+    def __deepcopy__(self, memo):
+        from copy import deepcopy
+        cp = self.__class__(None)
+        memo[id(self)] = cp
+        for attr in dir(self):
+            if not attr.startswith('_'):
+                setattr(cp, attr, deepcopy(getattr(self, attr), memo))
+        return cp
 
 
 class StructureReader:
