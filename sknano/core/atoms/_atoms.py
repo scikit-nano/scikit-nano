@@ -56,13 +56,21 @@ class Atoms(UserList):
         return self.masses.sum()
 
     @property
+    def elements(self):
+        """:class:`~numpy:numpy.ndarray` of :attr:`Atom.element`\ s \
+            in `Atoms`."""
+        return np.asarray([atom.element for atom in self])
+
+    @property
     def masses(self):
-        """Return list of `Atom` masses."""
+        """:class:`~numpy:numpy.ndarray` of :attr:`Atom.mass`\ s \
+            in `Atoms`."""
         return np.asarray([atom.mass for atom in self])
 
     @property
     def symbols(self):
-        """Return list of `Atom` symbols."""
+        """:class:`~numpy:numpy.ndarray` of :attr:`Atom.symbol`\ s \
+            in `Atoms`."""
         return np.asarray([atom.symbol for atom in self])
 
     def filter(self, condition, invert=False):
