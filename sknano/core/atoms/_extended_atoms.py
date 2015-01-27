@@ -18,7 +18,7 @@ from operator import attrgetter
 
 import numpy as np
 
-from sknano.core import xyz
+from sknano.core import dedupe, xyz
 from sknano.core.math import Vector, transformation_matrix
 from sknano.utils.geometric_shapes import Cuboid  # , Rectangle
 from ._atoms import Atoms
@@ -111,8 +111,8 @@ class XAtoms(Atoms):
 
     @property
     def coords(self):
-        """:class:`~numpy:numpy.ndarray` of `Atom`\ s \
-            :math:`x, y, z` coordinates."""
+        """:class:`~numpy:numpy.ndarray` of :attr:`Atom.r` position \
+            `Vector`\ s"""
         return np.asarray([atom.r for atom in self])
 
     @property
@@ -132,7 +132,7 @@ class XAtoms(Atoms):
 
     @property
     def inertia_tensor(self):
-        """Return the inertia tensor."""
+        """Inertia tensor."""
         Ixx = (self.masses * (self.y**2 + self.z**2)).sum()
         Iyy = (self.masses * (self.x**2 + self.z**2)).sum()
         Izz = (self.masses * (self.x**2 + self.y**2)).sum()
@@ -236,9 +236,16 @@ class XAtoms(Atoms):
         self.add_types(atoms=atoms)
 
     def assign_unique_ids(self, starting_id=1):
-        """Assign unique ID to each `XAtom` in `XAtoms`."""
+        """Assign unique :attr:`XAtom.id` to each `XAtom` in `XAtoms`."""
         [setattr(atom, 'id', i) for i, atom in
          enumerate(self, start=starting_id)]
+
+    def assign_unique_types(self):
+        """Assign unique :attr:`XAtom.type` to each `XAtom` in `XAtoms` \
+            based on the set of :attr:`XAtoms.elements`."""
+        self.mapatomattr('type', 'element',
+                         {element:i for i, element in
+                          enumerate(dedupe(self.elements), start=1)})
 
     def center_CM(self, axes=None):
         """Center atoms on CM coordinates."""
