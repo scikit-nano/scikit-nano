@@ -96,7 +96,12 @@ class Point(np.ndarray):
         return repr(self)
 
     def __repr__(self):
-        return "Point({!r})".format(self.__array__().tolist())
+        return "Point({!r})".format(self.plist)
+
+    @property
+    def plist(self):
+        """List of `Point` coordinates formatted for *pretty* output."""
+        return [float("{:.6f}".format(i)) for i in self.__array__().tolist()]
 
     def __getattr__(self, name):
         try:

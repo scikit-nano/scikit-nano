@@ -254,13 +254,18 @@ class Vector(np.ndarray):
     def __repr__(self):
         try:
             if np.allclose(self.p0, np.zeros_like(self.p0)):
-                return "Vector({!r})".format(self.__array__().tolist())
+                return "Vector({!r})".format(self.plist)
             else:
                 return "Vector({!r}, p0={!r}, p={!r})".format(
-                    self.__array__().tolist(),
-                    self.p0.tolist(), self.p.tolist())
+                    self.plist, self.p0.plist, self.p.plist)
         except AttributeError:
-            return "Vector({!r})".format(self.__array__().tolist())
+            return "Vector({!r})".format(self.plist)
+
+    @property
+    def plist(self):
+        """List of `Vector` coordinates with values formatted for *pretty* \
+            output."""
+        return [float("{:.6f}".format(i)) for i in self.__array__().tolist()]
 
     def __getattr__(self, name):
         if Vector._verbosity > 4:
