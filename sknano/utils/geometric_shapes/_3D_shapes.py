@@ -74,9 +74,7 @@ class Parallelepiped(Geometric3DRegion):
         self.points.append(self.o)
         self.vectors.extend([self.u, self.v, self.w])
 
-    def __repr__(self):
-        return "Parallelepiped(o={!r}, u={!r}, v={!r}, w={!r})".format(
-            self.o.tolist(), self.u.tolist(), self.v.tolist(), self.w.tolist())
+        self.pstr = "o={o!r}, u={u!r}, v={v!r}, w={w!r}"
 
     @property
     def o(self):
@@ -170,6 +168,9 @@ class Parallelepiped(Geometric3DRegion):
         return d1 >= 0 and d1 <= 1 and d2 >= 0 and d2 <= 1 and \
             d3 >= 0 and d3 <= 1
 
+    def pdict(self):
+        return dict(o=self.o, u=self.u, v=self.v, w=self.w)
+
     def update_region_limits(self):
         self.limits['x']['min'] = self.xmin
         self.limits['x']['max'] = self.xmax
@@ -209,10 +210,7 @@ class Cuboid(Geometric3DRegion):
         self._pmax = pmax
 
         self.points.extend([self.pmin, self.pmax])
-
-    def __repr__(self):
-        return "Cuboid(pmin={!r}, pmax={!r})".format(
-            self.pmin.tolist(), self.pmax.tolist())
+        self.pstr = "pmin={pmin!r}, pmax={pmax!r}"
 
     @property
     def pmin(self):
@@ -334,6 +332,9 @@ class Cuboid(Geometric3DRegion):
             (p.y >= self.ymin) and (p.y <= self.ymax) and \
             (p.z >= self.zmin) and (p.z <= self.zmax)
 
+    def pdict(self):
+        return dict(pmin=self.pmin, pmax=self.pmax)
+
     def update_region_limits(self):
         self.limits['x']['min'] = self.xmin
         self.limits['x']['max'] = self.xmax
@@ -373,9 +374,7 @@ class Cube(Geometric3DRegion):
 
         self.points.append(self.center)
 
-    def __repr__(self):
-        return("Cube(center={!r}, a={!r})".format(self.center.tolist(),
-                                                  self.a))
+        self.pstr = "center={center!r}, a={a:.3f}"
 
     @property
     def center(self):
@@ -407,6 +406,9 @@ class Cube(Geometric3DRegion):
         return (p.x >= xmin) and (p.x <= xmax) and \
             (p.y >= ymin) and (p.y <= ymax) and \
             (p.z >= zmin) and (p.z <= zmax)
+
+    def pdict(self):
+        return dict(center=self.center, a=self.a)
 
     def update_region_limits(self):
         self.limits['x']['min'] = self.xmin
@@ -459,9 +461,7 @@ class Ellipsoid(Geometric3DRegion):
 
         self.points.append(self.center)
 
-    def __repr__(self):
-        return("Ellipsoid(center={!r}, a={!r}, b={!r}, c={!r})".format(
-            self.center, self.a, self.b, self.c))
+        self.pstr = "center={center!r}, a={a:.3f}, b={b:.3f}, c={c:.3f}"
 
     @property
     def center(self):
@@ -498,6 +498,9 @@ class Ellipsoid(Geometric3DRegion):
 
         return (p.x - c.x)**2 / a**2 + (p.y - c.y)**2 / b**2 + \
             (p.z - c.z)**2 / c**2 <= 1.0
+
+    def pdict(self):
+        return dict(center=self.center, a=self.a, b=self.b, c=self.c)
 
     def update_region_limits(self):
         c = self.center
@@ -550,9 +553,7 @@ class Spheroid(Geometric3DRegion):
 
         self.points.append(self.center)
 
-    def __repr__(self):
-        return("Spheroid(center={!r}, a={!r}, c={!r})".format(
-            self.center, self.a, self.c))
+        self.pstr = "center={center!r}, a={a:.3f}, c={c:.3f}"
 
     @property
     def center(self):
@@ -584,6 +585,9 @@ class Spheroid(Geometric3DRegion):
         a, c = self.a, self.c
 
         return ((x - h)**2 + (y - k)**2) / a**2 + (z - l)**2 / c**2 <= 1.0
+
+    def pdict(self):
+        return dict(center=self.center, a=self.a, c=self.c)
 
     def update_region_limits(self):
         c = self.center
@@ -625,8 +629,7 @@ class Sphere(Geometric3DRegion):
 
         self.points.append(self.center)
 
-    def __repr__(self):
-        return("Sphere(center={!r}, r={!r})".format(self.center, self.r))
+        self.pstr = "center={center!r}, r={r:.3f}"
 
     @property
     def r(self):
@@ -655,6 +658,9 @@ class Sphere(Geometric3DRegion):
         r = self.r
 
         return (p.x - c.x)**2 + (p.y - c.y)**2 + (p.z - c.z)**2 <= r**2
+
+    def pdict(self):
+        return dict(center=self.center, r=self.r)
 
     def update_region_limits(self):
         c = self.center

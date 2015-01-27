@@ -72,6 +72,11 @@ class GeometricRegion(six.with_metaclass(ABCMeta)):
         self.limits = {'x': {'min': -np.inf, 'max': np.inf},
                        'y': {'min': -np.inf, 'max': np.inf},
                        'z': {'min': -np.inf, 'max': np.inf}}
+        self.pstr = ""
+
+    def __repr__(self):
+        return "{}({})".format(self.__class__.__name__,
+                               self.pstr.format(**self.pdict()))
 
     @abstractproperty
     def centroid(self):
@@ -81,4 +86,9 @@ class GeometricRegion(six.with_metaclass(ABCMeta)):
     @abstractmethod
     def contains_point(self):
         """Check if point is contained within geometric region."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def pdict(self):
+        """Return `dict` of `__init__` parameters."""
         raise NotImplementedError

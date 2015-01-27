@@ -66,10 +66,7 @@ class Parallelogram(Geometric2DRegion):
 
         self.points.append(self.o)
         self.vectors.extend([self.u, self.v])
-
-    def __repr__(self):
-        return "Parallelogram(o={!r}, u={!r}, v={!r})".format(
-            self.o.tolist(), self.u, self.v)
+        self.pstr = "o={o!r}, u={u!r}, v={v!r}"
 
     @property
     def o(self):
@@ -117,6 +114,9 @@ class Parallelogram(Geometric2DRegion):
 
         return d1 >= 0 and d1 <= 1 and d2 >= 0 and d2 <= 1
 
+    def pdict(self):
+        return dict(o=self.o, u=self.u, v=self.v)
+
 
 class Rectangle(Geometric2DRegion):
     """Abstract data structure representing a rectangle.
@@ -149,9 +149,7 @@ class Rectangle(Geometric2DRegion):
 
         self.points.append([self.pmin, self.pmax])
 
-    def __repr__(self):
-        return "Rectangle(pmin={!r}, pmax={!r})".format(
-            self.pmin.tolist(), self.pmax.tolist())
+        self.pstr = "pmin={pmin!r}, pmax={pmax!r}"
 
     @property
     def pmin(self):
@@ -212,6 +210,9 @@ class Rectangle(Geometric2DRegion):
         return (p.x >= xmin) and (p.x <= xmax) and \
             (p.y >= ymin) and (p.y <= ymax)
 
+    def pdict(self):
+        return dict(pmin=self.pmin, pmax=self.pmax)
+
 
 class Square(Geometric2DRegion):
     """Abstract data structure representing a square.
@@ -240,10 +241,7 @@ class Square(Geometric2DRegion):
         self._a = a
 
         self.points.append(self.center)
-
-    def __repr__(self):
-        return "Square(center={!r}, a={!r})".format(
-            self.center.tolist(), self.a)
+        self.pstr = "center={center!r}, a={a:.2f}"
 
     @property
     def center(self):
@@ -281,6 +279,9 @@ class Square(Geometric2DRegion):
         return (p.x >= xmin) and (p.x <= xmax) and \
             (p.y >= ymin) and (p.y <= ymax)
 
+    def pdict(self):
+        return dict(center=self.center, a=self.a)
+
 
 class Ellipse(Geometric2DRegion):
     """Abstract data structure representing an ellipse.
@@ -308,10 +309,7 @@ class Ellipse(Geometric2DRegion):
         self._ry = ry
 
         self.points.append(self.center)
-
-    def __repr__(self):
-        return "Ellipse(center={!r}, rx={!r}, ry={!r})".format(
-            self.center.tolist(), self.rx, self.ry)
+        self.pstr = "center={center!r}, rx={rx:.3f}, ry={ry:.3f}"
 
     @property
     def center(self):
@@ -374,6 +372,9 @@ class Ellipse(Geometric2DRegion):
 
         return (p.x - c.x)**2 / rx**2 + (p.y - c.y)**2 / ry**2 <= 1.0
 
+    def pdict(self):
+        return dict(center=self.center, rx=self.rx, ry=self.ry)
+
 
 class Circle(Geometric2DRegion):
     """Abstract data structure representing a circle.
@@ -403,10 +404,7 @@ class Circle(Geometric2DRegion):
         self._r = r
 
         self.points.append(self.center)
-
-    def __repr__(self):
-        return "Circle(center={!r}, r={!r})".format(
-            self.center.tolist(), self.r)
+        self.pstr = "center={center!r}, r={r:.3f}"
 
     @property
     def center(self):
@@ -439,3 +437,6 @@ class Circle(Geometric2DRegion):
         r = self.r
 
         return (p.x - c.x)**2 + (p.y - c.y)**2 <= r**2
+
+    def pdict(self):
+        return dict(center=self.center, r=self.r)
