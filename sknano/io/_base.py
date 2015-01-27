@@ -13,6 +13,7 @@ __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
 
+from sknano.core import get_fpath
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 #from sknano.utils.analysis import StructureAnalyzer
 from sknano.version import short_version as version
@@ -150,13 +151,24 @@ class StructureWriter:
         structure_format : {None, str}, optional
 
         """
-        if structure_format == 'data':
+        if fname is None and structure_format is None:
+            structure_format = default_structure_format
+
+        if fname is None:
+            fname = get_fpath(fname='structure_data', ext=structure_format,
+                              add_fnum=True)
+
+        if (structure_format is None and fname.endswith('.data')) or \
+                structure_format == 'data':
             from ._lammps_data_format import DATAWriter
             DATAWriter.write(fname=fname, atoms=atoms, **kwargs)
-        elif structure_format == 'dump':
+        elif (structure_format is None and fname.endswith('.dump')) or \
+                structure_format == 'dump':
             from ._lammps_dump_format import DUMPWriter
             DUMPWriter.write(fname=fname, atoms=atoms, **kwargs)
-        elif structure_format == 'xyz':
+        #elif (structure_format is None and fname.endswith('.xyz')) or \
+        #        structure_format == 'xyz':
+        else:
             from ._xyz_format import XYZWriter
             XYZWriter.write(fname=fname, atoms=atoms, **kwargs)
 
