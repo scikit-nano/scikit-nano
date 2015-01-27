@@ -136,6 +136,8 @@ class StructureReader:
                 structure_format == 'xyz':
             from ._xyz_format import XYZReader
             return XYZReader.read(fpath)
+        else:
+            raise StructureIOError("Unable to determine `structure_format`")
 
 
 class StructureWriter:
