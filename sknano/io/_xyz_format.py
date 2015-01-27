@@ -56,6 +56,9 @@ class XYZReader(StructureIO):
                     '{}'.format(Natoms)
                 raise XYZIOError(error_msg)
 
+        if len(set(self.atoms.elements)) > 1:
+            self.assign_unique_types()
+
 
 class XYZWriter:
     """`StructureWriter` class for writing `xyz` chemical file format."""
