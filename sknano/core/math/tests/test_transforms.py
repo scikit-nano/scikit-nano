@@ -5,9 +5,8 @@ import nose
 from nose.tools import *
 import numpy as np
 
-from sknano.core.math import Point, Vector, rotate, scale, translate, \
-    Rx, Ry, Rz, reflection_matrix, rotation_matrix, transformation_matrix, \
-    axis_angle_from_rotation_matrix
+from sknano.core.math import Point, Vector, rotate, Rx, Ry, Rz, \
+    rotation_matrix, transformation_matrix, axis_angle_from_rotation_matrix
 
 from six.moves import zip
 

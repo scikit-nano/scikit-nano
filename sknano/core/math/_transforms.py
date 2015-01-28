@@ -10,24 +10,18 @@ Functions for linear algebra transforms (:mod:`sknano.core.math._transforms`)
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
+__docformat__ = 'restructuredtext en'
+
 from itertools import combinations
 
 import six
 from six.moves import range
 
-__docformat__ = 'restructuredtext en'
-
 import numpy as np
 
-__all__ = ['rotate',
-           'scale',
-           'translate',
-           'Rx', 'Ry', 'Rz',
-           'reflection_matrix',
-           'rotation_matrix',
-           'scaling_matrix',
-           'transformation_matrix',
-           'axis_angle_from_rotation_matrix']
+__all__ = ['rotate', 'Rx', 'Ry', 'Rz', 'rotation_matrix',
+           'reflection_matrix', 'scaling_matrix',
+           'transformation_matrix', 'axis_angle_from_rotation_matrix']
 
 I = np.identity(4)
 
@@ -97,15 +91,6 @@ def rotate(obj, angle=None, axis=None, anchor_point=None, rot_point=None,
         rot_obj = obj.__class__(rot_obj)
 
     return rot_obj
-
-
-def scale():
-    pass
-
-
-def translate(obj, t):
-    """Translate object points by a vector `t`."""
-    pass
 
 
 def Rx(angle, degrees=False):
