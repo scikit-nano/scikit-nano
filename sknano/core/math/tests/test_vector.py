@@ -353,5 +353,43 @@ def test19():
     assert_true(np.allclose(u.unit_vector, v))
 
 
+def test20():
+    a = Vector([1, 1, 1])
+    b = Vector([1, 0, 0])
+    assert_equals(vec.scalar_projection(a, b), 1.0)
+
+    a = Vector([1, 0, 0])
+    b = Vector([1, 1, 1])
+    assert_equals(vec.scalar_projection(a, b), 1.0 / np.sqrt(3))
+
+
+def test21():
+    a = Vector([1, 1, 1])
+    b = Vector([1, 0, 0])
+    assert_equals(vec.vector_projection(a, b), Vector([1, 0, 0]))
+
+    a = Vector([1, 0, 0])
+    b = Vector([1, 1, 1])
+    assert_equals(vec.vector_projection(a, b), Vector(1/3 * np.ones(3)))
+
+    a = Vector([5, 6, 7])
+    b = Vector([1, 1, 1])
+    assert_equals(vec.vector_projection(a, b), Vector(3 * [6]))
+
+
+def test22():
+    a = Vector([1, 1, 1])
+    b = Vector([1, 0, 0])
+    assert_equals(vec.vector_rejection(a, b), Vector([0, 1, 1]))
+
+    a = Vector([1, 0, 0])
+    b = Vector([1, 1, 1])
+    assert_equals(vec.vector_rejection(a, b), Vector([2/3, -1/3, -1/3]))
+
+    a = Vector([5, 6, 7])
+    b = Vector([1, 1, 1])
+    assert_equals(vec.vector_rejection(a, b), a - Vector(3 * [6]))
+
+
 if __name__ == '__main__':
     nose.runmodule()
