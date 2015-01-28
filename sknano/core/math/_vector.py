@@ -21,7 +21,8 @@ from ._point import Point
 from ._transforms import rotate, transformation_matrix
 
 __all__ = ['Vector', 'angle', 'cross', 'dot', 'scalar_triple_product',
-           'vector_triple_product']
+           'vector_triple_product', 'scalar_projection', 'vector_projection',
+           'vector_rejection']
 
 
 class Vector(np.ndarray):
@@ -556,7 +557,7 @@ class Vector(np.ndarray):
 
 
 def angle(u, v):
-    """Compute the angle between two Cartesian vectors.
+    """Compute the angle between two Cartesian `Vector`\ s.
 
     Parameters
     ----------
@@ -571,7 +572,7 @@ def angle(u, v):
 
 
 def cross(u, v, p0=None):
-    """Vector cross product of two vectors.
+    """Vector cross product of two `Vector`\ s.
 
     Parameters
     ----------
@@ -593,7 +594,7 @@ def cross(u, v, p0=None):
 
 
 def dot(u, v):
-    """Dot product of two vectors.
+    """Dot product of two `Vector`\ s.
 
     Parameters
     ----------
@@ -608,7 +609,7 @@ def dot(u, v):
 
 
 def scalar_triple_product(u, v, w):
-    """Compute scalar triple product of three vectors.
+    """Compute scalar triple product of three `Vector`\ s.
 
     Parameters
     ----------
@@ -623,7 +624,7 @@ def scalar_triple_product(u, v, w):
 
 
 def vector_triple_product(u, v, w):
-    """Compute vector triple product of three vectors.
+    """Compute vector triple product of three `Vector`\ s.
 
     Parameters
     ----------
@@ -636,3 +637,52 @@ def vector_triple_product(u, v, w):
     """
 
     return cross(u, cross(v, w))
+
+
+def scalar_projection(a, b):
+    """Compute the scalar projection of :math:`\\mathbf{a}` onto \
+        :math:`\\mathbf{b}`.
+
+    Parameters
+    ----------
+    a, b : `Vector`
+
+    Returns
+    -------
+    v : :class:`~numpy:numpy.number`
+
+    """
+    return dot(a, b) / b.norm
+
+
+def vector_projection(a, b):
+    """Compute the vector projection of :math:`\\mathbf{a}` onto \
+        :math:`\\mathbf{b}`.
+
+    Parameters
+    ----------
+    a, b : `Vector`
+
+    Returns
+    -------
+    v : `Vector`
+
+    """
+    return dot(a, b) / dot(b, b) * b
+
+
+def vector_rejection(a, b):
+    """Compute the vector rejection of :math:`\\mathbf{a}` onto \
+        :math:`\\mathbf{b}`.
+
+    Parameters
+    ----------
+    a, b : `Vector`
+
+    Returns
+    -------
+    v : `Vector`
+
+    """
+    a1 = vector_projection(a, b)
+    return a - a1
