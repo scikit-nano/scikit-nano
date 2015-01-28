@@ -31,9 +31,7 @@ __all__ = ['rotate',
 
 I = np.identity(4)
 
-_str2array = {}
-for i, axis_ in enumerate(('x', 'y', 'z')):
-    _str2array[axis_] = I[:3, i]
+_str2array = {axis: I[:3, i] for i, axis in enumerate(('x', 'y', 'z'))}
 
 
 def rotate(obj, angle=None, axis=None, anchor_point=None, rot_point=None,
