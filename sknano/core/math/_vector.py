@@ -22,7 +22,7 @@ from ._transforms import rotate, transformation_matrix
 
 __all__ = ['Vector', 'angle', 'cross', 'dot', 'scalar_triple_product',
            'vector_triple_product', 'scalar_projection', 'vector_projection',
-           'vector_rejection']
+           'vector_rejection', 'projection', 'rejection']
 
 
 class Vector(np.ndarray):
@@ -670,6 +670,8 @@ def vector_projection(a, b):
     """
     return dot(a, b) / dot(b, b) * b
 
+projection = vector_projection
+
 
 def vector_rejection(a, b):
     """Compute the vector rejection of :math:`\\mathbf{a}` onto \
@@ -686,3 +688,5 @@ def vector_rejection(a, b):
     """
     a1 = vector_projection(a, b)
     return a - a1
+
+rejection = vector_rejection
