@@ -75,3 +75,7 @@ sknano/*.pdb
 **/tests/*.xyz
 **/tests/*.data
 **/tests/*.pdb
+
+# sublime text project/workspace files
+*.sublime-project
+*.sublime-workspace
