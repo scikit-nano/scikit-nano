@@ -70,7 +70,9 @@ class XAtom(Atom):
 
         super().__init__(element=element, mass=mass, **kwargs)
 
-        self.dr = Vector(np.zeros(3), p0=[x, y, z])
+        #self.dr = Vector(np.zeros(3), p0=[x, y, z])
+        self.r0 = Vector([x, y, z])
+
         self.r = Vector([x, y, z])
         self.v = Vector([vx, vy, vz])
         self.f = Vector([fx, fy, fz])
@@ -301,6 +303,33 @@ class XAtom(Atom):
         self._r = Vector(value)
 
     @property
+    def r0(self):
+        """:math:`x, y, z` components of `Atom` position vector at t=0.
+
+        Returns
+        -------
+        ndarray
+            3-element ndarray of [:math:`x, y, z`] coordinates of `Atom`.
+
+        """
+        return self._r0
+
+    @r0.setter
+    def r0(self, value):
+        """Set :math:`x, y, z` components of `Atom` position vector at t=0.
+
+        Parameters
+        ----------
+        value : array_like
+            :math:`x, y, z` coordinates of `Atom` position vector relative to
+            the origin.
+
+        """
+        if not isinstance(value, (list, np.ndarray)):
+            raise TypeError('Expected an array_like object')
+        self._r0 = Vector(value)
+
+    @property
     def dr(self):
         """:math:`x, y, z` components of `Atom` displacement vector.
 
@@ -310,21 +339,7 @@ class XAtom(Atom):
             3-element ndarray of [:math:`x, y, z`] coordinates of `Atom`.
 
         """
-        return self._dr
-
-    @dr.setter
-    def dr(self, value):
-        """Set :math:`x, y, z` components of `Atom` displacement vector.
-
-        Parameters
-        ----------
-        value : array_like
-            :math:`x, y, z` components of `Atom` displacement vector.
-
-        """
-        if not isinstance(value, (list, np.ndarray)):
-            raise TypeError('Expected an array_like object')
-        self._dr = Vector(value)
+        return self.r - self.r0
 
     def get_coords(self, asdict=False):
         """Return atom coords.
