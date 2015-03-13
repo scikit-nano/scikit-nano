@@ -113,9 +113,16 @@ class Snapshot:
             except AttributeError:
                 reference_atom = None
 
+            try:
+                t0_atom = self.trajectory.t0_atoms.get_atom(
+                    int(atom[self.atomattrs.index('id')]))
+            except AttributeError:
+                t0_atom = None
+
             attrs = [dtype(value) for dtype, value in
                      zip(self.attr_dtypes, atom)]
             atoms.append(Atom(reference_atom=reference_atom,
+                              t0_atom=t0_atom,
                               **dict(list(zip(self.atomattrs, attrs)))))
         return atoms
 
@@ -139,6 +146,9 @@ class Trajectory(UserList):
         self.nselect = 0
         self.reference_atoms = None
         self._reference_snapshot = None
+
+        self.t0_atoms = None
+        self._t0_snapshot = None
 
     @property
     def Nsnaps(self):
@@ -166,6 +176,18 @@ class Trajectory(UserList):
         self._reference_snapshot = value
         self.reference_atoms = self.reference_snapshot.atoms
         self.reference_atoms.update_attrs()
+
+    @property
+    def t0_snapshot(self):
+        return self._t0_snapshot
+
+    @t0_snapshot.setter
+    def t0_snapshot(self, value):
+        if not isinstance(value, Snapshot):
+            raise TypeError('Expected a `Snapshot` instance.')
+        self._t0_snapshot = value
+        self.t0_atoms = self.t0_snapshot.atoms
+        #self.t0_atoms.update_attrs()
 
     @property
     def timesteps(self):
