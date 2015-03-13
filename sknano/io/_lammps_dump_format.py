@@ -86,6 +86,8 @@ class DUMPReader(StructureIO):
         print("read {:d} snapshots".format(self.Nsnaps))
 
         self.trajectory.tselect.all()
+        self.trajectory.t0_snapshot = self.trajectory[0]
+
         if self.dumpattrs:
             print('Dumped Atom attributes: {}'.format(self.dumpattrs2str()))
         else:
