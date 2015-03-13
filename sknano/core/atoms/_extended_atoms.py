@@ -111,24 +111,35 @@ class XAtoms(Atoms):
 
     @property
     def coords(self):
+        """Alias for :meth:`Atoms.r`."""
+        return self.r
+
+    @property
+    def r(self):
         """:class:`~numpy:numpy.ndarray` of :attr:`Atom.r` position \
             `Vector`\ s"""
         return np.asarray([atom.r for atom in self])
 
     @property
+    def dr(self):
+        """:class:`~numpy:numpy.ndarray` of :attr:`Atom.dr` displacement \
+            `Vector`\ s"""
+        return np.asarray([atom.dr for atom in self])
+
+    @property
     def x(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`x` coordinates."""
-        return self.coords[:,0]
+        return self.r[:,0]
 
     @property
     def y(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`y` coordinates."""
-        return self.coords[:,1]
+        return self.r[:,1]
 
     @property
     def z(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`z` coordinates."""
-        return self.coords[:,2]
+        return self.r[:,2]
 
     @property
     def inertia_tensor(self):
