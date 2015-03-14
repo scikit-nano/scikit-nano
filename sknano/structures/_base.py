@@ -26,14 +26,9 @@ class StructureBase:
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
         :class:`~sknano.core.atoms.Atom` 1 and 2
-    bond : float, optional
-        Distance between nearest neighbor atoms (i.e., bond length).
-        Must be in units of **\u212b**. Default value is
-        the carbon-carbon bond length in graphite, approximately
-        :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
 
     """
-    def __init__(self, *args, element1='C', element2='C', bond=CCbond,
+    def __init__(self, *args, element1='C', element2='C', bond=None,
                  verbose=False, debug=False, **kwargs):
 
         self.element1 = element1
@@ -41,12 +36,12 @@ class StructureBase:
 
         if bond is None:
             bond = CCbond
-
         self.bond = bond
+
         self.verbose = verbose
         self.debug = debug
 
-        super(StructureBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def bond(self):
