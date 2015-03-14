@@ -37,8 +37,10 @@ from __future__ import absolute_import, division, print_function
 
 __docformat__ = 'restructuredtext en'
 
-from ._constants import *
+from ._bonds import *
 from ._conversion_factors import *
+from ._element_data import *
+from ._lattice_constants import *
 from ._periodic_table import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
