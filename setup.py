@@ -231,8 +231,11 @@ def setup_package():
     except (AttributeError, ImportError, RuntimeError):
         install_requires += ['scipy>=0.14']
 
-    # Add six module to install_requires
+    # Add six module to install_requires (used in numpydoc git submodule)
     install_requires += ['six>=1.9']
+
+    # Add future module to install requires
+    install_requires += ['future>=0.14.3']
 
     metadata = dict(
         name=DISTNAME,
