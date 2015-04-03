@@ -161,22 +161,6 @@ def argparser():
     bilayer_graphene_parser.set_defaults(
         generator_class='BilayerGrapheneGenerator')
 
-    nanotube_parent_parser = argparse.ArgumentParser(add_help=False)
-    nanotube_parent_parser_group = \
-        nanotube_parent_parser.add_mutually_exclusive_group()
-    nanotube_parent_parser_group.add_argument(
-        '--nz', type=int, default=1,
-        help='Number of repeat unit cells along `z` axis '
-        '(default: %(default)s)')
-    nanotube_parent_parser_group.add_argument(
-        '--Lz', type=float, default=None,
-        help='Length of nanotube along `z` axis in **nanometers**. '
-        '(default: %(default)s)')
-    nanotube_parent_parser.add_argument(
-        '--fix-Lz', action='store_true', help='Generate the nanotube with '
-        'length as close to the specified `Lz` as possible. If `True`, then '
-        'non integer `nz` cells are permitted. (default: ' '%(default)s)')
-
     swnt_parent_parser = argparse.ArgumentParser(add_help=False)
     swnt_parent_parser.add_argument('-n', type=int, default=10,
                                     help='Chiral index `n` '
@@ -184,18 +168,27 @@ def argparser():
     swnt_parent_parser.add_argument('-m', type=int, default=10,
                                     help='Chiral index `m` '
                                     '(default: %(default)s)')
-
-    mwnt_parent_parser = argparse.ArgumentParser(add_help=False)
+    swnt_parent_parser_group = \
+        swnt_parent_parser.add_mutually_exclusive_group()
+    swnt_parent_parser_group.add_argument(
+        '--nz', type=int, default=1,
+        help='Number of repeat unit cells along `z` axis '
+        '(default: %(default)s)')
+    swnt_parent_parser_group.add_argument(
+        '--Lz', type=float, default=None,
+        help='Length of nanotube along `z` axis in **nanometers**. '
+        '(default: %(default)s)')
+    swnt_parent_parser.add_argument(
+        '--fix-Lz', action='store_true', help='Generate the nanotube with '
+        'length as close to the specified `Lz` as possible. If `True`, then '
+        'non integer `nz` cells are permitted. (default: ' '%(default)s)')
 
     swnt_parser = \
-        subparsers.add_parser('swnt', parents=[swnt_parent_parser,
-                                               nanotube_parent_parser])
+        subparsers.add_parser('swnt', parents=[swnt_parent_parser])
     swnt_parser.set_defaults(generator_class='SWNTGenerator')
 
     unrolled_swnt_parser = \
-        subparsers.add_parser('unrolled_swnt',
-                              parents=[swnt_parent_parser,
-                                       nanotube_parent_parser])
+        subparsers.add_parser('unrolled_swnt', parents=[swnt_parent_parser])
 
     unrolled_swnt_parser_group = \
         unrolled_swnt_parser.add_mutually_exclusive_group()
@@ -214,8 +207,14 @@ def argparser():
 
     unrolled_swnt_parser.set_defaults(generator_class='UnrolledSWNTGenerator')
 
+    mwnt_parent_parser = argparse.ArgumentParser(add_help=False)
+    mwnt_parent_parser.add_argument(
+        '--Lz', type=float, default=None,
+        help='Length of nanotube along `z` axis in **nanometers**. '
+        '(default: %(default)s)')
+
     mwnt_parser = \
-        subparsers.add_parser('mwnt', parents=[nanotube_parent_parser])
+        subparsers.add_parser('mwnt', parents=[mwnt_parent_parser])
     mwnt_parser.set_defaults(generator_class='MWNTGenerator')
 
     bundle_parent_parser = argparse.ArgumentParser(add_help=False)
