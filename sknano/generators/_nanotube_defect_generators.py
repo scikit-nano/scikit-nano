@@ -9,7 +9,6 @@ Nanotube defect generators (:mod:`sknano.generators._nanotube_defect_generators`
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-from six.moves import range
 __docformat__ = 'restructuredtext en'
 
 import itertools

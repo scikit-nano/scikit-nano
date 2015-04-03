@@ -10,7 +10,6 @@ from sknano.core.atoms import POAVAtom, POAVAtoms
 from sknano.generators import SWNTGenerator
 from sknano.io import DATAReader
 from sknano.testing import generate_atoms
-from six.moves import range
 #from sknano.utils.geometric_shapes import Ellipsoid
 
 

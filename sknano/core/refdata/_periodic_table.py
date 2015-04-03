@@ -11,7 +11,6 @@ Periodic Table of Elements (:mod:`sknano.core.refdata._periodic_table`)
 
 """
 from __future__ import division, absolute_import, print_function
-import six
 __docformat__ = 'restructuredtext'
 
 from collections import OrderedDict
@@ -72,13 +71,13 @@ atomic_numbers = OrderedDict()
 for Z, symbol in enumerate(element_symbols, start=1):
     atomic_numbers[symbol] = Z
 
-atomic_number_symbol_map = {v: k for k, v in six.iteritems(atomic_numbers)}
+atomic_number_symbol_map = {v: k for k, v in atomic_numbers.items()}
 
 atomic_masses = OrderedDict()
 for i, symbol in enumerate(element_symbols):
     atomic_masses[symbol] = float(_atomic_masses[i])
 
-atomic_mass_symbol_map = {v: k for k, v in six.iteritems(atomic_masses)}
+atomic_mass_symbol_map = {v: k for k, v in atomic_masses.items()}
 
 
 class PeriodicTable(object):

@@ -10,7 +10,6 @@ An "eXtended" `Atoms` class for structure analysis.
 
 """
 from __future__ import absolute_import, division, print_function
-from six.moves import zip
 __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
@@ -289,7 +288,7 @@ class XAtoms(Atoms):
                         self.y >= region.limits['y']['min'],
                         self.z >= region.limits['z']['min'])))].tolist()
 
-        #for dim, limits in region.limits.iteritems():
+        #for dim, limits in region.limits.items():
         #    atoms = atoms[np.where(getattr(self, dim) <= limits['max'])]
         #    atoms = atoms[np.where(getattr(self, dim) >= limits['min'])]
         #    self = atoms.tolist()

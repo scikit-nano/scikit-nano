@@ -9,7 +9,6 @@ Mixin structure classes (:mod:`sknano.structures._mixins`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-from six.moves import range
 __docformat__ = 'restructuredtext en'
 
 import numbers

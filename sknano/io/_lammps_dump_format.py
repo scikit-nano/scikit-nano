@@ -8,9 +8,6 @@ LAMMPS dump format (:mod:`sknano.io._lammps_dump_format`)
 
 """
 from __future__ import absolute_import, division, print_function
-import six
-from six.moves import range
-from six.moves import zip
 __docformat__ = 'restructuredtext en'
 
 #import glob
@@ -195,7 +192,7 @@ class DUMPReader(StructureIO):
             attribute name.
 
         """
-        for k, v in six.iteritems(attrmap):
+        for k, v in attrmap.items():
             self.atomattrs[self.atomattrs.index(k)] = v
 
     def unscale(self):

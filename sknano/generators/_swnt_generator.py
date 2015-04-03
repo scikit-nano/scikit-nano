@@ -21,8 +21,6 @@ from __future__ import absolute_import, division, print_function, \
 
 __docformat__ = 'restructuredtext en'
 
-#import six
-from six.moves import range
 import numpy as np
 
 from sknano.core import pluralize

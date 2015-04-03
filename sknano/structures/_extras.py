@@ -9,8 +9,6 @@ Extra helper functions (:mod:`sknano.structures._extras`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-import six
-from six.moves import range
 __docformat__ = 'restructuredtext en'
 
 import importlib
@@ -82,8 +80,8 @@ def cmp_Ch(Ch1, Ch2):
         Ch1_type = get_Ch_type(Ch1)
         n2, m2 = Ch2
         Ch2_type = get_Ch_type(Ch2)
-    elif isinstance(Ch1, (str, six.text_type)) and \
-            isinstance(Ch2, (str, six.text_type)):
+    elif isinstance(Ch1, str) and \
+            isinstance(Ch2, str):
         n1, m1 = get_Ch_indices(Ch1)
         Ch1_type = get_Ch_type(Ch1)
         n2, m2 = get_Ch_indices(Ch2)

@@ -16,8 +16,6 @@ try:
 except ImportError:
     from collections import Set
 
-from six.moves import zip
-
 __docformat__ = 'restructuredtext en'
 
 import numpy as np

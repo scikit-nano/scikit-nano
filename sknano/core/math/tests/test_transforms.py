@@ -8,8 +8,6 @@ import numpy as np
 from sknano.core.math import Point, Vector, rotate, Rx, Ry, Rz, \
     rotation_matrix, transformation_matrix, axis_angle_from_rotation_matrix
 
-from six.moves import zip
-
 
 def test_rotation_matrix():
     assert_true(np.allclose(rotation_matrix(angle=np.pi/2),

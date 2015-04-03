@@ -88,7 +88,8 @@ for, you can do something like this from within an interactive session::
     ...     SWNTGenerator(n=n, m=m).save_data(structure_format='data')
 
 """
-from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 __docformat__ = 'restructuredtext en'
 
 import argparse

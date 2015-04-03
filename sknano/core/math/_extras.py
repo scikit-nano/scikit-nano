@@ -8,7 +8,6 @@ Math helper functions (:mod:`sknano.core._extras`)
 
 """
 from __future__ import absolute_import, division, print_function
-from six.moves import range
 __docformat__ = 'restructuredtext en'
 
 from fractions import gcd

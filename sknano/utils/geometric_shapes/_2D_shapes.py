@@ -7,8 +7,13 @@
 .. currentmodule:: sknano.utils.geometric_shapes._2D_shapes
 
 """
-from __future__ import absolute_import, division, print_function
-import six
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
+from builtins import super
+from builtins import dict
+from future import standard_library
+standard_library.install_aliases()
+from future.utils import with_metaclass
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractproperty
@@ -22,8 +27,9 @@ __all__ = ['Geometric2DRegion', 'Parallelogram', 'Rectangle', 'Square',
            'Ellipse', 'Circle']
 
 
-class Geometric2DRegion(six.with_metaclass(ABCMeta, GeometricTransformsMixin,
-                                           GeometricRegion)):
+class Geometric2DRegion(with_metaclass(ABCMeta,
+                        type('NewBase', (GeometricTransformsMixin,
+                                         GeometricRegion), {}))):
     """Abstract base class for representing 2D geometric regions."""
 
     @abstractproperty

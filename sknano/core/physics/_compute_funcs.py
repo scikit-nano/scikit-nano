@@ -9,7 +9,6 @@ Compute functions (:mod:`sknano.structures._compute_funcs`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-from six.moves import range
 __docformat__ = 'restructuredtext en'
 
 import numpy as np

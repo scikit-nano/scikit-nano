@@ -14,9 +14,6 @@ __docformat__ = 'restructuredtext en'
 
 from itertools import combinations
 
-import six
-from six.moves import range
-
 import numpy as np
 
 __all__ = ['rotate', 'Rx', 'Ry', 'Rz', 'rotation_matrix',
@@ -480,7 +477,7 @@ def transformation_matrix(angle=None, axis=None, anchor_point=None,
             # Handle N-D rotation around the N-D rotation vector anchored at
             # an arbitrary N-D point.
 
-            if isinstance(axis, (str, six.text_type)):
+            if isinstance(axis, str):
                 try:
                     axis = _str2array[axis]
                 except KeyError:

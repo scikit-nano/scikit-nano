@@ -7,8 +7,9 @@
 .. currentmodule:: sknano.utils.geometric_shapes._3D_shapes
 
 """
-from __future__ import absolute_import, division, print_function
-import six
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
+
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractproperty
@@ -23,9 +24,9 @@ __all__ = ['Geometric3DRegion', 'Parallelepiped', 'Cuboid', 'Cube',
            'Ellipsoid', 'Spheroid', 'Sphere']
 
 
-class Geometric3DRegion(six.with_metaclass(ABCMeta, GeometricTransformsMixin,
-                                           GeometricRegion)):
+class Geometric3DRegion(GeometricTransformsMixin, GeometricRegion):
     """Abstract base class for representing 3D geometric regions."""
+    __metaclass__ = ABCMeta
 
     @abstractproperty
     def volume(self):

@@ -6,7 +6,6 @@ import nose
 from nose.tools import *
 from sknano.core.atoms import Atom, Atoms
 from sknano.testing import generate_atoms
-from six.moves import range
 
 
 def test_instantiation():

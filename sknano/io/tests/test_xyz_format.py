@@ -6,7 +6,6 @@ import nose
 from nose.tools import *
 from pkg_resources import resource_filename
 from sknano.io import XYZData, XYZReader, XYZWriter, XYZ2DATAConverter
-from six.moves import range
 
 
 def test_reader():
