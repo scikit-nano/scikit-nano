@@ -2,8 +2,17 @@
 # -*- coding: utf-8 -*-
 """Python toolkit for generating and analyzing nanostructure data"""
 
-from __future__ import absolute_import, division, print_function
-from six.moves import map
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import dict
+from builtins import open
+from builtins import map
+from builtins import str
+from future import standard_library
+standard_library.install_aliases()
+
 __docformat__ = 'restructuredtext en'
 
 import os
@@ -11,12 +20,6 @@ import sys
 import shutil
 import subprocess
 from distutils.command.clean import clean as Clean
-
-try:
-    import setuptools
-except ImportError:
-    sys.exit("setuptools required for Python3 install.\n"
-             "`pip install --upgrade setuptools`")
 
 #if sys.version_info[0] < 3:
 #    print('Python 2 support requires running `3to2` on source directory.')
@@ -26,10 +29,11 @@ except ImportError:
 if (3, 0) <= sys.version_info[:2] < (3, 4):
     raise RuntimeError("Python 3.4+ required.")
 
-if sys.version_info[0] >= 3:
-    import builtins
-else:
-    import __builtin__ as builtins
+try:
+    import setuptools
+except ImportError:
+    sys.exit("setuptools required for Python3 install.\n"
+             "`pip install --upgrade setuptools`")
 
 DISTNAME = 'scikit-nano'
 DESCRIPTION = __doc__
