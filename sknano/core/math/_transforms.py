@@ -9,6 +9,7 @@ Functions for linear algebra transforms (:mod:`sknano.core.math._transforms`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
+from builtins import range
 
 __docformat__ = 'restructuredtext en'
 

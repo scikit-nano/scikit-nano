@@ -8,6 +8,7 @@ Base class for structure data atom (:mod:`sknano.core.atoms._atom`)
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import object
 
 __docformat__ = 'restructuredtext en'
 
@@ -22,7 +23,7 @@ __all__ = ['Atom']
 
 
 @total_ordering
-class Atom:
+class Atom(object):
     """Base class for abstract representation of structure atom.
 
     Parameters

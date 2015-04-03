@@ -9,6 +9,8 @@ Base classes for geometric regions (:mod:`sknano.utils.geometric_shapes._base`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
+from builtins import object
+from future.utils import with_metaclass
 
 __docformat__ = 'restructuredtext en'
 
@@ -20,7 +22,7 @@ import numpy as np
 __all__ = ['GeometricRegion', 'GeometricTransformsMixin']
 
 
-class GeometricTransformsMixin:
+class GeometricTransformsMixin(object):
 
     def rotate(self, angle=None, axis=None, anchor_point=None,
                rot_point=None, from_vector=None, to_vector=None,
@@ -64,9 +66,8 @@ class GeometricTransformsMixin:
         self.vectors.translate(t, fix_anchor_points=fix_anchor_points)
 
 
-class GeometricRegion:
+class GeometricRegion(with_metaclass(ABCMeta, object)):
     """Abstract base class for geometric regions."""
-    __metaclass__ = ABCMeta
 
     def __init__(self):
         self.points = Points()

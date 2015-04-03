@@ -8,6 +8,7 @@ Base class for structure data atoms (:mod:`sknano.core.atoms._atoms`)
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import str
 __docformat__ = 'restructuredtext en'
 
 from operator import attrgetter

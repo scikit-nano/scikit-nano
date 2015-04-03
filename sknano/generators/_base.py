@@ -8,6 +8,7 @@ Structure generator base module (:mod:`sknano.generators._base`)
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 import copy
@@ -31,7 +32,7 @@ STRUCTURE_GENERATORS = ('FullereneGenerator',
                         'MWNTBundleGenerator')
 
 
-class GeneratorBase:
+class GeneratorBase(object):
     """Base class for generator classes"""
 
     def __init__(self, *args, **kwargs):

@@ -10,6 +10,8 @@ An `Atom` sub-class for POAV analysis.
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import zip
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
@@ -27,7 +29,7 @@ from ._kdtree_atom import KDTAtom
 __all__ = ['POAV', 'POAV1', 'POAV2', 'POAVR', 'POAVAtomMixin', 'POAVAtom']
 
 
-class POAV:
+class POAV(object):
     """Base class for POAV analysis.
 
     Parameters
@@ -63,7 +65,7 @@ class POAV:
 
     def __str__(self):
         strrep = '{}\n=====\n'.format(self.__class__.__name__)
-        for k, v in self.todict(rad2deg=True).items():
+        for k, v in list(self.todict(rad2deg=True).items()):
             strrep += '{}: {}\n'.format(k, v)
         return strrep
 
@@ -484,7 +486,7 @@ class POAVR(POAV):
         return self.R1 * self.R2 * self.R3 * super().T
 
 
-class POAVAtomMixin:
+class POAVAtomMixin(object):
     """Mixin class for `POAVAtom`."""
     @property
     def POAV1(self):

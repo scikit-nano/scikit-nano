@@ -10,6 +10,9 @@ Classes for analyzing the atom trajectories of molecular dynamics simulations.
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import zip
+from builtins import range
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 #import numbers
@@ -24,7 +27,7 @@ from ._md_atoms import MDAtoms as Atoms
 __all__ = ['Snapshot', 'Trajectory']
 
 
-class aselect:
+class aselect(object):
     def __init__(self, traj):
         self.traj = traj
 
@@ -43,7 +46,7 @@ class aselect:
             snapshot.nselect = snapshot.Natoms
 
 
-class tselect:
+class tselect(object):
     def __init__(self, traj):
         self.traj = traj
 
@@ -89,7 +92,7 @@ class tselect:
             self.traj.nselect, self.traj.Nsnaps))
 
 
-class Snapshot:
+class Snapshot(object):
     """Container class for MD data at single timestep"""
     def __init__(self, trajectory=None):
 

@@ -8,6 +8,7 @@ NanoGen view (:mod:`sknano.apps.nanogen_gui._ng_view`)
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import str
 __docformat__ = 'restructuredtext en'
 
 import importlib

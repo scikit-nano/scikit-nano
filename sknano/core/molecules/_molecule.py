@@ -8,6 +8,7 @@ Base class for structure molecule (:mod:`sknano.core.molecules._molecule`)
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 #from collections import OrderedDict
@@ -23,7 +24,7 @@ __all__ = ['Molecule']
 
 
 @total_ordering
-class Molecule:
+class Molecule(object):
     """Base class for abstract representation of molecule.
 
     Parameters

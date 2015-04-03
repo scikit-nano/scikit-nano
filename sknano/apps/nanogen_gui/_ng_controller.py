@@ -8,6 +8,7 @@ NanoGen controller (:mod:`sknano.apps.nanogen_gui._ng_controller`)
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 

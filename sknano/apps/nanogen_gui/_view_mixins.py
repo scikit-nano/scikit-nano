@@ -9,6 +9,8 @@ View mixin classes (:mod:`sknano.apps.nanogen_gui._view_mixins`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
+from builtins import str
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 try:
@@ -19,7 +21,7 @@ except ImportError as e:
 __all__ = ['NanotubeViewMixin', 'GrapheneViewMixin']
 
 
-class NanotubeViewMixin:
+class NanotubeViewMixin(object):
     """Mixin class for nanotube classes."""
     @pyqtSlot()
     def on_n_spinBox_editingFinished(self):
@@ -103,7 +105,7 @@ class NanotubeViewMixin:
         self.model.Lz = value
 
 
-class GrapheneViewMixin:
+class GrapheneViewMixin(object):
     """Mixin class for graphene."""
 
     #@pyqtSlot(int)

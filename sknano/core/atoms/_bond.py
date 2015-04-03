@@ -8,6 +8,7 @@ Base class for atom bond (:mod:`sknano.core.atoms._bond`)
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 from functools import total_ordering
@@ -20,7 +21,7 @@ __all__ = ['Bond']
 
 
 @total_ordering
-class Bond:
+class Bond(object):
     """Abstract representation of bond between 2 `Atom` objects.
 
     Parameters

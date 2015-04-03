@@ -9,6 +9,8 @@ Extra helper functions (:mod:`sknano.structures._extras`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
+from builtins import str
+from builtins import range
 __docformat__ = 'restructuredtext en'
 
 import importlib

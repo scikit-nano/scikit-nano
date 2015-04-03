@@ -9,6 +9,7 @@ Base structure classes (:mod:`sknano.structures._base`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 import numbers
@@ -18,7 +19,7 @@ from sknano.core.refdata import CCbond
 __all__ = ['StructureBase']
 
 
-class StructureBase:
+class StructureBase(object):
     """Base class for creating abstract representation of nano structure.
 
     Parameters

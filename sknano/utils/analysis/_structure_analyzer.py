@@ -8,6 +8,7 @@ Structure analyzer class (:mod:`sknano.utils.analysis._structure_analyzer`)
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 __all__ = ['StructureAnalyzer']

@@ -9,6 +9,7 @@ NanoGen GUI CLI (:mod:`sknano.scripts.nanogenui`)
 
 """
 from __future__ import absolute_import, print_function, division
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 import sys

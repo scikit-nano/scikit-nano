@@ -11,6 +11,7 @@ Contents
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import object
 
 from functools import wraps
 import inspect
@@ -126,7 +127,7 @@ def method_function(module, classobj):
         setattr(moduleobj, method, func)
 
 
-class methodfunc:
+class methodfunc(object):
     """Define functions from existing class methods.
 
     This class is based off of the the `numpy`
@@ -209,7 +210,7 @@ def timethis(func):
     return wrapper
 
 
-class with_doc:
+class with_doc(object):
     """Decorator class to combine class method docstrings.
 
     Parameters

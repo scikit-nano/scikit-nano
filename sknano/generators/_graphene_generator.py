@@ -8,6 +8,7 @@ Graphene structure generator (:mod:`sknano.generators._graphene_generator`)
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import range
 __docformat__ = 'restructuredtext en'
 
 import numpy as np

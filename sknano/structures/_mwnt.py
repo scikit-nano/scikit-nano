@@ -9,6 +9,7 @@ MWNT structure class (:mod:`sknano.structures._mwnt`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
+from builtins import range
 __docformat__ = 'restructuredtext en'
 
 import numpy as np
@@ -81,7 +82,7 @@ class MWNT(MWNTMixin, StructureBase):
             dt_masks = [self.generate_dt_mask(_dt) for _dt in dt_list]
 
             Ch_list = [tuple(self._Ch_pool[_mask][
-                np.random.choice(range(len(self._Ch_pool[_mask])))].tolist())
+                np.random.choice(list(range(len(self._Ch_pool[_mask]))))].tolist())
                 for _mask in dt_masks]
 
         self.Ch_list = Ch_list[:]

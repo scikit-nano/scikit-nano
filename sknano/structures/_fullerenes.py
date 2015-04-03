@@ -8,6 +8,7 @@ Fullerene structure classes (:mod:`sknano.structures._fullerenes`)
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 import numbers
@@ -15,7 +16,7 @@ import numbers
 __all__ = ['Fullerene']
 
 
-class Fullerene:
+class Fullerene(object):
     """Fullerene structure class.
 
     The `fullerene data

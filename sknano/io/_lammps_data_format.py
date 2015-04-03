@@ -8,6 +8,9 @@ LAMMPS data format (:mod:`sknano.io._lammps_data_format`)
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import str
+from builtins import range
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
@@ -71,7 +74,7 @@ class DATAReader(StructureIO):
                     if len(line) == 0:
                         continue
                     found = False
-                    for header in header_specs.keys():
+                    for header in list(header_specs.keys()):
                         if header in line:
                             found = True
                             self.header_data[header] = \
@@ -89,7 +92,7 @@ class DATAReader(StructureIO):
 
                 while True:
                     found = False
-                    for section, header in section_header_map.items():
+                    for section, header in list(section_header_map.items()):
                         if section in line:
                             found = True
                             f.readline()
@@ -146,7 +149,7 @@ class DATAReader(StructureIO):
                            'mass': None, 'x': None, 'y': None, 'z': None,
                            'vx': None, 'vy': None, 'vz': None}
 
-            for kw in atom_kwargs.keys():
+            for kw in list(atom_kwargs.keys()):
                 if kw in atoms_section_attrs:
                     atom_kwargs[kw] = \
                         line[self.section_attrs_specs['Atoms'][kw]['index']]
@@ -241,7 +244,7 @@ class DATAReader(StructureIO):
 LAMMPSDATAReader = DATAReader
 
 
-class DATAWriter:
+class DATAWriter(object):
     """`StructureWriter` class for writing `LAMMPS data` file format."""
 
     @classmethod
@@ -351,7 +354,7 @@ class DATAWriter:
                     dim=dim))
 
             f.write('\nMasses\n\n')
-            for type, properties in types.items():
+            for type, properties in list(types.items()):
                 f.write('{}{:.4f}\n'.format(
                     '{:d}'.format(type).ljust(Natoms_width),
                     properties['mass']))
@@ -567,7 +570,7 @@ class DATAIOError(StructureIOError):
 LAMMPSDATAIOError = DATAIOError
 
 
-class DATAFormatSpec:
+class DATAFormatSpec(object):
     """`StructureFormatSpec` class the `LAMMPS data` format spec.
 
     Parameters
@@ -596,7 +599,7 @@ class DATAFormatSpec:
              'Dihedrals': dihedrals_section_attrs}
 
         self.section_attrs_specs = OrderedDict()
-        for section, attrs in self.section_attrs.items():
+        for section, attrs in list(self.section_attrs.items()):
             self.section_attrs_specs[section] = OrderedDict()
             for i, attr in enumerate(attrs):
                 self.section_attrs_specs[section][attr] = \
@@ -721,7 +724,7 @@ atom_styles['wavepacket'] = \
 lammps_atom_styles = atom_styles
 
 atoms_section_attrs = {}
-for atom_style, attrs in atom_styles.items():
+for atom_style, attrs in list(atom_styles.items()):
     atom_style_attrs = atoms_section_attrs[atom_style] = []
     for attr in attrs:
         attr = attr.replace('atom-', '').replace('molecule-ID', 'mol').lower()

@@ -8,6 +8,7 @@ Generator mixin classes (:mod:`sknano.generators._mixins`)
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 import copy

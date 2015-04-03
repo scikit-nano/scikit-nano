@@ -8,6 +8,7 @@ XYZ format (:mod:`sknano.io._xyz_format`)
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 import os
@@ -60,7 +61,7 @@ class XYZReader(StructureIO):
             self.assign_unique_types()
 
 
-class XYZWriter:
+class XYZWriter(object):
     """`StructureWriter` class for writing `xyz` chemical file format."""
 
     @classmethod

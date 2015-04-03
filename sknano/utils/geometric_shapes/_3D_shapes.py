@@ -9,6 +9,7 @@
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
+from future.utils import with_metaclass
 
 __docformat__ = 'restructuredtext en'
 
@@ -24,9 +25,8 @@ __all__ = ['Geometric3DRegion', 'Parallelepiped', 'Cuboid', 'Cube',
            'Ellipsoid', 'Spheroid', 'Sphere']
 
 
-class Geometric3DRegion(GeometricTransformsMixin, GeometricRegion):
+class Geometric3DRegion(with_metaclass(ABCMeta, type('NewBase', (GeometricTransformsMixin, GeometricRegion), {}))):
     """Abstract base class for representing 3D geometric regions."""
-    __metaclass__ = ABCMeta
 
     @abstractproperty
     def volume(self):

@@ -8,6 +8,8 @@ Base classes for structure data (:mod:`sknano.io._base`)
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import object
+from future.utils import with_metaclass
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
@@ -35,7 +37,7 @@ __all__ = ['Atom', 'Atoms',
            'supported_structure_formats']
 
 
-class StructureData:
+class StructureData(object):
     """Container class for structure data."""
     def __init__(self):
         self._atoms = Atoms()
@@ -61,7 +63,7 @@ class StructureData:
             delattr(self._atoms, name)
 
 
-class StructureIO:
+class StructureIO(object):
     """Base class for structure data file input and output.
 
     Parameters
@@ -112,7 +114,7 @@ class StructureIO:
         return cp
 
 
-class StructureReader:
+class StructureReader(object):
     """Structure data reader base class."""
     @classmethod
     def read(cls, fpath, structure_format=None, **kwargs):
@@ -139,7 +141,7 @@ class StructureReader:
             raise StructureIOError("Unable to determine `structure_format`")
 
 
-class StructureWriter:
+class StructureWriter(object):
     """Structure data writer base class."""
     @classmethod
     def write(cls, fname=None, atoms=None, structure_format=None, **kwargs):
@@ -174,7 +176,7 @@ class StructureWriter:
             XYZWriter.write(fname=fname, atoms=atoms, **kwargs)
 
 
-class StructureConverter:
+class StructureConverter(with_metaclass(ABCMeta, object)):
     """Abstract base class for converting structure data.
 
     Parameters
@@ -183,7 +185,6 @@ class StructureConverter:
     outfile : str
 
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, infile=None, outfile=None, **kwargs):
         self.infile = infile
@@ -197,7 +198,7 @@ class StructureConverter:
                                   'to implement the `convert` method.')
 
 
-class StructureFormatSpec:
+class StructureFormatSpec(object):
     """Base class for defining a format specification.
 
     Parameters

@@ -9,6 +9,8 @@ Mixin structure classes (:mod:`sknano.structures._mixins`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
+from builtins import range
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 import numbers
@@ -23,7 +25,7 @@ __all__ = ['MWNTMixin', 'NanotubeMixin', 'SWNTMixin', 'NanotubeBundleMixin',
            'UnrolledSWNTMixin']
 
 
-class SWNTMixin:
+class SWNTMixin(object):
     """Mixin class for nanotube classes."""
     @property
     def n(self):
@@ -374,7 +376,7 @@ class SWNTMixin:
 NanotubeMixin = SWNTMixin
 
 
-class MWNTMixin:
+class MWNTMixin(object):
     """Mixin class for MWNTs."""
 
     @property
@@ -491,7 +493,7 @@ class MWNTMixin:
         return [swnt.rt for swnt in self.shells]
 
 
-class NanotubeBundleMixin:
+class NanotubeBundleMixin(object):
     """Mixin class for nanotube bundles."""
 
     @property
@@ -649,7 +651,7 @@ class NanotubeBundleMixin:
                     self.bundle_coords.append(dr)
 
 
-class UnrolledSWNTMixin:
+class UnrolledSWNTMixin(object):
     """Mixin class for unrolled nanotubes."""
 
     @property

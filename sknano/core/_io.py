@@ -9,6 +9,7 @@ I/O functions (:mod:`sknano.core._io`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
+from builtins import str
 __docformat__ = 'restructuredtext en'
 
 import os

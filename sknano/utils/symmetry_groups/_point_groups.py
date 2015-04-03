@@ -8,6 +8,7 @@ Point groups (:mod:`sknano.utils.symmetry_groups._point_groups`)
 
 """
 from __future__ import absolute_import, division, print_function
+from builtins import object
 __docformat__ = 'restructuredtext en'
 
 __all__ = ['PointGroup']
