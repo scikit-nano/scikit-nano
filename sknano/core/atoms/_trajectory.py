@@ -51,28 +51,25 @@ class tselect:
 
     def all(self):
         traj = self.traj
-        for snapshot in traj:
-            snapshot.tselect = 1
+        [setattr(snapshot, 'tselect', 1) for snapshot in traj]
         traj.nselect = len(traj)
         traj.aselect.all()
-        print('{}/{} snapshots selected'.format(traj.nselect, traj.Nsnaps))
+        self.print_fraction_selected()
 
     def one(self, n):
         traj = self.traj
-        for snapshot in traj:
-            snapshot.tselect = 0
+        [setattr(snapshot, 'tselect', 0) for snapshot in traj]
         i = traj.findtimestep(n)
         traj.snapshots[i].tselect = 1
         traj.nselect = 1
         traj.aselect.all()
-        print('{}/{} snapshots selected'.format(traj.nselect, traj.Nsnaps))
+        self.print_fraction_selected()
 
     def none(self):
         traj = self.traj
-        for snapshot in traj:
-            snapshot.tselect = 0
+        [setattr(snapshot, 'tselect', 0) for snapshot in traj]
         traj.nselect = 0
-        print('{}/{} snapshots selected'.format(traj.nselect, traj.Nsnaps))
+        self.print_fraction_selected()
 
     def skip(self, n):
         traj = self.traj
@@ -87,7 +84,11 @@ class tselect:
             snapshot.tselect = 0
             traj.nselect -= 1
         traj.aselect.all()
-        print('{}/{} snapshots selected'.format(traj.nselect, traj.Nsnaps))
+        self.print_fraction_selected()
+
+    def print_fraction_selected(self):
+        print('{}/{} snapshots selected'.format(
+            self.traj.nselect, self.traj.Nsnaps))
 
 
 class Snapshot:
