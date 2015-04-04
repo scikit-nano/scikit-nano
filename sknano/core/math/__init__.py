@@ -25,8 +25,6 @@ Linear algebra transforms
    :toctree: generated/
 
    rotate
-   scale
-   translate
    Rx
    Ry
    Rz
