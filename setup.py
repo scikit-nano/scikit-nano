@@ -29,6 +29,11 @@ from distutils.command.clean import clean as Clean
 if (3, 0) <= sys.version_info[:2] < (3, 4):
     raise RuntimeError("Python 3.4+ required.")
 
+if sys.version_info[0] < 3:
+    import __builtin__ as builtins
+else:
+    import builtins
+
 try:
     import setuptools
 except ImportError:
