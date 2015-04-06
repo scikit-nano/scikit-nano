@@ -11,6 +11,7 @@ Periodic Table of Elements (:mod:`sknano.core.refdata._periodic_table`)
 
 """
 from __future__ import division, absolute_import, print_function
+from __future__ import unicode_literals
 from builtins import object
 __docformat__ = 'restructuredtext'
 

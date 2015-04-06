@@ -8,6 +8,7 @@ Base class for atom bond (:mod:`sknano.core.atoms._bond`)
 
 """
 from __future__ import absolute_import, division, print_function
+from __future__ import unicode_literals
 from builtins import object
 __docformat__ = 'restructuredtext en'
 

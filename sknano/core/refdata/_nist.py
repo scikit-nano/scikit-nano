@@ -16,6 +16,7 @@ References
           Relative Atomic Masses. http://www.nist.gov/pml/data/comp.cfm
 
 """
+from __future__ import unicode_literals
 
 
 atomic_masses_nist_list = [

@@ -43,6 +43,7 @@ Number theory
 
 """
 from __future__ import absolute_import
+from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._extras import *

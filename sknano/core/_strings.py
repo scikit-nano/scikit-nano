@@ -8,6 +8,7 @@ Helper functions for string manipulation (:mod:`sknano.core._strings`)
 
 """
 from __future__ import absolute_import, division, print_function
+from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 __all__ = ['plural_word_check', 'pluralize']

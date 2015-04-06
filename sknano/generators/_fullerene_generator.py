@@ -8,6 +8,7 @@ Fullerene generators (:mod:`sknano.generators._fullerene_generators`)
 
 """
 from __future__ import absolute_import, division, print_function
+from __future__ import unicode_literals
 from builtins import str
 __docformat__ = 'restructuredtext en'
 

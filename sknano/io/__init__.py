@@ -48,6 +48,7 @@ I/O classes for the `xyz` structure data format
 
 """
 from __future__ import absolute_import, division, print_function
+from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._base import *

@@ -8,6 +8,7 @@ MWNT bundle structure class (:mod:`sknano.structures._mwnt_bundle`)
 
 """
 from __future__ import absolute_import, division, print_function
+from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._nanotube_bundle import NanotubeBundleBase

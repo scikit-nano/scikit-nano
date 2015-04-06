@@ -10,6 +10,7 @@ An `Atom` class for molecular dynamics trajectory analysis.
 
 """
 from __future__ import absolute_import, division, print_function
+from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 import numpy as np

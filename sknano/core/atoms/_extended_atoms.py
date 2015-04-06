@@ -10,6 +10,7 @@ An "eXtended" `Atoms` class for structure analysis.
 
 """
 from __future__ import absolute_import, division, print_function
+from __future__ import unicode_literals
 from builtins import zip
 __docformat__ = 'restructuredtext en'
 

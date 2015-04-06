@@ -8,6 +8,7 @@ Graphene defect generators (:mod:`sknano.generators._graphene_defect_generators`
 
 """
 from __future__ import absolute_import, division, print_function
+from __future__ import unicode_literals
 from builtins import next
 from builtins import range
 __docformat__ = 'restructuredtext en'

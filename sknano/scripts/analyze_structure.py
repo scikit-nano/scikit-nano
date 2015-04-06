@@ -9,6 +9,7 @@ Command line script (:mod:`sknano.scripts.analyze_structure`)
 
 """
 from __future__ import absolute_import, division, print_function
+from __future__ import unicode_literals
 
 from collections import OrderedDict
 import argparse

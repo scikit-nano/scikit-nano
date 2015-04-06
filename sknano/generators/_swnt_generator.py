@@ -100,7 +100,7 @@ class SWNTGenerator(SWNT, GeneratorBase):
     """
     def __init__(self, *Ch, autogen=True, **kwargs):
 
-        super(SWNTGenerator, self).__init__(*Ch, **kwargs)
+        super().__init__(*Ch, **kwargs)
 
         if autogen:
             self.generate_unit_cell()
@@ -203,6 +203,6 @@ class SWNTGenerator(SWNT, GeneratorBase):
             fname_wordlist = (chirality, nz)
             fname = '_'.join(fname_wordlist)
 
-        super(SWNTGenerator, self).save_data(
-            fname=fname, outpath=outpath, structure_format=structure_format,
-            center_CM=center_CM, **kwargs)
+        super().save_data(fname=fname, outpath=outpath,
+                          structure_format=structure_format,
+                          center_CM=center_CM, **kwargs)

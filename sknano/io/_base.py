@@ -8,6 +8,7 @@ Base classes for structure data (:mod:`sknano.io._base`)
 
 """
 from __future__ import absolute_import, division, print_function
+from __future__ import unicode_literals
 from builtins import object
 from future.utils import with_metaclass
 __docformat__ = 'restructuredtext en'

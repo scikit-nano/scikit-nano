@@ -8,6 +8,7 @@ Graphene structure classes (:mod:`sknano.structures._graphene`)
 
 """
 from __future__ import absolute_import, division, print_function
+from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 #import itertools

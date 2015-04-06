@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from __future__ import division, print_function, absolute_import
+from __future__ import unicode_literals
 
 
 def configuration(parent_package='apps', top_path=None):

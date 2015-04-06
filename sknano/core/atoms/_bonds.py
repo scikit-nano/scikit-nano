@@ -8,6 +8,7 @@ Container class for collection of `Bond`\ s (:mod:`sknano.core.atoms._bonds`)
 
 """
 from __future__ import absolute_import, division, print_function
+from __future__ import unicode_literals
 from builtins import str
 __docformat__ = 'restructuredtext en'
 

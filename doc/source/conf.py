@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, print_function
 #
 # scikit-nano documentation build configuration file, created by
 # sphinx-quickstart on Wed Oct 30 00:26:16 2013.
@@ -12,6 +11,9 @@ from __future__ import absolute_import, division, print_function
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
+from builtins import object
 
 import os
 import re
@@ -19,7 +21,6 @@ import sys
 
 # Check Sphinx version
 import sphinx
-import six
 if sphinx.__version__ < "1.2":
     raise RuntimeError("Sphinx 1.2 or newer required")
 
@@ -80,8 +81,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General substitutions.
-project = six.u('scikit-nano')
-copyright = six.u('2014, Andrew Merrill')
+project = 'scikit-nano'
+copyright = '2015, Andrew Merrill'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -312,8 +313,8 @@ latex_use_modindex = False
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'scikit-nano', six.u('scikit-nano Documentation'),
-     [six.u('Andrew Merrill')], 1)
+    ('index', 'scikit-nano', 'scikit-nano Documentation',
+     ['Andrew Merrill'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -327,8 +328,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [('index', 'scikit-nano',
-                      six.u('scikit-nano Documentation'),
-                      six.u('Andrew Merrill'), 'scikit-nano',
+                      'scikit-nano Documentation',
+                      'Andrew Merrill', 'scikit-nano',
                       'python toolkit',
                       'Miscellaneous')]
 

@@ -8,6 +8,7 @@ StructureAtom(s) class references (:mod:`sknano.core.atoms._structure_atoms`)
 
 """
 from __future__ import absolute_import, division, print_function
+from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 __all__ = ['StructureAtom', 'StructureAtoms']

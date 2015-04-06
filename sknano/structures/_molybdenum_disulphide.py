@@ -8,6 +8,7 @@ MoS2 structure class (:mod:`sknano.structures._molybdenum_disulphide`)
 
 """
 from __future__ import absolute_import, division, print_function
+from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 #import itertools
