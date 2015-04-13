@@ -24,7 +24,7 @@ from ._transforms import rotate, transformation_matrix
 __all__ = ['Vector', 'angle', 'cross', 'dot', 'scalar_triple_product',
            'vector_triple_product', 'scalar_projection', 'vector_projection',
            'vector_rejection', 'projection', 'rejection',
-           '_check_vector_compatibility', '_vector_math_warning']
+           '_check_vector_compatibility', '_vector_math_warning_message']
 
 
 def _check_vector_compatibility(v1, v2):
@@ -33,7 +33,7 @@ def _check_vector_compatibility(v1, v2):
                          "of components".format(v1, v2))
 
 
-def _vector_math_warning(operation, *args):
+def _vector_math_warning_message(operation, *args):
     msg = "Undefined mathematical operation:\n"
     if len(args) == 1:
         msg += "{} of a Vector by {!r}".format(operation, args[0])
@@ -42,7 +42,7 @@ def _vector_math_warning(operation, *args):
     else:
         msg += "{} of a Vector by a Vector".format(operation)
 
-    warnings.warn(msg, UserWarning)
+    return msg
 
 
 class Vector(np.ndarray):
@@ -396,7 +396,8 @@ class Vector(np.ndarray):
                   "{!r}\n{!r}".format(self, other))
             return self.dot(other)
         else:
-            _vector_math_warning('multiplication', other)
+            warnings.warn(_vector_math_warning_message(
+                'multiplication', other), UserWarning)
 
     __rmul__ = __mul__
 
@@ -405,9 +406,11 @@ class Vector(np.ndarray):
             return Vector(self.__array__() / other, p0=self.p0)
         else:
             if isinstance(other, Vector):
-                _vector_math_warning('division')
+                warnings.warn(_vector_math_warning_message('division'),
+                              UserWarning)
             else:
-                _vector_math_warning('division', other)
+                warnings.warn(_vector_math_warning_message(
+                    'division', other), UserWarning)
             return None
 
     __truediv__ = __div__
@@ -417,9 +420,23 @@ class Vector(np.ndarray):
             return Vector(self.__array__() // other, p0=self.p0)
         else:
             if isinstance(other, Vector):
-                _vector_math_warning('division')
+                warnings.warn(_vector_math_warning_message('division'),
+                              UserWarning)
             else:
-                _vector_math_warning('division', other)
+                warnings.warn(_vector_math_warning_message(
+                    'division', other), UserWarning)
+            return None
+
+    def __pow__(self, other):
+        if isinstance(other, numbers.Number):
+            return Vector(self.__array__() ** other, p0=self.p0)
+        else:
+            if isinstance(other, Vector):
+                warnings.warn(_vector_math_warning_message(
+                    'exponentiation'), UserWarning)
+            else:
+                warnings.warn(_vector_math_warning_message(
+                    'exponentiation', other), UserWarning)
             return None
 
     def __iadd__(self, other):
@@ -448,7 +465,8 @@ class Vector(np.ndarray):
                 print(e)
                 return None
         else:
-            _vector_math_warning('multiplication', other)
+            warnings.warn(_vector_math_warning_message(
+                'multiplication', other), UserWarning)
 
     def __idiv__(self, other):
         if isinstance(other, numbers.Number):
@@ -457,9 +475,11 @@ class Vector(np.ndarray):
             return self
         else:
             if isinstance(other, Vector):
-                _vector_math_warning('division')
+                warnings.warn(_vector_math_warning_message('division'),
+                              UserWarning)
             else:
-                _vector_math_warning('division', other)
+                warnings.warn(_vector_math_warning_message(
+                    'division', other), UserWarning)
             return None
 
     __itruediv__ = __idiv__
@@ -471,9 +491,11 @@ class Vector(np.ndarray):
             return self
         else:
             if isinstance(other, Vector):
-                _vector_math_warning('division')
+                warnings.warn(_vector_math_warning_message('division'),
+                              UserWarning)
             else:
-                _vector_math_warning('division', other)
+                warnings.warn(_vector_math_warning_message(
+                    'division', other), UserWarning)
             return None
 
     def __ipow__(self, other):
@@ -483,9 +505,11 @@ class Vector(np.ndarray):
             return self
         else:
             if isinstance(other, Vector):
-                _vector_math_warning('exponentiation')
+                warnings.warn(_vector_math_warning_message(
+                    'exponentiation'), UserWarning)
             else:
-                _vector_math_warning('exponentiation', other)
+                warnings.warn(_vector_math_warning_message(
+                    'exponentiation', other), UserWarning)
             return None
 
     # def __copy__(self):
