@@ -95,7 +95,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
 
     def __init__(self, autogen=True, **kwargs):
 
-        super(UnrolledSWNTGenerator, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         if autogen:
             self.generate_unit_cell()
@@ -164,7 +164,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
 
     def generate_structure_data(self):
         """Generate structure data."""
-        #self.atoms = Atoms()
+
         self.structure_data.clear()
         for nx in range(self.nx):
             for nz in range(int(np.ceil(self.nz))):
@@ -200,6 +200,5 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
         if center_CM:
             self.atoms.center_CM()
 
-        super(UnrolledSWNTGenerator, self).save_data(
-            fname=fname, outpath=outpath, structure_format=structure_format,
-            center_CM=False, **kwargs)
+        super().save_data(fname=fname, outpath=outpath,
+            structure_format=structure_format, center_CM=False, **kwargs)

@@ -35,7 +35,7 @@ class GraphenePrimitiveCell(StructureBase):
 
     """
     def __init__(self, **kwargs):
-        super(GraphenePrimitiveCell, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.a = np.sqrt(3) * self.bond
 
         self.a1 = Vector(nd=2)
@@ -94,7 +94,7 @@ class Graphene(StructureBase):
                  layer_spacing=dVDW, layer_rotation_angles=None,
                  stacking_order='AB', deg2rad=True, **kwargs):
 
-        super(Graphene, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.length = length
         self.width = width

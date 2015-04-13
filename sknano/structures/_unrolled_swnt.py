@@ -26,7 +26,7 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
                  stacking_order='AB', Lx=None, fix_Lx=False, Lz=None,
                  fix_Lz=False, **kwargs):
 
-        super(UnrolledSWNT, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.n = n
         self.m = m

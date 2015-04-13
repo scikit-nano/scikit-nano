@@ -8,7 +8,8 @@ from nose.tools import *
 
 import numpy as np
 
-from sknano.core.math import Point, Vector, vector as vec
+from sknano.core.math import e1, e2, e3, xhat, yhat, zhat, \
+    Point, Vector, vector as vec
 
 
 def test1():
@@ -187,10 +188,6 @@ def test7():
 
 
 def test8():
-    e1 = Vector([1, 0, 0])
-    e2 = Vector([0, 1, 0])
-    e3 = Vector([0, 0, 1])
-
     assert_true(np.allclose(vec.cross(e1, e2), e3))
     assert_equal(vec.cross(e1, e2), e3)
 
@@ -390,6 +387,72 @@ def test22():
     a = Vector([5, 6, 7])
     b = Vector([1, 1, 1])
     assert_equals(vec.vector_rejection(a, b), a - Vector(3 * [6]))
+
+
+def test23():
+    for v1, v2 in zip([e1, e2, e3], [xhat, yhat, zhat]):
+        assert_true(np.allclose(v1, v2))
+        assert_equals(v1, v2)
+
+
+def test24():
+    assert_true(np.allclose(Vector([5,0,0]), 5 * e1))
+
+
+def test25():
+    assert_equal(e1 * e1, e1.dot(e1))
+    assert_equal(e1 * e1, 1.0)
+
+    with assert_raises(ValueError):
+        e1.dot(Vector([1.0, 0.0]))
+
+    with assert_raises(ValueError):
+        Vector([1.0, 0.0]).dot(e1)
+
+def test26():
+    v = Vector([5, 0, 0])
+    assert_equal(5 * e1, v)
+    assert_equal(e1 * 5, v)
+
+    e1copy = e1.copy()
+    assert_true(e1 == e1copy)
+    assert_true(not e1 is e1copy)
+    assert_true(not (e1 is e1copy))
+    assert_true(e1 is not e1copy)
+    e1copy *= 5
+    assert_equal(5* e1, e1copy)
+    assert_equal(e1copy, v)
+
+
+def test27():
+    v = Vector([5, 0, 0])
+    v += 5
+    assert_equal(v, Vector([10, 5, 5]))
+
+    v += v
+    assert_equal(v, Vector([20, 10, 10]))
+    #with assert_raises(Val
+
+
+def test28():
+    v = Vector([5, 0, 0])
+    v -= 5
+    assert_equal(v, Vector([0, -5, -5]))
+
+
+def test29():
+    v = Vector([5, 0, 0])
+    v *= v
+
+
+def test30():
+    v = Vector([5, 0, 0])
+    v /= v
+
+
+def test31():
+    v = Vector([5, 0, 0])
+    v //= v
 
 
 if __name__ == '__main__':

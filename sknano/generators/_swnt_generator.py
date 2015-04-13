@@ -171,7 +171,7 @@ class SWNTGenerator(SWNT, GeneratorBase):
 
     def generate_structure_data(self):
         """Generate structure data."""
-        #self.atoms = Atoms()
+
         self.structure_data.clear()
         for nz in range(int(np.ceil(self.nz))):
             dr = Vector([0.0, 0.0, nz * self.T])
@@ -204,5 +204,4 @@ class SWNTGenerator(SWNT, GeneratorBase):
             fname = '_'.join(fname_wordlist)
 
         super().save_data(fname=fname, outpath=outpath,
-                          structure_format=structure_format,
-                          center_CM=center_CM, **kwargs)
+            structure_format=structure_format, center_CM=center_CM, **kwargs)

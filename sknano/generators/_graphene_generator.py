@@ -122,7 +122,7 @@ class GrapheneGenerator(Graphene, GeneratorBase):
 
     def __init__(self, autogen=True, **kwargs):
 
-        super(GrapheneGenerator, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         if autogen:
             self.generate_unit_cell()
@@ -170,11 +170,10 @@ class GrapheneGenerator(Graphene, GeneratorBase):
             atom4.y = np.sqrt(3) / 2 * bond
 
         self.unit_cell.extend([atom1, atom2, atom3, atom4])
-        #self.Natoms = self.unit_cell.Natoms
 
     def generate_structure_data(self):
         """Generate the full structure coordinates."""
-        #self.atoms = Atoms()
+
         self.structure_data.clear()
         for nlayer in range(self.nlayers):
             layer = Atoms()
@@ -220,7 +219,6 @@ class GrapheneGenerator(Graphene, GeneratorBase):
         if center_CM and self.nlayers > 1:
             self.atoms.center_CM()
 
-        super(GrapheneGenerator, self).save_data(
-            fname=fname, outpath=outpath, structure_format=structure_format,
-            center_CM=False, angle=rotation_angle, axis=rotation_axis,
-            **kwargs)
+        super().save_data(fname=fname, outpath=outpath,
+            structure_format=structure_format, center_CM=False,
+            angle=rotation_angle, axis=rotation_axis, **kwargs)

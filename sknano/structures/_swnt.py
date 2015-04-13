@@ -146,7 +146,7 @@ class SWNT(SWNTMixin, StructureBase):
                 m = kwargs['m']
                 del kwargs['m']
 
-        super(SWNT, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         if tube_length is not None and Lz is None:
             Lz = tube_length
