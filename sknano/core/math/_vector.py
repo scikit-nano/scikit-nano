@@ -11,7 +11,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-#import copy
+# import copy
 import numbers
 import warnings
 
@@ -23,7 +23,26 @@ from ._transforms import rotate, transformation_matrix
 
 __all__ = ['Vector', 'angle', 'cross', 'dot', 'scalar_triple_product',
            'vector_triple_product', 'scalar_projection', 'vector_projection',
-           'vector_rejection', 'projection', 'rejection']
+           'vector_rejection', 'projection', 'rejection',
+           '_check_vector_compatibility', '_vector_math_warning']
+
+
+def _check_vector_compatibility(v1, v2):
+    if len(v1) != len(v2):
+        raise ValueError("{!r} and {!r} must have same number "
+                         "of components".format(v1, v2))
+
+
+def _vector_math_warning(operation, *args):
+    msg = "Undefined mathematical operation:\n"
+    if len(args) == 1:
+        msg += "{} of a Vector by {!r}".format(operation, args[0])
+    elif len(args) == 2:
+        msg += "{} of {!r} by {!r}".format(operation, args[0], args[-1])
+    else:
+        msg += "{} of a Vector by a Vector".format(operation)
+
+    warnings.warn(msg, UserWarning)
 
 
 class Vector(np.ndarray):
@@ -125,7 +144,7 @@ class Vector(np.ndarray):
             v = p - p0
 
         arr = np.array(v, dtype=dtype, copy=copy).view(cls)
-        #vec = np.ndarray.__new__(cls, arr.shape, arr.dtype, buffer=arr)
+        # vec = np.ndarray.__new__(cls, arr.shape, arr.dtype, buffer=arr)
         vec = super(Vector, cls).__new__(cls, arr.shape, arr.dtype, buffer=arr)
 
         vec.nd = nd
@@ -188,12 +207,12 @@ class Vector(np.ndarray):
                   'context: {}\n'.format(context))
 
         if self.__array_priority__ >= Vector.__array_priority__:
-            ret = obj if isinstance(obj, type(self)) else obj.view(type(self))
+            res = obj if isinstance(obj, type(self)) else obj.view(type(self))
         else:
-            ret = obj.view(Vector)
+            res = obj.view(Vector)
 
         if context is None:
-            return ret
+            return res
         return super(Vector, self).__array_prepare__(obj, context)
 
     def __array_wrap__(self, obj, context=None):
@@ -216,15 +235,15 @@ class Vector(np.ndarray):
             except TypeError:
                 pass
 
-        #if obj.shape == ():
-        #    return obj[()]
-        #else:
+        # if obj.shape == ():
+        #     return obj[()]
+        # else:
 
         res = super(Vector, self).__array_wrap__(obj, context)
         res = Vector(res.__array__(), p0=self.p0)
-        #res.p = self.p
-        #res = Vector(p0=self.p0, p=self.p)
-        #res = Vector(res.__array__())
+        # res.p = self.p
+        # res = Vector(p0=self.p0, p=self.p)
+        # res = Vector(res.__array__())
 
         if Vector._verbosity > 0:
             print('In Vector.__array_wrap__\n'
@@ -247,7 +266,7 @@ class Vector(np.ndarray):
                   'res.p0: {}\n'.format(res.p0) +
                   'type(res.p0): {}\n'.format(type(res.p0)) +
                   'context: {}\n'.format(context))
-        #return super(Vector, self).__array_wrap__(obj, context)
+        # return super(Vector, self).__array_wrap__(obj, context)
         return res
 
     def __str__(self):
@@ -303,7 +322,7 @@ class Vector(np.ndarray):
             except TypeError:
                 pass
 
-        #nd = len(self)
+        # nd = len(self)
         nd = getattr(self, 'nd', None)
 
         if nd is not None and nd == 2 and name in ('x', 'y'):
@@ -340,48 +359,11 @@ class Vector(np.ndarray):
                     pass
         else:
             super(Vector, self).__setattr__(name, value)
-            #if name is not None and name.endswith('p'):
+            # if name is not None and name.endswith('p'):
             #    try:
             #        self[:] = self._p.__array__() - self._p0.__array__()
             #    except (AttributeError, TypeError):
             #        pass
-
-    def __iadd__(self, other):
-        """Add other to self in-place."""
-        super(Vector, self).__iadd__(other)
-        self._update_p()
-        return self
-
-    def __isub__(self, other):
-        """Subtract other from self in-place."""
-        super(Vector, self).__isub__(other)
-        self._update_p()
-        return self
-
-    def __imul__(self, other):
-        super(Vector, self).__imul__(other)
-        self._update_p()
-        return self
-
-    def __idiv__(self, other):
-        super(Vector, self).__idiv__(other)
-        self._update_p()
-        return self
-
-    def __ifloordiv__(self, other):
-        super(Vector, self).__ifloordiv__(other)
-        self._update_p()
-        return self
-
-    def __itruediv__(self, other):
-        super(Vector, self).__itruediv__(other)
-        self._update_p()
-        return self
-
-    def __ipow__(self, other):
-        super(Vector, self).__ipow__(other)
-        self._update_p()
-        return self
 
     def __eq__(self, other):
         if self is other or (np.allclose(self, other) and
@@ -406,13 +388,113 @@ class Vector(np.ndarray):
     def __ne__(self, other):
         return not self == other
 
-    #def __copy__(self):
+    def __mul__(self, other):
+        if isinstance(other, numbers.Number):
+            return Vector(other * self.__array__(), p0=self.p0)
+        elif isinstance(other, Vector):
+            print("Computing *scalar product* of Vector's:\n"
+                  "{!r}\n{!r}".format(self, other))
+            return self.dot(other)
+        else:
+            _vector_math_warning('multiplication', other)
+
+    __rmul__ = __mul__
+
+    def __div__(self, other):
+        if isinstance(other, numbers.Number):
+            return Vector(self.__array__() / other, p0=self.p0)
+        else:
+            if isinstance(other, Vector):
+                _vector_math_warning('division')
+            else:
+                _vector_math_warning('division', other)
+            return None
+
+    __truediv__ = __div__
+
+    def __floordiv__(self, other):
+        if isinstance(other, numbers.Number):
+            return Vector(self.__array__() // other, p0=self.p0)
+        else:
+            if isinstance(other, Vector):
+                _vector_math_warning('division')
+            else:
+                _vector_math_warning('division', other)
+            return None
+
+    def __iadd__(self, other):
+        """Add other to self in-place."""
+        super(Vector, self).__iadd__(other)
+        self._update_p()
+        return self
+
+    def __isub__(self, other):
+        """Subtract other from self in-place."""
+        super(Vector, self).__isub__(other)
+        self._update_p()
+        return self
+
+    def __imul__(self, other):
+        """Multiply self by other in-place."""
+        if isinstance(other, numbers.Number):
+            super(Vector, self).__imul__(other)
+            self._update_p()
+            return self
+        elif isinstance(other, Vector):
+            try:
+                self = self.dot(other)
+                return self
+            except ValueError as e:
+                print(e)
+                return None
+        else:
+            _vector_math_warning('multiplication', other)
+
+    def __idiv__(self, other):
+        if isinstance(other, numbers.Number):
+            super(Vector, self).__itruediv__(other)
+            self._update_p()
+            return self
+        else:
+            if isinstance(other, Vector):
+                _vector_math_warning('division')
+            else:
+                _vector_math_warning('division', other)
+            return None
+
+    __itruediv__ = __idiv__
+
+    def __ifloordiv__(self, other):
+        if isinstance(other, numbers.Number):
+            super(Vector, self).__ifloordiv__(other)
+            self._update_p()
+            return self
+        else:
+            if isinstance(other, Vector):
+                _vector_math_warning('division')
+            else:
+                _vector_math_warning('division', other)
+            return None
+
+    def __ipow__(self, other):
+        if isinstance(other, numbers.Number):
+            super(Vector, self).__ipow__(other)
+            self._update_p()
+            return self
+        else:
+            if isinstance(other, Vector):
+                _vector_math_warning('exponentiation')
+            else:
+                _vector_math_warning('exponentiation', other)
+            return None
+
+    # def __copy__(self):
     #    pass
 
     def __deepcopy__(self, memo):
         cp = self.__class__(self.__array__(), p0=self.p0)
-        #memo[id(self)] = cp
-        #for attr in dir(self):
+        # memo[id(self)] = cp
+        # for attr in dir(self):
         #    if not attr.startswith('_'):
         #        setattr(cp, attr, copy.deepcopy(getattr(self, attr), memo))
         return cp
@@ -424,13 +506,6 @@ class Vector(np.ndarray):
     def length(self):
         """Alias for :attr:`Vector.norm`."""
         return self.norm
-
-    @property
-    def unit_vector(self):
-        """Unit vector for `Vector`."""
-        with warnings.catch_warnings():
-            warnings.filterwarnings('ignore')
-            return self / self.norm
 
     @property
     def magnitude(self):
@@ -448,19 +523,26 @@ class Vector(np.ndarray):
         return np.sqrt((self**2).sum())
 
     @property
+    def unit_vector(self):
+        """Return unit vector."""
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore')
+            return self / self.norm
+
+    @property
     def p(self):
-        """Terminating :class:`Point` of vector."""
+        """:class:`Point` of `Vector` *head*."""
         return self._p
 
     @p.setter
     def p(self, value=np.ndarray):
-        """Set new terminating :class:`Point` of vector."""
+        """Set new terminating :class:`Point` of `Vector`."""
         self._p[:] = value
         self[:] = self._p - self._p0
 
     @property
     def p0(self):
-        """Origin :class:`Point` of vector."""
+        """:class:`Point` of `Vector` *tail*."""
         return self._p0
 
     @p0.setter
@@ -482,7 +564,8 @@ class Vector(np.ndarray):
             self.p.translate(t)
 
     def dot(self, other, out=None):
-        """Computes dot product of two vectors."""
+        """Dot product of two `Vector`\ s."""
+        _check_vector_compatibility(self, other)
         return self.__array__().dot(other.__array__())
 
     def normalize(self):
@@ -490,7 +573,7 @@ class Vector(np.ndarray):
         self[:] = self.unit_vector
 
     def projection(self, v):
-        """Compute vector projection onto vector `v`."""
+        """Vector projection onto `Vector` `v`."""
         u = self
         return dot(u, v) / dot(v, v) * v
 
