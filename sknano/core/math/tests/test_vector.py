@@ -409,6 +409,7 @@ def test25():
     with assert_raises(ValueError):
         Vector([1.0, 0.0]).dot(e1)
 
+
 def test26():
     v = Vector([5, 0, 0])
     assert_equal(5 * e1, v)
@@ -420,7 +421,7 @@ def test26():
     assert_true(not (e1 is e1copy))
     assert_true(e1 is not e1copy)
     e1copy *= 5
-    assert_equal(5* e1, e1copy)
+    assert_equal(5 * e1, e1copy)
     assert_equal(e1copy, v)
 
 
@@ -453,6 +454,48 @@ def test30():
 def test31():
     v = Vector([5, 0, 0])
     v //= v
+
+
+def test32():
+    v1 = Vector([1, 0, 0])
+    v2 = Vector([0, 1, 0])
+    v3 = v1.cross(v2)
+    assert_is_instance(v3, Vector)
+    assert_true(np.allclose(v3, np.cross(np.asarray(v1), np.asarray(v2))))
+    assert_true(np.allclose(v3.p0, v1.p0))
+    assert_true(np.allclose(v3.p0, v2.p0))
+
+    v1 = Vector([1, 0, 0], p0=[1, 1, 1])
+    v2 = Vector([0, 1, 0], p0=[1, 1, 1])
+
+    v3 = v1.cross(v2)
+    assert_is_instance(v3, Vector)
+    assert_true(np.allclose(v3, np.cross(np.asarray(v1), np.asarray(v2))))
+    assert_true(np.allclose(v3.p0, v1.p0))
+    assert_true(np.allclose(v3.p0, v2.p0))
+
+    v1 = Vector([1, 0, 0], p0=[1, 0, 0])
+    v2 = Vector([0, 1, 0], p0=[0, 1, 0])
+
+    v3 = v1.cross(v2)
+    assert_is_instance(v3, Vector)
+    assert_true(np.allclose(v3, np.cross(np.asarray(v1), np.asarray(v2))))
+    assert_true(np.allclose(v3.p0, v1.p0))
+    assert_false(np.allclose(v3.p0, v2.p0))
+
+    v1 = Vector([1, 2, 3], p0=[1, 0, 0])
+    v2 = Vector([4, 5, 6], p0=[0, 1, 0])
+    v3 = v1.cross(v2)
+    assert_is_instance(v3, Vector)
+    assert_true(np.allclose(v3, np.cross(np.asarray(v1), np.asarray(v2))))
+    assert_true(np.allclose(v3.p0, v1.p0))
+    assert_false(np.allclose(v3.p0, v2.p0))
+
+
+def test33():
+    assert_equal(e1.angle(e1), 0.0)
+    assert_equal(e1.angle(e2), np.pi/2)
+    assert_equal(e1.angle(-e1), np.pi)
 
 
 if __name__ == '__main__':
