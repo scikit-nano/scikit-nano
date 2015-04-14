@@ -587,6 +587,12 @@ class Vector(np.ndarray):
         else:
             self.p.translate(t)
 
+    def angle(self, other):
+        """Angle between two `Vector`\ s."""
+        _check_vector_compatibility(self, other)
+        return np.arccos(np.dot(self.__array__(), other.__array__()) /
+                         (self.norm * other.norm))
+
     def cross(self, other):
         """Cross product of two `Vector`\ s."""
         _check_vector_compatibility(self, other)
