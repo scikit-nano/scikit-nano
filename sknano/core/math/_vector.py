@@ -587,6 +587,14 @@ class Vector(np.ndarray):
         else:
             self.p.translate(t)
 
+    def cross(self, other):
+        """Cross product of two `Vector`\ s."""
+        _check_vector_compatibility(self, other)
+        val = np.cross(self.__array__(), other.__array__())
+        if val.shape == ():
+            return val[()]
+        return Vector(val, p0=self.p0)
+
     def dot(self, other, out=None):
         """Dot product of two `Vector`\ s."""
         _check_vector_compatibility(self, other)
