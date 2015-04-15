@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-===============================================================================
-Bilayer Graphene (:mod:`sknano.generators._bilayer_graphene_generator`)
-===============================================================================
+============================================================================================
+Bilayer Graphene structure generator (:mod:`sknano.generators._bilayer_graphene_generator`)
+============================================================================================
 
 .. currentmodule:: sknano.generators._bilayer_graphene_generator
 
@@ -93,7 +93,7 @@ class BilayerGrapheneGenerator(BilayerGraphene, GeneratorBase):
     ...                                               element1='B',
     ...                                               element2='N',
     ...                                               layer_rotation_angle=45,
-                                                      degrees=True)
+    ...                                               degrees=True)
     >>> rotated_BN_bilayer.save_data(fname='BN_bilayer_rotated_45deg.xyz')
 
     The rendered structure looks like:
