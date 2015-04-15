@@ -395,49 +395,62 @@ class Vector(np.ndarray):
             print("Computing *scalar product* of Vector's:\n"
                   "{!r}\n{!r}".format(self, other))
             return self.dot(other)
+        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
+        #         isinstance(other[0], numbers.Number):
+        #     return self * other[0]
         else:
             warnings.warn(_vector_math_warning_message(
                 'multiplication', other), UserWarning)
+            return self
 
     __rmul__ = __mul__
 
     def __div__(self, other):
         if isinstance(other, numbers.Number):
             return Vector(self.__array__() / other, p0=self.p0)
+        elif isinstance(other, Vector):
+            warnings.warn(_vector_math_warning_message('division'),
+                          UserWarning)
+            return self
+        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
+        #         isinstance(other[0], numbers.Number):
+        #     return self / other[0]
         else:
-            if isinstance(other, Vector):
-                warnings.warn(_vector_math_warning_message('division'),
-                              UserWarning)
-            else:
-                warnings.warn(_vector_math_warning_message(
-                    'division', other), UserWarning)
-            return None
+            warnings.warn(_vector_math_warning_message(
+                'division', other), UserWarning)
+            return self
 
     __truediv__ = __div__
 
     def __floordiv__(self, other):
         if isinstance(other, numbers.Number):
             return Vector(self.__array__() // other, p0=self.p0)
+        elif isinstance(other, Vector):
+            warnings.warn(_vector_math_warning_message('division'),
+                          UserWarning)
+            return self
+        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
+        #         isinstance(other[0], numbers.Number):
+        #     return self // other[0]
         else:
-            if isinstance(other, Vector):
-                warnings.warn(_vector_math_warning_message('division'),
-                              UserWarning)
-            else:
-                warnings.warn(_vector_math_warning_message(
-                    'division', other), UserWarning)
-            return None
+            warnings.warn(_vector_math_warning_message(
+                'division', other), UserWarning)
+            return self
 
     def __pow__(self, other):
         if isinstance(other, numbers.Number):
             return Vector(self.__array__() ** other, p0=self.p0)
+        elif isinstance(other, Vector):
+            warnings.warn(_vector_math_warning_message(
+                'exponentiation'), UserWarning)
+            return self
+        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
+        #         isinstance(other[0], numbers.Number):
+        #     return self ** other[0]
         else:
-            if isinstance(other, Vector):
-                warnings.warn(_vector_math_warning_message(
-                    'exponentiation'), UserWarning)
-            else:
-                warnings.warn(_vector_math_warning_message(
-                    'exponentiation', other), UserWarning)
-            return None
+            warnings.warn(_vector_math_warning_message(
+                'exponentiation', other), UserWarning)
+            return self
 
     def __iadd__(self, other):
         """Add other to self in-place."""
@@ -456,31 +469,33 @@ class Vector(np.ndarray):
         if isinstance(other, numbers.Number):
             super(Vector, self).__imul__(other)
             self._update_p()
-            return self
         elif isinstance(other, Vector):
             try:
                 self = self.dot(other)
-                return self
             except ValueError as e:
                 print(e)
-                return None
+        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
+        #         isinstance(other[0], numbers.Number):
+        #     self *= other[0]
         else:
             warnings.warn(_vector_math_warning_message(
                 'multiplication', other), UserWarning)
+        return self
 
     def __idiv__(self, other):
         if isinstance(other, numbers.Number):
             super(Vector, self).__itruediv__(other)
             self._update_p()
-            return self
+        elif isinstance(other, Vector):
+            warnings.warn(_vector_math_warning_message('division'),
+                          UserWarning)
+        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
+        #         isinstance(other[0], numbers.Number):
+        #     self /= other[0]
         else:
-            if isinstance(other, Vector):
-                warnings.warn(_vector_math_warning_message('division'),
-                              UserWarning)
-            else:
-                warnings.warn(_vector_math_warning_message(
-                    'division', other), UserWarning)
-            return None
+            warnings.warn(_vector_math_warning_message(
+                'division', other), UserWarning)
+        return self
 
     __itruediv__ = __idiv__
 
@@ -488,29 +503,31 @@ class Vector(np.ndarray):
         if isinstance(other, numbers.Number):
             super(Vector, self).__ifloordiv__(other)
             self._update_p()
-            return self
+        elif isinstance(other, Vector):
+            warnings.warn(_vector_math_warning_message('division'),
+                          UserWarning)
+        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
+        #         isinstance(other[0], numbers.Number):
+        #     self //= other[0]
         else:
-            if isinstance(other, Vector):
-                warnings.warn(_vector_math_warning_message('division'),
-                              UserWarning)
-            else:
-                warnings.warn(_vector_math_warning_message(
-                    'division', other), UserWarning)
-            return None
+            warnings.warn(_vector_math_warning_message(
+                'division', other), UserWarning)
+        return self
 
     def __ipow__(self, other):
         if isinstance(other, numbers.Number):
             super(Vector, self).__ipow__(other)
             self._update_p()
-            return self
+        elif isinstance(other, Vector):
+            warnings.warn(_vector_math_warning_message(
+                'exponentiation'), UserWarning)
+        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
+        #         isinstance(other[0], numbers.Number):
+        #     self **= other[0]
         else:
-            if isinstance(other, Vector):
-                warnings.warn(_vector_math_warning_message(
-                    'exponentiation'), UserWarning)
-            else:
-                warnings.warn(_vector_math_warning_message(
-                    'exponentiation', other), UserWarning)
-            return None
+            warnings.warn(_vector_math_warning_message(
+                'exponentiation', other), UserWarning)
+        return self
 
     # def __copy__(self):
     #    pass
