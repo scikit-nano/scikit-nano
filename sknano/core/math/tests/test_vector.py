@@ -3,6 +3,8 @@
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
+import warnings
+
 import nose
 from nose.tools import *
 
@@ -442,21 +444,57 @@ def test28():
 
 
 def test29():
-    v = Vector([5, 0, 0])
-    v *= v
+    u = Vector([5, 0, 0])
+    v = u.copy()
+
+    u *= v
+
+    assert_equal(u, 25)
 
 
 def test30():
-    v = Vector([5, 0, 0])
-    v /= v
+    u = Vector([5, 0, 0])
+    v = u.copy()
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore')
+        v /= v
+
+    assert_equal(u, v)
+
+    #v /= np.array([2.0])
+    #assert_equal(u / 2.0, v)
 
 
 def test31():
-    v = Vector([5, 0, 0])
-    v //= v
+    u = Vector([5, 0, 0])
+    v = u.copy()
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore')
+        v //= v
+
+    assert_equal(u, v)
+
+    #v //= np.array([2.0])
+    #assert_equal(u // 2.0, v)
 
 
 def test32():
+    u = Vector([5, 0, 0])
+    v = u.copy()
+
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore')
+        v **= v
+
+    assert_equal(u, v)
+
+    #v **= np.array([2.0])
+    #assert_equal(u**2, v)
+
+
+def test33():
     v1 = Vector([1, 0, 0])
     v2 = Vector([0, 1, 0])
     v3 = v1.cross(v2)
@@ -492,7 +530,7 @@ def test32():
     assert_false(np.allclose(v3.p0, v2.p0))
 
 
-def test33():
+def test34():
     assert_equal(e1.angle(e1), 0.0)
     assert_equal(e1.angle(e2), np.pi/2)
     assert_equal(e1.angle(-e1), np.pi)
