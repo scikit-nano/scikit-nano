@@ -401,7 +401,7 @@ class POAV2(POAV):
         for bond, pair in zip(self.bonds, self.bond_angle_pairs):
             cosa = \
                 np.cos(self.bond_angles[
-                    np.in1d(self.bonds, pair, invert=True)])
+                    np.in1d(self.bonds, pair, invert=True)])[0]
             vi.append(cosa * bond.vector.unit_vector)
 
         self._v1 = vi[0]
