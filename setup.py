@@ -32,15 +32,16 @@ if sys.version_info[0] < 3:
                        "backporting process from the setup script,\n"
                        "I will restore Python 2 support that way.\n"
                        "Until then, if you must install this for Python 2\n"
-                       "you're on you're own. It shouldn't be difficult\n"
+                       "you're on your own. It shouldn't be difficult\n"
                        "but you'll have to manually backport the package\n"
                        "source code using a Python 3 to Python 2\n"
                        "compatibility library such as the python `future`\n"
-                       "module, which provides a python script `pasteurize`\n"
-                       "which you'll need to run on the source directory.\n"
-                       "You'll also need to manually hack this setup script\n"
-                       "to remove any exceptions that are raised if\n"
-                       "running under Python 2.")
+                       "module, which provides a python script called\n"
+                       "`pasteurize` that can be run on the source\n"
+                       "directory to automate the backporting process.\n"
+                       "You'll also need to hack this setup script\n"
+                       "to remove any exceptions that are raised when\n"
+                       "executed under Python 2.")
 
 #if sys.version_info[:2] < (2, 7) or (3, 0) <= sys.version_info[:2] < (3, 4):
 if (3, 0) <= sys.version_info[:2] < (3, 4):
