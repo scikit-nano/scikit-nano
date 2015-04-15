@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import
+import builtins
 from builtins import dict
 from builtins import open
 from builtins import map
@@ -21,18 +22,29 @@ import shutil
 import subprocess
 from distutils.command.clean import clean as Clean
 
-#if sys.version_info[0] < 3:
-#    print('Python 2 support requires running `3to2` on source directory.')
-#    #raise RuntimeError("Python version 3.4+ required.")
+if sys.version_info[0] < 3:
+    raise RuntimeError("Python version 3.4+ required.\n\n"
+                       "Sorry, but there are features of Python 3\n"
+                       "that I want to take advantage of and without\n"
+                       "worrying about Python 2 compatibility.\n"
+                       "Therefore, Python 2 support was removed starting\n"
+                       "in v0.3.7. Once/if I learn how to automate the\n"
+                       "backporting process from the setup script,\n"
+                       "I will restore Python 2 support that way.\n"
+                       "Until then, if you must install this for Python 2\n"
+                       "you're on you're own. It shouldn't be difficult\n"
+                       "but you'll have to manually backport the package\n"
+                       "source code using a Python 3 to Python 2\n"
+                       "compatibility library such as the python `future`\n"
+                       "module, which provides a python script `pasteurize`\n"
+                       "which you'll need to run on the source directory.\n"
+                       "You'll also need to manually hack this setup script\n"
+                       "to remove any exceptions that are raised if\n"
+                       "running under Python 2.")
 
 #if sys.version_info[:2] < (2, 7) or (3, 0) <= sys.version_info[:2] < (3, 4):
 if (3, 0) <= sys.version_info[:2] < (3, 4):
     raise RuntimeError("Python 3.4+ required.")
-
-if sys.version_info[0] < 3:
-    import __builtin__ as builtins
-else:
-    import builtins
 
 try:
     import setuptools
