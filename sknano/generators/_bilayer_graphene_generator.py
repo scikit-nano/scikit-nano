@@ -79,7 +79,7 @@ class BilayerGrapheneGenerator(BilayerGraphene, GeneratorBase):
     >>> rotated_bilayer = BilayerGrapheneGenerator(length=10, width=10,
     ...                                            edge='armchair',
     ...                                            layer_rotation_angle=45,
-                                                   degrees=True)
+    ...                                            degrees=True)
     >>> rotated_bilayer.save_data(fname='rotated_bilayer.xyz')
 
     The rendered structure looks like:
