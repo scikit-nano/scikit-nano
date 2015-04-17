@@ -29,8 +29,9 @@ class StructureBase(object):
         :class:`~sknano.core.atoms.Atom` 1 and 2
 
     """
-    def __init__(self, *args, element1='C', element2='C', bond=None,
-                 verbose=False, debug=False, **kwargs):
+    def __init__(self, *args, element1='C', element2='C',
+                 bond=None, verbose=False, debug=False,
+                 **kwargs):
 
         self.element1 = element1
         self.element2 = element2
