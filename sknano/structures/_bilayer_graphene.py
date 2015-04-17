@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Graphene structure classes (:mod:`sknano.structures._bilayer_graphene`)
+Bilayer Graphene structure class (:mod:`sknano.structures._bilayer_graphene`)
 ===============================================================================
 
 .. currentmodule:: sknano.structures._bilayer_graphene
