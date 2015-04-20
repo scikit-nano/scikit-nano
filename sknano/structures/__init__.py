@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Nanostructure data structures (:mod:`sknano.structures`)
+Nanostructure objects (:mod:`sknano.structures`)
 ===============================================================================
 
 .. currentmodule:: sknano.structures
+
+Contents
+========
 
 This package defines classes for creating
 abstract object representations of nanostructures
@@ -12,8 +15,6 @@ including fullerenes, graphene, and nanotubes.
 
 See the specific class doc pages below for detailed documentation on its use.
 
-Contents
-========
 
 Structure Classes
 ------------------

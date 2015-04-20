@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ======================================================================
-Structure generators (:mod:`sknano.generators`)
+Nanostructure generators (:mod:`sknano.generators`)
 ======================================================================
 
 .. currentmodule:: sknano.generators

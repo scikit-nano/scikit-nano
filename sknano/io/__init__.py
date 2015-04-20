@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ==========================================================
-Structure data Input/Output (:mod:`sknano.io`)
+Structure data I/O (:mod:`sknano.io`)
 ==========================================================
 
 .. currentmodule:: sknano.io
