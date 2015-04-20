@@ -31,7 +31,6 @@ Structure Classes
 
    Fullerene
 
-   GraphenePrimitiveCell
    Graphene
    BilayerGraphene
 
@@ -100,8 +99,8 @@ from ._nanotube_bundle import *
 
 from ._fullerenes import *
 
-from ._bilayer_graphene import *
 from ._graphene import *
+from ._bilayer_graphene import *
 
 from ._swnt import *
 from ._swnt_bundle import *

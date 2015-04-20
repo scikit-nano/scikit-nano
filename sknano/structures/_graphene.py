@@ -11,18 +11,18 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-#import itertools
+# import itertools
 import numbers
 
 import numpy as np
 
-#from sknano.core.atoms import Atom
+# from sknano.core.atoms import Atom
 from sknano.core.math import Vector
 from sknano.core.refdata import dVDW  # , grams_per_Da
 from ._base import StructureBase
 from ._extras import edge_types
 
-__all__ = ['GraphenePrimitiveCell', 'Graphene']
+__all__ = ['Graphene']
 
 
 class GraphenePrimitiveCell(StructureBase):
