@@ -14,16 +14,25 @@ Lattice systems
 .. autosummary::
    :toctree: generated/
 
-   
+   SimpleCubicLattice
+   BodyCenteredCubicLattice
+   FaceCenteredCubicLattice
 
 Crystal structures
 -------------------
+.. autosummary::
+   :toctree: generated/
+
+   DiamondStructure
+   HexagonalClosePackedStructure
+   CubicClosePackedStructure
 
 """
 from __future__ import absolute_import
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from ._base import *
 from ._lattices import *
 from ._structures import *
 
