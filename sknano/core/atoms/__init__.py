@@ -73,7 +73,12 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-#from ._base import *
+
+from ._poav_atom import POAVAtom as StructureAtom
+from ._poav_atoms import POAVAtoms as StructureAtoms
+__all__ = ['StructureAtom', 'StructureAtoms']
+
+# from ._base import *
 from ._atom import *
 from ._atoms import *
 from ._extended_atom import *
@@ -82,7 +87,6 @@ from ._kdtree_atom import *
 from ._kdtree_atoms import *
 from ._poav_atom import *
 from ._poav_atoms import *
-from ._structure_atoms import *
 
 from ._bond import *
 from ._bonds import *
@@ -91,4 +95,4 @@ from ._md_atom import *
 from ._md_atoms import *
 from ._trajectory import *
 
-__all__ = [s for s in dir() if not s.startswith('_')]
+__all__ += [s for s in dir() if not s.startswith('_')]

@@ -13,13 +13,13 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-#import numbers
-#import numpy as np
+# import numbers
+# import numpy as np
 
-#from sknano.core.math import Vector, vector as vec
-#from ._bond import Bond
-#from ._bonds import Bonds
-from ._structure_atoms import StructureAtoms as Atoms
+# from sknano.core.math import Vector, vector as vec
+# from ._bond import Bond
+# from ._bonds import Bonds
+from . import StructureAtoms as Atoms
 
 __all__ = ['MDAtoms']
 

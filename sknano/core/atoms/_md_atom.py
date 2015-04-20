@@ -17,7 +17,7 @@ import numpy as np
 
 import sknano.core.atoms
 
-from ._structure_atoms import StructureAtom as Atom
+from . import StructureAtom as Atom
 
 __all__ = ['MDAtom']
 
