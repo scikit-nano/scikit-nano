@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Core code for package development and general use (:mod:`sknano.core`)
+Core package code (:mod:`sknano.core`)
 ===============================================================================
 
 .. currentmodule:: sknano.core
 
 Contents
 ========
+Core code for package development and general use.
 
 Functions
 ----------
