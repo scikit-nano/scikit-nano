@@ -67,9 +67,9 @@ class SWNT(SWNTMixin, StructureBase):
 
     Create a SWNT with :math:`\\mathbf{C}_{h} = (10, 10)` chirality.
 
-    >>> swnt = SWNT(n=10, m=10, verbose=True)
-    >>> print(unicode(swnt))
-    SWNT(n=10, m=10, element1='C', element2='C', bond=1.42, nz=1)
+    >>> swnt = SWNT((10, 10), verbose=True)
+    >>> print(swnt)
+    SWNT((10, 10), element1='C', element2='C', bond=1.42, nz=1)
     n: 10
     m: 10
     t₁: 1
@@ -88,8 +88,8 @@ class SWNT(SWNTMixin, StructureBase):
     Change the chirality to :math:`\\mathbf{C}_{h} = (20, 10)`.
 
     >>> swnt.n = 20
-    >>> print(unicode(swnt))
-    SWNT(n=20, m=10, element1='C', element2='C', bond=1.42, nz=1)
+    >>> print(swnt)
+    SWNT((20, 10), element1='C', element2='C', bond=1.42, nz=1)
     n: 20
     m: 10
     t₁: 4
@@ -108,8 +108,8 @@ class SWNT(SWNTMixin, StructureBase):
     Change the chirality to :math:`\\mathbf{C}_{h} = (20, 0)`.
 
     >>> swnt.m = 0
-    >>> print(unicode(swnt))
-    SWNT(n=20, m=0, element1='C', element2='C', bond=1.42, nz=1)
+    >>> print(swnt)
+    SWNT((20, 0), element1='C', element2='C', bond=1.42, nz=1)
     n: 20
     m: 0
     t₁: 1
