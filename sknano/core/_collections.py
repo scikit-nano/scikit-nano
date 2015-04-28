@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Custom list class (:mod:`sknano.core._user_list`)
+Custom container datatypes (:mod:`sknano.core._collections`)
 ==============================================================================
 
-.. currentmodule:: sknano.core._user_list
+.. currentmodule:: sknano.core._collections
 
 """
 from __future__ import absolute_import, division, print_function
@@ -12,11 +12,42 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 try:
-    from collections.abc import MutableSequence
+    from collections.abc import MutableSequence, Set
 except ImportError:
-    from collections import MutableSequence
+    from collections import MutableSequence, Set
 
-__all__ = ['UserList']
+__all__ = ['ListBasedSet', 'UserList']
+
+
+# class AttrDict(dict):
+#     def __init__(self, *args, **kwargs):
+#         super(AttrDict, self).__init__(*args, **kwargs)
+#         self.__dict__ = self
+
+
+class ListBasedSet(Set):
+    """Alternate set implementation favoring space over speed and not
+    requiring the set elements to be hashable.
+
+    Parameters
+    ----------
+    iterable
+
+    """
+    def __init__(self, iterable):
+        self.elements = elements = []
+        for value in iterable:
+            if value not in elements:
+                elements.append(value)
+
+    def __iter__(self):
+        return iter(self.elements)
+
+    def __contains__(self, value):
+        return value in self.elements
+
+    def __len__(self):
+        return len(self.elements)
 
 
 class _UserList(MutableSequence):
@@ -100,7 +131,7 @@ class _UserList(MutableSequence):
         return self
 
     def __mul__(self, n):
-        return self.__class__(self.data*n)
+        return self.__class__(self.data * n)
 
     __rmul__ = __mul__
 
@@ -121,7 +152,7 @@ class _UserList(MutableSequence):
         self.data.remove(item)
 
     def clear(self):
-        #self.data.clear()
+        # self.data.clear()
         del self.data[:]
 
     def copy(self):
