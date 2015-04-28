@@ -19,22 +19,38 @@ import inspect
 import sys
 import time
 import warnings
-#warnings.resetwarnings()
+# warnings.resetwarnings()
 
 import numpy as np
 from numpy.compat import formatargspec, getargspec
 
 __all__ = ['check_type', 'deprecated', 'get_object_signature', 'memoize',
            'method_function', 'methodfunc', 'removed_package_warning',
-           'timethis', 'with_doc']
+           'timethis', 'with_doc', 'dtype', 'unsigned', 'maxsize',
+           'Type', 'Unsigned', 'MaxSize',
+           'Integer', 'UnsignedInteger', 'Float', 'UnsignedFloat',
+           'String', 'SizedString']
 
 
-def check_type(value, allowed_types=()):
-    """Check object `value` type against tuple of `allowed_types`.
+def check_attributes(**kwargs):
+    """Class decorator for enforcing type/value constraints on attributes."""
+    def decorate(cls):
+        for key, value in kwargs.items():
+            if isinstance(value, Descriptor):
+                value.name = key
+                setattr(cls, key, value)
+            else:
+                setattr(cls, key, value(key))
+        return cls
+    return decorate
+
+
+def check_type(obj, allowed_types=()):
+    """Check object type against tuple of `allowed_types`.
 
     Parameters
     ----------
-    value : `object`
+    obj : `object`
     allowed_types : tuple
         tuple of allowed classes and/or types
 
@@ -44,9 +60,9 @@ def check_type(value, allowed_types=()):
         If `value` fails `isinstance` check against `allowed_types`.
 
     """
-    if not isinstance(value, allowed_types):
-        raise TypeError('{} does not have an allowed type.\n'.format(value) +
-                        '(Allowed Type(s): {})'.format(allowed_types))
+    if not isinstance(obj, allowed_types):
+        raise TypeError('{} does not have an allowed type.\n'.format(obj) +
+                        '(Allowed type(s): {})'.format(allowed_types))
 
 
 def deprecated(replacement=None):
@@ -180,21 +196,21 @@ class methodfunc(object):
 
 def removed_package_warning(oldpkg, newpkg=None):
     msg = '\n\n#TODO: UPDATE THIS WARNING MESSAGE.\n'
-    #msg = '\n\n{:<74.74}\n'.format('{:*^80}'.format(' NB '))
+    # msg = '\n\n{:<74.74}\n'.format('{:*^80}'.format(' NB '))
     #    "As of version 0.3, the {!r} package was ".format(oldpkg)
-    #if newpkg is None:
+    # if newpkg is None:
     #    msg += "removed.\n"
-    #else:
+    # else:
     #    msg += "renamed.\n\n" + \
     #        "Replace imports from: {!r}\n".format(oldpkg) + \
     #        "with imports from: {!r}\n".format(newpkg)
-    #msg += "Also review the module specific Warnings issued by\n" + \
+    # msg += "Also review the module specific Warnings issued by\n" + \
     #    "module imports from a deprecated package location, as\n" + \
     #    "in some cases the module code may have moved to a different\n" + \
     #    "package entirely.\n\n"
-    #msg += "Please update your code accordingly as these warnings and\n" + \
+    # msg += "Please update your code accordingly as these warnings and\n" + \
     #    "associated fallback code will likely be removed in a future version."
-    #msg += "\n{}\n".format(74 * '*')
+    # msg += "\n{}\n".format(74 * '*')
 
     warnings.warn(msg, ImportWarning)
 
@@ -239,3 +255,135 @@ class with_doc(object):
             new_method.__doc__ = original_doc
 
         return new_method
+
+
+class Descriptor:
+    """Base class using descriptor to set a value.
+
+    Parameters
+    ----------
+    name : {`str`, None}
+    opts : {`dict`}
+
+    """
+    def __init__(self, name=None, **kwargs):
+        self.name = name
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def __set__(self, instance, value):
+        instance.__dict__[self.name] = value
+
+
+class Type(Descriptor):
+    """Descriptor class for enforcing types."""
+    expected_type = type(None)
+
+    def __set__(self, instance, value):
+        if not isinstance(value, self.expected_type):
+            raise TypeError('expected ' + str(self.expected_type))
+        super().__set__(instance, value)
+
+
+class Unsigned(Descriptor):
+    """Descriptor class for enforcing values."""
+    def __set__(self, instance, value):
+        if value < 0:
+            raise ValueError('Expected value >= 0')
+        super().__set__(instance, value)
+
+
+class MaxSize(Descriptor):
+    """Descriptor class for enforcing object size."""
+    def __init__(self, name=None, **kwargs):
+        if 'size' not in kwargs:
+            raise ValueError('Missing `size` option in kwargs')
+        super().__init__(name, **kwargs)
+
+    def __set__(self, instance, value):
+        if len(value) >= self.size:
+            raise ValueError('size must be < ' + str(self.size))
+        super().__set__(instance, value)
+
+
+def dtype(expected_type, cls=None):
+    """Class decorator for enforcing attribute type.
+
+    Parameters
+    ----------
+    expected_type : `type`
+    cls : `object`
+
+    """
+    if cls is None:
+        return lambda cls: dtype(expected_type, cls)
+    super_set = cls.__set__
+
+    def __set__(self, instance, value):
+        if not isinstance(value, expected_type):
+            raise TypeError('Expected ' + str(expected_type))
+        super_set(self, instance, value)
+    cls.__set__ = __set__
+    return cls
+
+
+def unsigned(cls):
+    """Class decorator for enforcing attribute value."""
+    super_set = cls.__set__
+    def __set__(self, instance, value):
+        if value < 0:
+            raise ValueError('Expected value >= 0')
+        super_set(self, instance, value)
+    cls.__set__ = __set__
+    return cls
+
+
+def maxsize(cls):
+    """Class decorator for enforcing attribute size."""
+    super_init = cls.__init__
+    def __init__(self, name=None, **kwargs):
+        if 'size' not in kwargs:
+            raise ValueError('Missing `size` option')
+        super_init(self, name, **kwargs)
+    cls.__init__ = __init__
+
+    super_set = cls.__set__
+    def __set__(self, instance, value):
+        if len(value) >= self.size:
+            raise ValueError('size must be < ' + str(self.size))
+        super_set(self, instance, value)
+    cls.__set__ = __set__
+    return cls
+
+
+@dtype(int)
+class Integer(Descriptor):
+    pass
+
+
+@dtype(int)
+@unsigned
+class UnsignedInteger(Descriptor):
+    pass
+
+
+@dtype(float)
+class Float(Descriptor):
+    pass
+
+
+@dtype(float)
+@unsigned
+class UnsignedFloat(Descriptor):
+    pass
+
+
+@dtype(str)
+class String(Descriptor):
+    pass
+
+
+@dtype(str)
+@maxsize
+class SizedString(Descriptor):
+    pass
