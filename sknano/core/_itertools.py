@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Custom iterator building blocks (:mod:`sknano.core._itertools`)
+Custom iterator functions (:mod:`sknano.core._itertools`)
 ===============================================================================
 
 .. currentmodule:: sknano.core._itertools
