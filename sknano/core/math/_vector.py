@@ -74,9 +74,7 @@ class Vector(np.ndarray):
     teach myself about subclassing :class:`~numpy:numpy.ndarray`.
     I still don't completely understand the machinery of it, but I ended
     up with some code that's been useful for handling math operations involving
-    points and vectors. It could use some more testing and there are
-    some math operations don't behave as expected on account of my
-    lack of understanding on how the who subclassing thing works.
+    points and vectors. More testing is in order...
 
     Here are some examples of their use.
 
@@ -631,6 +629,11 @@ class Vector(np.ndarray):
         """Vector projection onto `Vector` `v`."""
         u = self
         return dot(u, v) / dot(v, v) * v
+
+    def rejection(self, v):
+        """Vector rejection onto `Vector` `v`."""
+        u = self
+        return u - self.projection(v)
 
     def rezero_components(self, epsilon=1.0e-10):
         """Alias for :meth:`Vector.rezero`"""
