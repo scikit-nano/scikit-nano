@@ -13,12 +13,36 @@ Core code for package development and general use.
 Functions
 ----------
 
-Custom iterators:
+Iterator functions:
 
 .. autosummary::
    :toctree: generated/
 
    cyclic_pairs
+   take
+   tabulate
+   consume
+   nth
+   quantify
+   padnone
+   ncycles
+   dotproduct
+   flatten
+   repeatfunc
+   pairwise
+   grouper
+   roundrobin
+   partition
+   powerset
+   unique_everseen
+   unique_justseen
+   iter_except
+   first_true
+   random_product
+   random_permutation
+   random_combination
+   random_combination_with_replacement
+
 
 Array functions:
 
@@ -27,7 +51,7 @@ Array functions:
 
    rezero_array
 
-Meta functions:
+Meta functions/classes:
 
 .. autosummary::
    :toctree: generated/
@@ -68,7 +92,9 @@ Sub-packages
 -------------
 
 * atoms (:mod:`sknano.core.atoms`)
+* crystallography (:mod:`sknano.core.crystallography`)
 * math (:mod:`sknano.core.math`)
+* molecules (:mod:`sknano.core.molecules`)
 * physics (:mod:`sknano.core.physics`)
 * refdata (:mod:`sknano.core.refdata`)
 
@@ -77,10 +103,11 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from ._collections import *
 from ._extras import *
 from ._io import *
+from ._itertools import *
 from ._meta import *
 from ._strings import *
-from ._user_list import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
