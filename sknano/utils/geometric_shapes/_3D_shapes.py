@@ -25,7 +25,8 @@ __all__ = ['Geometric3DRegion', 'Parallelepiped', 'Cuboid', 'Cube',
            'Ellipsoid', 'Spheroid', 'Sphere']
 
 
-class Geometric3DRegion(with_metaclass(ABCMeta, type('NewBase', (GeometricTransformsMixin, GeometricRegion), {}))):
+class Geometric3DRegion(with_metaclass(ABCMeta, GeometricRegion,
+                                       GeometricTransformsMixin)):
     """Abstract base class for representing 3D geometric regions."""
 
     @abstractproperty

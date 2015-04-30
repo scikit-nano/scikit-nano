@@ -27,9 +27,8 @@ __all__ = ['Geometric2DRegion', 'Parallelogram', 'Rectangle', 'Square',
            'Ellipse', 'Circle']
 
 
-class Geometric2DRegion(with_metaclass(ABCMeta,
-                        type('NewBase', (GeometricTransformsMixin,
-                                         GeometricRegion), {}))):
+class Geometric2DRegion(with_metaclass(ABCMeta, GeometricRegion,
+                                       GeometricTransformsMixin)):
     """Abstract base class for representing 2D geometric regions."""
 
     @abstractproperty
