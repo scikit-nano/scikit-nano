@@ -63,6 +63,9 @@ Meta functions/classes
    timethis
    method_func
    with_doc
+   make_sig
+   ClassSignature
+
 
 I/O functions
 --------------

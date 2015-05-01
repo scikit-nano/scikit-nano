@@ -14,7 +14,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 from builtins import object
 
-from inspect import signature
+from inspect import signature, Signature, Parameter
 from functools import wraps
 import time
 import warnings
@@ -25,7 +25,8 @@ from numpy.compat import formatargspec, getargspec
 
 __all__ = ['check_type', 'deprecated', 'get_object_signature', 'memoize',
            'method_func', 'removed_package_warning',
-           'timethis', 'typeassert', 'typed_property', 'with_doc']
+           'timethis', 'typeassert', 'typed_property', 'with_doc',
+           'make_sig', 'ClassSignature']
 
 
 def check_type(obj, allowed_types=()):
@@ -256,3 +257,24 @@ class with_doc(object):
             new_method.__doc__ = original_doc
 
         return new_method
+
+
+def make_sig(*names):
+    params = [Parameter(name, Parameter.POSITIONAL_OR_KEYWORD)
+              for name in names]
+    return Signature(params)
+
+
+class ClassSignatureMeta(type):
+    def __new__(cls, clsname, bases, clsdict):
+        clsdict['__signature__'] = make_sig(*clsdict.get('_fields', []))
+        return super().__new__(cls, clsname, bases, clsdict)
+
+
+class ClassSignature(metaclass=ClassSignatureMeta):
+    _fields = []
+    def __init__(self, *args, **kwargs):
+        bound_values = self.__signature__.bind(*args, **kwargs)
+        for name, value in bound_values.arguments.items():
+            setattr(self, name, value)
+
