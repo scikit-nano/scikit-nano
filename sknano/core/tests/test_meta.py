@@ -5,15 +5,16 @@ from __future__ import unicode_literals
 import nose
 from nose.tools import *
 
-from sknano.core import timethis, Integer, Float, String, \
-    UnsignedInteger, UnsignedFloat, SizedString
+from sknano.core import timethis, typeassert, typed_property
+
 
 @timethis
 def test1():
     class Stock:
-        name = SizedString('name', size=8)
-        shares = UnsignedInteger('shares')
-        price = UnsignedFloat('price')
+        name = typed_property('name', str)
+        shares = typed_property('shares', int)
+        price = typed_property('price', float)
+
         def __init__(self, name, shares, price):
             self.name = name
             self.shares = shares
@@ -27,23 +28,26 @@ def test1():
     assert_true(s.shares == 50)
     assert_true(s.price == 91.1)
 
-    with assert_raises(ValueError):
-        s.name = '0123456789'
-
     with assert_raises(TypeError):
         s.name = 123456
-
-    with assert_raises(ValueError):
-        s.shares = -10
 
     with assert_raises(TypeError):
         s.shares = '10'
 
-    with assert_raises(ValueError):
-        s.price = -91.1
-
     with assert_raises(TypeError):
         s.price = '-91.1'
+
+
+def test2():
+    @typeassert(int, int)
+    def add(x, y):
+        return x + y
+
+    assert_equal(add(2, 2), 2 + 2)
+
+    with assert_raises(TypeError):
+        add(2, 'hello')
+
 
 if __name__ == '__main__':
     nose.runmodule()

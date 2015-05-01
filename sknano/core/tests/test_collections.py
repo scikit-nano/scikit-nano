@@ -5,12 +5,13 @@ from __future__ import unicode_literals
 import nose
 from nose.tools import *
 
-from sknano.core import dedupe, rezero_array
+from sknano.core import ListBasedSet
 
 
 def test1():
-    lst = [1, 2, 2, 3, 4, 50, 50, 4, 5]
-    assert_equal(list(dedupe(lst)), [1, 2, 3, 4, 50, 5])
+    l1 = ListBasedSet('abcdef')
+    l2 = ListBasedSet('defghi')
+    assert_equal(list(l1 & l2), ['d', 'e', 'f'])
 
 
 if __name__ == '__main__':
