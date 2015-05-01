@@ -10,10 +10,17 @@ Contents
 ========
 Core code for package development and general use.
 
-Functions
-----------
+Data structures & algorithms
+-----------------------------
+.. autosummary::
+   :toctree: generated/
 
-Iterator functions:
+   dedupe
+   rezero_array
+
+
+Iterator functions
+------------------
 
 .. autosummary::
    :toctree: generated/
@@ -34,8 +41,7 @@ Iterator functions:
    roundrobin
    partition
    powerset
-   unique_everseen
-   unique_justseen
+   unique_elements
    iter_except
    first_true
    random_product
@@ -44,14 +50,8 @@ Iterator functions:
    random_combination_with_replacement
 
 
-Array functions:
-
-.. autosummary::
-   :toctree: generated/
-
-   rezero_array
-
-Meta functions/classes:
+Meta functions/classes
+-----------------------
 
 .. autosummary::
    :toctree: generated/
@@ -60,12 +60,12 @@ Meta functions/classes:
    deprecated
    get_object_signature
    memoize
-   method_function
    timethis
-   methodfunc
+   method_func
    with_doc
 
-I/O functions:
+I/O functions
+--------------
 
 .. autosummary::
    :toctree: generated/
@@ -73,19 +73,21 @@ I/O functions:
    get_fname
    get_fpath
 
-String functions:
+String functions
+-----------------
 
 .. autosummary::
    :toctree: generated/
 
    pluralize
 
-Classes
--------
+Custom container datatypes
+---------------------------
 
 .. autosummary::
    :toctree: generated/
 
+   ListBasedSet
    UserList
 
 Sub-packages
