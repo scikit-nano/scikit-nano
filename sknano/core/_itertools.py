@@ -19,13 +19,12 @@ import collections
 import operator
 import random
 from itertools import chain, combinations, count, cycle, filterfalse, \
-    groupby, islice, repeat, starmap, tee, zip_longest
-from operator import itemgetter
+    islice, repeat, starmap, tee, zip_longest
 
 __all__ = ['cyclic_pairs', 'take', 'tabulate', 'consume', 'nth', 'quantify',
            'padnone', 'ncycles', 'dotproduct', 'flatten', 'repeatfunc',
            'pairwise', 'grouper', 'roundrobin', 'partition', 'powerset',
-           'unique_everseen', 'unique_justseen', 'iter_except', 'first_true',
+           'unique_elements', 'iter_except', 'first_true',
            'random_product', 'random_permutation', 'random_combination',
            'random_combination_with_replacement']
 
@@ -34,13 +33,15 @@ def cyclic_pairs(iterable):
     """
     Generate a cyclic list of all subsequence pairs in `iterable`.
 
-    Parameters
-    ----------
-    iterable : `sequence`
-
     Returns
     -------
     :class:`~python:list`
+
+    Examples
+    --------
+
+    >>> cyclic_pairs('ABC')
+    [('A', 'B'), ('B', 'C'), ('C', 'A')]
 
     """
     a, b = tee(iterable)
@@ -139,7 +140,7 @@ def roundrobin(*iterables):
 
 
 def partition(pred, iterable):
-    'Use a predicate to partition entries into false entries and true entries'
+    "Use a predicate to partition entries into false entries and true entries"
     # partition(is_odd, range(10)) --> 0 2 4 6 8   and  1 3 5 7 9
     t1, t2 = tee(iterable)
     return filterfalse(pred, t1), filter(pred, t2)
@@ -148,13 +149,22 @@ def partition(pred, iterable):
 def powerset(iterable):
     "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
     s = list(iterable)
-    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+    return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
 
-def unique_everseen(iterable, key=None):
-    "List unique elements, preserving order. Remember all elements ever seen."
-    # unique_everseen('AAAABBBCCDAABBB') --> A B C D
-    # unique_everseen('ABBCcAD', str.lower) --> A B C D
+def unique_elements(iterable, key=None):
+    """Return generator of unique elements in `iterable`, preserving order.
+
+    Examples
+    --------
+    >>> list(unique_elements('AAAABBBCCDAABBB'))
+    ['A', 'B', 'C', 'D']
+    >>> list(unique_elements('ABBCcAD'))
+    ['A', 'B', 'C', 'c', 'D']
+    >>> list(unique_elements('ABBCcAD', str.lower))
+    ['A', 'B', 'C', 'D']
+
+    """
     seen = set()
     seen_add = seen.add
     if key is None:
@@ -169,26 +179,6 @@ def unique_everseen(iterable, key=None):
                 yield element
 
 
-def unique_justseen(iterable, key=None):
-    """List unique elements, preserving order.
-    Remember only the element just seen.
-
-    Parameters
-    ----------
-    iterable : `sequence`
-    key : {None, `callable`}
-
-    Examples
-    --------
-    >>> unique_justseen('AAAABBBCCDAABBB')
-    A B C D A B
-    >>> unique_justseen('ABBCcAD', str.lower)
-    A B C A D
-
-    """
-    return map(next, map(itemgetter(1), groupby(iterable, key)))
-
-
 def iter_except(func, exception, first=None):
     """Call a function repeatedly until an exception is raised.
 
@@ -200,7 +190,8 @@ def iter_except(func, exception, first=None):
     ----------
     func : `callable`
     exception : `Exception`
-    first :
+    first : `callable`
+        for database APIs needing an initial cast to db.first()
 
     Examples
     --------
@@ -245,7 +236,6 @@ def first_true(iterable, default=False, pred=None):
 
     Parameters
     ----------
-    iterable : `sequence`
     default : `bool`
     pred : {None, `callable`}, optional
 
@@ -261,20 +251,20 @@ def first_true(iterable, default=False, pred=None):
 
 
 def random_product(*args, repeat=1):
-    "Random selection from itertools.product(*args, **kwds)"
+    """Random selection from :func:`~python:itertools.product`."""
     pools = [tuple(pool) for pool in args] * repeat
     return tuple(random.choice(pool) for pool in pools)
 
 
 def random_permutation(iterable, r=None):
-    "Random selection from itertools.permutations(iterable, r)"
+    """Random selection from :func:`~python:itertools.permutations`."""
     pool = tuple(iterable)
     r = len(pool) if r is None else r
     return tuple(random.sample(pool, r))
 
 
 def random_combination(iterable, r):
-    """Random selection from itertools.combinations(iterable, r)"""
+    """Random selection from :func:`~python:itertools.combinations`."""
     pool = tuple(iterable)
     n = len(pool)
     indices = sorted(random.sample(range(n), r))
@@ -283,7 +273,7 @@ def random_combination(iterable, r):
 
 def random_combination_with_replacement(iterable, r):
     """Random selection from \
-    :func:`~python:itertools.combinations_with_replacement`\ (iterable, r)
+    :func:`~python:itertools.combinations_with_replacement`.
 
     """
     pool = tuple(iterable)
