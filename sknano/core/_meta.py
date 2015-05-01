@@ -14,9 +14,8 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 from builtins import object
 
-from inspect import ismethod, getmembers, signature
+from inspect import signature
 from functools import wraps
-import sys
 import time
 import warnings
 # warnings.resetwarnings()
@@ -24,8 +23,8 @@ import warnings
 import numpy as np
 from numpy.compat import formatargspec, getargspec
 
-__all__ = ['check_type','deprecated', 'get_object_signature', 'memoize',
-           'method_function', 'methodfunc', 'removed_package_warning',
+__all__ = ['check_type', 'deprecated', 'get_object_signature', 'memoize',
+           'method_func', 'removed_package_warning',
            'timethis', 'typeassert', 'typed_property', 'with_doc']
 
 
@@ -106,23 +105,7 @@ def memoize(f, cache={}):
     return g
 
 
-def method_function(module, classobj):
-    # get the module as an object
-    moduleobj = sys.modules[module]
-
-    # Iterate over the methods of the class and dynamically create a function
-    # for each method that calls the method and add it to the current module
-    for member in getmembers(classobj, predicate=ismethod):
-        method = member[0]
-
-        # get the bound method
-        func = getattr(classobj, method)
-
-        # add the function to the current module
-        setattr(moduleobj, method, func)
-
-
-class methodfunc(object):
+class method_func(object):
     """Define functions from existing class methods.
 
     This class is based off of the the `numpy`
