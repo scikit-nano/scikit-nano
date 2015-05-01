@@ -14,8 +14,8 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 from builtins import object
 
+from inspect import ismethod, getmembers, signature
 from functools import wraps
-import inspect
 import sys
 import time
 import warnings
@@ -24,25 +24,9 @@ import warnings
 import numpy as np
 from numpy.compat import formatargspec, getargspec
 
-__all__ = ['check_type', 'deprecated', 'get_object_signature', 'memoize',
+__all__ = ['check_type','deprecated', 'get_object_signature', 'memoize',
            'method_function', 'methodfunc', 'removed_package_warning',
-           'timethis', 'with_doc', 'dtype', 'unsigned', 'maxsize',
-           'Type', 'Unsigned', 'MaxSize',
-           'Integer', 'UnsignedInteger', 'Float', 'UnsignedFloat',
-           'String', 'SizedString']
-
-
-def check_attributes(**kwargs):
-    """Class decorator for enforcing type/value constraints on attributes."""
-    def decorate(cls):
-        for key, value in kwargs.items():
-            if isinstance(value, Descriptor):
-                value.name = key
-                setattr(cls, key, value)
-            else:
-                setattr(cls, key, value(key))
-        return cls
-    return decorate
+           'timethis', 'typeassert', 'typed_property', 'with_doc']
 
 
 def check_type(obj, allowed_types=()):
@@ -66,23 +50,17 @@ def check_type(obj, allowed_types=()):
 
 
 def deprecated(replacement=None):
-    """Deprecated decorator.
-
-    A decorator which can be used to mark functions as deprecated.
-    replacement is a callable that will be called with the same args
-    as the decorated function.
-
-    Source: http://code.activestate.com/recipes/577819-deprecated-decorator/
-    Original Author: Giampaolo Rodola' <g.rodola [AT] gmail [DOT] com>
-    License: MIT
+    """Decorator to mark functions as deprecated.
 
     Parameters
     ----------
     replacement : callable, optional
+        callable that will be called with the same args
+        as the decorated function.
 
     Returns
     -------
-    decorator : decorator function
+    decorate : decorated function
 
     """
     def decorate(func):
@@ -134,7 +112,7 @@ def method_function(module, classobj):
 
     # Iterate over the methods of the class and dynamically create a function
     # for each method that calls the method and add it to the current module
-    for member in inspect.getmembers(classobj, predicate=inspect.ismethod):
+    for member in getmembers(classobj, predicate=ismethod):
         method = member[0]
 
         # get the bound method
@@ -168,9 +146,9 @@ class methodfunc(object):
         "Return the doc of the function (from the doc of the method)."
         meth = getattr(self._classobj, self.__name__, None) or \
             getattr(np, self.__name__, None)
-        signature = self.__name__ + get_object_signature(meth)
+        sig = self.__name__ + get_object_signature(meth)
         if meth is not None:
-            doc = """    {}\n{}""".format(signature,
+            doc = """    {}\n{}""".format(sig,
                                           getattr(meth, '__doc__', None))
             return doc
 
@@ -227,6 +205,46 @@ def timethis(func):
     return wrapper
 
 
+def typeassert(*type_args, **type_kwargs):
+    """Decorator that enforces type checking of function arguments."""
+    def decorate(func):
+        # If in optimized mode, disable type checking
+        if not __debug__:
+            return func
+
+        # Map function argument names to supplied types
+        sig = signature(func)
+        bound_types = sig.bind_partial(*type_args, **type_kwargs).arguments
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            bound_values = sig.bind(*args, **kwargs)
+            # Enforce type assertions across supplied arguments
+            for name, value in bound_values.arguments.items():
+                if name in bound_types:
+                    if not isinstance(value, bound_types[name]):
+                        raise TypeError('Argument {} must be {}'.format(
+                                        name, bound_types[name]))
+            return func(*args, **kwargs)
+        return wrapper
+    return decorate
+
+
+def typed_property(name, expected_type):
+    _name = '_' + name
+
+    @property
+    def prop(self):
+        return getattr(self, _name)
+
+    @prop.setter
+    def prop(self, value):
+        check_type(value, expected_type)
+        setattr(self, _name, value)
+
+    return prop
+
+
 class with_doc(object):
     """Decorator class to combine class method docstrings.
 
@@ -255,135 +273,3 @@ class with_doc(object):
             new_method.__doc__ = original_doc
 
         return new_method
-
-
-class Descriptor:
-    """Base class using descriptor to set a value.
-
-    Parameters
-    ----------
-    name : {`str`, None}
-    opts : {`dict`}
-
-    """
-    def __init__(self, name=None, **kwargs):
-        self.name = name
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-
-    def __set__(self, instance, value):
-        instance.__dict__[self.name] = value
-
-
-class Type(Descriptor):
-    """Descriptor class for enforcing types."""
-    expected_type = type(None)
-
-    def __set__(self, instance, value):
-        if not isinstance(value, self.expected_type):
-            raise TypeError('expected ' + str(self.expected_type))
-        super().__set__(instance, value)
-
-
-class Unsigned(Descriptor):
-    """Descriptor class for enforcing values."""
-    def __set__(self, instance, value):
-        if value < 0:
-            raise ValueError('Expected value >= 0')
-        super().__set__(instance, value)
-
-
-class MaxSize(Descriptor):
-    """Descriptor class for enforcing object size."""
-    def __init__(self, name=None, **kwargs):
-        if 'size' not in kwargs:
-            raise ValueError('Missing `size` option in kwargs')
-        super().__init__(name, **kwargs)
-
-    def __set__(self, instance, value):
-        if len(value) >= self.size:
-            raise ValueError('size must be < ' + str(self.size))
-        super().__set__(instance, value)
-
-
-def dtype(expected_type, cls=None):
-    """Class decorator for enforcing attribute type.
-
-    Parameters
-    ----------
-    expected_type : `type`
-    cls : `object`
-
-    """
-    if cls is None:
-        return lambda cls: dtype(expected_type, cls)
-    super_set = cls.__set__
-
-    def __set__(self, instance, value):
-        if not isinstance(value, expected_type):
-            raise TypeError('Expected ' + str(expected_type))
-        super_set(self, instance, value)
-    cls.__set__ = __set__
-    return cls
-
-
-def unsigned(cls):
-    """Class decorator for enforcing attribute value."""
-    super_set = cls.__set__
-    def __set__(self, instance, value):
-        if value < 0:
-            raise ValueError('Expected value >= 0')
-        super_set(self, instance, value)
-    cls.__set__ = __set__
-    return cls
-
-
-def maxsize(cls):
-    """Class decorator for enforcing attribute size."""
-    super_init = cls.__init__
-    def __init__(self, name=None, **kwargs):
-        if 'size' not in kwargs:
-            raise ValueError('Missing `size` option')
-        super_init(self, name, **kwargs)
-    cls.__init__ = __init__
-
-    super_set = cls.__set__
-    def __set__(self, instance, value):
-        if len(value) >= self.size:
-            raise ValueError('size must be < ' + str(self.size))
-        super_set(self, instance, value)
-    cls.__set__ = __set__
-    return cls
-
-
-@dtype(int)
-class Integer(Descriptor):
-    pass
-
-
-@dtype(int)
-@unsigned
-class UnsignedInteger(Descriptor):
-    pass
-
-
-@dtype(float)
-class Float(Descriptor):
-    pass
-
-
-@dtype(float)
-@unsigned
-class UnsignedFloat(Descriptor):
-    pass
-
-
-@dtype(str)
-class String(Descriptor):
-    pass
-
-
-@dtype(str)
-@maxsize
-class SizedString(Descriptor):
-    pass
