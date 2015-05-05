@@ -79,3 +79,6 @@ sknano/*.pdb
 # sublime text project/workspace files
 *.sublime-project
 *.sublime-workspace
+
+# virtualenvwrapper trigger file to automatically activate virtualenv
+.venv
