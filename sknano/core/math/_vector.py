@@ -361,15 +361,19 @@ class Vector(np.ndarray):
             #        pass
 
     def __eq__(self, other):
-        if self is other or (np.allclose(self, other) and
-                             np.allclose(self.p0, other.p0) and
-                             np.allclose(self.p, other.p)):
-            return True
-        else:
-            return False
+        if isinstance(other, Vector):
+            if self is other or (np.allclose(self, other) and
+                                 np.allclose(self.p0, other.p0) and
+                                 np.allclose(self.p, other.p)):
+                return True
+            else:
+                return False
+        return False
 
     def __lt__(self, other):
-        return self.norm < other.norm
+        if isinstance(other, Vector):
+            return self.norm < other.norm
+        return False
 
     def __le__(self, other):
         return self < other or self == other
