@@ -14,6 +14,9 @@ Lattice systems
 .. autosummary::
    :toctree: generated/
 
+   CrystalLattice
+   ReciprocalLatticeMixin
+
    SimpleCubicLattice
    BodyCenteredCubicLattice
    FaceCenteredCubicLattice
@@ -23,6 +26,7 @@ Crystal structures
 .. autosummary::
    :toctree: generated/
 
+   CrystalStructure
    DiamondStructure
    HexagonalClosePackedStructure
    CubicClosePackedStructure
