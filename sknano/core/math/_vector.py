@@ -192,23 +192,23 @@ class Vector(np.ndarray):
                 except TypeError:
                     pass
 
-    def __array_prepare__(self, obj, context=None):
-        if Vector._verbosity > 2:
-            print('In Vector.__array_prepare__\n'
-                  'self: {}\n'.format(self) +
-                  'type(self): {}\n'.format(type(self)) +
-                  'obj: {}\n'.format(obj) +
-                  'type(obj): {}\n'.format(type(obj)) +
-                  'context: {}\n'.format(context))
+    # def __array_prepare__(self, obj, context=None):
+    #     if Vector._verbosity > 2:
+    #         print('In Vector.__array_prepare__\n'
+    #               'self: {}\n'.format(self) +
+    #               'type(self): {}\n'.format(type(self)) +
+    #               'obj: {}\n'.format(obj) +
+    #               'type(obj): {}\n'.format(type(obj)) +
+    #               'context: {}\n'.format(context))
 
-        if self.__array_priority__ >= Vector.__array_priority__:
-            res = obj if isinstance(obj, type(self)) else obj.view(type(self))
-        else:
-            res = obj.view(Vector)
+    #     if self.__array_priority__ >= Vector.__array_priority__:
+    #         res = obj if isinstance(obj, type(self)) else obj.view(type(self))
+    #     else:
+    #         res = obj.view(Vector)
 
-        if context is None:
-            return res
-        return super(Vector, self).__array_prepare__(obj, context)
+    #     if context is None:
+    #         return res
+    #     return super(Vector, self).__array_prepare__(obj, context)
 
     def __array_wrap__(self, obj, context=None):
         if Vector._verbosity > 2:
