@@ -149,10 +149,6 @@ class Vector(np.ndarray):
         vec.nd = len(vec)
         vec._p = p
         vec._p0 = p0
-        if nd == 2:
-            vec.x, vec.y = vec
-        elif nd == 3:
-            vec.x, vec.y, vec.z = vec
 
         return vec
 
@@ -184,11 +180,6 @@ class Vector(np.ndarray):
                       'obj.shape: {}\n'.format(obj.shape))
             except AttributeError:
                 pass
-
-        if self.nd == 2:
-            self.x, self.y = obj
-        elif self.nd == 3:
-            self.x, self.y, self.z = obj
 
         self._p0 = getattr(obj, 'p0', None)
         self._p = getattr(obj, 'p', None)
