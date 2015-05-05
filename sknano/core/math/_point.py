@@ -74,7 +74,8 @@ class Point(np.ndarray):
         #pt = np.ndarray.__new__(cls, arr.shape, arr.dtype, buffer=arr)
         pt = super(Point, cls).__new__(cls, arr.shape, arr.dtype, buffer=arr)
 
-        pt.nd = nd
+        pt.nd = len(pt)
+
         if nd == 2:
             pt.x, pt.y = pt
         elif nd == 3:
@@ -86,7 +87,7 @@ class Point(np.ndarray):
         if pt is None:
             return None
 
-        self.nd = len(pt)
+        self.nd = len(self)
 
         if self.nd == 2:
             self.x, self.y = pt
@@ -162,6 +163,14 @@ class Point(np.ndarray):
 
     def __ne__(self, other):
         return not self == other
+
+    @property
+    def column_matrix(self):
+        return np.matrix(self.__array__().reshape(self.shape[0], 1))
+
+    @property
+    def row_matrix(self):
+        return np.matrix(self.__array__())
 
     def euclidean_distance(self, pt):
         return np.sqrt(((self - pt)**2).sum())

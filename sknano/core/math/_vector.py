@@ -90,6 +90,7 @@ class Vector(np.ndarray):
                   'type(v): {}\n'.format(type(v)))
 
         if isinstance(v, Vector):
+
             if dtype is None:
                 intype = v.dtype
             else:
@@ -145,7 +146,7 @@ class Vector(np.ndarray):
         # vec = np.ndarray.__new__(cls, arr.shape, arr.dtype, buffer=arr)
         vec = super(Vector, cls).__new__(cls, arr.shape, arr.dtype, buffer=arr)
 
-        vec.nd = nd
+        vec.nd = len(vec)
         vec._p = p
         vec._p0 = p0
         if nd == 2:
@@ -159,8 +160,13 @@ class Vector(np.ndarray):
         if obj is None:
             return None
 
-        self.nd = len(obj)
+        self.nd = len(self)
         if Vector._verbosity > 2:
+            print('In Vector.__array_finalize__\n'
+                  'self: {}\n'.format(self) +
+                  'type(self): {}\n'.format(type(self)) +
+                  'obj: {}\n'.format(obj) +
+                  'type(obj): {}\n'.format(type(obj)))
             try:
                 print('In Vector.__array_finalize__\n'
                       'self: {}\n'.format(self) +
@@ -559,7 +565,7 @@ class Vector(np.ndarray):
     @property
     def norm(self):
         """Return the vector norm."""
-        return np.sqrt((self**2).sum())
+        return np.sqrt((self ** 2).sum())
 
     @property
     def unit_vector(self):
@@ -601,6 +607,14 @@ class Vector(np.ndarray):
             self.translate(t)
         else:
             self.p.translate(t)
+
+    @property
+    def column_matrix(self):
+        return np.matrix(self.__array__().reshape(self.shape[0], 1))
+
+    @property
+    def row_matrix(self):
+        return np.matrix(self.__array__())
 
     def angle(self, other):
         """Angle between two `Vector`\ s."""
