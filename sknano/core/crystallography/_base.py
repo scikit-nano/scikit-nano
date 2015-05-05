@@ -16,29 +16,72 @@ from builtins import super
 __docformat__ = 'restructuredtext en'
 
 # from abc import ABCMeta, abstractproperty
-from enum import Enum
+# from enum import Enum
 
-# from sknano.core import rezero_array
 from sknano.core.math import Point, Vector
 
 import numpy as np
 
-__all__ = ['CrystalLattice', 'CrystalStructure']
+__all__ = ['CrystalLattice', 'CrystalStructure',
+           'ReciprocalLatticeMixin']
 
 
 class ReciprocalLatticeVectors:
     pass
 
 
-class ReciprocalLattice:
-    pass
+class ReciprocalLatticeMixin:
+    """Mixin class for computing the reciprocal lattice properties."""
+    @property
+    def cos_alpha_star(self):
+        """:math:`\\cos\\alpha^*`"""
+        return np.around((self.cos_beta * self.cos_gamma - self.cos_alpha) /
+                         (self.sin_beta * self.sin_gamma), decimals=6)
+
+    @property
+    def cos_beta_star(self):
+        """:math:`\\cos\\beta^*`"""
+        return np.around((self.cos_gamma * self.cos_alpha - self.cos_beta) /
+                         (self.sin_gamma * self.sin_alpha), decimals=6)
+
+    @property
+    def cos_gamma_star(self):
+        """:math:`\\cos\\gamma^*`"""
+        return np.around((self.cos_alpha * self.cos_beta - self.cos_gamma) /
+                         (self.sin_alpha * self.sin_beta), decimals=6)
+
+    @property
+    def sin_alpha_star(self):
+        """:math:`\\sin\\alpha^*`"""
+        return np.sqrt(1 - self.cos_alpha_star ** 2)
+
+    @property
+    def sin_beta_star(self):
+        """:math:`\\sin\\beta^*`"""
+        return np.sqrt(1 - self.cos_beta_star ** 2)
+
+    @property
+    def sin_gamma_star(self):
+        """:math:`\\sin\\gamma^*`"""
+        return np.sqrt(1 - self.cos_gamma_star ** 2)
+
+    @property
+    def b1(self):
+        """Reciprocal lattice vector :math:`\\mathbf{b}_1=\\mathbf{a}^{*}`."""
+        return self.a2.cross(self.a3) / self.cell_volume
+
+    @property
+    def b2(self):
+        """Reciprocal lattice vector :math:`\\mathbf{b}_2=\\mathbf{b}^{*}`."""
+        return self.a3.cross(self.a1) / self.cell_volume
+
+    @property
+    def b3(self):
+        """Reciprocal lattice vector :math:`\\mathbf{b}_3=\\mathbf{c}^{*}`."""
+        return self.a1.cross(self.a2) / self.cell_volume
 
 
-class CrystalCell:
-    pass
-
-
-class CrystalLattice:
+class CrystalLattice(ReciprocalLatticeMixin):
     """Base class for crystal lattice systems."""
 
     def __init__(self, a=None, b=None, c=None,
@@ -93,6 +136,8 @@ class CrystalLattice:
 
     @classmethod
     def from_matrix(cls, cell_matrix):
+        """Alternate constructor to create `CrystalLattice` from \
+            matrix of lattice vectors."""
         return cls.__init__(a1=cell_matrix[0, :],
                             a2=cell_matrix[1, :],
                             a3=cell_matrix[2, :])
@@ -100,7 +145,7 @@ class CrystalLattice:
     @property
     def alpha(self):
         """Angle between lattice vectors :math:`\\mathbf{b}` and \
-        :math:`\\mathbf{c}`."""
+        :math:`\\mathbf{c}` in **degrees**."""
         return np.around(self._alpha, decimals=6)
 
     @alpha.setter
@@ -110,7 +155,7 @@ class CrystalLattice:
     @property
     def beta(self):
         """Angle between lattice vectors :math:`\\mathbf{c}` and \
-        :math:`\\mathbf{a}`."""
+        :math:`\\mathbf{a}` in **degrees**."""
         return np.around(self._beta, decimals=6)
 
     @beta.setter
@@ -120,7 +165,7 @@ class CrystalLattice:
     @property
     def gamma(self):
         """Angle between lattice vectors :math:`\\mathbf{a}` and \
-        :math:`\\mathbf{b}`."""
+        :math:`\\mathbf{b}` in **degrees**."""
         return np.around(self._gamma, decimals=6)
 
     @gamma.setter
@@ -128,97 +173,68 @@ class CrystalLattice:
         self._gamma = value
 
     @property
-    def cos_alpha(self):
-        return np.around(np.cos(np.radians(self.alpha)), decimals=6)
-
-    @property
-    def cos_beta(self):
-        return np.around(np.cos(np.radians(self.beta)), decimals=6)
-
-    @property
-    def cos_gamma(self):
-        return np.around(np.cos(np.radians(self.gamma)), decimals=6)
-
-    @property
-    def sin_alpha(self):
-        return np.around(np.sin(np.radians(self.alpha)), decimals=6)
-
-    @property
-    def sin_beta(self):
-        return np.around(np.sin(np.radians(self.beta)), decimals=6)
-
-    @property
-    def sin_gamma(self):
-        return np.around(np.sin(np.radians(self.gamma)), decimals=6)
-
-    @property
-    def cos_alpha_star(self):
-        return np.around((self.cos_beta * self.cos_gamma - self.cos_alpha) /
-                         (self.sin_beta * self.sin_gamma), decimals=6)
-
-    @property
-    def cos_beta_star(self):
-        return np.around((self.cos_gamma * self.cos_alpha - self.cos_beta) /
-                         (self.sin_gamma * self.sin_alpha), decimals=6)
-
-    @property
-    def cos_gamma_star(self):
-        return np.around((self.cos_alpha * self.cos_beta - self.cos_gamma) /
-                         (self.sin_alpha * self.sin_beta), decimals=6)
-
-    @property
-    def sin_alpha_star(self):
-        return np.sqrt(1 - self.cos_alpha_star ** 2)
-
-    @property
-    def sin_beta_star(self):
-        return np.sqrt(1 - self.cos_beta_star ** 2)
-
-    @property
-    def sin_gamma_star(self):
-        return np.sqrt(1 - self.cos_gamma_star ** 2)
-
-    @property
     def a1(self):
+        """Lattice vector :math:`\\mathbf{a}_1=\\mathbf{a}`."""
         return Vector(self.ortho_matrix[:, 0].A.flatten())
 
     @property
     def a2(self):
+        """Lattice vector :math:`\\mathbf{a}_2=\\mathbf{b}`."""
         return Vector(self.ortho_matrix[:, 1].A.flatten())
 
     @property
     def a3(self):
+        """Lattice vector :math:`\\mathbf{a}_3=\\mathbf{c}`."""
         return Vector(self.ortho_matrix[:, 2].A.flatten())
 
     @property
-    def b1(self):
-        return self.a2.cross(self.a3) / self.cell_volume
+    def cos_alpha(self):
+        """:math:`\\cos\\alpha`"""
+        return np.around(np.cos(np.radians(self.alpha)), decimals=6)
 
     @property
-    def b2(self):
-        return self.a3.cross(self.a1) / self.cell_volume
+    def cos_beta(self):
+        """:math:`\\cos\\beta`"""
+        return np.around(np.cos(np.radians(self.beta)), decimals=6)
 
     @property
-    def b3(self):
-        return self.a1.cross(self.a2) / self.cell_volume
-
-    def generate_cell_vectors(self):
-        pass
+    def cos_gamma(self):
+        """:math:`\\cos\\gamma`"""
+        return np.around(np.cos(np.radians(self.gamma)), decimals=6)
 
     @property
-    def space_group(self):
-        pass
+    def sin_alpha(self):
+        """:math:`\\sin\\alpha`"""
+        return np.around(np.sin(np.radians(self.alpha)), decimals=6)
 
     @property
-    def lattice_type(self):
-        return self._lattice_type
+    def sin_beta(self):
+        """:math:`\\sin\\beta`"""
+        return np.around(np.sin(np.radians(self.beta)), decimals=6)
 
-    @lattice_type.setter
-    def lattice_type(self, value):
-        self._lattice_type = value
+    @property
+    def sin_gamma(self):
+        """:math:`\\sin\\gamma`"""
+        return np.around(np.sin(np.radians(self.gamma)), decimals=6)
+
+    @property
+    def cell_volume(self):
+        """Unit cell volume."""
+        return self.a * self.b * self.c * \
+            np.sqrt(1 - self.cos_alpha ** 2 - self.cos_beta ** 2 -
+                    self.cos_gamma ** 2 +
+                    2 * self.cos_alpha * self.cos_beta * self.cos_gamma)
+
+    @property
+    def fractional_matrix(self):
+        """Transformation matrix to convert from cartesian coordinates to \
+            fractional coordinates."""
+        return np.linalg.inv(self.ortho_matrix)
 
     @property
     def ortho_matrix(self):
+        """Transformation matrix to convert from fractional coordinates to \
+            cartesian coordinates."""
         m11 = self.a
         m12 = self.b * self.cos_gamma
         m13 = self.c * self.cos_beta
@@ -235,48 +251,56 @@ class CrystalLattice:
                           [0.0, 0.0, m33]])
 
     @property
-    def fractional_matrix(self):
-        return np.linalg.inv(self.ortho_matrix)
-
-    @property
-    def cell_volume(self):
-        return self.a * self.b * self.c * \
-            np.sqrt(1 - self.cos_alpha ** 2 - self.cos_beta ** 2 -
-                    self.cos_gamma ** 2 +
-                    2 * self.cos_alpha * self.cos_beta * self.cos_gamma)
-
-    @property
-    def origin(self):
-        return self._origin
-
-    @origin.setter
-    def origin(self, value):
-        self._origin = value
-
-    def cell_vectors(self):
-        pass
-
-    @property
-    def cell_matrix(self):
-        pass
-
-    @property
-    def lattice_vectors(self):
-        pass
+    def metric_tensor(self):
+        """Metric tensor."""
+        return self.ortho_matrix * self.ortho_matrix.T
 
     def fractional_to_cartesian(self, p):
+        """Convert fractional coordinate to cartesian coordinate.
+
+        Parameters
+        ----------
+        p : `Point`
+
+        Returns
+        -------
+        `Point`
+
+        """
         p = Point(p)
         c = self.orientation_matrix * self.ortho_matrix * \
             p.column_matrix + self.offset.column_matrix
         return Point(c.A.flatten())
 
     def cartesian_to_fractional(self, p):
+        """Convert cartesian coordinate to fractional coordinate.
+
+        Parameters
+        ----------
+        p : `Point`
+
+        Returns
+        -------
+        `Point`
+
+        """
         p = Point(p)
         f = self.fractional_matrix * np.linalg.inv(self.orientation_matrix) * \
             (p - self.offset).column_matrix
         return Point(f.A.flatten())
 
     def wrap_fractional_coordinate(self, p, epsilon=1e-6):
+        """Wrap fractional coordinate to lie within unit cell.
+
+        Parameters
+        ----------
+        p : `Point`
+
+        Returns
+        -------
+        `Point`
+
+        """
 
         p = Point(np.fmod(p, 1))
         p[np.where(p.__array__() < 0)] += 1
@@ -287,9 +311,55 @@ class CrystalLattice:
         return p
 
     def wrap_cartesian_coordinate(self, p):
+        """Wrap cartesian coordinate to lie within unit cell.
+
+        Parameters
+        ----------
+        p : `Point`
+
+        Returns
+        -------
+        `Point`
+
+        """
         return self.fractional_to_cartesian(
             self.wrap_fractional_coordinate(
                 self.cartesian_to_fractional(p)))
+
+    # @property
+    # def cell_vectors(self):
+    #     pass
+
+    # @property
+    # def cell_matrix(self):
+    #     pass
+
+    # @property
+    # def lattice_vectors(self):
+    #     pass
+
+    # @property
+    # def lattice_type(self):
+    #     return self._lattice_type
+
+    # @lattice_type.setter
+    # def lattice_type(self, value):
+    #     self._lattice_type = value
+
+    # @property
+    # def origin(self):
+    #     return self._origin
+
+    # @origin.setter
+    # def origin(self, value):
+    #     self._origin = value
+
+    # @property
+    # def space_group(self):
+    #     pass
+
+    # def generate_cell_vectors(self):
+    #     pass
 
 
 class CrystalStructure(CrystalLattice):
