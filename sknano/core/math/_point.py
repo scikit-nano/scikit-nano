@@ -76,11 +76,6 @@ class Point(np.ndarray):
 
         pt.nd = len(pt)
 
-        if nd == 2:
-            pt.x, pt.y = pt
-        elif nd == 3:
-            pt.x, pt.y, pt.z = pt
-
         return pt
 
     def __array_finalize__(self, pt):
@@ -88,11 +83,6 @@ class Point(np.ndarray):
             return None
 
         self.nd = len(self)
-
-        if self.nd == 2:
-            self.x, self.y = pt
-        elif self.nd == 3:
-            self.x, self.y, self.z = pt
 
     def __str__(self):
         return repr(self)
