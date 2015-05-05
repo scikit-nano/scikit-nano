@@ -143,8 +143,7 @@ class Vector(np.ndarray):
             v = p - p0
 
         arr = np.array(v, dtype=dtype, copy=copy).view(cls)
-        # vec = np.ndarray.__new__(cls, arr.shape, arr.dtype, buffer=arr)
-        vec = super(Vector, cls).__new__(cls, arr.shape, arr.dtype, buffer=arr)
+        vec = np.ndarray.__new__(cls, arr.shape, arr.dtype, buffer=arr)
 
         vec.nd = len(vec)
         vec._p = p
@@ -234,7 +233,7 @@ class Vector(np.ndarray):
         #     return obj[()]
         # else:
 
-        res = super(Vector, self).__array_wrap__(obj, context)
+        res = np.ndarray.__array_wrap__(self, obj, context)
         res = Vector(res.__array__(), p0=self.p0)
         # res.p = self.p
         # res = Vector(p0=self.p0, p=self.p)
