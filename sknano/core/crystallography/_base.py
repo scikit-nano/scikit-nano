@@ -19,7 +19,7 @@ __docformat__ = 'restructuredtext en'
 from enum import Enum
 
 # from sknano.core import rezero_array
-from sknano.core.math import Vector
+from sknano.core.math import Point, Vector
 
 import numpy as np
 
@@ -38,31 +38,6 @@ class CrystalCell:
     pass
 
 
-# def compute_ortho_matrix(a, b, c, alpha, beta, gamma):
-#     cos_alpha = np.cos(np.radians(alpha))
-#     cos_beta = np.cos(np.radians(beta))
-#     cos_gamma = np.cos(np.radians(gamma))
-
-#     sin_alpha = np.sin(np.radians(alpha))
-#     sin_beta = np.sin(np.radians(beta))
-#     sin_gamma = np.sin(np.radians(gamma))
-
-#     m11 = a
-#     m12 = b * cos_gamma
-#     m13 = c * cos_beta
-
-#     m22 = self.b * self.sin_gamma
-#     m23 = self.c * (self.cos_alpha - self.cos_beta * self.cos_gamma) / \
-#         self.sin_gamma
-
-#     m33 = self.c * self.sin_alpha * self.sin_beta * self.sin_gamma_star / \
-#         self.sin_gamma
-
-#     return np.matrix([[m11, m12, m13],
-#                       [0.0, m22, m23],
-#                       [0.0, 0.0, m33]])
-
-
 class CrystalLattice:
     """Base class for crystal lattice systems."""
 
@@ -71,12 +46,7 @@ class CrystalLattice:
                  a1=None, a2=None, a3=None, cell_matrix=None,
                  orientation_matrix=None):
 
-        self.offset = Vector(np.zeros(3))
-
-        if orientation_matrix is None:
-            orientation_matrix = np.matrix(np.identity(3))
-
-        self.orientation_matrix = orientation_matrix
+        self.offset = Point(np.zeros(3))
 
         if a1 is not None and a2 is not None and a3 is not None:
             a1 = Vector(a1)
@@ -100,9 +70,13 @@ class CrystalLattice:
         self.gamma = gamma
 
         if cell_matrix is not None:
-            self.orientation_matrix = \
-                cell_matrix.T * np.linalg.inv(self.ortho_matrix)
+            orientation_matrix = \
+                cell_matrix.T * self.fractional_matrix
 
+        if orientation_matrix is None:
+            orientation_matrix = np.matrix(np.identity(3))
+
+        self.orientation_matrix = orientation_matrix
         self.lattice_type = None
 
         self.pstr = "a={a!r}, b={b!r}, c={c!r}, " + \
@@ -119,13 +93,9 @@ class CrystalLattice:
 
     @classmethod
     def from_matrix(cls, cell_matrix):
-        return cls.__init__(a1=cell_matrix[0,:],
-                            a2=cell_matrix[1,:],
-                            a3=cell_matrix[2,:])
-
-    # @property
-    # def α(self):
-    #     return self.alpha
+        return cls.__init__(a1=cell_matrix[0, :],
+                            a2=cell_matrix[1, :],
+                            a3=cell_matrix[2, :])
 
     @property
     def alpha(self):
@@ -209,51 +179,33 @@ class CrystalLattice:
         return np.sqrt(1 - self.cos_gamma_star ** 2)
 
     @property
-    def unit_cell(self):
-        pass
-
-    @property
     def a1(self):
-        return self.ortho_matrix[:, 0].flatten()
+        return Vector(self.ortho_matrix[:, 0].A.flatten())
 
     @property
     def a2(self):
-        return self.ortho_matrix[:, 1].flatten()
+        return Vector(self.ortho_matrix[:, 1].A.flatten())
 
     @property
     def a3(self):
-        return self.ortho_matrix[:, 2].flatten()
+        return Vector(self.ortho_matrix[:, 2].A.flatten())
 
     @property
     def b1(self):
-        return np.cross(self.a2, self.a3) / self.cell_volume
+        return self.a2.cross(self.a3) / self.cell_volume
 
     @property
     def b2(self):
-        return np.cross(self.a3, self.a1) / self.cell_volume
+        return self.a3.cross(self.a1) / self.cell_volume
 
     @property
     def b3(self):
-        return np.cross(self.a1, self.a2) / self.cell_volume
-
-    def fractional_to_cartesian(self, v):
-        v = np.matrix(np.asarray(v).reshape(3, 1))
-        return self.orientation_matrix * self.ortho_matrix * v + self.offset
-
-    def cartesian_to_fractional(self, v):
-        pass
-
-    def wrap_fractional_coordinate(self):
-        pass
-
-    def wrap_cartesian_coordinate(self):
-        pass
+        return self.a1.cross(self.a2) / self.cell_volume
 
     def generate_cell_vectors(self):
         pass
-        # self.a1.x = self.a
-        # self.a2.x = self.b * np.cos(self.gamma)
 
+    @property
     def space_group(self):
         pass
 
@@ -264,15 +216,6 @@ class CrystalLattice:
     @lattice_type.setter
     def lattice_type(self, value):
         self._lattice_type = value
-
-    def lattice_vectors(self):
-        pass
-
-    def cell_vectors(self):
-        pass
-
-    def cell_matrix(self):
-        pass
 
     @property
     def ortho_matrix(self):
@@ -287,9 +230,9 @@ class CrystalLattice:
         m33 = self.c * self.sin_alpha * self.sin_beta * self.sin_gamma_star / \
             self.sin_gamma
 
-        return np.around(np.matrix([[m11, m12, m13],
-                                    [0.0, m22, m23],
-                                    [0.0, 0.0, m33]]), decimals=10)
+        return np.matrix([[m11, m12, m13],
+                          [0.0, m22, m23],
+                          [0.0, 0.0, m33]])
 
     @property
     def fractional_matrix(self):
@@ -302,8 +245,51 @@ class CrystalLattice:
                     self.cos_gamma ** 2 +
                     2 * self.cos_alpha * self.cos_beta * self.cos_gamma)
 
+    @property
     def origin(self):
+        return self._origin
+
+    @origin.setter
+    def origin(self, value):
+        self._origin = value
+
+    def cell_vectors(self):
         pass
+
+    @property
+    def cell_matrix(self):
+        pass
+
+    @property
+    def lattice_vectors(self):
+        pass
+
+    def fractional_to_cartesian(self, p):
+        p = Point(p)
+        c = self.orientation_matrix * self.ortho_matrix * \
+            p.column_matrix + self.offset.column_matrix
+        return Point(c.A.flatten())
+
+    def cartesian_to_fractional(self, p):
+        p = Point(p)
+        f = self.fractional_matrix * np.linalg.inv(self.orientation_matrix) * \
+            (p - self.offset).column_matrix
+        return Point(f.A.flatten())
+
+    def wrap_fractional_coordinate(self, p, epsilon=1e-6):
+
+        p = Point(np.fmod(p, 1))
+        p[np.where(p.__array__() < 0)] += 1
+        p[np.where(p.__array__() > 1 - epsilon)] -= 1
+        p[np.where(np.logical_or(
+                   (p.__array__() > 1 - epsilon),
+                   (p.__array__() < epsilon)))] = 0
+        return p
+
+    def wrap_cartesian_coordinate(self, p):
+        return self.fractional_to_cartesian(
+            self.wrap_fractional_coordinate(
+                self.cartesian_to_fractional(p)))
 
 
 class CrystalStructure(CrystalLattice):
@@ -329,10 +315,6 @@ class CrystalStructure(CrystalLattice):
     @basis.setter
     def basis(self, value):
         self._basis = value
-
-    @basis.deleter
-    def basis(self):
-        del self._basis
 
     @property
     def unit_cell(self):
