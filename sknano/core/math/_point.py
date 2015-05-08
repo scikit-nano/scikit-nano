@@ -155,10 +155,12 @@ class Point(np.ndarray):
 
     @property
     def column_matrix(self):
+        """Return column matrix representation of `Point` coordinates."""
         return np.matrix(self.__array__().reshape(self.shape[0], 1))
 
     @property
     def row_matrix(self):
+        """Return row matrix representation of `Point` coordinates."""
         return np.matrix(self.__array__())
 
     def euclidean_distance(self, pt):
