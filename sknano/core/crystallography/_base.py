@@ -367,16 +367,15 @@ class CrystalLattice(ReciprocalLatticeMixin):
     #     pass
 
 
-class CrystalStructure(CrystalLattice):
+class CrystalStructure:
     """Abstract base class for crystal structures."""
 
-    def __init__(self, basis, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, lattice, basis, coords=None, cartesian=False):
+
+        self.lattice = lattice
         self.basis = basis
 
-        self.pstr = "basis={basis!r}"
-        for k, v in kwargs.items():
-            self.pstr += ", {}={{{key!s}!r}}".format(k, key=k)
+        self.fmtstr = "{lattice!r}, {basis!r}"
 
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__,
@@ -392,11 +391,19 @@ class CrystalStructure(CrystalLattice):
         self._basis = value
 
     @property
+    def lattice(self):
+        return self._lattice
+
+    @lattice.setter
+    def lattice(self, value):
+        if not isinstance(value, CrystalLattice):
+            value = CrystalLattice(cell_matrix=value)
+        self._lattice = value
+
+    @property
     def unit_cell(self):
         pass
 
     def pdict(self):
         """Return `dict` of `CrystalStructure` parameters."""
-        super_pdict = super().pdict()
-        super_pdict.update(dict(basis=self.basis))
-        return super_pdict
+        return dict(lattice=self.lattice, basis=self.basis)
