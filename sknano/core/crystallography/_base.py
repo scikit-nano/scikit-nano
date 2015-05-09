@@ -216,6 +216,12 @@ class CrystalLattice(ReciprocalLatticeMixin):
         return np.around(np.sin(np.radians(self.gamma)), decimals=6)
 
     @property
+    def cell_matrix(self):
+        """Matrix of `CrystalLattice` lattice row vectors. \
+            Same as :attr:`CrystalLattice.ortho_matrix`\ .T."""
+        return self.ortho_matrix.T
+
+    @property
     def cell_volume(self):
         """Unit cell volume."""
         return self.a * self.b * self.c * \
@@ -326,10 +332,6 @@ class CrystalLattice(ReciprocalLatticeMixin):
 
     # @property
     # def cell_vectors(self):
-    #     pass
-
-    # @property
-    # def cell_matrix(self):
     #     pass
 
     # @property
