@@ -13,8 +13,6 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-import numbers
-
 import sknano.core.atoms
 from ._bond import Bond
 from ._bonds import Bonds
@@ -28,38 +26,18 @@ class KDTAtom(XAtom):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        #self.strrep = "Atom(element={element!r}, id={id!r}, " + \
-        #    "mol={mol!r}, type={type!r}, " + \
-        #    "q={q!r}, mass={mass!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
-        #    "CN={CN!r}, NN={NN!s}, bonds={bonds!s})"
-
-    #def __repr__(self):
-    #    """Return canonical string representation of `KDTAtom`."""
-    #    reprstr = "Atom(element={element!r}, id={id!r}, " + \
-    #        "mol={mol!r}, type={type!r}, " + \
-    #        "q={q!r}, mass={mass!r}, x={x:.6f}, y={y:.6f}, z={z:.6f}, " + \
-    #        "CN={CN!r}, NN={NN!r})"
-    #    return reprstr.format(**self.todict())
-
     def __dir__(self):
         attrs = super().__dir__()
         attrs.extend(['NN', 'bonds'])
         return attrs
 
-    @property
+    @XAtom.CN.getter
     def CN(self):
-        """Return `KDTAtom` coordination number."""
+        """`KDTAtom` coordination number."""
         try:
             return self.NN.Natoms
         except AttributeError:
-            return self._CN
-
-    @CN.setter
-    def CN(self, value):
-        """Set `KDTAtom` coordination number."""
-        if not isinstance(value, numbers.Number):
-            raise TypeError('Expected a number.')
-        self._CN = int(value)
+            return super().CN
 
     @property
     def NN(self):

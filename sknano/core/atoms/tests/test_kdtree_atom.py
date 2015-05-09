@@ -21,5 +21,12 @@ def test_attributes():
         assert_equals(kdtatom.element, element)
 
 
+def test3():
+    atom = KDTAtom(element='C')
+    assert_equal(atom.CN, 0)
+    atom.CN = 3
+    assert_equal(atom.CN, 3)
+
+
 if __name__ == '__main__':
     nose.runmodule()
