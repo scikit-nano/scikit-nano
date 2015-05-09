@@ -28,19 +28,24 @@ __all__ = ['BravaisLattice', 'SimpleCubicLattice',
 
 class BravaisLattice:
     """Class for bravais lattices."""
-    pass
+    def __init__(self, symbol=None):
+        pass
 
 
 class SimpleCubicLattice(BravaisLattice):
     """Abstract representation of simple cubic lattice."""
-    pass
+    lattice_points = [[0.0, 0.0, 0.0]]
 
 
 class BodyCenteredCubicLattice(BravaisLattice):
     """Abstract representation of body-centered cubic lattice."""
-    pass
+    lattice_points = [[0.0, 0.0, 0.0],
+                      [0.5, 0.5, 0.5]]
 
 
 class FaceCenteredCubicLattice(BravaisLattice):
     """Abstract representation of face-centered cubic lattice."""
-    pass
+    lattice_points = [[0.0, 0.0, 0.0],
+                      [0.5, 0.5, 0.0],
+                      [0.0, 0.5, 0.5],
+                      [0.5, 0.0, 0.5]]
