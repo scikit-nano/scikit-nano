@@ -14,8 +14,12 @@ Lattice systems
 .. autosummary::
    :toctree: generated/
 
-   CrystalLattice
+   DirectLatticeMixin
    ReciprocalLatticeMixin
+   UnitCellMixin
+
+   CrystalLattice
+   ReciprocalLattice
 
    SimpleCubicLattice
    BodyCenteredCubicLattice
