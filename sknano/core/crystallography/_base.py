@@ -91,6 +91,12 @@ class CrystalLattice(ReciprocalLatticeMixin):
 
         self.offset = Point(np.zeros(3))
 
+        if cell_matrix is not None:
+            cell_matrix = np.asarray(cell_matrix)
+            a1 = np.array(cell_matrix[0, :])
+            a2 = np.array(cell_matrix[1, :])
+            a3 = np.array(cell_matrix[2, :])
+
         if a1 is not None and a2 is not None and a3 is not None:
             a1 = Vector(a1)
             a2 = Vector(a2)
@@ -133,14 +139,6 @@ class CrystalLattice(ReciprocalLatticeMixin):
         """Return `dict` of `CrystalLattice` parameters."""
         return dict(a=self.a, b=self.b, c=self.c,
                     alpha=self.alpha, beta=self.beta, gamma=self.gamma)
-
-    @classmethod
-    def from_matrix(cls, cell_matrix):
-        """Alternate constructor to create `CrystalLattice` from \
-            matrix of lattice vectors."""
-        return cls.__init__(a1=cell_matrix[0, :],
-                            a2=cell_matrix[1, :],
-                            a3=cell_matrix[2, :])
 
     @property
     def alpha(self):
