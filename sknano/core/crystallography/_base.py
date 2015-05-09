@@ -259,6 +259,11 @@ class CrystalLattice(ReciprocalLatticeMixin):
         """Metric tensor."""
         return self.ortho_matrix * self.ortho_matrix.T
 
+    @property
+    def reciprocal_lattice(self):
+        """Return `CrystalLattice` reciprocal lattice."""
+        return np.linalg.inv(self.cell_matrix)
+
     def fractional_to_cartesian(self, p):
         """Convert fractional coordinate to cartesian coordinate.
 
