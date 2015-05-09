@@ -390,6 +390,42 @@ class CrystalLattice(ReciprocalLatticeMixin, UnitCellMixin):
         """Return `CrystalLattice` reciprocal lattice."""
         return ReciprocalLattice(cell_matrix=np.linalg.inv(self.cell_matrix))
 
+    @classmethod
+    def cubic(cls, a):
+        """Generate a cubic lattice with lattice parameter \
+            :math:`a`."""
+        return cls(a=a, b=a, c=a, alpha=90, beta=90, gamma=90)
+
+    @classmethod
+    def triclinic(cls, a, b, c, alpha, beta, gamma):
+        """Generate a triclinic lattice with lattice parameters \
+            :math:`a, b, c, \\alpha, \\beta, \\gamma`."""
+        return cls(a=a, b=b, c=c, alpha=alpha, beta=beta, gamma=gamma)
+
+    @classmethod
+    def monoclinic(cls, a, b, c, beta):
+        """Generate a triclinic lattice with lattice parameters \
+            :math:`a, b, c, \\beta`."""
+        return cls(a=a, b=b, c=c, alpha=90, beta=beta, gamma=90)
+
+    @classmethod
+    def orthorhombic(cls, a, b, c):
+        """Generate a triclinic lattice with lattice parameters \
+            :math:`a, b, c`."""
+        return cls(a=a, b=b, c=c, alpha=90, beta=90, gamma=90)
+
+    @classmethod
+    def tetragonal(cls, a, c):
+        """Generate a triclinic lattice with lattice parameters \
+            :math:`a, c`."""
+        return cls(a=a, b=a, c=c, alpha=90, beta=90, gamma=90)
+
+    @classmethod
+    def hexagonal(cls, a, c):
+        """Generate a triclinic lattice with lattice parameters \
+            :math:`a, c`."""
+        return cls(a=a, b=a, c=c, alpha=90, beta=90, gamma=120)
+
 
 class ReciprocalLattice(DirectLatticeMixin, UnitCellMixin):
     def __init__(self, a_star=None, b_star=None, c_star=None,
@@ -554,6 +590,51 @@ class ReciprocalLattice(DirectLatticeMixin, UnitCellMixin):
     def reciprocal_lattice(self):
         """`ReciprocalLattice` reciprocal lattice."""
         return CrystalLattice(cell_matrix=np.linalg.inv(self.cell_matrix))
+
+    @classmethod
+    def cubic(cls, a_star):
+        """Generate a cubic lattice with lattice parameter \
+            :math:`a`."""
+        return cls(a_star=a_star, b_star=a_star, c_star=a_star,
+                   alpha_star=90, beta_star=90, gamma_star=90)
+
+    @classmethod
+    def triclinic(cls, a_star, b_star, c_star,
+                  alpha_star, beta_star, gamma_star):
+        """Generate a triclinic lattice with lattice parameters \
+            :math:`a, b, c, \\alpha, \\beta, \\gamma`."""
+        return cls(a_star=a_star, b_star=b_star, c_star=c_star,
+                   alpha_star=alpha_star, beta_star=beta_star,
+                   gamma_star=gamma_star)
+
+    @classmethod
+    def monoclinic(cls, a_star, b_star, c_star, beta_star):
+        """Generate a triclinic lattice with lattice parameters \
+            :math:`a, b, c, \\beta`."""
+        return cls(a_star=a_star, b_star=b_star, c_star=c_star,
+                   alpha_star=90, beta_star=beta_star, gamma_star=90)
+
+    @classmethod
+    def orthorhombic(cls, a_star, b_star, c_star):
+        """Generate a triclinic lattice with lattice parameters \
+            :math:`a, b, c`."""
+        return cls(a_star=a_star, b=b_star, c_star=c_star,
+                   alpha_star=90, beta_star=90, gamma_star=90)
+
+    @classmethod
+    def tetragonal(cls, a_star, c_star):
+        """Generate a triclinic lattice with lattice parameters \
+            :math:`a, c`."""
+        return cls(a_star=a_star, b=a_star, c_star=c_star,
+                   alpha_star=90, beta_star=90, gamma_star=90)
+
+    @classmethod
+    def hexagonal(cls, a_star, c_star):
+        """Generate a triclinic lattice with lattice parameters \
+            :math:`a, c`."""
+        return cls(a_star=a_star, b=a_star, c_star=c_star,
+                   alpha_star=90, beta_star=90, gamma_star=120)
+
 
 
 class CrystalStructure:
