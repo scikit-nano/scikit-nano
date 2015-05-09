@@ -7,40 +7,35 @@ import nose
 from nose.tools import *
 import numpy as np
 
-from sknano.core.crystallography import CrystalLattice, \
+from sknano.core.crystallography import CrystalLattice, ReciprocalLattice, \
     CrystalStructure
 from sknano.core.atoms import Atom, Atoms, XAtom, XAtoms
 from sknano.core.math import Point
 
 
-def test_crystal_lattice():
+def test_instantiation():
     lattice = CrystalLattice()
     assert_is_instance(lattice, CrystalLattice)
 
 
-def test_crystal_structure():
-    xtal = CrystalStructure(None)
-    assert_is_instance(xtal, CrystalStructure)
-
-
-def test3():
+def test1():
     xtal = CrystalLattice(a=4.0, b=8.0, c=2.0, alpha=90,
                           beta=90, gamma=120)
     print(xtal)
 
 
-def test4():
-    xtal = CrystalStructure(basis=XAtoms(atoms=[XAtom('Au'), XAtom('Au')]),
-                            a=4.0, b=8.0, c=2.0, alpha=90,
-                            beta=90, gamma=120)
-    print(xtal)
+# def test4():
+#     xtal = CrystalStructure(basis=XAtoms(atoms=[XAtom('Au'), XAtom('Au')]),
+#                             a=4.0, b=8.0, c=2.0, alpha=90,
+#                             beta=90, gamma=120)
+#     print(xtal)
 
 
-def test5():
-    xtal = CrystalStructure(basis=XAtom(element='Au'),
-                            a=4.0, b=8.0, c=2.0, alpha=90,
-                            beta=90, gamma=120)
-    print(xtal)
+# def test5():
+#     xtal = CrystalStructure(basis=XAtom(element='Au'),
+#                             a=4.0, b=8.0, c=2.0, alpha=90,
+#                             beta=90, gamma=120)
+#     print(xtal)
 
 
 def test6():
