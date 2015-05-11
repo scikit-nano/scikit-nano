@@ -40,7 +40,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from ._base import *
+from ._mixins import *
 from ._lattices import *
 from ._structures import *
 
