@@ -1,0 +1,83 @@
+2D:
+    crystal_families:
+        oblique:
+            symbol: m
+            crystal_system:
+                oblique:
+                    point_groups: ['1', '2']
+                    restrictions: null
+                    cell_parameters: [a, b, gamma]
+                    bravais_lattices: [mp]
+                rectangular:
+                    point_groups: [m, 2mm]
+                    restrictions: {
+                        gamma: 90
+                    }
+                    cell_parameters: [a, b]
+                    bravais_lattices: [op, oc]
+                square:
+                    point_groups: ['4', 4mm]
+                    restrictions: {
+                        a: b,
+                        b: a
+                    }
+    lattice_types:
+        p:
+            centering_type: primitive,
+            lattice_points:
+                - [0, 0]
+        c:
+            centering_type: centered,
+            lattice_points:
+                - [0, 0]
+                - [1/2, 1/2]
+        h:
+            centering_type: hexagonally centered,
+            lattice_points:
+                - [0, 0]
+                - [2/3, 1/3]
+                - [1/3, 2/3]
+3D:
+    crystal_families:
+        triclinic:
+            symbol: a
+            crystal_system:
+                triclinic:
+    lattice_types:
+        P:
+            centering_type: primitive,
+            lattice_points:
+                - [0, 0, 0]
+        I:
+            centering_type: body-centered,
+            lattice_points:
+                - [0, 0, 0]
+                - [1/2, 1/2, 1/2]
+        F:
+            centering_type: face-centered,
+            lattice_points:
+                - [0, 0, 0]
+                - [1/2, 1/2, 0]
+                - [0, 1/2, 1/2]
+                - [1/2, 0, 1/2]
+        C:
+            centering_type: C-centered,
+            lattice_points:
+                 - [0, 0, 0]
+                 - [1/2, 1/2, 0]
+        A:
+            centering_type: A-centered,
+            lattice_points:
+                - [0, 0, 0]
+                - [0, 1/2, 1/2]
+        B:
+            centering_type: B-centered,
+            lattice_points:
+                - [0, 0, 0]
+                - [1/2, 0, 1/2]
+        R:
+            centering_type: rhombohedrally centered,
+            lattice_points:
+                - [0, 0, 0]
+                - [2/3, 1/3, 1/3]
+                - [1/3, 2/3, 2/3]
