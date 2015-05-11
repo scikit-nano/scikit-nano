@@ -75,11 +75,11 @@ class GeometricRegion(with_metaclass(ABCMeta, object)):
         self.limits = {'x': {'min': -np.inf, 'max': np.inf},
                        'y': {'min': -np.inf, 'max': np.inf},
                        'z': {'min': -np.inf, 'max': np.inf}}
-        self.pstr = ""
+        self.fmtstr = ""
 
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__,
-                               self.pstr.format(**self.pdict()))
+                               self.fmtstr.format(**self.todict()))
 
     @abstractproperty
     def centroid(self):
@@ -92,6 +92,6 @@ class GeometricRegion(with_metaclass(ABCMeta, object)):
         raise NotImplementedError
 
     @abstractmethod
-    def pdict(self):
+    def todict(self):
         """Return `dict` of `__init__` parameters."""
         raise NotImplementedError
