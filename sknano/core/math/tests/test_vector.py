@@ -11,7 +11,7 @@ from nose.tools import *
 import numpy as np
 
 from sknano.core.math import e1, e2, e3, xhat, yhat, zhat, \
-    Point, Vector, vector as vec
+    Point, Vector, vector as vec, Rx, Ry, Rz
 
 
 def test1():
@@ -456,8 +456,7 @@ def test30():
     u = Vector([5, 0, 0])
     v = u.copy()
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore')
+    with assert_raises(TypeError):
         v /= v
 
     assert_equal(u, v)
@@ -470,8 +469,7 @@ def test31():
     u = Vector([5, 0, 0])
     v = u.copy()
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore')
+    with assert_raises(TypeError):
         v //= v
 
     assert_equal(u, v)
@@ -484,8 +482,7 @@ def test32():
     u = Vector([5, 0, 0])
     v = u.copy()
 
-    with warnings.catch_warnings():
-        warnings.filterwarnings('ignore')
+    with assert_raises(TypeError):
         v **= v
 
     assert_equal(u, v)
@@ -534,6 +531,16 @@ def test34():
     assert_equal(e1.angle(e1), 0.0)
     assert_equal(e1.angle(e2), np.pi/2)
     assert_equal(e1.angle(-e1), np.pi)
+
+
+def test35():
+    v0 = Vector(np.arange(3) + 2)
+    I = np.identity(3)
+    v1 = Vector((v0.row_matrix * I).A.flatten(), p0=v0.p0)
+    v2 = Vector((I * v0.column_matrix).A.flatten(), p0=v0.p0)
+
+    assert_true(np.allclose(v0, v1))
+    assert_true(np.allclose(v0, v2))
 
 
 if __name__ == '__main__':
