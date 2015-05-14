@@ -80,14 +80,8 @@ class Vector(np.ndarray):
 
     """
     __array_priority__ = 15.0
-    _verbosity = 0
 
     def __new__(cls, v=None, nd=None, p0=None, p=None, dtype=None, copy=True):
-        if Vector._verbosity > 0:
-            print('In Vector.__new__\n'
-                  'cls: {}\n'.format(cls) +
-                  'v: {}\n'.format(v) +
-                  'type(v): {}\n'.format(type(v)))
 
         if isinstance(v, Vector):
 
@@ -156,30 +150,6 @@ class Vector(np.ndarray):
             return None
 
         self.nd = len(self)
-        if Vector._verbosity > 2:
-            print('In Vector.__array_finalize__\n'
-                  'self: {}\n'.format(self) +
-                  'type(self): {}\n'.format(type(self)) +
-                  'obj: {}\n'.format(obj) +
-                  'type(obj): {}\n'.format(type(obj)))
-            try:
-                print('In Vector.__array_finalize__\n'
-                      'self: {}\n'.format(self) +
-                      'type(self): {}\n'.format(type(self)) +
-                      'self.p: {}\n'.format(self.p) +
-                      'type(self.p): {}\n'.format(type(self.p)) +
-                      'self.p0: {}\n'.format(self.p0) +
-                      'type(self.p0): {}\n'.format(type(self.p0)) +
-                      'obj: {}\n'.format(obj) +
-                      'type(obj): {}\n'.format(type(obj)) +
-                      'obj.p: {}\n'.format(obj.p) +
-                      'type(obj.p): {}\n'.format(type(obj.p)) +
-                      'obj.p0: {}\n'.format(obj.p0) +
-                      'type(obj.p0): {}\n'.format(type(obj.p0)) +
-                      'obj.shape: {}\n'.format(obj.shape))
-            except AttributeError:
-                pass
-
         self._p0 = getattr(obj, 'p0', None)
         self._p = getattr(obj, 'p', None)
         if self._p0 is not None and self._p is None:
@@ -192,14 +162,6 @@ class Vector(np.ndarray):
                     pass
 
     # def __array_prepare__(self, obj, context=None):
-    #     if Vector._verbosity > 2:
-    #         print('In Vector.__array_prepare__\n'
-    #               'self: {}\n'.format(self) +
-    #               'type(self): {}\n'.format(type(self)) +
-    #               'obj: {}\n'.format(obj) +
-    #               'type(obj): {}\n'.format(type(obj)) +
-    #               'context: {}\n'.format(context))
-
     #     if self.__array_priority__ >= Vector.__array_priority__:
     #         res = obj if isinstance(obj, type(self)) else obj.view(type(self))
     #     else:
@@ -233,10 +195,6 @@ class Vector(np.ndarray):
         return [float("{:.6f}".format(i)) for i in self.__array__().tolist()]
 
     def __getattr__(self, name):
-        if Vector._verbosity > 4:
-            print('In Vector.__getattr__\n'
-                  'self: {}\n'.format(self.__array__()) +
-                  'name: {}\n'.format(name))
         try:
             nd = len(self)
             if nd == 2 and name in ('x', 'y'):
@@ -256,16 +214,6 @@ class Vector(np.ndarray):
         return super(Vector, self).__getattribute__(name)
 
     def __setattr__(self, name, value):
-        if Vector._verbosity > 3:
-            try:
-                print('In Vector.__setattr__\n'
-                      'self: {}\n'.format(self) +
-                      'type(self): {}\n'.format(type(self)) +
-                      'name: {}\n'.format(name) +
-                      'value: {}\n'.format(value))
-            except TypeError:
-                pass
-
         # nd = len(self)
         nd = getattr(self, 'nd', None)
 
