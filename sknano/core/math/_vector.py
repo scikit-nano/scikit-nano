@@ -384,7 +384,7 @@ class Vector(np.ndarray):
         return not (self < other)
 
     def __ne__(self, other):
-        return not self == other
+        return not (self == other)
 
     def __mul__(self, other):
         if isinstance(other, numbers.Number):
