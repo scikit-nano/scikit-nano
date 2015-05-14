@@ -210,58 +210,8 @@ class Vector(np.ndarray):
     #     return super(Vector, self).__array_prepare__(obj, context)
 
     def __array_wrap__(self, obj, context=None):
-        if Vector._verbosity > 2:
-            try:
-                print('In Vector.__array_wrap__\n'
-                      'self: {}\n'.format(self) +
-                      'type(self): {}\n'.format(type(self)) +
-                      'self.p: {}\n'.format(self.p) +
-                      'type(self.p): {}\n'.format(type(self.p)) +
-                      'self.p0: {}\n'.format(self.p0) +
-                      'type(self.p0): {}\n'.format(type(self.p0)) +
-                      'obj: {}\n'.format(obj) +
-                      'type(obj): {}\n'.format(type(obj)) +
-                      'obj.p: {}\n'.format(obj.p) +
-                      'type(obj.p): {}\n'.format(type(obj.p)) +
-                      'obj.p0: {}\n'.format(obj.p0) +
-                      'type(obj.p0): {}\n'.format(type(obj.p0)) +
-                      'context: {}\n'.format(context))
-            except TypeError:
-                pass
-
-        # if obj.shape == ():
-        #     return obj[()]
-        # else:
-
         res = np.ndarray.__array_wrap__(self, obj, context)
-        res = Vector(res.__array__(), p0=self.p0)
-        # res.p = self.p
-        # res = Vector(p0=self.p0, p=self.p)
-        # res = Vector(res.__array__())
-
-        if Vector._verbosity > 0:
-            print('In Vector.__array_wrap__\n'
-                  'self: {}\n'.format(self) +
-                  'type(self): {}\n'.format(type(self)) +
-                  'self.p: {}\n'.format(self.p) +
-                  'type(self.p): {}\n'.format(type(self.p)) +
-                  'self.p0: {}\n'.format(self.p0) +
-                  'type(self.p0): {}\n'.format(type(self.p0)) +
-                  'obj: {}\n'.format(obj) +
-                  'type(obj): {}\n'.format(type(obj)) +
-                  'obj.p: {}\n'.format(obj.p) +
-                  'type(obj.p): {}\n'.format(type(obj.p)) +
-                  'obj.p0: {}\n'.format(obj.p0) +
-                  'type(obj.p0): {}\n'.format(type(obj.p0)) +
-                  'res: {}\n'.format(res) +
-                  'type(res): {}\n'.format(type(res)) +
-                  'res.p: {}\n'.format(res.p) +
-                  'type(res.p): {}\n'.format(type(res.p)) +
-                  'res.p0: {}\n'.format(res.p0) +
-                  'type(res.p0): {}\n'.format(type(res.p0)) +
-                  'context: {}\n'.format(context))
-        # return super(Vector, self).__array_wrap__(obj, context)
-        return res
+        return self.__class__(res.__array__(), p0=self.p0)
 
     def __str__(self):
         return repr(self)
