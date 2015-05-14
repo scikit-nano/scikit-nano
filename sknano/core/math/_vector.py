@@ -24,25 +24,13 @@ from ._transforms import rotate, transformation_matrix
 __all__ = ['Vector', 'angle', 'cross', 'dot', 'scalar_triple_product',
            'vector_triple_product', 'scalar_projection', 'vector_projection',
            'vector_rejection', 'projection', 'rejection',
-           '_check_vector_compatibility', '_vector_math_warning_message']
+           '_check_vector_compatibility']
 
 
 def _check_vector_compatibility(v1, v2):
     if len(v1) != len(v2):
         raise ValueError("{!r} and {!r} must have same number "
                          "of components".format(v1, v2))
-
-
-def _vector_math_warning_message(operation, *args):
-    msg = "Undefined mathematical operation:\n"
-    if len(args) == 1:
-        msg += "{} of a Vector by {!r}".format(operation, args[0])
-    elif len(args) == 2:
-        msg += "{} of {!r} by {!r}".format(operation, args[0], args[-1])
-    else:
-        msg += "{} of a Vector by a Vector".format(operation)
-
-    return msg
 
 
 class Vector(np.ndarray):
@@ -285,145 +273,90 @@ class Vector(np.ndarray):
         return not (self == other)
 
     def __mul__(self, other):
-        if isinstance(other, numbers.Number):
-            return Vector(other * self.__array__(), p0=self.p0)
-        elif isinstance(other, Vector):
+        if np.isscalar(other):
+            return self.__class__(self.__array__() * other, p0=self.p0)
+        elif isinstance(other, Vector) and other.nd == self.nd:
             print("Computing *scalar product* of Vector's:\n"
                   "{!r}\n{!r}".format(self, other))
             return self.dot(other)
-        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
-        #         isinstance(other[0], numbers.Number):
-        #     return self * other[0]
-        else:
-            warnings.warn(_vector_math_warning_message(
-                'multiplication', other), UserWarning)
-            return self
+        elif isinstance(other, np.matrix):
+            res = self.row_matrix * other
+            if len(self) == res.shape[1]:
+                return self.__class__(res.A.flatten(), p0=self.p0)
+            elif res.shape == (1, 1):
+                return res.A.flatten()[0]
+        return NotImplemented
 
-    __rmul__ = __mul__
+    def __rmul__(self, other):
+        if np.isscalar(other):
+            return self.__class__(other * self.__array__(), p0=self.p0)
+        elif isinstance(other, np.matrix):
+            res = other * self.column_matrix
+            if len(self) == res.shape[0]:
+                return self.__class__(res.A.flatten(), p0=self.p0)
+            elif res.shape == (1, 1):
+                return res.A.flatten()[0]
+        return NotImplemented
 
     def __truediv__(self, other):
-        if isinstance(other, numbers.Number):
+        if np.isscalar(other):
             return Vector(self.__array__() / other, p0=self.p0)
-        elif isinstance(other, Vector):
-            warnings.warn(_vector_math_warning_message('division'),
-                          UserWarning)
-            return self
-        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
-        #         isinstance(other[0], numbers.Number):
-        #     return self / other[0]
-        else:
-            warnings.warn(_vector_math_warning_message(
-                'division', other), UserWarning)
-            return self
+        return NotImplemented
 
     __div__ = __truediv__
 
     def __floordiv__(self, other):
-        if isinstance(other, numbers.Number):
+        if np.isscalar(other):
             return Vector(self.__array__() // other, p0=self.p0)
-        elif isinstance(other, Vector):
-            warnings.warn(_vector_math_warning_message('division'),
-                          UserWarning)
-            return self
-        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
-        #         isinstance(other[0], numbers.Number):
-        #     return self // other[0]
-        else:
-            warnings.warn(_vector_math_warning_message(
-                'division', other), UserWarning)
-            return self
+        return NotImplemented
 
-    def __pow__(self, other):
+    def __pow__(self, other, *modulo):
         if isinstance(other, numbers.Number):
             return Vector(self.__array__() ** other, p0=self.p0)
-        elif isinstance(other, Vector):
-            warnings.warn(_vector_math_warning_message(
-                'exponentiation'), UserWarning)
-            return self
-        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
-        #         isinstance(other[0], numbers.Number):
-        #     return self ** other[0]
-        else:
-            warnings.warn(_vector_math_warning_message(
-                'exponentiation', other), UserWarning)
-            return self
+        return NotImplemented
 
     def __iadd__(self, other):
         """Add other to self in-place."""
-        super(Vector, self).__iadd__(other)
+        super().__iadd__(other)
         self._update_p()
         return self
 
     def __isub__(self, other):
         """Subtract other from self in-place."""
-        super(Vector, self).__isub__(other)
+        super().__isub__(other)
         self._update_p()
         return self
 
     def __imul__(self, other):
         """Multiply self by other in-place."""
-        if isinstance(other, numbers.Number):
-            super(Vector, self).__imul__(other)
+        if np.isscalar(other):
+            super().__imul__(other)
             self._update_p()
-        elif isinstance(other, Vector):
-            try:
-                self = self.dot(other)
-            except ValueError as e:
-                print(e)
-        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
-        #         isinstance(other[0], numbers.Number):
-        #     self *= other[0]
-        else:
-            warnings.warn(_vector_math_warning_message(
-                'multiplication', other), UserWarning)
-        return self
+            return self
+        return NotImplemented
 
     def __itruediv__(self, other):
-        if isinstance(other, numbers.Number):
-            super(Vector, self).__itruediv__(other)
+        if np.isscalar(other):
+            super().__itruediv__(other)
             self._update_p()
-        elif isinstance(other, Vector):
-            warnings.warn(_vector_math_warning_message('division'),
-                          UserWarning)
-        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
-        #         isinstance(other[0], numbers.Number):
-        #     self /= other[0]
-        else:
-            warnings.warn(_vector_math_warning_message(
-                'division', other), UserWarning)
-        return self
+            return self
+        return NotImplemented
 
     __idiv__ = __itruediv__
 
     def __ifloordiv__(self, other):
-        if isinstance(other, numbers.Number):
-            super(Vector, self).__ifloordiv__(other)
+        if np.isscalar(other):
+            super().__ifloordiv__(other)
             self._update_p()
-        elif isinstance(other, Vector):
-            warnings.warn(_vector_math_warning_message('division'),
-                          UserWarning)
-        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
-        #         isinstance(other[0], numbers.Number):
-        #     self //= other[0]
-        else:
-            warnings.warn(_vector_math_warning_message(
-                'division', other), UserWarning)
-        return self
+            return self
+        return NotImplemented
 
     def __ipow__(self, other):
-        if isinstance(other, numbers.Number):
-            super(Vector, self).__ipow__(other)
+        if np.isscalar(other):
+            super().__ipow__(other)
             self._update_p()
-        elif isinstance(other, Vector):
-            warnings.warn(_vector_math_warning_message(
-                'exponentiation'), UserWarning)
-        # elif isinstance(other, np.ndarray) and len(other) == 1 and \
-        #         isinstance(other[0], numbers.Number):
-        #     self **= other[0]
-        else:
-            warnings.warn(_vector_math_warning_message(
-                'exponentiation', other), UserWarning)
-        return self
+            return self
+        return NotImplemented
 
     # def __copy__(self):
     #    pass
