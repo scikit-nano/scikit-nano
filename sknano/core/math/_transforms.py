@@ -18,7 +18,7 @@ from itertools import combinations
 import numpy as np
 
 __all__ = ['rotate', 'Rx', 'Ry', 'Rz', 'rotation_matrix',
-           'reflection_matrix', 'scaling_matrix',
+           'reflection_matrix', 'scaling_matrix', 'translation_matrix',
            'transformation_matrix', 'axis_angle_from_rotation_matrix']
 
 I = np.identity(4)
@@ -240,7 +240,7 @@ def Rz(angle, degrees=False):
 
 def reflection_matrix(v):
     """Generate reflection matrix that represents reflection of points \
-        in a mirror normal to the vector `v`.
+        in a mirror plane defined by normal `Vector` `v`.
 
     Parameters
     ----------
@@ -341,7 +341,7 @@ def scaling_matrix(s=None, v=None):
         from ._vector import Vector
         v = Vector(v)
 
-        Smat = np.zeros((v.nd, v.nd))
+        Smat = np.zeros((v.nd + 1, v.nd + 1))
         for i in range(v.nd):
             Smat[i, i] = 1 + (s - 1) * v[i]**2 / v.norm**2
 
@@ -350,6 +350,28 @@ def scaling_matrix(s=None, v=None):
 
         Smat[np.where(np.abs(Smat) <= np.finfo(float).eps)] = 0.0
         return Smat
+
+
+def translation_matrix(v):
+    """Generate :math:`4\\times4` translation matrix given 3D translation \
+        `Vector` `v`.
+
+    Parameters
+    ----------
+    v : `Vector`
+        Translation vector.
+
+    Returns
+    -------
+    M : :class:`~numpy:numpy.matrix`
+        Translation matrix
+    """
+    from . import Vector
+    v = Vector(v)
+    nd = v.nd
+    M = np.identity(nd + 1)
+    M[:nd, nd] = v[:nd]
+    return np.asmatrix(M)
 
 
 def transformation_matrix(angle=None, axis=None, anchor_point=None,
