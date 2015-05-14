@@ -279,23 +279,23 @@ class Vector(np.ndarray):
             print("Computing *scalar product* of Vector's:\n"
                   "{!r}\n{!r}".format(self, other))
             return self.dot(other)
-        elif isinstance(other, np.matrix):
-            res = self.row_matrix * other
-            if len(self) == res.shape[1]:
-                return self.__class__(res.A.flatten(), p0=self.p0)
-            elif res.shape == (1, 1):
-                return res.A.flatten()[0]
+        # elif isinstance(other, np.matrix):
+        #     res = self.row_matrix * other
+        #     if len(self) == res.shape[1]:
+        #         return self.__class__(res.A.flatten(), p0=self.p0)
+        #     elif res.shape == (1, 1):
+        #         return res.A.flatten()[0]
         return NotImplemented
 
     def __rmul__(self, other):
         if np.isscalar(other):
             return self.__class__(other * self.__array__(), p0=self.p0)
-        elif isinstance(other, np.matrix):
-            res = other * self.column_matrix
-            if len(self) == res.shape[0]:
-                return self.__class__(res.A.flatten(), p0=self.p0)
-            elif res.shape == (1, 1):
-                return res.A.flatten()[0]
+        # elif isinstance(other, np.matrix):
+        #     res = other * self.column_matrix
+        #     if len(self) == res.shape[0]:
+        #         return self.__class__(res.A.flatten(), p0=self.p0)
+        #     elif res.shape == (1, 1):
+        #         return res.A.flatten()[0]
         return NotImplemented
 
     def __truediv__(self, other):
