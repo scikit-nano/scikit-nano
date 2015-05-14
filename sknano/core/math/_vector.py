@@ -403,7 +403,7 @@ class Vector(np.ndarray):
 
     __rmul__ = __mul__
 
-    def __div__(self, other):
+    def __truediv__(self, other):
         if isinstance(other, numbers.Number):
             return Vector(self.__array__() / other, p0=self.p0)
         elif isinstance(other, Vector):
@@ -418,7 +418,7 @@ class Vector(np.ndarray):
                 'division', other), UserWarning)
             return self
 
-    __truediv__ = __div__
+    __div__ = __truediv__
 
     def __floordiv__(self, other):
         if isinstance(other, numbers.Number):
@@ -480,7 +480,7 @@ class Vector(np.ndarray):
                 'multiplication', other), UserWarning)
         return self
 
-    def __idiv__(self, other):
+    def __itruediv__(self, other):
         if isinstance(other, numbers.Number):
             super(Vector, self).__itruediv__(other)
             self._update_p()
@@ -495,7 +495,7 @@ class Vector(np.ndarray):
                 'division', other), UserWarning)
         return self
 
-    __itruediv__ = __idiv__
+    __idiv__ = __itruediv__
 
     def __ifloordiv__(self, other):
         if isinstance(other, numbers.Number):
