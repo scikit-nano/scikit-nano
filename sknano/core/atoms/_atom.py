@@ -76,9 +76,6 @@ class Atom(object):
         """Test if `self` is *less than* `other`."""
         return self.Z < other.Z
 
-    #def __mul__(self, other):
-    #    """Multiply atom
-
     def __dir__(self):
         return ['element', 'Z', 'mass']
 
