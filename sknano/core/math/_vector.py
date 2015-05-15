@@ -24,6 +24,7 @@ from ._transforms import rotate, transformation_matrix
 __all__ = ['Vector', 'angle', 'cross', 'dot', 'scalar_triple_product',
            'vector_triple_product', 'scalar_projection', 'vector_projection',
            'vector_rejection', 'projection', 'rejection',
+           'e1', 'e2', 'e3', 'xhat', 'yhat', 'zhat',
            '_check_vector_compatibility']
 
 
@@ -673,3 +674,7 @@ def vector_rejection(a, b):
     return a - a1
 
 rejection = vector_rejection
+
+e1 = xhat = Vector([1, 0, 0])
+e2 = yhat = Vector([0, 1, 0])
+e3 = zhat = Vector([0, 0, 1])

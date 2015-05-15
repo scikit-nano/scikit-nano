@@ -15,17 +15,10 @@ __docformat__ = 'restructuredtext en'
 from fractions import gcd
 import operator
 
-from ._vector import Vector
-
-__all__ = ['e1', 'e2', 'e3', 'xhat', 'yhat', 'zhat',
-           'comparison_symbol_operator_mappings',
+__all__ = ['comparison_symbol_operator_mappings',
            'math_symbol_operator_mappings',
            'symbol_operator_mappings',
            'totient_func']
-
-e1 = xhat = Vector([1, 0, 0])
-e2 = yhat = Vector([0, 1, 0])
-e3 = zhat = Vector([0, 0, 1])
 
 symbol_operator_mappings = {}
 
