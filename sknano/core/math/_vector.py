@@ -170,7 +170,7 @@ class Vector(np.ndarray):
     def __repr__(self):
         try:
             if np.allclose(self.p0, np.zeros_like(self.p0)):
-                return "Vector({!r})".format(self.tolist)
+                return "Vector({!r})".format(self.tolist())
             else:
                 return "Vector({!r}, p0={!r}, p={!r})".format(
                     self.tolist(), self.p0.tolist(), self.p.tolist())
