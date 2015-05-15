@@ -95,4 +95,7 @@ from ._md_atom import *
 from ._md_atoms import *
 from ._trajectory import *
 
+from ._basis_atom import *
+from ._basis_atoms import *
+
 __all__ += [s for s in dir() if not s.startswith('_')]
