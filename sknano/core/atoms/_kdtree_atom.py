@@ -4,7 +4,7 @@
 Atom class for KDTree analysis (:mod:`sknano.core.atoms._kdtree_atom`)
 ===============================================================================
 
-An `XAtom` class for structure analysis.
+An `XAtom` sub-class for structure analysis.
 
 .. currentmodule:: sknano.core.atoms._kdtree_atom
 
@@ -13,15 +13,13 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-import sknano.core.atoms
-from ._bond import Bond
-from ._bonds import Bonds
 from ._extended_atom import XAtom
+from ._mixins import NNAtomMixin
 
 __all__ = ['KDTAtom']
 
 
-class KDTAtom(XAtom):
+class KDTAtom(XAtom, NNAtomMixin):
     """An `Atom` class for KDTree analysis."""
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -35,34 +33,11 @@ class KDTAtom(XAtom):
     def CN(self):
         """`KDTAtom` coordination number."""
         try:
-            return self.NN.Natoms
+            return super().NN.Natoms
         except AttributeError:
             return super().CN
 
-    @property
-    def NN(self):
-        """Nearest-neighbor `Atoms`."""
-        try:
-            return self._NN
-        except AttributeError:
-            return None
-
-    @NN.setter
-    def NN(self, value):
-        """Set nearest-neighbor `Atoms`."""
-        if not isinstance(value, sknano.core.atoms.Atoms):
-            raise TypeError('Expected an `Atoms` object.')
-        self._NN = value
-
-    @property
-    def bonds(self):
-        """Return atom `Bonds` instance."""
-        try:
-            return Bonds(bonds=[Bond(self, nn) for nn in self.NN])
-        except (AttributeError, TypeError):
-            return Bonds()
-
-    #def todict(self):
+    # def todict(self):
     #    return dict(element=self.element, id=self.id,
     #                mol=self.mol, type=self.type,
     #                q=self.q, mass=self.mass,
