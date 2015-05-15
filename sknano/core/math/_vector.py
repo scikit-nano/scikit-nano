@@ -170,18 +170,17 @@ class Vector(np.ndarray):
     def __repr__(self):
         try:
             if np.allclose(self.p0, np.zeros_like(self.p0)):
-                return "Vector({!r})".format(self.plist)
+                return "Vector({!r})".format(self.tolist)
             else:
                 return "Vector({!r}, p0={!r}, p={!r})".format(
-                    self.plist, self.p0.plist, self.p.plist)
+                    self.tolist(), self.p0.tolist(), self.p.tolist())
         except AttributeError:
-            return "Vector({!r})".format(self.plist)
+            return "Vector({!r})".format(self.tolist())
 
-    @property
-    def plist(self):
+    def tolist(self):
         """List of `Vector` coordinates with values formatted for *pretty* \
             output."""
-        return [float("{:.6f}".format(i)) for i in self.__array__().tolist()]
+        return np.around(self.__array__(), decimals=6).tolist()
 
     def __getattr__(self, name):
         try:

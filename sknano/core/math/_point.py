@@ -87,12 +87,11 @@ class Point(np.ndarray):
         return repr(self)
 
     def __repr__(self):
-        return "Point({!r})".format(self.plist)
+        return "Point({!r})".format(self.tolist())
 
-    @property
-    def plist(self):
+    def tolist(self):
         """List of `Point` coordinates formatted for *pretty* output."""
-        return [float("{:.6f}".format(i)) for i in self.__array__().tolist()]
+        return np.around(self.__array__(), decimals=6).tolist()
 
     def __getattr__(self, name):
         try:
