@@ -65,10 +65,10 @@ class POAV(object):
         self._misalignment_angles = None
 
     def __str__(self):
-        strrep = '{}\n=====\n'.format(self.__class__.__name__)
+        fmtstr = '{}\n=====\n'.format(self.__class__.__name__)
         for k, v in list(self.todict(rad2deg=True).items()):
-            strrep += '{}: {}\n'.format(k, v)
-        return strrep
+            fmtstr += '{}: {}\n'.format(k, v)
+        return fmtstr
 
     def __repr__(self):
         return '{!r}({!r})'.format(self.__class__.__name__, self.bonds)

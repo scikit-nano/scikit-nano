@@ -166,43 +166,43 @@ class SWNT(SWNTMixin, StructureBase):
 
     def __str__(self):
         """Return nice string representation of `SWNT`."""
-        strrep = repr(self)
+        fmtstr = repr(self)
         if self.verbose:
-            strrep += '\n'
+            fmtstr += '\n'
             for attr in self._structure_attrs:
                 var = attr
                 if attr in attr_symbols:
                     var = attr_symbols[attr]
                 if attr in attr_strfmt:
                     if attr in attr_units:
-                        strrep += \
+                        fmtstr += \
                             "{}: {}{}\n".format(
                                 var, attr_strfmt[attr].format(
                                     getattr(self, attr)), attr_units[attr])
                     else:
-                        strrep += "{}: {}\n".format(
+                        fmtstr += "{}: {}\n".format(
                             var, attr_strfmt[attr].format(getattr(self, attr)))
                 else:
                     if attr in attr_units:
-                        strrep += "{}: {}{}\n".format(
+                        fmtstr += "{}: {}{}\n".format(
                             var, getattr(self, attr), attr_units[attr])
                     else:
-                        strrep += "{}: {}\n".format(
+                        fmtstr += "{}: {}\n".format(
                             var, getattr(self, attr))
 
-        return strrep
+        return fmtstr
 
     def __repr__(self):
         """Return canonical string representation of `SWNT`."""
-        strrep = "SWNT({!r}, element1={!r}, element2={!r}, bond={!r}"
+        fmtstr = "SWNT({!r}, element1={!r}, element2={!r}, bond={!r}"
         Ch = (self.n, self.m)
         if self.fix_Lz:
-            strrep += ", Lz={!r}, fix_Lz={!r})"
-            return strrep.format(Ch, self.element1, self.element2,
+            fmtstr += ", Lz={!r}, fix_Lz={!r})"
+            return fmtstr.format(Ch, self.element1, self.element2,
                                  self.bond, self.Lz, self.fix_Lz)
         else:
-            strrep += ", nz={!r})"
-            return strrep.format(Ch, self.element1, self.element2,
+            fmtstr += ", nz={!r})"
+            return fmtstr.format(Ch, self.element1, self.element2,
                                  self.bond, self.nz)
 
     def todict(self):

@@ -106,9 +106,9 @@ class MWNT(MWNTMixin, StructureBase):
 
     def __repr__(self):
         """Return canonical string representation of `MWNT`."""
-        strrep = "MWNT(Ch_list={!r}, Nwalls={!r}, Lz={!r}, " + \
+        fmtstr = "MWNT(Ch_list={!r}, Nwalls={!r}, Lz={!r}, " + \
             "element1={!r}, element2={!r}, bond={!r})"
-        return strrep.format(self.Ch_list, self.Nwalls, self.Lz,
+        return fmtstr.format(self.Ch_list, self.Nwalls, self.Lz,
                              self.element1, self.element2, self.bond)
 
     def todict(self):

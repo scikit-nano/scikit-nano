@@ -49,12 +49,12 @@ class Atom(object):
 
         self.element = element
 
-        self.strrep = "Atom(element={element!s})"
+        self.fmtstr = "Atom(element={element!s})"
 
     def __str__(self):
         """Return a nice string representation of `Atom`."""
         try:
-            return self.strrep.format(**self.todict())
+            return self.fmtstr.format(**self.todict())
         except KeyError:
             return repr(self)
 

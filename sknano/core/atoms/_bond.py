@@ -36,7 +36,7 @@ class Bond(object):
 
     def __str__(self):
         """Return nice string representation of `Bond`."""
-        #return strrep.format(self.atom1.element, self.atom2.element,
+        #return fmtstr.format(self.atom1.element, self.atom2.element,
         #                     self.vector, self.length)
         return "Bond({!r}->{!r})".format(self.atom1.id, self.atom2.id)
 
