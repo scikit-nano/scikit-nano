@@ -19,6 +19,7 @@ import numpy as np
 
 __all__ = ['rotate', 'Rx', 'Ry', 'Rz', 'rotation_matrix',
            'reflection_matrix', 'scaling_matrix', 'translation_matrix',
+           'translation_from_matrix',
            'transformation_matrix', 'axis_angle_from_rotation_matrix']
 
 I = np.identity(4)
@@ -372,6 +373,11 @@ def translation_matrix(v):
     M = np.identity(nd + 1)
     M[:nd, nd] = v[:nd]
     return np.asmatrix(M)
+
+
+def translation_from_matrix(M):
+    from . import Vector
+    return Vector(np.asarray(M)[:-1, -1])
 
 
 def transformation_matrix(angle=None, axis=None, anchor_point=None,

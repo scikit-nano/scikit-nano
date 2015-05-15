@@ -8,7 +8,8 @@ from nose.tools import *
 import numpy as np
 
 from sknano.core.math import Point, Vector, rotate, Rx, Ry, Rz, \
-    rotation_matrix, translation_matrix, transformation_matrix, \
+    rotation_matrix, translation_matrix, translation_from_matrix, \
+    transformation_matrix, \
     axis_angle_from_rotation_matrix
 
 
@@ -92,9 +93,10 @@ def test_axis_angle_from_rotation_matrix():
 
 
 def test_translation_matrix():
-    v = Vector([1, 1])
-    assert_equal(Vector(v),
-                 Vector(translation_matrix(v.tolist())[:v.nd, v.nd]))
+    for l in ([1, 1], [1, 1, 1]):
+        v = Vector(l)
+        assert_equal(v, Vector(translation_matrix(v.tolist())[:v.nd, v.nd]))
+        assert_equal(v, translation_from_matrix(translation_matrix(v)))
 
 
 if __name__ == '__main__':
