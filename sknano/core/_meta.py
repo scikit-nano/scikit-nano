@@ -24,7 +24,7 @@ import numpy as np
 from numpy.compat import formatargspec, getargspec
 
 __all__ = ['check_type', 'deprecated', 'get_object_signature', 'memoize',
-           'method_func', 'removed_package_warning',
+           'method_func', 'optional_debug', 'removed_package_warning',
            'timethis', 'typeassert', 'typed_property', 'with_doc',
            'make_sig', 'ClassSignature']
 
@@ -154,6 +154,16 @@ class method_func(object):
         # Still here ? OK, let's call the corresponding np function
         method = getattr(np, method_name)
         return method(a, *args, **params)
+
+
+def optional_debug(func):
+    """Decorator that adds an optional `debug` keyword argument."""
+    @wraps(func)
+    def wrapper(*args, debug=False, **kwargs):
+        if debug:
+            print('Calling', func.__name__)
+        return func(*args, **kwargs)
+    return wrapper
 
 
 def removed_package_warning(oldpkg, newpkg=None):
