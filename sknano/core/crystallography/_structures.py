@@ -29,7 +29,7 @@ from ._lattices import CrystalLattice
 
 __all__ = ['CrystalStructure', 'DiamondStructure',
            'HexagonalClosePackedStructure',
-           'CubicClosePackedStructure']
+           'CubicClosePackedStructure', 'pymatgen_structure']
 
 
 class CrystalStructure:
@@ -94,34 +94,43 @@ class CrystalStructure:
         pass
 
     @classmethod
-    def from_pymatgen(cls, *args, classmethod=None, **kwargs):
-        try:
-            from pymatgen import Structure
-        except ImportError as e:
-            print(e)
-        else:
-            constructor = None
-            if classmethod is None:
-                constructor = Structure
-            else:
-                constructor = getattr(Structure, classmethod, None)
-
-            pmg_sig = inspect.signature(constructor)
-            bound_sig = pmg_sig.bind(*args, **kwargs)
-            print(bound_sig.signature)
-            structure = constructor(*bound_sig.args, **bound_sig.kwargs)
-
-            atoms = Atoms()
-            for site in structure.sites:
-                atoms.append(Atom(element=site.specie.symbol,
-                                  x=site.x, y=site.y, z=site.z))
-            return cls(lattice=CrystalLattice(
-                       cell_matrix=structure.lattice.matrix),
-                       basis=atoms)
+    def from_pymatgen_structure(cls, structure):
+        atoms = Atoms()
+        for site in structure.sites:
+            atoms.append(Atom(element=site.specie.symbol,
+                              x=site.x, y=site.y, z=site.z))
+        return cls(lattice=CrystalLattice(
+                   cell_matrix=structure.lattice.matrix),
+                   basis=atoms)
 
     def todict(self):
         """Return `dict` of `CrystalStructure` parameters."""
         return dict(lattice=self.lattice, basis=self.basis)
+
+
+def pymatgen_structure(*args, classmethod=None, **kwargs):
+    try:
+        from pymatgen import Structure
+    except ImportError as e:
+        print(e)
+    else:
+        constructor = None
+        if classmethod is None:
+            constructor = Structure
+        else:
+            constructor = getattr(Structure, classmethod, None)
+
+        pmg_sig = inspect.signature(constructor)
+        bound_sig = pmg_sig.bind(*args, **kwargs)
+        return constructor(*bound_sig.args, **bound_sig.kwargs)
+
+        # atoms = Atoms()
+        # for site in structure.sites:
+        #     atoms.append(Atom(element=site.specie.symbol,
+        #                       x=site.x, y=site.y, z=site.z))
+        # return CrystalStructure(lattice=CrystalLattice(
+        #                         cell_matrix=structure.lattice.matrix),
+        #                         basis=atoms)
 
 
 class DiamondStructure(CrystalStructure):
