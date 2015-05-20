@@ -23,15 +23,15 @@ import inspect
 
 import numpy as np
 
-# from sknano.core.math import Point, Vector
+from sknano.core.math import Vector
 
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from ._lattices import CrystalLattice
 
 __all__ = ['CrystalStructure', 'DiamondStructure',
            'HexagonalClosePackedStructure',
-           'CubicClosePackedStructure', 'FCCStructure', 'Gold',
-           'Copper', 'pymatgen_structure']
+           'CubicClosePackedStructure', 'FCCStructure', 'HexagonalStructure',
+           'Gold', 'Copper', 'pymatgen_structure', 'AlphaQuartz']
 
 
 class CrystalStructure:
@@ -39,11 +39,19 @@ class CrystalStructure:
 
     def __init__(self, lattice=None, basis=None, coords=None, cartesian=False):
 
-        if basis is None:
-            self._atoms = Atoms()
-        elif basis is not None:
-            self._atoms = Atoms(atoms=basis)
+        atoms = None
 
+        if basis is None:
+            atoms = Atoms()
+        elif basis is not None:
+            atoms = Atoms(atoms=basis)
+            if coords is not None:
+                for atom, pos in zip(atoms, coords):
+                    if not cartesian:
+                        pos = lattice.fractional_to_cartesian(pos)
+                    atom.r = Vector(pos)
+
+        self._atoms = atoms
         self.lattice = lattice
         self.basis = basis
         self.fmtstr = "lattice={lattice!r}, basis={basis!r}"
@@ -105,6 +113,27 @@ class CrystalStructure:
                    cell_matrix=structure.lattice.matrix),
                    basis=atoms)
 
+    @classmethod
+    def from_spacegroup(cls, sg, lattice, basis, coords, scaling_matrix=None):
+        if not isinstance(basis, list):
+            basis = [basis]
+        if len(basis) != len(coords):
+            if isinstance(coords, list) and len(coords) != 0 and \
+                    isinstance(coords[0], (int, float)):
+                coords = [coords]
+                cls.from_spacegroup(sg, lattice, basis, coords,
+                                    scaling_matrix=scaling_matrix)
+
+        structure = \
+            pymatgen_structure(sg, lattice.cell_matrix, basis, coords,
+                               classmethod='from_spacegroup')
+        if scaling_matrix is not None and \
+                isinstance(scaling_matrix,
+                           (int, float, tuple, list, np.ndarray)):
+            structure.make_supercell(scaling_matrix)
+        structure = CrystalStructure.from_pymatgen_structure(structure)
+        return cls(lattice=structure.lattice, basis=structure.basis)
+
     def todict(self):
         """Return `dict` of `CrystalStructure` parameters."""
         return dict(lattice=self.lattice, basis=self.basis)
@@ -159,29 +188,55 @@ class CubicClosePackedStructure(CrystalStructure):
     pass
 
 
-class FCCStructure(CrystalStructure):
+class HexagonalStructure(CrystalStructure):
+    @classmethod
+    def from_spacegroup(cls, sg, a, c, basis, coords, scaling_matrix=None):
+        lattice = CrystalLattice.hexagonal(a, c)
+        # lattice = CrystalLattice(a=a, b=a, c=c, alpha=90, beta=90, gamma=60)
+        return CrystalStructure.from_spacegroup(sg, lattice, basis, coords,
+                                                scaling_matrix=scaling_matrix)
 
+
+class FCCStructure(CrystalStructure):
     @classmethod
     def from_spacegroup(cls, sg, a, basis, coords, scaling_matrix=None):
-        if not isinstance(basis, list):
-            basis = [basis]
-        if len(basis) != len(coords):
-            if isinstance(coords, list) and len(coords) != 0 and \
-                    isinstance(coords[0], (int, float)):
-                coords = [coords]
-                cls.from_spacegroup(sg, a, basis, coords,
-                                    scaling_matrix=scaling_matrix)
-
         lattice = CrystalLattice.cubic(a)
-        fcc = \
-            pymatgen_structure(sg, lattice.cell_matrix, basis, coords,
-                               classmethod='from_spacegroup')
+        return CrystalStructure.from_spacegroup(sg, lattice, basis, coords,
+                                                scaling_matrix=scaling_matrix)
+
+
+class AlphaQuartz(HexagonalStructure):
+    def __init__(self, a=4.916, c=5.405, scaling_matrix=None):
+        lattice = CrystalLattice.hexagonal(a, c)
+        basis = 3 * ["Si"]
+        basis.extend(6 * ["O"])
+        basis = Atoms(atoms=[Atom(element=s) for s in basis])
+        coords = [[0.4697, 0.0000, 0.0000],
+                  [0.0000, 0.4697, 0.6667],
+                  [0.5305, 0.5303, 0.3333],
+                  [0.4133, 0.2672, 0.1188],
+                  [0.2672, 0.4133, 0.5479],
+                  [0.7328, 0.1461, 0.7855],
+                  [0.5867, 0.8539, 0.2145],
+                  [0.8539, 0.5867, 0.4521],
+                  [0.1461, 0.7328, 0.8812]]
+        structure = pymatgen_structure(lattice.cell_matrix,
+                                       basis.symbols,
+                                       coords)
         if scaling_matrix is not None and \
                 isinstance(scaling_matrix,
                            (int, float, tuple, list, np.ndarray)):
-            fcc.make_supercell(scaling_matrix)
-        fcc = CrystalStructure.from_pymatgen_structure(fcc)
-        return cls(lattice=fcc.lattice, basis=fcc.basis)
+            structure.make_supercell(scaling_matrix)
+        structure = CrystalStructure.from_pymatgen_structure(structure)
+        super().__init__(structure.lattice, structure.basis)
+        # super().__init__(lattice, basis, coords)
+
+        # quartz = \
+        #     HexagonalStructure.from_spacegroup(154, a, c, ["Si", "O"],
+        #                                        [[0.4697, 0.0000, 0.0000],
+        #                                         [0.4135, 0.2669, 0.1191]],
+        #                                        scaling_matrix=scaling_matrix)
+        # super().__init__(quartz.lattice, quartz.basis)
 
 
 class Gold(FCCStructure):
