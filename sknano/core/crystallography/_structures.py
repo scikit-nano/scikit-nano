@@ -160,8 +160,6 @@ class CubicClosePackedStructure(CrystalStructure):
 
 
 class FCCStructure(CrystalStructure):
-    def __init__(self, lattice, basis):
-        super().__init__(lattice=lattice, basis=basis)
 
     @classmethod
     def from_spacegroup(cls, sg, a, basis, coords, scaling_matrix=None):
