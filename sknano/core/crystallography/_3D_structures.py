@@ -17,7 +17,6 @@ standard_library.install_aliases()
 
 __docformat__ = 'restructuredtext en'
 
-import inspect
 # import numbers
 # from abc import ABCMeta, abstractproperty
 
@@ -26,12 +25,13 @@ import numpy as np
 from sknano.core.math import Vector
 
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
-from ._lattices import CrystalLattice
+from ._3D_lattices import CrystalLattice
+from ._extras import pymatgen_structure
 
 __all__ = ['CrystalStructure', 'DiamondStructure',
            'HexagonalClosePackedStructure',
            'CubicClosePackedStructure', 'FCCStructure', 'HexagonalStructure',
-           'Gold', 'Copper', 'pymatgen_structure', 'AlphaQuartz']
+           'Gold', 'Copper', 'AlphaQuartz']
 
 
 class CrystalStructure:
@@ -137,31 +137,6 @@ class CrystalStructure:
     def todict(self):
         """Return `dict` of `CrystalStructure` parameters."""
         return dict(lattice=self.lattice, basis=self.basis)
-
-
-def pymatgen_structure(*args, classmethod=None, **kwargs):
-    try:
-        from pymatgen import Structure
-    except ImportError as e:
-        print(e)
-    else:
-        constructor = None
-        if classmethod is None:
-            constructor = Structure
-        else:
-            constructor = getattr(Structure, classmethod, None)
-
-        pmg_sig = inspect.signature(constructor)
-        bound_sig = pmg_sig.bind(*args, **kwargs)
-        return constructor(*bound_sig.args, **bound_sig.kwargs)
-
-        # atoms = Atoms()
-        # for site in structure.sites:
-        #     atoms.append(Atom(element=site.specie.symbol,
-        #                       x=site.x, y=site.y, z=site.z))
-        # return CrystalStructure(lattice=CrystalLattice(
-        #                         cell_matrix=structure.lattice.matrix),
-        #                         basis=atoms)
 
 
 class DiamondStructure(CrystalStructure):
