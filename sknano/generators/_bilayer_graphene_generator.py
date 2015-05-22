@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-============================================================================================
-Bilayer Graphene structure generator (:mod:`sknano.generators._bilayer_graphene_generator`)
-============================================================================================
+===============================================================================
+BLG structure generator (:mod:`sknano.generators._bilayer_graphene_generator`)
+===============================================================================
 
 .. currentmodule:: sknano.generators._bilayer_graphene_generator
 
@@ -16,12 +16,13 @@ import copy
 import numpy as np
 
 from sknano.structures import BilayerGraphene
-from ._base import Atoms, GeneratorBase
+from ._base import Atoms
+from ._graphene_generator import GrapheneGenerator
 
 __all__ = ['BilayerGrapheneGenerator']
 
 
-class BilayerGrapheneGenerator(BilayerGraphene, GeneratorBase):
+class BilayerGrapheneGenerator(BilayerGraphene, GrapheneGenerator):
     """Bilayer graphene structure generator class.
 
     Parameters
@@ -104,7 +105,7 @@ class BilayerGrapheneGenerator(BilayerGraphene, GeneratorBase):
 
     def __init__(self, autogen=True, **kwargs):
 
-        super(BilayerGrapheneGenerator, self).__init__(**kwargs)
+        super(BilayerGrapheneGenerator, self).__init__(autogen=False, **kwargs)
 
         if autogen:
             super(BilayerGrapheneGenerator, self).generate_unit_cell()
@@ -123,10 +124,10 @@ class BilayerGrapheneGenerator(BilayerGraphene, GeneratorBase):
             epsilon = 1e-10
 
             for n, z in enumerate(z_set):
-                layer = Atoms(atoms=bilayer.get_atoms(asarray=True)[
-                    np.where(np.abs(z_coords - z) < epsilon)].tolist(),
-                    deepcopy=True)
+                layer = copy.deepcopy(
+                    Atoms(atoms=bilayer.get_atoms(asarray=True)[
+                        np.where(np.abs(z_coords - z) < epsilon)].tolist()))
                 if (n % 2) != 0:
                     layer.rotate(angle=self.layer_rotation_angle, axis='z')
 
-                self.atoms.extend(layer.atoms)
+                self.atoms.extend(layer)
