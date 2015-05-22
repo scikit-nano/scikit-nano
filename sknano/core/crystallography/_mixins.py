@@ -22,11 +22,61 @@ from sknano.core.math import Point
 
 import numpy as np
 
-__all__ = ['DirectLatticeMixin', 'ReciprocalLatticeMixin', 'UnitCellMixin']
+__all__ = ['DirectLatticeMixin', 'ReciprocalLatticeMixin', 'UnitCellMixin',
+           'Direct2DLatticeMixin', 'Direct3DLatticeMixin',
+           'Reciprocal2DLatticeMixin', 'Reciprocal3DLatticeMixin']
 
 
-class DirectLatticeMixin:
-    """Mixin class for computing the direct lattice parameters from \
+class Direct2DLatticeMixin:
+    """Mixin class for computing the 2D direct lattice parameters from \
+        2D reciprocal lattice parameters."""
+    @property
+    def cos_gamma(self):
+        """:math:`\\cos\\gamma`"""
+        return np.around(np.acos(np.radians(self.gamma)), decimals=6)
+
+    @property
+    def sin_gamma(self):
+        """:math:`\\sin\\gamma`"""
+        return np.sqrt(1 - self.cos_gamma ** 2)
+
+    @property
+    def a1(self):
+        """Lattice vector :math:`\\mathbf{a}_1=\\mathbf{a}`."""
+        return self.b2.cross(self.b3) / self.cell_volume
+
+    @property
+    def a2(self):
+        """Lattice vector :math:`\\mathbf{a}_2=\\mathbf{b}`."""
+        return self.b3.cross(self.b1) / self.cell_volume
+
+
+class Reciprocal2DLatticeMixin:
+    """Mixin class for computing the 2D reciprocal lattice parameters from \
+        2D direct lattice parameters."""
+    @property
+    def cos_gamma_star(self):
+        """:math:`\\cos\\gamma^*`"""
+        return np.around(np.acos(np.radians(self.gamma_star)), decimals=6)
+
+    @property
+    def sin_gamma_star(self):
+        """:math:`\\sin\\gamma^*`"""
+        return np.sqrt(1 - self.cos_gamma_star ** 2)
+
+    @property
+    def b1(self):
+        """Reciprocal lattice vector :math:`\\mathbf{b}_1=\\mathbf{a}^{*}`."""
+        return self.a2.cross(self.a3) / self.cell_volume
+
+    @property
+    def b2(self):
+        """Reciprocal lattice vector :math:`\\mathbf{b}_2=\\mathbf{b}^{*}`."""
+        return self.a3.cross(self.a1) / self.cell_volume
+
+
+class Direct3DLatticeMixin:
+    """Mixin class for computing the 3D direct lattice parameters from \
         reciprocal lattice parameters."""
     @property
     def cos_alpha(self):
@@ -79,9 +129,11 @@ class DirectLatticeMixin:
         """Lattice vector :math:`\\mathbf{a}_3=\\mathbf{c}`."""
         return self.b1.cross(self.b2) / self.cell_volume
 
+DirectLatticeMixin = Direct3DLatticeMixin
 
-class ReciprocalLatticeMixin:
-    """Mixin class for computing the reciprocal lattice parameters from \
+
+class Reciprocal3DLatticeMixin:
+    """Mixin class for computing the 3D reciprocal lattice parameters from \
         the direct lattice parameters."""
     @property
     def cos_alpha_star(self):
@@ -131,6 +183,8 @@ class ReciprocalLatticeMixin:
         """Reciprocal lattice vector :math:`\\mathbf{b}_3=\\mathbf{c}^{*}`."""
         return self.a1.cross(self.a2) / self.cell_volume
 
+ReciprocalLatticeMixin = Reciprocal3DLatticeMixin
+
 
 class UnitCellMixin:
     """Mixin class for lattice unit cell."""
@@ -166,7 +220,7 @@ class UnitCellMixin:
         p = Point(p)
         c = self.orientation_matrix * self.ortho_matrix * \
             p.column_matrix + self.offset.column_matrix
-        return Point(c.A.flatten())
+        return p.__class__(c.A.flatten())
 
     def cartesian_to_fractional(self, p):
         """Convert cartesian coordinate to fractional coordinate.
@@ -183,7 +237,7 @@ class UnitCellMixin:
         p = Point(p)
         f = self.fractional_matrix * np.linalg.inv(self.orientation_matrix) * \
             (p - self.offset).column_matrix
-        return Point(f.A.flatten())
+        return p.__class__(f.A.flatten())
 
     def wrap_fractional_coordinate(self, p, epsilon=1e-6):
         """Wrap fractional coordinate to lie within unit cell.
