@@ -23,6 +23,7 @@ from sknano.core import dedupe, xyz
 from sknano.core.math import Vector, transformation_matrix
 from sknano.utils.geometric_shapes import Cuboid  # , Rectangle
 from ._atoms import Atoms
+from ._extended_atom import XAtom
 
 __all__ = ['XAtoms']
 
@@ -45,6 +46,10 @@ class XAtoms(Atoms):
         super().__init__(atoms=atoms)
 
         self._types = {}
+
+    @property
+    def __atom_class__(self):
+        return XAtom
 
     def sort(self, key=attrgetter('element', 'Z', 'type', 'mol', 'id', 'z'),
              reverse=False):

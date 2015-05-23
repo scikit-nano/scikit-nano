@@ -17,6 +17,7 @@ from operator import attrgetter
 import numpy as np
 
 from sknano.core import UserList
+from ._atom import Atom
 
 __all__ = ['Atoms']
 
@@ -32,8 +33,15 @@ class Atoms(UserList):
 
     """
     def __init__(self, atoms=None):
+        if not isinstance(atoms, type(self)) and isinstance(atoms, list):
+            for i, atom in enumerate(atoms):
+                atoms[i] = self.__atom_class__(element=atom)
         super().__init__(initlist=atoms)
         self.kwargs = {}
+
+    @property
+    def __atom_class__(self):
+        return Atom
 
     def __str__(self):
         """Return a nice string representation of `Atoms`."""

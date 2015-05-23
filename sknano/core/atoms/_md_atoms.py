@@ -19,7 +19,7 @@ __docformat__ = 'restructuredtext en'
 # from sknano.core.math import Vector, vector as vec
 # from ._bond import Bond
 # from ._bonds import Bonds
-from . import StructureAtoms as Atoms
+from . import StructureAtom as Atom, StructureAtoms as Atoms
 
 __all__ = ['MDAtoms']
 
@@ -40,3 +40,7 @@ class MDAtoms(Atoms):
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    @property
+    def __atom_class__(self):
+        return Atom

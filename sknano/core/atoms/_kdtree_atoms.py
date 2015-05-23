@@ -16,6 +16,7 @@ __docformat__ = 'restructuredtext en'
 from ._extended_atoms import XAtoms
 from ._mixins import NNAtomsMixin
 from ._bonds import Bonds
+from ._kdtree_atom import KDTAtom
 
 __all__ = ['KDTAtoms']
 
@@ -44,3 +45,7 @@ class KDTAtoms(XAtoms, NNAtomsMixin):
             self.bonds = atoms.bonds
         except AttributeError:
             self.bonds = Bonds()
+
+    @property
+    def __atom_class__(self):
+        return KDTAtom

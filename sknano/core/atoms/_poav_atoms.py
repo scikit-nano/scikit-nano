@@ -19,7 +19,7 @@ import numpy as np
 
 from sknano.core.math import vector as vec
 from ._kdtree_atoms import KDTAtoms
-from ._poav_atom import POAV1, POAV2, POAVR
+from ._poav_atom import POAV1, POAV2, POAVR, POAVAtom
 
 __all__ = ['POAVAtoms']
 
@@ -39,6 +39,10 @@ class POAVAtoms(KDTAtoms):
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    @property
+    def __atom_class__(self):
+        return POAVAtom
 
     def compute_POAVs(self):
         """Compute `POAV1`, `POAV2`, `POAVR`."""
