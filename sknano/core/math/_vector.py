@@ -205,7 +205,7 @@ class Vector(np.ndarray):
                     return self[2]
         except TypeError:
             pass
-        return super(Vector, self).__getattribute__(name)
+        return np.ndarray.__getattribute__(self, name)
 
     def __setattr__(self, name, value):
         # nd = len(self)
@@ -244,7 +244,7 @@ class Vector(np.ndarray):
                 except AttributeError:
                     pass
         else:
-            super(Vector, self).__setattr__(name, value)
+            np.ndarray.__setattr__(self, name, value)
             # if name is not None and name.endswith('p'):
             #    try:
             #        self[:] = self._p.__array__() - self._p0.__array__()
@@ -390,6 +390,10 @@ class Vector(np.ndarray):
             self._update_p()
             return self
         return NotImplemented
+
+    def copy(self):
+        """Return a copy of the `Vector`."""
+        return self.__copy__()
 
     def __copy__(self):
         return self.__class__(self.__array__(), p0=self.p0.__array__())
