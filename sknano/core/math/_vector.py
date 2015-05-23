@@ -264,12 +264,14 @@ class Vector(np.ndarray):
 
     def __setitem__(self, index, value):
         data = np.ndarray.view(self, np.ndarray)
+        p0 = np.ndarray.view(np.ndarray.__getattribute__(self, 'p0'),
+                             np.ndarray)
+        p = np.ndarray.view(np.ndarray.__getattribute__(self, 'p'),
+                            np.ndarray)
+
         np.ndarray.__setitem__(data, index, value)
-        p0 = np.ndarray.__getitem__(np.ndarray.__getattribute__(self, 'p0'),
-                                    index)
-        p = np.ndarray.__getitem__(np.ndarray.__getattribute__(self, 'p'),
-                                   index)
-        p[:] = p0[:] + value
+        np.ndarray.__setitem__(p, index, np.ndarray.__getitem__(p0, index) +
+                               np.ndarray.__getitem__(data, index))
 
         vout = data.view(type(self))
         vout._p0 = np.ndarray.view(p0, p0.__class__)
