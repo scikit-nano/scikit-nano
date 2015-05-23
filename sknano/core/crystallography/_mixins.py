@@ -18,7 +18,7 @@ __docformat__ = 'restructuredtext en'
 # from abc import ABCMeta, abstractproperty
 # from enum import Enum
 
-from sknano.core.math import Point
+from sknano.core.math import Point, Vector, zhat
 
 import numpy as np
 
@@ -43,12 +43,16 @@ class Direct2DLatticeMixin:
     @property
     def a1(self):
         """Lattice vector :math:`\\mathbf{a}_1=\\mathbf{a}`."""
-        return self.b2.cross(self.b3) / self.cell_volume
+        b2 = Vector()
+        b2[:2] = self.b2
+        return b2.cross(zhat) / self.cell_area
 
     @property
     def a2(self):
         """Lattice vector :math:`\\mathbf{a}_2=\\mathbf{b}`."""
-        return self.b3.cross(self.b1) / self.cell_volume
+        b1 = Vector()
+        b1[:2] = self.b1
+        return zhat.cross(b1) / self.cell_area
 
 
 class Reciprocal2DLatticeMixin:
@@ -67,12 +71,16 @@ class Reciprocal2DLatticeMixin:
     @property
     def b1(self):
         """Reciprocal lattice vector :math:`\\mathbf{b}_1=\\mathbf{a}^{*}`."""
-        return self.a2.cross(self.a3) / self.cell_volume
+        a2 = Vector()
+        a2[:2] = self.a2
+        return a2.cross(zhat)[:2] / self.cell_area
 
     @property
     def b2(self):
         """Reciprocal lattice vector :math:`\\mathbf{b}_2=\\mathbf{b}^{*}`."""
-        return self.a3.cross(self.a1) / self.cell_volume
+        a1 = Vector()
+        a1[:2] = self.a1
+        return zhat.cross(a1)[:2] / self.cell_area
 
 
 class Direct3DLatticeMixin:
