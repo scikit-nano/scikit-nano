@@ -82,7 +82,7 @@ class Vector(np.ndarray):
             vec = v.view(cls)
 
             if p0 is not None:
-                vec = Vector(np.asarray(vec), p0=p0)
+                vec = Vector(np.asarray(vec), nd=nd, p0=Point(p0, nd=nd))
 
             if intype != v.dtype:
                 return vec.astype(intype)
@@ -103,6 +103,10 @@ class Vector(np.ndarray):
                 v = np.zeros(len(v), dtype=dtype)
             else:
                 v = np.asarray(v, dtype=dtype)
+
+            if nd is not None and isinstance(nd, numbers.Number) and \
+                    len(v) < int(nd):
+                v = np.append(v, np.zeros(int(nd) - len(v)))
             nd = len(v)
 
             if p0 is None:
