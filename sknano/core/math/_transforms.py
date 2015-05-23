@@ -63,33 +63,35 @@ def rotate(obj, angle=None, axis=None, anchor_point=None, rot_point=None,
               'anchor_point: {}\n'.format(anchor_point) +
               'transform_matrix: {}\n'.format(transform_matrix))
 
+    objarr = np.asarray(obj)
+    nd = len(objarr)
+    objarr = np.append(objarr, 1)
+
     if transform_matrix is not None and \
             isinstance(transform_matrix, np.ndarray):
-        if transform_matrix.shape == (3, 3):
-            I4x4 = np.eye(4)
-            I4x4[:3, :3] = transform_matrix
-            transform_matrix = I4x4
-    t = np.append(np.asarray(obj), 1)
+
+        if transform_matrix.shape[-1] != nd + 1:
+            augmented_tmatrix = np.eye(nd + 1)
+            augmented_tmatrix[:nd, :nd] = transform_matrix
+            transform_matrix = augmented_tmatrix
 
     try:
-        rot_obj = np.dot(transform_matrix, t)[:-1]
+        rot_obj = np.dot(transform_matrix, objarr)[:-1]
     except TypeError:
         if axis is None and from_vector is None and to_vector is None and \
-                len(obj) > 2:
+                nd > 2:
             raise ValueError('Expected `axis` to be a 3D `Vector`.')
-        tmatrix = \
+        transform_matrix = \
             transformation_matrix(angle=angle, axis=axis,
                                   anchor_point=anchor_point,
                                   rot_point=rot_point, from_vector=from_vector,
                                   to_vector=to_vector, degrees=degrees,
                                   verbose=verbose, **kwargs)
-
-        rot_obj = np.dot(tmatrix, t)[:-1]
-
-    if rot_obj.__class__ != obj.__class__:
-        rot_obj = obj.__class__(rot_obj)
-
-    return rot_obj
+        return rotate(obj, transform_matrix=transform_matrix)
+    else:
+        if rot_obj.__class__ != obj.__class__:
+            rot_obj = obj.__class__(rot_obj)
+        return rot_obj
 
 
 def Rx(angle, degrees=False):
