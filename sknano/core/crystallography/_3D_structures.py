@@ -28,13 +28,13 @@ from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from ._3D_lattices import CrystalLattice
 from ._extras import pymatgen_structure
 
-__all__ = ['CrystalStructure', 'DiamondStructure',
-           'HexagonalClosePackedStructure',
-           'CubicClosePackedStructure', 'FCCStructure', 'HexagonalStructure',
+__all__ = ['CrystalStructure', 'Crystal3DStructure', 'DiamondStructure',
+           'HexagonalClosePackedStructure', 'CubicClosePackedStructure',
+           'BCCStructure', 'FCCStructure', 'HexagonalStructure',
            'Gold', 'Copper', 'AlphaQuartz']
 
 
-class CrystalStructure:
+class Crystal3DStructure:
     """Abstract base class for crystal structures."""
 
     def __init__(self, lattice=None, basis=None, coords=None, cartesian=False):
@@ -49,7 +49,7 @@ class CrystalStructure:
                 for atom, pos in zip(atoms, coords):
                     if not cartesian:
                         pos = lattice.fractional_to_cartesian(pos)
-                    atom.r = Vector(pos)
+                    atom.r = pos
 
         self._atoms = atoms
         self.lattice = lattice
@@ -138,6 +138,8 @@ class CrystalStructure:
         """Return `dict` of `CrystalStructure` parameters."""
         return dict(lattice=self.lattice, basis=self.basis)
 
+CrystalStructure = Crystal3DStructure
+
 
 class DiamondStructure(CrystalStructure):
     """Abstract representation of diamond structure."""
@@ -170,6 +172,10 @@ class HexagonalStructure(CrystalStructure):
         # lattice = CrystalLattice(a=a, b=a, c=c, alpha=90, beta=90, gamma=60)
         return CrystalStructure.from_spacegroup(sg, lattice, basis, coords,
                                                 scaling_matrix=scaling_matrix)
+
+
+class BCCStructure(CrystalStructure):
+    pass
 
 
 class FCCStructure(CrystalStructure):
