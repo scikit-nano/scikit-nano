@@ -395,11 +395,7 @@ class Vector(np.ndarray):
     #    pass
 
     def __deepcopy__(self, memo):
-        cp = self.__class__(self.__array__(), p0=self.p0)
-        # memo[id(self)] = cp
-        # for attr in dir(self):
-        #    if not attr.startswith('_'):
-        #        setattr(cp, attr, copy.deepcopy(getattr(self, attr), memo))
+        cp = self.__class__(self.__array__(), p0=self.p0.__array__())
         return cp
 
     def _update_p(self):
