@@ -301,7 +301,7 @@ class XAtom(Atom):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        self._r = Vector(value)
+        self._r = Vector(value, nd=3)
 
     @property
     def r0(self):
@@ -328,7 +328,7 @@ class XAtom(Atom):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        self._r0 = Vector(value)
+        self._r0 = Vector(value, nd=3)
 
     @property
     def dr(self):
@@ -451,7 +451,7 @@ class XAtom(Atom):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        self._v = Vector(value)
+        self._v = Vector(value, nd=3)
 
     @property
     def fx(self):
@@ -542,7 +542,7 @@ class XAtom(Atom):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        self._f = Vector(value)
+        self._f = Vector(value, nd=3)
 
     @property
     def pe(self):
@@ -737,4 +737,4 @@ class XAtom(Atom):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        self._i = Point(value, dtype=int)
+        self._i = Point(value, nd=3, dtype=int)
