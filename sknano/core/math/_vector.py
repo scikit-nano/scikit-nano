@@ -82,7 +82,8 @@ class Vector(np.ndarray):
             vec = v.view(cls)
 
             if p0 is not None:
-                vec = Vector(np.asarray(vec), nd=nd, p0=Point(p0, nd=nd))
+                vec = Vector(np.asarray(vec), nd=nd,
+                             p0=Point(p0, nd=nd, dtype=dtype, copy=copy))
 
             if intype != v.dtype:
                 return vec.astype(intype)
@@ -112,7 +113,7 @@ class Vector(np.ndarray):
             if p0 is None:
                 p0 = Point(nd=nd, dtype=dtype)
             else:
-                p0 = Point(p0, nd=nd, dtype=dtype)
+                p0 = Point(p0, nd=nd, dtype=dtype, copy=copy)
             p = p0 + v
         else:
             if nd is None or not isinstance(nd, numbers.Number):
@@ -120,12 +121,12 @@ class Vector(np.ndarray):
             if p is None:
                 p = Point(nd=nd, dtype=dtype)
             else:
-                p = Point(p, nd=nd, dtype=dtype)
+                p = Point(p, nd=nd, dtype=dtype, copy=copy)
 
             if p0 is None:
                 p0 = Point(nd=nd, dtype=dtype)
             else:
-                p0 = Point(p0, nd=nd, dtype=dtype)
+                p0 = Point(p0, nd=nd, dtype=dtype, copy=copy)
 
             v = p - p0
 
