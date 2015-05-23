@@ -156,7 +156,8 @@ class Vector(np.ndarray):
 
     # def __array_prepare__(self, obj, context=None):
     #     if self.__array_priority__ >= Vector.__array_priority__:
-    #         res = obj if isinstance(obj, type(self)) else obj.view(type(self))
+    #         res = obj if isinstance(obj, type(self)) \
+    #             else obj.view(type(self))
     #     else:
     #         res = obj.view(Vector)
 
@@ -248,6 +249,31 @@ class Vector(np.ndarray):
             #        self[:] = self._p.__array__() - self._p0.__array__()
             #    except (AttributeError, TypeError):
             #        pass
+
+    def __getitem__(self, index):
+        aview = np.ndarray.view(self, np.ndarray)
+        vout = np.ndarray.__getitem__(aview, index)
+        try:
+            vout = vout.view(type(self))
+            vout._p0 = self.p0.__getitem__(index)
+            vout._p = self.p.__getitem__(index)
+            vout._nd = len(vout)
+        except (AttributeError, TypeError):
+            pass
+        return vout
+
+    def __setitem__(self, index, value):
+        data = np.ndarray.view(self, np.ndarray)
+        np.ndarray.__setitem__(data, index, value)
+        p0 = np.ndarray.__getitem__(np.ndarray.__getattribute__(self, 'p0'),
+                                    index)
+        p = np.ndarray.__getitem__(np.ndarray.__getattribute__(self, 'p'),
+                                   index)
+        p[:] = p0[:] + value
+
+        vout = data.view(type(self))
+        vout._p0 = np.ndarray.view(p0, p0.__class__)
+        vout._p = np.ndarray.view(p, p.__class__)
 
     def __eq__(self, other):
         if isinstance(other, Vector):
