@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-=======================================================================
-Crystal lattice classes (:mod:`sknano.core.crystallography._lattices`)
-=======================================================================
+==========================================================================
+3D crystal lattice classes (:mod:`sknano.core.crystallography._3D_lattices`)
+==========================================================================
 
-.. currentmodule:: sknano.core.crystallography._lattices
+.. currentmodule:: sknano.core.crystallography._3D_lattices
 
 """
 from __future__ import absolute_import, division, print_function, \
@@ -24,13 +24,14 @@ from sknano.core.math import Point, Vector
 
 from ._mixins import DirectLatticeMixin, ReciprocalLatticeMixin, UnitCellMixin
 
-__all__ = ['CrystalLattice', 'ReciprocalLattice',
-           'BravaisLattice', 'SimpleCubicLattice',
-           'BodyCenteredCubicLattice', 'FaceCenteredCubicLattice']
+__all__ = ['CrystalLattice', 'ReciprocalLattice', 'BravaisLattice',
+           'Crystal3DLattice', 'Reciprocal3DLattice', 'Bravais3DLattice',
+           'SimpleCubicLattice', 'BodyCenteredCubicLattice',
+           'FaceCenteredCubicLattice']
 
 
-class CrystalLattice(ReciprocalLatticeMixin, UnitCellMixin):
-    """Crystal lattice class."""
+class Crystal3DLattice(ReciprocalLatticeMixin, UnitCellMixin):
+    """3D crystal lattice class."""
 
     def __init__(self, a=None, b=None, c=None,
                  alpha=None, beta=None, gamma=None,
@@ -196,43 +197,45 @@ class CrystalLattice(ReciprocalLatticeMixin, UnitCellMixin):
         return ReciprocalLattice(cell_matrix=np.linalg.inv(self.cell_matrix))
 
     @classmethod
-    def cubic(cls, a):
-        """Generate a cubic lattice with lattice parameter \
-            :math:`a`."""
-        return cls(a=a, b=a, c=a, alpha=90, beta=90, gamma=90)
-
-    @classmethod
     def triclinic(cls, a, b, c, alpha, beta, gamma):
-        """Generate a triclinic lattice with lattice parameters \
+        """Generate a triclinic 3D lattice with lattice parameters \
             :math:`a, b, c, \\alpha, \\beta, \\gamma`."""
         return cls(a=a, b=b, c=c, alpha=alpha, beta=beta, gamma=gamma)
 
     @classmethod
     def monoclinic(cls, a, b, c, beta):
-        """Generate a triclinic lattice with lattice parameters \
+        """Generate a monoclinic 3D lattice with lattice parameters \
             :math:`a, b, c, \\beta`."""
         return cls(a=a, b=b, c=c, alpha=90, beta=beta, gamma=90)
 
     @classmethod
     def orthorhombic(cls, a, b, c):
-        """Generate a triclinic lattice with lattice parameters \
+        """Generate an orthorhombic 3D lattice with lattice parameters \
             :math:`a, b, c`."""
         return cls(a=a, b=b, c=c, alpha=90, beta=90, gamma=90)
 
     @classmethod
     def tetragonal(cls, a, c):
-        """Generate a triclinic lattice with lattice parameters \
+        """Generate a tetragonal 3D lattice with lattice parameters \
             :math:`a, c`."""
         return cls(a=a, b=a, c=c, alpha=90, beta=90, gamma=90)
 
     @classmethod
     def hexagonal(cls, a, c):
-        """Generate a triclinic lattice with lattice parameters \
+        """Generate a hexagonal 3D lattice with lattice parameters \
             :math:`a, c`."""
         return cls(a=a, b=a, c=c, alpha=90, beta=90, gamma=120)
 
+    @classmethod
+    def cubic(cls, a):
+        """Generate a cubic 3D lattice with lattice parameter \
+            :math:`a`."""
+        return cls(a=a, b=a, c=a, alpha=90, beta=90, gamma=90)
 
-class ReciprocalLattice(DirectLatticeMixin, UnitCellMixin):
+CrystalLattice = Crystal3DLattice
+
+
+class Reciprocal3DLattice(DirectLatticeMixin, UnitCellMixin):
     def __init__(self, a_star=None, b_star=None, c_star=None,
                  alpha_star=None, beta_star=None, gamma_star=None,
                  b1=None, b2=None, b3=None,
@@ -397,54 +400,59 @@ class ReciprocalLattice(DirectLatticeMixin, UnitCellMixin):
         return CrystalLattice(cell_matrix=np.linalg.inv(self.cell_matrix))
 
     @classmethod
-    def cubic(cls, a_star):
-        """Generate a cubic lattice with lattice parameter \
-            :math:`a`."""
-        return cls(a_star=a_star, b_star=a_star, c_star=a_star,
-                   alpha_star=90, beta_star=90, gamma_star=90)
-
-    @classmethod
     def triclinic(cls, a_star, b_star, c_star,
                   alpha_star, beta_star, gamma_star):
-        """Generate a triclinic lattice with lattice parameters \
-            :math:`a, b, c, \\alpha, \\beta, \\gamma`."""
+        """Generate a triclinic 3D lattice with lattice parameters \
+            :math:`a^*, b^*, c^*, \\alpha^*, \\beta^*, \\gamma^*`."""
         return cls(a_star=a_star, b_star=b_star, c_star=c_star,
                    alpha_star=alpha_star, beta_star=beta_star,
                    gamma_star=gamma_star)
 
     @classmethod
     def monoclinic(cls, a_star, b_star, c_star, beta_star):
-        """Generate a triclinic lattice with lattice parameters \
-            :math:`a, b, c, \\beta`."""
+        """Generate a monoclinic 3D lattice with lattice parameters \
+            :math:`a^*, b^*, c^*, \\beta^*`."""
         return cls(a_star=a_star, b_star=b_star, c_star=c_star,
                    alpha_star=90, beta_star=beta_star, gamma_star=90)
 
     @classmethod
     def orthorhombic(cls, a_star, b_star, c_star):
-        """Generate a triclinic lattice with lattice parameters \
-            :math:`a, b, c`."""
-        return cls(a_star=a_star, b=b_star, c_star=c_star,
+        """Generate an orthorhombic 3D lattice with lattice parameters \
+            :math:`a^*, b^*, c^*`."""
+        return cls(a_star=a_star, b_star=b_star, c_star=c_star,
                    alpha_star=90, beta_star=90, gamma_star=90)
 
     @classmethod
     def tetragonal(cls, a_star, c_star):
-        """Generate a triclinic lattice with lattice parameters \
-            :math:`a, c`."""
-        return cls(a_star=a_star, b=a_star, c_star=c_star,
+        """Generate a tetragonal 3D lattice with lattice parameters \
+            :math:`a^*, c^*`."""
+        return cls(a_star=a_star, b_star=a_star, c_star=c_star,
                    alpha_star=90, beta_star=90, gamma_star=90)
 
     @classmethod
     def hexagonal(cls, a_star, c_star):
-        """Generate a triclinic lattice with lattice parameters \
-            :math:`a, c`."""
-        return cls(a_star=a_star, b=a_star, c_star=c_star,
+        """Generate a hexagonal 3D lattice with lattice parameters \
+            :math:`a^*, c^*`."""
+        return cls(a_star=a_star, b_star=a_star, c_star=c_star,
                    alpha_star=90, beta_star=90, gamma_star=120)
 
+    @classmethod
+    def cubic(cls, a_star):
+        """Generate a cubic 3D lattice with lattice parameter \
+            :math:`a^*`."""
+        return cls(a_star=a_star, b_star=a_star, c_star=a_star,
+                   alpha_star=90, beta_star=90, gamma_star=90)
 
-class BravaisLattice:
+ReciprocalLattice = Reciprocal3DLattice
+
+
+class Bravais3DLattice:
     """Class for bravais lattices."""
-    def __init__(self, symbol=None):
+    def __init__(self, crystal_system=None, centering=None,
+                 symbol=None):
         pass
+
+BravaisLattice = Bravais3DLattice
 
 
 class SimpleCubicLattice(BravaisLattice):
