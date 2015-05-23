@@ -391,12 +391,11 @@ class Vector(np.ndarray):
             return self
         return NotImplemented
 
-    # def __copy__(self):
-    #    pass
+    def __copy__(self):
+        return self.__class__(self.__array__(), p0=self.p0.__array__())
 
     def __deepcopy__(self, memo):
-        cp = self.__class__(self.__array__(), p0=self.p0.__array__())
-        return cp
+        return self.__copy__()
 
     def _update_p(self):
         self._p[:] = self._p0[:] + self.__array__()
