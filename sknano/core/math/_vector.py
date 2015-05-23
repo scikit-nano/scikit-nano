@@ -252,16 +252,23 @@ class Vector(np.ndarray):
             #        pass
 
     def __getitem__(self, index):
-        aview = np.ndarray.view(self, np.ndarray)
-        vout = np.ndarray.__getitem__(aview, index)
+        data = np.ndarray.__getitem__(np.ndarray.view(self, np.ndarray),
+                                      index)
+        p0 = np.ndarray.__getitem__(np.ndarray.view(
+                                    np.ndarray.__getattribute__(self, 'p0'),
+                                    np.ndarray), index)
+        p = np.ndarray.__getitem__(np.ndarray.view(
+                                   np.ndarray.__getattribute__(self, 'p'),
+                                   np.ndarray), index)
+
         try:
-            vout = vout.view(type(self))
-            vout._p0 = self.p0.__getitem__(index)
-            vout._p = self.p.__getitem__(index)
-            vout._nd = len(vout)
+            data = data.view(type(self))
+            data._p0 = np.ndarray.view(p0, Point)
+            data._p = np.ndarray.view(p, Point)
+            data._nd = len(data)
         except (AttributeError, TypeError):
             pass
-        return vout
+        return data
 
     def __setitem__(self, index, value):
         data = np.ndarray.view(self, np.ndarray)
@@ -274,9 +281,9 @@ class Vector(np.ndarray):
         np.ndarray.__setitem__(p, index, np.ndarray.__getitem__(p0, index) +
                                np.ndarray.__getitem__(data, index))
 
-        vout = data.view(type(self))
-        vout._p0 = np.ndarray.view(p0, p0.__class__)
-        vout._p = np.ndarray.view(p, p.__class__)
+        data = data.view(type(self))
+        data._p0 = np.ndarray.view(p0, Point)
+        data._p = np.ndarray.view(p, Point)
 
     def __eq__(self, other):
         if isinstance(other, Vector):
