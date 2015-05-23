@@ -49,7 +49,7 @@ class Atom(object):
 
         self.element = element
 
-        self.fmtstr = "Atom(element={element!s})"
+        self.fmtstr = "Atom(element={element!r}, mass={mass!r})"
 
     def __str__(self):
         """Return a nice string representation of `Atom`."""
@@ -60,7 +60,7 @@ class Atom(object):
 
     def __repr__(self):
         """Return canonical string representation of `Atom`."""
-        return "Atom(element={!r}, mass={!r})".format(self.element, self.mass)
+        return self.fmtstr.format(**self.todict())
 
     def __eq__(self, other):
         """Test equality of two `Atom` object instances."""
