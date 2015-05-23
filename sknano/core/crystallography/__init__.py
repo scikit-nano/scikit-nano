@@ -40,8 +40,13 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from ._2D_lattices import *
+from ._2D_structures import *
+
+from ._3D_lattices import *
+from ._3D_structures import *
+
+from ._extras import *
 from ._mixins import *
-from ._lattices import *
-from ._structures import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
