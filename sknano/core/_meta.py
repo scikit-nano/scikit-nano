@@ -16,6 +16,7 @@ from builtins import object
 
 from inspect import signature, Signature, Parameter
 from functools import wraps
+import inspect
 import time
 import warnings
 # warnings.resetwarnings()
@@ -158,11 +159,21 @@ class method_func(object):
 
 def optional_debug(func):
     """Decorator that adds an optional `debug` keyword argument."""
+    if 'debug' in inspect.getargspec(func).args:
+        raise TypeError('debug argument already defined')
+
     @wraps(func)
     def wrapper(*args, debug=False, **kwargs):
         if debug:
             print('Calling', func.__name__)
         return func(*args, **kwargs)
+
+    sig = inspect.signature(func)
+    params = list(sig.parameters.values())
+    params.append(inspect.Parameter('debug',
+                                    inspect.Parameter.KEYWORD_ONLY,
+                                    default=False))
+    wrapper.__signature__ = sig.replace(parameters=params)
     return wrapper
 
 
