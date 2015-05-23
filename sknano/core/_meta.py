@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ======================================================================
-Meta functions and class (:mod:`sknano.core._meta`)
+Meta functions and classes (:mod:`sknano.core._meta`)
 ======================================================================
 
 .. currentmodule:: sknano.core._meta
@@ -19,6 +19,7 @@ from functools import wraps
 import inspect
 import time
 import warnings
+import weakref
 # warnings.resetwarnings()
 
 import numpy as np
@@ -27,7 +28,8 @@ from numpy.compat import formatargspec, getargspec
 __all__ = ['check_type', 'deprecated', 'get_object_signature', 'memoize',
            'method_func', 'optional_debug', 'removed_package_warning',
            'timethis', 'typeassert', 'typed_property', 'with_doc',
-           'make_sig', 'ClassSignature']
+           'make_sig', 'ClassSignature', 'Cached', 'NoInstances',
+           'Singleton']
 
 
 def check_type(obj, allowed_types=()):
@@ -299,3 +301,37 @@ class ClassSignature(metaclass=ClassSignatureMeta):
         for name, value in bound_values.arguments.items():
             setattr(self, name, value)
 
+
+class Cached(type):
+    """Cached class type."""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__cache = weakref.WeakValueDictionary()
+
+    def __call__(self, *args):
+        if args in self.__cache:
+            return self.__cache[args]
+        else:
+            obj = super().__call__(*args)
+            self.__cache[args] = obj
+            return obj
+
+
+class NoInstances(type):
+    """Not callable class type."""
+    def __call__(self, *args, **kwargs):
+        raise RuntimeError("Can't instantiate directly.")
+
+
+class Singleton(type):
+    """Singleton class type."""
+    def __init__(self, *args, **kwargs):
+        self.__instance = None
+        super().__init__(*args, **kwargs)
+
+    def __call__(self, *args, **kwargs):
+        if self.__instance is None:
+            self.__instance = super().__call__(*args, **kwargs)
+            return self.__instance
+        else:
+            return self.__instance
