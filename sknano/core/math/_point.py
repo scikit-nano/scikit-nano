@@ -37,6 +37,10 @@ class Point(np.ndarray):
     def __new__(cls, p=None, nd=None, dtype=None, copy=True):
 
         if isinstance(p, Point):
+            if nd is not None and isinstance(nd, numbers.Number) and \
+                    len(p) < int(nd):
+                p = np.append(p, np.zeros(int(nd) - len(p)))
+
             if dtype is None:
                 intype = p.dtype
             else:
