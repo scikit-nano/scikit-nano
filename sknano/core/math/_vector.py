@@ -73,6 +73,9 @@ class Vector(np.ndarray):
     def __new__(cls, v=None, nd=None, p0=None, p=None, dtype=None, copy=True):
 
         if isinstance(v, Vector):
+            if nd is not None and isinstance(nd, numbers.Number) and \
+                    len(v) < int(nd):
+                v = np.append(v, np.zeros(int(nd) - len(v)))
 
             if dtype is None:
                 intype = v.dtype
@@ -403,7 +406,10 @@ class Vector(np.ndarray):
         return self.__copy__()
 
     def __copy__(self):
-        return self.__class__(self.__array__(), p0=self.p0.__array__())
+        try:
+            return self.__class__(self.__array__(), p0=self.p0.__array__())
+        except AttributeError:
+            return self.__class__(self.__array__())
 
     def __deepcopy__(self, memo):
         return self.__copy__()
