@@ -200,7 +200,7 @@ class UnitCellMixin:
     def cell_matrix(self):
         """Matrix of `CrystalLattice` lattice row vectors. \
             Same as :attr:`CrystalLattice.ortho_matrix`\ .T."""
-        return self.ortho_matrix.T
+        return self.ortho_matrix.T * self.orientation_matrix.T
 
     @property
     def fractional_matrix(self):
