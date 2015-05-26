@@ -60,12 +60,15 @@ class Crystal3DLattice(ReciprocalLatticeMixin, UnitCellMixin):
                                                np.asarray(a2),
                                                np.asarray(a3))))
 
-        self.a = a
-        self.b = b
-        self.c = c
-        self.alpha = alpha
-        self.beta = beta
-        self.gamma = gamma
+        self._a = a
+        self._b = b
+        self._c = c
+        self._alpha = alpha
+        self._beta = beta
+        self._gamma = gamma
+
+        if None not in (a, b, c, alpha, beta, gamma):
+            self._update_ortho_matrix()
 
         if cell_matrix is not None:
             orientation_matrix = \
@@ -90,14 +93,40 @@ class Crystal3DLattice(ReciprocalLatticeMixin, UnitCellMixin):
                     alpha=self.alpha, beta=self.beta, gamma=self.gamma)
 
     @property
+    def a(self):
+        """Length of lattice vector :math:`\\mathbf{a}`."""
+        return np.around(self._a, decimals=6)
+
+    @a.setter
+    def a(self, value):
+        self._a = value
+        self._update_ortho_matrix()
+
+    @property
+    def b(self):
+        """Length of lattice_vector :math:`\\mathbf{b}`."""
+        return np.around(self._b, decimals=6)
+
+    @b.setter
+    def b(self, value):
+        self._b = value
+        self._update_ortho_matrix()
+
+    @property
+    def c(self):
+        """Length of lattice vector :math:`\\mathbf{c}`."""
+        return np.around(self._c, decimals=6)
+
+    @c.setter
+    def c(self, value):
+        self._c = value
+        self._update_ortho_matrix()
+
+    @property
     def alpha(self):
         """Angle between lattice vectors :math:`\\mathbf{b}` and \
         :math:`\\mathbf{c}` in **degrees**."""
         return np.around(self._alpha, decimals=6)
-
-    @alpha.setter
-    def alpha(self, value):
-        self._alpha = value
 
     @property
     def beta(self):
@@ -105,19 +134,11 @@ class Crystal3DLattice(ReciprocalLatticeMixin, UnitCellMixin):
         :math:`\\mathbf{a}` in **degrees**."""
         return np.around(self._beta, decimals=6)
 
-    @beta.setter
-    def beta(self, value):
-        self._beta = value
-
     @property
     def gamma(self):
         """Angle between lattice vectors :math:`\\mathbf{a}` and \
         :math:`\\mathbf{b}` in **degrees**."""
         return np.around(self._gamma, decimals=6)
-
-    @gamma.setter
-    def gamma(self, value):
-        self._gamma = value
 
     @property
     def a1(self):
@@ -176,6 +197,9 @@ class Crystal3DLattice(ReciprocalLatticeMixin, UnitCellMixin):
     def ortho_matrix(self):
         """Transformation matrix to convert from fractional coordinates to \
             cartesian coordinates."""
+        return self._ortho_matrix
+
+    def _update_ortho_matrix(self):
         m11 = self.a
         m12 = self.b * self.cos_gamma
         m13 = self.c * self.cos_beta
@@ -187,9 +211,9 @@ class Crystal3DLattice(ReciprocalLatticeMixin, UnitCellMixin):
         m33 = self.c * self.sin_alpha * self.sin_beta * self.sin_gamma_star / \
             self.sin_gamma
 
-        return np.matrix([[m11, m12, m13],
-                          [0.0, m22, m23],
-                          [0.0, 0.0, m33]])
+        self._ortho_matrix = np.matrix([[m11, m12, m13],
+                                        [0.0, m22, m23],
+                                        [0.0, 0.0, m33]])
 
     @property
     def reciprocal_lattice(self):
@@ -261,12 +285,16 @@ class Reciprocal3DLattice(DirectLatticeMixin, UnitCellMixin):
                                                np.asarray(b2),
                                                np.asarray(b3))))
 
-        self.a_star = a_star
-        self.b_star = b_star
-        self.c_star = c_star
-        self.alpha_star = alpha_star
-        self.beta_star = beta_star
-        self.gamma_star = gamma_star
+        self._a_star = a_star
+        self._b_star = b_star
+        self._c_star = c_star
+        self._alpha_star = alpha_star
+        self._beta_star = beta_star
+        self._gamma_star = gamma_star
+
+        if None not in (a_star, b_star, c_star,
+                        alpha_star, beta_star, gamma_star):
+            self._update_ortho_matrix()
 
         if cell_matrix is not None:
             orientation_matrix = \
@@ -293,14 +321,40 @@ class Reciprocal3DLattice(DirectLatticeMixin, UnitCellMixin):
                     beta_star=self.beta_star, gamma_star=self.gamma_star)
 
     @property
+    def a_star(self):
+        """Length of lattice vector :math:`\\mathbf{a^*}`."""
+        return np.around(self._a_star, decimals=6)
+
+    @a_star.setter
+    def a_star(self, value):
+        self._a_star = value
+        self._update_ortho_matrix()
+
+    @property
+    def b_star(self):
+        """Length of lattice_vector :math:`\\mathbf{b^*}`."""
+        return np.around(self._b_star, decimals=6)
+
+    @b_star.setter
+    def b_star(self, value):
+        self._b_star = value
+        self._update_ortho_matrix()
+
+    @property
+    def c_star(self):
+        """Length of lattice vector :math:`\\mathbf{c^*}`."""
+        return np.around(self._c_star, decimals=6)
+
+    @c_star.setter
+    def c_star(self, value):
+        self._c_star = value
+        self._update_ortho_matrix()
+
+    @property
     def alpha_star(self):
         """Angle between lattice vectors :math:`\\mathbf{b}^{\\ast}` and \
         :math:`\\mathbf{c}^{\\ast}` in **degrees**."""
         return np.around(self._alpha_star, decimals=6)
-
-    @alpha_star.setter
-    def alpha_star(self, value):
-        self._alpha_star = value
 
     @property
     def beta_star(self):
@@ -308,19 +362,11 @@ class Reciprocal3DLattice(DirectLatticeMixin, UnitCellMixin):
         :math:`\\mathbf{a}` in **degrees**."""
         return np.around(self._beta_star, decimals=6)
 
-    @beta_star.setter
-    def beta_star(self, value):
-        self._beta_star = value
-
     @property
     def gamma_star(self):
         """Angle between lattice vectors :math:`\\mathbf{a}` and \
         :math:`\\mathbf{b}` in **degrees**."""
         return np.around(self._gamma_star, decimals=6)
-
-    @gamma_star.setter
-    def gamma_star(self, value):
-        self._gamma_star = value
 
     @property
     def b1(self):
@@ -379,6 +425,9 @@ class Reciprocal3DLattice(DirectLatticeMixin, UnitCellMixin):
     def ortho_matrix(self):
         """Transformation matrix to convert from fractional coordinates to \
             cartesian coordinates."""
+        return self._ortho_matrix
+
+    def _update_ortho_matrix(self):
         m11 = self.a_star
         m12 = self.b_star * self.cos_gamma_star
         m13 = self.c_star * self.cos_beta_star
@@ -390,9 +439,9 @@ class Reciprocal3DLattice(DirectLatticeMixin, UnitCellMixin):
         m33 = self.c_star * self.sin_alpha_star * self.sin_beta_star * \
             self.sin_gamma / self.sin_gamma_star
 
-        return np.matrix([[m11, m12, m13],
-                          [0.0, m22, m23],
-                          [0.0, 0.0, m33]])
+        self._ortho_matrix = np.matrix([[m11, m12, m13],
+                                        [0.0, m22, m23],
+                                        [0.0, 0.0, m33]])
 
     @property
     def reciprocal_lattice(self):
