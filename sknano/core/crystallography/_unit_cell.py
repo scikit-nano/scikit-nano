@@ -48,7 +48,6 @@ class UnitCell:
 
         self.lattice = lattice
         self.basis = basis
-        # self.fmtstr = "lattice={lattice!r}, basis={basis!r}"
         self.fmtstr = "{lattice!r}, {basis!r}, {coords!r}, cartesian=False"
 
     def __repr__(self):
