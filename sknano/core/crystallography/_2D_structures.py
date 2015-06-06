@@ -25,81 +25,24 @@ import numpy as np
 
 from sknano.core.math import Vector
 
-from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
+# from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
+from sknano.core.atoms import BasisAtom as Atom, BasisAtoms as Atoms
 from ._2D_lattices import Crystal2DLattice
+from ._base import StructureBase
 from ._extras import pymatgen_structure
 
 __all__ = ['Crystal2DStructure']
 
 
-class Crystal2DStructure:
+class Crystal2DStructure(StructureBase):
     """Abstract base class for 2D crystal structures."""
 
-    def __init__(self, lattice=None, basis=None, coords=None, cartesian=False):
+    def __init__(self, lattice=None, basis=None, coords=None,
+                 cartesian=False):
+        if not isinstance(lattice, Crystal2DLattice):
+            lattice = Crystal2DLattice(cell_matrix=lattice)
 
-        atoms = None
-
-        if basis is None:
-            atoms = Atoms()
-        elif basis is not None:
-            atoms = Atoms(atoms=basis)
-            if coords is not None:
-                for atom, pos in zip(atoms, coords):
-                    if not cartesian:
-                        pos = lattice.fractional_to_cartesian(pos)
-                    atom.r = pos
-
-        self._atoms = atoms
-        self.lattice = lattice
-        self.basis = atoms
-        self.fmtstr = "lattice={lattice!r}, basis={basis!r}"
-
-    def __repr__(self):
-        return "{}({})".format(self.__class__.__name__,
-                               self.fmtstr.format(**self.todict()))
-
-    @property
-    def atoms(self):
-        return self._atoms
-
-    @property
-    def basis(self):
-        """Crystal structure basis."""
-        return self._basis
-
-    @basis.setter
-    def basis(self, value):
-        self._basis = value
-
-    @property
-    def lattice(self):
-        return self._lattice
-
-    @lattice.setter
-    def lattice(self, value):
-        if not isinstance(value, Crystal2DLattice):
-            value = Crystal2DLattice(cell_matrix=value)
-        self._lattice = value
-
-    def __getattr__(self, name):
-        if name != '_atoms':
-            return getattr(self._atoms, name)
-
-    def __setattr__(self, name, value):
-        if name.startswith('_'):
-            super().__setattr__(name, value)
-        else:
-            setattr(self._atoms, name, value)
-
-    def __delattr__(self, name):
-        if name.startswith('_'):
-            super().__delattr__(name)
-        else:
-            delattr(self._atoms, name)
-
-    @property
-    def unit_cell(self):
-        pass
+        super().__init__(lattice, basis, coords, cartesian)
 
     @classmethod
     def from_pymatgen_structure(cls, structure):
