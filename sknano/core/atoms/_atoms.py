@@ -32,11 +32,14 @@ class Atoms(UserList):
         existing `Atoms` instance object.
 
     """
-    def __init__(self, atoms=None):
+    def __init__(self, atoms=None, **kwargs):
+        if atoms is not None and isinstance(atoms, str):
+            atoms = [atoms]
         if not isinstance(atoms, type(self)) and isinstance(atoms, list):
             for i, atom in enumerate(atoms):
-                atoms[i] = self.__atom_class__(element=atom)
+                atoms[i] = self.__atom_class__(atom, **kwargs)
         super().__init__(initlist=atoms)
+        self.fmtstr = "{atoms!r}"
         self.kwargs = {}
 
     @property
@@ -49,10 +52,19 @@ class Atoms(UserList):
 
     def __repr__(self):
         """Return canonical string representation of `Atoms`."""
-        return "Atoms(atoms={!r})".format(self.data)
+        return "{}({})".format(self.__class__.__name__,
+                               self.fmtstr.format(**self.todict()))
 
-    def sort(self, key=attrgetter('element', 'Z'), reverse=False):
+    def sort(self, key=attrgetter('element', 'Z', 'mass'), reverse=False):
         super().sort(key=key, reverse=reverse)
+
+    @property
+    def fmtstr(self):
+        return self._fmtstr
+
+    @fmtstr.setter
+    def fmtstr(self, value):
+        self._fmtstr = value
 
     @property
     def Natoms(self):
@@ -62,7 +74,7 @@ class Atoms(UserList):
     @property
     def M(self):
         """Total mass of `Atoms`."""
-        #return math.fsum(self.masses)
+        # return math.fsum(self.masses)
         return self.masses.sum()
 
     @property
@@ -148,3 +160,54 @@ class Atoms(UserList):
             return np.asarray(self.data)
         else:
             return self.data
+
+    def getatomattr(self, attr):
+        """Get :class:`~numpy:numpy.ndarray` of atom attributes `attr`.
+
+        Parameters
+        ----------
+        attr : str
+            Name of attribute to pass to `getattr` from each `XAtom` in
+            `XAtoms`.
+
+        Returns
+        -------
+        :class:`~numpy:numpy.ndarray`
+
+        """
+        try:
+            return np.asarray([getattr(atom, attr) for atom in self])
+        except AttributeError:
+            return None
+
+    def mapatomattr(self, attr, from_attr, attrmap):
+        """Set/update atom attribute from another atom attribute with dict.
+
+        Parameters
+        ----------
+        attr, from_attr : :class:`python:str`
+        attrmap : :class:`python:dict`
+
+        Examples
+        --------
+        Suppose you have an `XAtoms` instance named ``atoms`` that has
+        `XAtom` instances of two atom types `1` and `2` and we want to set
+        all `XAtom`\ s with `type=1` to Nitrogen and all `XAtom`\ s with
+        `type=2` to Argon.
+
+        We'd call this method like so::
+
+        >>> atoms.mapatomattr('element', 'type', {1: 'N', 2: 'Ar'})
+
+        """
+        [setattr(atom, attr, attrmap[getattr(atom, from_attr)])
+         for atom in self if getattr(atom, from_attr) is not None]
+
+    def rotate(self, **kwargs):
+        assert not hasattr(super(), 'rotate')
+
+    def translate(self, *args, **kwargs):
+        assert not hasattr(super(), 'translate')
+
+    def todict(self):
+        return dict(atoms=self.data)
