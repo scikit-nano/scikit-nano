@@ -26,8 +26,8 @@ class MDAtom(Atom):
     """An `Atom` class for molecular dynamics trajectory analysis.
 
     """
-    def __init__(self, reference_atom=None, t0_atom=None, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, reference_atom=None, t0_atom=None, **kwargs):
+        super().__init__(*args, **kwargs)
         self.reference_atom = reference_atom
         try:
             self.r0 = t0_atom.r

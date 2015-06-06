@@ -529,8 +529,8 @@ class POAVAtomMixin(object):
 class POAVAtom(POAVAtomMixin, KDTAtom):
     """An `Atom` sub-class for POAV analysis."""
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._POAV1 = None
         self._POAV2 = None
         self._POAVR = None
