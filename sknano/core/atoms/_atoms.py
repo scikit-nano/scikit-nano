@@ -36,8 +36,12 @@ class Atoms(UserList):
         if atoms is not None and isinstance(atoms, str):
             atoms = [atoms]
         if not isinstance(atoms, type(self)) and isinstance(atoms, list):
+            atoms = atoms[:]
             for i, atom in enumerate(atoms):
-                atoms[i] = self.__atom_class__(atom, **kwargs)
+                try:
+                    atoms[i] = self.__atom_class__(**atom.todict())
+                except AttributeError:
+                    atoms[i] = self.__atom_class__(atom, **kwargs)
         super().__init__(initlist=atoms)
         self.fmtstr = "{atoms!r}"
         self.kwargs = {}
