@@ -12,12 +12,14 @@ from __future__ import unicode_literals
 
 import json
 
-C_C = CCbond = 1.42  # angstroms
+# from sknano.core.atoms import Bond
+
+aCC = C_C = CCbond = 1.42  # angstroms
 C_H = CHbond = 1.09  # angstroms
 dVDW = 3.35  # angstroms
 
 __all__ = ['dump_bond_data', 'load_bond_data',
-           'C_C', 'CCbond', 'C_H', 'CHbond', 'dVDW']
+           'aCC', 'C_C', 'CCbond', 'C_H', 'CHbond', 'dVDW']
 
 
 def dump_bond_data(data):
