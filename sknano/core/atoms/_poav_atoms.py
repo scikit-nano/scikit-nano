@@ -37,9 +37,6 @@ class POAVAtoms(KDTAtoms):
         existing `POAVAtoms` instance object.
 
     """
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     @property
     def __atom_class__(self):
         return POAVAtom
