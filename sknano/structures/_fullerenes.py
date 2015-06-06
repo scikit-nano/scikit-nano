@@ -9,7 +9,6 @@ Fullerene structure classes (:mod:`sknano.structures._fullerenes`)
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import object
 __docformat__ = 'restructuredtext en'
 
 import numbers
@@ -17,7 +16,7 @@ import numbers
 __all__ = ['Fullerene']
 
 
-class Fullerene(object):
+class Fullerene:
     """Fullerene structure class.
 
     The `fullerene data
@@ -39,11 +38,10 @@ class Fullerene(object):
     """
     def __init__(self, N=60, PG=None, Ni=None, **kwargs):
 
-        super(Fullerene, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         # Check that N is a valid `N` and that `N` is
         self.N = N
-
         self.PG = PG
         self.Ni = Ni
 
