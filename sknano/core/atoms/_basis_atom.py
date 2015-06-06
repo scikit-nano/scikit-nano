@@ -39,7 +39,10 @@ class BasisAtom(XYZAtom):
         super().__init__(*args, **kwargs)
 
         self.lattice = lattice
-        self.rs = Vector([xs, ys, zs])
+        try:
+            self.rs = Vector([xs, ys, zs])
+        except AttributeError:
+            pass
         self.fmtstr = super().fmtstr + \
             ", xs={xs:.6f}, ys={ys:.6f}, zs={zs:.6f}"
 
@@ -154,7 +157,10 @@ class BasisAtom(XYZAtom):
             3-element ndarray of [:math:`x, y, z`] coordinates of `Atom`.
 
         """
-        return Vector(self.lattice.cartesian_to_fractional(self.r))
+        try:
+            return Vector(self.lattice.cartesian_to_fractional(self.r))
+        except AttributeError:
+            return Vector()
 
     @rs.setter
     def rs(self, value):
