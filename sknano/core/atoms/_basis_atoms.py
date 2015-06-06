@@ -13,16 +13,17 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from operator import attrgetter
+# from operator import attrgetter
 
 import numpy as np
 
-from ._atoms import Atoms
+from ._xyz_atoms import XYZAtoms
+from ._basis_atom import BasisAtom
 
 __all__ = ['BasisAtoms']
 
 
-class BasisAtoms(Atoms):
+class BasisAtoms(XYZAtoms):
     """An `Atoms` sub-class for crystal structure basis atoms.
 
     Sub-class of `Atoms` class, and a container class for lists of
@@ -35,6 +36,28 @@ class BasisAtoms(Atoms):
         existing `BasisAtoms` instance object.
 
     """
-    def __init__(self, atoms=None):
 
-        super().__init__(atoms=atoms)
+    @property
+    def __atom_class__(self):
+        return BasisAtom
+
+    @property
+    def rs(self):
+        """:class:`~numpy:numpy.ndarray` of :attr:`Atom.r` position \
+            `Vector`\ s"""
+        return np.asarray([atom.rs for atom in self])
+
+    @property
+    def xs(self):
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`x` coordinates."""
+        return self.rs[:, 0]
+
+    @property
+    def ys(self):
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`y` coordinates."""
+        return self.rs[:, 1]
+
+    @property
+    def zs(self):
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`z` coordinates."""
+        return self.rs[:, 2]

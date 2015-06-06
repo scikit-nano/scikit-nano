@@ -14,65 +14,54 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from functools import total_ordering
+import copy
 import numbers
 import numpy as np
 
 from sknano.core.math import Vector
-from ._atom import Atom
+from ._xyz_atom import XYZAtom
 
 __all__ = ['BasisAtom']
 
 
 @total_ordering
-class BasisAtom(Atom):
+class BasisAtom(XYZAtom):
     """An abstract object representation of a crystal structure basis atom.
 
     Parameters
     ----------
-    basis_point : `Point`
 
     """
 
-    def __init__(self, frac_coords=None, **kwargs):
+    def __init__(self, *args, lattice=None, xs=None, ys=None, zs=None,
+                 **kwargs):
 
-        super().__init__(**kwargs)
+        super().__init__(*args, **kwargs)
 
-        self.frac_coords = Vector(frac_coords)
-
-        self.fmtstr = "Atom(frac_coords={frac_coords!s}, " + \
-            "element={element!s}, mass={mass!s})"
-
-    def __str__(self):
-        """Return a nice string representation of `BasisAtom`."""
-        try:
-            return self.fmtstr.format(**self.todict())
-        except KeyError:
-            return repr(self)
-
-    def __repr__(self):
-        """Return canonical string representation of `BasisAtom`."""
-        return "Atom(coords={!r}, element={!r}, mass={!r})".format(
-            self.frac_coords, self.element, self.mass)
+        self.lattice = lattice
+        self.rs = Vector([xs, ys, zs])
+        self.fmtstr = super().fmtstr + \
+            ", xs={xs:.6f}, ys={ys:.6f}, zs={zs:.6f}"
 
     def __eq__(self, other):
         return super().__eq__(other)
 
     def __lt__(self, other):
         """Test if `self` is *less than* `other`."""
-        if not isinstance(type(self)):
+        if not isinstance(other, type(self)):
             return NotImplemented
-        if self.frac_coords.length < other.frac_coords.length:
+        if self.rs < other.rs:
             return True
         else:
             return super().__lt__(other)
 
     def __dir__(self):
         attrs = super().__dir__()
-        attrs.append('frac_coords')
+        attrs.append('rs')
         return attrs
 
     @property
-    def x(self):
+    def xs(self):
         """:math:`x`-coordinate in units of **Angstroms**.
 
         Returns
@@ -81,10 +70,10 @@ class BasisAtom(Atom):
             :math:`x`-coordinate in units of **Angstroms**.
 
         """
-        return self._r.x
+        return self.rs.x
 
-    @x.setter
-    def x(self, value):
+    @xs.setter
+    def xs(self, value):
         """Set `Atom` :math:`x`-coordinate in units of **Angstroms**.
 
         Parameters
@@ -95,10 +84,12 @@ class BasisAtom(Atom):
         """
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self._r.x = value
+        rs = self.rs
+        rs.x = value
+        self._update_cartesian_coordinate(rs)
 
     @property
-    def y(self):
+    def ys(self):
         """:math:`y`-coordinate in units of **Angstroms**.
 
         Returns
@@ -107,10 +98,10 @@ class BasisAtom(Atom):
             :math:`y`-coordinate in units of **Angstroms**.
 
         """
-        return self._r.y
+        return self.rs.y
 
-    @y.setter
-    def y(self, value):
+    @ys.setter
+    def ys(self, value):
         """Set `Atom` :math:`y`-coordinate in units of **Angstroms**.
 
         Parameters
@@ -121,10 +112,12 @@ class BasisAtom(Atom):
         """
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self._r.y = value
+        rs = self.rs
+        rs.y = value
+        self._update_cartesian_coordinate(rs)
 
     @property
-    def z(self):
+    def zs(self):
         """:math:`z`-coordinate in units of **Angstroms**.
 
         Returns
@@ -133,10 +126,10 @@ class BasisAtom(Atom):
             :math:`z`-coordinate in units of **Angstroms**.
 
         """
-        return self._r.z
+        return self.rs.z
 
-    @z.setter
-    def z(self, value):
+    @zs.setter
+    def zs(self, value):
         """Set `Atom` :math:`z`-coordinate in units of **Angstroms**.
 
         Parameters
@@ -147,10 +140,12 @@ class BasisAtom(Atom):
         """
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self._r.z = value
+        rs = self.rs
+        rs.z = value
+        self._update_cartesian_coordinate(rs)
 
     @property
-    def r(self):
+    def rs(self):
         """:math:`x, y, z` components of `Atom` position vector.
 
         Returns
@@ -159,10 +154,10 @@ class BasisAtom(Atom):
             3-element ndarray of [:math:`x, y, z`] coordinates of `Atom`.
 
         """
-        return self._r
+        return Vector(self.lattice.cartesian_to_fractional(self.r))
 
-    @r.setter
-    def r(self, value):
+    @rs.setter
+    def rs(self, value):
         """Set :math:`x, y, z` components of `Atom` position vector.
 
         Parameters
@@ -174,33 +169,21 @@ class BasisAtom(Atom):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        self._r = Vector(value)
+        rs = Vector(value, nd=3)
+        self._update_cartesian_coordinate(rs)
+
+    def _update_cartesian_coordinate(self, rs):
+        self.r = self.lattice.fractional_to_cartesian(rs)
 
     @property
-    def frac_coords(self):
-        return self.r
+    def lattice(self):
+        return self._lattice
 
-    @frac_coords.setter
-    def frac_coords(self, value):
-        self.r = value
+    @lattice.setter
+    def lattice(self, value):
+        self._lattice = copy.copy(value)
 
-    def rezero(self, epsilon=1.0e-10):
-        """Re-zero position vector components.
-
-        Set position vector components with absolute value less than
-        `epsilon` to zero.
-
-        Parameters
-        ----------
-        epsilon : float
-            smallest allowed absolute value of any :math:`x,y,z` component.
-
-        """
-        self._r.rezero(epsilon=epsilon)
-
-    def rotate(self, angle=None, axis=None, anchor_point=None,
-               rot_point=None, from_vector=None, to_vector=None, degrees=False,
-               transform_matrix=None, verbose=False, **kwargs):
+    def rotate(self, **kwargs):
         """Rotate `Atom` position vector.
 
         Parameters
@@ -214,11 +197,8 @@ class BasisAtom(Atom):
         transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
-        self.r.rotate(angle=angle, axis=axis,
-                      anchor_point=anchor_point,
-                      rot_point=rot_point, from_vector=from_vector,
-                      to_vector=to_vector, transform_matrix=transform_matrix,
-                      degrees=degrees, verbose=verbose, **kwargs)
+        self.lattice.rotate(**kwargs)
+        super().rotate(**kwargs)
 
     def translate(self, t, fix_anchor_point=True):
         """Translate `Atom` position vector by :class:`Vector` `t`.
@@ -229,8 +209,12 @@ class BasisAtom(Atom):
         fix_anchor_point : bool, optional
 
         """
-        self.r.translate(t, fix_anchor_point=fix_anchor_point)
+        # TODO compare timing benchmarks for translation of position vector.
+        self.lattice.translate(t, fix_anchor_point=fix_anchor_point)
+        super().translate(t, fix_anchor_point=fix_anchor_point)
 
     def todict(self):
-        return dict(frac_coords=self.frac_coords, element=self.element,
-                    mass=self.mass)
+        super_dict = super().todict()
+        super_dict.update(dict(lattice=self.lattice, xs=self.xs, ys=self.ys,
+                               zs=self.zs))
+        return super_dict
