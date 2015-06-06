@@ -65,7 +65,7 @@ class ReciprocalLatticeBase(LatticeBase):
 
 class StructureBase:
 
-    def __init__(self, lattice, basis, coords, cartesian):
+    def __init__(self, lattice, basis, coords, cartesian=False):
         self.unit_cell = UnitCell(lattice, basis, coords, cartesian)
         self.atoms = Atoms()
 
