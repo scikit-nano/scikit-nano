@@ -81,6 +81,25 @@ __all__ = ['StructureAtom', 'StructureAtoms']
 # from ._base import *
 from ._atom import *
 from ._atoms import *
+from ._xyz_atom import *
+from ._xyz_atoms import *
+from ._velocity_atom import *
+from ._velocity_atoms import *
+from ._force_atom import *
+from ._force_atoms import *
+from ._image_atom import *
+from ._image_atoms import *
+from ._charged_atom import *
+from ._charged_atoms import *
+from ._energy_atom import *
+from ._energy_atoms import *
+from ._id_atom import *
+from ._id_atoms import *
+from ._type_atom import *
+from ._type_atoms import *
+from ._basis_atom import *
+from ._basis_atoms import *
+
 from ._extended_atom import *
 from ._extended_atoms import *
 from ._kdtree_atom import *
@@ -94,8 +113,5 @@ from ._bonds import *
 from ._md_atom import *
 from ._md_atoms import *
 from ._trajectory import *
-
-from ._basis_atom import *
-from ._basis_atoms import *
 
 __all__ += [s for s in dir() if not s.startswith('_')]
