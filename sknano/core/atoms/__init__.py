@@ -87,6 +87,8 @@ from ._velocity_atom import *
 from ._velocity_atoms import *
 from ._force_atom import *
 from ._force_atoms import *
+from ._cn_atom import *
+from ._cn_atoms import *
 from ._image_atom import *
 from ._image_atoms import *
 from ._charged_atom import *
@@ -97,6 +99,7 @@ from ._id_atom import *
 from ._id_atoms import *
 from ._type_atom import *
 from ._type_atoms import *
+
 from ._basis_atom import *
 from ._basis_atoms import *
 
