@@ -74,7 +74,3 @@ class Crystal2DStructure(StructureBase):
             structure.make_supercell(scaling_matrix)
         structure = Crystal2DStructure.from_pymatgen_structure(structure)
         return cls(lattice=structure.lattice, basis=structure.basis)
-
-    def todict(self):
-        """Return `dict` of `Crystal2DStructure` parameters."""
-        return dict(lattice=self.lattice, basis=self.basis)

@@ -76,10 +76,6 @@ class Crystal3DStructure(StructureBase):
         structure = CrystalStructure.from_pymatgen_structure(structure)
         return cls(lattice=structure.lattice, basis=structure.basis)
 
-    def todict(self):
-        """Return `dict` of `CrystalStructure` parameters."""
-        return dict(lattice=self.lattice, basis=self.basis)
-
 CrystalStructure = Crystal3DStructure
 
 
