@@ -20,22 +20,23 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-from sknano.core.math import Point, Vector
+from sknano.core.math import Vector
 
+from ._base import LatticeBase, ReciprocalLatticeBase
 from ._mixins import Direct2DLatticeMixin, Reciprocal2DLatticeMixin, \
     UnitCellMixin
 
 __all__ = ['Crystal2DLattice', 'Reciprocal2DLattice']
 
 
-class Crystal2DLattice(Reciprocal2DLatticeMixin, UnitCellMixin):
+class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin, UnitCellMixin):
     """2D crystal lattice class."""
 
     def __init__(self, a=None, b=None, gamma=None,
                  a1=None, a2=None, cell_matrix=None,
                  orientation_matrix=None):
 
-        self.offset = Point(np.zeros(3))
+        super().__init__(nd=2)
 
         if cell_matrix is not None:
             cell_matrix = np.asarray(cell_matrix)
@@ -43,13 +44,14 @@ class Crystal2DLattice(Reciprocal2DLatticeMixin, UnitCellMixin):
             a2 = np.array(cell_matrix[1, :])
 
         if a1 is not None and a2 is not None:
-            a1 = Vector(a1)
-            a2 = Vector(a2)
+            a1 = Vector(a1, nd=3)
+            a2 = Vector(a2, nd=3)
             a = a1.length
             b = a2.length
             gamma = np.degrees(a1.angle(a2))
             cell_matrix = np.matrix(np.vstack((np.asarray(a1),
-                                               np.asarray(a2))))
+                                               np.asarray(a2),
+                                               np.asarray([0, 0, 1]))))
 
         self._a = a
         self._b = b
@@ -70,9 +72,8 @@ class Crystal2DLattice(Reciprocal2DLatticeMixin, UnitCellMixin):
 
         self.fmtstr = "a={a!r}, b={b!r}, gamma={gamma!r}"
 
-    def __repr__(self):
-        return "{}({})".format(self.__class__.__name__,
-                               self.fmtstr.format(**self.todict()))
+    def __dir__(self):
+        return ['a', 'b', 'gamma']
 
     def todict(self):
         """Return `dict` of `CrystalLattice` parameters."""
@@ -81,7 +82,7 @@ class Crystal2DLattice(Reciprocal2DLatticeMixin, UnitCellMixin):
     @property
     def a(self):
         """Length of lattice vector :math:`\\mathbf{a}`."""
-        return np.around(self._a, decimals=6)
+        return np.around(self._a, decimals=10)
 
     @a.setter
     def a(self, value):
@@ -90,7 +91,7 @@ class Crystal2DLattice(Reciprocal2DLatticeMixin, UnitCellMixin):
     @property
     def b(self):
         """Length of lattice_vector :math:`\\mathbf{b}`."""
-        return np.around(self._b, decimals=6)
+        return np.around(self._b, decimals=10)
 
     @b.setter
     def b(self, value):
@@ -100,31 +101,36 @@ class Crystal2DLattice(Reciprocal2DLatticeMixin, UnitCellMixin):
     def gamma(self):
         """Angle between lattice vectors :math:`\\mathbf{a}` and \
         :math:`\\mathbf{b}` in **degrees**."""
-        return np.around(self._gamma, decimals=6)
+        try:
+            return np.around(float(self._gamma), decimals=10)
+        except TypeError:
+            return None
 
     @property
     def a1(self):
         """Lattice vector :math:`\\mathbf{a}_1=\\mathbf{a}`."""
-        return Vector(self.ortho_matrix[:, 0].A.flatten())
+        return Vector(self.cell_matrix[0, :].A.flatten())[:2]
 
-    @a1.setter
-    def a1(self, value):
-        self.ortho_matrix[:]
+    # @a1.setter
+    # def a1(self, value):
+    #     if not isinstance(value, Vector):
+    #         value = Vector(value)
+    #     self.cell_matrix[:, 0] = np.asarray(value)
 
     @property
     def a2(self):
         """Lattice vector :math:`\\mathbf{a}_2=\\mathbf{b}`."""
-        return Vector(self.ortho_matrix[:, 1].A.flatten())
+        return Vector(self.cell_matrix[1, :].A.flatten())[:2]
 
     @property
     def cos_gamma(self):
         """:math:`\\cos\\gamma`"""
-        return np.around(np.cos(np.radians(self.gamma)), decimals=6)
+        return np.around(np.cos(np.radians(self.gamma)), decimals=10)
 
     @property
     def sin_gamma(self):
         """:math:`\\sin\\gamma`"""
-        return np.around(np.sin(np.radians(self.gamma)), decimals=6)
+        return np.around(np.sin(np.radians(self.gamma)), decimals=10)
 
     @property
     def cell_area(self):
@@ -142,8 +148,11 @@ class Crystal2DLattice(Reciprocal2DLatticeMixin, UnitCellMixin):
         m12 = self.b * self.cos_gamma
         m22 = self.b * self.sin_gamma
 
-        self._ortho_matrix = np.matrix([[m11, m12],
-                                        [0.0, m22]])
+        # self._ortho_matrix = np.matrix([[m11, m12],
+        #                                 [0.0, m22]])
+        self._ortho_matrix = np.matrix([[m11, m12, 0.0],
+                                        [0.0, m22, 0.0],
+                                        [0.0, 0.0, 1.0]])
 
     @property
     def reciprocal_lattice(self):
@@ -175,49 +184,24 @@ class Crystal2DLattice(Reciprocal2DLatticeMixin, UnitCellMixin):
         return cls(a=a, b=a, gamma=120)
 
 
-class Reciprocal2DLattice(Direct2DLatticeMixin, UnitCellMixin):
+class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin,
+                          UnitCellMixin):
+
     def __init__(self, a_star=None, b_star=None, gamma_star=None,
                  b1=None, b2=None, cell_matrix=None, orientation_matrix=None):
 
-        self.offset = Point(np.zeros(3))
+        super().__init__(nd=2)
 
-        if cell_matrix is not None:
-            cell_matrix = np.asarray(cell_matrix)
-            b1 = np.array(cell_matrix[0, :])
-            b2 = np.array(cell_matrix[1, :])
-
-        if b1 is not None and b2 is not None:
-            b1 = Vector(b1)
-            b2 = Vector(b2)
-            a_star = b1.length
-            b_star = b2.length
-            gamma_star = np.degrees(b1.angle(b2))
-            cell_matrix = np.matrix(np.vstack((np.asarray(b1),
-                                               np.asarray(b2))))
-
-        self._a_star = a_star
-        self._b_star = b_star
-        self._gamma_star = gamma_star
-
-        if None not in (a_star, b_star, gamma_star):
-            self._update_ortho_matrix()
-
-        if cell_matrix is not None:
-            orientation_matrix = \
-                cell_matrix.T * self.fractional_matrix
-
-        if orientation_matrix is None:
-            orientation_matrix = np.matrix(np.identity(3))
-
-        self.orientation_matrix = orientation_matrix
-        self.lattice_type = None
+        self._direct_lattice = \
+            Crystal2DLattice(a=a_star, b=b_star, gamma=gamma_star,
+                             a1=b1, a2=b2, cell_matrix=cell_matrix,
+                             orientation_matrix=orientation_matrix)
 
         self.fmtstr = "a_star={a_star!r}, b_star={b_star!r}, " + \
             "gamma_star={gamma_star!r}"
 
-    def __repr__(self):
-        return "{}({})".format(self.__class__.__name__,
-                               self.fmtstr.format(**self.todict()))
+    def __dir__(self):
+        return ['a_star', 'b_star', 'gamma_star']
 
     def todict(self):
         """Return `dict` of `Reciprocal2DLattice` parameters."""
@@ -225,48 +209,51 @@ class Reciprocal2DLattice(Direct2DLatticeMixin, UnitCellMixin):
                     gamma_star=self.gamma_star)
 
     @property
+    def a_star(self):
+        """Length of lattice vector :math:`\\mathbf{a^*}`."""
+        return self._direct_lattice.a
+
+    @a_star.setter
+    def a_star(self, value):
+        self._direct_lattice.a = value
+
+    @property
+    def b_star(self):
+        """Length of lattice_vector :math:`\\mathbf{b^*}`."""
+        return self._direct_lattice.b
+
+    @b_star.setter
+    def b_star(self, value):
+        self._direct_lattice.b = value
+
+    @property
     def gamma_star(self):
         """Angle between lattice vectors :math:`\\mathbf{a}` and \
         :math:`\\mathbf{b}` in **degrees**."""
-        return np.around(self._gamma_star, decimals=6)
+        try:
+            return np.around(self._direct_lattice.gamma, decimals=10)
+        except TypeError:
+            return None
 
     @property
     def b1(self):
         """Reciprocal lattice vector :math:`\\mathbf{b}_1=\\mathbf{a}^*`."""
-        return Vector(self.ortho_matrix[:, 0].A.flatten())
+        return self._direct_lattice.a1
 
     @property
     def b2(self):
         """Reciprocal lattice vector :math:`\\mathbf{b}_2=\\mathbf{b}^*`."""
-        return Vector(self.ortho_matrix[:, 1].A.flatten())
+        return self._direct_lattice.a2
 
     @property
     def cos_gamma_star(self):
         """:math:`\\cos\\gamma^*`"""
-        return np.around(np.cos(np.radians(self.gamma_star)), decimals=6)
+        return self._direct_lattice.cos_gamma
 
     @property
     def sin_gamma_star(self):
         """:math:`\\sin\\gamma^*`"""
-        return np.around(np.sin(np.radians(self.gamma_star)), decimals=6)
-
-    @property
-    def cell_area(self):
-        """Reciprocal unit cell area."""
-        return self.b1.cross(self.b2)
-
-    @property
-    def ortho_matrix(self):
-        """Transformation matrix to convert from fractional coordinates to \
-            cartesian coordinates."""
-        return self._ortho_matrix
-
-    def _update_ortho_matrix(self):
-        m11 = self.a_star
-        m12 = self.b_star * self.cos_gamma_star
-        m22 = self.b_star * self.sin_gamma_star
-        self._ortho_matrix = np.matrix([[m11, m12],
-                                        [0.0, m22]])
+        return self._direct_lattice.sin_gamma
 
     @property
     def reciprocal_lattice(self):
