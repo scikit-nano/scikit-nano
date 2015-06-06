@@ -69,7 +69,7 @@ class StructureBase:
         self.unit_cell = UnitCell(lattice, basis, coords, cartesian)
         self.atoms = Atoms()
 
-        self.fmtstr = "lattice={lattice!r}, basis={basis!r}"
+        self.fmtstr = "{lattice!r}, {basis!r}, {coords!r}, cartesian=True"
 
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__,
@@ -90,3 +90,6 @@ class StructureBase:
 
     def rotate(self, **kwargs):
         self.unit_cell.rotate(**kwargs)
+
+    def todict(self):
+        return self.unit_cell.todict()
