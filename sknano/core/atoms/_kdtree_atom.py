@@ -21,8 +21,6 @@ __all__ = ['KDTAtom']
 
 class KDTAtom(XAtom, NNAtomMixin):
     """An `Atom` class for KDTree analysis."""
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
 
     def __dir__(self):
         attrs = super().__dir__()
