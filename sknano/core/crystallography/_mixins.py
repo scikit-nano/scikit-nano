@@ -18,7 +18,8 @@ __docformat__ = 'restructuredtext en'
 # from abc import ABCMeta, abstractproperty
 # from enum import Enum
 
-from sknano.core.math import Point, Vector, zhat
+from sknano.core.math import Point, Vector, zhat, rotation_matrix, \
+    transformation_matrix
 
 import numpy as np
 
@@ -33,7 +34,7 @@ class Direct2DLatticeMixin:
     @property
     def cos_gamma(self):
         """:math:`\\cos\\gamma`"""
-        return np.around(np.acos(np.radians(self.gamma)), decimals=6)
+        return np.around(np.acos(np.radians(self.gamma)), decimals=10)
 
     @property
     def sin_gamma(self):
@@ -61,7 +62,7 @@ class Reciprocal2DLatticeMixin:
     @property
     def cos_gamma_star(self):
         """:math:`\\cos\\gamma^*`"""
-        return np.around(np.acos(np.radians(self.gamma_star)), decimals=6)
+        return np.around(np.acos(np.radians(self.gamma_star)), decimals=10)
 
     @property
     def sin_gamma_star(self):
@@ -91,21 +92,21 @@ class Direct3DLatticeMixin:
         """:math:`\\cos\\alpha`"""
         return np.around(
             (self.cos_beta_star * self.cos_gamma_star - self.cos_alpha_star) /
-            (self.sin_beta_star * self.sin_gamma_star), decimals=6)
+            (self.sin_beta_star * self.sin_gamma_star), decimals=10)
 
     @property
     def cos_beta(self):
         """:math:`\\cos\\beta`"""
         return np.around(
             (self.cos_gamma * self.cos_alpha - self.cos_beta) /
-            (self.sin_gamma * self.sin_alpha), decimals=6)
+            (self.sin_gamma * self.sin_alpha), decimals=10)
 
     @property
     def cos_gamma(self):
         """:math:`\\cos\\gamma`"""
         return np.around(
             (self.cos_alpha_star * self.cos_beta_star - self.cos_gamma_star) /
-            (self.sin_alpha_star * self.sin_beta_star), decimals=6)
+            (self.sin_alpha_star * self.sin_beta_star), decimals=10)
 
     @property
     def sin_alpha(self):
@@ -147,19 +148,19 @@ class Reciprocal3DLatticeMixin:
     def cos_alpha_star(self):
         """:math:`\\cos\\alpha^*`"""
         return np.around((self.cos_beta * self.cos_gamma - self.cos_alpha) /
-                         (self.sin_beta * self.sin_gamma), decimals=6)
+                         (self.sin_beta * self.sin_gamma), decimals=10)
 
     @property
     def cos_beta_star(self):
         """:math:`\\cos\\beta^*`"""
         return np.around((self.cos_gamma * self.cos_alpha - self.cos_beta) /
-                         (self.sin_gamma * self.sin_alpha), decimals=6)
+                         (self.sin_gamma * self.sin_alpha), decimals=10)
 
     @property
     def cos_gamma_star(self):
         """:math:`\\cos\\gamma^*`"""
         return np.around((self.cos_alpha * self.cos_beta - self.cos_gamma) /
-                         (self.sin_alpha * self.sin_beta), decimals=6)
+                         (self.sin_alpha * self.sin_beta), decimals=10)
 
     @property
     def sin_alpha_star(self):
@@ -247,7 +248,7 @@ class UnitCellMixin:
             (p - self.offset).column_matrix
         return p.__class__(f.A.flatten())
 
-    def wrap_fractional_coordinate(self, p, epsilon=1e-6):
+    def wrap_fractional_coordinate(self, p, epsilon=1e-8):
         """Wrap fractional coordinate to lie within unit cell.
 
         Parameters
@@ -283,3 +284,52 @@ class UnitCellMixin:
         return self.fractional_to_cartesian(
             self.wrap_fractional_coordinate(
                 self.cartesian_to_fractional(p)))
+
+    def rotate(self, angle=None, axis=None, anchor_point=None,
+               rot_point=None, from_vector=None, to_vector=None, degrees=False,
+               transform_matrix=None, verbose=False, **kwargs):
+        """Rotate unit cell.
+
+        Parameters
+        ----------
+        angle : float
+        axis : :class:`~sknano.core.math.Vector`, optional
+        anchor_point : :class:`~sknano.core.math.Point`, optional
+        rot_point : :class:`~sknano.core.math.Point`, optional
+        from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
+        degrees : bool, optional
+        transform_matrix : :class:`~numpy:numpy.ndarray`
+
+        """
+        if self.nd == 2:
+            axis = 'z'
+        if transform_matrix is None:
+            transform_matrix = \
+                rotation_matrix(angle=angle, axis=axis,
+                                anchor_point=anchor_point,
+                                rot_point=rot_point,
+                                from_vector=from_vector,
+                                to_vector=to_vector, degrees=degrees,
+                                verbose=verbose, **kwargs)
+
+            # transform_matrix = \
+            #     transformation_matrix(angle=angle, axis=axis,
+            #                           anchor_point=anchor_point,
+            #                           rot_point=rot_point,
+            #                           from_vector=from_vector,
+            #                           to_vector=to_vector, degrees=degrees,
+            #                           verbose=verbose, **kwargs)
+
+        self.orientation_matrix = \
+            np.dot(transform_matrix, self.orientation_matrix)
+
+    def translate(self, t, fix_anchor_point=True):
+        """Translate unit cell.
+
+        Parameters
+        ----------
+        t : :class:`Vector`
+        fix_anchor_point : bool, optional
+
+        """
+        self.offset.translate(t, fix_anchor_point=fix_anchor_point)
