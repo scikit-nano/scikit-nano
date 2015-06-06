@@ -34,9 +34,9 @@ class KDTAtoms(XAtoms, NNAtomsMixin):
         existing `KDTAtoms` instance object.
 
     """
-    def __init__(self, kNN=3, NNrc=2.0, atoms=None):
+    def __init__(self, atoms=None, kNN=3, NNrc=2.0):
 
-        super().__init__(atoms=atoms)
+        super().__init__(atoms)
 
         self.kNN = kNN
         self.NNrc = NNrc
