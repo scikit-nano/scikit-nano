@@ -146,7 +146,7 @@ class Vector(np.ndarray):
         if obj is None:
             return None
 
-        self.nd = len(self)
+        self.nd = len(obj)
         self._p0 = getattr(obj, 'p0', None)
         self._p = getattr(obj, 'p', None)
         if self._p0 is not None and self._p is None:

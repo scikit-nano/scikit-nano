@@ -88,7 +88,8 @@ class Point(np.ndarray):
         if pt is None:
             return None
 
-        self.nd = len(self)
+        # self.nd = len(self)
+        self.nd = len(pt)
 
     def __str__(self):
         return repr(self)
