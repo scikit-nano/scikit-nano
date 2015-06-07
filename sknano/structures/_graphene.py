@@ -17,40 +17,38 @@ import numbers
 import numpy as np
 
 # from sknano.core.atoms import Atom
+from sknano.core.crystallography import Crystal2DLattice, UnitCell
 from sknano.core.math import Vector
-from sknano.core.refdata import dVDW  # , grams_per_Da
+from sknano.core.refdata import aCC, dVDW  # , grams_per_Da
 from ._base import StructureBase
 from ._extras import edge_types
 
-__all__ = ['Graphene']
+__all__ = ['GraphenePrimitiveCell', 'GrapheneConventionalCell', 'Graphene']
 
 
-class GraphenePrimitiveCell(StructureBase):
+class GraphenePrimitiveCell(UnitCell):
     """Graphene primitive unit cell structure class.
 
     Parameters
     ----------
-    bond : float, optional
-        bond length between nearest-neighbor atoms in **Angstroms**.
 
     """
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.a = np.sqrt(3) * self.bond
+    def __init__(self, bond=aCC, a=np.sqrt(3)*aCC, basis=['C', 'C'],
+                 coords=[[0, 0, 0], [aCC, 0, 0]], cartesian=True):
 
-        self.a1 = Vector(nd=2)
-        self.a2 = Vector(nd=2)
+        lattice = Crystal2DLattice(a=a, b=a, gamma=60)
+        lattice.rotate(angle=-np.pi/6)
 
-        self.a1.x = self.a2.x = np.sqrt(3) / 2 * self.a
-        self.a1.y = 1 / 2 * self.a
-        self.a2.y = -self.a1.y
+        super().__init__(lattice, basis, coords, cartesian)
 
-        self.b1 = Vector(nd=2)
-        self.b2 = Vector(nd=2)
 
-        self.b1.x = self.b2.x = 1 / np.sqrt(3) * 2 * np.pi / self.a
-        self.b1.y = 2 * np.pi / self.a
-        self.b2.y = -self.b1.y
+class GrapheneConventionalCell(UnitCell):
+    def __init__(self, bond=aCC, a=3*aCC, b=np.sqrt(3)*aCC, basis=4*['C'],
+                 coords=[[0, 0, 0], [aCC, 0, 0],
+                         [3/2*aCC, np.sqrt(3)/2*aCC, 0],
+                         [5/2*aCC, np.sqrt(3)/2*aCC, 0]], cartesian=True):
+        lattice = Crystal2DLattice.rectangular(a=a, b=b)
+        super().__init__(lattice, basis, coords, cartesian)
 
 
 class Graphene(StructureBase):
@@ -90,22 +88,20 @@ class Graphene(StructureBase):
 
     """
 
-    def __init__(self, length=None, width=None, edge=None, nlayers=1,
-                 layer_spacing=dVDW, layer_rotation_angles=None,
-                 stacking_order='AB', deg2rad=True, **kwargs):
+    def __init__(self, armchair_edge_length=None, zigzag_edge_length=None,
+                 bond=aCC, nlayers=1, layer_spacing=dVDW,
+                 layer_rotation_angles=None, layer_rotation_increment=None,
+                 stacking_order='AB', degrees=True, cartesian=True, **kwargs):
 
-        super().__init__(**kwargs)
+        if 'deg2rad' in kwargs:
+            degrees = kwargs['deg2rad']
+            del kwargs['deg2rad']
 
-        self.length = length
-        self.width = width
-        if edge in ('armchair', 'zigzag'):
-            edge = edge_types[edge]
-        elif edge not in ('AC', 'ZZ'):
-            print('unrecognized edge parameter: {}\n'.format(edge) +
-                  'choosing one at random...\n')
-            edge = np.random.choice(['AC', 'ZZ'])
-            print('the randomly chosen edge type is: {}'.format(edge))
-        self.edge = edge
+        self.cell = GrapheneConventionalCell(bond=bond)
+        super().__init__(bond=bond, **self.cell.todict())
+
+        self.armchair_edge_length = armchair_edge_length
+        self.zigzag_edge_length = zigzag_edge_length
 
         self._Nx = 0
         self._Ny = 0
@@ -117,7 +113,15 @@ class Graphene(StructureBase):
         self.nlayers = nlayers
         self.layer_spacing = layer_spacing
 
-        if layer_rotation_angles is not None and deg2rad:
+        if layer_rotation_increment is not None and \
+                layer_rotation_angles is None:
+            layer_rotation_angles = layer_rotation_increment * \
+                np.arange(self.nlayers)
+        else:
+            layer_rotation_angles = np.zeros(self.nlayers)
+            degrees = False
+
+        if layer_rotation_angles is not None and degrees:
             if isinstance(layer_rotation_angles, numbers.Number):
                 layer_rotation_angles = np.radians(layer_rotation_angles)
             elif isinstance(layer_rotation_angles, (list, np.ndarray)):
@@ -130,32 +134,21 @@ class Graphene(StructureBase):
         self.layer_shift = Vector()
 
         if nlayers > 1 and stacking_order == 'AB':
-            if edge == 'AC':
-                self.layer_shift.y = self.bond
-            else:
-                self.layer_shift.x = self.bond
+            self.layer_shift.x = self.bond
 
-        self.cell = Vector()
-        if edge == 'AC':
-            # Set up the unit cell with the armchair edge aligned
-            # along the `y`-axis.
-            self.cell.x = np.sqrt(3) * self.bond
-            self.cell.y = 3 * self.bond
-        else:
-            # Set up the unit cell with the zigzag edge aligned
-            # along the `y`-axis.
-            self.cell.x = 3 * self.bond
-            self.cell.y = np.sqrt(3) * self.bond
+        self.Nx = int(np.ceil(10 * self.armchair_edge_length / self.cell.a))
+        self.Ny = int(np.ceil(10 * self.zigzag_edge_length / self.cell.b))
+        self.fmtstr = 'armchair_edge_length={armchair_edge_length!r}, ' + \
+            'zigzag_edge_length={zigzag_edge_length!r}, ' + \
+            'bond={bond!r}, nlayers={nlayers!r}, ' + \
+            'layer_spacing={layer_spacing!r}, ' + \
+            'layer_rotation_angles={layer_rotation_angles!r}, ' + \
+            'stacking_order={stacking_order!r}'
 
-        self.Nx = int(np.ceil(10 * self.width / self.cell.x))
-        self.Ny = int(np.ceil(10 * self.length / self.cell.y))
-
-    def __repr__(self):
-        retstr = 'Graphene(length={!r}, width={!r}, edge={!r}, ' + \
-            'element1={!r}, element2={!r}, bond={!r}, nlayers={!r}, ' + \
-            'layer_spacing={!r}, layer_rotation_angles={!r}, ' + \
-            'stacking_order={!r})'
-        return retstr.format(self.length, self.width, self.edge, self.element1,
-                             self.element2, self.bond, self.nlayers,
-                             self.layer_spacing, self.layer_rotation_angles,
-                             self.stacking_order)
+    def todict(self):
+        return dict(armchair_edge_length=self.armchair_edge_length,
+                    zigzag_edge_length=self.zigzag_edge_length,
+                    bond=self.bond, nlayers=self.nlayers,
+                    layer_spacing=self.layer_spacing,
+                    layer_rotation_angles=self.layer_rotation_angles,
+                    stacking_order=self.stacking_order)
