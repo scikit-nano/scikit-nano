@@ -543,5 +543,9 @@ def test35():
     assert_true(np.allclose(v0, v2))
 
 
+def test36():
+    v0 = Vector(np.arange(10))
+    assert_equal(v0.argmax(), len(v0)-1)
+
 if __name__ == '__main__':
     nose.runmodule()
