@@ -9,10 +9,10 @@ from sknano.structures import Graphene
 
 
 def test1():
-    graphene = Graphene(length=5, width=5, edge='AC')
-    assert_equals(graphene.length, 5)
-    assert_equals(graphene.width, 5)
-    assert_equals(graphene.edge, 'AC')
+    graphene = Graphene(armchair_edge_length=5, zigzag_edge_length=5)
+    assert_equals(graphene.zigzag_edge_length, 5)
+    assert_equals(graphene.armchair_edge_length, 5)
+    print(graphene.unit_cell)
 
 
 if __name__ == '__main__':
