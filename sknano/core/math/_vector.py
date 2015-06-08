@@ -189,7 +189,7 @@ class Vector(np.ndarray):
     def tolist(self):
         """List of `Vector` coordinates with values formatted for *pretty* \
             output."""
-        return np.around(self.__array__(), decimals=6).tolist()
+        return np.around(self.__array__(), decimals=10).tolist()
 
     def __getattr__(self, name):
         try:
@@ -289,19 +289,18 @@ class Vector(np.ndarray):
         data._p = np.ndarray.view(p, Point)
 
     def __eq__(self, other):
-        if isinstance(other, Vector):
-            if self is other or (np.allclose(self, other) and
-                                 np.allclose(self.p0, other.p0) and
-                                 np.allclose(self.p, other.p)):
-                return True
-            else:
-                return False
+        if not isinstance(other, Vector):
+            other = Vector(other)
+        if self is other or (np.allclose(self.__array__(), other.__array__())
+                             and np.allclose(self.p0, other.p0)
+                             and np.allclose(self.p, other.p)):
+            return True
         return False
 
     def __lt__(self, other):
-        if isinstance(other, Vector):
-            return self.norm < other.norm
-        return False
+        if not isinstance(other, Vector):
+            other = Vector(other)
+        return self.norm < other.norm
 
     def __le__(self, other):
         return self < other or self == other
