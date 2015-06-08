@@ -41,6 +41,8 @@ class StructureBase(metaclass=ABCMeta):
 
         self.fmtstr = ""
 
+        super().__init__(*args, **kwargs)
+
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__,
                                self.fmtstr.format(**self.todict()))

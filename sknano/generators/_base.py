@@ -33,11 +33,11 @@ STRUCTURE_GENERATORS = ('FullereneGenerator',
                         'MWNTBundleGenerator')
 
 
-class GeneratorBase(object):
+class GeneratorBase:
     """Base class for generator classes"""
 
     def __init__(self, *args, **kwargs):
-        super(GeneratorBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.structure_data = StructureData()
 
     def __getattr__(self, name):

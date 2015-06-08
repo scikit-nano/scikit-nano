@@ -40,6 +40,7 @@ class StructureData:
     """Container class for structure data."""
     def __init__(self):
         self._atoms = Atoms()
+        super().__init__()
 
     @property
     def atoms(self):
