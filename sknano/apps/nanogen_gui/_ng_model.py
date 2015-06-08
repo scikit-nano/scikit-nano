@@ -9,7 +9,6 @@ NanoGen model (:mod:`sknano.apps.nanogen_gui._ng_model`)
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import object
 __docformat__ = 'restructuredtext en'
 
 from sknano.core.refdata import CCbond, dVDW
@@ -22,9 +21,10 @@ class NGModel(object):
     """:mod:`~sknano.apps.nanogen_gui` MVC model class."""
     def __init__(self):
         self._observers = []
-        self.swnt = SWNT(n=10, m=10, bond=CCbond)
-        self.swntbundle = SWNTBundle(n=10, m=10, bond=CCbond)
-        self.graphene = Graphene(length=10, width=1, bond=CCbond, edge='AC')
+        self.swnt = SWNT((10, 10), bond=CCbond)
+        self.swntbundle = SWNTBundle((10, 10), bond=CCbond)
+        self.graphene = Graphene(armchair_edge_length=10,
+                                 zigzag_edge_length=1, bond=CCbond)
 
     @property
     def n(self):
@@ -119,30 +119,22 @@ class NGModel(object):
         self.notify_observers()
 
     @property
-    def length(self):
-        return self.graphene.length
+    def armchair_edge_length(self):
+        return self.graphene.armchair_edge_length
 
-    @length.setter
-    def length(self, value):
-        self.graphene.length = value
+    @armchair_edge_length.setter
+    def armchair_edge_length(self, value):
+        self.graphene.armchair_edge_length = value
         self.notify_observers()
 
     @property
-    def width(self):
-        return self.graphene.width
+    def zigzag_edge_length(self):
+        return self.graphene.zigzag_edge_length
 
-    @width.setter
-    def width(self, value):
-        self.graphene.width = value
+    @zigzag_edge_length.setter
+    def zigzag_edge_length(self, value):
+        self.graphene.zigzag_edge_length = value
         self.notify_observers()
-
-    @property
-    def edge(self):
-        return self.graphene.edge
-
-    @edge.setter
-    def edge(self, value):
-        self.graphene.edge = value
 
     @property
     def nlayers(self):

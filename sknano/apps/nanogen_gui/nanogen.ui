@@ -831,7 +831,7 @@
                          </widget>
                         </item>
                         <item>
-                         <widget class="QDoubleSpinBox" name="length_doubleSpinBox">
+                         <widget class="QDoubleSpinBox" name="armchair_edge_length_doubleSpinBox">
                           <property name="minimumSize">
                            <size>
                             <width>200</width>
@@ -874,7 +874,7 @@
                          </widget>
                         </item>
                         <item>
-                         <widget class="QDoubleSpinBox" name="width_doubleSpinBox">
+                         <widget class="QDoubleSpinBox" name="zigzag_edge_length_doubleSpinBox">
                           <property name="minimumSize">
                            <size>
                             <width>200</width>
@@ -1287,7 +1287,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QDoubleSpinBox" name="doubleSpinBox">
+                   <widget class="QDoubleSpinBox" name="layer_rotation_increment_doubleSpinBox">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>

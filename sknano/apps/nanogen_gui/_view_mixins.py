@@ -9,8 +9,6 @@ View mixin classes (:mod:`sknano.apps.nanogen_gui._view_mixins`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-from builtins import str
-from builtins import object
 __docformat__ = 'restructuredtext en'
 
 try:
@@ -21,7 +19,7 @@ except ImportError as e:
 __all__ = ['NanotubeViewMixin', 'GrapheneViewMixin']
 
 
-class NanotubeViewMixin(object):
+class NanotubeViewMixin:
     """Mixin class for nanotube classes."""
     @pyqtSlot()
     def on_n_spinBox_editingFinished(self):
@@ -108,26 +106,28 @@ class NanotubeViewMixin(object):
 class GrapheneViewMixin(object):
     """Mixin class for graphene."""
 
-    #@pyqtSlot(int)
-    #def on_stacking_order_buttonGroup_buttonClicked(self):
-    #    if self.nlayer_spinBox.value() == 1:
-    #        pass
+    # @pyqtSlot(int)
+    # def on_stacking_order_buttonGroup_buttonClicked(self):
+    #     if self.nlayer_spinBox.value() == 1:
+    #         pass
 
     @pyqtSlot()
-    def on_length_doubleSpinBox_editingFinished(self):
-        self.model.length = self.length_doubleSpinBox.value()
+    def on_armchair_edge_length_doubleSpinBox_editingFinished(self):
+        self.model.armchair_edge_length = \
+            self.armchair_edge_length_doubleSpinBox.value()
 
     @pyqtSlot(float)
-    def on_length_doubleSpinBox_valueChanged(self, value):
-        self.model.length = value
+    def on_armchair_edge_length_doubleSpinBox_valueChanged(self, value):
+        self.model.armchair_edge_length = value
 
     @pyqtSlot()
-    def on_width_doubleSpinBox_editingFinished(self):
-        self.model.width = self.width_doubleSpinBox.value()
+    def on_zigzag_edge_length_doubleSpinBox_editingFinished(self):
+        self.model.zigzag_edge_length = \
+            self.zigzag_edge_length_doubleSpinBox.value()
 
     @pyqtSlot(float)
-    def on_width_doubleSpinBox_valueChanged(self, value):
-        self.model.width = value
+    def on_zigzag_edge_length_doubleSpinBox_valueChanged(self, value):
+        self.model.zigzag_edge_length = value
 
     @pyqtSlot()
     def on_nlayers_spinBox_editingFinished(self):
@@ -137,17 +137,17 @@ class GrapheneViewMixin(object):
     @pyqtSlot(int)
     def on_nlayers_spinBox_valueChanged(self, value):
         self.model.nlayers = value
-        #self.update_stacking_order_buttonGroup()
+        # self.update_stacking_order_buttonGroup()
 
-    #def update_stacking_order_buttonGroup(self):
-    #    if self.nlayers_spinBox.value() == 1:
-    #        for rb in (self.AA_stacking_radioButton,
-    #                   self.AB_stacking_radioButton):
-    #            rb.setCheckable(False)
-    #    else:
-    #        for rb in (self.AA_stacking_radioButton,
-    #                   self.AB_stacking_radioButton):
-    #            rb.setCheckable(True)
+    # def update_stacking_order_buttonGroup(self):
+    #     if self.nlayers_spinBox.value() == 1:
+    #         for rb in (self.AA_stacking_radioButton,
+    #                    self.AB_stacking_radioButton):
+    #             rb.setCheckable(False)
+    #     else:
+    #         for rb in (self.AA_stacking_radioButton,
+    #                    self.AB_stacking_radioButton):
+    #             rb.setCheckable(True)
 
     @pyqtSlot()
     def on_graphene_bond_doubleSpinBox_editingFinished(self):

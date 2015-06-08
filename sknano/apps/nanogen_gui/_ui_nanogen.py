@@ -1,11 +1,9 @@
-from __future__ import unicode_literals
-from builtins import object
 # -*- coding: utf-8 -*-
 
 # Form implementation generated from reading ui file 'nanogen.ui'
 #
-# Created: Sun Nov 30 00:02:03 2014
-#      by: PyQt4 UI code generator 4.10.4
+# Created: Mon Jun  8 13:32:26 2015
+#      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -417,16 +415,16 @@ class Ui_NanoGen(object):
         self.label_9.setFont(font)
         self.label_9.setObjectName(_fromUtf8("label_9"))
         self.horizontalLayout_16.addWidget(self.label_9)
-        self.length_doubleSpinBox = QtGui.QDoubleSpinBox(self.graphene_generator_tabWidget)
-        self.length_doubleSpinBox.setMinimumSize(QtCore.QSize(200, 36))
+        self.armchair_edge_length_doubleSpinBox = QtGui.QDoubleSpinBox(self.graphene_generator_tabWidget)
+        self.armchair_edge_length_doubleSpinBox.setMinimumSize(QtCore.QSize(200, 36))
         font = QtGui.QFont()
         font.setPointSize(20)
-        self.length_doubleSpinBox.setFont(font)
-        self.length_doubleSpinBox.setDecimals(4)
-        self.length_doubleSpinBox.setMaximum(1000.0)
-        self.length_doubleSpinBox.setProperty("value", 10.0)
-        self.length_doubleSpinBox.setObjectName(_fromUtf8("length_doubleSpinBox"))
-        self.horizontalLayout_16.addWidget(self.length_doubleSpinBox)
+        self.armchair_edge_length_doubleSpinBox.setFont(font)
+        self.armchair_edge_length_doubleSpinBox.setDecimals(4)
+        self.armchair_edge_length_doubleSpinBox.setMaximum(1000.0)
+        self.armchair_edge_length_doubleSpinBox.setProperty("value", 10.0)
+        self.armchair_edge_length_doubleSpinBox.setObjectName(_fromUtf8("armchair_edge_length_doubleSpinBox"))
+        self.horizontalLayout_16.addWidget(self.armchair_edge_length_doubleSpinBox)
         self.verticalLayout_9.addLayout(self.horizontalLayout_16)
         self.horizontalLayout_17 = QtGui.QHBoxLayout()
         self.horizontalLayout_17.setObjectName(_fromUtf8("horizontalLayout_17"))
@@ -436,16 +434,16 @@ class Ui_NanoGen(object):
         self.label_10.setFont(font)
         self.label_10.setObjectName(_fromUtf8("label_10"))
         self.horizontalLayout_17.addWidget(self.label_10)
-        self.width_doubleSpinBox = QtGui.QDoubleSpinBox(self.graphene_generator_tabWidget)
-        self.width_doubleSpinBox.setMinimumSize(QtCore.QSize(200, 36))
+        self.zigzag_edge_length_doubleSpinBox = QtGui.QDoubleSpinBox(self.graphene_generator_tabWidget)
+        self.zigzag_edge_length_doubleSpinBox.setMinimumSize(QtCore.QSize(200, 36))
         font = QtGui.QFont()
         font.setPointSize(20)
-        self.width_doubleSpinBox.setFont(font)
-        self.width_doubleSpinBox.setDecimals(4)
-        self.width_doubleSpinBox.setMaximum(1000.0)
-        self.width_doubleSpinBox.setProperty("value", 1.0)
-        self.width_doubleSpinBox.setObjectName(_fromUtf8("width_doubleSpinBox"))
-        self.horizontalLayout_17.addWidget(self.width_doubleSpinBox)
+        self.zigzag_edge_length_doubleSpinBox.setFont(font)
+        self.zigzag_edge_length_doubleSpinBox.setDecimals(4)
+        self.zigzag_edge_length_doubleSpinBox.setMaximum(1000.0)
+        self.zigzag_edge_length_doubleSpinBox.setProperty("value", 1.0)
+        self.zigzag_edge_length_doubleSpinBox.setObjectName(_fromUtf8("zigzag_edge_length_doubleSpinBox"))
+        self.horizontalLayout_17.addWidget(self.zigzag_edge_length_doubleSpinBox)
         self.verticalLayout_9.addLayout(self.horizontalLayout_17)
         self.horizontalLayout_19.addLayout(self.verticalLayout_9)
         self.line_5 = QtGui.QFrame(self.graphene_generator_tabWidget)
@@ -621,10 +619,10 @@ class Ui_NanoGen(object):
         self.label_15.setFont(font)
         self.label_15.setObjectName(_fromUtf8("label_15"))
         self.horizontalLayout_26.addWidget(self.label_15)
-        self.doubleSpinBox = QtGui.QDoubleSpinBox(self.graphene_generator_tabWidget)
-        self.doubleSpinBox.setMinimumSize(QtCore.QSize(0, 36))
-        self.doubleSpinBox.setObjectName(_fromUtf8("doubleSpinBox"))
-        self.horizontalLayout_26.addWidget(self.doubleSpinBox)
+        self.layer_rotation_increment_doubleSpinBox = QtGui.QDoubleSpinBox(self.graphene_generator_tabWidget)
+        self.layer_rotation_increment_doubleSpinBox.setMinimumSize(QtCore.QSize(0, 36))
+        self.layer_rotation_increment_doubleSpinBox.setObjectName(_fromUtf8("layer_rotation_increment_doubleSpinBox"))
+        self.horizontalLayout_26.addWidget(self.layer_rotation_increment_doubleSpinBox)
         self.verticalLayout_7.addLayout(self.horizontalLayout_26)
         self.verticalLayout_8.addLayout(self.verticalLayout_7)
         self.horizontalLayout_37.addLayout(self.verticalLayout_8)
@@ -743,9 +741,9 @@ class Ui_NanoGen(object):
         self.Lz_doubleSpinBox.setSuffix(_translate("NanoGen", " nm", None))
         self.nanogen_tabWidget.setTabText(self.nanogen_tabWidget.indexOf(self.nanotube_generator_tabWidget), _translate("NanoGen", "Nanotubes", None))
         self.label_9.setText(_translate("NanoGen", "<html><head/><body><p><span style=\" font-style:italic;\">L</span><span style=\" vertical-align:sub;\">x</span> =</p></body></html>", None))
-        self.length_doubleSpinBox.setSuffix(_translate("NanoGen", " nm", None))
+        self.armchair_edge_length_doubleSpinBox.setSuffix(_translate("NanoGen", " nm", None))
         self.label_10.setText(_translate("NanoGen", "<html><head/><body><p><span style=\" font-style:italic;\">L</span><span style=\" vertical-align:sub;\">y</span> =</p></body></html>", None))
-        self.width_doubleSpinBox.setSuffix(_translate("NanoGen", " nm", None))
+        self.zigzag_edge_length_doubleSpinBox.setSuffix(_translate("NanoGen", " nm", None))
         self.label_5.setText(_translate("NanoGen", "<html><head/><body><p align=\"center\"><span style=\" font-style:italic;\">L</span><span style=\" vertical-align:sub;\">x</span> edge</p></body></html>", None))
         self.AC_edge_radioButton.setText(_translate("NanoGen", "armchair", None))
         self.ZZ_edge_radioButton.setText(_translate("NanoGen", "zigzag", None))

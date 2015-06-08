@@ -9,7 +9,6 @@ NanoGen view (:mod:`sknano.apps.nanogen_gui._ng_view`)
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import str
 __docformat__ = 'restructuredtext en'
 
 import importlib
@@ -75,8 +74,10 @@ class NGView(QMainWindow, Ui_NanoGen, NanotubeViewMixin, GrapheneViewMixin):
             elif self.unrolled_nanotube_generator_radioButton.isChecked():
                 generator_class = 'UnrolledNanotubeGenerator'
         elif generator_tab == 'Graphene':
-            kwargs['width'] = self.width_doubleSpinBox.value()
-            kwargs['length'] = self.length_doubleSpinBox.value()
+            kwargs['zigzag_edge_length'] = \
+                self.zigzag_edge_length_doubleSpinBox.value()
+            kwargs['armchair_edge_length'] = \
+                self.armchair_edge_length_doubleSpinBox.value()
             kwargs['bond'] = self.graphene_bond_doubleSpinBox.value()
             kwargs['nlayers'] = self.nlayers_spinBox.value()
 
@@ -100,8 +101,8 @@ class NGView(QMainWindow, Ui_NanoGen, NanotubeViewMixin, GrapheneViewMixin):
 
         generator = getattr(importlib.import_module('sknano.generators'),
                             generator_class)
-        #generator(**kwargs).save_data(fname=fname,
-        #                              structure_format=structure_format)
+        # generator(**kwargs).save_data(fname=fname,
+        #                               structure_format=structure_format)
         generator(**kwargs).save_data(structure_format=structure_format)
 
     def update_app_view(self):
@@ -115,8 +116,10 @@ class NGView(QMainWindow, Ui_NanoGen, NanotubeViewMixin, GrapheneViewMixin):
         self.Ly_lineEdit.setText('{:.4f} nm'.format(self.model.Ly))
         self.Lz_doubleSpinBox.setValue(self.model.Lz)
 
-        self.width_doubleSpinBox.setValue(self.model.width)
-        self.length_doubleSpinBox.setValue(self.model.length)
+        self.zigzag_edge_length_doubleSpinBox.setValue(
+            self.model.zigzag_edge_length)
+        self.armchair_edge_length_doubleSpinBox.setValue(
+            self.model.armchair_edge_length)
         self.nlayers_spinBox.setValue(self.model.nlayers)
         self.graphene_bond_doubleSpinBox.setValue(self.model.graphene_bond)
 
@@ -130,21 +133,21 @@ class NGView(QMainWindow, Ui_NanoGen, NanotubeViewMixin, GrapheneViewMixin):
                       self.model.graphene_element2)) + ' bond ='
         self.graphene_e1e2_bond_label.setText(graphene_e1e2_bond_label_text)
 
-        #self.Ch_lineEdit.setText('{:.3f}'.format(self.model.Ch))
-        #self.dt_lineEdit.setText('{:.3f}'.format(self.model.dt))
-        #self.T_lineEdit.setText('{:.3f}'.format(self.model.T))
-        #self.chiral_angle_lineEdit.setText(
+        # self.Ch_lineEdit.setText('{:.3f}'.format(self.model.Ch))
+        # self.dt_lineEdit.setText('{:.3f}'.format(self.model.dt))
+        # self.T_lineEdit.setText('{:.3f}'.format(self.model.T))
+        # self.chiral_angle_lineEdit.setText(
         #    '{:.2f}'.format(self.model.chiral_angle))
-        #self.N_lineEdit.setText(str(self.model.N))
-        #self.Natoms_lineEdit.setText(str(self.model.Natoms))
-        #self.tube_mass_lineEdit.setText(
+        # self.N_lineEdit.setText(str(self.model.N))
+        # self.Natoms_lineEdit.setText(str(self.model.Natoms))
+        # self.tube_mass_lineEdit.setText(
         #    '{:.3e}'.format(self.model.tube_mass))
-        #self.Natoms_per_tube_lineEdit.setText(
+        # self.Natoms_per_tube_lineEdit.setText(
         #    str(self.model.Natoms_per_tube))
-        #self.Ntubes_mantissa_spinBox.setValue(
+        # self.Ntubes_mantissa_spinBox.setValue(
         #    str(self.model.Ntubes))
 
-        #self.d_lineEdit.setText(str(self.model.d))
-        #self.dR_lineEdit.setText(str(self.model.dR))
-        #self.t1_lineEdit.setText(str(self.model.t1))
-        #self.t2_lineEdit.setText(str(self.model.t2))
+        # self.d_lineEdit.setText(str(self.model.d))
+        # self.dR_lineEdit.setText(str(self.model.dR))
+        # self.t1_lineEdit.setText(str(self.model.t1))
+        # self.t2_lineEdit.setText(str(self.model.t2))
