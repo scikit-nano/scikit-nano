@@ -25,7 +25,7 @@ class NanotubeBundleBase(NanotubeBundleMixin):
     def __init__(self, *Ch, nx=1, ny=1, vdw_spacing=dVDW,
                  bundle_packing=None, bundle_geometry=None, **kwargs):
 
-        super(NanotubeBundleBase, self).__init__(*Ch, **kwargs)
+        super().__init__(*Ch, **kwargs)
 
         self.nx = nx
         self.ny = ny
