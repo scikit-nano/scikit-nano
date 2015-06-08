@@ -97,8 +97,8 @@ class Graphene(StructureBase):
             degrees = kwargs['deg2rad']
             del kwargs['deg2rad']
 
-        self.cell = GrapheneConventionalCell(bond=bond)
-        super().__init__(bond=bond, **self.cell.todict())
+        self.unit_cell = GrapheneConventionalCell(bond=bond)
+        super().__init__(bond=bond, **kwargs)
 
         self.armchair_edge_length = armchair_edge_length
         self.zigzag_edge_length = zigzag_edge_length
@@ -136,8 +136,8 @@ class Graphene(StructureBase):
         if nlayers > 1 and stacking_order == 'AB':
             self.layer_shift.x = self.bond
 
-        self.Nx = int(np.ceil(10 * self.armchair_edge_length / self.cell.a))
-        self.Ny = int(np.ceil(10 * self.zigzag_edge_length / self.cell.b))
+        self.Nx = int(np.ceil(10 * self.armchair_edge_length / self.unit_cell.a))
+        self.Ny = int(np.ceil(10 * self.zigzag_edge_length / self.unit_cell.b))
         self.fmtstr = 'armchair_edge_length={armchair_edge_length!r}, ' + \
             'zigzag_edge_length={zigzag_edge_length!r}, ' + \
             'bond={bond!r}, nlayers={nlayers!r}, ' + \
