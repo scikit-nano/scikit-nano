@@ -32,7 +32,7 @@ class Atoms(UserList):
         existing `Atoms` instance object.
 
     """
-    def __init__(self, atoms=None, **kwargs):
+    def __init__(self, atoms=None):
         if atoms is not None and isinstance(atoms, str):
             atoms = [atoms]
         if not isinstance(atoms, type(self)) and isinstance(atoms, list):
@@ -41,7 +41,7 @@ class Atoms(UserList):
                 try:
                     atoms[i] = self.__atom_class__(**atom.todict())
                 except AttributeError:
-                    atoms[i] = self.__atom_class__(atom, **kwargs)
+                    atoms[i] = self.__atom_class__(atom)
         super().__init__(initlist=atoms)
         self.fmtstr = "{atoms!r}"
         self.kwargs = {}
