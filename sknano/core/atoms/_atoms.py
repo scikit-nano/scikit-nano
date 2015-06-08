@@ -62,6 +62,12 @@ class Atoms(UserList):
     def sort(self, key=attrgetter('element', 'Z', 'mass'), reverse=False):
         super().sort(key=key, reverse=reverse)
 
+    def __getitem__(self, index):
+        data = super().__getitem__(index)
+        if isinstance(data, list):
+            return self.__class__(data)
+        return data
+
     @property
     def fmtstr(self):
         return self._fmtstr
