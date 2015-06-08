@@ -26,5 +26,13 @@ def test1():
     print(cell)
 
 
+def test2():
+    lattice = Crystal3DLattice.hexagonal(a=5.0, c=10.0)
+    cell = UnitCell(lattice=lattice, basis=['C', 'C'],
+                    coords=[[0, 0, 0], [1/2, 1/2, 1/2]])
+    print(cell)
+    print(cell.basis)
+
+
 if __name__ == '__main__':
     nose.runmodule()
