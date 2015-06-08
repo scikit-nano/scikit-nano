@@ -148,16 +148,15 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
 
     def __init__(self, *Ch, autogen=True, **kwargs):
 
-        super(SWNTBundleGenerator, self).__init__(*Ch, autogen=False, **kwargs)
+        super().__init__(*Ch, autogen=False, **kwargs)
 
         if autogen:
-            super(SWNTBundleGenerator, self).generate_unit_cell()
             self.generate_structure_data()
 
     def generate_structure_data(self):
         """Generate structure data."""
-        super(SWNTBundleGenerator, self).generate_structure_data()
-        super(SWNTBundleGenerator, self).generate_bundle()
+        super().generate_structure_data()
+        super().generate_bundle()
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   center_CM=True, **kwargs):
