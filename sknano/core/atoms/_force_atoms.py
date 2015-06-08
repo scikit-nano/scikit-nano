@@ -47,4 +47,3 @@ class ForceAtoms(Atoms):
 
     def sort(self, key=attrgetter('f'), reverse=False):
         super().sort(key=key, reverse=reverse)
-        super().sort(reverse=reverse)

@@ -46,8 +46,7 @@ class XYZAtoms(Atoms):
         return XYZAtom
 
     def sort(self, key=attrgetter('r'), reverse=False):
-        self.data.sort(key=key, reverse=reverse)
-        super().sort(reverse=reverse)
+        super().sort(key=key, reverse=reverse)
 
     @property
     def CM(self):

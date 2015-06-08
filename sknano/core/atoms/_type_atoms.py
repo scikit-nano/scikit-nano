@@ -45,8 +45,7 @@ class TypeAtoms(Atoms):
         return TypeAtom
 
     def sort(self, key=attrgetter('type'), reverse=False):
-        self.data.sort(key=key, reverse=reverse)
-        super().sort(reverse=reverse)
+        super().sort(key=key, reverse=reverse)
 
     @property
     def Ntypes(self):

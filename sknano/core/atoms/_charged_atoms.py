@@ -46,8 +46,7 @@ class ChargedAtoms(Atoms):
         return ChargedAtom
 
     def sort(self, key=attrgetter('q'), reverse=False):
-        self.data.sort(key=key, reverse=reverse)
-        super().sort(reverse=reverse)
+        super().sort(key=key, reverse=reverse)
 
     @property
     def charges(self):

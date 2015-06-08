@@ -40,8 +40,7 @@ class VelocityAtoms(Atoms):
         return VelocityAtom
 
     def sort(self, key=attrgetter('v'), reverse=False):
-        self.data.sort(key=key, reverse=reverse)
-        super().sort(reverse=reverse)
+        super().sort(key=key, reverse=reverse)
 
     @property
     def velocities(self):
