@@ -65,28 +65,41 @@ class ReciprocalLatticeBase(LatticeBase):
 
 class StructureBase:
 
-    def __init__(self, lattice, basis, coords, cartesian=False):
-        self.unit_cell = UnitCell(lattice, basis, coords, cartesian)
-        self.atoms = Atoms()
+    def __init__(self, lattice=None, basis=None, coords=None, cartesian=False):
+        self.unit_cell = UnitCell(lattice=lattice, basis=basis,
+                                  coords=coords, cartesian=cartesian)
+        # self.atoms = Atoms()
 
         self.fmtstr = "{lattice!r}, {basis!r}, {coords!r}, cartesian=True"
+        super().__init__()
 
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__,
                                self.fmtstr.format(**self.todict()))
 
     def __getattr__(self, name):
-        return getattr(self.unit_cell, name)
+        try:
+            return getattr(self.unit_cell, name)
+        except AttributeError:
+            return super().__getattr__(name)
+
+    # @property
+    # def atoms(self):
+    #     return self._atoms
+
+    # @atoms.setter
+    # def atoms(self, value):
+    #     if not isinstance(value, Atoms):
+    #         raise TypeError('Expected an `Atoms` object')
+    #     self._atoms = value
 
     @property
-    def atoms(self):
-        return self._atoms
+    def fmtstr(self):
+        return self._fmtstr
 
-    @atoms.setter
-    def atoms(self, value):
-        if not isinstance(value, Atoms):
-            raise TypeError('Expected an `Atoms` object')
-        self._atoms = value
+    @fmtstr.setter
+    def fmtstr(self, value):
+        self._fmtstr = value
 
     def rotate(self, **kwargs):
         self.unit_cell.rotate(**kwargs)
