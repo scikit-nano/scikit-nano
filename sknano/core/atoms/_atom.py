@@ -56,8 +56,6 @@ class Atom:
         self.element = element
         self.fmtstr = "{element!r}, mass={mass!r}"
 
-        super().__init__(*args, **kwargs)
-
     def __str__(self):
         """Return a nice string representation of `Atom`."""
         return repr(self)
