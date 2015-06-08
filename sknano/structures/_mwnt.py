@@ -36,7 +36,7 @@ class MWNT(MWNTMixin, StructureBase):
             Ch_list = kwargs['Ch']
             del kwargs['Ch']
 
-        super(MWNT, self).__init__(bond=bond, **kwargs)
+        super().__init__(bond=bond, **kwargs)
 
         if Ch_list is None or not isinstance(Ch_list, list):
 
@@ -55,9 +55,7 @@ class MWNT(MWNTMixin, StructureBase):
             delta_dt = 2 * shell_spacing
 
             imax = 100
-            #self._Ch_pool = \
-            #    np.asarray([(n, m) for n in range(imax) for m in range(imax)
-            #                if not n == m == 0])
+
             self._Ch_pool = \
                 np.asarray(generate_Ch_list(imax=imax,
                                             chiral_type=chiral_types))
@@ -87,6 +85,9 @@ class MWNT(MWNTMixin, StructureBase):
                 for _mask in dt_masks]
 
         self.Ch_list = Ch_list[:]
+        self.min_shell_diameter = min_shell_diameter
+        self.max_shell_diameter = max_shell_diameter
+        self.max_shells = max_shells
 
         if Lz is None:
             Lz = 1.0
@@ -96,34 +97,27 @@ class MWNT(MWNTMixin, StructureBase):
             [SWNT(Ch, Lz=Lz, fix_Lz=True, basis=basis, bond=bond, **kwargs)
              for Ch in self.Ch_list]
 
-
         a = compute_dt(self.Ch_list[-1], bond) + dVDW
         c = compute_T(self.Ch_list[-1], bond, length=True)
         lattice = Crystal3DLattice.hexagonal(a, c)
 
         self.unit_cell = UnitCell(lattice, basis)
 
-
-        #if Lz is not None:
-        #    self.nz = 10 * float(Lz) / min([shell.T for shell in self.shells])
-        #elif nz is not None:
-
-
         if self.verbose:
             print(self.shells)
 
-    def __str__(self):
-        return repr(self)
-
-    def __repr__(self):
-        """Return canonical string representation of `MWNT`."""
-        fmtstr = "MWNT(Ch_list={!r}, Nwalls={!r}, Lz={!r}, " + \
-            "element1={!r}, element2={!r}, bond={!r})"
-        return fmtstr.format(self.Ch_list, self.Nwalls, self.Lz,
-                             self.element1, self.element2, self.bond)
+        self.fmtstr = "Ch_list={Ch_list!r}, Lz={Lz!r}, bond={bond!r}, " + \
+            "basis={basis!r}, min_shell_diameter={min_shell_diameter!r}, " + \
+            "max_shell_diameter={max_shell_diameter!r}, " + \
+            "max_shells={max_shells!r}, chiral_types={chiral_types!r}, " + \
+            "shell_spacing={shell_spacing!r}"
 
     def todict(self):
         """Return :class:`~python:dict` of `MWNT` attributes."""
-        return dict(Ch_list=self.Ch_list, Nwalls=self.Nwalls, Lz=self.Lz,
-                    element1=self.element1, element2=self.element2,
-                    bond=self.bond)
+        return dict(Ch_list=self.Ch_list, Lz=self.Lz, bond=self.bond,
+                    basis=[self.element1, self.element2],
+                    min_shell_diameter=self.min_shell_diameter,
+                    max_shell_diameter=self.max_shell_diameter,
+                    max_shells=self.max_shells,
+                    chiral_types=self.chiral_types,
+                    shell_spacing=self.shell_spacing)
