@@ -73,5 +73,28 @@ def test3():
     assert_equal(swnt.Ntubes, 1)
 
 
+def test4():
+    swnt = SWNT((10, 5))
+
+    assert_equal(swnt.element1, 'C')
+    assert_equal(swnt.element2, 'C')
+    print(swnt)
+    print(swnt.basis)
+    print(swnt.unit_cell)
+    print(type(swnt.basis))
+
+    print(swnt)
+    print(swnt.basis[:2])
+    print(type(swnt.basis[:2]))
+
+    swnt.element1 = 'N'
+    assert_equal(swnt.element1, 'N')
+    print(swnt)
+
+    swnt.element2 = 'Ar'
+    assert_equal(swnt.element2, 'Ar')
+    print(swnt)
+
+
 if __name__ == '__main__':
     nose.runmodule()
