@@ -93,74 +93,12 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
 
     """
 
-    def __init__(self, autogen=True, **kwargs):
+    def __init__(self, *Ch, autogen=True, **kwargs):
 
-        super().__init__(**kwargs)
+        super().__init__(*Ch, **kwargs)
 
         if autogen:
-            self.generate_unit_cell()
             self.generate_structure_data()
-
-    def generate_unit_cell(self):
-        """Generate the nanotube unit cell."""
-        eps = 0.01
-
-        e1 = self.element1
-        e2 = self.element2
-        N = self.N
-        T = self.T
-        rt = self.rt
-
-        psi, tau, dpsi, dtau = self.unit_cell_symmetry_params
-
-        if self.verbose:
-            print('dpsi: {}'.format(dpsi))
-            print('dtau: {}\n'.format(dtau))
-
-        self.unit_cell = Atoms()
-
-        for i in range(N):
-            x1 = rt * i * psi
-            z1 = i * tau
-
-            while z1 > T - eps:
-                z1 -= T
-
-            if z1 < 0:
-                z1 += T
-
-            if self.debug:
-                print('i={}: x1, z1 = ({:.6f}, {:.6f})'.format(
-                    i, x1, z1))
-
-            atom1 = Atom(element=e1, x=x1, z=z1)
-            atom1.rezero()
-
-            if self.verbose:
-                print('Basis Atom 1:\n{}'.format(atom1))
-
-            self.unit_cell.append(atom1)
-
-            x2 = rt * (i * psi + dpsi)
-            z2 = i * tau - dtau
-
-            while z2 > T - eps:
-                z2 -= T
-
-            if z2 < 0:
-                z2 += T
-
-            if self.debug:
-                print('i={}: x2, z2 = ({:.6f}, {:.6f})'.format(
-                    i, x2, z2))
-
-            atom2 = Atom(element=e2, x=x2, z=z2)
-            atom2.rezero()
-
-            if self.verbose:
-                print('Basis Atom 2:\n{}'.format(atom2))
-
-            self.unit_cell.append(atom2)
 
     def generate_structure_data(self):
         """Generate structure data."""
