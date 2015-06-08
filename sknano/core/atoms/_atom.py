@@ -36,15 +36,18 @@ class Atom:
     """
     # _fields = ['element']
 
-    def __init__(self, *args, element=None, mass=None, **kwargs):
+    def __init__(self, *args, element=None, mass=None, Z=None, **kwargs):
         args = list(args)
 
         if 'm' in kwargs and mass is None:
             mass = kwargs['m']
             del kwargs['m']
 
-        if len(args) == 0 and mass is not None:
-            args.append(mass)
+        if len(args) == 0 and (mass is not None or Z is not None):
+            if mass is not None:
+                args.append(mass)
+            else:
+                args.append(Z)
 
         if len(args) == 1:
             element = args.pop(0)
