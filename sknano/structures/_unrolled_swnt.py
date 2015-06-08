@@ -11,10 +11,13 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from sknano.core.refdata import dVDW
+from sknano.core.atoms import BasisAtom as Atom
+from sknano.core.crystallography import Crystal3DLattice, UnitCell
+from sknano.core.refdata import aCC, dVDW
 
 from ._mixins import NanotubeMixin, UnrolledSWNTMixin
 from ._base import StructureBase
+from ._compute_funcs import compute_dt, compute_T
 
 __all__ = ['UnrolledSWNT']
 
@@ -22,11 +25,28 @@ __all__ = ['UnrolledSWNT']
 class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
     """Unrolled SWNT structure class."""
 
-    def __init__(self, n=10, m=0, nx=1, nz=1, Nlayers=1, layer_spacing=dVDW,
-                 stacking_order='AB', Lx=None, fix_Lx=False, Lz=None,
-                 fix_Lz=False, **kwargs):
+    def __init__(self, *Ch, nx=1, nz=1, bond=aCC, basis=['C', 'C'],
+                 Nlayers=1, layer_spacing=dVDW, stacking_order='AB',
+                 Lx=None, fix_Lx=False, Lz=None, fix_Lz=False, **kwargs):
 
-        super().__init__(**kwargs)
+        try:
+            n, m = Ch
+        except ValueError:
+            try:
+                n, m = Ch[0]
+            except IndexError:
+                n = kwargs['n']
+                del kwargs['n']
+                m = kwargs['m']
+                del kwargs['m']
+
+        a = compute_dt(n, m, bond) + dVDW
+        c = compute_T(n, m, bond, length=True)
+        lattice = Crystal3DLattice.hexagonal(a, c)
+
+        self.unit_cell = UnitCell(lattice, basis)
+
+        super().__init__(bond=bond, **kwargs)
 
         self.n = n
         self.m = m
@@ -50,3 +70,52 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
         self.Nlayers = Nlayers
         self.layer_spacing = layer_spacing
         self.stacking_order = stacking_order
+
+        self.generate_unit_cell()
+
+    def generate_unit_cell(self):
+        """Generate the nanotube unit cell."""
+        eps = 0.01
+
+        e1 = self.element1
+        e2 = self.element2
+        N = self.N
+        T = self.T
+        rt = self.rt
+
+        psi, tau, dpsi, dtau = self.unit_cell_symmetry_params
+
+        self.basis.clear()
+
+        if self.verbose:
+            print('dpsi: {}'.format(dpsi))
+            print('dtau: {}\n'.format(dtau))
+
+        for i in range(N):
+            for j, element in enumerate((e1, e2), start=1):
+                theta = i * psi
+                h = i * tau
+
+                if j == 2:
+                    theta += dpsi
+                    h -= dtau
+
+                x = rt * theta
+                z = h
+
+                while z > T - eps:
+                    z -= T
+
+                if z < 0:
+                    z += T
+
+                if self.debug:
+                    print('i={}: x, z = ({:.6f}, {:.6f})'.format(i, x, z))
+
+                atom = Atom(element, x=x, z=z)
+                atom.rezero()
+
+                if self.verbose:
+                    print('Basis Atom:\n{}'.format(atom))
+
+                self.basis.append(atom)
