@@ -88,7 +88,6 @@ class Point(np.ndarray):
         if pt is None:
             return None
 
-        # self.nd = len(self)
         self.nd = len(pt)
 
     def __str__(self):
@@ -99,7 +98,7 @@ class Point(np.ndarray):
 
     def tolist(self):
         """List of `Point` coordinates formatted for *pretty* output."""
-        return np.around(self.__array__(), decimals=6).tolist()
+        return np.around(self.__array__(), decimals=10).tolist()
 
     def __getattr__(self, name):
         try:
@@ -118,7 +117,7 @@ class Point(np.ndarray):
                     return self[2]
         except TypeError:
             pass
-        return super(Point, self).__getattribute__(name)
+        return super().__getattribute__(name)
 
     def __setattr__(self, name, value):
         nd = getattr(self, 'nd', None)
@@ -135,15 +134,18 @@ class Point(np.ndarray):
             else:
                 self[2] = value
         else:
-            super(Point, self).__setattr__(name, value)
+            super().__setattr__(name, value)
 
     def __eq__(self, other):
-        if self is other or np.allclose(self, other):
+        if not isinstance(other, Point):
+            other = Point(other)
+        if self is other or np.allclose(self.__array__(), other.__array__()):
             return True
-        else:
-            return False
+        return False
 
     def __lt__(self, other):
+        if not isinstance(other, Point):
+            other = Point(other)
         origin = Point(nd=self.nd)
         return self.euclidean_distance(origin) < \
             other.euclidean_distance(origin)
