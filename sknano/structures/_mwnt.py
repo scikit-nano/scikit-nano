@@ -88,6 +88,7 @@ class MWNT(MWNTMixin, StructureBase):
         self.min_shell_diameter = min_shell_diameter
         self.max_shell_diameter = max_shell_diameter
         self.max_shells = max_shells
+        self.shell_spacing = shell_spacing
 
         if Lz is None:
             Lz = 1.0
