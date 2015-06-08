@@ -6,18 +6,20 @@ from __future__ import unicode_literals
 import nose
 from nose.tools import *
 from sknano.core.atoms import BasisAtom
+from sknano.core.crystallography import Crystal2DLattice, Crystal3DLattice
 
 
-def test_instantiation():
+def test1():
     from sknano.core.atoms import Atom
     xatom = BasisAtom()
     assert_is_instance(xatom, (Atom, BasisAtom))
 
 
-def test_attributes():
+def test2():
+    lattice = Crystal2DLattice.square(a=1.0)
     elements = ['H', 'He', 'B', 'C', 'N', 'O', 'Ar']
     for element in elements:
-        xatom = BasisAtom(element=element)
+        xatom = BasisAtom(element, lattice=lattice)
         assert_equals(xatom.element, element)
         assert_equals(xatom.m, xatom.mass)
 
@@ -26,8 +28,9 @@ def test_attributes():
         assert_equals(getattr(xatom, c), 0.0)
 
 
-def test_str():
-    atom = BasisAtom('C')
+def test3():
+    lattice = Crystal2DLattice.square(a=1.0)
+    atom = BasisAtom('C', lattice=lattice)
     print(atom)
 
 
