@@ -9,6 +9,7 @@ from sknano.structures import SWNT
 
 def test1():
     swnt = SWNT(n=10, m=10)
+    print(swnt)
     assert_equal(swnt.n, 10)
     assert_equal(swnt.m, 10)
     assert_equal(swnt.element1, 'C')
@@ -30,6 +31,7 @@ def test1():
 
 def test2():
     swnt = SWNT(n=20, m=10)
+    print(swnt)
     assert_equal(swnt.element1, 'C')
     assert_equal(swnt.element2, 'C')
     assert_equal(swnt.n, 20)
@@ -51,6 +53,7 @@ def test2():
 
 def test3():
     swnt = SWNT(n=20, m=0)
+    print(swnt)
     assert_equal(swnt.element1, 'C')
     assert_equal(swnt.element2, 'C')
     assert_equal(swnt.n, 20)
