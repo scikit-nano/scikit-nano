@@ -9,15 +9,13 @@ Base classes for structure data (:mod:`sknano.io._base`)
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import object
-from future.utils import with_metaclass
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
 
 from sknano.core import get_fpath
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
-#from sknano.utils.analysis import StructureAnalyzer
+# from sknano.utils.analysis import StructureAnalyzer
 from sknano.version import short_version as version
 
 default_comment_line = \
@@ -38,7 +36,7 @@ __all__ = ['Atom', 'Atoms',
            'supported_structure_formats']
 
 
-class StructureData(object):
+class StructureData:
     """Container class for structure data."""
     def __init__(self):
         self._atoms = Atoms()
@@ -64,7 +62,7 @@ class StructureData(object):
             delattr(self._atoms, name)
 
 
-class StructureIO(object):
+class StructureIO:
     """Base class for structure data file input and output.
 
     Parameters
@@ -115,7 +113,7 @@ class StructureIO(object):
         return cp
 
 
-class StructureReader(object):
+class StructureReader:
     """Structure data reader base class."""
     @classmethod
     def read(cls, fpath, structure_format=None, **kwargs):
@@ -142,7 +140,7 @@ class StructureReader(object):
             raise StructureIOError("Unable to determine `structure_format`")
 
 
-class StructureWriter(object):
+class StructureWriter:
     """Structure data writer base class."""
     @classmethod
     def write(cls, fname=None, atoms=None, structure_format=None, **kwargs):
@@ -177,7 +175,7 @@ class StructureWriter(object):
             XYZWriter.write(fname=fname, atoms=atoms, **kwargs)
 
 
-class StructureConverter(with_metaclass(ABCMeta, object)):
+class StructureConverter(metaclass=ABCMeta):
     """Abstract base class for converting structure data.
 
     Parameters
@@ -199,7 +197,7 @@ class StructureConverter(with_metaclass(ABCMeta, object)):
                                   'to implement the `convert` method.')
 
 
-class StructureFormatSpec(object):
+class StructureFormatSpec:
     """Base class for defining a format specification.
 
     Parameters
