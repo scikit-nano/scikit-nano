@@ -208,6 +208,9 @@ class Atom:
     def m(self, value):
         self.mass = value
 
+    def rezero(self, *args, **kwargs):
+        assert not hasattr(super(), 'rezero')
+
     def rotate(self, **kwargs):
         assert not hasattr(super(), 'rotate')
 
