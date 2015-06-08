@@ -658,7 +658,7 @@ class UnrolledSWNTMixin:
 
     @property
     def Ly(self):
-        return self.Nlayers * self.layer_spacing / 10
+        return self.nlayers * self.layer_spacing / 10
 
     @property
     def nx(self):
@@ -673,20 +673,20 @@ class UnrolledSWNTMixin:
         self._nx = int(value)
 
     @property
-    def Nlayers(self):
+    def nlayers(self):
         """Number of layers."""
-        return self._Nlayers
+        return self._nlayers
 
-    @Nlayers.setter
-    def Nlayers(self, value):
-        """Set :attr:`Nlayers`."""
+    @nlayers.setter
+    def nlayers(self, value):
+        """Set :attr:`nlayers`."""
         if not (isinstance(value, numbers.Number) or value > 0):
             raise TypeError('Expected a real positive number.')
-        self._Nlayers = int(value)
+        self._nlayers = int(value)
 
-    @Nlayers.deleter
-    def Nlayers(self):
-        del self._Nlayers
+    @nlayers.deleter
+    def nlayers(self):
+        del self._nlayers
 
     @property
     def fix_Lx(self):
