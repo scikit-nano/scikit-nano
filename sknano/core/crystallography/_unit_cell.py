@@ -37,8 +37,9 @@ class UnitCell:
         if basis is None:
             basis = Atoms()
         elif basis is not None:
-            basis = Atoms(basis, lattice=lattice)
-            if coords is not None:
+            basis = Atoms(basis)
+            basis.lattice = lattice
+            if lattice is not None and coords is not None:
                 for atom, pos in zip(basis, coords):
                     atom.lattice = lattice
                     if not cartesian:
