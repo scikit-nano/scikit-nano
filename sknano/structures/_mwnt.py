@@ -14,11 +14,12 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-from sknano.core.refdata import dVDW
+from sknano.core.crystallography import Crystal3DLattice, UnitCell
+from sknano.core.refdata import aCC, dVDW
 
 from ._base import StructureBase
 from ._swnt import SWNT
-from ._compute_funcs import compute_dt
+from ._compute_funcs import compute_dt, compute_T
 from ._extras import generate_Ch_list
 from ._mixins import MWNTMixin
 
@@ -30,12 +31,12 @@ class MWNT(MWNTMixin, StructureBase):
     def __init__(self, Ch_list=None, Nwalls=None, Lz=None,
                  min_shell_diameter=None, max_shell_diameter=None,
                  max_shells=None, chiral_types=None, shell_spacing=dVDW,
-                 **kwargs):
+                 basis=['C', 'C'], bond=aCC, **kwargs):
         if Ch_list is None and 'Ch' in kwargs:
             Ch_list = kwargs['Ch']
             del kwargs['Ch']
 
-        super(MWNT, self).__init__(**kwargs)
+        super(MWNT, self).__init__(bond=bond, **kwargs)
 
         if Ch_list is None or not isinstance(Ch_list, list):
 
@@ -92,11 +93,21 @@ class MWNT(MWNTMixin, StructureBase):
         self.L0 = Lz
 
         self.shells = \
-            [SWNT(Ch, Lz=Lz, fix_Lz=True, **kwargs) for Ch in self.Ch_list]
+            [SWNT(Ch, Lz=Lz, fix_Lz=True, basis=basis, bond=bond, **kwargs)
+             for Ch in self.Ch_list]
+
+
+        a = compute_dt(self.Ch_list[-1], bond) + dVDW
+        c = compute_T(self.Ch_list[-1], bond, length=True)
+        lattice = Crystal3DLattice.hexagonal(a, c)
+
+        self.unit_cell = UnitCell(lattice, basis)
+
 
         #if Lz is not None:
         #    self.nz = 10 * float(Lz) / min([shell.T for shell in self.shells])
         #elif nz is not None:
+
 
         if self.verbose:
             print(self.shells)
