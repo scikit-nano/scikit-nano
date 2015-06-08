@@ -157,9 +157,9 @@ class SWNT(SWNTMixin, StructureBase):
         c = compute_T(n, m, bond, length=True)
         lattice = Crystal3DLattice.hexagonal(a, c)
 
-        self.unit_cell = UnitCell(lattice, basis)
-
         super().__init__(bond=bond, **kwargs)
+
+        self.unit_cell = UnitCell(lattice, basis)
 
         if tube_length is not None and Lz is None:
             Lz = tube_length
@@ -178,6 +178,14 @@ class SWNT(SWNTMixin, StructureBase):
             self.nz = 1
 
         self.generate_unit_cell()
+
+        fmtstr = "{Ch!r}, "
+        if self.fix_Lz:
+            fmtstr += "Lz={Lz!r}, fix_Lz=True, "
+        else:
+            fmtstr += "nz={nz!r}, "
+
+        self.fmtstr = fmtstr + "bond={bond!r}, basis={basis!r}"
 
     def __str__(self):
         """Return nice string representation of `SWNT`."""
@@ -206,19 +214,6 @@ class SWNT(SWNTMixin, StructureBase):
                             var, getattr(self, attr))
 
         return fmtstr
-
-    def __repr__(self):
-        """Return canonical string representation of `SWNT`."""
-        fmtstr = "SWNT({!r}, element1={!r}, element2={!r}, bond={!r}"
-        Ch = (self.n, self.m)
-        if self.fix_Lz:
-            fmtstr += ", Lz={!r}, fix_Lz={!r})"
-            return fmtstr.format(Ch, self.element1, self.element2,
-                                 self.bond, self.Lz, self.fix_Lz)
-        else:
-            fmtstr += ", nz={!r})"
-            return fmtstr.format(Ch, self.element1, self.element2,
-                                 self.bond, self.nz)
 
     def generate_unit_cell(self):
         """Generate the nanotube unit cell."""
@@ -270,7 +265,7 @@ class SWNT(SWNTMixin, StructureBase):
 
     def todict(self):
         """Return :class:`~python:dict` of `SWNT` attributes."""
-        return dict(n=self.n, m=self.m, nz=self.nz, Lz=self.Lz,
-                    fix_Lz=self.fix_Lz, bond=self.bond)
-
+        return dict(Ch=(self.n, self.m), nz=self.nz,
+                    bond=self.bond, basis=[self.element1, self.element2],
+                    Lz=self.Lz)
 Nanotube = SWNT

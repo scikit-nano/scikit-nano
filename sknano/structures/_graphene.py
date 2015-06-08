@@ -89,7 +89,7 @@ class Graphene(StructureBase):
     """
 
     def __init__(self, armchair_edge_length=None, zigzag_edge_length=None,
-                 bond=aCC, nlayers=1, layer_spacing=dVDW,
+                 bond=aCC, basis=['C', 'C'], nlayers=1, layer_spacing=dVDW,
                  layer_rotation_angles=None, layer_rotation_increment=None,
                  stacking_order='AB', degrees=True, cartesian=True, **kwargs):
 
@@ -97,8 +97,9 @@ class Graphene(StructureBase):
             degrees = kwargs['deg2rad']
             del kwargs['deg2rad']
 
-        self.unit_cell = GrapheneConventionalCell(bond=bond)
         super().__init__(bond=bond, **kwargs)
+
+        self.unit_cell = GrapheneConventionalCell(bond=bond, basis=basis)
 
         self.armchair_edge_length = armchair_edge_length
         self.zigzag_edge_length = zigzag_edge_length
@@ -140,15 +141,17 @@ class Graphene(StructureBase):
         self.Ny = int(np.ceil(10 * self.zigzag_edge_length / self.unit_cell.b))
         self.fmtstr = 'armchair_edge_length={armchair_edge_length!r}, ' + \
             'zigzag_edge_length={zigzag_edge_length!r}, ' + \
-            'bond={bond!r}, nlayers={nlayers!r}, ' + \
+            'bond={bond!r}, basis={basis!r}, nlayers={nlayers!r}, ' + \
             'layer_spacing={layer_spacing!r}, ' + \
             'layer_rotation_angles={layer_rotation_angles!r}, ' + \
+            'layer_rotation_increment={layer_rotation_increment!r}, ' + \
             'stacking_order={stacking_order!r}'
 
     def todict(self):
         return dict(armchair_edge_length=self.armchair_edge_length,
                     zigzag_edge_length=self.zigzag_edge_length,
-                    bond=self.bond, nlayers=self.nlayers,
-                    layer_spacing=self.layer_spacing,
+                    bond=self.bond, basis=[self.element1, self.element2],
+                    nlayers=self.nlayers, layer_spacing=self.layer_spacing,
                     layer_rotation_angles=self.layer_rotation_angles,
+                    layer_rotation_increment=self.layer_rotation_increment,
                     stacking_order=self.stacking_order)
