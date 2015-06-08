@@ -13,13 +13,11 @@ __docformat__ = 'restructuredtext en'
 
 from ._nanotube_bundle import NanotubeBundleBase
 from ._mwnt import MWNT
-#from ._swnt_bundle import SWNTBundle
+# from ._swnt_bundle import SWNTBundle
 
 __all__ = ['MWNTBundle']
 
 
 class MWNTBundle(NanotubeBundleBase, MWNT):
     """MWNT bundle structure class."""
-    def __init__(self, **kwargs):
-
-        super(MWNTBundle, self).__init__(**kwargs)
+    pass
