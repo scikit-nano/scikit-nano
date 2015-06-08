@@ -26,7 +26,7 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
     """Unrolled SWNT structure class."""
 
     def __init__(self, *Ch, nx=1, nz=1, bond=aCC, basis=['C', 'C'],
-                 Nlayers=1, layer_spacing=dVDW, stacking_order='AB',
+                 nlayers=1, layer_spacing=dVDW, stacking_order='AB',
                  Lx=None, fix_Lx=False, Lz=None, fix_Lz=False, **kwargs):
 
         try:
@@ -44,9 +44,9 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
         c = compute_T(n, m, bond, length=True)
         lattice = Crystal3DLattice.hexagonal(a, c)
 
-        self.unit_cell = UnitCell(lattice, basis)
-
         super().__init__(bond=bond, **kwargs)
+
+        self.unit_cell = UnitCell(lattice, basis)
 
         self.n = n
         self.m = m
@@ -67,11 +67,15 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
         else:
             self.nz = 1
 
-        self.Nlayers = Nlayers
+        self.nlayers = nlayers
         self.layer_spacing = layer_spacing
         self.stacking_order = stacking_order
-
         self.generate_unit_cell()
+
+        self.fmtstr = "{Ch!r}, nx={nx!r}, nz={nz!r}, bond={bond!r}, " + \
+            "basis={basis!r}, nlayers={nlayers!r}, " + \
+            "layer_spacing={layer_spacing!r}, " + \
+            "stacking_order={stacking_order!r}"
 
     def generate_unit_cell(self):
         """Generate the nanotube unit cell."""
@@ -119,3 +123,10 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
                     print('Basis Atom:\n{}'.format(atom))
 
                 self.basis.append(atom)
+
+    def todict(self):
+        """Return :class:`~python:dict` of `SWNT` attributes."""
+        return dict(Ch=(self.n, self.m), nx=self.nx, nz=self.nz,
+                    bond=self.bond, basis=[self.element1, self.element2],
+                    nlayers=self.nlayers, layer_spacing=self.layer_spacing,
+                    stacking_order=self.stacking_order)
