@@ -83,7 +83,11 @@ class UnitCell:
     #     self._lattice = value
 
     def __getattr__(self, name):
-        return getattr(self.lattice, name)
+        try:
+            return getattr(self.lattice, name)
+        except AttributeError:
+            return super().__getattr__(name)
+
         # if name != '_lattice':
         #     return getattr(self._lattice, name)
 
@@ -92,6 +96,9 @@ class UnitCell:
     #         super().__setattr__(name, value)
     #     else:
     #         setattr(self._lattice, name, value)
+
+    def __iter__(self):
+        return iter(self.basis)
 
     def rotate(self, **kwargs):
         self.lattice.rotate(**kwargs)
