@@ -11,12 +11,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-import copy
-
-import numpy as np
-
 from sknano.structures import BilayerGraphene
-from ._base import Atoms
 from ._graphene_generator import GrapheneGenerator
 
 __all__ = ['BilayerGrapheneGenerator']
@@ -102,32 +97,4 @@ class BilayerGrapheneGenerator(BilayerGraphene, GrapheneGenerator):
     .. image:: /images/BN_bilayer_rotated_45deg.png
 
     """
-
-    def __init__(self, autogen=True, **kwargs):
-
-        super(BilayerGrapheneGenerator, self).__init__(autogen=False, **kwargs)
-
-        if autogen:
-            super(BilayerGrapheneGenerator, self).generate_unit_cell()
-            self.generate_structure_data()
-
-    def generate_structure_data(self):
-        """Generate the full structure coordinates."""
-        super(BilayerGrapheneGenerator, self).generate_structure_data()
-
-        if self.layer_rotation_angle is not None:
-            bilayer = copy.deepcopy(self.atoms)
-            self.atoms = Atoms()
-
-            z_coords = bilayer.get_coords(asdict=True)['z']
-            z_set = np.asarray(sorted(list(set(z_coords))))
-            epsilon = 1e-10
-
-            for n, z in enumerate(z_set):
-                layer = copy.deepcopy(
-                    Atoms(atoms=bilayer.get_atoms(asarray=True)[
-                        np.where(np.abs(z_coords - z) < epsilon)].tolist()))
-                if (n % 2) != 0:
-                    layer.rotate(angle=self.layer_rotation_angle, axis='z')
-
-                self.atoms.extend(layer)
+    pass
