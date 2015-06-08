@@ -12,17 +12,20 @@ from sknano.testing import GeneratorTestFixtures
 class TestCase(GeneratorTestFixtures):
 
     def test1(self):
-        generator = GrapheneGenerator(width=5, length=5)
+        generator = GrapheneGenerator(armchair_edge_length=5,
+                                      zigzag_edge_length=5)
         generator.save_data()
         self.tmpdata.append(generator.fname)
 
     def test2(self):
-        generator = GrapheneGenerator(length=20, width=1, edge='ZZ')
+        generator = GrapheneGenerator(armchair_edge_length=20,
+                                      zigzag_edge_length=1)
         generator.save_data()
         self.tmpdata.append(generator.fname)
 
     def test3(self):
-        generator = GrapheneGenerator(length=20, width=1, edge='AC')
+        generator = GrapheneGenerator(armchair_edge_length=1,
+                                      zigzag_edge_length=20)
         generator.save_data()
         self.tmpdata.append(generator.fname)
 
