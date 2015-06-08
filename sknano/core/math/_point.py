@@ -171,7 +171,7 @@ class Point(np.ndarray):
         return np.matrix(self.__array__())
 
     def euclidean_distance(self, pt):
-        return np.sqrt(((self - pt)**2).sum())
+        return np.sqrt(((self.__array__() - pt.__array__())**2).sum())
 
     def rezero_coords(self, epsilon=1.0e-10):
         """Alias for :meth:`Point.rezero`."""
