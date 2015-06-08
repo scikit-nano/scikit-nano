@@ -68,6 +68,14 @@ class Atoms(UserList):
             return self.__class__(data)
         return data
 
+    def __setitem__(self, index, value):
+        if not isinstance(value, (self.__class__, self.__atom_class__)):
+            if isinstance(index, slice):
+                value = self.__class__(value)
+            else:
+                value = self.__atom_class__(value)
+        super().__setitem__(index, value)
+
     @property
     def fmtstr(self):
         return self._fmtstr
