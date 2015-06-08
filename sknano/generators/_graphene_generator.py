@@ -14,6 +14,7 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
+from sknano.core.math import Vector
 from sknano.structures import Graphene
 from ._base import Atom, Atoms, GeneratorBase
 
@@ -125,51 +126,7 @@ class GrapheneGenerator(Graphene, GeneratorBase):
         super().__init__(**kwargs)
 
         if autogen:
-            self.generate_unit_cell()
             self.generate_structure_data()
-
-    def generate_unit_cell(self):
-        """Generate the graphene unit cell.
-
-        Called automatically if `autogen` is `True`.
-
-        """
-        bond = self.bond
-        edge = self.edge
-        e1 = self.element1
-        e2 = self.element2
-
-        self.unit_cell = Atoms()
-        # Set up 4 atom basis
-        # Leave atom 1 at the origin
-        atom1 = Atom(element=e1)
-        atom2 = Atom(element=e2)
-        atom3 = Atom(element=e1)
-        atom4 = Atom(element=e2)
-        if edge == 'AC':
-            # Move atom 2 to 2nd basis position
-            atom2.x = -np.sqrt(3) / 2 * bond
-            atom2.y = bond / 2
-
-            # Move atom 3 from atom 1 along a1 primitive vector
-            atom3.x = -np.sqrt(3) / 2 * bond
-            atom3.y = 3 / 2 * bond
-
-            # Move atom 4 from atom 2 along a2 primitive vector
-            atom4.y = 2 * bond
-        else:
-            # Move atom 2 to 2nd basis position
-            atom2.x = bond
-
-            # Move atom 3 from atom 1 along a1 primitive vector
-            atom3.x = 3 / 2 * bond
-            atom3.y = np.sqrt(3) / 2 * bond
-
-            # Move atom 4 from atom 2 along a2 primitive vector
-            atom4.x = -bond / 2
-            atom4.y = np.sqrt(3) / 2 * bond
-
-        self.unit_cell.extend([atom1, atom2, atom3, atom4])
 
     def generate_structure_data(self):
         """Generate the full structure coordinates."""
@@ -179,11 +136,11 @@ class GrapheneGenerator(Graphene, GeneratorBase):
             layer = Atoms()
             for nx in range(self.Nx):
                 for ny in range(self.Ny):
-                    dr = np.array([nx * self.cell.x,
-                                   ny * self.cell.y,
-                                   nlayer * self.layer_spacing])
+                    dr = Vector([nx * self.unit_cell.a,
+                                 ny * self.unit_cell.b,
+                                 0.0])
                     for atom in self.unit_cell:
-                        layer_atom = Atom(element=atom.symbol)
+                        layer_atom = Atom(atom.symbol)
                         layer_atom.r = atom.r + dr
                         layer.append(layer_atom)
 
@@ -191,12 +148,11 @@ class GrapheneGenerator(Graphene, GeneratorBase):
                 self.Natoms_per_layer = layer.Natoms
 
             # translate layer to put its center of mass at the origin
-            dr = layer.CM
-            dr.z = 0
-            layer.translate(dr)
+            layer.center_CM()
+            layer.translate(Vector([0, 0, nlayer * self.layer_spacing]))
             if (nlayer % 2) != 0:
                 layer.translate(self.layer_shift)
-
+            layer.rotate(angle=self.layer_rotation_angles[nlayer], axis='z')
             self.atoms.extend(layer)
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
@@ -209,11 +165,11 @@ class GrapheneGenerator(Graphene, GeneratorBase):
 
         """
         if fname is None:
-            dimensions = '{}nmx{}nm'.format(self.length, self.width)
+            dimensions = '{}nmx{}nm'.format(self.armchair_edge_length,
+                                            self.zigzag_edge_length)
             nlayer = '{}layer'.format(self.nlayers)
-            edge = 'AC' if self.edge in ('AC', 'armchair') else 'ZZ'
-            atombond = '{}{}'.format(self.element1, self.element2)
-            fname_wordlist = (dimensions, nlayer, edge, atombond, 'graphene')
+            basis = ''.join(self.basis.symbols[:2])
+            fname_wordlist = (dimensions, nlayer, basis, 'graphene')
             fname = '_'.join(fname_wordlist)
 
         if center_CM and self.nlayers > 1:
