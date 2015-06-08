@@ -61,3 +61,14 @@ class BasisAtoms(XYZAtoms):
     def zs(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`z` coordinates."""
         return self.rs[:, 2]
+
+    @property
+    def lattice(self):
+        try:
+            return self[0].lattice
+        except IndexError:
+            return None
+
+    @lattice.setter
+    def lattice(self, value):
+        [setattr(atom, 'lattice', value) for atom in self]
