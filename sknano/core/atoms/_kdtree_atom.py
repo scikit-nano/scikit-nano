@@ -13,14 +13,20 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+import sknano.core.atoms
 from ._extended_atom import XAtom
-from ._mixins import NNAtomMixin
+from ._bond import Bond
+from ._bonds import Bonds
 
 __all__ = ['KDTAtom']
 
 
-class KDTAtom(XAtom, NNAtomMixin):
+class KDTAtom(XAtom):
     """An `Atom` class for KDTree analysis."""
+    def __init__(self, *args, NN=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if NN is not None:
+            self.NN = NN
 
     def __dir__(self):
         attrs = super().__dir__()
@@ -31,17 +37,38 @@ class KDTAtom(XAtom, NNAtomMixin):
     def CN(self):
         """`KDTAtom` coordination number."""
         try:
-            return super().NN.Natoms
+            return self.NN.Natoms
         except AttributeError:
             return super().CN
 
-    # def todict(self):
-    #    return dict(element=self.element, id=self.id,
-    #                mol=self.mol, type=self.type,
-    #                q=self.q, mass=self.mass,
-    #                x=self.x, y=self.y, z=self.z,
-    #                vx=self.vx, vy=self.vy, vz=self.vz,
-    #                fx=self.fx, fy=self.fy, fz=self.fz,
-    #                nx=self.nx, ny=self.ny, nz=self.nz,
-    #                pe=self.pe, ke=self.ke, etotal=self.etotal,
-    #                CN=self.CN, NN=self.NN, bonds=self.bonds)
+    @property
+    def NN(self):
+        """Nearest-neighbor `Atoms`."""
+        try:
+            return self._NN
+        except AttributeError:
+            return None
+
+    @NN.setter
+    def NN(self, value):
+        """Set nearest-neighbor `Atoms`."""
+        if not isinstance(value, sknano.core.atoms.Atoms):
+            raise TypeError('Expected an `Atoms` object.')
+        self._NN = value
+
+    @NN.deleter
+    def NN(self):
+        del self._NN
+
+    @property
+    def bonds(self):
+        """Return atom `Bonds` instance."""
+        try:
+            return Bonds([Bond(self, nn) for nn in self.NN])
+        except (AttributeError, TypeError):
+            return Bonds()
+
+    def todict(self):
+        super_dict = super().todict()
+        super_dict.update(dict(CN=self.CN, NN=self.NN))
+        return super_dict
