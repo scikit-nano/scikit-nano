@@ -11,12 +11,8 @@ Classes for analyzing the atom trajectories of molecular dynamics simulations.
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import zip
-from builtins import range
-from builtins import object
 __docformat__ = 'restructuredtext en'
 
-#import numbers
 from operator import attrgetter
 
 import numpy as np
@@ -28,7 +24,7 @@ from ._md_atoms import MDAtoms as Atoms
 __all__ = ['Snapshot', 'Trajectory']
 
 
-class aselect(object):
+class aselect:
     def __init__(self, traj):
         self.traj = traj
 
@@ -47,7 +43,7 @@ class aselect(object):
             snapshot.nselect = snapshot.Natoms
 
 
-class tselect(object):
+class tselect:
     def __init__(self, traj):
         self.traj = traj
 
@@ -190,7 +186,7 @@ class Trajectory(UserList):
             raise TypeError('Expected a `Snapshot` instance.')
         self._t0_snapshot = value
         self.t0_atoms = self.t0_snapshot.atoms
-        #self.t0_atoms.update_attrs()
+        # self.t0_atoms.update_attrs()
 
     @property
     def timesteps(self):

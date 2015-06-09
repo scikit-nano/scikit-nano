@@ -11,12 +11,11 @@ An `Atoms` class for POAV analysis
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import zip
 __docformat__ = 'restructuredtext en'
 
-#import importlib
 import numpy as np
 
+# from sknano.core import timethis
 from sknano.core.math import vector as vec
 from ._kdtree_atoms import KDTAtoms
 from ._poav_atom import POAV1, POAV2, POAVR, POAVAtom
@@ -41,6 +40,7 @@ class POAVAtoms(KDTAtoms):
     def __atom_class__(self):
         return POAVAtom
 
+    # @timethis
     def compute_POAVs(self):
         """Compute `POAV1`, `POAV2`, `POAVR`."""
         super().update_attrs()

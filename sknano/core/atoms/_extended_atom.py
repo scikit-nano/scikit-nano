@@ -11,17 +11,9 @@ An "eXtended" `Atom` class for structure analysis.
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import zip
 
 __docformat__ = 'restructuredtext en'
 
-from collections import OrderedDict
-from functools import total_ordering
-import numbers
-import numpy as np
-
-from sknano.core import xyz
-from sknano.core.math import Point, Vector
 from ._xyz_atom import XYZAtom
 from ._velocity_atom import VelocityAtom
 from ._force_atom import ForceAtom
