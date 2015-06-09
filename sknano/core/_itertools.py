@@ -11,11 +11,7 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from builtins import zip
-from builtins import next
-
 import collections
-# import itertools
 import operator
 import random
 from itertools import chain, combinations, count, cycle, filterfalse, \
