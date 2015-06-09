@@ -9,10 +9,11 @@ Base class for atom bond (:mod:`sknano.core.atoms._bond`)
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import object
 __docformat__ = 'restructuredtext en'
 
 from functools import total_ordering
+
+import numpy as np
 
 from sknano.core.math import Vector
 
@@ -22,7 +23,7 @@ __all__ = ['Bond']
 
 
 @total_ordering
-class Bond(object):
+class Bond:
     """Abstract representation of bond between 2 `Atom` objects.
 
     Parameters
@@ -31,32 +32,44 @@ class Bond(object):
 
     """
     def __init__(self, atom1, atom2):
-        self._atoms = sknano.core.atoms.StructureAtoms(atoms=[atom1, atom2])
-        self._vector = Vector(atom2.r - atom1.r, p0=atom1.r.p)
+        self.atoms = sknano.core.atoms.StructureAtoms([atom1, atom2])
+        self.vector = Vector(atom2.r - atom1.r, p0=atom1.r.p)
+        self.fmtstr = "{atom1!r}, {atom2!r}"
 
     def __str__(self):
         """Return nice string representation of `Bond`."""
-        #return fmtstr.format(self.atom1.element, self.atom2.element,
-        #                     self.vector, self.length)
         return "Bond({!r}->{!r})".format(self.atom1.id, self.atom2.id)
 
     def __repr__(self):
         """Return canonical string representation of `Bond`."""
-        return "Bond({!r}, {!r})".format(self.atom1, self.atom2)
+        return "{}({})".format(self.__class__.__name__,
+                               self.fmtstr.format(**self.todict()))
 
     def __eq__(self, other):
-        if self is other or (self.atoms == other.atoms):
-            return True
-        else:
-            return False
+        return self is other or (self.atoms == other.atoms)
 
     def __lt__(self, other):
         return self.length < other.length
+
+    def __dir__(self):
+        return ['atoms', 'atom1', 'atom2', 'vector', 'unit_vector', 'length']
+
+    @property
+    def fmtstr(self):
+        return self._fmtstr
+
+    @fmtstr.setter
+    def fmtstr(self, value):
+        self._fmtstr = value
 
     @property
     def atoms(self):
         """:class:`~sknano.core.atoms.Atoms` in `Bond`."""
         return self._atoms
+
+    @atoms.setter
+    def atoms(self, value):
+        self._atoms = value
 
     @property
     def atom1(self):
@@ -81,6 +94,8 @@ class Bond(object):
     @vector.setter
     def vector(self, value):
         """Set `Bond` :class:`~sknano.core.math.Vector`."""
+        if not isinstance(value, (list, np.ndarray)):
+            raise TypeError('Expected an `array_like` object')
         self._vector = Vector(value)
 
     @property
@@ -92,3 +107,6 @@ class Bond(object):
     def length(self):
         """`Bond` :attr:`~sknano.core.math.Vector.length`."""
         return self.vector.length
+
+    def todict(self):
+        return dict(atom1=self.atom1, atom2=self.atom2)
