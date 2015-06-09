@@ -11,7 +11,7 @@ import numpy as np
 
 from sknano.core.atoms import Trajectory
 from sknano.io import DUMPReader
-#from sknano.testing import generate_atoms
+# from sknano.testing import generate_atoms
 
 
 def test1():
@@ -28,14 +28,14 @@ def test2():
     traj = dump.trajectory
     traj.reference_snapshot = traj[0]
     prev_ss_atom = None
-    for ss in traj:
+    for i, ss in enumerate(traj, start=1):
         atoms = ss.atoms
         atoms = atoms.filter((atoms.z <= 20) & (atoms.z >= -20))
         atoms.update_attrs()
         atoms = atoms.filter((atoms.z <= 15) & (atoms.z >= -15))
         atom = atoms.get_atom(259)
-        print('atom.NN:\n{}'.format(atom.NN))
-        print('atom.bonds:\n{}\n'.format(atom.bonds))
+        # print('ss={}, atom.NN:\n{}'.format(i, atom.NN))
+        # print('ss={}, atom.bonds:\n{}\n'.format(i, atom.bonds))
 
         if prev_ss_atom is not None:
             assert_true(np.all(atom.NN.ids == prev_ss_atom.NN.ids))
