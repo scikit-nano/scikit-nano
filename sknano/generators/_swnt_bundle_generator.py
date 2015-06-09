@@ -170,8 +170,6 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
             chirality = '{}{}'.format('{}'.format(self.n).zfill(2),
                                       '{}'.format(self.m).zfill(2))
             packing = '{}cp'.format(self.bundle_packing[0])
-            #Ntubes = ''.join(('{}'.format(self._Ntubes),
-            #                  pluralize('tube', self._Ntubes)))
             Ntube = '{}tube'.format(self.Ntubes)
 
             fname_wordlist = None
@@ -194,6 +192,6 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
 
             fname = '_'.join(fname_wordlist)
 
-        super(SWNTBundleGenerator, self).save_data(
-            fname=fname, outpath=outpath, structure_format=structure_format,
-            center_CM=center_CM, **kwargs)
+        super().save_data(fname=fname, outpath=outpath,
+                          structure_format=structure_format,
+                          center_CM=center_CM, **kwargs)

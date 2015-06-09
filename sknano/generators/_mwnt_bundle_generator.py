@@ -83,15 +83,15 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
     """
     def __init__(self, autogen=True, **kwargs):
 
-        super(MWNTBundleGenerator, self).__init__(autogen=False, **kwargs)
+        super().__init__(autogen=False, **kwargs)
 
         if autogen:
             self.generate_structure_data()
 
     def generate_structure_data(self):
         """Generate structure data."""
-        super(MWNTBundleGenerator, self).generate_structure_data()
-        super(MWNTBundleGenerator, self).generate_bundle()
+        super().generate_structure_data()
+        super().generate_bundle()
 
     def save_data(self, fname=None, outpath=None, structure_format=None,
                   center_CM=True, **kwargs):

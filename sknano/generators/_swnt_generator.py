@@ -28,7 +28,7 @@ from sknano.core import pluralize
 from sknano.core.math import Point, Vector
 from sknano.structures import SWNT
 from sknano.utils.geometric_shapes import Cuboid
-from ._base import Atom, Atoms, GeneratorBase
+from ._base import Atom, GeneratorBase
 
 __all__ = ['SWNTGenerator']
 
@@ -140,4 +140,5 @@ class SWNTGenerator(SWNT, GeneratorBase):
             fname = '_'.join(fname_wordlist)
 
         super().save_data(fname=fname, outpath=outpath,
-            structure_format=structure_format, center_CM=center_CM, **kwargs)
+                          structure_format=structure_format,
+                          center_CM=center_CM, **kwargs)

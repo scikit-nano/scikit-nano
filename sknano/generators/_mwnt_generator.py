@@ -95,7 +95,7 @@ class MWNTGenerator(MWNT, GeneratorBase):
     """
     def __init__(self, autogen=True, **kwargs):
 
-        super(MWNTGenerator, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         if autogen:
             self.generate_structure_data()
