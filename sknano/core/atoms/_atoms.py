@@ -50,10 +50,6 @@ class Atoms(UserList):
     def __atom_class__(self):
         return Atom
 
-    def __str__(self):
-        """Return a nice string representation of `Atoms`."""
-        return '\n'.join([str(atom) for atom in self])
-
     def __repr__(self):
         """Return canonical string representation of `Atoms`."""
         return "{}({})".format(self.__class__.__name__,
