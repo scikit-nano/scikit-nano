@@ -9,10 +9,8 @@ Container class for collection of `Bond`\ s (:mod:`sknano.core.atoms._bonds`)
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import str
 __docformat__ = 'restructuredtext en'
 
-#from itertools import combinations
 from operator import attrgetter
 
 import numpy as np
@@ -21,7 +19,6 @@ from sknano.core import UserList, cyclic_pairs, dedupe
 from sknano.core.math import vector as vec
 
 import sknano.core.atoms
-#from ._bond import Bond
 
 __all__ = ['Bonds']
 
@@ -37,17 +34,37 @@ class Bonds(UserList):
     """
     def __init__(self, bonds=None):
         super().__init__(initlist=bonds)
-
-    def __str__(self):
-        """Return a nice string representation of `Bonds`."""
-        return '\n'.join([str(bond) for bond in self])
+        self.fmtstr = "{bonds!r}"
 
     def __repr__(self):
-        """Return the canonical string representation of `Bonds`."""
-        return "Bonds({!r})".format(self.data)
+        """Return canonical string representation of `Bonds`."""
+        return "{}({})".format(self.__class__.__name__,
+                               self.fmtstr.format(**self.todict()))
 
     def sort(self, key=attrgetter('length'), reverse=False):
         super().sort(key=key, reverse=reverse)
+
+    # def __getitem__(self, index):
+    #     data = super().__getitem__(index)
+    #     if isinstance(data, list):
+    #         return self.__class__(data)
+    #     return data
+
+    # def __setitem__(self, index, value):
+    #     if not isinstance(value, (self.__class__, Bond)):
+    #         if isinstance(index, slice):
+    #             value = self.__class__(value)
+    #         else:
+    #             value = Bond(value)
+    #     super().__setitem__(index, value)
+
+    @property
+    def fmtstr(self):
+        return self._fmtstr
+
+    @fmtstr.setter
+    def fmtstr(self, value):
+        self._fmtstr = value
 
     @property
     def Nbonds(self):
@@ -77,7 +94,7 @@ class Bonds(UserList):
     @property
     def bond_angle_pairs(self):
         """`cyclic_pairs` of `Bond`\ s."""
-        return cyclic_pairs(self)
+        return cyclic_pairs(self.data)
 
     @property
     def angles(self):
@@ -95,5 +112,8 @@ class Bonds(UserList):
         """`Atoms` :class:`python:set` in `Bonds`."""
         atoms = []
         [atoms.extend(bond.atoms) for bond in self]
-        atoms = dedupe(atoms, key=attrgetter('id', 'x', 'y', 'z'))
-        return sknano.core.atoms.StructureAtoms(atoms=list(atoms))
+        atoms = dedupe(atoms, key=attrgetter('id'))
+        return sknano.core.atoms.StructureAtoms(list(atoms))
+
+    def todict(self):
+        return dict(bonds=self.data)
