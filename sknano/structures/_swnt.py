@@ -139,8 +139,7 @@ class SWNT(SWNTMixin, StructureBase):
                         'electronic_type']
 
     def __init__(self, *Ch, nz=None, bond=aCC, basis=['C', 'C'],
-                 tube_length=None, Lz=None,
-                 fix_Lz=False, **kwargs):
+                 tube_length=None, Lz=None, fix_Lz=False, **kwargs):
 
         try:
             n, m = Ch
@@ -148,10 +147,14 @@ class SWNT(SWNTMixin, StructureBase):
             try:
                 n, m = Ch[0]
             except IndexError:
-                n = kwargs['n']
-                del kwargs['n']
-                m = kwargs['m']
-                del kwargs['m']
+                try:
+                    n, m = kwargs['Ch']
+                    del kwargs['Ch']
+                except KeyError:
+                    n = kwargs['n']
+                    del kwargs['n']
+                    m = kwargs['m']
+                    del kwargs['m']
 
         a = compute_dt(n, m, bond) + dVDW
         c = compute_T(n, m, bond, length=True)
