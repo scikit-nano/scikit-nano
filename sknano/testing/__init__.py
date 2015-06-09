@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ============================================================================
-Testing package (:mod:`sknano.testing`)
+Testing tools (:mod:`sknano.testing`)
 ============================================================================
 
 .. currentmodule:: sknano.testing
@@ -9,12 +9,19 @@ Testing package (:mod:`sknano.testing`)
 Contents
 ========
 
-Helper functions for generating test data
-------------------------------------------
+Helper funcs to generate test data
+---------------------------------------
 .. autosummary::
    :toctree: generated/
 
    generate_atoms
+
+Tools for timing processes
+---------------------------
+.. autosummary::
+   :toctree: generated/
+
+   Timer
 
 Test fixtures
 --------------
@@ -24,11 +31,12 @@ Test fixtures
    GeneratorTestFixtures
 
 """
-from __future__ import absolute_import, division, print_function
-from __future__ import unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._funcs import *
+from ._timer import *
 from ._tools import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
