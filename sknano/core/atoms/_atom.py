@@ -16,6 +16,8 @@ from functools import total_ordering
 
 import numbers
 
+import numpy as np
+
 # from sknano.core import ClassSignature
 from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols, element_names
@@ -43,14 +45,16 @@ class Atom:
             mass = kwargs['m']
             del kwargs['m']
 
-        if len(args) == 0 and (mass is not None or Z is not None):
-            if mass is not None:
-                args.append(mass)
-            else:
-                args.append(Z)
+        if element is None:
 
-        if len(args) == 1:
-            element = args.pop(0)
+            if len(args) == 0 and (mass is not None or Z is not None):
+                if Z is not None:
+                    args.append(Z)
+                else:
+                    args.append(mass)
+
+            if len(args) == 1:
+                element = args.pop(0)
 
         self.mass = mass
         self.element = element
@@ -67,17 +71,17 @@ class Atom:
 
     def __eq__(self, other):
         """Test equality of two `Atom` object instances."""
-        if self is other:
-            return True
-        else:
-            for attr in self.__dir__():
-                if getattr(self, attr) != getattr(other, attr):
-                    return False
-            return True
+        return self is other or (self.element == other.element and
+                                 self.Z == other.Z and
+                                 np.allclose(self.mass, other.mass))
 
     def __lt__(self, other):
         """Test if `self` is *less than* `other`."""
-        return self.Z < other.Z
+        if self.element == other.element == 'X' and \
+                self.Z == other.Z == 0:
+            return self.mass < other.mass
+        else:
+            return self.Z < other.Z
 
     def __dir__(self):
         return ['element', 'Z', 'mass']
@@ -140,14 +144,12 @@ class Atom:
     def element(self, value):
         """Set element symbol."""
         symbol = None
-        if isinstance(value, numbers.Integral) or \
-                (isinstance(value, numbers.Number) and
-                 abs(value - int(value)) < 1e-6):
+        if isinstance(value, numbers.Integral):
             try:
                 Z = int(value)
                 idx = Z - 1
                 symbol = element_symbols[idx]
-            except KeyError:
+            except IndexError:
                 print('unrecognized element number: {}'.format(value))
 
         if symbol is None:
@@ -220,4 +222,4 @@ class Atom:
 
     def todict(self):
         """Return `dict` of `Atom` constructor parameters."""
-        return dict(element=self.element, mass=self.mass)
+        return dict(element=self.element, mass=self.mass, Z=self.Z)
