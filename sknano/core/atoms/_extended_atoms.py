@@ -47,6 +47,7 @@ class XAtoms(CNAtoms, EnergyAtoms, ChargedAtoms, ForceAtoms, VelocityAtoms,
     def __atom_class__(self):
         return XAtom
 
-    def sort(self, key=attrgetter('element', 'Z', 'type', 'mol', 'id', 'z'),
-             reverse=False):
+    def sort(self, key=attrgetter('element', 'Z', 'mass', 'type', 'id',
+                                  'mol', 'r', 'x', 'y', 'z', 'CN', 'q',
+                                  'etotal'), reverse=False):
         super().sort(key=key, reverse=reverse)
