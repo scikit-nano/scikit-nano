@@ -47,20 +47,16 @@ class BasisAtom(XYZAtom):
             ", xs={xs:.6f}, ys={ys:.6f}, zs={zs:.6f}, lattice={lattice!r}"
 
     def __eq__(self, other):
-        return super().__eq__(other)
+        return self.rs == other.rs and super().__eq__(other)
 
     def __lt__(self, other):
         """Test if `self` is *less than* `other`."""
-        if not isinstance(other, type(self)):
-            return NotImplemented
-        if self.rs < other.rs:
-            return True
-        else:
-            return super().__lt__(other)
+        return (self.rs < other.rs and super().__le__(other)) or \
+            (self.rs <= other.rs and super().__lt__(other))
 
     def __dir__(self):
         attrs = super().__dir__()
-        attrs.append('rs')
+        attrs.extend(['rs', 'xs', 'ys', 'zs'])
         return attrs
 
     @property

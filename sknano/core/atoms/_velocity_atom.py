@@ -47,13 +47,11 @@ class VelocityAtom(Atom):
             ", vx={x:.6f}, vy={vy:.6f}, vz={vz:.6f}"
 
     def __eq__(self, other):
-        return super().__eq__(other)
+        return self.v == other.v and super().__eq__(other)
 
     def __lt__(self, other):
-        if self.v < other.v:
-            return True
-        else:
-            return super().__lt__(other)
+        return (self.v < other.v and super().__le__(other)) or \
+            (self.v <= other.v and super().__lt__(other))
 
     def __dir__(self):
         attrs = super().__dir__()
@@ -166,7 +164,7 @@ class VelocityAtom(Atom):
             smallest allowed absolute value of any :math:`x,y,z` component.
 
         """
-        self._v.rezero(epsilon)
+        self.v.rezero(epsilon)
         super().rezero(epsilon)
 
     def rotate(self, **kwargs):

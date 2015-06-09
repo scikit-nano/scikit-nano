@@ -15,6 +15,8 @@ __docformat__ = 'restructuredtext en'
 from functools import total_ordering
 import numbers
 
+import numpy as np
+
 from ._atom import Atom
 
 __all__ = ['CNAtom']
@@ -38,13 +40,11 @@ class CNAtom(Atom):
         self.fmtstr = super().fmtstr + ", CN={CN!r}"
 
     def __eq__(self, other):
-        return super().__eq__(other)
+        return np.allclose(self.CN, other.CN) and super().__eq__(other)
 
     def __lt__(self, other):
-        if self.CN < other.CN:
-            return True
-        else:
-            return super().__lt__(other)
+        return (self.CN < other.CN and super().__le__(other)) or \
+            (self.CN <= other.CN and super().__lt__(other))
 
     def __dir__(self):
         attrs = super().__dir__()

@@ -11,17 +11,13 @@ An `Atom` class with energy attributes
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import zip
 
 __docformat__ = 'restructuredtext en'
 
-from collections import OrderedDict
 from functools import total_ordering
-import numbers
+
 import numpy as np
 
-from sknano.core import xyz
-from sknano.core.math import Point, Vector
 from ._atom import Atom
 
 __all__ = ['EnergyAtom']
@@ -50,13 +46,13 @@ class EnergyAtom(Atom):
             ", pe={pe!r}, ke={ke!r}, etotal={etotal!r}"
 
     def __eq__(self, other):
-        return super().__eq__(other)
+        return np.allclose([self.pe, self.ke, self.etotal],
+                           [other.pe, other.ke, other.etotal]) and \
+            super().__eq__(other)
 
     def __lt__(self, other):
-        if self.etotal < other.etotal:
-            return True
-        else:
-            return super().__lt__(other)
+        return (self.etotal < other.etotal and super().__le__(other)) or \
+            (self.etotal <= other.etotal and super().__lt__(other))
 
     def __dir__(self):
         attrs = super().__dir__()

@@ -11,17 +11,13 @@ An `Atom` class with a charge attribute
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import zip
 
 __docformat__ = 'restructuredtext en'
 
-from collections import OrderedDict
 from functools import total_ordering
 import numbers
 import numpy as np
 
-from sknano.core import xyz
-from sknano.core.math import Point, Vector
 from ._atom import Atom
 
 __all__ = ['ChargedAtom']
@@ -47,13 +43,11 @@ class ChargedAtom(Atom):
         self.fmtstr = super().fmtstr + ", q={q!r}"
 
     def __eq__(self, other):
-        return super().__eq__(other)
+        return np.allclose(self.q, other.q) and super().__eq__(other)
 
     def __lt__(self, other):
-        if self.q < other.q:
-            return True
-        else:
-            return super().__lt__(other)
+        return (self.q < other.q and super().__le__(other)) or \
+            (self.q <= other.q and super().__lt__(other))
 
     def __dir__(self):
         attrs = super().__dir__()

@@ -14,13 +14,11 @@ from __future__ import unicode_literals
 
 __docformat__ = 'restructuredtext en'
 
-from collections import OrderedDict
 from functools import total_ordering
 import numbers
 import numpy as np
 
-from sknano.core import xyz
-from sknano.core.math import Point, Vector
+from sknano.core.math import Vector
 from ._atom import Atom
 
 __all__ = ['ForceAtom']
@@ -48,13 +46,11 @@ class ForceAtom(Atom):
             ", fx={fx:.6f}, fy={fy:.6f}, fz={fz:.6f}"
 
     def __eq__(self, other):
-        return super().__eq__(other)
+        return self.f == other.f and super().__eq__(other)
 
     def __lt__(self, other):
-        if self.f < other.f:
-            return True
-        else:
-            return super().__lt__(other)
+        return (self.f < other.f and super().__le__(other)) or \
+            (self.f <= other.f and super().__lt__(other))
 
     def __dir__(self):
         attrs = super().__dir__()
@@ -164,7 +160,7 @@ class ForceAtom(Atom):
             smallest allowed absolute value of any :math:`x,y,z` component.
 
         """
-        self._f.rezero(epsilon)
+        self.f.rezero(epsilon)
         super().rezero(epsilon)
 
     def rotate(self, **kwargs):

@@ -14,13 +14,9 @@ from __future__ import unicode_literals
 
 __docformat__ = 'restructuredtext en'
 
-from collections import OrderedDict
 from functools import total_ordering
 import numbers
-import numpy as np
 
-from sknano.core import xyz
-from sknano.core.math import Point, Vector
 from ._atom import Atom
 
 __all__ = ['TypeAtom']
@@ -50,13 +46,11 @@ class TypeAtom(Atom):
         self.fmtstr = super().fmtstr + ", type={type!r}"
 
     def __eq__(self, other):
-        return super().__eq__(other)
+        return self.type == other.type and super().__eq__(other)
 
     def __lt__(self, other):
-        if self.type < other.type:
-            return True
-        else:
-            return super().__lt__(other)
+        return (self.type < other.type and super().__le__(other)) or \
+            (self.type <= other.type and super().__lt__(other))
 
     def __dir__(self):
         attrs = super().__dir__()

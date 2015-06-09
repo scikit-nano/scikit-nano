@@ -51,17 +51,19 @@ class IDAtom(Atom):
 
         self.id = id
         self.mol = mol
-
         self.fmtstr = super().fmtstr + ", id={id!r}, mol={mol!r}"
 
     def __eq__(self, other):
-        return super().__eq__(other)
+        return self.id == other.id and self.mol == other.mol and \
+            super().__eq__(other)
 
     def __lt__(self, other):
-        if self.id < other.id:
-            return True
-        else:
-            return super().__lt__(other)
+        return ((self.id < other.id and self.mol <= other.mol and
+                 super().__le__(other))
+                or (self.id <= other.id and self.mol < other.mol and
+                    super().__le__(other))
+                or (self.id <= other.id and self.mol <= other.mol and
+                    super().__lt__(other)))
 
     def __dir__(self):
         attrs = super().__dir__()

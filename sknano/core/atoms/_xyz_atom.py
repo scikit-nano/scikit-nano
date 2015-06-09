@@ -41,22 +41,18 @@ class XYZAtom(Atom):
 
     """
     def __init__(self, *args, x=None, y=None, z=None, **kwargs):
-
-        #self.dr = Vector(np.zeros(3), p0=[x, y, z])
-        self.r0 = Vector([x, y, z])
-        self.r = Vector([x, y, z])
         super().__init__(*args, **kwargs)
 
+        self.r0 = Vector([x, y, z])
+        self.r = Vector([x, y, z])
         self.fmtstr = super().fmtstr + ", x={x:.6f}, y={y:.6f}, z={z:.6f}"
 
     def __eq__(self, other):
-        return super().__eq__(other)
+        return self.r == other.r and super().__eq__(other)
 
     def __lt__(self, other):
-        if self.r.length < other.r.length:
-            return True
-        else:
-            return super().__lt__(other)
+        return (self.r < other.r and super().__le__(other)) or \
+            (self.r <= other.r and super().__lt__(other))
 
     def __dir__(self):
         attrs = super().__dir__()

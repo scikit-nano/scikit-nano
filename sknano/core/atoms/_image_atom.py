@@ -41,13 +41,11 @@ class ImageAtom(Atom):
         self.fmtstr = super().fmtstr + ", ix={ix:d}, iy={iy:d}, iz={iz:d}"
 
     def __eq__(self, other):
-        return super().__eq__(other)
+        return self.i == other.i and super().__eq__(other)
 
     def __lt__(self, other):
-        if self.i < other.i:
-            return True
-        else:
-            return super().__lt__(other)
+        return (self.i < other.i and super().__le__(other)) or \
+            (self.i <= other.i and super().__lt__(other))
 
     def __dir__(self):
         attrs = super().__dir__()
