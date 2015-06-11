@@ -139,7 +139,6 @@ def test_structure_data():
     swnt_atoms = swnt.atoms
     swnt_atoms.assign_unique_ids()
     swnt_atoms.update_attrs()
-    #swnt.save_data(fname=fname, structure_format='data')
     data = DATAReader(fname)
     atoms = data.atoms
     atoms.assign_unique_ids()

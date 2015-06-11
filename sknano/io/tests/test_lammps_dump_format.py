@@ -14,7 +14,7 @@ from sknano.io import DUMPData, DUMPReader, DUMPWriter
 #    dumpdata = DUMPReader(dumpfile)
 
 
-def test_dump():
+def test1():
     #dumpfile = resource_filename('sknano', 'data/lammpstrj/dump.peptide')
     dumpfile = resource_filename('sknano', 'data/lammpstrj/1010+ion.dump')
     traj = DUMPData(dumpfile).trajectory

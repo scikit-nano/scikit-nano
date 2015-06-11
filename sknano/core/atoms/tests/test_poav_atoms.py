@@ -125,7 +125,6 @@ def test_structure_data():
     swnt_atoms = swnt.atoms
     swnt_atoms.assign_unique_ids()
     swnt_atoms.compute_POAVs()
-    #swnt.save_data(fname=fname, structure_format='data')
     data = DATAReader(fname)
     atoms = data.atoms
     atoms.assign_unique_ids()
