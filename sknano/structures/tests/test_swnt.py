@@ -96,5 +96,43 @@ def test4():
     print(swnt)
 
 
+def test5():
+    swnt = SWNT((10, 5), basis=['B', 'N'])
+    assert_equal(swnt.element1, 'B')
+    assert_equal(swnt.element2, 'N')
+    print(swnt.unit_cell.basis.symbols)
+    assert_equal(swnt.unit_cell.basis.symbols.tolist()[:2], ['B', 'N'])
+    print(swnt)
+    print(swnt.unit_cell.basis)
+
+    swnt.element1 = 'N'
+    swnt.element2 = 'B'
+
+    assert_equal(swnt.element1, 'N')
+    assert_equal(swnt.element2, 'B')
+
+    print(swnt)
+
+    assert_equal(swnt.unit_cell.basis.symbols.tolist()[:2], ['N', 'B'])
+    print(swnt.unit_cell)
+
+
+def test6():
+    swnt = SWNT((10, 5), element1='B', element2='N')
+    assert_equal(swnt.element1, 'B')
+    assert_equal(swnt.element2, 'N')
+    print(swnt)
+    swnt.element1 = 'N'
+    swnt.element2 = 'B'
+
+    assert_equal(swnt.element1, 'N')
+    assert_equal(swnt.element2, 'B')
+
+    print(swnt)
+
+    assert_equal(swnt.unit_cell.basis.symbols.tolist()[:2], ['N', 'B'])
+    print(swnt.unit_cell)
+
+
 if __name__ == '__main__':
     nose.runmodule()

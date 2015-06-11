@@ -9,6 +9,7 @@ from sknano.structures import SWNTBundle
 
 def test1():
     swnt = SWNTBundle(n=10, m=10)
+    print(swnt)
     assert_equal(swnt.n, 10)
     assert_equal(swnt.m, 10)
     assert_equal(swnt.element1, 'C')
@@ -30,6 +31,7 @@ def test1():
 
 def test2():
     bundle = SWNTBundle(n=10, m=10, nx=3, ny=3)
+    print(bundle)
     assert_equal(bundle.element1, 'C')
     assert_equal(bundle.element2, 'C')
     assert_equal(bundle.Ntubes, 9)
