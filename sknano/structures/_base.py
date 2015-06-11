@@ -15,8 +15,6 @@ __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
 
-# from sknano.core.crystallography import StructureBase as XtalBase
-from sknano.core.atoms import BasisAtom
 from sknano.core.refdata import aCC
 
 __all__ = ['StructureBase']
@@ -32,10 +30,25 @@ class StructureBase(metaclass=ABCMeta):
         :class:`~sknano.core.atoms.Atom` 1 and 2
 
     """
-    def __init__(self, *args, bond=None, verbose=False, debug=False, **kwargs):
+    def __init__(self, *args, basis=None, bond=None, verbose=False,
+                 debug=False, **kwargs):
+
+        if basis is None:
+            basis = ['C', 'C']
+        self.basis = basis[:]
+
+        if 'element1' in kwargs:
+            self.basis[0] = kwargs['element1']
+            del kwargs['element1']
+
+        if 'element2' in kwargs:
+            self.basis[1] = kwargs['element2']
+            del kwargs['element2']
+
         if bond is None:
             bond = aCC
         self.bond = bond
+
         self.verbose = verbose
         self.debug = debug
 
@@ -63,19 +76,21 @@ class StructureBase(metaclass=ABCMeta):
 
     @property
     def element1(self):
-        return self.basis[0].symbol
+        return self.basis[0]
 
     @element1.setter
     def element1(self, value):
         self.basis[0] = value
+        self.unit_cell.basis[0] = value
 
     @property
     def element2(self):
-        return self.basis[1].symbol
+        return self.basis[1]
 
     @element2.setter
     def element2(self, value):
         self.basis[1] = value
+        self.unit_cell.basis[1] = value
 
     @abstractmethod
     def todict(self):
