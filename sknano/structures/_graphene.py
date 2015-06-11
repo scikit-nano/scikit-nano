@@ -191,7 +191,7 @@ class Graphene(StructureBase):
     def todict(self):
         return dict(armchair_edge_length=self.armchair_edge_length,
                     zigzag_edge_length=self.zigzag_edge_length,
-                    bond=self.bond, basis=[self.element1, self.element2],
+                    bond=self.bond, basis=self.basis,
                     nlayers=self.nlayers, layer_spacing=self.layer_spacing,
                     layer_rotation_angles=self.layer_rotation_angles,
                     layer_rotation_increment=self.layer_rotation_increment,

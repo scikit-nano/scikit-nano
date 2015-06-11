@@ -46,9 +46,19 @@ class SWNTGenerator(SWNT, GeneratorBase):
     nz : :class:`python:int`, optional
         Number of repeat unit cells in the :math:`z` direction, along
         the *length* of the nanotube.
+    basis : {:class:`python:list`}, optional
+        List of :class:`python:str`\ s of element symbols or atomic number
+        of the two atom basis (default: ['C', 'C'])
+
+        .. versionadded:: 0.3.10
+
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
         :class:`~sknano.core.Atom` 1 and 2
+
+        .. deprecated:: 0.3.10
+           Use `basis` instead
+
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.

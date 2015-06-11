@@ -22,16 +22,48 @@ class BilayerGrapheneGenerator(BilayerGraphene, GrapheneGenerator):
 
     Parameters
     ----------
-    length : float
-        Length of graphene sheet in **nanometers**
-    width : float
+    armchair_edge_length : float, optional
+        Length of armchair edge in **nanometers**
+
+        .. versionadded:: 0.3.10
+
+    zigzag_edge_length : float, optional
+        Length of zigzag edge in **nanometers**
+
+        .. versionadded:: 0.3.10
+
+    length : float, optional
+        Length of armchair edge in **nanometers**
+
+        .. deprecated:: 0.3.10
+           Use `armchair_edge_length` instead
+
+    width : float, optional
         Width of graphene sheet in **nanometers**
+
+        .. deprecated:: 0.3.10
+           Use `zigzag_edge_length` instead
+
     edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
         the `length` of the sheet.
+
+        .. deprecated:: 0.3.10
+           No longer used!
+
+    basis : {:class:`python:list`}, optional
+        List of :class:`python:str`\ s of element symbols or atomic number
+        of the two atom basis (default: ['C', 'C'])
+
+        .. versionadded:: 0.3.10
+
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.core.atoms.Atom` 1 and 2
+        :class:`~sknano.core.Atom` 1 and 2
+
+        .. deprecated:: 0.3.10
+           Use `basis` instead
+
     bond : float, optional
         bond length between nearest-neighbor atoms in **Angstroms**.
     layer_spacing : float, optional
@@ -57,13 +89,14 @@ class BilayerGrapheneGenerator(BilayerGraphene, GrapheneGenerator):
     >>> from sknano.generators import BilayerGrapheneGenerator
 
     Generate **10 nm** wide by **1 nm** long `AB` stacked
-    bilayer-graphene with a `ZZ` edge:
+    bilayer-graphene:
 
-    >>> bi_graphene = BilayerGrapheneGenerator(length=10, width=1, edge='ZZ')
+    >>> blg = BilayerGrapheneGenerator(armchair_edge_length=10,
+    ...                                zigzag_edge_length=1)
 
     Save structure data in `xyz` format:
 
-    >>> bi_graphene.save()
+    >>> blg.save()
 
     The rendered structure looks like (after rotating 90 degrees so that
     it better fits the page):
@@ -72,8 +105,8 @@ class BilayerGrapheneGenerator(BilayerGraphene, GrapheneGenerator):
 
     Now generate bilayer-graphene with top layer rotated by 45 degrees.
 
-    >>> rotated_bilayer = BilayerGrapheneGenerator(length=10, width=10,
-    ...                                            edge='armchair',
+    >>> rotated_bilayer = BilayerGrapheneGenerator(armchair_edge_length=10,
+    ...                                            zigzag_edge_length=10,
     ...                                            layer_rotation_angle=45,
     ...                                            degrees=True)
     >>> rotated_bilayer.save(fname='rotated_bilayer.xyz')
@@ -84,10 +117,9 @@ class BilayerGrapheneGenerator(BilayerGraphene, GrapheneGenerator):
 
     Now generate BN bilayer-graphene with top layer rotated 45 degrees.
 
-    >>> rotated_BN_bilayer = BilayerGrapheneGenerator(length=10, width=10,
-    ...                                               edge='zigzag',
-    ...                                               element1='B',
-    ...                                               element2='N',
+    >>> rotated_BN_bilayer = BilayerGrapheneGenerator(armchair_edge_length=10,
+    ...                                               zigzag_edge_length=10,
+    ...                                               basis=['B', 'N'],
     ...                                               layer_rotation_angle=45,
     ...                                               degrees=True)
     >>> rotated_BN_bilayer.save(fname='BN_bilayer_rotated_45deg.xyz')

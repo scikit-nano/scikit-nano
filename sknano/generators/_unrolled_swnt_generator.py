@@ -44,9 +44,19 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
         :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
     nx, ny, nz : int, optional
         Number of repeat unit cells in the :math:`x, y, z` dimensions
+    basis : {:class:`python:list`}, optional
+        List of :class:`python:str`\ s of element symbols or atomic number
+        of the two atom basis (default: ['C', 'C'])
+
+        .. versionadded:: 0.3.10
+
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
         :class:`~sknano.core.Atom` 1 and 2
+
+        .. deprecated:: 0.3.10
+           Use `basis` instead
+
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.

@@ -26,16 +26,48 @@ class GrapheneGenerator(Graphene, GeneratorBase):
 
     Parameters
     ----------
-    length : float
-        Length of graphene sheet in **nanometers**
-    width : float
+    armchair_edge_length : float, optional
+        Length of armchair edge in **nanometers**
+
+        .. versionadded:: 0.3.10
+
+    zigzag_edge_length : float, optional
+        Length of zigzag edge in **nanometers**
+
+        .. versionadded:: 0.3.10
+
+    length : float, optional
+        Length of armchair edge in **nanometers**
+
+        .. deprecated:: 0.3.10
+           Use `armchair_edge_length` instead
+
+    width : float, optional
         Width of graphene sheet in **nanometers**
+
+        .. deprecated:: 0.3.10
+           Use `zigzag_edge_length` instead
+
     edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
         the `length` of the sheet.
+
+        .. deprecated:: 0.3.10
+           No longer used!
+
+    basis : {:class:`python:list`}, optional
+        List of :class:`python:str`\ s of element symbols or atomic number
+        of the two atom basis (default: ['C', 'C'])
+
+        .. versionadded:: 0.3.10
+
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.core.atoms.Atom` 1 and 2
+        :class:`~sknano.core.Atom` 1 and 2
+
+        .. deprecated:: 0.3.10
+           Use `basis` instead
+
     bond : float, optional
         bond length between nearest-neighbor atoms in **Angstroms**.
     nlayers : int, optional
@@ -66,9 +98,9 @@ class GrapheneGenerator(Graphene, GeneratorBase):
 
     >>> from sknano.generators import GrapheneGenerator
 
-    Now generate a **20 nm x 1 nm** armchair edge graphene nano-ribbon.
+    Now generate a **20 nm AC x 1 nm ZZ** graphene nano-ribbon.
 
-    >>> ACG = GrapheneGenerator(length=20, width=1, edge='AC')
+    >>> ACG = GrapheneGenerator(armchair_edge_length=20, zigzag_edge_length=1)
 
     Save structure data in `xyz` format:
 
@@ -78,19 +110,19 @@ class GrapheneGenerator(Graphene, GeneratorBase):
 
     .. image:: /images/20nmx1nm_AC_edge.png
 
-    Now let's generate a **20 nm x 1 nm** zigzag edge graphene nano-ribbon.
+    Now let's generate a **20 nm ZZ x 1 nm AC** graphene nano-ribbon.
 
-    >>> ZZG = GrapheneGenerator(length=20, width=1, edge='ZZ')
+    >>> ZZG = GrapheneGenerator(armchair_edge_length=20, zigzag_edge_length=1)
     >>> ZZG.save()
 
     The rendered structure looks like:
 
     .. image:: /images/20nmx1nm_ZZ_edge.png
 
-    Now generate **25 nm x 5 nm**, `armchair` edge,
-    5 layer, `AB`-stacked graphene.
+    Now generate **25 nm AC x 5 nm ZZ**, 5 layer, `AB`-stacked graphene.
 
-    >>> ACG_5layers = GrapheneGenerator(length=25, width=5, edge='AC',
+    >>> ACG_5layers = GrapheneGenerator(armchair_edge_length=25,
+    ...                                 zigzag_edge_length=5,
     ...                                 nlayers=5)
     >>> ACG_5layers.save()
 
@@ -100,8 +132,9 @@ class GrapheneGenerator(Graphene, GeneratorBase):
 
     Now generate single layer, **10 nm x 10 nm** sheet of BN Graphene.
 
-    >>> BN_graphene = GrapheneGenerator(length=10, width=10, edge='AC',
-    ...                                 element1='B', element2='N')
+    >>> BN_graphene = GrapheneGenerator(armchair_edge_length=10,
+    ...                                 zigzag_edge_length=10,
+    ...                                 basis=['B', 'N'])
     >>> BN_graphene.save()
 
     The rendered structure looks like:
@@ -111,8 +144,9 @@ class GrapheneGenerator(Graphene, GeneratorBase):
     Now, just because we can, generate a **5 nm x 5 nm** sheet of
     Uranium-Einsteinium Graphene.
 
-    >>> UEs_graphene = GrapheneGenerator(width=5, length=5, edge='zigzag',
-    ...                                  element1='U', element2='Es')
+    >>> UEs_graphene = GrapheneGenerator(armchair_edge_length=5,
+    ...                                  zigzag_edge_length=5,
+    ...                                  basis=['U', 'Es'])
     >>> UEs_graphene.save()
 
     The rendered structure looks like:
