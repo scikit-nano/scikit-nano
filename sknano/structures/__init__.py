@@ -22,23 +22,25 @@ Structure Classes
 .. autosummary::
    :toctree: generated/
 
+   Fullerene
+   Graphene
+   BilayerGraphene
+   SWNT
+   SWNTBundle
+   MWNT
+   MWNTBundle
+
+Mixin/Base Classes
+------------------
+
+.. autosummary::
+   :toctree: generated/
+
    StructureBase
    NanotubeBundleBase
-
    MWNTMixin
    NanotubeBundleMixin
    UnrolledSWNTMixin
-
-   Fullerene
-
-   Graphene
-   BilayerGraphene
-
-   SWNT
-   SWNTBundle
-
-   MWNT
-   MWNTBundle
 
 Compute Functions
 ------------------
