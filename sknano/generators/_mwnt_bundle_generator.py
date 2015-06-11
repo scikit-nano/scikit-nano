@@ -76,7 +76,7 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
     >>> from sknano.generators import MWNTBundleGenerator
     >>> mwntbundle = MWNTBundleGenerator(Nwalls=5, min_shell_diameter=5, Lz=5,
     ...                                  bundle_geometry='hexagon')
-    >>> mwntbundle.save_data()
+    >>> mwntbundle.save()
 
     .. image:: /images/5shell_mwnt_(1,6)@(11,7)@(18,9)@(31,2)@(41,0)_hcp_7tube_hexagon-perspective_view-01.png
 
@@ -93,11 +93,11 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
         super().generate_structure_data()
         super().generate_bundle()
 
-    def save_data(self, fname=None, outpath=None, structure_format=None,
-                  center_CM=True, **kwargs):
+    def save(self, fname=None, outpath=None, structure_format=None,
+             center_CM=True, **kwargs):
         """Save structure data.
 
-        See :meth:`~sknano.generators.GeneratorBase.save_data` method
+        See :meth:`~sknano.generators.GeneratorBase.save` method
         for documentation.
 
         """
@@ -127,6 +127,6 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
 
             fname = '_'.join(fname_wordlist)
 
-        super(MWNTBundleGenerator, self).save_data(
-            fname=fname, outpath=outpath, structure_format=structure_format,
-            center_CM=center_CM, **kwargs)
+        super().save(fname=fname, outpath=outpath,
+                     structure_format=structure_format,
+                     center_CM=center_CM, **kwargs)

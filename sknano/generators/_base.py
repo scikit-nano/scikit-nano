@@ -74,8 +74,8 @@ class GeneratorBase:
     def structure(self):
         del self.structure_data
 
-    def save_data(self, fname=None, outpath=None, structure_format=None,
-                  center_CM=True, **kwargs):
+    def save(self, fname=None, outpath=None, structure_format=None,
+             center_CM=True, **kwargs):
         """Save structure data.
 
         .. todo::

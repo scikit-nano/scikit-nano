@@ -97,7 +97,7 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
 
     >>> from sknano.generators import SWNTBundleGenerator
     >>> SWCNTbundle = SWNTBundleGenerator(n=10, m=5, nx=10, ny=3, nz=5)
-    >>> SWCNTbundle.save_data()
+    >>> SWCNTbundle.save()
 
     The rendered structure looks like:
 
@@ -108,17 +108,17 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
 
     >>> SWCNTbundle = SWNTBundleGenerator(n=6, m=5, nz=5,
     ...                                   bundle_geometry='hexagon')
-    >>> SWCNTbundle.save_data()
+    >>> SWCNTbundle.save()
 
     which looks like:
 
     .. image:: /images/0605_hcp_7tube_hexagon-01.png
 
-    Remember, all of the :meth:`~SWNTBundleGenerator.save_data`
+    Remember, all of the :meth:`~SWNTBundleGenerator.save`
     methods allow you to rotate the structure data before saving:
 
-    >>> SWCNTbundle.save_data(fname='0605_hcp_7tube_hexagon_rot-30deg.xyz',
-    ...                       rot_axis='z', rotation_angle=30)
+    >>> SWCNTbundle.save(fname='0605_hcp_7tube_hexagon_rot-30deg.xyz',
+    ...                  rot_axis='z', rotation_angle=30)
 
     .. image:: /images/0605_hcp_7tube_hexagon_rot-30deg-01.png
 
@@ -127,7 +127,7 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
 
     >>> BIGASSHEXABUN = SWNTBundleGenerator(10, 0, nx=25, ny=25, nz=1,
     ...                                     bundle_geometry='hexagon')
-    >>> BIGASSHEXABUN.save_data()
+    >>> BIGASSHEXABUN.save()
 
     Take a look at the 469 :math:`(10, 0)` unit cells in this big ass bundle!
 
@@ -138,7 +138,7 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
 
     >>> SWCNTbundle = SWNTBundleGenerator(10, 10, nx=3, ny=3, nz=5,
     ...                                   bundle_packing='ccp')
-    >>> SWCNTbundle.save_data()
+    >>> SWCNTbundle.save()
 
     The rendered `ccp` structure looks like:
 
@@ -158,11 +158,11 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
         super().generate_structure_data()
         super().generate_bundle()
 
-    def save_data(self, fname=None, outpath=None, structure_format=None,
-                  center_CM=True, **kwargs):
+    def save(self, fname=None, outpath=None, structure_format=None,
+             center_CM=True, **kwargs):
         """Save structure data.
 
-        See :meth:`~sknano.generators.GeneratorBase.save_data` method
+        See :meth:`~sknano.generators.GeneratorBase.save` method
         for documentation.
 
         """
@@ -192,6 +192,6 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
 
             fname = '_'.join(fname_wordlist)
 
-        super().save_data(fname=fname, outpath=outpath,
-                          structure_format=structure_format,
-                          center_CM=center_CM, **kwargs)
+        super().save(fname=fname, outpath=outpath,
+                     structure_format=structure_format,
+                     center_CM=center_CM, **kwargs)

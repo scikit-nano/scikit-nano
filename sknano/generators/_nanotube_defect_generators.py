@@ -138,7 +138,7 @@ class NanotubeStoneWalesDefectGenerator(StoneWalesDefectGenerator):
                 element2=element2, bond=bond, vdw_spacing=vdw_spacing,
                 bundle_packing=bundle_packing, bundle_geometry=bundle_geometry,
                 Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz, verbose=verbose)
-            generator.save_data(structure_format='data', **kwargs)
+            generator.save(structure_format='data', **kwargs)
             fname = generator.fname
             structure_format = generator.structure_format
             self._Ntubes = generator.Ntubes
@@ -320,7 +320,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                                            Lx=Lx, Ly=Ly, Lz=Lz,
                                            fix_Lz=fix_Lz,
                                            verbose=verbose)
-            ntbg.save_data(structure_format='data', **kwargs)
+            ntbg.save(structure_format='data', **kwargs)
             fname = ntbg.fname
             structure_format = ntbg.structure_format
             self._Ntubes = ntbg.Ntubes

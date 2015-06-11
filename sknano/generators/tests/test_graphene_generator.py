@@ -14,19 +14,19 @@ class TestCase(GeneratorTestFixtures):
     def test1(self):
         generator = GrapheneGenerator(armchair_edge_length=5,
                                       zigzag_edge_length=5)
-        generator.save_data()
+        generator.save()
         self.tmpdata.append(generator.fname)
 
     def test2(self):
         generator = GrapheneGenerator(armchair_edge_length=20,
                                       zigzag_edge_length=1)
-        generator.save_data()
+        generator.save()
         self.tmpdata.append(generator.fname)
 
     def test3(self):
         generator = GrapheneGenerator(armchair_edge_length=1,
                                       zigzag_edge_length=20)
-        generator.save_data()
+        generator.save()
         self.tmpdata.append(generator.fname)
 
 

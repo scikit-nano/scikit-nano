@@ -15,7 +15,7 @@ class TestCase(GeneratorTestFixtures):
         generator = BilayerGrapheneGenerator(armchair_edge_length=5,
                                              zigzag_edge_length=5,
                                              layer_rotation_increment=45)
-        generator.save_data()
+        generator.save()
         self.tmpdata.append(generator.fname)
 
 

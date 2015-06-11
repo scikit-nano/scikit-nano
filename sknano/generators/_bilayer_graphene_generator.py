@@ -63,7 +63,7 @@ class BilayerGrapheneGenerator(BilayerGraphene, GrapheneGenerator):
 
     Save structure data in `xyz` format:
 
-    >>> bi_graphene.save_data()
+    >>> bi_graphene.save()
 
     The rendered structure looks like (after rotating 90 degrees so that
     it better fits the page):
@@ -76,7 +76,7 @@ class BilayerGrapheneGenerator(BilayerGraphene, GrapheneGenerator):
     ...                                            edge='armchair',
     ...                                            layer_rotation_angle=45,
     ...                                            degrees=True)
-    >>> rotated_bilayer.save_data(fname='rotated_bilayer.xyz')
+    >>> rotated_bilayer.save(fname='rotated_bilayer.xyz')
 
     The rendered structure looks like:
 
@@ -90,7 +90,7 @@ class BilayerGrapheneGenerator(BilayerGraphene, GrapheneGenerator):
     ...                                               element2='N',
     ...                                               layer_rotation_angle=45,
     ...                                               degrees=True)
-    >>> rotated_BN_bilayer.save_data(fname='BN_bilayer_rotated_45deg.xyz')
+    >>> rotated_BN_bilayer.save(fname='BN_bilayer_rotated_45deg.xyz')
 
     The rendered structure looks like:
 

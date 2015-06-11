@@ -15,9 +15,9 @@ class TestCase(GeneratorTestFixtures):
         mwnt = MWNTGenerator(max_shells=3, Lz=1.0)
         print(mwnt)
         print(mwnt.todict())
-        mwnt.save_data()
+        mwnt.save()
         self.tmpdata.append(mwnt.fname)
-        mwnt.save_data(structure_format='data')
+        mwnt.save(structure_format='data')
         self.tmpdata.append(mwnt.fname)
 
     def test2(self):
@@ -26,9 +26,9 @@ class TestCase(GeneratorTestFixtures):
         print(mwnt.todict())
         assert_equal(mwnt.Nwalls, 2)
         assert_equal(mwnt.chiral_set, set(['armchair']))
-        mwnt.save_data()
+        mwnt.save()
         self.tmpdata.append(mwnt.fname)
-        mwnt.save_data(structure_format='data')
+        mwnt.save(structure_format='data')
         self.tmpdata.append(mwnt.fname)
 
     def test3(self):
@@ -37,9 +37,9 @@ class TestCase(GeneratorTestFixtures):
         print(mwnt.todict())
         assert_equal(mwnt.Nwalls, 3)
         assert_equal(mwnt.chiral_set, set(['armchair']))
-        mwnt.save_data()
+        mwnt.save()
         self.tmpdata.append(mwnt.fname)
-        mwnt.save_data(structure_format='data')
+        mwnt.save(structure_format='data')
         self.tmpdata.append(mwnt.fname)
 
 

@@ -87,7 +87,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
     SWCNT unit cell.
 
     >>> flatswcnt = UnrolledSWNTGenerator(n=10, m=5)
-    >>> flatswcnt.save_data()
+    >>> flatswcnt.save()
 
     The rendered structure looks like:
 
@@ -112,11 +112,11 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
                     nt_atom.r = uc_atom.r + dr
                     self.atoms.append(nt_atom)
 
-    def save_data(self, fname=None, outpath=None, structure_format=None,
-                  center_CM=True, **kwargs):
+    def save(self, fname=None, outpath=None, structure_format=None,
+             center_CM=True, **kwargs):
         """Save structure data.
 
-        See :meth:`~sknano.generators.GeneratorBase.save_data` method
+        See :meth:`~sknano.generators.GeneratorBase.save` method
         for documentation.
 
         """
@@ -138,5 +138,6 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
         if center_CM:
             self.atoms.center_CM()
 
-        super().save_data(fname=fname, outpath=outpath,
-            structure_format=structure_format, center_CM=False, **kwargs)
+        super().save(fname=fname, outpath=outpath,
+                     structure_format=structure_format,
+                     center_CM=False, **kwargs)

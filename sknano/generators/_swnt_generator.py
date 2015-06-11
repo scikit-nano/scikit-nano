@@ -87,7 +87,7 @@ class SWNTGenerator(SWNT, GeneratorBase):
     SWNT unit cell.
 
     >>> swnt = SWNTGenerator((10, 5))
-    >>> nt.save_data(fname='10,5_unit_cell.xyz')
+    >>> swnt.save(fname='10,5_unit_cell.xyz')
     >>> # note that there are two other alternative, but equivalent
     >>> # means of passing arguments to SWNTGenerator constructor:
     >>> # SWNTGenerator(10, 5) and SWNTGenerator(n=10, m=5)
@@ -123,11 +123,11 @@ class SWNTGenerator(SWNT, GeneratorBase):
             region_bounds.update_region_limits()
             self.atoms.clip_bounds(region_bounds)
 
-    def save_data(self, fname=None, outpath=None, structure_format=None,
-                  center_CM=True, **kwargs):
+    def save(self, fname=None, outpath=None, structure_format=None,
+             center_CM=True, **kwargs):
         """Save structure data.
 
-        See :meth:`~sknano.generators.GeneratorBase.save_data` method
+        See :meth:`~sknano.generators.GeneratorBase.save` method
         for documentation.
 
         """
@@ -139,6 +139,6 @@ class SWNTGenerator(SWNT, GeneratorBase):
             fname_wordlist = (chirality, nz)
             fname = '_'.join(fname_wordlist)
 
-        super().save_data(fname=fname, outpath=outpath,
-                          structure_format=structure_format,
-                          center_CM=center_CM, **kwargs)
+        super().save(fname=fname, outpath=outpath,
+                     structure_format=structure_format,
+                     center_CM=center_CM, **kwargs)

@@ -75,7 +75,7 @@ class MWNTGenerator(MWNT, GeneratorBase):
     --------
 
     >>> from sknano.generators import MWNTGenerator
-    >>> MWNTGenerator(Nwalls=5, min_shell_diameter=10, Lz=5).save_data()
+    >>> MWNTGenerator(Nwalls=5, min_shell_diameter=10, Lz=5).save()
 
     The above command generated a 5 wall,  10 **nanometer** long `MWNT`.
     The only constraints on the `MWNT` shell chiralities were the diameter
@@ -114,11 +114,11 @@ class MWNTGenerator(MWNT, GeneratorBase):
         for swnt in self.shells:
             self.atoms.extend(SWNTGenerator(**swnt.todict()).atoms)
 
-    def save_data(self, fname=None, outpath=None, structure_format=None,
-                  center_CM=True, **kwargs):
+    def save(self, fname=None, outpath=None, structure_format=None,
+             center_CM=True, **kwargs):
         """Save structure data.
 
-        See :meth:`~sknano.generators.GeneratorBase.save_data` method
+        See :meth:`~sknano.generators.GeneratorBase.save` method
         for documentation.
 
         """
@@ -129,6 +129,6 @@ class MWNTGenerator(MWNT, GeneratorBase):
 
             fname = '_'.join((Nshells, chiralities))
 
-        super(MWNTGenerator, self).save_data(
-            fname=fname, outpath=outpath, structure_format=structure_format,
-            center_CM=center_CM, **kwargs)
+        super().save(fname=fname, outpath=outpath,
+                     structure_format=structure_format,
+                     center_CM=center_CM, **kwargs)

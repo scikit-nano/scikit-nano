@@ -212,7 +212,7 @@ class GrapheneVacancyGenerator(VacancyGenerator):
                 raise TypeError('Either `fname` must be set or `n` and `m` '
                                 'must be specified as integers or `length` '
                                 'and `width` must be specified as floats.')
-            gg.save_data(outpath=outpath, structure_format='data', **kwargs)
+            gg.save(outpath=outpath, structure_format='data', **kwargs)
             fname = gg.fname
             structure_format = gg.structure_format
 

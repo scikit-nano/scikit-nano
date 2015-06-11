@@ -72,7 +72,7 @@ class GrapheneGenerator(Graphene, GeneratorBase):
 
     Save structure data in `xyz` format:
 
-    >>> ACG.save_data()
+    >>> ACG.save()
 
     The rendered structure look like:
 
@@ -81,7 +81,7 @@ class GrapheneGenerator(Graphene, GeneratorBase):
     Now let's generate a **20 nm x 1 nm** zigzag edge graphene nano-ribbon.
 
     >>> ZZG = GrapheneGenerator(length=20, width=1, edge='ZZ')
-    >>> ZZG.save_data()
+    >>> ZZG.save()
 
     The rendered structure looks like:
 
@@ -92,7 +92,7 @@ class GrapheneGenerator(Graphene, GeneratorBase):
 
     >>> ACG_5layers = GrapheneGenerator(length=25, width=5, edge='AC',
     ...                                 nlayers=5)
-    >>> ACG_5layers.save_data()
+    >>> ACG_5layers.save()
 
     The rendered structure looks like:
 
@@ -102,7 +102,7 @@ class GrapheneGenerator(Graphene, GeneratorBase):
 
     >>> BN_graphene = GrapheneGenerator(length=10, width=10, edge='AC',
     ...                                 element1='B', element2='N')
-    >>> BN_graphene.save_data()
+    >>> BN_graphene.save()
 
     The rendered structure looks like:
 
@@ -113,7 +113,7 @@ class GrapheneGenerator(Graphene, GeneratorBase):
 
     >>> UEs_graphene = GrapheneGenerator(width=5, length=5, edge='zigzag',
     ...                                  element1='U', element2='Es')
-    >>> UEs_graphene.save_data()
+    >>> UEs_graphene.save()
 
     The rendered structure looks like:
 
@@ -155,12 +155,12 @@ class GrapheneGenerator(Graphene, GeneratorBase):
             layer.rotate(angle=self.layer_rotation_angles[nlayer], axis='z')
             self.atoms.extend(layer)
 
-    def save_data(self, fname=None, outpath=None, structure_format=None,
-                  center_CM=True, rotation_angle=-np.pi/2, rotation_axis='x',
-                  **kwargs):
+    def save(self, fname=None, outpath=None, structure_format=None,
+             center_CM=True, rotation_angle=-np.pi/2, rotation_axis='x',
+             **kwargs):
         """Save structure data.
 
-        See :meth:`~sknano.generators.GeneratorBase.save_data` method
+        See :meth:`~sknano.generators.GeneratorBase.save` method
         for documentation.
 
         """
@@ -168,13 +168,13 @@ class GrapheneGenerator(Graphene, GeneratorBase):
             dimensions = '{}nmx{}nm'.format(self.armchair_edge_length,
                                             self.zigzag_edge_length)
             nlayer = '{}layer'.format(self.nlayers)
-            basis = ''.join(self.basis.symbols[:2])
+            basis = ''.join(self.basis)
             fname_wordlist = (dimensions, nlayer, basis, 'graphene')
             fname = '_'.join(fname_wordlist)
 
         if center_CM and self.nlayers > 1:
             self.atoms.center_CM()
 
-        super().save_data(fname=fname, outpath=outpath,
-            structure_format=structure_format, center_CM=False,
-            angle=rotation_angle, axis=rotation_axis, **kwargs)
+        super().save(fname=fname, outpath=outpath,
+                     structure_format=structure_format, center_CM=False,
+                     angle=rotation_angle, axis=rotation_axis, **kwargs)

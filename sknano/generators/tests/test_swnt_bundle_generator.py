@@ -14,25 +14,25 @@ class TestCase(GeneratorTestFixtures):
     def test1(self):
         bundle = SWNTBundleGenerator(n=10, m=5, nx=3, ny=3, nz=1,
                                      bundle_geometry='hexagon')
-        bundle.save_data()
+        bundle.save()
         self.tmpdata.append(bundle.fname)
-        bundle.save_data(structure_format='data')
+        bundle.save(structure_format='data')
         self.tmpdata.append(bundle.fname)
 
     def test2(self):
         bundle = SWNTBundleGenerator(n=10, m=0, nx=10, ny=3, nz=5)
-        bundle.save_data()
+        bundle.save()
         self.tmpdata.append(bundle.fname)
-        bundle.save_data(structure_format='data')
+        bundle.save(structure_format='data')
         self.tmpdata.append(bundle.fname)
 
     def test3(self):
         bundle = \
             SWNTBundleGenerator(n=10, m=5, nx=3, ny=3, nz=1,
                                 bundle_packing='ccp')
-        bundle.save_data()
+        bundle.save()
         self.tmpdata.append(bundle.fname)
-        bundle.save_data(structure_format='data')
+        bundle.save(structure_format='data')
         self.tmpdata.append(bundle.fname)
 
 if __name__ == '__main__':

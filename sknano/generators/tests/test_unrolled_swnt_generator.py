@@ -13,23 +13,23 @@ class TestCase(GeneratorTestFixtures):
 
     def test1(self):
         unrolled_swnt = UnrolledSWNTGenerator(n=10, m=10)
-        unrolled_swnt.save_data()
+        unrolled_swnt.save()
         self.tmpdata.append(unrolled_swnt.fname)
-        unrolled_swnt.save_data(structure_format='data')
+        unrolled_swnt.save(structure_format='data')
         self.tmpdata.append(unrolled_swnt.fname)
 
     def test2(self):
         unrolled_swnt = UnrolledSWNTGenerator(n=10, m=0)
-        unrolled_swnt.save_data()
+        unrolled_swnt.save()
         self.tmpdata.append(unrolled_swnt.fname)
-        unrolled_swnt.save_data(structure_format='data')
+        unrolled_swnt.save(structure_format='data')
         self.tmpdata.append(unrolled_swnt.fname)
 
     def test3(self):
         unrolled_swnt = UnrolledSWNTGenerator(n=10, m=5)
-        unrolled_swnt.save_data()
+        unrolled_swnt.save()
         self.tmpdata.append(unrolled_swnt.fname)
-        unrolled_swnt.save_data(structure_format='data')
+        unrolled_swnt.save(structure_format='data')
         self.tmpdata.append(unrolled_swnt.fname)
 
 

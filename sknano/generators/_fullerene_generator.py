@@ -39,7 +39,7 @@ class FullereneGenerator(Fullerene, GeneratorBase):
 
     >>> from sknano.generators import FullereneGenerator
     >>> fg = FullereneGenerator(N=60)
-    >>> fg.save_data(fname='C60.data')
+    >>> fg.save(fname='C60.data')
 
     """
 
@@ -69,17 +69,17 @@ class FullereneGenerator(Fullerene, GeneratorBase):
                 CNfile = files[0]
             self.atoms = XYZReader(os.path.join(datadir, CNfile)).atoms
 
-    def save_data(self, fname=None, outpath=None, structure_format=None,
-                  center_CM=True, **kwargs):
+    def save(self, fname=None, outpath=None, structure_format=None,
+             center_CM=True, **kwargs):
         """Save structure data.
 
-        See :py:meth:`~sknano.generators.GeneratorBase.save_data` method
+        See :py:meth:`~sknano.generators.GeneratorBase.save` method
         for documentation.
 
         """
         if fname is None:
             fname = 'C{}'.format(self.N)
 
-        super(FullereneGenerator, self).save_data(
-            fname=fname, outpath=outpath, structure_format=structure_format,
-            center_CM=center_CM, **kwargs)
+        super().save(fname=fname, outpath=outpath,
+                     structure_format=structure_format,
+                     center_CM=center_CM, **kwargs)
