@@ -101,9 +101,9 @@ class NGView(QMainWindow, Ui_NanoGen, NanotubeViewMixin, GrapheneViewMixin):
 
         generator = getattr(importlib.import_module('sknano.generators'),
                             generator_class)
-        # generator(**kwargs).save_data(fname=fname,
+        # generator(**kwargs).save(fname=fname,
         #                               structure_format=structure_format)
-        generator(**kwargs).save_data(structure_format=structure_format)
+        generator(**kwargs).save(structure_format=structure_format)
 
     def update_app_view(self):
         self.n_spinBox.setValue(self.model.n)

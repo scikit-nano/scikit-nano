@@ -85,7 +85,7 @@ for, you can do something like this from within an interactive session::
     >>> # Generate your list of (n, m) chiralities
     >>> Ch_list = generate_Ch_list(ni=5, nf=25, mi=0, mf=25, handedness='right')
     >>> for n, m in Ch_list:
-    ...     SWNTGenerator(n=n, m=m).save_data(structure_format='data')
+    ...     SWNTGenerator(n=n, m=m).save(structure_format='data')
 
 """
 from __future__ import absolute_import, division, print_function, \
@@ -264,7 +264,7 @@ def nanogen(generator_class=None, element1='C', element2='C', bond=CCbond,
     """
     generator = getattr(importlib.import_module('sknano.generators'),
                         generator_class)
-    generator(**kwargs).save_data(fname=fname,
+    generator(**kwargs).save(fname=fname,
                                   structure_format=structure_format)
 
 
