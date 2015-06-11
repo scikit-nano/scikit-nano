@@ -36,7 +36,7 @@ class MWNT(MWNTMixin, StructureBase):
             Ch_list = kwargs['Ch']
             del kwargs['Ch']
 
-        super().__init__(bond=bond, **kwargs)
+        super().__init__(basis=basis, bond=bond, **kwargs)
 
         if Ch_list is None or not isinstance(Ch_list, list):
 
@@ -95,14 +95,15 @@ class MWNT(MWNTMixin, StructureBase):
         self.L0 = Lz
 
         self.shells = \
-            [SWNT(Ch, Lz=Lz, fix_Lz=True, basis=basis, bond=bond, **kwargs)
+            [SWNT(Ch, Lz=Lz, fix_Lz=True, basis=self.basis, bond=self.bond,
+                  **kwargs)
              for Ch in self.Ch_list]
 
         a = compute_dt(self.Ch_list[-1], bond) + dVDW
         c = compute_T(self.Ch_list[-1], bond, length=True)
         lattice = Crystal3DLattice.hexagonal(a, c)
 
-        self.unit_cell = UnitCell(lattice, basis)
+        self.unit_cell = UnitCell(lattice, basis=self.basis)
 
         if self.verbose:
             print(self.shells)
@@ -115,8 +116,8 @@ class MWNT(MWNTMixin, StructureBase):
 
     def todict(self):
         """Return :class:`~python:dict` of `MWNT` attributes."""
-        return dict(Ch_list=self.Ch_list, Lz=self.Lz, bond=self.bond,
-                    basis=[self.element1, self.element2],
+        return dict(Ch_list=self.Ch_list, Lz=self.Lz,
+                    basis=self.basis, bond=self.bond,
                     min_shell_diameter=self.min_shell_diameter,
                     max_shell_diameter=self.max_shell_diameter,
                     max_shells=self.max_shells,

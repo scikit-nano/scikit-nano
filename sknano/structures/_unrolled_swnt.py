@@ -25,7 +25,7 @@ __all__ = ['UnrolledSWNT']
 class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
     """Unrolled SWNT structure class."""
 
-    def __init__(self, *Ch, nx=1, nz=1, bond=aCC, basis=['C', 'C'],
+    def __init__(self, *Ch, nx=1, nz=1, basis=['C', 'C'], bond=aCC,
                  nlayers=1, layer_spacing=dVDW, stacking_order='AB',
                  Lx=None, fix_Lx=False, Lz=None, fix_Lz=False, **kwargs):
 
@@ -40,13 +40,13 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
                 m = kwargs['m']
                 del kwargs['m']
 
+        super().__init__(basis=basis, bond=bond, **kwargs)
+
         a = compute_dt(n, m, bond) + dVDW
         c = compute_T(n, m, bond, length=True)
         lattice = Crystal3DLattice.hexagonal(a, c)
 
-        super().__init__(bond=bond, **kwargs)
-
-        self.unit_cell = UnitCell(lattice, basis)
+        self.unit_cell = UnitCell(lattice, basis=self.basis)
 
         self.n = n
         self.m = m
@@ -89,7 +89,7 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
 
         psi, tau, dpsi, dtau = self.unit_cell_symmetry_params
 
-        self.basis.clear()
+        self.unit_cell.basis.clear()
 
         if self.verbose:
             print('dpsi: {}'.format(dpsi))
@@ -122,11 +122,11 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
                 if self.verbose:
                     print('Basis Atom:\n{}'.format(atom))
 
-                self.basis.append(atom)
+                self.unit_cell.basis.append(atom)
 
     def todict(self):
         """Return :class:`~python:dict` of `SWNT` attributes."""
         return dict(Ch=(self.n, self.m), nx=self.nx, nz=self.nz,
-                    bond=self.bond, basis=[self.element1, self.element2],
+                    bond=self.bond, basis=self.basis,
                     nlayers=self.nlayers, layer_spacing=self.layer_spacing,
                     stacking_order=self.stacking_order)

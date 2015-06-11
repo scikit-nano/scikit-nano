@@ -30,16 +30,26 @@ class SWNT(SWNTMixin, StructureBase):
     Parameters
     ----------
     *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
-        Either a 2-tuple of integers (i.e., *Ch = [(n, m)]) or
-        2 integers (i.e., *Ch = [n, m]) specifying the chiral indices
+        Either a 2-tuple of integers (i.e., *Ch = ((n, m)) or
+        2 integers (i.e., *Ch = (n, m) specifying the chiral indices
         of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
     nz : :class:`python:int`, optional
         Number of repeat unit cells in the :math:`z` direction, along
         the *length* of the nanotube.
+    basis : {:class:`python:list`}, optional
+        List of :class:`python:str`\ s of element symbols or atomic number
+        of the two atom basis (default: ['C', 'C'])
+
+        .. versionadded:: 0.3.10
+
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
         :class:`~sknano.core.Atom` 1 and 2
+
+        .. deprecated:: 0.3.10
+           Use `basis` instead
+
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
@@ -156,13 +166,12 @@ class SWNT(SWNTMixin, StructureBase):
                     m = kwargs['m']
                     del kwargs['m']
 
+        super().__init__(basis=basis, bond=bond, **kwargs)
+
         a = compute_dt(n, m, bond) + dVDW
         c = compute_T(n, m, bond, length=True)
         lattice = Crystal3DLattice.hexagonal(a, c)
-
-        super().__init__(bond=bond, **kwargs)
-
-        self.unit_cell = UnitCell(lattice, basis)
+        self.unit_cell = UnitCell(lattice, basis=self.basis)
 
         if tube_length is not None and Lz is None:
             Lz = tube_length
@@ -188,7 +197,7 @@ class SWNT(SWNTMixin, StructureBase):
         else:
             fmtstr += "nz={nz!r}, "
 
-        self.fmtstr = fmtstr + "bond={bond!r}, basis={basis!r}"
+        self.fmtstr = fmtstr + "basis={basis!r}, bond={bond!r}"
 
     def __str__(self):
         """Return nice string representation of `SWNT`."""
@@ -230,7 +239,7 @@ class SWNT(SWNTMixin, StructureBase):
 
         psi, tau, dpsi, dtau = self.unit_cell_symmetry_params
 
-        self.basis.clear()
+        self.unit_cell.basis.clear()
         if self.verbose:
             print('dpsi: {}'.format(dpsi))
             print('dtau: {}\n'.format(dtau))
@@ -264,11 +273,11 @@ class SWNT(SWNTMixin, StructureBase):
                 if self.verbose:
                     print('Basis Atom:\n{}'.format(atom))
 
-                self.basis.append(atom)
+                self.unit_cell.basis.append(atom)
 
     def todict(self):
         """Return :class:`~python:dict` of `SWNT` attributes."""
         return dict(Ch=(self.n, self.m), nz=self.nz,
-                    bond=self.bond, basis=[self.element1, self.element2],
+                    bond=self.bond, basis=self.basis,
                     Lz=self.Lz)
 Nanotube = SWNT

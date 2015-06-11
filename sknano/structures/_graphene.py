@@ -21,7 +21,6 @@ from sknano.core.crystallography import Crystal2DLattice, UnitCell
 from sknano.core.math import Vector
 from sknano.core.refdata import aCC, dVDW  # , grams_per_Da
 from ._base import StructureBase
-from ._extras import edge_types
 
 __all__ = ['GraphenePrimitiveCell', 'GrapheneConventionalCell', 'Graphene']
 
@@ -56,24 +55,57 @@ class Graphene(StructureBase):
 
     Parameters
     ----------
+    armchair_edge_length : float, optional
+        Length of armchair edge in **nanometers**
+
+        .. versionadded:: 0.3.10
+
+    zigzag_edge_length : float, optional
+        Length of zigzag edge in **nanometers**
+
+        .. versionadded:: 0.3.10
+
     length : float, optional
-        Length of graphene sheet in **nanometers**
+        Length of armchair edge in **nanometers**
+
+        .. deprecated:: 0.3.10
+           Use `armchair_edge_length` instead
+
     width : float, optional
         Width of graphene sheet in **nanometers**
+
+        .. deprecated:: 0.3.10
+           Use `zigzag_edge_length` instead
+
     edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
         the `length` of the sheet.
+
+        .. deprecated:: 0.3.10
+           No longer used!
+
+    basis : {:class:`python:list`}, optional
+        List of :class:`python:str`\ s of element symbols or atomic number
+        of the two atom basis (default: ['C', 'C'])
+
+        .. versionadded:: 0.3.10
+
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
-        :class:`~sknano.core.atoms.Atom` 1 and 2
+        :class:`~sknano.core.Atom` 1 and 2
+
+        .. deprecated:: 0.3.10
+           Use `basis` instead
+
     bond : float, optional
-        bond length between nearest-neighbor atoms in **Angstroms**.
+        :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
+        nearest neighbor atoms. Must be in units of **Angstroms**.
     nlayers : int, optional
-        Number of graphene layers.
+        Number of graphene layers (default: 1)
     layer_spacing : float, optional
-        Distance between layers in **Angstroms**.
+        Distance between layers in **Angstroms** (default: 3.35).
     stacking_order : {'AA', 'AB'}, optional
-        Stacking order of graphene layers
+        Stacking order of graphene layers.
     verbose : bool, optional
         verbose output
 
@@ -89,7 +121,7 @@ class Graphene(StructureBase):
     """
 
     def __init__(self, armchair_edge_length=None, zigzag_edge_length=None,
-                 bond=aCC, basis=['C', 'C'], nlayers=1, layer_spacing=dVDW,
+                 basis=['C', 'C'], bond=aCC, nlayers=1, layer_spacing=dVDW,
                  layer_rotation_angles=None, layer_rotation_increment=None,
                  stacking_order='AB', degrees=True, cartesian=True, **kwargs):
 
@@ -97,9 +129,18 @@ class Graphene(StructureBase):
             degrees = kwargs['deg2rad']
             del kwargs['deg2rad']
 
-        super().__init__(bond=bond, **kwargs)
+        if 'length' in kwargs:
+            armchair_edge_length = kwargs['length']
+            del kwargs['length']
 
-        self.unit_cell = GrapheneConventionalCell(bond=bond, basis=basis)
+        if 'width' in kwargs:
+            zigzag_edge_length = kwargs['width']
+            del kwargs['width']
+
+        super().__init__(basis=basis, bond=bond, **kwargs)
+
+        self.unit_cell = GrapheneConventionalCell(bond=self.bond,
+                                                  basis=self.basis)
 
         self.armchair_edge_length = armchair_edge_length
         self.zigzag_edge_length = zigzag_edge_length
