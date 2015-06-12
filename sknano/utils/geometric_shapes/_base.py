@@ -9,12 +9,10 @@ Base classes for geometric regions (:mod:`sknano.utils.geometric_shapes._base`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-from builtins import object
-from future.utils import with_metaclass
 
 __docformat__ = 'restructuredtext en'
 
-from abc import ABCMeta, abstractmethod, abstractproperty
+from abc import ABCMeta, abstractmethod
 from sknano.core.math import Points, Vectors, transformation_matrix
 
 import numpy as np
@@ -22,7 +20,7 @@ import numpy as np
 __all__ = ['GeometricRegion', 'GeometricTransformsMixin']
 
 
-class GeometricTransformsMixin(object):
+class GeometricTransformsMixin:
 
     def rotate(self, angle=None, axis=None, anchor_point=None,
                rot_point=None, from_vector=None, to_vector=None,
@@ -66,7 +64,7 @@ class GeometricTransformsMixin(object):
         self.vectors.translate(t, fix_anchor_points=fix_anchor_points)
 
 
-class GeometricRegion(with_metaclass(ABCMeta, object)):
+class GeometricRegion(metaclass=ABCMeta):
     """Abstract base class for geometric regions."""
 
     def __init__(self):
@@ -81,7 +79,8 @@ class GeometricRegion(with_metaclass(ABCMeta, object)):
         return "{}({})".format(self.__class__.__name__,
                                self.fmtstr.format(**self.todict()))
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def centroid(self):
         """Centroid of geometric region."""
         raise NotImplementedError

@@ -9,14 +9,11 @@
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-from builtins import super
-from builtins import dict
 from future import standard_library
 standard_library.install_aliases()
-from future.utils import with_metaclass
 __docformat__ = 'restructuredtext en'
 
-from abc import ABCMeta, abstractproperty
+from abc import ABCMeta, abstractmethod
 
 import numpy as np
 
@@ -27,11 +24,12 @@ __all__ = ['Geometric2DRegion', 'Parallelogram', 'Rectangle', 'Square',
            'Ellipse', 'Circle']
 
 
-class Geometric2DRegion(with_metaclass(ABCMeta, GeometricRegion,
-                                       GeometricTransformsMixin)):
+class Geometric2DRegion(GeometricRegion, GeometricTransformsMixin,
+                        metaclass=ABCMeta):
     """Abstract base class for representing 2D geometric regions."""
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def area(self):
         """Area of 2D geometric region."""
         raise NotImplementedError

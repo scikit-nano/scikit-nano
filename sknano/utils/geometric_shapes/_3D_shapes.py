@@ -9,11 +9,10 @@
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-from future.utils import with_metaclass
 
 __docformat__ = 'restructuredtext en'
 
-from abc import ABCMeta, abstractproperty
+from abc import ABCMeta, abstractmethod
 
 import numbers
 import numpy as np
@@ -25,11 +24,12 @@ __all__ = ['Geometric3DRegion', 'Parallelepiped', 'Cuboid', 'Cube',
            'Ellipsoid', 'Spheroid', 'Sphere']
 
 
-class Geometric3DRegion(with_metaclass(ABCMeta, GeometricRegion,
-                                       GeometricTransformsMixin)):
+class Geometric3DRegion(GeometricRegion, GeometricTransformsMixin,
+                        metaclass=ABCMeta):
     """Abstract base class for representing 3D geometric regions."""
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def volume(self):
         """Volume of 3D geometric region."""
         raise NotImplementedError
