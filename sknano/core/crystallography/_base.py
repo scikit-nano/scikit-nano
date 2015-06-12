@@ -19,7 +19,6 @@ from functools import total_ordering
 
 import numpy as np
 
-# from sknano.core.atoms import StructureAtoms as Atoms
 from sknano.core.math import Point
 from ._unit_cell import UnitCell
 
@@ -75,6 +74,8 @@ class StructureBase:
         if scaling_matrix is not None and \
                 isinstance(scaling_matrix,
                            (int, float, tuple, list, np.ndarray)):
+            if isinstance(scaling_matrix, (int, float)):
+                scaling_matrix = 3 * [scaling_matrix]
             self.scaling_matrix = scaling_matrix
 
         self.fmtstr = "{lattice!r}, {basis!r}, {coords!r}, cartesian=True"
