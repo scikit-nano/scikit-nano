@@ -21,9 +21,9 @@ __docformat__ = 'restructuredtext en'
 # import numbers
 # from abc import ABCMeta, abstractproperty
 
-import numpy as np
+# import numpy as np
 
-from sknano.core.math import Vector
+# from sknano.core.math import Vector
 
 # from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from sknano.core.atoms import BasisAtom as Atom, BasisAtoms as Atoms
@@ -36,23 +36,24 @@ __all__ = ['Crystal2DStructure']
 
 class Crystal2DStructure(StructureBase):
     """Abstract base class for 2D crystal structures."""
-
-    def __init__(self, lattice=None, basis=None, coords=None,
-                 cartesian=False):
+    def __init__(self, lattice=None, basis=None, coords=None, cartesian=False,
+                 scaling_matrix=None, **kwargs):
         if not isinstance(lattice, Crystal2DLattice):
             lattice = Crystal2DLattice(cell_matrix=lattice)
 
-        super().__init__(lattice, basis, coords, cartesian)
+        super().__init__(lattice=lattice, basis=basis, coords=coords,
+                         cartesian=cartesian, scaling_matrix=scaling_matrix,
+                         **kwargs)
 
     @classmethod
-    def from_pymatgen_structure(cls, structure):
+    def from_pymatgen_structure(cls, structure, scaling_matrix=None):
         atoms = Atoms()
         for site in structure.sites:
             atoms.append(Atom(element=site.specie.symbol,
                               x=site.x, y=site.y, z=site.z))
         return cls(lattice=Crystal2DLattice(
-                   cell_matrix=structure.lattice.matrix),
-                   basis=atoms)
+                   cell_matrix=structure.lattice.matrix), basis=atoms,
+                   scaling_matrix=scaling_matrix)
 
     @classmethod
     def from_spacegroup(cls, sg, lattice, basis, coords, scaling_matrix=None):
@@ -67,10 +68,7 @@ class Crystal2DStructure(StructureBase):
 
         structure = \
             pymatgen_structure(sg, lattice.cell_matrix, basis, coords,
-                               classmethod='from_spacegroup')
-        if scaling_matrix is not None and \
-                isinstance(scaling_matrix,
-                           (int, float, tuple, list, np.ndarray)):
-            structure.make_supercell(scaling_matrix)
-        structure = Crystal2DStructure.from_pymatgen_structure(structure)
-        return cls(lattice=structure.lattice, basis=structure.basis)
+                               classmethod='from_spacegroup',
+                               scaling_matrix=scaling_matrix)
+        return cls.from_pymatgen_structure(structure,
+                                           scaling_matrix=scaling_matrix)

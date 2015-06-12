@@ -21,10 +21,12 @@ import inspect
 # import numbers
 # from abc import ABCMeta, abstractproperty
 
+import numpy as np
+
 __all__ = ['pymatgen_structure']
 
 
-def pymatgen_structure(*args, classmethod=None, **kwargs):
+def pymatgen_structure(*args, classmethod=None, scaling_matrix=None, **kwargs):
     try:
         from pymatgen import Structure
     except ImportError as e:
@@ -38,4 +40,9 @@ def pymatgen_structure(*args, classmethod=None, **kwargs):
 
         pmg_sig = inspect.signature(constructor)
         bound_sig = pmg_sig.bind(*args, **kwargs)
-        return constructor(*bound_sig.args, **bound_sig.kwargs)
+        structure = constructor(*bound_sig.args, **bound_sig.kwargs)
+        if scaling_matrix is not None and \
+                isinstance(scaling_matrix,
+                           (int, float, tuple, list, np.ndarray)):
+            structure.make_supercell(scaling_matrix)
+        return structure

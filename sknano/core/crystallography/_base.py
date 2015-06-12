@@ -17,9 +17,9 @@ __docformat__ = 'restructuredtext en'
 # from abc import ABCMeta, abstractproperty
 from functools import total_ordering
 
-# import numpy as np
+import numpy as np
 
-from sknano.core.atoms import StructureAtoms as Atoms
+# from sknano.core.atoms import StructureAtoms as Atoms
 from sknano.core.math import Point
 from ._unit_cell import UnitCell
 
@@ -65,13 +65,20 @@ class ReciprocalLatticeBase(LatticeBase):
 
 class StructureBase:
 
-    def __init__(self, lattice=None, basis=None, coords=None, cartesian=False):
+    def __init__(self, lattice=None, basis=None, coords=None,
+                 cartesian=False, scaling_matrix=None, **kwargs):
+
         self.unit_cell = UnitCell(lattice=lattice, basis=basis,
                                   coords=coords, cartesian=cartesian)
-        # self.atoms = Atoms()
+
+        self.scaling_matrix = scaling_matrix
+        if scaling_matrix is not None and \
+                isinstance(scaling_matrix,
+                           (int, float, tuple, list, np.ndarray)):
+            self.scaling_matrix = scaling_matrix
 
         self.fmtstr = "{lattice!r}, {basis!r}, {coords!r}, cartesian=True"
-        super().__init__()
+        super().__init__(**kwargs)
 
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__,
