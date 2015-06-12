@@ -164,23 +164,7 @@ class XYZAtoms(Atoms):
             CM0 = self.CM
             self.translate(-CM0)
 
-        self.data = \
-            np.asarray(self)[np.logical_and(
-                np.logical_and(
-                    self.x <= region.limits['x']['max'],
-                    np.logical_and(
-                        self.y <= region.limits['y']['max'],
-                        self.z <= region.limits['z']['max'])),
-                np.logical_and(
-                    self.x >= region.limits['x']['min'],
-                    np.logical_and(
-                        self.y >= region.limits['y']['min'],
-                        self.z >= region.limits['z']['min'])))].tolist()
-
-        #for dim, limits in region.limits.items():
-        #    atoms = atoms[np.where(getattr(self, dim) <= limits['max'])]
-        #    atoms = atoms[np.where(getattr(self, dim) >= limits['min'])]
-        #    self = atoms.tolist()
+        self.data = [atom for atom in self if region.contains(atom.r)]
 
         if CM0 is not None:
             self.translate(CM0)
