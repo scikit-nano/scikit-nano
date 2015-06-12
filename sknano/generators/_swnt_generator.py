@@ -130,7 +130,6 @@ class SWNTGenerator(SWNT, GeneratorBase):
             Lz_cutoff = 10 * self.L0 + 1
             region_bounds = Cuboid(pmin=Point([-np.inf, -np.inf, 0]),
                                    pmax=Point([np.inf, np.inf, Lz_cutoff]))
-            region_bounds.update_region_limits()
             self.atoms.clip_bounds(region_bounds)
 
     def save(self, fname=None, outpath=None, structure_format=None,
