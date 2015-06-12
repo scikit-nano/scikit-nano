@@ -51,7 +51,7 @@ class Parallelogram(Geometric2DRegion):
     """
     def __init__(self, o=None, u=None, v=None):
 
-        super(Parallelogram, self).__init__()
+        super().__init__()
 
         if o is None:
             o = Point(nd=2)
@@ -136,7 +136,7 @@ class Rectangle(Geometric2DRegion):
     def __init__(self, pmin=None, pmax=None, xmin=None, ymin=None,
                  xmax=None, ymax=None):
 
-        super(Rectangle, self).__init__()
+        super().__init__()
 
         if pmin is None:
             pmin = Point([xmin, ymin])
@@ -231,7 +231,7 @@ class Square(Geometric2DRegion):
     """
     def __init__(self, center=None, a=None):
 
-        super(Square, self).__init__()
+        super().__init__()
 
         if center is None:
             center = Point(nd=2)
@@ -300,7 +300,7 @@ class Ellipse(Geometric2DRegion):
 
     """
     def __init__(self, center=None, rx=1, ry=1):
-        super(Ellipse, self).__init__()
+        super().__init__()
 
         if center is None or not isinstance(center, (tuple, list, np.ndarray)):
             center = Point(nd=2)
@@ -394,7 +394,7 @@ class Circle(Geometric2DRegion):
     """
     def __init__(self, center=None, r=1.0):
 
-        super(Circle, self).__init__()
+        super().__init__()
 
         if center is None or not isinstance(center, (tuple, list, np.ndarray)):
             center = Point(nd=2)

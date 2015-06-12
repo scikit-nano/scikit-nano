@@ -53,7 +53,7 @@ class Parallelepiped(Geometric3DRegion):
 
     """
     def __init__(self, o=None, u=None, v=None, w=None):
-        super(Parallelepiped, self).__init__()
+        super().__init__()
 
         if o is None:
             o = Point(nd=3)
@@ -197,7 +197,7 @@ class Cuboid(Geometric3DRegion):
     def __init__(self, pmin=None, pmax=None,
                  xmin=None, ymin=None, zmin=None,
                  xmax=None, ymax=None, zmax=None):
-        super(Cuboid, self).__init__()
+        super().__init__()
 
         if pmin is None:
             pmin = Point([xmin, ymin, zmin])
@@ -362,7 +362,7 @@ class Cube(Geometric3DRegion):
 
     """
     def __init__(self, center=None, a=None):
-        super(Cube, self).__init__()
+        super().__init__()
 
         if center is None:
             center = Point()
@@ -445,7 +445,7 @@ class Ellipsoid(Geometric3DRegion):
 
     """
     def __init__(self, center=None, a=None, b=None, c=None):
-        super(Ellipsoid, self).__init__()
+        super().__init__()
 
         if center is None:
             center = Point()
@@ -538,7 +538,7 @@ class Spheroid(Geometric3DRegion):
         :class:`Spheroid` with symmetry axis along :math:`z` axis.
     """
     def __init__(self, center=None, a=None, c=None):
-        super(Spheroid, self).__init__()
+        super().__init__()
 
         if center is None:
             center = Point()
@@ -617,7 +617,7 @@ class Sphere(Geometric3DRegion):
         Sphere radius :math:`r`
     """
     def __init__(self, center=None, r=None):
-        super(Sphere, self).__init__()
+        super().__init__()
 
         if center is None:
             center = Point()
