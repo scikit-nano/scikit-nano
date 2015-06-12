@@ -122,7 +122,7 @@ class SWNTGenerator(SWNT, GeneratorBase):
         for nz in range(int(np.ceil(self.nz))):
             dr = Vector([0.0, 0.0, nz * self.T])
             for uc_atom in self.unit_cell:
-                nt_atom = Atom(element=uc_atom.symbol)
+                nt_atom = Atom(uc_atom.symbol)
                 nt_atom.r = uc_atom.r + dr
                 self.atoms.append(nt_atom)
 
