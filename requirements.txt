@@ -1,4 +1,7 @@
-cython==0.21.2
-numpy==1.9.1
-scipy==0.14.1
+future==0.14.3
+cython==0.22
+numpy==1.9.2
+scipy==0.15.1
 six==1.9.0
+PyYAML==3.11
+pymatgen==3.0.13
