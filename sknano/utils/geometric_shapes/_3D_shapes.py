@@ -134,7 +134,7 @@ class Parallelepiped(Geometric3DRegion):
 
         return Point([xcom, ycom, zcom])
 
-    def contains_point(self, point):
+    def contains(self, point):
         """Check if point is contained within volume of `Parallelepiped`."""
         p = Point(point)
 
@@ -318,7 +318,7 @@ class Cuboid(Geometric3DRegion):
         c = self.c
         return a * b * c
 
-    def contains_point(self, point):
+    def contains(self, point):
         """Check if point is contained within volume of `Cuboid`."""
         p = Point(point)
 
@@ -379,7 +379,7 @@ class Cube(Geometric3DRegion):
         a = self.a
         return a**3
 
-    def contains_point(self, point):
+    def contains(self, point):
         p = Point(point)
         c = self.center
         a = self.a
@@ -468,7 +468,7 @@ class Ellipsoid(Geometric3DRegion):
         c = self.c
         return 4 / 3 * np.pi * a * b * c
 
-    def contains_point(self, point):
+    def contains(self, point):
         """Check if point is contained within volume of :class:`Ellipsoid`."""
         p = Point(point)
         c = self.center
@@ -545,7 +545,7 @@ class Spheroid(Geometric3DRegion):
         c = self.c
         return 4 / 3 * np.pi * a**2 * c
 
-    def contains_point(self, point=None):
+    def contains(self, point=None):
         """Check if point is contained within volume of :class:`Spheroid`."""
         x, y, z = point
 
@@ -610,7 +610,7 @@ class Sphere(Geometric3DRegion):
         r = self.r
         return 4 / 3 * np.pi * r**3
 
-    def contains_point(self, point):
+    def contains(self, point):
         p = point
         c = self.center
         r = self.r

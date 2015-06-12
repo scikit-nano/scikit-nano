@@ -83,7 +83,7 @@ class GeometricRegion(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def contains_point(self):
+    def contains(self):
         """Check if point is contained within geometric region."""
         raise NotImplementedError
 

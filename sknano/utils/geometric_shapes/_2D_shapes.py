@@ -104,7 +104,7 @@ class Parallelogram(Geometric2DRegion):
 
         return Point([xcom, ycom])
 
-    def contains_point(self, point):
+    def contains(self, point):
         """Check if point is contained within volume of cuboid."""
         p = Point(point)
 
@@ -202,7 +202,7 @@ class Rectangle(Geometric2DRegion):
         k = (self.ymax + self.ymin) / 2
         return Point([h, k])
 
-    def contains_point(self, point):
+    def contains(self, point):
         """Check if point is contained within volume of cuboid."""
         p = Point(point)
         xmin = self.xmin
@@ -271,7 +271,7 @@ class Square(Geometric2DRegion):
     def centroid(self):
         return self.center
 
-    def contains_point(self, point):
+    def contains(self, point):
         p = Point(point)
         c = self.center
         a = self.a
@@ -368,7 +368,7 @@ class Ellipse(Geometric2DRegion):
     def centroid(self):
         return self.center
 
-    def contains_point(self, point):
+    def contains(self, point):
         p = Point(point)
         c = self.center
         rx, ry = self.rx, self.ry
@@ -434,7 +434,7 @@ class Circle(Geometric2DRegion):
     def centroid(self):
         return self.center
 
-    def contains_point(self, point):
+    def contains(self, point):
         p = Point(point)
         c = self.center
         r = self.r
