@@ -75,7 +75,7 @@ class GeneratorBase:
         del self.structure_data
 
     def save(self, fname=None, outpath=None, structure_format=None,
-             center_CM=True, **kwargs):
+             center_CM=True, region_bounds=None, **kwargs):
         """Save structure data.
 
         .. todo::
@@ -128,6 +128,9 @@ class GeneratorBase:
 
         if center_CM:
             atoms.center_CM()
+
+        if region_bounds is not None:
+            atoms.clip_bounds(region_bounds)
 
         if kwargs:
             atoms.rotate(**kwargs)
