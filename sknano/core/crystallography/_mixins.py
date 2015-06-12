@@ -323,13 +323,12 @@ class UnitCellMixin:
         self.orientation_matrix = \
             np.dot(transform_matrix, self.orientation_matrix)
 
-    def translate(self, t, fix_anchor_point=True):
+    def translate(self, t):
         """Translate unit cell.
 
         Parameters
         ----------
         t : :class:`Vector`
-        fix_anchor_point : bool, optional
 
         """
-        self.offset.translate(t, fix_anchor_point=fix_anchor_point)
+        self.offset.translate(t)
