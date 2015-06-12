@@ -173,14 +173,6 @@ class Parallelepiped(Geometric3DRegion):
     def todict(self):
         return dict(o=self.o, u=self.u, v=self.v, w=self.w)
 
-    def update_region_limits(self):
-        self.limits['x']['min'] = self.xmin
-        self.limits['x']['max'] = self.xmax
-        self.limits['y']['min'] = self.ymin
-        self.limits['y']['max'] = self.ymax
-        self.limits['z']['min'] = self.zmin
-        self.limits['z']['max'] = self.zmax
-
 
 class Cuboid(Geometric3DRegion):
     """Abstract representation of cuboid.
@@ -337,14 +329,6 @@ class Cuboid(Geometric3DRegion):
     def todict(self):
         return dict(pmin=self.pmin, pmax=self.pmax)
 
-    def update_region_limits(self):
-        self.limits['x']['min'] = self.xmin
-        self.limits['x']['max'] = self.xmax
-        self.limits['y']['min'] = self.ymin
-        self.limits['y']['max'] = self.ymax
-        self.limits['z']['min'] = self.zmin
-        self.limits['z']['max'] = self.zmax
-
 
 class Cube(Geometric3DRegion):
     """Abstract data structure representing a cube.
@@ -411,14 +395,6 @@ class Cube(Geometric3DRegion):
 
     def todict(self):
         return dict(center=self.center, a=self.a)
-
-    def update_region_limits(self):
-        self.limits['x']['min'] = self.xmin
-        self.limits['x']['max'] = self.xmax
-        self.limits['y']['min'] = self.ymin
-        self.limits['y']['max'] = self.ymax
-        self.limits['z']['min'] = self.zmin
-        self.limits['z']['max'] = self.zmax
 
 
 class Ellipsoid(Geometric3DRegion):
@@ -504,16 +480,6 @@ class Ellipsoid(Geometric3DRegion):
     def todict(self):
         return dict(center=self.center, a=self.a, b=self.b, c=self.c)
 
-    def update_region_limits(self):
-        c = self.center
-        r = self.r
-        self.limits['x']['min'] = c.x - r
-        self.limits['x']['max'] = c.x + r
-        self.limits['y']['min'] = c.y - r
-        self.limits['y']['max'] = c.y + r
-        self.limits['z']['min'] = c.z - r
-        self.limits['z']['max'] = c.z + r
-
 
 class Spheroid(Geometric3DRegion):
     """Abstract data structure representing a spheroid.
@@ -591,16 +557,6 @@ class Spheroid(Geometric3DRegion):
     def todict(self):
         return dict(center=self.center, a=self.a, c=self.c)
 
-    def update_region_limits(self):
-        c = self.center
-        r = self.r
-        self.limits['x']['min'] = c.x - r
-        self.limits['x']['max'] = c.x + r
-        self.limits['y']['min'] = c.y - r
-        self.limits['y']['max'] = c.y + r
-        self.limits['z']['min'] = c.z - r
-        self.limits['z']['max'] = c.z + r
-
 
 class Sphere(Geometric3DRegion):
     """Abstract data structure representing a sphere.
@@ -663,13 +619,3 @@ class Sphere(Geometric3DRegion):
 
     def todict(self):
         return dict(center=self.center, r=self.r)
-
-    def update_region_limits(self):
-        c = self.center
-        r = self.r
-        self.limits['x']['min'] = c.x - r
-        self.limits['x']['max'] = c.x + r
-        self.limits['y']['min'] = c.y - r
-        self.limits['y']['max'] = c.y + r
-        self.limits['z']['min'] = c.z - r
-        self.limits['z']['max'] = c.z + r

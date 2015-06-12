@@ -70,9 +70,6 @@ class GeometricRegion(metaclass=ABCMeta):
     def __init__(self):
         self.points = Points()
         self.vectors = Vectors()
-        self.limits = {'x': {'min': -np.inf, 'max': np.inf},
-                       'y': {'min': -np.inf, 'max': np.inf},
-                       'z': {'min': -np.inf, 'max': np.inf}}
         self.fmtstr = ""
 
     def __repr__(self):
