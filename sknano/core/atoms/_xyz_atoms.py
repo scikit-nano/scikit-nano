@@ -152,7 +152,7 @@ class XYZAtoms(Atoms):
         self.translate(dr)
 
     def clip_bounds(self, region, center_before_clipping=False):
-        """Remove atoms outside the given limits along given dimension.
+        """Remove atoms outside the given region.
 
         Parameters
         ----------
