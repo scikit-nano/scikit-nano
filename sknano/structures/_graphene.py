@@ -185,7 +185,6 @@ class Graphene(StructureBase):
             'bond={bond!r}, basis={basis!r}, nlayers={nlayers!r}, ' + \
             'layer_spacing={layer_spacing!r}, ' + \
             'layer_rotation_angles={layer_rotation_angles!r}, ' + \
-            'layer_rotation_increment={layer_rotation_increment!r}, ' + \
             'stacking_order={stacking_order!r}'
 
     def todict(self):
@@ -194,5 +193,4 @@ class Graphene(StructureBase):
                     bond=self.bond, basis=self.basis,
                     nlayers=self.nlayers, layer_spacing=self.layer_spacing,
                     layer_rotation_angles=self.layer_rotation_angles,
-                    layer_rotation_increment=self.layer_rotation_increment,
                     stacking_order=self.stacking_order)
