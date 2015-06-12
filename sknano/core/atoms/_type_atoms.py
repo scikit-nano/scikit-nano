@@ -74,10 +74,8 @@ class TypeAtoms(Atoms):
             A :class:`~sknano.core.atoms.TypeAtom` instance.
 
         """
-        if atom.type not in self._types:
-            self._types[atom.type] = {}
-            self._types[atom.type]['mass'] = atom.mass
-            # self._types[atom.type]['q'] = atom.q
+        self._types[atom.type] = {}
+        self._types[atom.type]['mass'] = atom.mass
 
     def add_atomtype(self, atom):
         self.add_type(atom)
