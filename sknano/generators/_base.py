@@ -9,7 +9,6 @@ Structure generator base module (:mod:`sknano.generators._base`)
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import object
 __docformat__ = 'restructuredtext en'
 
 import copy
@@ -19,7 +18,8 @@ from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from sknano.io import StructureData, StructureWriter, \
     default_structure_format, supported_structure_formats
 
-__all__ = ['Atom', 'Atoms', 'GeneratorBase', 'STRUCTURE_GENERATORS']
+__all__ = ['Atom', 'Atoms', 'GeneratorBase', 'BulkGeneratorBase',
+           'STRUCTURE_GENERATORS']
 
 
 #: Tuple of structure generator classes.
@@ -122,7 +122,7 @@ class GeneratorBase:
             fpath = os.path.join(os.getcwd(), fname)
         self.fpath = fpath
 
-        #self._structure_format = structure_format
+        # self._structure_format = structure_format
 
         atoms = copy.deepcopy(self.atoms)
 
@@ -134,3 +134,23 @@ class GeneratorBase:
 
         StructureWriter.write(fname=fname, outpath=outpath,
                               structure_format=structure_format, atoms=atoms)
+
+
+class BulkGeneratorBase(GeneratorBase):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.generate()
+
+    def generate(self):
+        self.structure_data.clear()
+        for atom in self.unit_cell:
+            self.atoms.append(Atom(atom.element, x=atom.x, y=atom.y, z=atom.z))
+
+    def save(self, fname=None, scaling_matrix=None, **kwargs):
+        if fname is not None:
+            if scaling_matrix is not None:
+                fname = '_'.join((fname,
+                                  'x'.join(map(str, scaling_matrix))))
+
+        super().save(fname=fname, **kwargs)

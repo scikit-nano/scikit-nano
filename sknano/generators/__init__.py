@@ -31,6 +31,7 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._base import *
+from ._bulk_structure_generator import *
 from ._mixins import *
 from ._fullerene_generator import *
 from ._graphene_generator import *
