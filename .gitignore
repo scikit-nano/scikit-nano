@@ -84,4 +84,4 @@ sknano/*.pdb
 .venv
 
 # Qt Creator autosave files
-.autosave
+*.autosave
