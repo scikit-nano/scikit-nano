@@ -82,3 +82,6 @@ sknano/*.pdb
 
 # virtualenvwrapper trigger file to automatically activate virtualenv
 .venv
+
+# Qt Creator autosave files
+.autosave
