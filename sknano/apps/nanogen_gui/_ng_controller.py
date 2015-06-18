@@ -9,7 +9,6 @@ NanoGen controller (:mod:`sknano.apps.nanogen_gui._ng_controller`)
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import object
 __docformat__ = 'restructuredtext en'
 
 
@@ -22,7 +21,7 @@ except ImportError as e:
 __all__ = ['NGController']
 
 
-class NGController(object):
+class NGController:
     """:mod:`~sknano.apps.nanogen_gui` MVC controller class.
 
     Parameters
