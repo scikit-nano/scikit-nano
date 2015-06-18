@@ -9,7 +9,6 @@
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
@@ -123,49 +122,49 @@ class Parallelepiped(Geometric3DRegion):
 
     @property
     def centroid(self):
-        o = self.o
-        u = self.u
-        v = self.v
-        w = self.w
+        ox, oy, oz = self.o
+        ux, uy, uz = self.u
+        vx, vy, vz = self.v
+        wx, wy, wz = self.w
 
-        xcom = 0.5 * (2 * o.x + u.x + v.x + w.x)
-        ycom = 0.5 * (2 * o.y + u.y + v.y + w.y)
-        zcom = 0.5 * (2 * o.y + u.y + v.y + w.z)
+        xcom = 0.5 * (2 * ox + ux + vx + wx)
+        ycom = 0.5 * (2 * oy + uy + vy + wy)
+        zcom = 0.5 * (2 * oy + uy + vy + wz)
 
         return Point([xcom, ycom, zcom])
 
     def contains(self, point):
         """Check if point is contained within volume of `Parallelepiped`."""
-        p = Point(point)
+        x, y, z = Point(point)
 
-        o = self.o
-        u = self.u
-        v = self.v
-        w = self.w
+        ox, oy, oz = self.o
+        ux, uy, uz = self.u
+        vx, vy, vz = self.v
+        wx, wy, wz = self.w
 
-        d1 = (v.z * (w.x * (p.y - o.y) + w.y * (o.x - p.x)) +
-              w.z * (v.x * (o.y - p.y) + v.y * (p.x - o.x)) +
-              o.z * (v.y * w.x - v.x * w.y) +
-              p.z * (v.x * w.y - v.y * w.x)) / \
-            (u.z * (v.x * w.y - v.y * w.x) +
-             u.y * (v.z * w.x - v.x * w.z) +
-             u.x * (v.y * w.z - v.z * w.y))
+        d1 = (vz * (wx * (y - oy) + wy * (ox - x)) +
+              wz * (vx * (oy - y) + vy * (x - ox)) +
+              oz * (vy * wx - vx * wy) +
+              z * (vx * wy - vy * wx)) / \
+            (uz * (vx * wy - vy * wx) +
+             uy * (vz * wx - vx * wz) +
+             ux * (vy * wz - vz * wy))
 
-        d2 = (u.z * (w.x * (p.y - o.y) + w.y * (o.x - p.x)) +
-              w.z * (u.x * (o.y - p.y) + u.y * (p.x - o.x)) +
-              o.z * (u.y * w.x - u.x * w.y) +
-              p.z * (u.x * w.y - u.y * w.x)) / \
-            (u.z * (v.y * w.x - v.x * w.y) +
-             u.y * (v.x * w.z - v.z * w.x) +
-             u.x * (v.z * w.y - v.y * w.z))
+        d2 = (uz * (wx * (y - oy) + wy * (ox - x)) +
+              wz * (ux * (oy - y) + uy * (x - ox)) +
+              oz * (uy * wx - ux * wy) +
+              z * (ux * wy - uy * wx)) / \
+            (uz * (vy * wx - vx * wy) +
+             uy * (vx * wz - vz * wx) +
+             ux * (vz * wy - vy * wz))
 
-        d3 = (u.z * (v.x * (p.y - o.y) + v.y * (o.x - p.x)) +
-              v.z * (u.x * (o.y - p.y) + u.y * (p.x - o.x)) +
-              o.z * (u.y * v.x - u.x * v.y) +
-              p.z * (u.x * v.y - u.y * v.x)) / \
-            (u.z * (v.x * w.y - v.y * w.x) +
-             u.y * (v.z * w.x - v.x * w.z) +
-             u.x * (v.y * w.z - v.z * w.y))
+        d3 = (uz * (vx * (y - oy) + vy * (ox - x)) +
+              vz * (ux * (oy - y) + uy * (x - ox)) +
+              oz * (uy * vx - ux * vy) +
+              z * (ux * vy - uy * vx)) / \
+            (uz * (vx * wy - vy * wx) +
+             uy * (vz * wx - vx * wz) +
+             ux * (vy * wz - vz * wy))
 
         return d1 >= 0 and d1 <= 1 and d2 >= 0 and d2 <= 1 and \
             d3 >= 0 and d3 <= 1
@@ -320,11 +319,11 @@ class Cuboid(Geometric3DRegion):
 
     def contains(self, point):
         """Check if point is contained within volume of `Cuboid`."""
-        p = Point(point)
+        x, y, z = Point(point)
 
-        return (p.x >= self.xmin) and (p.x <= self.xmax) and \
-            (p.y >= self.ymin) and (p.y <= self.ymax) and \
-            (p.z >= self.zmin) and (p.z <= self.zmax)
+        return (x >= self.xmin) and (x <= self.xmax) and \
+            (y >= self.ymin) and (y <= self.ymax) and \
+            (z >= self.zmin) and (z <= self.zmax)
 
     def todict(self):
         return dict(pmin=self.pmin, pmax=self.pmax)
@@ -380,18 +379,18 @@ class Cube(Geometric3DRegion):
         return a**3
 
     def contains(self, point):
-        p = Point(point)
-        c = self.center
+        x, y, z = Point(point)
+        h, k, l = self.center
         a = self.a
-        xmin = c.x - a / 2
-        ymin = c.y - a / 2
-        zmin = c.z - a / 2
-        xmax = c.x + a / 2
-        ymax = c.y + a / 2
-        zmax = c.z + a / 2
-        return (p.x >= xmin) and (p.x <= xmax) and \
-            (p.y >= ymin) and (p.y <= ymax) and \
-            (p.z >= zmin) and (p.z <= zmax)
+        xmin = h - a / 2
+        ymin = k - a / 2
+        zmin = l - a / 2
+        xmax = h + a / 2
+        ymax = k + a / 2
+        zmax = l + a / 2
+        return (x >= xmin) and (x <= xmax) and \
+            (y >= ymin) and (y <= ymax) and \
+            (z >= zmin) and (z <= zmax)
 
     def todict(self):
         return dict(center=self.center, a=self.a)
@@ -470,12 +469,12 @@ class Ellipsoid(Geometric3DRegion):
 
     def contains(self, point):
         """Check if point is contained within volume of :class:`Ellipsoid`."""
-        p = Point(point)
-        c = self.center
+        x, y, z = Point(point)
+        h, k, l = self.center
         a, b, c = self.a, self.b, self.c
 
-        return (p.x - c.x)**2 / a**2 + (p.y - c.y)**2 / b**2 + \
-            (p.z - c.z)**2 / c**2 <= 1.0
+        return (x - h)**2 / a**2 + (y - k)**2 / b**2 + \
+            (z - l)**2 / c**2 <= 1.0
 
     def todict(self):
         return dict(center=self.center, a=self.a, b=self.b, c=self.c)
@@ -611,11 +610,11 @@ class Sphere(Geometric3DRegion):
         return 4 / 3 * np.pi * r**3
 
     def contains(self, point):
-        p = point
-        c = self.center
+        x, y, z = point
+        h, k, l = self.center
         r = self.r
 
-        return (p.x - c.x)**2 + (p.y - c.y)**2 + (p.z - c.z)**2 <= r**2
+        return (x - h)**2 + (y - k)**2 + (z - l)**2 <= r**2
 
     def todict(self):
         return dict(center=self.center, r=self.r)
