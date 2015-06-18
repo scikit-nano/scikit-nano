@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>570</width>
-    <height>693</height>
+    <height>695</height>
    </rect>
   </property>
   <property name="font">
@@ -20,7 +20,7 @@
    <string>NanoGen</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout_5">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_38">
       <item>
@@ -1374,18 +1374,18 @@
      </widget>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_5">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_25">
         <item>
-         <widget class="QLabel" name="label_16">
+         <widget class="QPushButton" name="save_as_pushButton">
           <property name="text">
-           <string>Save directory:</string>
+           <string>Save As...</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="save_directory_lineEdit">
+         <widget class="QLineEdit" name="save_as_fpath_lineEdit">
           <property name="font">
            <font>
             <family>Arial</family>
@@ -1480,7 +1480,7 @@
  <connections/>
  <buttongroups>
   <buttongroup name="nanotube_generator_buttonGroup"/>
-  <buttongroup name="stacking_order_buttonGroup"/>
   <buttongroup name="Lx_edge_buttonGroup"/>
+  <buttongroup name="stacking_order_buttonGroup"/>
  </buttongroups>
 </ui>
