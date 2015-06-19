@@ -12,6 +12,7 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 import importlib
+import time
 
 try:
     # from PyQt4.QtCore import pyqtSlot
@@ -55,8 +56,12 @@ class NGView(QMainWindow, Ui_NanoGen, NanotubeViewMixin, GrapheneViewMixin):
         kwargs = {}
 
         if generator_tab == 'Nanotubes':
-            kwargs['n'] = self.n_spinBox.value()
-            kwargs['m'] = self.m_spinBox.value()
+            kwargs['Ch'] = (self.n_spinBox.value(), self.m_spinBox.value())
+            element1 = str(self.nanotube_element1_comboBox.itemText(
+                           self.nanotube_element1_comboBox.currentIndex()))
+            element2 = str(self.nanotube_element2_comboBox.itemText(
+                           self.nanotube_element2_comboBox.currentIndex()))
+            kwargs['basis'] = [element1, element2]
             kwargs['nz'] = self.nz_spinBox.value()
             kwargs['bond'] = self.nanotube_bond_doubleSpinBox.value()
             if self.nanotube_generator_radioButton.isChecked():
@@ -74,12 +79,17 @@ class NGView(QMainWindow, Ui_NanoGen, NanotubeViewMixin, GrapheneViewMixin):
                 else:
                     generator_class = 'MWNTGenerator'
             elif self.unrolled_nanotube_generator_radioButton.isChecked():
-                generator_class = 'UnrolledNanotubeGenerator'
+                generator_class = 'UnrolledSWNTGenerator'
         elif generator_tab == 'Graphene':
-            kwargs['zigzag_edge_length'] = \
-                self.zigzag_edge_length_doubleSpinBox.value()
             kwargs['armchair_edge_length'] = \
                 self.armchair_edge_length_doubleSpinBox.value()
+            kwargs['zigzag_edge_length'] = \
+                self.zigzag_edge_length_doubleSpinBox.value()
+            element1 = str(self.graphene_element1_comboBox.itemText(
+                           self.graphene_element1_comboBox.currentIndex))
+            element2 = str(self.graphene_element2_comboBox.itemText(
+                           self.graphene_element2_comboBox.currentIndex))
+            kwargs['basis'] = [element1, element2]
             kwargs['bond'] = self.graphene_bond_doubleSpinBox.value()
             kwargs['nlayers'] = self.nlayers_spinBox.value()
 
@@ -95,17 +105,21 @@ class NGView(QMainWindow, Ui_NanoGen, NanotubeViewMixin, GrapheneViewMixin):
 
             generator_class = 'GrapheneGenerator'
 
+        fname = None
+        outpath = None
+
         structure_format = \
             str(self.structure_format_comboBox.itemText(
                 self.structure_format_comboBox.currentIndex()))
-        if structure_format.endswith('data'):
-            structure_format = 'data'
 
         generator = getattr(importlib.import_module('sknano.generators'),
                             generator_class)
-        # generator(**kwargs).save(fname=fname,
-        #                               structure_format=structure_format)
-        generator(**kwargs).save(structure_format=structure_format)
+        self.nanogen_statusBar.showMessage('Generating structure...')
+        generator(**kwargs).save(fname=fname, outpath=outpath,
+                                 structure_format=structure_format)
+        self.nanogen_statusBar.showMessage('Done!')
+        time.sleep(2)
+        self.nanogen_statusBar.showMessage('Ready.')
 
     def update_app_view(self):
         self.n_spinBox.setValue(self.model.n)
