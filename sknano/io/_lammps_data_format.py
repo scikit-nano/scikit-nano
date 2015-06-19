@@ -294,7 +294,7 @@ class DATAWriter(object):
             comment_line = default_comment_line
 
         atoms.rezero()
-
+        atoms.assign_unique_types()
         types = atoms.types
 
         Natoms = atoms.Natoms
