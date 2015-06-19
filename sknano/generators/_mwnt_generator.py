@@ -19,7 +19,7 @@ __docformat__ = 'restructuredtext en'
 #from sknano.core import pluralize
 #from sknano.core.math import Vector
 from sknano.structures import MWNT
-#from sknano.utils.geometric_shapes import Cuboid
+#from sknano.core.geometric_regions import Cuboid
 from ._base import GeneratorBase
 from ._swnt_generator import SWNTGenerator
 

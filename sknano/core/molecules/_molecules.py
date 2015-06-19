@@ -19,7 +19,7 @@ import numpy as np
 
 from sknano.core import UserList, xyz
 from sknano.core.math import Vector, transformation_matrix
-from sknano.utils.geometric_shapes import Cuboid  # , Rectangle
+from sknano.core.geometric_regions import Cuboid  # , Rectangle
 
 __all__ = ['Molecules']
 
@@ -122,7 +122,7 @@ class Molecules(UserList):
 
         Parameters
         ----------
-        region : :class:`~sknano.utils.geometric_shapes.`GeometricRegion`
+        region : :class:`~sknano.core.geometric_regions.`GeometricRegion`
 
         """
         CM0 = None

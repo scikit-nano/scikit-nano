@@ -26,7 +26,7 @@ import numpy as np
 from sknano.core import pluralize
 from sknano.core.math import Point, Vector
 from sknano.structures import SWNT
-from sknano.utils.geometric_shapes import Cuboid
+from sknano.core.geometric_regions import Cuboid
 from ._base import Atom, GeneratorBase
 
 __all__ = ['SWNTGenerator']

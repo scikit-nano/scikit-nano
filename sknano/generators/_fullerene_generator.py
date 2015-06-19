@@ -18,7 +18,7 @@ import os
 
 from sknano.io import XYZReader
 from sknano.structures import Fullerene
-#from sknano.utils.geometric_shapes import Cuboid
+#from sknano.core.geometric_regions import Cuboid
 from ._base import GeneratorBase
 
 __all__ = ['FullereneGenerator']

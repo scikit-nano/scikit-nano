@@ -8,7 +8,7 @@ import nose
 from nose.tools import *
 from sknano.core.atoms import XAtom, XAtoms
 from sknano.testing import generate_atoms
-#from sknano.utils.geometric_shapes import Ellipsoid
+#from sknano.core.geometric_regions import Ellipsoid
 
 
 def test_instantiation():

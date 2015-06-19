@@ -9,7 +9,7 @@ from nose.tools import *
 from sknano.core.atoms import BasisAtom, BasisAtoms
 from sknano.core.crystallography import Crystal2DLattice, Crystal3DLattice
 from sknano.testing import generate_atoms
-#from sknano.utils.geometric_shapes import Ellipsoid
+#from sknano.core.geometric_regions import Ellipsoid
 
 
 def test1():

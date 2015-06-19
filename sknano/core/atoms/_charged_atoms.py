@@ -21,7 +21,7 @@ import numpy as np
 
 from sknano.core import dedupe, xyz
 from sknano.core.math import Vector, transformation_matrix
-from sknano.utils.geometric_shapes import Cuboid  # , Rectangle
+from sknano.core.geometric_regions import Cuboid  # , Rectangle
 from ._atoms import Atoms
 from ._charged_atom import ChargedAtom
 

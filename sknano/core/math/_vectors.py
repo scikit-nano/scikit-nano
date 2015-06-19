@@ -17,7 +17,7 @@ import numpy as np
 
 from sknano.core import UserList
 from ._transforms import transformation_matrix
-#from sknano.utils.geometric_shapes import Cuboid  # , Rectangle
+#from sknano.core.geometric_regions import Cuboid  # , Rectangle
 
 __all__ = ['Vectors']
 

@@ -20,7 +20,7 @@ import numpy as np
 
 from sknano.core import xyz
 from sknano.core.math import Vector, transformation_matrix
-from sknano.utils.geometric_shapes import Cuboid  # , Rectangle
+from sknano.core.geometric_regions import Cuboid  # , Rectangle
 from ._atoms import Atoms
 from ._xyz_atom import XYZAtom
 
@@ -98,7 +98,7 @@ class XYZAtoms(Atoms):
 
         Returns
         -------
-        :class:`~sknano.utils.geometric_shapes.Cuboid`"""
+        :class:`~sknano.core.geometric_regions.Cuboid`"""
         return Cuboid(pmin=[self.x.min(), self.y.min(), self.z.min()],
                       pmax=[self.x.max(), self.y.max(), self.z.max()])
 
@@ -155,7 +155,7 @@ class XYZAtoms(Atoms):
 
         Parameters
         ----------
-        region : :class:`~sknano.utils.geometric_shapes.`GeometricRegion`
+        region : :class:`~sknano.core.geometric_regions.`GeometricRegion`
 
         """
         CM0 = None
