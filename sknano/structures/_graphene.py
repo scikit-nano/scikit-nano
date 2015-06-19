@@ -159,18 +159,21 @@ class Graphene(StructureBase):
                 layer_rotation_angles is None:
             layer_rotation_angles = layer_rotation_increment * \
                 np.arange(self.nlayers)
-        else:
+        elif isinstance(layer_rotation_angles, numbers.Number):
+            layer_rotation_angles = layer_rotation_angles * \
+                np.ones(self.nlayers)
+        elif layer_rotation_angles is None or \
+                isinstance(layer_rotation_angles, (tuple, list, np.ndarray)) \
+                and len(layer_rotation_angles) != self.nlayers:
             layer_rotation_angles = np.zeros(self.nlayers)
             degrees = False
 
-        if layer_rotation_angles is not None and degrees:
-            if isinstance(layer_rotation_angles, numbers.Number):
-                layer_rotation_angles = np.radians(layer_rotation_angles)
-            elif isinstance(layer_rotation_angles, (list, np.ndarray)):
-                layer_rotation_angles = \
-                    np.radians(np.asarray(layer_rotation_angles)).tolist()
+        if degrees:
+            layer_rotation_angles = \
+                np.radians(np.asarray(layer_rotation_angles)).tolist()
 
-        self.layer_rotation_angles = layer_rotation_angles
+        self.layer_rotation_angles = \
+            np.asarray(layer_rotation_angles).tolist()
         self.stacking_order = stacking_order
 
         self.layer_shift = Vector()
