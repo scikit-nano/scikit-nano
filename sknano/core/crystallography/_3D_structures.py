@@ -9,22 +9,8 @@ Crystal structure classes (:mod:`sknano.core.crystallography._structures`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-# from builtins import super
-# from builtins import dict
-from future import standard_library
-standard_library.install_aliases()
-# from future.utils import with_metaclass
-
 __docformat__ = 'restructuredtext en'
 
-# import numbers
-# from abc import ABCMeta, abstractproperty
-
-# import numpy as np
-
-# from sknano.core.math import Vector
-
-# from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from sknano.core.atoms import BasisAtom as Atom, BasisAtoms as Atoms
 from sknano.core.refdata import crystal_bonds as bonds
 from ._3D_lattices import Crystal3DLattice

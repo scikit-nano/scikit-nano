@@ -9,11 +9,6 @@
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-# from builtins import super
-from builtins import dict
-from future import standard_library
-standard_library.install_aliases()
-# from future.utils import with_metaclass
 __docformat__ = 'restructuredtext en'
 
 # from abc import ABCMeta, abstractproperty

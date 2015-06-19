@@ -9,21 +9,15 @@ Crystal unit cell classes (:mod:`sknano.core.crystallography._unit_cells`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-# from builtins import super
-# from builtins import dict
-from future import standard_library
-standard_library.install_aliases()
-# from future.utils import with_metaclass
-
 __docformat__ = 'restructuredtext en'
 
-import copy
+# import copy
 # import numbers
 # from abc import ABCMeta, abstractproperty
 
-import numpy as np
+# import numpy as np
 
-from sknano.core.math import Vector
+# from sknano.core.math import Vector
 from sknano.core.atoms import BasisAtoms as Atoms
 
 __all__ = ['UnitCell']
