@@ -8,7 +8,7 @@ from nose.tools import *
 
 import numpy as np
 
-from sknano.utils.geometric_shapes import Parallelogram, Rectangle, Square, \
+from sknano.core.geometric_regions import Parallelogram, Rectangle, Square, \
     Ellipse, Circle
 
 

@@ -7,7 +7,7 @@ import nose
 from nose.tools import *
 import numpy as np
 
-from sknano.utils.geometric_shapes import Parallelepiped, Cuboid, Cube, \
+from sknano.core.geometric_regions import Parallelepiped, Cuboid, Cube, \
     Ellipsoid, Spheroid, Sphere
 
 

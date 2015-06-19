@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 """
 ============================================================================
-Abstract geometric data structures (:mod:`sknano.utils.geometric_shapes`)
+Abstract geometric data structures (:mod:`sknano.core.geometric_regions`)
 ============================================================================
 
-.. currentmodule:: sknano.utils.geometric_shapes
+.. currentmodule:: sknano.core.geometric_regions
 
 Contents
 ========
 
-Abstract Base Classes for defining new geometric shapes
+Abstract Base Classes for defining new geometric regions
 --------------------------------------------------------
 .. autosummary::
    :toctree: generated/
@@ -18,7 +18,7 @@ Abstract Base Classes for defining new geometric shapes
    Geometric2DRegion
    Geometric3DRegion
 
-2D Shapes
+2D Regions
 ----------
 .. autosummary::
    :toctree: generated/
@@ -29,7 +29,7 @@ Abstract Base Classes for defining new geometric shapes
    Ellipse
    Circle
 
-3D Shapes
+3D Regions
 ----------
 
 .. autosummary::
@@ -49,7 +49,7 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._base import *
-from ._2D_shapes import *
-from ._3D_shapes import *
+from ._2D_regions import *
+from ._3D_regions import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]

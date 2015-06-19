@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 =======================================================================
-3D geometric shapes (:mod:`sknano.utils.geometric_shapes._3D_shapes`)
+3D geometric regions (:mod:`sknano.core.geometric_regions._3D_regions`)
 =======================================================================
 
-.. currentmodule:: sknano.utils.geometric_shapes._3D_shapes
+.. currentmodule:: sknano.core.geometric_regions._3D_regions
 
 """
 from __future__ import absolute_import, division, print_function, \
