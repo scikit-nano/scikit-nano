@@ -27,7 +27,55 @@ __all__ = ['MWNT']
 
 
 class MWNT(MWNTMixin, StructureBase):
-    """MWNT structure class."""
+    """MWNT structure class.
+
+    Parameters
+    ----------
+    Ch_list : :class:`python:list`, optional
+        (:attr:`~SWNT.n`, :attr:`~SWNT.m`) for each `SWNT` wall in `MWNT`.
+    Nwalls : int, optional
+        Number of `SWNT` walls in `MWNT`.
+    Lz : float, optional
+        `MWNT` length in **nanometers**.
+    min_shell_diameter : float, optional
+        Minimum `MWNT` wall diameter, in units of **Angstroms**.
+    max_shell_diameter : float, optional
+        Maximum `MWNT` wall diameter, in units of **Angstroms**.
+    max_shells : int, optional
+        Maximum number of `MWNT` walls.
+    chiral_types : {None, 'armchair', 'zigzag', 'achiral', 'chiral'}, optional
+        If `None`, the :attr:`~SWNT.chiral_type` of each `MWNT` walls
+        will be random and determined by the set of randomly selected
+        chiral indices (:attr:`~SWNT.n`, :attr:`~SWNT.m`).
+    shell_spacing : float, optional
+        Inter-wall spacing in units of **Angstroms**.
+        Default value is the van der Waals interaction distance of 3.35
+        Angstroms.
+    basis : {:class:`python:list`}, optional
+        List of :class:`python:str`\ s of element symbols or atomic number
+        of the two atom basis (default: ['C', 'C'])
+
+        .. versionadded:: 0.3.10
+
+    element1, element2 : {str, int}, optional
+        Element symbol or atomic number of basis
+        :class:`~sknano.core.Atom` 1 and 2
+
+        .. deprecated:: 0.3.10
+           Use `basis` instead
+
+    bond : float, optional
+        :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
+        nearest neighbor atoms, in units of **Angstroms**.
+    verbose : bool, optional
+        if `True`, show verbose output
+
+    Examples
+    --------
+
+    >>> from sknano.generators import MWNT
+
+    """
     def __init__(self, Ch_list=None, Nwalls=None, Lz=None,
                  min_shell_diameter=None, max_shell_diameter=None,
                  max_shells=None, chiral_types=None, shell_spacing=dVDW,
