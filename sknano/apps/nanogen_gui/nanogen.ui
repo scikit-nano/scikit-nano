@@ -1397,7 +1397,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="save_as_fpath_lineEdit">
+         <widget class="QLineEdit" name="fpath_lineEdit">
           <property name="font">
            <font>
             <family>Arial</family>

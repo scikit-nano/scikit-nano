@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'nanogen.ui'
 #
-# Created by: PyQt5 UI code generator 5.4.1
+# Created by: PyQt5 UI code generator 5.4.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -648,12 +648,12 @@ class Ui_NanoGen(object):
         self.save_as_pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.save_as_pushButton.setObjectName("save_as_pushButton")
         self.horizontalLayout_25.addWidget(self.save_as_pushButton)
-        self.save_as_fpath_lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.fpath_lineEdit = QtWidgets.QLineEdit(self.centralwidget)
         font = QtGui.QFont()
         font.setFamily("Arial")
-        self.save_as_fpath_lineEdit.setFont(font)
-        self.save_as_fpath_lineEdit.setObjectName("save_as_fpath_lineEdit")
-        self.horizontalLayout_25.addWidget(self.save_as_fpath_lineEdit)
+        self.fpath_lineEdit.setFont(font)
+        self.fpath_lineEdit.setObjectName("fpath_lineEdit")
+        self.horizontalLayout_25.addWidget(self.fpath_lineEdit)
         self.structure_format_comboBox = QtWidgets.QComboBox(self.centralwidget)
         self.structure_format_comboBox.setMinimumSize(QtCore.QSize(80, 36))
         self.structure_format_comboBox.setMaximumSize(QtCore.QSize(120, 36))
