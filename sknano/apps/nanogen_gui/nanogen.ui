@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>570</width>
-    <height>695</height>
+    <width>500</width>
+    <height>700</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>500</width>
+    <height>700</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>500</width>
+    <height>700</height>
+   </size>
   </property>
   <property name="font">
    <font>
@@ -1393,6 +1405,44 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QComboBox" name="structure_format_comboBox">
+          <property name="minimumSize">
+           <size>
+            <width>80</width>
+            <height>36</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>120</width>
+            <height>36</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>18</pointsize>
+           </font>
+          </property>
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <property name="modelColumn">
+           <number>0</number>
+          </property>
+          <item>
+           <property name="text">
+            <string>data</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>xyz</string>
+           </property>
+          </item>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -1409,38 +1459,6 @@
            </size>
           </property>
          </spacer>
-        </item>
-        <item>
-         <widget class="QComboBox" name="structure_format_comboBox">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>36</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>Arial</family>
-            <pointsize>18</pointsize>
-           </font>
-          </property>
-          <property name="currentIndex">
-           <number>1</number>
-          </property>
-          <property name="modelColumn">
-           <number>0</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>LAMMPS data</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>xyz</string>
-           </property>
-          </item>
-         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="generate_pushButton">
@@ -1479,8 +1497,8 @@
  <resources/>
  <connections/>
  <buttongroups>
+  <buttongroup name="stacking_order_buttonGroup"/>
   <buttongroup name="nanotube_generator_buttonGroup"/>
   <buttongroup name="Lx_edge_buttonGroup"/>
-  <buttongroup name="stacking_order_buttonGroup"/>
  </buttongroups>
 </ui>

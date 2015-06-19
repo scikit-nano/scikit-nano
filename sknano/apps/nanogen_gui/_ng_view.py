@@ -14,8 +14,10 @@ __docformat__ = 'restructuredtext en'
 import importlib
 
 try:
-    from PyQt4.QtCore import pyqtSlot
-    from PyQt4.QtGui import QMainWindow
+    # from PyQt4.QtCore import pyqtSlot
+    # from PyQt4.QtGui import QMainWindow
+    from PyQt5.QtCore import pyqtSlot
+    from PyQt5.QtWidgets import QMainWindow
     from ._ui_nanogen import Ui_NanoGen
 except ImportError as e:
     print(e)

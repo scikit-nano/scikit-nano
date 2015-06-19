@@ -12,7 +12,8 @@ from __future__ import absolute_import, division, print_function, \
 __docformat__ = 'restructuredtext en'
 
 try:
-    from PyQt4.QtCore import pyqtSlot
+    # from PyQt4.QtCore import pyqtSlot
+    from PyQt5.QtCore import pyqtSlot
 except ImportError as e:
     print(e)
 

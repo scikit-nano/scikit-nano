@@ -13,7 +13,8 @@ __docformat__ = 'restructuredtext en'
 
 
 try:
-    from PyQt4.QtGui import QApplication
+    # from PyQt4.QtGui import QApplication
+    from PyQt5.QtWidgets import QApplication
     from ._ng_view import NGView
 except ImportError as e:
     print(e)
