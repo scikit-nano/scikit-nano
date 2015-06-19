@@ -10,7 +10,6 @@ NanoGen GUI CLI (:mod:`sknano.scripts.nanogenui`)
 """
 from __future__ import absolute_import, print_function, division
 from __future__ import unicode_literals
-from builtins import object
 __docformat__ = 'restructuredtext en'
 
 import sys
@@ -24,7 +23,7 @@ except ImportError as e:
 __all__ = ['NanoGen']
 
 
-class NanoGen(object):
+class NanoGen:
     """Base class for instantiating the NanoGen MVC.
 
     .. versionadded:: 0.2.24
