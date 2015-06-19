@@ -32,6 +32,11 @@ class Geometric2DRegion(GeometricRegion, GeometricTransformsMixin,
         """Area of 2D geometric region."""
         raise NotImplementedError
 
+    @property
+    def measure(self):
+        """Measure of 2D geometric region."""
+        return self.area
+
 
 class Parallelogram(Geometric2DRegion):
     """Abstract object representation of a parallelogram.
@@ -52,18 +57,16 @@ class Parallelogram(Geometric2DRegion):
         super().__init__()
 
         if o is None:
-            o = Point(nd=2)
-        elif isinstance(o, (tuple, list, np.ndarray)):
-            o = Point(o)
-        self._o = o
+            o = [0, 0]
+        self.o = o
 
         if u is None:
-            u = [1., 0.]
-        self._u = Vector(u, p0=self._o)
+            u = [1, 0]
+        self.u = u
 
         if v is None:
-            v = [1., 1.]
-        self._v = Vector(v, p0=self._o)
+            v = [1, 1]
+        self.v = v
 
         self.points.append(self.o)
         self.vectors.extend([self.u, self.v])
@@ -73,17 +76,34 @@ class Parallelogram(Geometric2DRegion):
     def o(self):
         return self._o
 
+    @o.setter
+    def o(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 2:
+            raise TypeError('Expected a 2-element array_like object')
+        self._o = Point(value)
+
     @property
     def u(self):
         return self._u
+
+    @u.setter
+    def u(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 2:
+            raise TypeError('Expected a 2-element array_like object')
+        self._u = Vector(value, p0=self.o)
 
     @property
     def v(self):
         return self._v
 
-    @property
-    def center(self):
-        return self.centroid
+    @v.setter
+    def v(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 2:
+            raise TypeError('Expected a 2-element array_like object')
+        self._v = Vector(value, p0=self.o)
 
     @property
     def area(self):
@@ -93,27 +113,27 @@ class Parallelogram(Geometric2DRegion):
 
     @property
     def centroid(self):
-        o = self.o
-        u = self.u
-        v = self.v
+        ox, oy = self.o
+        ux, uy = self.u
+        vx, vy = self.v
 
-        xcom = 0.5 * (2 * o.x + u.x + v.x)
-        ycom = 0.5 * (2 * o.y + u.y + v.y)
+        xcom = 0.5 * (2 * ox + ux + vx)
+        ycom = 0.5 * (2 * oy + uy + vy)
 
         return Point([xcom, ycom])
 
     def contains(self, point):
-        """Check if point is contained within volume of cuboid."""
-        p = Point(point)
+        """Check if `point` is within region."""
+        x, y = Point(point)
 
-        o = self.o
-        u = self.u
-        v = self.v
+        ox, oy = self.o
+        ux, uy = self.u
+        vx, vy = self.v
 
-        d1 = ((p.y - o.y) * v.x + (o.x - p.x) * v.y) / (u.y * v.x - u.x * v.y)
-        d2 = ((p.y - o.y) * u.x + (o.x - p.x) * u.y) / (u.x * v.y - u.y * v.x)
+        q1 = ((y - oy) * vx + (ox - x) * vy) / (uy * vx - ux * vy)
+        q2 = ((y - oy) * ux + (ox - x) * uy) / (ux * vy - uy * vx)
 
-        return d1 >= 0 and d1 <= 1 and d2 >= 0 and d2 <= 1
+        return q1 >= 0 and q1 <= 1 and q2 >= 0 and q2 <= 1
 
     def todict(self):
         return dict(o=self.o, u=self.u, v=self.v)
@@ -137,16 +157,12 @@ class Rectangle(Geometric2DRegion):
         super().__init__()
 
         if pmin is None:
-            pmin = Point([xmin, ymin])
-        elif isinstance(pmin, (tuple, list, np.ndarray)):
-            pmin = Point(pmin)
-        self._pmin = pmin
+            pmin = [xmin, ymin]
+        self.pmin = pmin
 
         if pmax is None:
-            pmax = Point([xmax, ymax])
-        elif isinstance(pmax, (tuple, list, np.ndarray)):
-            pmax = Point(pmax)
-        self._pmax = pmax
+            pmax = [xmax, ymax]
+        self.pmax = pmax
 
         self.points.append([self.pmin, self.pmax])
 
@@ -156,9 +172,23 @@ class Rectangle(Geometric2DRegion):
     def pmin(self):
         return self._pmin
 
+    @pmin.setter
+    def pmin(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 2:
+            raise TypeError('Expected a 2-element array_like object')
+        self._pmin = Point(value)
+
     @property
     def pmax(self):
         return self._pmax
+
+    @pmax.setter
+    def pmax(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 2:
+            raise TypeError('Expected a 2-element array_like object')
+        self._pmax = Point(value)
 
     @property
     def xmin(self):
@@ -175,10 +205,6 @@ class Rectangle(Geometric2DRegion):
     @property
     def ymax(self):
         return self.pmax.y
-
-    @property
-    def center(self):
-        return self.centroid
 
     @property
     def a(self):
@@ -201,15 +227,14 @@ class Rectangle(Geometric2DRegion):
         return Point([h, k])
 
     def contains(self, point):
-        """Check if point is contained within volume of cuboid."""
-        p = Point(point)
+        """Check if `point` is within region."""
+        x, y = Point(point)
         xmin = self.xmin
         xmax = self.xmax
         ymin = self.ymin
         ymax = self.ymax
 
-        return (p.x >= xmin) and (p.x <= xmax) and \
-            (p.y >= ymin) and (p.y <= ymax)
+        return (x >= xmin) and (x <= xmax) and (y >= ymin) and (y <= ymax)
 
     def todict(self):
         return dict(pmin=self.pmin, pmax=self.pmax)
@@ -227,19 +252,15 @@ class Square(Geometric2DRegion):
         length of side
 
     """
-    def __init__(self, center=None, a=None):
+    def __init__(self, center=None, a=1):
 
         super().__init__()
 
         if center is None:
-            center = Point(nd=2)
-        elif isinstance(center, (tuple, list, np.ndarray)):
-            center = Point(center)
-        self._center = center
+            center = [0, 0]
+        self.center = center
 
-        if a is None:
-            a = 1.0
-        self._a = a
+        self.a = a
 
         self.points.append(self.center)
         self.fmtstr = "center={center!r}, a={a:.2f}"
@@ -250,6 +271,9 @@ class Square(Geometric2DRegion):
 
     @center.setter
     def center(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 2:
+            raise TypeError('Expected a 2-element array_like object')
         self._center = Point(value)
 
     @property
@@ -270,15 +294,14 @@ class Square(Geometric2DRegion):
         return self.center
 
     def contains(self, point):
-        p = Point(point)
-        c = self.center
+        x, y = Point(point)
+        h, k = self.center
         a = self.a
-        xmin = c.x - a / 2
-        ymin = c.y - a / 2
-        xmax = c.x + a / 2
-        ymax = c.y + a / 2
-        return (p.x >= xmin) and (p.x <= xmax) and \
-            (p.y >= ymin) and (p.y <= ymax)
+        xmin = h - a / 2
+        ymin = k - a / 2
+        xmax = h + a / 2
+        ymax = k + a / 2
+        return (x >= xmin) and (x <= xmax) and (y >= ymin) and (y <= ymax)
 
     def todict(self):
         return dict(center=self.center, a=self.a)
@@ -300,14 +323,11 @@ class Ellipse(Geometric2DRegion):
     def __init__(self, center=None, rx=1, ry=1):
         super().__init__()
 
-        if center is None or not isinstance(center, (tuple, list, np.ndarray)):
-            center = Point(nd=2)
-        elif isinstance(center, (tuple, list, np.ndarray)):
-            center = Point(center)
-
-        self._center = center
-        self._rx = rx
-        self._ry = ry
+        if center is None:
+            center = [0, 0]
+        self.center = center
+        self.rx = rx
+        self.ry = ry
 
         self.points.append(self.center)
         self.fmtstr = "center={center!r}, rx={rx:.3f}, ry={ry:.3f}"
@@ -318,6 +338,9 @@ class Ellipse(Geometric2DRegion):
 
     @center.setter
     def center(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 2:
+            raise TypeError('Expected a 2-element array_like object')
         self._center = Point(value)
 
     @property
@@ -367,11 +390,11 @@ class Ellipse(Geometric2DRegion):
         return self.center
 
     def contains(self, point):
-        p = Point(point)
-        c = self.center
+        x, y = Point(point)
+        h, k = self.center
         rx, ry = self.rx, self.ry
 
-        return (p.x - c.x)**2 / rx**2 + (p.y - c.y)**2 / ry**2 <= 1.0
+        return (x - h)**2 / rx**2 + (y - k)**2 / ry**2 <= 1.0
 
     def todict(self):
         return dict(center=self.center, rx=self.rx, ry=self.ry)
@@ -394,15 +417,10 @@ class Circle(Geometric2DRegion):
 
         super().__init__()
 
-        if center is None or not isinstance(center, (tuple, list, np.ndarray)):
-            center = Point(nd=2)
-        elif isinstance(center, (tuple, list, np.ndarray)):
-            center = Point(center)
-        self._center = center
-
-        if r is None:
-            r = 1.0
-        self._r = r
+        if center is None:
+            center = [0, 0]
+        self.center = center
+        self.r = r
 
         self.points.append(self.center)
         self.fmtstr = "center={center!r}, r={r:.3f}"
@@ -413,6 +431,9 @@ class Circle(Geometric2DRegion):
 
     @center.setter
     def center(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 2:
+            raise TypeError('Expected a 2-element array_like object')
         self._center = Point(value)
 
     @property
@@ -433,11 +454,11 @@ class Circle(Geometric2DRegion):
         return self.center
 
     def contains(self, point):
-        p = Point(point)
-        c = self.center
+        x, y = Point(point)
+        h, k = self.center
         r = self.r
 
-        return (p.x - c.x)**2 + (p.y - c.y)**2 <= r**2
+        return (x - h)**2 + (y - k)**2 <= r**2
 
     def todict(self):
         return dict(center=self.center, r=self.r)

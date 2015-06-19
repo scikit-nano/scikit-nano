@@ -20,7 +20,7 @@ from sknano.core.math import Point, Vector, vector as vec
 from ._base import GeometricRegion, GeometricTransformsMixin
 
 __all__ = ['Geometric3DRegion', 'Parallelepiped', 'Cuboid', 'Cube',
-           'Ellipsoid', 'Spheroid', 'Sphere']
+           'Ellipsoid', 'Spheroid', 'Sphere', 'Cylinder']
 
 
 class Geometric3DRegion(GeometricRegion, GeometricTransformsMixin,
@@ -32,6 +32,11 @@ class Geometric3DRegion(GeometricRegion, GeometricTransformsMixin,
     def volume(self):
         """Volume of 3D geometric region."""
         raise NotImplementedError
+
+    @property
+    def measure(self):
+        """Measure of 3D geometric region."""
+        return self.volume
 
 
 class Parallelepiped(Geometric3DRegion):
@@ -55,22 +60,20 @@ class Parallelepiped(Geometric3DRegion):
         super().__init__()
 
         if o is None:
-            o = Point(nd=3)
-        elif isinstance(o, (tuple, list, np.ndarray)):
-            o = Point(o)
-        self._o = o
+            o = [0, 0, 0]
+        self.o = o
 
         if u is None:
-            u = [1., 0., 0.]
-        self._u = Vector(u, p0=self._o)
+            u = [1, 0, 0]
+        self.u = u
 
         if v is None:
-            v = [1., 1., 0.]
-        self._v = Vector(v, p0=self._o)
+            v = [1, 1, 0]
+        self.v = v
 
         if w is None:
-            w = [0., 1., 1.]
-        self._w = Vector(w, p0=self._o)
+            w = [0, 1, 1]
+        self.w = w
 
         self.points.append(self.o)
         self.vectors.extend([self.u, self.v, self.w])
@@ -83,7 +86,10 @@ class Parallelepiped(Geometric3DRegion):
 
     @o.setter
     def o(self, value):
-        self._o[:] = value
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 3:
+            raise TypeError('Expected a 3-element array_like object')
+        self._o = Point(value)
 
     @property
     def u(self):
@@ -91,7 +97,10 @@ class Parallelepiped(Geometric3DRegion):
 
     @u.setter
     def u(self, value):
-        self._u[:] = value
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 3:
+            raise TypeError('Expected a 3-element array_like object')
+        self._u = Vector(value, p0=self.o)
 
     @property
     def v(self):
@@ -99,7 +108,10 @@ class Parallelepiped(Geometric3DRegion):
 
     @v.setter
     def v(self, value):
-        self._v[:] = value
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 3:
+            raise TypeError('Expected a 3-element array_like object')
+        self._v = Vector(value, p0=self.o)
 
     @property
     def w(self):
@@ -107,11 +119,10 @@ class Parallelepiped(Geometric3DRegion):
 
     @w.setter
     def w(self, value):
-        self._w[:] = value
-
-    @property
-    def center(self):
-        return self.centroid
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 3:
+            raise TypeError('Expected a 3-element array_like object')
+        self._w = Vector(value, p0=self.o)
 
     @property
     def volume(self):
@@ -142,7 +153,7 @@ class Parallelepiped(Geometric3DRegion):
         vx, vy, vz = self.v
         wx, wy, wz = self.w
 
-        d1 = (vz * (wx * (y - oy) + wy * (ox - x)) +
+        q1 = (vz * (wx * (y - oy) + wy * (ox - x)) +
               wz * (vx * (oy - y) + vy * (x - ox)) +
               oz * (vy * wx - vx * wy) +
               z * (vx * wy - vy * wx)) / \
@@ -150,7 +161,7 @@ class Parallelepiped(Geometric3DRegion):
              uy * (vz * wx - vx * wz) +
              ux * (vy * wz - vz * wy))
 
-        d2 = (uz * (wx * (y - oy) + wy * (ox - x)) +
+        q2 = (uz * (wx * (y - oy) + wy * (ox - x)) +
               wz * (ux * (oy - y) + uy * (x - ox)) +
               oz * (uy * wx - ux * wy) +
               z * (ux * wy - uy * wx)) / \
@@ -158,7 +169,7 @@ class Parallelepiped(Geometric3DRegion):
              uy * (vx * wz - vz * wx) +
              ux * (vz * wy - vy * wz))
 
-        d3 = (uz * (vx * (y - oy) + vy * (ox - x)) +
+        q3 = (uz * (vx * (y - oy) + vy * (ox - x)) +
               vz * (ux * (oy - y) + uy * (x - ox)) +
               oz * (uy * vx - ux * vy) +
               z * (ux * vy - uy * vx)) / \
@@ -166,8 +177,8 @@ class Parallelepiped(Geometric3DRegion):
              uy * (vz * wx - vx * wz) +
              ux * (vy * wz - vz * wy))
 
-        return d1 >= 0 and d1 <= 1 and d2 >= 0 and d2 <= 1 and \
-            d3 >= 0 and d3 <= 1
+        return q1 >= 0 and q1 <= 1 and q2 >= 0 and q2 <= 1 and \
+            q3 >= 0 and q3 <= 1
 
     def todict(self):
         return dict(o=self.o, u=self.u, v=self.v, w=self.w)
@@ -191,16 +202,12 @@ class Cuboid(Geometric3DRegion):
         super().__init__()
 
         if pmin is None:
-            pmin = Point([xmin, ymin, zmin])
-        elif isinstance(pmin, (tuple, list, np.ndarray)):
-            pmin = Point(pmin)
-        self._pmin = pmin
+            pmin = [xmin, ymin, zmin]
+        self.pmin = pmin
 
         if pmax is None:
-            pmax = Point([xmax, ymax, zmax])
-        elif isinstance(pmax, (tuple, list, np.ndarray)):
-            pmax = Point(pmax)
-        self._pmax = pmax
+            pmax = [xmax, ymax, zmax]
+        self.pmax = pmax
 
         self.points.extend([self.pmin, self.pmax])
         self.fmtstr = "pmin={pmin!r}, pmax={pmax!r}"
@@ -210,22 +217,22 @@ class Cuboid(Geometric3DRegion):
         return self._pmin
 
     @pmin.setter
-    def pmin(self, point):
-        if not isinstance(point, (list, np.ndarray)) or \
-                len(point) != self.pmin.nd:
-            raise TypeError('Expected a 3-element list or ndarray')
-        self._pmin[:] = point
+    def pmin(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 3:
+            raise TypeError('Expected a 3-element array_like object')
+        self._pmin = Point(value)
 
     @property
     def pmax(self):
         return self._pmax
 
     @pmax.setter
-    def pmax(self, point):
-        if not isinstance(point, (list, np.ndarray)) or \
-                len(point) != self.pmax.nd:
-            raise TypeError('Expected a 3-element list or ndarray')
-        self._pmax[:] = point
+    def pmax(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 3:
+            raise TypeError('Expected a 3-element array_like object')
+        self._pmax = Point(value)
 
     @property
     def xmin(self):
@@ -235,7 +242,7 @@ class Cuboid(Geometric3DRegion):
     def xmin(self, value):
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self._pmin.x = value
+        self.pmin.x = value
 
     @property
     def ymin(self):
@@ -245,7 +252,7 @@ class Cuboid(Geometric3DRegion):
     def ymin(self, value):
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self._pmin.y = value
+        self.pmin.y = value
 
     @property
     def zmin(self):
@@ -255,7 +262,7 @@ class Cuboid(Geometric3DRegion):
     def zmin(self, value):
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self._pmin.z = value
+        self.pmin.z = value
 
     @property
     def xmax(self):
@@ -265,7 +272,7 @@ class Cuboid(Geometric3DRegion):
     def xmax(self, value):
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self._pmax.x = value
+        self.pmax.x = value
 
     @property
     def ymax(self):
@@ -275,7 +282,7 @@ class Cuboid(Geometric3DRegion):
     def ymax(self, value):
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self._pmax.y = value
+        self.pmax.y = value
 
     @property
     def zmax(self):
@@ -285,11 +292,7 @@ class Cuboid(Geometric3DRegion):
     def zmax(self, value):
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self._pmax.z = value
-
-    @property
-    def center(self):
-        return self.centroid
+        self.pmax.z = value
 
     @property
     def centroid(self):
@@ -344,19 +347,13 @@ class Cube(Geometric3DRegion):
         length of edge
 
     """
-    def __init__(self, center=None, a=None):
+    def __init__(self, center=None, a=1):
         super().__init__()
 
         if center is None:
-            center = Point()
-        elif isinstance(center, (tuple, list, np.ndarray)):
-            center = Point(center)
-        self._center = center
-
-        if a is None:
-            a = 1.0
-        self._a = a
-
+            center = [0, 0, 0]
+        self.center = center
+        self.a = a
         self.points.append(self.center)
 
         self.fmtstr = "center={center!r}, a={a:.3f}"
@@ -365,9 +362,20 @@ class Cube(Geometric3DRegion):
     def center(self):
         return self._center
 
+    @center.setter
+    def center(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 3:
+            raise TypeError('Expected a 3-element array_like object')
+        self._center = Point(value)
+
     @property
     def a(self):
         return self._a
+
+    @a.setter
+    def a(self, value):
+        self._a = value
 
     @property
     def centroid(self):
@@ -423,10 +431,8 @@ class Ellipsoid(Geometric3DRegion):
         super().__init__()
 
         if center is None:
-            center = Point()
-        elif isinstance(center, (tuple, list, np.ndarray)):
-            center = Point(center)
-        self._center = center
+            center = [0, 0, 0]
+        self.center = center
 
         if a is None:
             a = 0.5
@@ -434,7 +440,7 @@ class Ellipsoid(Geometric3DRegion):
             b = 0.5
         if c is None:
             c = 0.5
-        self._a, self._b, self._c = a, b, c
+        self.a, self.b, self.c = a, b, c
 
         self.points.append(self.center)
 
@@ -444,17 +450,36 @@ class Ellipsoid(Geometric3DRegion):
     def center(self):
         return self._center
 
+    @center.setter
+    def center(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 3:
+            raise TypeError('Expected a 3-element array_like object')
+        self._center = Point(value)
+
     @property
     def a(self):
         return self._a
+
+    @a.setter
+    def a(self, value):
+        self._a = value
 
     @property
     def b(self):
         return self._b
 
+    @b.setter
+    def b(self, value):
+        self._b = value
+
     @property
     def c(self):
         return self._c
+
+    @c.setter
+    def c(self, value):
+        self._c = value
 
     @property
     def centroid(self):
@@ -506,17 +531,15 @@ class Spheroid(Geometric3DRegion):
         super().__init__()
 
         if center is None:
-            center = Point()
-        elif isinstance(center, (tuple, list, np.ndarray)):
-            center = Point(center)
-        self._center = center
+            center = [0, 0, 0]
+        self.center = center
 
         if a is None:
             a = 0.5
         if c is None:
             c = 0.5
 
-        self._a, self._c = a, c
+        self.a, self.c = a, c
 
         self.points.append(self.center)
 
@@ -526,13 +549,28 @@ class Spheroid(Geometric3DRegion):
     def center(self):
         return self._center
 
+    @center.setter
+    def center(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 3:
+            raise TypeError('Expected a 3-element array_like object')
+        self._center = Point(value)
+
     @property
     def a(self):
         return self._a
 
+    @a.setter
+    def a(self, value):
+        self._a = value
+
     @property
     def c(self):
         return self._c
+
+    @c.setter
+    def c(self, value):
+        self._c = value
 
     @property
     def centroid(self):
@@ -546,8 +584,7 @@ class Spheroid(Geometric3DRegion):
 
     def contains(self, point=None):
         """Check if point is contained within volume of :class:`Spheroid`."""
-        x, y, z = point
-
+        x, y, z = Point(point)
         h, k, l = self.center
         a, c = self.a, self.c
 
@@ -571,18 +608,14 @@ class Sphere(Geometric3DRegion):
     r : float, optional
         Sphere radius :math:`r`
     """
-    def __init__(self, center=None, r=None):
+    def __init__(self, center=None, r=1):
         super().__init__()
 
         if center is None:
-            center = Point()
-        elif isinstance(center, (tuple, list, np.ndarray)):
-            center = Point(center)
-        self._center = center
+            center = [0, 0, 0]
+        self.center = center
 
-        if r is None:
-            r = 1.0
-        self._r = r
+        self.r = r
 
         self.points.append(self.center)
 
@@ -599,6 +632,13 @@ class Sphere(Geometric3DRegion):
     @property
     def center(self):
         return self._center
+
+    @center.setter
+    def center(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != 3:
+            raise TypeError('Expected a 3-element array_like object')
+        self._center = Point(value)
 
     @property
     def centroid(self):
@@ -618,3 +658,98 @@ class Sphere(Geometric3DRegion):
 
     def todict(self):
         return dict(center=self.center, r=self.r)
+
+
+class Cylinder(Geometric3DRegion):
+    """`Geometric3DRegion` for a cylinder.
+
+    .. versionadded:: 0.3.10
+
+    Parameters
+    ----------
+    p1, p2 : sequence, optional
+        3-tuples or :class:`~sknano.core.Point` class instances
+        specifying the `Cylinder` axis from point :math:`p_1=(x_1,y_1,z_1)`
+        to :math:`p_2=(x_2,y_2,z_2)`.
+    r : float, optional
+        `Cylinder` radius :math:`r`
+    """
+    def __init__(self, p1=None, p2=None, r=1):
+        super().__init__()
+
+        if p1 is None:
+            p1 = [0, 0, -1]
+        if p2 is None:
+            p2 = [0, 0, 1]
+
+        self.p1 = p1
+        self.p2 = p2
+        self.points.extend([self.p1, self.p2])
+        self.r = r
+        self.fmtstr = "p1={p1!r}, p2={p2!r}, r={r:.3f}"
+
+    @property
+    def r(self):
+        return self._r
+
+    @r.setter
+    def r(self, value):
+        self._r = value
+
+    @property
+    def p1(self):
+        return self._p1
+
+    @p1.setter
+    def p1(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)):
+            raise TypeError('Expected a 3-element array_like object')
+        self._p1 = Point(value)
+
+    @property
+    def p2(self):
+        return self._p2
+
+    @p2.setter
+    def p2(self, value):
+        if not isinstance(value, (tuple, list, np.ndarray)):
+            raise TypeError('Expected a 3-element array_like object')
+        self._p2 = Point(value)
+
+    @property
+    def axis(self):
+        return Vector(p0=self.p1, p=self.p2)
+
+    @property
+    def centroid(self):
+        x1, y1, z1 = self.p1
+        x2, y2, z2 = self.p2
+
+        xcom = 0.5 * (x1 + x2)
+        ycom = 0.5 * (y1 + y2)
+        zcom = 0.5 * (z1 + z2)
+        return Point([xcom, ycom, zcom])
+
+    @property
+    def volume(self):
+        return np.pi * self.r**2 * self.axis.length
+
+    def contains(self, point):
+        px, py, pz = Point(point)
+        x1, y1, z1 = self.p1
+        x2, y2, z2 = self.p2
+        r = self.r
+
+        q1 = ((px - x1) * (x2 - x1) +
+              (py - y1) * (y2 - y1) +
+              (pz - z1) * (z2 - z1)) / \
+            ((x2 - x1)**2 + (y2 - y1)**2 + (z2 - z1)**2)
+
+        return r > 0 and (not np.allclose(x1, x2) or
+                          not np.allclose(y1, y2) or
+                          not np.allclose(z1, z2)) and \
+            q1 >= 0 and q1 <= 1 and (x1 - px + (x2 - x1) * q1)**2 + \
+            (y1 - py + (y2 - y1) * q1)**2 + (z1 - pz + (z2 - z1) * q1)**2 <= r
+
+    def todict(self):
+        return dict(p1=self.p1, p2=self.p2, r=self.r)

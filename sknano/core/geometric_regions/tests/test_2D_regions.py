@@ -23,8 +23,9 @@ def test_square():
 
 
 def test_rectangle():
-    s = Rectangle()
-    assert_is_instance(s, Rectangle)
+    r = Rectangle()
+    assert_is_instance(r, Rectangle)
+    assert_true(np.allclose(r.centroid, np.zeros(2)))
 
 
 def test_circle():
@@ -57,9 +58,6 @@ def test_ellipse():
 
     e = Ellipse((0, 0))
     assert_true(np.allclose(e.center, np.zeros(2)))
-
-    s = Rectangle()
-    assert_true(np.allclose(s.center, np.zeros(2)))
 
 
 if __name__ == '__main__':

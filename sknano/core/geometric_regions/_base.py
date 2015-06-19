@@ -82,6 +82,17 @@ class GeometricRegion(metaclass=ABCMeta):
         """Centroid of geometric region."""
         raise NotImplementedError
 
+    @property
+    def center(self):
+        """Alias for :attr:`GeometricRegion.centroid`."""
+        return self.centroid
+
+    @property
+    @abstractmethod
+    def measure(self):
+        """Measure of geometric region."""
+        raise NotImplementedError
+
     @abstractmethod
     def contains(self):
         """Check if point is contained within geometric region."""
