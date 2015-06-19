@@ -98,6 +98,7 @@ Sub-packages
 
 * atoms (:mod:`sknano.core.atoms`)
 * crystallography (:mod:`sknano.core.crystallography`)
+* geometric regions (:mod:`sknano.core.geometric_regions`)
 * math (:mod:`sknano.core.math`)
 * molecules (:mod:`sknano.core.molecules`)
 * physics (:mod:`sknano.core.physics`)

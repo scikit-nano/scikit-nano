@@ -13,7 +13,6 @@ Sub-packages
 -------------
 
 * analysis (:mod:`sknano.utils.analysis`)
-* geometric_shapes (:mod:`sknano.utils.geometric_shapes`)
 * symmetry_groups (:mod:`sknano.utils.symmetry_groups`)
 
 """

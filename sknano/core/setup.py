@@ -7,11 +7,13 @@ def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import Configuration
     config = Configuration('core', parent_package, top_path)
     config.add_subpackage('atoms')
+    config.add_subpackage('crystallography')
+    config.add_subpackage('geometric_regions')
     config.add_subpackage('math')
     config.add_subpackage('molecules')
     config.add_subpackage('physics')
     config.add_subpackage('refdata')
-    #config.add_subpackage('units')
+    # config.add_subpackage('units')
     config.add_data_dir('tests')
     return config
 
