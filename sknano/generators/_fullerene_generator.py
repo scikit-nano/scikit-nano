@@ -45,7 +45,7 @@ class FullereneGenerator(Fullerene, GeneratorBase):
 
     def __init__(self, autogen=True, **kwargs):
 
-        super(FullereneGenerator, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         if autogen:
             self.generate_structure_data()
