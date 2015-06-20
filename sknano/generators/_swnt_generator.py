@@ -131,6 +131,17 @@ class SWNTGenerator(SWNT, GeneratorBase):
                                    pmax=Point([np.inf, np.inf, Lz_cutoff]))
             self.atoms.clip_bounds(region_bounds)
 
+    @classmethod
+    def generate_fname(cls, n, m, nz, integer_nz=True):
+
+        chirality = '{}{}'.format('{}'.format(n).zfill(2),
+                                  '{}'.format(m).zfill(2))
+        nz_fmtstr = '{}' if integer_nz else '{:.2f}'
+        nz = ''.join((nz_fmtstr.format(nz), pluralize('cell', nz)))
+        fname_wordlist = (chirality, nz)
+        fname = '_'.join(fname_wordlist)
+        return fname
+
     def save(self, fname=None, outpath=None, structure_format=None,
              center_CM=True, **kwargs):
         """Save structure data.
@@ -140,12 +151,8 @@ class SWNTGenerator(SWNT, GeneratorBase):
 
         """
         if fname is None:
-            chirality = '{}{}'.format('{}'.format(self.n).zfill(2),
-                                      '{}'.format(self.m).zfill(2))
-            nz = '{}' if self._assert_integer_nz else '{:.2f}'
-            nz = ''.join((nz.format(self.nz), pluralize('cell', self.nz)))
-            fname_wordlist = (chirality, nz)
-            fname = '_'.join(fname_wordlist)
+            fname = self.generate_fname(self.n, self.m, self.nz,
+                                        integer_nz=self._assert_integer_nz)
 
         super().save(fname=fname, outpath=outpath,
                      structure_format=structure_format,

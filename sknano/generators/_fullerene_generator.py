@@ -65,9 +65,13 @@ class FullereneGenerator(Fullerene, GeneratorBase):
         files = os.listdir(datadir)
         if len(files) > 0:
             if CNfile not in files:
-                #TODO: try to *intelligently* pick the best match
+                # TODO: try to *intelligently* pick the best match
                 CNfile = files[0]
             self.atoms = XYZReader(os.path.join(datadir, CNfile)).atoms
+
+    @classmethod
+    def generate_fname(cls, N):
+        return 'C{}'.format(N)
 
     def save(self, fname=None, outpath=None, structure_format=None,
              center_CM=True, **kwargs):
@@ -78,7 +82,7 @@ class FullereneGenerator(Fullerene, GeneratorBase):
 
         """
         if fname is None:
-            fname = 'C{}'.format(self.N)
+            fname = self.generate_fname(self.N)
 
         super().save(fname=fname, outpath=outpath,
                      structure_format=structure_format,

@@ -124,6 +124,15 @@ class MWNTGenerator(MWNT, GeneratorBase):
         for swnt in self.shells:
             self.atoms.extend(SWNTGenerator(**swnt.todict()).atoms)
 
+    @classmethod
+    def generate_fname(cls, Nshells, Ch_list):
+        Nshells = '{}shell_mwnt'.format(Nshells)
+        chiralities = '@'.join([str(Ch).replace(' ', '') for
+                                Ch in Ch_list])
+
+        fname = '_'.join((Nshells, chiralities))
+        return fname
+
     def save(self, fname=None, outpath=None, structure_format=None,
              center_CM=True, **kwargs):
         """Save structure data.
@@ -133,11 +142,7 @@ class MWNTGenerator(MWNT, GeneratorBase):
 
         """
         if fname is None:
-            Nshells = '{}shell_mwnt'.format(self.Nshells)
-            chiralities = '@'.join([str(Ch).replace(' ', '') for
-                                    Ch in self.Ch_list])
-
-            fname = '_'.join((Nshells, chiralities))
+            fname = self.generate_fname(self.Nshells, self.Ch_list)
 
         super().save(fname=fname, outpath=outpath,
                      structure_format=structure_format,

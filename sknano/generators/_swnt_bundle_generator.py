@@ -168,6 +168,35 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
         super().generate_structure_data()
         super().generate_bundle()
 
+    @classmethod
+    def generate_fname(cls, n, m, nx, ny, nz, integer_nz=True, Ntubes=None,
+                       bundle_geometry=None, bundle_packing=None):
+        chirality = '{}{}'.format('{}'.format(n).zfill(2),
+                                  '{}'.format(m).zfill(2))
+        packing = '{}cp'.format(bundle_packing[0])
+        Ntube = '{}tube'.format(Ntubes)
+
+        fname_wordlist = None
+        if bundle_geometry is None:
+            nx = ''.join(('{}'.format(nx),
+                         pluralize('cell', nx)))
+            ny = ''.join(('{}'.format(ny),
+                         pluralize('cell', ny)))
+            if integer_nz:
+                nz = ''.join(('{}'.format(nz),
+                              pluralize('cell', nz)))
+            else:
+                nz = ''.join(('{:.2f}'.format(nz),
+                              pluralize('cell', nz)))
+            cells = 'x'.join((nx, ny, nz))
+            fname_wordlist = (chirality, packing, cells)
+        else:
+            fname_wordlist = \
+                (chirality, packing, Ntube, bundle_geometry)
+
+        fname = '_'.join(fname_wordlist)
+        return fname
+
     def save(self, fname=None, outpath=None, structure_format=None,
              center_CM=True, **kwargs):
         """Save structure data.
@@ -177,30 +206,12 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
 
         """
         if fname is None:
-            chirality = '{}{}'.format('{}'.format(self.n).zfill(2),
-                                      '{}'.format(self.m).zfill(2))
-            packing = '{}cp'.format(self.bundle_packing[0])
-            Ntube = '{}tube'.format(self.Ntubes)
-
-            fname_wordlist = None
-            if self.bundle_geometry is None:
-                nx = ''.join(('{}'.format(self.nx),
-                             pluralize('cell', self.nx)))
-                ny = ''.join(('{}'.format(self.ny),
-                             pluralize('cell', self.ny)))
-                if self._assert_integer_nz:
-                    nz = ''.join(('{}'.format(self.nz),
-                                  pluralize('cell', self.nz)))
-                else:
-                    nz = ''.join(('{:.2f}'.format(self.nz),
-                                  pluralize('cell', self.nz)))
-                cells = 'x'.join((nx, ny, nz))
-                fname_wordlist = (chirality, packing, cells)
-            else:
-                fname_wordlist = \
-                    (chirality, packing, Ntube, self.bundle_geometry)
-
-            fname = '_'.join(fname_wordlist)
+            fname = self.generate_fname(self.n, self.m,
+                                        self.nx, self.ny, self.nz,
+                                        integer_nz=self._assert_integer_nz,
+                                        Ntubes=self.Ntubes,
+                                        bundle_geometry=self.bundle_geometry,
+                                        bundle_packing=self.bundle_packing)
 
         super().save(fname=fname, outpath=outpath,
                      structure_format=structure_format,

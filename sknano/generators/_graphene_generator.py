@@ -188,6 +188,17 @@ class GrapheneGenerator(Graphene, GeneratorBase):
             layer.rotate(angle=self.layer_rotation_angles[nlayer], axis='z')
             self.atoms.extend(layer)
 
+    @classmethod
+    def generate_fname(cls, armchair_edge_length, zigzag_edge_length,
+                       nlayers, basis):
+        dimensions = '{}nmx{}nm'.format(armchair_edge_length,
+                                        zigzag_edge_length)
+        nlayer = '{}layer'.format(nlayers)
+        basis = ''.join(basis)
+        fname_wordlist = (dimensions, nlayer, basis, 'graphene')
+        fname = '_'.join(fname_wordlist)
+        return fname
+
     def save(self, fname=None, outpath=None, structure_format=None,
              center_CM=True, rotation_angle=-np.pi/2, rotation_axis='x',
              **kwargs):
@@ -198,12 +209,9 @@ class GrapheneGenerator(Graphene, GeneratorBase):
 
         """
         if fname is None:
-            dimensions = '{}nmx{}nm'.format(self.armchair_edge_length,
-                                            self.zigzag_edge_length)
-            nlayer = '{}layer'.format(self.nlayers)
-            basis = ''.join(self.basis)
-            fname_wordlist = (dimensions, nlayer, basis, 'graphene')
-            fname = '_'.join(fname_wordlist)
+            fname = self.generate_fname(self.armchair_edge_length,
+                                        self.zigzag_edge_length,
+                                        self.nlayers, self.basis)
 
         if center_CM and self.nlayers > 1:
             self.atoms.center_CM()

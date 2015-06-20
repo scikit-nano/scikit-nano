@@ -18,7 +18,6 @@ Unrolled SWNT generator (:mod:`sknano.generators._unrolled_swnt_generator`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-from builtins import range
 __docformat__ = 'restructuredtext en'
 
 import numpy as np
@@ -26,8 +25,8 @@ import numpy as np
 from sknano.core import pluralize
 from sknano.core.math import Vector
 from sknano.structures import UnrolledSWNT
-#from sknano.core.geometric_regions import Cuboid
-from ._base import Atom, Atoms, GeneratorBase
+# from sknano.core.geometric_regions import Cuboid
+from ._base import Atom, GeneratorBase
 
 __all__ = ['UnrolledSWNTGenerator']
 
@@ -96,7 +95,7 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
     Now let's generate an unrolled :math:`\\mathbf{C}_{\\mathrm{h}} = (10, 5)`
     SWCNT unit cell.
 
-    >>> flatswcnt = UnrolledSWNTGenerator(n=10, m=5)
+    >>> flatswcnt = UnrolledSWNTGenerator(10, 5)
     >>> flatswcnt.save()
 
     The rendered structure looks like:
@@ -122,6 +121,23 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
                     nt_atom.r = uc_atom.r + dr
                     self.atoms.append(nt_atom)
 
+    @classmethod
+    def generate_fname(self, n, m, nx, nz, integer_nx=True, integer_nz=True):
+        chirality = '{}{}'.format('{}'.format(n).zfill(2),
+                                  '{}'.format(m).zfill(2))
+
+        nx_fmtstr = '{}' if integer_nx else '{:.2f}'
+        nx = ''.join((nx_fmtstr.format(nx), pluralize('cell', nx)))
+
+        nz_fmtstr = '{}' if integer_nz else '{:.2f}'
+        nz = ''.join((nz_fmtstr.format(nz), pluralize('cell', nz)))
+
+        cells = 'x'.join((nx, nz))
+        fname_wordlist = (chirality, cells)
+
+        fname = 'unrolled_' + '_'.join(fname_wordlist)
+        return fname
+
     def save(self, fname=None, outpath=None, structure_format=None,
              center_CM=True, **kwargs):
         """Save structure data.
@@ -131,19 +147,9 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
 
         """
         if fname is None:
-            chirality = '{}{}'.format('{}'.format(self.n).zfill(2),
-                                      '{}'.format(self.m).zfill(2))
-
-            nx = '{}' if self._assert_integer_nx else '{:.2f}'
-            nx = ''.join((nx.format(self.nx), pluralize('cell', self.nx)))
-
-            nz = '{}' if self._assert_integer_nz else '{:.2f}'
-            nz = ''.join((nz.format(self.nz), pluralize('cell', self.nz)))
-
-            cells = 'x'.join((nx, nz))
-            fname_wordlist = (chirality, cells)
-
-            fname = 'unrolled_' + '_'.join(fname_wordlist)
+            fname = self.generate_fname(self.n, self.m, self.nx, self.nz,
+                                        integer_nx=self._assert_integer_nx,
+                                        integer_nz=self._assert_integer_nz)
 
         if center_CM:
             self.atoms.center_CM()

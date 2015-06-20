@@ -103,6 +103,32 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
         super().generate_structure_data()
         super().generate_bundle()
 
+    @classmethod
+    def generate_fname(cls, Nshells, Ch_list, nx, ny, Ntubes=None,
+                       bundle_geometry=None, bundle_packing=None):
+        Nshells = '{}shell_mwnt'.format(Nshells)
+        chiralities = '@'.join([str(Ch).replace(' ', '')
+                                for Ch in Ch_list])
+        packing = '{}cp'.format(bundle_packing[0])
+        Ntubes = '{}tube'.format(Ntubes)
+
+        fname_wordlist = None
+        if bundle_geometry is None:
+            nx = ''.join(('{}'.format(nx), pluralize('cell', nx)))
+            ny = ''.join(('{}'.format(ny), pluralize('cell', ny)))
+            cells = 'x'.join((nx, ny))
+
+            if nx == 1 and ny == 1:
+                fname_wordlist = (Nshells, chiralities, cells)
+            else:
+                fname_wordlist = (Nshells, chiralities, packing, cells)
+        else:
+            fname_wordlist = \
+                (Nshells, chiralities, packing, Ntubes, bundle_geometry)
+
+        fname = '_'.join(fname_wordlist)
+        return fname
+
     def save(self, fname=None, outpath=None, structure_format=None,
              center_CM=True, **kwargs):
         """Save structure data.
@@ -112,30 +138,10 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
 
         """
         if fname is None:
-            Nshells = '{}shell_mwnt'.format(self.Nshells)
-            chiralities = '@'.join([str(Ch).replace(' ', '')
-                                    for Ch in self.Ch_list])
-            packing = '{}cp'.format(self.bundle_packing[0])
-            Ntubes = '{}tube'.format(self.Ntubes)
-
-            fname_wordlist = None
-            if self.bundle_geometry is None:
-                nx = ''.join(('{}'.format(self.nx),
-                             pluralize('cell', self.nx)))
-                ny = ''.join(('{}'.format(self.ny),
-                             pluralize('cell', self.ny)))
-                cells = 'x'.join((nx, ny))
-
-                if self.nx == 1 and self.ny == 1:
-                    fname_wordlist = (Nshells, chiralities, cells)
-                else:
-                    fname_wordlist = (Nshells, chiralities, packing, cells)
-            else:
-                fname_wordlist = \
-                    (Nshells, chiralities, packing, Ntubes,
-                     self.bundle_geometry)
-
-            fname = '_'.join(fname_wordlist)
+            fname = self.generate_fname(self.Nshells, self.Ch_list,
+                                        self.nx, self.ny, Ntubes=self.Ntubes,
+                                        bundle_geometry=self.bundle_geometry,
+                                        bundle_packing=self.bundle_packing)
 
         super().save(fname=fname, outpath=outpath,
                      structure_format=structure_format,
