@@ -20,14 +20,14 @@ import h5py
 import numpy as np
 
 from sknano.io import DATAReader
-from sknano.structures import get_Ch_indices
+from sknano.structures import get_chiral_indices_from_str
 
 __all__ = ['analyze_datasets']
 
 
 def run_analysis(datafile, datalog=None, datagroup=None, Ch_subgroup=None):
     print('data file: {}'.format(datafile))
-    structure_Ch = get_Ch_indices(datafile[:4])
+    structure_Ch = get_chiral_indices_from_str(datafile[:4])
     if structure_Ch is not None and datalog is not None:
         atoms = DATAReader(datafile).atoms
         Ch = str(structure_Ch)

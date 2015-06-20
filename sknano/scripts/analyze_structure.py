@@ -19,7 +19,7 @@ import sys
 import numpy as np
 
 from sknano.io import StructureReader
-from sknano.structures import get_Ch_indices
+from sknano.structures import get_chiral_indices_from_str
 
 __all__ = ['analyze_structure']
 
