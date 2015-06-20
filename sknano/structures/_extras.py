@@ -23,7 +23,7 @@ __all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'generate_Ch_list',
            'generate_Ch_property_grid', 'get_Ch_indices', 'get_Ch_type',
            'map_Ch', 'chiral_type_name_mappings', 'Ch_types', 'edge_types',
            'filter_key_type_mappings', 'attr_units', 'attr_symbols',
-           'attr_strfmt']
+           'attr_strfmt', 'get_chiral_indices', 'get_chiral_indices_from_str']
 
 chiral_type_name_mappings = Ch_types = \
     {'achiral': 'aCh', 'armchair': 'AC', 'zigzag': 'ZZ', 'chiral': 'Ch'}
@@ -84,9 +84,9 @@ def cmp_Ch(Ch1, Ch2):
         Ch2_type = get_Ch_type(Ch2)
     elif isinstance(Ch1, str) and \
             isinstance(Ch2, str):
-        n1, m1 = get_Ch_indices(Ch1)
+        n1, m1 = get_chiral_indices_from_str(Ch1)
         Ch1_type = get_Ch_type(Ch1)
-        n2, m2 = get_Ch_indices(Ch2)
+        n2, m2 = get_chiral_indices_from_str(Ch2)
         Ch2_type = get_Ch_type(Ch2)
 
     if Ch1_type == 'armchair' and Ch2_type == 'zigzag':
@@ -131,7 +131,7 @@ def filter_Ch(Ch, even_only=False, odd_only=False, Ch_type=None,
         this_Ch_type = get_Ch_type(Ch)
         n, m = Ch
     else:
-        n, m = get_Ch_indices(Ch)
+        n, m = get_chiral_indices_from_str(Ch)
         this_Ch_type = get_Ch_type(Ch)
 
     if even_only:
@@ -449,30 +449,6 @@ def generate_Ch_property_grid(compute=str, imax=10, **kwargs):
         return None
 
 
-def get_Ch_indices(Ch):
-    """Return the chiral indicies `n` and `m`.
-
-    Parameters
-    ----------
-    Ch : str
-        string of the form 'NNMM' or "(n, m)". Extra spaces are acceptable.
-
-    Returns
-    -------
-    sequence
-        2-tuple of chiral indices `n` and `m`
-
-    """
-    try:
-        return int(Ch[:2]), int(Ch[2:])
-    except ValueError:
-        try:
-            return tuple([int(c) for c in re.split('[\(\),\s*]+', Ch)[1:-1]])
-        except Exception as e:
-            print(e)
-            return None
-
-
 def get_Ch_type(Ch):
     """Identify the type of nanotube based on its chirality
 
@@ -491,7 +467,7 @@ def get_Ch_type(Ch):
     if isinstance(Ch, tuple):
         n, m = Ch
     else:
-        n, m = get_Ch_indices(Ch)
+        n, m = get_chiral_indices_from_str(Ch)
     if n == m:
         return 'armchair'
     elif n != m and (n == 0 or m == 0):
@@ -518,7 +494,7 @@ def map_Ch(Ch, compute=None, **kwargs):
         if isinstance(Ch, tuple):
             n, m = Ch
         else:
-            n, m = get_Ch_indices(Ch)
+            n, m = get_chiral_indices_from_str(Ch)
 
         return compute_func(n, m, **kwargs)
     except AttributeError as e:
@@ -528,3 +504,52 @@ def map_Ch(Ch, compute=None, **kwargs):
 
 def get_Ch_map_from_data(Chlist, Chdata):
     pass
+
+
+def get_chiral_indices(*args, **kwargs):
+    """Parse the chiral indices `n` and `m` from a `vararg` `*args`, \
+        which may be a `tuple` or 2 ints or from varkwargs `**kwargs`.
+
+    """
+    n = m = None
+    try:
+        n, m = args
+    except ValueError:
+        try:
+            n, m = args[0]
+        except IndexError:
+            try:
+                n, m = kwargs['Ch']
+                del kwargs['Ch']
+            except KeyError:
+                n = kwargs['n']
+                del kwargs['n']
+                m = kwargs['m']
+                del kwargs['m']
+    return n, m, kwargs
+
+get_Ch_indices = get_chiral_indices
+
+
+def get_chiral_indices_from_str(Ch):
+    """Return the chiral indicies `n` and `m`.
+
+    Parameters
+    ----------
+    Ch : str
+        string of the form 'NNMM' or "(n, m)". Extra spaces are acceptable.
+
+    Returns
+    -------
+    sequence
+        2-tuple of chiral indices `n` and `m`
+
+    """
+    try:
+        return int(Ch[:2]), int(Ch[2:])
+    except ValueError:
+        try:
+            return tuple([int(c) for c in re.split('[\(\),\s*]+', Ch)[1:-1]])
+        except Exception as e:
+            print(e)
+            return None
