@@ -9,7 +9,6 @@ XYZ format (:mod:`sknano.io._xyz_format`)
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import object
 __docformat__ = 'restructuredtext en'
 
 import os
@@ -33,7 +32,7 @@ class XYZReader(StructureIO):
 
     """
     def __init__(self, fpath, **kwargs):
-        super(XYZReader, self).__init__(fpath=fpath, **kwargs)
+        super().__init__(fpath=fpath, **kwargs)
 
         if self.fpath is not None:
             self.read()
@@ -62,7 +61,7 @@ class XYZReader(StructureIO):
             self.assign_unique_types()
 
 
-class XYZWriter(object):
+class XYZWriter:
     """`StructureWriter` class for writing `xyz` chemical file format."""
 
     @classmethod
@@ -110,7 +109,7 @@ class XYZData(XYZReader):
 
     """
     def __init__(self, fpath=None, **kwargs):
-        super(XYZData, self).__init__(fpath, **kwargs)
+        super().__init__(fpath, **kwargs)
 
     def write(self, xyzfile=None, **kwargs):
         """Write xyz file.
@@ -169,8 +168,8 @@ class XYZ2DATAConverter(StructureConverter):
         self._xyzfile = xyzfile
         self._datafile = os.path.splitext(self._xyzfile)[0] + '.data'
 
-        super(XYZ2DATAConverter, self).__init__(
-            infile=self._xyzfile, outfile=self._datafile, **kwargs)
+        super().__init__(infile=self._xyzfile, outfile=self._datafile,
+                         **kwargs)
 
         self._new_atoms = []
         self._add_new_atoms = False

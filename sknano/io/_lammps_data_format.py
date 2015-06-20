@@ -9,9 +9,6 @@ LAMMPS data format (:mod:`sknano.io._lammps_data_format`)
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import str
-from builtins import range
-from builtins import object
 __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
@@ -41,7 +38,7 @@ class DATAReader(StructureIO):
 
     """
     def __init__(self, fpath, atom_style='full', **kwargs):
-        super(DATAReader, self).__init__(fpath=fpath, **kwargs)
+        super().__init__(fpath=fpath, **kwargs)
 
         self.header_data = {}
         self.section_data = {}
@@ -172,8 +169,8 @@ class DATAReader(StructureIO):
                             atom_kwargs[kw] = \
                                 velocity[self.section_attrs_specs[
                                     'Velocities'][kw]['index']]
-                #else:
-                #    print('unknown atom keyword: {}'.format(kw))
+                # else:
+                #     print('unknown atom keyword: {}'.format(kw))
 
             atom = Atom(**atom_kwargs)
             self.atoms.append(atom)
@@ -245,7 +242,7 @@ class DATAReader(StructureIO):
 LAMMPSDATAReader = DATAReader
 
 
-class DATAWriter(object):
+class DATAWriter:
     """`StructureWriter` class for writing `LAMMPS data` file format."""
 
     @classmethod
@@ -400,7 +397,7 @@ class DATAData(DATAReader):
 
     """
     def __init__(self, fpath=None, **kwargs):
-        super(DATAData, self).__init__(fpath, **kwargs)
+        super().__init__(fpath, **kwargs)
 
     def delete(self, key):
         try:
@@ -524,8 +521,8 @@ class DATA2XYZConverter(StructureConverter):
         self._datafile = datafile
         self._xyzfile = os.path.splitext(self._datafile)[0] + '.xyz'
 
-        super(DATA2XYZConverter, self).__init__(
-            infile=self._datafile, outfile=self._xyzfile, **kwargs)
+        super().__init__(infile=self._datafile, outfile=self._xyzfile,
+                         **kwargs)
 
     @property
     def datafile(self):
@@ -571,7 +568,7 @@ class DATAIOError(StructureIOError):
 LAMMPSDATAIOError = DATAIOError
 
 
-class DATAFormatSpec(object):
+class DATAFormatSpec:
     """`StructureFormatSpec` class the `LAMMPS data` format spec.
 
     Parameters
@@ -584,7 +581,7 @@ class DATAFormatSpec(object):
     def __init__(self, atom_style='full', bond_style=None, angle_style=None,
                  dihedral_style=None, improper_style=None, pair_style=None,
                  **kwargs):
-        super(DATAFormatSpec, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.atom_style = atom_style
         self.bond_style = bond_style
         self.angle_style = angle_style

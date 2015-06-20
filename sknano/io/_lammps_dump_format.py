@@ -9,9 +9,6 @@ LAMMPS dump format (:mod:`sknano.io._lammps_dump_format`)
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import zip
-from builtins import range
-from builtins import object
 __docformat__ = 'restructuredtext en'
 
 #import glob
@@ -52,7 +49,7 @@ class DUMPReader(StructureIO):
 
     """
     def __init__(self, *args, **kwargs):
-        super(DUMPReader, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.trajectory = Trajectory()
         self.dumpattrs = {}
@@ -242,7 +239,7 @@ class DUMPReader(StructureIO):
         return ' '.join(sorted(self.dumpattrs, key=self.dumpattrs.__getitem__))
 
 
-class DUMPWriter(object):
+class DUMPWriter:
     """Class for writing LAMMPS dump chemical file format."""
 
     @classmethod
@@ -293,7 +290,7 @@ class DUMPData(DUMPReader):
 
     """
     def __init__(self, *args):
-        super(DUMPData, self).__init__(*args)
+        super().__init__(*args)
 
     def write(self, dumpfile=None):
         """Write dump file.
