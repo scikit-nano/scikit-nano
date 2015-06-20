@@ -9,7 +9,6 @@ Compute functions (:mod:`sknano.structures._compute_funcs`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-from builtins import range
 __docformat__ = 'restructuredtext en'
 
 from fractions import gcd
@@ -18,6 +17,7 @@ import numpy as np
 
 from sknano.core.atoms import Atom
 from sknano.core.refdata import CCbond, grams_per_Da
+from ._extras import get_chiral_indices
 
 __all__ = ['compute_d', 'compute_dR', 'compute_N', 'compute_t1', 'compute_t2',
            'compute_Ch', 'compute_chiral_angle', 'compute_T', 'compute_dt',
@@ -50,10 +50,7 @@ def compute_d(*Ch):
         Greatest Common Divisor of :math:`n` and :math:`m`
 
     """
-    try:
-        n, m = Ch
-    except ValueError:
-        n, m = Ch[0]
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -81,10 +78,7 @@ def compute_dR(*Ch):
         greatest common divisor of :math:`2n+m` and :math:`2m+n`
 
     """
-    try:
-        n, m = Ch
-    except ValueError:
-        n, m = Ch[0]
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -113,10 +107,7 @@ def compute_N(*Ch):
         :math:`N = \\frac{2(n^2+m^2+nm)}{d_R}`.
 
     """
-    try:
-        n, m = Ch
-    except ValueError:
-        n, m = Ch[0]
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -154,10 +145,7 @@ def compute_t1(*Ch):
         :math:`t_1`
 
     """
-    try:
-        n, m = Ch
-    except ValueError:
-        n, m = Ch[0]
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -195,10 +183,7 @@ def compute_t2(*Ch):
         :math:`t_2`
 
     """
-    try:
-        n, m = Ch
-    except ValueError:
-        n, m = Ch[0]
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -244,10 +229,7 @@ def compute_Ch(*Ch, bond=None, **kwargs):
         n, m = Ch[0]
         bond = Ch[-1]
     else:
-        try:
-            n, m = Ch
-        except ValueError:
-            n, m = Ch[0]
+        n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -282,10 +264,7 @@ def compute_chiral_angle(*Ch, rad2deg=True):
         degrees (default) or radians (if `rad2deg=False`).
 
     """
-    try:
-        n, m = Ch
-    except ValueError:
-        n, m = Ch[0]
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -340,10 +319,7 @@ def compute_T(*Ch, bond=None, length=True, **kwargs):
         n, m = Ch[0]
         bond = Ch[-1]
     else:
-        try:
-            n, m = Ch
-        except ValueError:
-            n, m = Ch[0]
+        n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -399,10 +375,7 @@ def compute_dt(*Ch, bond=None, **kwargs):
         n, m = Ch[0]
         bond = Ch[-1]
     else:
-        try:
-            n, m = Ch
-        except ValueError:
-            n, m = Ch[0]
+        n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -445,10 +418,7 @@ def compute_rt(*Ch, bond=None, **kwargs):
         n, m = Ch[0]
         bond = Ch[-1]
     else:
-        try:
-            n, m = Ch
-        except ValueError:
-            n, m = Ch[0]
+        n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -478,10 +448,7 @@ def compute_M(*Ch):
         :math:`M = mp - nq`
 
     """
-    try:
-        n, m = Ch
-    except ValueError:
-        n, m = Ch[0]
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -542,10 +509,7 @@ def compute_R(*Ch, bond=None, length=False, **kwargs):
         n, m = Ch[0]
         bond = Ch[-1]
     else:
-        try:
-            n, m = Ch
-        except ValueError:
-            n, m = Ch[0]
+        n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -599,10 +563,7 @@ def compute_R_chiral_angle(*Ch, rad2deg=True):
 
 
     """
-    try:
-        n, m = Ch
-    except ValueError:
-        n, m = Ch[0]
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -655,10 +616,7 @@ def compute_symmetry_operation(*Ch, bond=None):
         n, m = Ch[0]
         bond = Ch[-1]
     else:
-        try:
-            n, m = Ch
-        except ValueError:
-            n, m = Ch[0]
+        n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -692,10 +650,7 @@ def compute_psi(*Ch):
         in **radians**.
 
     """
-    try:
-        n, m = Ch
-    except ValueError:
-        n, m = Ch[0]
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -742,10 +697,7 @@ def compute_tau(*Ch, bond=None, **kwargs):
         n, m = Ch[0]
         bond = Ch[-1]
     else:
-        try:
-            n, m = Ch
-        except ValueError:
-            n, m = Ch[0]
+        n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -814,10 +766,7 @@ def compute_electronic_type(*Ch):
     str
 
     """
-    try:
-        n, m = Ch
-    except ValueError:
-        n, m = Ch[0]
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -860,10 +809,7 @@ def compute_Natoms(*Ch, nz=1):
         n, m = Ch[0]
         nz = Ch[-1]
     else:
-        try:
-            n, m = Ch
-        except ValueError:
-            n, m = Ch[0]
+        n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -924,10 +870,7 @@ def compute_Natoms_per_unit_cell(*Ch):
 
 
     """
-    try:
-        n, m = Ch
-    except ValueError:
-        n, m = Ch[0]
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -966,10 +909,7 @@ def compute_unit_cell_mass(*Ch, element1=None, element2=None, **kwargs):
         determining number of atoms of each element.
 
     """
-    try:
-        n, m = Ch
-    except ValueError:
-        n, m = Ch[0]
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -1019,10 +959,7 @@ def compute_linear_mass_density(*Ch, bond=None, element1=None, element2=None,
         n, m = Ch[0]
         bond = Ch[-1]
     else:
-        try:
-            n, m = Ch
-        except ValueError:
-            n, m = Ch[0]
+        n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -1072,10 +1009,7 @@ def compute_bundle_density(*Ch, d_vdw=None, bond=None,
         :math:`\\mathrm{\\frac{g}{cm^3}}`
 
     """
-    try:
-        n, m = Ch
-    except ValueError:
-        n, m = Ch[0]
+    n, m, _ = get_chiral_indices(*Ch)
 
     if bond is None:
         bond = CCbond
@@ -1141,10 +1075,7 @@ def compute_Lz(*Ch, nz=1, bond=None, **kwargs):
         n, m = Ch[0]
         nz = Ch[-1]
     else:
-        try:
-            n, m = Ch
-        except ValueError:
-            n, m = Ch[0]
+        n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -1212,10 +1143,7 @@ def compute_tube_mass(*Ch, nz=1, element1=None, element2=None):
         n, m = Ch[0]
         nz = Ch[-1]
     else:
-        try:
-            n, m = Ch
-        except ValueError:
-            n, m = Ch[0]
+        n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
