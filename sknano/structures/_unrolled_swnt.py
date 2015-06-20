@@ -18,6 +18,7 @@ from sknano.core.refdata import aCC, dVDW
 from ._mixins import NanotubeMixin, UnrolledSWNTMixin
 from ._base import StructureBase
 from ._compute_funcs import compute_dt, compute_T
+from ._extras import get_chiral_indices
 
 __all__ = ['UnrolledSWNT']
 
@@ -29,16 +30,7 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
                  nlayers=1, layer_spacing=dVDW, stacking_order='AB',
                  Lx=None, fix_Lx=False, Lz=None, fix_Lz=False, **kwargs):
 
-        try:
-            n, m = Ch
-        except ValueError:
-            try:
-                n, m = Ch[0]
-            except IndexError:
-                n = kwargs['n']
-                del kwargs['n']
-                m = kwargs['m']
-                del kwargs['m']
+        n, m, kwargs = get_chiral_indices(*Ch, **kwargs)
 
         super().__init__(basis=basis, bond=bond, **kwargs)
 

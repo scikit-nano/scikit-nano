@@ -18,7 +18,7 @@ from sknano.core.crystallography import Crystal3DLattice, UnitCell
 from sknano.core.refdata import aCC, dVDW
 from ._base import StructureBase
 from ._compute_funcs import compute_dt, compute_T
-from ._extras import attr_strfmt, attr_symbols, attr_units
+from ._extras import attr_strfmt, attr_symbols, attr_units, get_chiral_indices
 from ._mixins import SWNTMixin
 
 __all__ = ['SWNT', 'Nanotube']
@@ -151,20 +151,7 @@ class SWNT(SWNTMixin, StructureBase):
     def __init__(self, *Ch, nz=None, bond=aCC, basis=['C', 'C'],
                  tube_length=None, Lz=None, fix_Lz=False, **kwargs):
 
-        try:
-            n, m = Ch
-        except ValueError:
-            try:
-                n, m = Ch[0]
-            except IndexError:
-                try:
-                    n, m = kwargs['Ch']
-                    del kwargs['Ch']
-                except KeyError:
-                    n = kwargs['n']
-                    del kwargs['n']
-                    m = kwargs['m']
-                    del kwargs['m']
+        n, m, kwargs = get_chiral_indices(*Ch, **kwargs)
 
         super().__init__(basis=basis, bond=bond, **kwargs)
 
