@@ -8,70 +8,75 @@ from nose.tools import *
 import numpy as np
 
 from sknano.core.geometric_regions import Parallelepiped, Cuboid, Cube, \
-    Ellipsoid, Spheroid, Sphere, Cylinder
+    Ellipsoid, Sphere, Cylinder, Cone
 from sknano.core.math import Point
 
 
 def test_parallelepiped():
-    s = Parallelepiped()
-    assert_is_instance(s, Parallelepiped)
-    assert_true(np.allclose(s.o, np.zeros(3)))
-    assert_equal(s.volume, 1.0)
+    r = Parallelepiped()
+    assert_is_instance(r, Parallelepiped)
+    assert_equal(r.o, Point([0, 0, 0]))
+    assert_true(np.allclose(r.measure, 1.0))
+    assert_equal(r.centroid, Point([1, 1, 0.5]))
+    assert_true(r.contains([0.5, 0.5, 0.5]))
+    assert_false(r.contains([0, 0, 1]))
 
 
 def test_cuboid():
-    s = Cuboid()
-    assert_is_instance(s, Cuboid)
+    r = Cuboid()
+    assert_is_instance(r, Cuboid)
+    assert_equal(r.centroid, Point([0.5, 0.5, 0.5]))
+    assert_true(np.allclose(r.measure, 1.0))
+    assert_true(r.contains(r.centroid))
+    assert_false(r.contains([-0.1, 0, 0]))
 
 
 def test_cube():
-    s = Cube()
-    assert_is_instance(s, Cube)
+    r = Cube()
+    assert_is_instance(r, Cube)
+    assert_equal(r.centroid, Point([0, 0, 0]))
+    assert_true(np.allclose(r.measure, 1.0))
+    assert_true(r.contains([0, 0, 0]))
+    assert_false(r.contains([1, 1, 1]))
 
 
 def test_ellipsoid():
-    s = Ellipsoid()
-    assert_is_instance(s, Ellipsoid)
-    assert_true(np.allclose(s.center, np.zeros(3)))
-
-    s = Ellipsoid([0, 0, 0])
-    assert_true(np.allclose(s.center, np.zeros(3)))
-
-
-def test_spheroid():
-    s = Spheroid()
-    assert_is_instance(s, Spheroid)
+    r = Ellipsoid()
+    assert_is_instance(r, Ellipsoid)
+    assert_equal(r.centroid, Point([0, 0, 0]))
+    assert_true(np.allclose(r.measure, 4 / 3 * np.pi))
+    assert_true(r.contains(r.centroid))
+    assert_false(r.contains([1.01, 1.01, 1.01]))
 
 
 def test_sphere():
-    s = Sphere()
-    assert_is_instance(s, Sphere)
-    assert_true(np.allclose(s.center, np.zeros(3)))
-    assert_equal(s.r, 1.0)
-    assert_true(np.allclose(s.volume, 4 / 3 * np.pi))
-
-    s = Sphere([0, 0, 0])
-    assert_true(np.allclose(s.center, np.zeros(3)))
-    assert_equal(s.r, 1.0)
-    assert_true(np.allclose(s.volume, 4 / 3 * np.pi))
-
-    s = Sphere([0, 0, 0])
-    assert_true(np.allclose(s.center, np.zeros(3)))
-    assert_equal(s.r, 1.0)
-    assert_true(np.allclose(s.volume, 4 / 3 * np.pi))
-
-    s = Sphere([1, 1, 1])
-    assert_true(np.allclose(s.center, np.ones(3)))
-    assert_equal(s.r, 1.0)
-    assert_true(np.allclose(s.volume, 4 / 3 * np.pi))
+    r = Sphere()
+    assert_is_instance(r, Sphere)
+    assert_equal(r.center, Point([0, 0, 0]))
+    assert_equal(r.r, 1.0)
+    assert_true(np.allclose(r.measure, 4 / 3 * np.pi))
+    assert_true(r.contains([0, 0, 0]))
+    assert_false(r.contains([1.1, 1.1, 1.1]))
 
 
 def test_cylinder():
     r = Cylinder()
     assert_is_instance(r, Cylinder)
-    assert_true(np.allclose(r.volume, 2 * np.pi))
+    assert_true(np.allclose(r.measure, 2 * np.pi))
     assert_equal(r.p1, Point([0, 0, -1]))
     assert_equal(r.p2, Point([0, 0, 1]))
+    assert_true(r.contains([0, 0, 0]))
+    assert_false(r.contains([1.1, 0, 0]))
+
+
+def test_cone():
+    r = Cone()
+    assert_is_instance(r, Cone)
+    assert_true(np.allclose(r.measure, 2 * np.pi / 3))
+    assert_equal(r.p1, Point(np.zeros(3)))
+    assert_equal(r.p2, Point([0, 0, 2]))
+    assert_true(r.contains([0, 0, 1]))
+    assert_false(r.contains([0, 0, 2.1]))
 
 
 if __name__ == '__main__':

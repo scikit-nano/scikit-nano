@@ -28,6 +28,7 @@ Abstract Base Classes for defining new geometric regions
    Square
    Ellipse
    Circle
+   Triangle
 
 3D Regions
 ----------
@@ -39,8 +40,9 @@ Abstract Base Classes for defining new geometric regions
    Cuboid
    Cube
    Ellipsoid
-   Spheroid
    Sphere
+   Cylinder
+   Cone
 
 """
 from __future__ import absolute_import, division, print_function
