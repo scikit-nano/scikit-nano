@@ -147,8 +147,8 @@ class MWNT(MWNTMixin, StructureBase):
                   **kwargs)
              for Ch in self.Ch_list]
 
-        a = compute_dt(self.Ch_list[-1], bond) + dVDW
-        c = compute_T(self.Ch_list[-1], bond, length=True)
+        a = compute_dt(self.Ch_list[-1], bond=bond) + dVDW
+        c = compute_T(self.Ch_list[-1], bond=bond, length=True)
         lattice = Crystal3DLattice.hexagonal(a, c)
 
         self.unit_cell = UnitCell(lattice, basis=self.basis)

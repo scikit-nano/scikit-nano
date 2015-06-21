@@ -155,8 +155,8 @@ class SWNT(SWNTMixin, StructureBase):
 
         super().__init__(basis=basis, bond=bond, **kwargs)
 
-        a = compute_dt(n, m, bond) + dVDW
-        c = compute_T(n, m, bond, length=True)
+        a = compute_dt(n, m, bond=bond) + dVDW
+        c = compute_T(n, m, bond=bond, length=True)
         lattice = Crystal3DLattice.hexagonal(a, c)
         self.unit_cell = UnitCell(lattice, basis=self.basis)
 
