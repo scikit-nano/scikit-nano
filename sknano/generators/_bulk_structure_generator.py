@@ -27,14 +27,15 @@ __docformat__ = 'restructuredtext en'
 # from sknano.core.math import Point, Vector
 from sknano.core.crystallography import AlphaQuartz, DiamondStructure, \
     Gold, Copper, FCCStructure, CaesiumChlorideStructure, \
-    RocksaltStructure, ZincblendeStructure
+    RocksaltStructure, ZincblendeStructure, MoS2
 from sknano.core.refdata import crystal_bonds as bonds
 from ._base import BulkGeneratorBase
 
 __all__ = ['AlphaQuartzGenerator', 'DiamondStructureGenerator',
            'FCCStructureGenerator', 'GoldGenerator', 'CopperGenerator',
            'CaesiumChlorideStructureGenerator',
-           'RocksaltStructureGenerator', 'ZincblendeStructureGenerator']
+           'RocksaltStructureGenerator', 'ZincblendeStructureGenerator',
+           'MoS2Generator']
 
 
 class AlphaQuartzGenerator(AlphaQuartz, BulkGeneratorBase):
@@ -105,4 +106,15 @@ class ZincblendeStructureGenerator(ZincblendeStructure, BulkGeneratorBase):
         self.generate()
 
     def save(self, fname='zincblende', **kwargs):
+        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+
+
+class MoS2Generator(MoS2, BulkGeneratorBase):
+    def __init__(self, a=bonds['molybdenum_disulphide']['a'],
+                 c=bonds['molybdenum_disulphide']['c'],
+                 scaling_matrix=None):
+        super().__init__(a=a, c=c, scaling_matrix=scaling_matrix)
+        self.generate()
+
+    def save(self, fname='MoS2', **kwargs):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
