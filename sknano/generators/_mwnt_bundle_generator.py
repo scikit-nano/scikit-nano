@@ -34,17 +34,17 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
         Number of `SWNT` walls in `MWNT`.
     Lz : float, optional
         `MWNT` length in **nanometers**.
-    min_shell_diameter : float, optional
+    min_wall_diameter : float, optional
         Minimum `MWNT` wall diameter, in units of **Angstroms**.
-    max_shell_diameter : float, optional
+    max_wall_diameter : float, optional
         Maximum `MWNT` wall diameter, in units of **Angstroms**.
-    max_shells : int, optional
+    max_walls : int, optional
         Maximum number of `MWNT` walls.
     chiral_types : {None, 'armchair', 'zigzag', 'achiral', 'chiral'}, optional
         If `None`, the :attr:`~SWNT.chiral_type` of each `MWNT` walls
         will be random and determined by the set of randomly selected
         chiral indices (:attr:`~SWNT.n`, :attr:`~SWNT.m`).
-    shell_spacing : float, optional
+    wall_spacing : float, optional
         Inter-wall spacing in units of **Angstroms**.
         Default value is the van der Waals interaction distance of 3.4
         Angstroms.
@@ -84,11 +84,11 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
     --------
 
     >>> from sknano.generators import MWNTBundleGenerator
-    >>> mwntbundle = MWNTBundleGenerator(Nwalls=5, min_shell_diameter=5, Lz=5,
+    >>> mwntbundle = MWNTBundleGenerator(Nwalls=5, min_wall_diameter=5, Lz=5,
     ...                                  bundle_geometry='hexagon')
     >>> mwntbundle.save()
 
-    .. image:: /images/5shell_mwnt_(1,6)@(11,7)@(18,9)@(31,2)@(41,0)_hcp_7tube_hexagon-perspective_view-01.png
+    .. image:: /images/5wall_mwnt_(1,6)@(11,7)@(18,9)@(31,2)@(41,0)_hcp_7tube_hexagon-perspective_view-01.png
 
     """
     def __init__(self, autogen=True, **kwargs):
@@ -104,9 +104,9 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
         super().generate_bundle()
 
     @classmethod
-    def generate_fname(cls, Nshells, Ch_list, nx, ny, Ntubes=None,
+    def generate_fname(cls, Nwalls, Ch_list, nx, ny, Ntubes=None,
                        bundle_geometry=None, bundle_packing=None):
-        Nshells = '{}shell_mwnt'.format(Nshells)
+        Nwalls = '{}wall_mwnt'.format(Nwalls)
         chiralities = '@'.join([str(Ch).replace(' ', '')
                                 for Ch in Ch_list])
         packing = '{}cp'.format(bundle_packing[0])
@@ -119,12 +119,12 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
             cells = 'x'.join((nx, ny))
 
             if nx == 1 and ny == 1:
-                fname_wordlist = (Nshells, chiralities, cells)
+                fname_wordlist = (Nwalls, chiralities, cells)
             else:
-                fname_wordlist = (Nshells, chiralities, packing, cells)
+                fname_wordlist = (Nwalls, chiralities, packing, cells)
         else:
             fname_wordlist = \
-                (Nshells, chiralities, packing, Ntubes, bundle_geometry)
+                (Nwalls, chiralities, packing, Ntubes, bundle_geometry)
 
         fname = '_'.join(fname_wordlist)
         return fname
@@ -138,7 +138,7 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
 
         """
         if fname is None:
-            fname = self.generate_fname(self.Nshells, self.Ch_list,
+            fname = self.generate_fname(self.Nwalls, self.Ch_list,
                                         self.nx, self.ny, Ntubes=self.Ntubes,
                                         bundle_geometry=self.bundle_geometry,
                                         bundle_packing=self.bundle_packing)

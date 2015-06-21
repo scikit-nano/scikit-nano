@@ -12,7 +12,7 @@ from sknano.testing import GeneratorTestFixtures
 class TestCase(GeneratorTestFixtures):
 
     def test1(self):
-        mwnt = MWNTGenerator(max_shells=3, Lz=1.0)
+        mwnt = MWNTGenerator(max_walls=3, Lz=1.0)
         print(mwnt)
         print(mwnt.todict())
         mwnt.save()

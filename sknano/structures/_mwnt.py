@@ -37,17 +37,17 @@ class MWNT(MWNTMixin, StructureBase):
         Number of `SWNT` walls in `MWNT`.
     Lz : float, optional
         `MWNT` length in **nanometers**.
-    min_shell_diameter : float, optional
+    min_wall_diameter : float, optional
         Minimum `MWNT` wall diameter, in units of **Angstroms**.
-    max_shell_diameter : float, optional
+    max_wall_diameter : float, optional
         Maximum `MWNT` wall diameter, in units of **Angstroms**.
-    max_shells : int, optional
+    max_walls : int, optional
         Maximum number of `MWNT` walls.
     chiral_types : {None, 'armchair', 'zigzag', 'achiral', 'chiral'}, optional
         If `None`, the :attr:`~SWNT.chiral_type` of each `MWNT` walls
         will be random and determined by the set of randomly selected
         chiral indices (:attr:`~SWNT.n`, :attr:`~SWNT.m`).
-    shell_spacing : float, optional
+    wall_spacing : float, optional
         Inter-wall spacing in units of **Angstroms**.
         Default value is the van der Waals interaction distance of 3.35
         Angstroms.
@@ -77,8 +77,8 @@ class MWNT(MWNTMixin, StructureBase):
 
     """
     def __init__(self, Ch_list=None, Nwalls=None, Lz=None,
-                 min_shell_diameter=None, max_shell_diameter=None,
-                 max_shells=None, chiral_types=None, shell_spacing=dVDW,
+                 min_wall_diameter=None, max_wall_diameter=None,
+                 max_walls=None, chiral_types=None, wall_spacing=dVDW,
                  basis=['C', 'C'], bond=aCC, **kwargs):
         if Ch_list is None and 'Ch' in kwargs:
             Ch_list = kwargs['Ch']
@@ -89,18 +89,18 @@ class MWNT(MWNTMixin, StructureBase):
         if Ch_list is None or not isinstance(Ch_list, list):
 
             if Nwalls is not None:
-                max_shells = Nwalls
+                max_walls = Nwalls
 
-            if max_shells is None:
-                max_shells = 10
+            if max_walls is None:
+                max_walls = 10
 
-            if max_shell_diameter is None:
-                max_shell_diameter = np.inf
+            if max_wall_diameter is None:
+                max_wall_diameter = np.inf
 
-            if min_shell_diameter is None:
-                min_shell_diameter = 5.0
+            if min_wall_diameter is None:
+                min_wall_diameter = 5.0
 
-            delta_dt = 2 * shell_spacing
+            delta_dt = 2 * wall_spacing
 
             imax = 100
 
@@ -110,21 +110,21 @@ class MWNT(MWNTMixin, StructureBase):
             self._dt_pool = np.asarray([compute_dt(_Ch, bond=self.bond) for _Ch
                                        in self._Ch_pool])
 
-            dt_mask = np.logical_and(self._dt_pool >= min_shell_diameter,
-                                     self._dt_pool <= max_shell_diameter)
+            dt_mask = np.logical_and(self._dt_pool >= min_wall_diameter,
+                                     self._dt_pool <= max_wall_diameter)
 
             self._Ch_pool = self._Ch_pool[dt_mask]
             self._dt_pool = self._dt_pool[dt_mask]
 
-            if max_shell_diameter < np.inf:
+            if max_wall_diameter < np.inf:
                 dt_list = []
                 dt = self._dt_pool.min()
-                while dt <= max_shell_diameter:
+                while dt <= max_wall_diameter:
                     dt_list.append(dt)
                     dt += delta_dt
             else:
                 dt_list = [self._dt_pool.min() + i * delta_dt
-                           for i in range(max_shells)]
+                           for i in range(max_walls)]
 
             dt_masks = [self.generate_dt_mask(_dt) for _dt in dt_list]
 
@@ -133,16 +133,16 @@ class MWNT(MWNTMixin, StructureBase):
                 for _mask in dt_masks]
 
         self.Ch_list = Ch_list[:]
-        self.min_shell_diameter = min_shell_diameter
-        self.max_shell_diameter = max_shell_diameter
-        self.max_shells = max_shells
-        self.shell_spacing = shell_spacing
+        self.min_wall_diameter = min_wall_diameter
+        self.max_wall_diameter = max_wall_diameter
+        self.max_walls = max_walls
+        self.wall_spacing = wall_spacing
 
         if Lz is None:
             Lz = 1.0
         self.L0 = Lz
 
-        self.shells = \
+        self.walls = \
             [SWNT(Ch, Lz=Lz, fix_Lz=True, basis=self.basis, bond=self.bond,
                   **kwargs)
              for Ch in self.Ch_list]
@@ -154,20 +154,20 @@ class MWNT(MWNTMixin, StructureBase):
         self.unit_cell = UnitCell(lattice, basis=self.basis)
 
         if self.verbose:
-            print(self.shells)
+            print(self.walls)
 
         self.fmtstr = "Ch_list={Ch_list!r}, Lz={Lz!r}, bond={bond!r}, " + \
-            "basis={basis!r}, min_shell_diameter={min_shell_diameter!r}, " + \
-            "max_shell_diameter={max_shell_diameter!r}, " + \
-            "max_shells={max_shells!r}, chiral_types={chiral_types!r}, " + \
-            "shell_spacing={shell_spacing!r}"
+            "basis={basis!r}, min_wall_diameter={min_wall_diameter!r}, " + \
+            "max_wall_diameter={max_wall_diameter!r}, " + \
+            "max_walls={max_walls!r}, chiral_types={chiral_types!r}, " + \
+            "wall_spacing={wall_spacing!r}"
 
     def todict(self):
         """Return :class:`~python:dict` of `MWNT` attributes."""
         return dict(Ch_list=self.Ch_list, Lz=self.Lz,
                     basis=self.basis, bond=self.bond,
-                    min_shell_diameter=self.min_shell_diameter,
-                    max_shell_diameter=self.max_shell_diameter,
-                    max_shells=self.max_shells,
+                    min_wall_diameter=self.min_wall_diameter,
+                    max_wall_diameter=self.max_wall_diameter,
+                    max_walls=self.max_walls,
                     chiral_types=self.chiral_types,
-                    shell_spacing=self.shell_spacing)
+                    wall_spacing=self.wall_spacing)

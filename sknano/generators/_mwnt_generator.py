@@ -45,17 +45,17 @@ class MWNTGenerator(MWNT, GeneratorBase):
         Number of `SWNT` walls in `MWNT`.
     Lz : float, optional
         `MWNT` length in **nanometers**.
-    min_shell_diameter : float, optional
+    min_wall_diameter : float, optional
         Minimum `MWNT` wall diameter, in units of **Angstroms**.
-    max_shell_diameter : float, optional
+    max_wall_diameter : float, optional
         Maximum `MWNT` wall diameter, in units of **Angstroms**.
-    max_shells : int, optional
+    max_walls : int, optional
         Maximum number of `MWNT` walls.
     chiral_types : {None, 'armchair', 'zigzag', 'achiral', 'chiral'}, optional
         If `None`, the :attr:`~SWNT.chiral_type` of each `MWNT` walls
         will be random and determined by the set of randomly selected
         chiral indices (:attr:`~SWNT.n`, :attr:`~SWNT.m`).
-    shell_spacing : float, optional
+    wall_spacing : float, optional
         Inter-wall spacing in units of **Angstroms**.
         Default value is the van der Waals interaction distance of 3.4
         Angstroms.
@@ -85,12 +85,12 @@ class MWNTGenerator(MWNT, GeneratorBase):
     --------
 
     >>> from sknano.generators import MWNTGenerator
-    >>> MWNTGenerator(Nwalls=5, min_shell_diameter=10, Lz=5).save()
+    >>> MWNTGenerator(Nwalls=5, min_wall_diameter=10, Lz=5).save()
 
     The above command generated a 5 wall,  10 **nanometer** long `MWNT`.
-    The only constraints on the `MWNT` shell chiralities were the diameter
-    constraints imposed by the `min_shell_diameter` parameter,
-    which set the minimum shell diameter to 10 Angstroms,
+    The only constraints on the `MWNT` wall chiralities were the diameter
+    constraints imposed by the `min_wall_diameter` parameter,
+    which set the minimum wall diameter to 10 Angstroms,
     as well as the minimum wall-to-wall separation, which
     defaults to the van der Waals distance of 3.4 Angstroms.
 
@@ -100,7 +100,7 @@ class MWNTGenerator(MWNT, GeneratorBase):
 
     Here's a colorful rendering of the generated `MWNT` structure:
 
-    .. image:: /images/5shell_mwnt_(8,7)@(17,8)@(9,24)@(27,18)@(22,32)-04.png
+    .. image:: /images/5wall_mwnt_(8,7)@(17,8)@(9,24)@(27,18)@(22,32)-04.png
 
     """
     def __init__(self, autogen=True, **kwargs):
@@ -121,16 +121,16 @@ class MWNTGenerator(MWNT, GeneratorBase):
         """
 
         self.structure_data.clear()
-        for swnt in self.shells:
+        for swnt in self.walls:
             self.atoms.extend(SWNTGenerator(**swnt.todict()).atoms)
 
     @classmethod
-    def generate_fname(cls, Nshells, Ch_list):
-        Nshells = '{}shell_mwnt'.format(Nshells)
+    def generate_fname(cls, Nwalls, Ch_list):
+        Nwalls = '{}wall_mwnt'.format(Nwalls)
         chiralities = '@'.join([str(Ch).replace(' ', '') for
                                 Ch in Ch_list])
 
-        fname = '_'.join((Nshells, chiralities))
+        fname = '_'.join((Nwalls, chiralities))
         return fname
 
     def save(self, fname=None, outpath=None, structure_format=None,
@@ -142,7 +142,7 @@ class MWNTGenerator(MWNT, GeneratorBase):
 
         """
         if fname is None:
-            fname = self.generate_fname(self.Nshells, self.Ch_list)
+            fname = self.generate_fname(self.Nwalls, self.Ch_list)
 
         super().save(fname=fname, outpath=outpath,
                      structure_format=structure_format,

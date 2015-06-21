@@ -14,7 +14,7 @@ def test1():
 
 
 def test2():
-    bundle = MWNTBundle(max_shells=5, nx=5, ny=2)
+    bundle = MWNTBundle(max_walls=5, nx=5, ny=2)
     assert_equal(bundle.Nwalls, 5)
     assert_equal(bundle.Ntubes, 10)
 

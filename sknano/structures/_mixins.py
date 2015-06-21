@@ -379,8 +379,8 @@ class MWNTMixin:
 
     @property
     def chiral_types(self):
-        """List of chiral types for each `MWNT` shell."""
-        return [swnt.chiral_type for swnt in self.shells]
+        """List of chiral types for each `MWNT` wall."""
+        return [swnt.chiral_type for swnt in self.walls]
 
     @property
     def chiral_set(self):
@@ -389,15 +389,15 @@ class MWNTMixin:
 
     @property
     def dt(self):
-        """`MWNT` shell diameters :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}` \
+        """`MWNT` wall diameters :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}` \
         in \u212b."""
-        return self.shells[-1].dt
+        return self.walls[-1].dt
 
     @property
     def rt(self):
-        """`MWNT` shell radii :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}` \
+        """`MWNT` wall radii :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}` \
         in \u212b."""
-        return self.shells[-1].rt
+        return self.walls[-1].rt
 
     @property
     def Natoms(self):
@@ -423,7 +423,7 @@ class MWNTMixin:
     @property
     def Natoms_per_tube(self):
         """Number of atoms in `MWNT`."""
-        return np.asarray([swnt.Natoms for swnt in self.shells]).sum()
+        return np.asarray([swnt.Natoms for swnt in self.walls]).sum()
 
     @property
     def Ntubes(self):
@@ -433,16 +433,12 @@ class MWNTMixin:
     @property
     def Nwalls(self):
         """Number of `MWNT` walls."""
-        return len(self.shells)
-
-    @property
-    def Nshells(self):
-        return self.Nwalls
+        return len(self.walls)
 
     @property
     def tube_mass(self):
         """MWNT mass in **grams**."""
-        return np.asarray([swnt.tube_mass for swnt in self.shells]).sum()
+        return np.asarray([swnt.tube_mass for swnt in self.walls]).sum()
 
     def generate_dt_mask(self, dt, max_dt_diff=0.5):
         """Generate boolean mask array.
@@ -466,29 +462,29 @@ class MWNTMixin:
     @property
     def nz(self):
         """Number of nanotube unit cells along the :math:`z`-axis."""
-        return [swnt.nz for swnt in self.shells]
+        return [swnt.nz for swnt in self.walls]
 
     @property
     def Lz(self):
         """MWNT length :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**."""
-        return [swnt.Lz for swnt in self.shells]
+        return [swnt.Lz for swnt in self.walls]
 
     @property
     def T(self):
         """Length of `MWNT` unit cell :math:`|\\mathbf{T}|` in \u212b."""
-        return [swnt.T for swnt in self.shells]
+        return [swnt.T for swnt in self.walls]
 
     @property
     def wall_diameters(self):
-        """`MWNT` shell diameters :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}` \
+        """`MWNT` wall diameters :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}` \
         in \u212b."""
-        return [swnt.dt for swnt in self.shells]
+        return [swnt.dt for swnt in self.walls]
 
     @property
     def wall_radii(self):
-        """`MWNT` shell radii :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}` \
+        """`MWNT` wall radii :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}` \
         in \u212b."""
-        return [swnt.rt for swnt in self.shells]
+        return [swnt.rt for swnt in self.walls]
 
 
 class NanotubeBundleMixin:

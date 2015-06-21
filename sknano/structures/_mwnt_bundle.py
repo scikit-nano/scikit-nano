@@ -31,17 +31,17 @@ class MWNTBundle(NanotubeBundleBase, MWNT):
         Number of `SWNT` walls in `MWNT`.
     Lz : float, optional
         `MWNT` length in **nanometers**.
-    min_shell_diameter : float, optional
+    min_wall_diameter : float, optional
         Minimum `MWNT` wall diameter, in units of **Angstroms**.
-    max_shell_diameter : float, optional
+    max_wall_diameter : float, optional
         Maximum `MWNT` wall diameter, in units of **Angstroms**.
-    max_shells : int, optional
+    max_walls : int, optional
         Maximum number of `MWNT` walls.
     chiral_types : {None, 'armchair', 'zigzag', 'achiral', 'chiral'}, optional
         If `None`, the :attr:`~SWNT.chiral_type` of each `MWNT` walls
         will be random and determined by the set of randomly selected
         chiral indices (:attr:`~SWNT.n`, :attr:`~SWNT.m`).
-    shell_spacing : float, optional
+    wall_spacing : float, optional
         Inter-wall spacing in units of **Angstroms**.
         Default value is the van der Waals interaction distance of 3.4
         Angstroms.

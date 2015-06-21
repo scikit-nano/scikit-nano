@@ -210,7 +210,7 @@ def argparser():
     mwnt_parent_parser.add_argument('--Ch-list', type=list,
                                     default=None,
                                     help='list of (`n`, `m`) chiralities '
-                                    'for each `SWNT` shell in `MWNT` '
+                                    'for each `SWNT` wall in `MWNT` '
                                     '(default: %(default)s)')
     mwnt_parent_parser.add_argument('--Nwalls', type=int,
                                     default=3,
@@ -220,17 +220,17 @@ def argparser():
                                     help='Length of nanotube along `z` axis '
                                     'in **nanometers**. '
                                     '(default: %(default)s)')
-    mwnt_parent_parser.add_argument('--min-shell-diameter', type=float,
+    mwnt_parent_parser.add_argument('--min-wall-diameter', type=float,
                                     default=None,
                                     help='Minimum `MWNT` wall diameter, in '
                                     'units of **Angstroms** '
                                     '(default: %(default)s)')
-    mwnt_parent_parser.add_argument('--max-shell-diameter', type=float,
+    mwnt_parent_parser.add_argument('--max-wall-diameter', type=float,
                                     default=None,
                                     help='Maximum `MWNT` wall diameter, in '
                                     'units of **Angstroms** '
                                     '(default: %(default)s)')
-    mwnt_parent_parser.add_argument('--max-shells', type=int, default=None,
+    mwnt_parent_parser.add_argument('--max-walls', type=int, default=None,
                                     help='Maximum number of `MWNT` walls '
                                     '(default: %(default)s)')
 

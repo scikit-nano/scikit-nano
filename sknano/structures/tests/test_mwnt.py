@@ -19,7 +19,7 @@ def test1():
 
 
 def test2():
-    mwnt = MWNT(max_shells=5)
+    mwnt = MWNT(max_walls=5)
     print(mwnt)
     print(mwnt.todict())
     print(mwnt.chiral_types)

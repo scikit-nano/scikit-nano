@@ -12,7 +12,7 @@ from sknano.testing import GeneratorTestFixtures
 class TestCase(GeneratorTestFixtures):
 
     def test1(self):
-        bundle = MWNTBundleGenerator(max_shells=2, Lz=1.0,
+        bundle = MWNTBundleGenerator(max_walls=2, Lz=1.0,
                                      bundle_geometry='hexagon')
         bundle.save()
         self.tmpdata.append(bundle.fname)
