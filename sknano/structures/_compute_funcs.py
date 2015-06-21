@@ -223,13 +223,7 @@ def compute_Ch(*Ch, bond=None, **kwargs):
         Nanotube circumference :math:`|\\mathbf{C}_h|` in \u212b.
 
     """
-    if len(Ch) == 3:
-        n, m, bond = Ch
-    elif len(Ch) == 2 and isinstance(Ch[0], tuple):
-        n, m = Ch[0]
-        bond = Ch[-1]
-    else:
-        n, m, _ = get_chiral_indices(*Ch)
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -313,13 +307,7 @@ def compute_T(*Ch, bond=None, length=True, **kwargs):
         (:math:`t_1`, :math:`t_2`).
 
     """
-    if len(Ch) == 3:
-        n, m, bond = Ch
-    elif len(Ch) == 2 and isinstance(Ch[0], tuple):
-        n, m = Ch[0]
-        bond = Ch[-1]
-    else:
-        n, m, _ = get_chiral_indices(*Ch)
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -369,13 +357,7 @@ def compute_dt(*Ch, bond=None, **kwargs):
         Nanotube diameter :math:`d_t` in \u212b.
 
     """
-    if len(Ch) == 3:
-        n, m, bond = Ch
-    elif len(Ch) == 2 and isinstance(Ch[0], tuple):
-        n, m = Ch[0]
-        bond = Ch[-1]
-    else:
-        n, m, _ = get_chiral_indices(*Ch)
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -412,13 +394,7 @@ def compute_rt(*Ch, bond=None, **kwargs):
         Nanotube radius :math:`r_t` in \u212b.
 
     """
-    if len(Ch) == 3:
-        n, m, bond = Ch
-    elif len(Ch) == 2 and isinstance(Ch[0], tuple):
-        n, m = Ch[0]
-        bond = Ch[-1]
-    else:
-        n, m, _ = get_chiral_indices(*Ch)
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -503,13 +479,7 @@ def compute_R(*Ch, bond=None, length=False, **kwargs):
         is `True` in units of **\u212b**.
 
     """
-    if len(Ch) == 3:
-        n, m, bond = Ch
-    elif len(Ch) == 2 and isinstance(Ch[0], tuple):
-        n, m = Ch[0]
-        bond = Ch[-1]
-    else:
-        n, m, _ = get_chiral_indices(*Ch)
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -610,13 +580,7 @@ def compute_symmetry_operation(*Ch, bond=None):
         :math:`\\tau` in \u212b.
 
     """
-    if len(Ch) == 3:
-        n, m, bond = Ch
-    elif len(Ch) == 2 and isinstance(Ch[0], tuple):
-        n, m = Ch[0]
-        bond = Ch[-1]
-    else:
-        n, m, _ = get_chiral_indices(*Ch)
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -691,13 +655,7 @@ def compute_tau(*Ch, bond=None, **kwargs):
         in **\u212b**.
 
     """
-    if len(Ch) == 3:
-        n, m, bond = Ch
-    elif len(Ch) == 2 and isinstance(Ch[0], tuple):
-        n, m = Ch[0]
-        bond = Ch[-1]
-    else:
-        n, m, _ = get_chiral_indices(*Ch)
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -803,13 +761,7 @@ def compute_Natoms(*Ch, nz=1):
     int
         :math:`N_{\\mathrm{atoms/tube}}`
     """
-    if len(Ch) == 3:
-        n, m, nz = Ch
-    elif len(Ch) == 2 and isinstance(Ch[0], tuple):
-        n, m = Ch[0]
-        nz = Ch[-1]
-    else:
-        n, m, _ = get_chiral_indices(*Ch)
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -953,13 +905,7 @@ def compute_linear_mass_density(*Ch, bond=None, element1=None, element2=None,
         Linear mass density in units of **g/nm**.
 
     """
-    if len(Ch) == 3:
-        n, m, bond = Ch
-    elif len(Ch) == 2 and isinstance(Ch[0], tuple):
-        n, m = Ch[0]
-        bond = Ch[-1]
-    else:
-        n, m, _ = get_chiral_indices(*Ch)
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -1069,13 +1015,7 @@ def compute_Lz(*Ch, nz=1, bond=None, **kwargs):
         :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**
 
     """
-    if len(Ch) == 3:
-        n, m, nz = Ch
-    elif len(Ch) == 2 and isinstance(Ch[0], tuple):
-        n, m = Ch[0]
-        nz = Ch[-1]
-    else:
-        n, m, _ = get_chiral_indices(*Ch)
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
@@ -1137,13 +1077,7 @@ def compute_tube_mass(*Ch, nz=1, element1=None, element2=None):
         determining number of atoms of each element.
 
     """
-    if len(Ch) == 3:
-        n, m, nz = Ch
-    elif len(Ch) == 2 and isinstance(Ch[0], tuple):
-        n, m = Ch[0]
-        nz = Ch[-1]
-    else:
-        n, m, _ = get_chiral_indices(*Ch)
+    n, m, _ = get_chiral_indices(*Ch)
 
     if not (isinstance(n, numbers.Real) or n >= 0):
         raise TypeError('Expected an integer')
