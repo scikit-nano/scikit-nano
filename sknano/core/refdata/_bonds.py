@@ -47,6 +47,7 @@ def load_bond_data():
 
 crystal_bonds = {}
 crystal_bonds.update({'alpha_quartz': {'a': 4.916, 'c': 5.405}})
+crystal_bonds.update({'molybdenum_disulphide': {'a': 3.160, 'c': 12.294}})
 crystal_bonds.update({'diamond': 3.567})
 crystal_bonds.update({'caesium_chloride': 4.123})
 crystal_bonds.update({'rock_salt': 5.406})
