@@ -10,7 +10,7 @@ import numpy as np
 from sknano.core.crystallography import UnitCell, Crystal3DLattice, \
     Crystal3DStructure, AlphaQuartz, DiamondStructure, HexagonalStructure, \
     FCCStructure, Gold, Copper, CaesiumChlorideStructure, \
-    RocksaltStructure, ZincblendeStructure
+    RocksaltStructure, ZincblendeStructure, MoS2
 from sknano.core.atoms import BasisAtoms
 
 
@@ -55,6 +55,12 @@ def test7():
     assert_true(isinstance(zincblende.basis, BasisAtoms))
     assert_equal(zincblende.basis.Natoms, 8)
 
+
+def test8():
+    molydisulphide = MoS2()
+    print(molydisulphide)
+    assert_true(isinstance(molydisulphide.basis, BasisAtoms))
+    assert_equal(molydisulphide.basis.Natoms, 6)
 
 if __name__ == '__main__':
     nose.runmodule()

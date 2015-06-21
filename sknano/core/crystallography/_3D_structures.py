@@ -26,7 +26,7 @@ __all__ = ['CrystalStructure', 'Crystal3DStructure',
            'FCCStructure', 'Copper', 'Gold',
            'CubicClosePackedStructure', 'CCPStructure',
            'HexagonalClosePackedStructure', 'HCPStructure',
-           'HexagonalStructure', 'AlphaQuartz']
+           'HexagonalStructure', 'AlphaQuartz', 'MoS2']
 
 
 class Crystal3DStructure(StructureBase):
@@ -77,6 +77,25 @@ class Crystal3DStructure(StructureBase):
                                            scaling_matrix=scaling_matrix)
 
 CrystalStructure = Crystal3DStructure
+
+
+class MoS2(Crystal3DStructure):
+    """Molybdenum disulphide structure class."""
+    def __init__(self, a=bonds['molybdenum_disulphide']['a'],
+                 c=bonds['molybdenum_disulphide']['c'],
+                 basis=['Mo', 'S'], scaling_matrix=None, **kwargs):
+
+        molybdenum_disulphide = \
+            pymatgen_structure(194,
+                               Crystal3DLattice.hexagonal(a, c).cell_matrix,
+                               basis, [[1/3, 2/3, 1/4], [1/3, 2/3, 0.621]],
+                               classmethod='from_spacegroup',
+                               scaling_matrix=scaling_matrix)
+        molybdenum_disulphide = \
+            Crystal3DStructure.from_pymatgen_structure(
+                molybdenum_disulphide, scaling_matrix=scaling_matrix)
+
+        super().__init__(structure=molybdenum_disulphide, **kwargs)
 
 
 class CaesiumChlorideStructure(Crystal3DStructure):
