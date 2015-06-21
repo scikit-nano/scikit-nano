@@ -16,14 +16,15 @@ import numbers
 import numpy as np
 
 from sknano.core.atoms import Atom
-from sknano.core.refdata import CCbond, grams_per_Da
+from sknano.core.refdata import CCbond, dVDW, grams_per_Da
 from ._extras import get_chiral_indices
 
 __all__ = ['compute_d', 'compute_dR', 'compute_N', 'compute_t1', 'compute_t2',
            'compute_Ch', 'compute_chiral_angle', 'compute_T', 'compute_dt',
            'compute_rt', 'compute_M', 'compute_R', 'compute_R_chiral_angle',
            'compute_symmetry_operation', 'compute_psi', 'compute_tau',
-           'compute_Lz', 'compute_electronic_type', 'compute_Natoms',
+           'compute_Lx', 'compute_Ly', 'compute_Lz',
+           'compute_electronic_type', 'compute_Natoms',
            'compute_Natoms_per_tube', 'compute_Natoms_per_unit_cell',
            'compute_unit_cell_mass', 'compute_linear_mass_density',
            'compute_bundle_density', 'compute_symmetry_chiral_angle',
@@ -985,6 +986,14 @@ def compute_bundle_density(*Ch, d_vdw=None, bond=None,
     # there are 1.6605e-24 grams / Da and 1e-8 cm / angstrom
     bundle_density *= grams_per_Da / (1e-8)**3
     return bundle_density
+
+
+def compute_Lx(*Ch, nx=1, bond=None, gutter=dVDW):
+    return nx * (compute_dt(*Ch, bond=bond) + gutter) / 10
+
+
+def compute_Ly(*Ch, ny=1, bond=None, gutter=dVDW):
+    return ny * (compute_dt(*Ch, bond=bond) + gutter) / 10
 
 
 def compute_Lz(*Ch, nz=1, bond=None, **kwargs):
