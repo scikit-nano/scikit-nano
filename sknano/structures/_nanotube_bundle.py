@@ -35,3 +35,11 @@ class NanotubeBundleBase(NanotubeBundleMixin):
         self.bundle_packing = bundle_packing
 
         self.generate_bundle_coords()
+
+    def todict(self):
+        attrdict = super().todict()
+        attrdict.update(dict(nx=self.nx, ny=self.ny,
+                             vdw_spacing=self.vdw_spacing,
+                             bundle_packing=self.bundle_packing,
+                             bundle_geometry=self.bundle_geometry))
+        return attrdict
