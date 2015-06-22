@@ -459,32 +459,47 @@ class MWNTMixin:
             dt_mask = np.abs(self._dt_pool - dt) <= max_dt_diff
         return dt_mask
 
+    # @property
+    # def Lz(self):
+    #     return self._Lz
+
+    # @Lz.setter
+    # def Lz(self, value):
+    #     self._Lz = value
+
     @property
-    def nz(self):
+    def nz_list(self):
         """Number of nanotube unit cells along the :math:`z`-axis."""
         return [swnt.nz for swnt in self.walls]
 
     @property
-    def Lz(self):
+    def Lz_list(self):
         """MWNT length :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**."""
         return [swnt.Lz for swnt in self.walls]
 
     @property
-    def T(self):
+    def T_list(self):
         """Length of `MWNT` unit cell :math:`|\\mathbf{T}|` in \u212b."""
         return [swnt.T for swnt in self.walls]
 
     @property
-    def wall_diameters(self):
+    def dt_list(self):
         """`MWNT` wall diameters :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}` \
         in \u212b."""
         return [swnt.dt for swnt in self.walls]
 
-    @property
-    def wall_radii(self):
+    def rt_list(self):
         """`MWNT` wall radii :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}` \
         in \u212b."""
         return [swnt.rt for swnt in self.walls]
+
+    @property
+    def wall_diameters(self):
+        return self.dt_list
+
+    @property
+    def wall_radii(self):
+        return self.rt_list
 
 
 class NanotubeBundleMixin:
