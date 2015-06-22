@@ -77,11 +77,31 @@ class SWNTBundle(NanotubeBundleBase, SWNT):
     Examples
     --------
 
-    >>> from sknano.structures import SWNT
+    Create a :math:`\\mathbf{C}_{h} = (10, 10)` hexagonally close packed
+    (*hcp*)  :math:`5\\times 3\\times 10` SWNT bundle.
 
-    Create a SWNT with :math:`\\mathbf{C}_{h} = (10, 10)` chirality.
+    >>> from sknano.structures import SWNTBundle
+    >>> swnt_bundle = SWNTBundle((10, 10), nx=5, ny=3, nz=10,
+    ...                          bundle_packing='hcp')
+    >>> print(swnt_bundle)
+    SWNTBundle((10, 10), nx=5, ny=3, nz=10, basis=['C', 'C'], bond=1.42,
+    vdw_spacing=3.35, bundle_packing='hcp', bundle_geometry=None)
 
     """
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        fmtstr = "{Ch!r}, nx={nx!r}, ny={ny!r}, "
+        if self.fix_Lz:
+            fmtstr += "Lz={Lz!r}, fix_Lz=True, "
+        else:
+            fmtstr += "nz={nz!r}, "
+
+        self.fmtstr = fmtstr + "basis={basis!r}, bond={bond!r}, " + \
+            "vdw_spacing={vdw_spacing!r}, " + \
+            "bundle_packing={bundle_packing!r}, " + \
+            "bundle_geometry={bundle_geometry!r}"
 
     @property
     def bundle_density(self):
