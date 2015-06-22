@@ -189,8 +189,9 @@ class GrapheneGenerator(Graphene, GeneratorBase):
             self.atoms.extend(layer)
 
     @classmethod
-    def generate_fname(cls, armchair_edge_length, zigzag_edge_length,
-                       nlayers, basis):
+    def generate_fname(cls, armchair_edge_length=None,
+                       zigzag_edge_length=None, nlayers=None, basis=None,
+                       **kwargs):
         dimensions = '{}nmx{}nm'.format(armchair_edge_length,
                                         zigzag_edge_length)
         nlayer = '{}layer'.format(nlayers)
@@ -209,9 +210,11 @@ class GrapheneGenerator(Graphene, GeneratorBase):
 
         """
         if fname is None:
-            fname = self.generate_fname(self.armchair_edge_length,
-                                        self.zigzag_edge_length,
-                                        self.nlayers, self.basis)
+            fname = \
+                self.generate_fname(
+                    armchair_edge_length=self.armchair_edge_length,
+                    zigzag_edge_length=self.zigzag_edge_length,
+                    nlayers=self.nlayers, basis=self.basis)
 
         if center_CM and self.nlayers > 1:
             self.atoms.center_CM()

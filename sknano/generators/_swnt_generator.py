@@ -132,7 +132,8 @@ class SWNTGenerator(SWNT, GeneratorBase):
             self.atoms.clip_bounds(region_bounds)
 
     @classmethod
-    def generate_fname(cls, n, m, nz, integer_nz=True):
+    def generate_fname(cls, n=None, m=None, nz=None, integer_nz=True,
+                       **kwargs):
 
         chirality = '{}{}'.format('{}'.format(n).zfill(2),
                                   '{}'.format(m).zfill(2))
@@ -151,7 +152,7 @@ class SWNTGenerator(SWNT, GeneratorBase):
 
         """
         if fname is None:
-            fname = self.generate_fname(self.n, self.m, self.nz,
+            fname = self.generate_fname(n=self.n, m=self.m, nz=self.nz,
                                         integer_nz=self._assert_integer_nz)
 
         super().save(fname=fname, outpath=outpath,

@@ -169,8 +169,9 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
         super().generate_bundle()
 
     @classmethod
-    def generate_fname(cls, n, m, nx, ny, nz, integer_nz=True, Ntubes=None,
-                       bundle_geometry=None, bundle_packing=None):
+    def generate_fname(cls, n=None, m=None, nx=None, ny=None, nz=None,
+                       integer_nz=True, Ntubes=None, bundle_geometry=None,
+                       bundle_packing=None, **kwargs):
         chirality = '{}{}'.format('{}'.format(n).zfill(2),
                                   '{}'.format(m).zfill(2))
         packing = '{}cp'.format(bundle_packing[0])
@@ -206,8 +207,8 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
 
         """
         if fname is None:
-            fname = self.generate_fname(self.n, self.m,
-                                        self.nx, self.ny, self.nz,
+            fname = self.generate_fname(n=self.n, m=self.m,
+                                        nx=self.nx, ny=self.ny, nz=self.nz,
                                         integer_nz=self._assert_integer_nz,
                                         Ntubes=self.Ntubes,
                                         bundle_geometry=self.bundle_geometry,

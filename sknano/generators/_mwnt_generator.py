@@ -125,7 +125,7 @@ class MWNTGenerator(MWNT, GeneratorBase):
             self.atoms.extend(SWNTGenerator(**swnt.todict()).atoms)
 
     @classmethod
-    def generate_fname(cls, Nwalls, Ch_list):
+    def generate_fname(cls, Ch_list=None, Nwalls=None, **kwargs):
         Nwalls = '{}wall_mwnt'.format(Nwalls)
         chiralities = '@'.join([str(Ch).replace(' ', '') for
                                 Ch in Ch_list])
@@ -142,7 +142,8 @@ class MWNTGenerator(MWNT, GeneratorBase):
 
         """
         if fname is None:
-            fname = self.generate_fname(self.Nwalls, self.Ch_list)
+            fname = self.generate_fname(Ch_list=self.Ch_list,
+                                        Nwalls=self.Nwalls)
 
         super().save(fname=fname, outpath=outpath,
                      structure_format=structure_format,

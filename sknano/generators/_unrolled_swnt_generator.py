@@ -122,7 +122,8 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
                     self.atoms.append(nt_atom)
 
     @classmethod
-    def generate_fname(self, n, m, nx, nz, integer_nx=True, integer_nz=True):
+    def generate_fname(self, n=None, m=None, nx=None, nz=None,
+                       integer_nx=True, integer_nz=True, **kwargs):
         chirality = '{}{}'.format('{}'.format(n).zfill(2),
                                   '{}'.format(m).zfill(2))
 
@@ -147,7 +148,8 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
 
         """
         if fname is None:
-            fname = self.generate_fname(self.n, self.m, self.nx, self.nz,
+            fname = self.generate_fname(n=self.n, m=self.m,
+                                        nx=self.nx, nz=self.nz,
                                         integer_nx=self._assert_integer_nx,
                                         integer_nz=self._assert_integer_nz)
 

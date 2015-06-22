@@ -104,8 +104,9 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
         super().generate_bundle()
 
     @classmethod
-    def generate_fname(cls, Nwalls, Ch_list, nx, ny, Ntubes=None,
-                       bundle_geometry=None, bundle_packing=None):
+    def generate_fname(cls, Ch_list=None, Nwalls=None, Ntubes=None,
+                       nx=None, ny=None, bundle_geometry=None,
+                       bundle_packing=None, **kwargs):
         Nwalls = '{}wall_mwnt'.format(Nwalls)
         chiralities = '@'.join([str(Ch).replace(' ', '')
                                 for Ch in Ch_list])
@@ -138,8 +139,10 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
 
         """
         if fname is None:
-            fname = self.generate_fname(self.Nwalls, self.Ch_list,
-                                        self.nx, self.ny, Ntubes=self.Ntubes,
+            fname = self.generate_fname(Ch_list=self.Ch_list,
+                                        Nwalls=self.Nwalls,
+                                        Ntubes=self.Ntubes,
+                                        nx=self.nx, ny=self.ny,
                                         bundle_geometry=self.bundle_geometry,
                                         bundle_packing=self.bundle_packing)
 
