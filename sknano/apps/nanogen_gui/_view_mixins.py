@@ -17,94 +17,118 @@ try:
 except ImportError as e:
     print(e)
 
-__all__ = ['NanotubeViewMixin', 'GrapheneViewMixin']
+__all__ = ['MainWindowViewMixin', 'SWNTViewMixin', 'MWNTViewMixin',
+           'GrapheneViewMixin', 'FullereneViewMixin']
 
 
-class NanotubeViewMixin:
+class MainWindowViewMixin:
+    """Mixin class for main window."""
+
+    @pyqtSlot(str)
+    def on_element1_comboBox_currentIndexChanged(self, value):
+        self.model.element1 = str(value)
+
+    @pyqtSlot(str)
+    def on_element2_comboBox_currentIndexChanged(self, value):
+        self.model.element2 = str(value)
+
+    @pyqtSlot()
+    def on_bond_doubleSpinBox_editingFinished(self):
+        self.model.bond = self.bond_doubleSpinBox.value()
+
+    @pyqtSlot(float)
+    def on_bond_doubleSpinBox_valueChanged(self, value):
+        self.model.bond = value
+
+
+class SWNTViewMixin:
     """Mixin class for nanotube classes."""
     @pyqtSlot()
-    def on_n_spinBox_editingFinished(self):
-        self.model.n = self.n_spinBox.value()
+    def on_swnt_n_spinBox_editingFinished(self):
+        self.model.n = self.swnt_n_spinBox.value()
 
     @pyqtSlot(int)
-    def on_n_spinBox_valueChanged(self, value):
+    def on_swnt_n_spinBox_valueChanged(self, value):
         self.model.n = value
 
     @pyqtSlot()
-    def on_m_spinBox_editingFinished(self):
-        self.model.m = self.m_spinBox.value()
+    def on_swnt_m_spinBox_editingFinished(self):
+        self.model.m = self.swnt_m_spinBox.value()
 
     @pyqtSlot(int)
-    def on_m_spinBox_valueChanged(self, value):
+    def on_swnt_m_spinBox_valueChanged(self, value):
         self.model.m = value
 
     @pyqtSlot()
-    def on_nanotube_bond_doubleSpinBox_editingFinished(self):
-        self.model.nanotube_bond = self.nanotube_bond_doubleSpinBox.value()
+    def on_swnt_nz_doubleSpinBox_editingFinished(self):
+        self.model.nz = self.swnt_nz_doubleSpinBox.value()
 
-    @pyqtSlot(float)
-    def on_nanotube_bond_doubleSpinBox_valueChanged(self, value):
-        self.model.nanotube_bond = value
+    @pyqtSlot(int)
+    def on_swnt_nz_doubleSpinBox_valueChanged(self, value):
+        self.model.nz = value
 
     @pyqtSlot()
-    def on_nx_spinBox_editingFinished(self):
+    def on_swnt_Lz_doubleSpinBox_editingFinished(self):
+        self.model.Lz = self.swnt_Lz_doubleSpinBox.value()
+
+    @pyqtSlot(float)
+    def on_swnt_Lz_doubleSpinBox_valueChanged(self, value):
+        self.model.Lz = value
+
+    @pyqtSlot()
+    def on_swnt_bundle_nx_spinBox_editingFinished(self):
         self.model.nx = self.nx_spinBox.value()
 
     @pyqtSlot(int)
-    def on_nx_spinBox_valueChanged(self, value):
+    def on_swnt_bundle_nx_spinBox_valueChanged(self, value):
         self.model.nx = value
 
     @pyqtSlot()
-    def on_ny_spinBox_editingFinished(self):
+    def on_swnt_bundle_ny_spinBox_editingFinished(self):
         self.model.ny = self.ny_spinBox.value()
 
     @pyqtSlot(int)
-    def on_ny_spinBox_valueChanged(self, value):
+    def on_swnt_bundle_ny_spinBox_valueChanged(self, value):
+        self.model.ny = value
+
+    # @pyqtSlot(int)
+    # def on_swnt_tab_generator_buttonGroup_buttonClicked(self):
+    #     if self.unrolled_swnt_generator_radioButton.isChecked():
+    #         if self.bundle_generator_checkBox.isChecked():
+    #             self.bundle_generator_checkBox.setCheckState(False)
+    #         self.bundle_generator_checkBox.setCheckable(False)
+    #     else:
+    #         self.bundle_generator_checkBox.setCheckable(True)
+
+
+class MWNTViewMixin:
+
+    @pyqtSlot()
+    def on_mwnt_bundle_nx_spinBox_editingFinished(self):
+        self.model.nx = self.mwnt_bundle_nx_spinBox.value()
+
+    @pyqtSlot(int)
+    def on_mwnt_bundle_nx_spinBox_valueChanged(self, value):
+        self.model.nx = value
+
+    @pyqtSlot()
+    def on_mwnt_bundle_ny_spinBox_editingFinished(self):
+        self.model.ny = self.mwnt_bundle_ny_spinBox.value()
+
+    @pyqtSlot(int)
+    def on_mwnt_bundle_ny_spinBox_valueChanged(self, value):
         self.model.ny = value
 
     @pyqtSlot()
-    def on_nz_spinBox_editingFinished(self):
-        self.model.nz = self.nz_spinBox.value()
+    def on_mwnt_Lz_spinBox_editingFinished(self):
+        self.model.Lz = self.mwnt_Lz_doubleSpinBox.value()
 
     @pyqtSlot(int)
-    def on_nz_spinBox_valueChanged(self, value):
-        self.model.nz = value
-
-    @pyqtSlot(int)
-    def on_nanotube_generator_buttonGroup_buttonClicked(self):
-        if self.unrolled_nanotube_generator_radioButton.isChecked():
-            if self.bundle_generator_checkBox.isChecked():
-                self.bundle_generator_checkBox.setCheckState(False)
-            self.bundle_generator_checkBox.setCheckable(False)
-        else:
-            self.bundle_generator_checkBox.setCheckable(True)
-
-    @pyqtSlot(str)
-    def on_nanotube_element1_comboBox_currentIndexChanged(self, value):
-        self.model.nanotube_element1 = str(value)
-
-    @pyqtSlot(str)
-    def on_nanotube_element2_comboBox_currentIndexChanged(self, value):
-        self.model.nanotube_element2 = str(value)
-
-    @pyqtSlot(str)
-    def on_graphene_element1_comboBox_currentIndexChanged(self, value):
-        self.model.graphene_element1 = str(value)
-
-    @pyqtSlot(str)
-    def on_graphene_element2_comboBox_currentIndexChanged(self, value):
-        self.model.graphene_element2 = str(value)
-
-    @pyqtSlot()
-    def on_Lz_doubleSpinBox_editingFinished(self):
-        self.model.Lz = self.Lz_doubleSpinBox.value()
-
-    @pyqtSlot(float)
-    def on_Lz_doubleSpinBox_valueChanged(self, value):
+    def on_mwnt_Lz_doubleSpinBox_valueChanged(self, value):
         self.model.Lz = value
 
 
-class GrapheneViewMixin(object):
+class GrapheneViewMixin:
     """Mixin class for graphene."""
 
     # @pyqtSlot(int)
@@ -150,10 +174,6 @@ class GrapheneViewMixin(object):
     #                    self.AB_stacking_radioButton):
     #             rb.setCheckable(True)
 
-    @pyqtSlot()
-    def on_graphene_bond_doubleSpinBox_editingFinished(self):
-        self.model.graphene_bond = self.graphene_bond_doubleSpinBox.value()
 
-    @pyqtSlot(float)
-    def on_graphene_bond_doubleSpinBox_valueChanged(self, value):
-        self.model.graphene_bond = value
+class FullereneViewMixin:
+    pass
