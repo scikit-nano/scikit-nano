@@ -106,6 +106,16 @@ class Graphene(StructureBase):
         Distance between layers in **Angstroms** (default: 3.35).
     stacking_order : {'AA', 'AB'}, optional
         Stacking order of graphene layers.
+    layer_rotation_angles : list, optional
+        list of rotation angles for each layer in **degrees** if
+        `degrees` is `True` (default), otherwise in radians.
+        The list length must equal the number of layers.
+    layer_rotation_increment : float, optional
+        incremental layer rotation angle in **degrees** if
+        `degrees` is `True` (default), otherwise in radians.
+        Each subsequent layer will
+        be rotated by `layer_rotation_increment` relative to the layer
+        below it.
     verbose : bool, optional
         verbose output
 
@@ -174,10 +184,9 @@ class Graphene(StructureBase):
 
         self.layer_rotation_angles = \
             np.asarray(layer_rotation_angles).tolist()
-        self.stacking_order = stacking_order
 
         self.layer_shift = Vector()
-
+        self.stacking_order = stacking_order
         if nlayers > 1 and stacking_order == 'AB':
             self.layer_shift.x = self.bond
 
