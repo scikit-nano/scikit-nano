@@ -149,9 +149,13 @@ class SWNT(SWNTMixin, StructureBase):
                         'electronic_type']
 
     def __init__(self, *Ch, nz=None, bond=aCC, basis=['C', 'C'],
-                 tube_length=None, Lz=None, fix_Lz=False, **kwargs):
+                 Lz=None, fix_Lz=False, **kwargs):
 
         n, m, kwargs = get_chiral_indices(*Ch, **kwargs)
+
+        if 'tube_length' in kwargs:
+            Lz = kwargs['tube_length']
+            del kwargs['tube_length']
 
         super().__init__(basis=basis, bond=bond, **kwargs)
 
@@ -159,9 +163,6 @@ class SWNT(SWNTMixin, StructureBase):
         c = compute_T(n, m, bond=bond, length=True)
         lattice = Crystal3DLattice.hexagonal(a, c)
         self.unit_cell = UnitCell(lattice, basis=self.basis)
-
-        if tube_length is not None and Lz is None:
-            Lz = tube_length
 
         self.L0 = Lz  # store initial value of Lz
 
