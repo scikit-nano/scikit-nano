@@ -119,7 +119,7 @@ class MWNT(MWNTMixin, StructureBase):
             if max_wall_diameter < np.inf:
                 dt_list = []
                 dt = self._dt_pool.min()
-                while dt <= max_wall_diameter:
+                while dt <= max_wall_diameter and len(dt_list) < max_walls:
                     dt_list.append(dt)
                     dt += delta_dt
             else:
@@ -140,7 +140,7 @@ class MWNT(MWNTMixin, StructureBase):
 
         if Lz is None:
             Lz = 1.0
-        self.L0 = Lz
+        self.Lz = Lz
 
         self.walls = \
             [SWNT(Ch, Lz=Lz, fix_Lz=True, basis=self.basis, bond=self.bond,
