@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-====================================================================
-NanoGen controller (:mod:`sknano.apps.nanogen_gui._ng_controller`)
-====================================================================
+===============================================================================
+NanoGen view controllers (:mod:`sknano.apps.nanogen_gui._nanogen_controllers`)
+===============================================================================
 
-.. currentmodule:: sknano.apps.nanogen_gui._ng_controller
+.. currentmodule:: sknano.apps.nanogen_gui._nanogen_controllers
 
 """
 from __future__ import absolute_import, division, print_function
@@ -15,31 +15,76 @@ __docformat__ = 'restructuredtext en'
 try:
     # from PyQt4.QtGui import QApplication
     from PyQt5.QtWidgets import QApplication
-    from ._ng_view import NGView
+    from ._nanogen_views import NanoGenView, SWNTGeneratorView, \
+        MWNTGeneratorView, GrapheneGeneratorView, \
+        FullereneGeneratorView, BulkStructureGeneratorView
 except ImportError as e:
     print(e)
 
-__all__ = ['NGController']
+__all__ = ['NanoGenController', 'SWNTGeneratorController',
+           'MWNTGeneratorController', 'GrapheneGeneratorController',
+           'BulkStructureGeneratorController', 'ViewControllerMixin',
+           'GeneratorViewController']
 
 
-class NGController:
+class ViewControllerMixin:
+    def refresh_view(self):
+        """Refresh `NanoGenView`."""
+        self.view.update_app_view()
+
+
+class NanoGenController(ViewControllerMixin):
     """:mod:`~sknano.apps.nanogen_gui` MVC controller class.
 
     Parameters
     ----------
     args : :attr:`python:sys.argv`
-    model : :class:`~sknano.apps.nanogen_gui._ng_model.NGModel`
-        An instance of :class:`~sknano.apps.nanogen_gui._ng_model.NGModel`.
+    model : :class:`~sknano.apps.nanogen_gui._nanogen_model.NanoGenModel`
+        An instance of
+        :class:`~sknano.apps.nanogen_gui._nanogen_model.NanoGenModel`.
 
     """
     def __init__(self, args, model=None):
         app = QApplication(args)
         self.model = model
-        self.view = NGView(self, self.model)
+        self.view = NanoGenView(self, self.model)
         self.model.notify_observers()
         self.view.show()
         app.exec_()
 
-    def refresh_view(self):
-        """Refresh `NGView`."""
-        self.view.update_app_view()
+
+class GeneratorViewController(ViewControllerMixin):
+    def __init__(self, model=None, view=None):
+        self.model = model
+        self.view = view(self, self.model)
+        self.model.notify_observers()
+        self.view.show()
+
+    def get_generator_parameters(self):
+        return self.view.get_generator_parameters()
+
+
+class SWNTGeneratorController(GeneratorViewController):
+    def __init__(self, model=None, **kwargs):
+        super().__init__(model=model, view=SWNTGeneratorView, **kwargs)
+
+
+class MWNTGeneratorController(GeneratorViewController):
+    def __init__(self, model=None, **kwargs):
+        super().__init__(model=model, view=MWNTGeneratorView, **kwargs)
+
+
+class GrapheneGeneratorController(GeneratorViewController):
+    def __init__(self, model=None, **kwargs):
+        super().__init__(model=model, view=GrapheneGeneratorView, **kwargs)
+
+
+class FullereneGeneratorController(GeneratorViewController):
+    def __init__(self, model=None, **kwargs):
+        super().__init__(model=model, view=FullereneGeneratorView, **kwargs)
+
+
+class BulkStructureGeneratorController(GeneratorViewController):
+    def __init__(self, model=None, **kwargs):
+        super().__init__(model=model, view=BulkStructureGeneratorView,
+                         **kwargs)
