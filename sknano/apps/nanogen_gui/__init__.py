@@ -14,9 +14,9 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 try:
-    from ._ng_model import *
-    from ._ng_view import *
-    from ._ng_controller import *
+    from ._nanogen_models import *
+    from ._nanogen_views import *
+    from ._nanogen_controllers import *
 except Exception as e:
     print(e)
 
