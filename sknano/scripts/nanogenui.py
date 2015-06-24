@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 ======================================================
 NanoGen GUI CLI (:mod:`sknano.scripts.nanogenui`)
@@ -15,7 +15,7 @@ __docformat__ = 'restructuredtext en'
 import sys
 
 try:
-    from ..apps.nanogen_gui import NGController, NGModel
+    from ..apps.nanogen_gui import NanoGenController, NanoGenModel
 except ImportError as e:
     print(e)
 
@@ -32,8 +32,7 @@ class NanoGen:
 
     """
     def __init__(self, args):
-        model = NGModel()
-        NGController(args, model)
+        NanoGenController(args, model=NanoGenModel())
 
 
 def main():
