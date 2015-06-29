@@ -209,7 +209,7 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
         if fname is None:
             fname = self.generate_fname(n=self.n, m=self.m,
                                         nx=self.nx, ny=self.ny, nz=self.nz,
-                                        integer_nz=self._assert_integer_nz,
+                                        integer_nz=self._integral_nz,
                                         Ntubes=self.Ntubes,
                                         bundle_geometry=self.bundle_geometry,
                                         bundle_packing=self.bundle_packing)

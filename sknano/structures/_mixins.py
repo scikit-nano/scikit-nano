@@ -224,7 +224,7 @@ class SWNTMixin:
         if not (isinstance(value, numbers.Real) or value > 0):
             raise TypeError('Expected a real, positive number.')
         self._nz = value
-        if self._assert_integer_nz:
+        if self._integral_nz:
             self._nz = int(np.ceil(value))
 
     @property
@@ -286,9 +286,7 @@ class SWNTMixin:
         if not isinstance(value, bool):
             raise TypeError('Expected `True` or `False`')
         self._fix_Lz = value
-        self._assert_integer_nz = True
-        if self.fix_Lz:
-            self._assert_integer_nz = False
+        self._integral_nz = False if self.fix_Lz else True
 
     @property
     def Natoms(self):
@@ -708,6 +706,4 @@ class UnrolledSWNTMixin:
         if not isinstance(value, bool):
             raise TypeError('Expected `True` or `False`')
         self._fix_Lx = value
-        self._assert_integer_nx = True
-        if self.fix_Lx:
-            self._assert_integer_nx = False
+        self._integral_nx = False if self.fix_Lx else True

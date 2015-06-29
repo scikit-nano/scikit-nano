@@ -150,8 +150,8 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
         if fname is None:
             fname = self.generate_fname(n=self.n, m=self.m,
                                         nx=self.nx, nz=self.nz,
-                                        integer_nx=self._assert_integer_nx,
-                                        integer_nz=self._assert_integer_nz)
+                                        integer_nx=self._integral_nx,
+                                        integer_nz=self._integral_nz)
 
         if center_CM:
             self.atoms.center_CM()

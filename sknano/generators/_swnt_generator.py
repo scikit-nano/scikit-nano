@@ -153,7 +153,7 @@ class SWNTGenerator(SWNT, GeneratorBase):
         """
         if fname is None:
             fname = self.generate_fname(n=self.n, m=self.m, nz=self.nz,
-                                        integer_nz=self._assert_integer_nz)
+                                        integer_nz=self._integral_nz)
 
         super().save(fname=fname, outpath=outpath,
                      structure_format=structure_format,
