@@ -54,9 +54,9 @@ class NanoGenController(ViewControllerMixin):
 
 
 class GeneratorViewController(ViewControllerMixin):
-    def __init__(self, model=None, view=None):
+    def __init__(self, model=None, view=None, **kwargs):
         self.model = model
-        self.view = view(self, self.model)
+        self.view = view(self, self.model, **kwargs)
         self.model.notify_observers()
         self.view.show()
 
