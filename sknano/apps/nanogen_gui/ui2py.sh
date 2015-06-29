@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 pyuic5 nanogen.ui > _ui_nanogen.py
-pyuic5 nanogen_swnts.ui > _ui_nanogen_swnts.py
-pyuic5 nanogen_mwnts.ui > _ui_nanogen_mwnts.py
-pyuic5 nanogen_graphene.ui > _ui_nanogen_graphene.py
-pyuic5 nanogen_fullerenes.ui > _ui_nanogen_fullerenes.py
-pyuic5 nanogen_bulk_structures.ui > _ui_nanogen_bulk_structures.py
+pyuic5 swnt_generator.ui > _ui_swnt_generator.py
+pyuic5 mwnt_generator.ui > _ui_mwnt_generator.py
+pyuic5 graphene_generator.ui > _ui_graphene_generator.py
+pyuic5 fullerene_generator.ui > _ui_fullerene_generator.py
+pyuic5 bulk_structure_generator.ui > _ui_bulk_structure_generator.py
