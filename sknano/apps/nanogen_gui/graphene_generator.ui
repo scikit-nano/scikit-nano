@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>GrapheneGeneratorMainWindow</class>
- <widget class="QMainWindow" name="GrapheneGeneratorMainWindow">
+ <class>GrapheneGenerator</class>
+ <widget class="QMainWindow" name="GrapheneGenerator">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -30,12 +30,12 @@
   </property>
   <property name="font">
    <font>
-    <family>Lucida Sans Unicode</family>
+    <family>Arial</family>
     <pointsize>14</pointsize>
    </font>
   </property>
   <property name="windowTitle">
-   <string>NanoGen</string>
+   <string>Graphene Generator</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -79,6 +79,9 @@
             <property name="checked">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">graphene_generator_button_group</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -237,6 +240,9 @@
             <property name="text">
              <string>(n, m) Chiral Indices</string>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">graphene_generator_button_group</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -261,7 +267,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QSpinBox" name="unrolled_swnt_n_spin_box">
+                   <widget class="QSpinBox" name="swnt_n_spin_box">
                     <property name="minimumSize">
                      <size>
                       <width>50</width>
@@ -273,6 +279,9 @@
                       <family>Arial</family>
                       <pointsize>14</pointsize>
                      </font>
+                    </property>
+                    <property name="readOnly">
+                     <bool>true</bool>
                     </property>
                     <property name="maximum">
                      <number>100</number>
@@ -300,7 +309,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QSpinBox" name="unrolled_swnt_m_spin_box">
+                   <widget class="QSpinBox" name="swnt_m_spin_box">
                     <property name="minimumSize">
                      <size>
                       <width>50</width>
@@ -312,6 +321,9 @@
                       <family>Arial</family>
                       <pointsize>14</pointsize>
                      </font>
+                    </property>
+                    <property name="readOnly">
+                     <bool>true</bool>
                     </property>
                     <property name="maximum">
                      <number>100</number>
@@ -377,6 +389,9 @@
                     <pointsize>14</pointsize>
                    </font>
                   </property>
+                  <property name="readOnly">
+                   <bool>true</bool>
+                  </property>
                   <property name="minimum">
                    <number>1</number>
                   </property>
@@ -424,6 +439,9 @@
                     <family>Arial</family>
                     <pointsize>14</pointsize>
                    </font>
+                  </property>
+                  <property name="readOnly">
+                   <bool>true</bool>
                   </property>
                   <property name="suffix">
                    <string> nm</string>
@@ -490,6 +508,9 @@
                     <pointsize>14</pointsize>
                    </font>
                   </property>
+                  <property name="readOnly">
+                   <bool>true</bool>
+                  </property>
                   <property name="minimum">
                    <number>1</number>
                   </property>
@@ -537,6 +558,9 @@
                     <family>Arial</family>
                     <pointsize>14</pointsize>
                    </font>
+                  </property>
+                  <property name="readOnly">
+                   <bool>true</bool>
                   </property>
                   <property name="suffix">
                    <string> nm</string>
@@ -686,6 +710,9 @@
                 <property name="checked">
                  <bool>false</bool>
                 </property>
+                <attribute name="buttonGroup">
+                 <string notr="true">stacking_order_button_group</string>
+                </attribute>
                </widget>
               </item>
               <item>
@@ -705,6 +732,9 @@
                 <property name="checked">
                  <bool>true</bool>
                 </property>
+                <attribute name="buttonGroup">
+                 <string notr="true">stacking_order_button_group</string>
+                </attribute>
                </widget>
               </item>
              </layout>
@@ -741,6 +771,9 @@
                   <family>Arial</family>
                   <pointsize>14</pointsize>
                  </font>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
                 </property>
                 <property name="maximum">
                  <double>359.990000000000009</double>
@@ -1038,4 +1071,8 @@
  </widget>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="graphene_generator_button_group"/>
+  <buttongroup name="stacking_order_button_group"/>
+ </buttongroups>
 </ui>

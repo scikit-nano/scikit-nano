@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MWNTGeneratorMainWindow</class>
- <widget class="QMainWindow" name="MWNTGeneratorMainWindow">
+ <class>MWNTGenerator</class>
+ <widget class="QMainWindow" name="MWNTGenerator">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -30,12 +30,12 @@
   </property>
   <property name="font">
    <font>
-    <family>Lucida Sans Unicode</family>
+    <family>Arial</family>
     <pointsize>14</pointsize>
    </font>
   </property>
   <property name="windowTitle">
-   <string>NanoGen</string>
+   <string>MWNT Generator</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -72,6 +72,9 @@
             <property name="checked">
              <bool>true</bool>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">mwnt_generator_button_group</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -121,6 +124,9 @@
             <property name="text">
              <string>Wall Parameters</string>
             </property>
+            <attribute name="buttonGroup">
+             <string notr="true">mwnt_generator_button_group</string>
+            </attribute>
            </widget>
           </item>
           <item>
@@ -630,7 +636,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QCheckBox" name="mwnt_bundle_generator_check_box">
+         <widget class="QCheckBox" name="bundle_generator_check_box">
           <property name="font">
            <font>
             <family>Arial</family>
@@ -665,7 +671,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="mwnt_bundle_nx_spin_box">
+               <widget class="QSpinBox" name="bundle_nx_spin_box">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -690,6 +696,9 @@
                   <pointsize>14</pointsize>
                  </font>
                 </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
                 <property name="minimum">
                  <number>1</number>
                 </property>
@@ -713,7 +722,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="mwnt_bundle_Lx_line_edit">
+               <widget class="QLineEdit" name="bundle_Lx_line_edit">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -778,7 +787,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="mwnt_bundle_ny_spin_box">
+               <widget class="QSpinBox" name="bundle_ny_spin_box">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -803,6 +812,9 @@
                   <pointsize>14</pointsize>
                  </font>
                 </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
                 <property name="minimum">
                  <number>1</number>
                 </property>
@@ -826,7 +838,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="mwnt_bundle_Ly_line_edit">
+               <widget class="QLineEdit" name="bundle_Ly_line_edit">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -1145,6 +1157,7 @@
  <resources/>
  <connections/>
  <buttongroups>
+  <buttongroup name="mwnt_generator_button_group"/>
   <buttongroup name="mwnts_wall_chiral_type_button_group"/>
  </buttongroups>
 </ui>

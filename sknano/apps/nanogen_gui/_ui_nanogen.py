@@ -20,7 +20,7 @@ class Ui_NanoGen(object):
         NanoGen.setMinimumSize(QtCore.QSize(500, 300))
         NanoGen.setMaximumSize(QtCore.QSize(800, 1000))
         font = QtGui.QFont()
-        font.setFamily("Lucida Sans Unicode")
+        font.setFamily("Arial")
         font.setPointSize(14)
         NanoGen.setFont(font)
         self.centralwidget = QtWidgets.QWidget(NanoGen)

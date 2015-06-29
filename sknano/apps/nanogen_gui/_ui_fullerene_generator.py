@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'nanogen_fullerenes.ui'
+# Form implementation generated from reading ui file 'fullerene_generator.ui'
 #
 # Created by: PyQt5 UI code generator 5.4.2
 #
@@ -8,22 +8,22 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class Ui_FullereneGeneratorMainWindow(object):
-    def setupUi(self, FullereneGeneratorMainWindow):
-        FullereneGeneratorMainWindow.setObjectName("FullereneGeneratorMainWindow")
-        FullereneGeneratorMainWindow.resize(300, 400)
+class Ui_FullereneGenerator(object):
+    def setupUi(self, FullereneGenerator):
+        FullereneGenerator.setObjectName("FullereneGenerator")
+        FullereneGenerator.resize(300, 400)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(FullereneGeneratorMainWindow.sizePolicy().hasHeightForWidth())
-        FullereneGeneratorMainWindow.setSizePolicy(sizePolicy)
-        FullereneGeneratorMainWindow.setMinimumSize(QtCore.QSize(300, 400))
-        FullereneGeneratorMainWindow.setMaximumSize(QtCore.QSize(800, 1000))
+        sizePolicy.setHeightForWidth(FullereneGenerator.sizePolicy().hasHeightForWidth())
+        FullereneGenerator.setSizePolicy(sizePolicy)
+        FullereneGenerator.setMinimumSize(QtCore.QSize(300, 400))
+        FullereneGenerator.setMaximumSize(QtCore.QSize(800, 1000))
         font = QtGui.QFont()
-        font.setFamily("Lucida Sans Unicode")
+        font.setFamily("Arial")
         font.setPointSize(14)
-        FullereneGeneratorMainWindow.setFont(font)
-        self.centralwidget = QtWidgets.QWidget(FullereneGeneratorMainWindow)
+        FullereneGenerator.setFont(font)
+        self.centralwidget = QtWidgets.QWidget(FullereneGenerator)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -44,13 +44,13 @@ class Ui_FullereneGeneratorMainWindow(object):
         self.fullerene_list_widget.setObjectName("fullerene_list_widget")
         self.verticalLayout_11.addWidget(self.fullerene_list_widget)
         self.verticalLayout.addLayout(self.verticalLayout_11)
-        FullereneGeneratorMainWindow.setCentralWidget(self.centralwidget)
+        FullereneGenerator.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi(FullereneGeneratorMainWindow)
-        QtCore.QMetaObject.connectSlotsByName(FullereneGeneratorMainWindow)
+        self.retranslateUi(FullereneGenerator)
+        QtCore.QMetaObject.connectSlotsByName(FullereneGenerator)
 
-    def retranslateUi(self, FullereneGeneratorMainWindow):
+    def retranslateUi(self, FullereneGenerator):
         _translate = QtCore.QCoreApplication.translate
-        FullereneGeneratorMainWindow.setWindowTitle(_translate("FullereneGeneratorMainWindow", "NanoGen"))
-        self.label_34.setText(_translate("FullereneGeneratorMainWindow", "Select Fullerene from list..."))
+        FullereneGenerator.setWindowTitle(_translate("FullereneGenerator", "Fullerene Generator"))
+        self.label_34.setText(_translate("FullereneGenerator", "Select Fullerene from list..."))
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'nanogen_bulk_structures.ui'
+# Form implementation generated from reading ui file 'bulk_structure_generator.ui'
 #
 # Created by: PyQt5 UI code generator 5.4.2
 #
@@ -8,22 +8,22 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class Ui_BulkStructureGeneratorMainWindow(object):
-    def setupUi(self, BulkStructureGeneratorMainWindow):
-        BulkStructureGeneratorMainWindow.setObjectName("BulkStructureGeneratorMainWindow")
-        BulkStructureGeneratorMainWindow.resize(350, 400)
+class Ui_BulkStructureGenerator(object):
+    def setupUi(self, BulkStructureGenerator):
+        BulkStructureGenerator.setObjectName("BulkStructureGenerator")
+        BulkStructureGenerator.resize(350, 400)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(BulkStructureGeneratorMainWindow.sizePolicy().hasHeightForWidth())
-        BulkStructureGeneratorMainWindow.setSizePolicy(sizePolicy)
-        BulkStructureGeneratorMainWindow.setMinimumSize(QtCore.QSize(350, 400))
-        BulkStructureGeneratorMainWindow.setMaximumSize(QtCore.QSize(800, 1000))
+        sizePolicy.setHeightForWidth(BulkStructureGenerator.sizePolicy().hasHeightForWidth())
+        BulkStructureGenerator.setSizePolicy(sizePolicy)
+        BulkStructureGenerator.setMinimumSize(QtCore.QSize(350, 400))
+        BulkStructureGenerator.setMaximumSize(QtCore.QSize(800, 1000))
         font = QtGui.QFont()
-        font.setFamily("Lucida Sans Unicode")
+        font.setFamily("Arial")
         font.setPointSize(14)
-        BulkStructureGeneratorMainWindow.setFont(font)
-        self.centralwidget = QtWidgets.QWidget(BulkStructureGeneratorMainWindow)
+        BulkStructureGenerator.setFont(font)
+        self.centralwidget = QtWidgets.QWidget(BulkStructureGenerator)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout(self.centralwidget)
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
@@ -115,17 +115,17 @@ class Ui_BulkStructureGeneratorMainWindow(object):
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_2.addItem(spacerItem)
         self.horizontalLayout_6.addLayout(self.verticalLayout_2)
-        BulkStructureGeneratorMainWindow.setCentralWidget(self.centralwidget)
+        BulkStructureGenerator.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi(BulkStructureGeneratorMainWindow)
-        QtCore.QMetaObject.connectSlotsByName(BulkStructureGeneratorMainWindow)
+        self.retranslateUi(BulkStructureGenerator)
+        QtCore.QMetaObject.connectSlotsByName(BulkStructureGenerator)
 
-    def retranslateUi(self, BulkStructureGeneratorMainWindow):
+    def retranslateUi(self, BulkStructureGenerator):
         _translate = QtCore.QCoreApplication.translate
-        BulkStructureGeneratorMainWindow.setWindowTitle(_translate("BulkStructureGeneratorMainWindow", "NanoGen"))
-        self.label.setText(_translate("BulkStructureGeneratorMainWindow", "Select Bulk Structure:"))
-        self.label_2.setText(_translate("BulkStructureGeneratorMainWindow", "Unit Cells:"))
-        self.label_3.setText(_translate("BulkStructureGeneratorMainWindow", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">x </span>=</p></body></html>"))
-        self.label_7.setText(_translate("BulkStructureGeneratorMainWindow", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">y </span>=</p></body></html>"))
-        self.label_6.setText(_translate("BulkStructureGeneratorMainWindow", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">z </span>=</p></body></html>"))
+        BulkStructureGenerator.setWindowTitle(_translate("BulkStructureGenerator", "Bulk Structure Generator"))
+        self.label.setText(_translate("BulkStructureGenerator", "Select Bulk Structure:"))
+        self.label_2.setText(_translate("BulkStructureGenerator", "Unit Cells:"))
+        self.label_3.setText(_translate("BulkStructureGenerator", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">x </span>=</p></body></html>"))
+        self.label_7.setText(_translate("BulkStructureGenerator", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">y </span>=</p></body></html>"))
+        self.label_6.setText(_translate("BulkStructureGenerator", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">z </span>=</p></body></html>"))
 

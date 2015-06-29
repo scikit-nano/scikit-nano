@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SWNTGeneratorMainWindow</class>
- <widget class="QMainWindow" name="SWNTGeneratorMainWindow">
+ <class>SWNTGenerator</class>
+ <widget class="QMainWindow" name="SWNTGenerator">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -30,12 +30,12 @@
   </property>
   <property name="font">
    <font>
-    <family>Lucida Sans Unicode</family>
+    <family>Arial</family>
     <pointsize>14</pointsize>
    </font>
   </property>
   <property name="windowTitle">
-   <string>NanoGen</string>
+   <string>SWNT Generator</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -54,7 +54,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>20</pointsize>
+                  <pointsize>16</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -73,7 +73,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>20</pointsize>
+                  <pointsize>16</pointsize>
                  </font>
                 </property>
                 <property name="maximum">
@@ -93,7 +93,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>20</pointsize>
+                  <pointsize>16</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -112,7 +112,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>20</pointsize>
+                  <pointsize>16</pointsize>
                  </font>
                 </property>
                 <property name="maximum">
@@ -151,7 +151,7 @@
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>20</pointsize>
+                <pointsize>16</pointsize>
                </font>
               </property>
               <property name="text">
@@ -170,6 +170,7 @@
               <property name="font">
                <font>
                 <family>Arial</family>
+                <pointsize>16</pointsize>
                </font>
               </property>
               <property name="decimals">
@@ -211,7 +212,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>20</pointsize>
+                  <pointsize>16</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -236,8 +237,11 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>20</pointsize>
+                  <pointsize>16</pointsize>
                  </font>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
                 </property>
                 <property name="suffix">
                  <string> nm</string>
@@ -297,7 +301,7 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_23">
         <item>
-         <widget class="QCheckBox" name="swnt_bundle_generator_check_box">
+         <widget class="QCheckBox" name="bundle_generator_check_box">
           <property name="font">
            <font>
             <family>Arial</family>
@@ -323,7 +327,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>20</pointsize>
+                  <pointsize>16</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -332,7 +336,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="swnt_bundle_nx_spin_box">
+               <widget class="QSpinBox" name="bundle_nx_spin_box">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -348,8 +352,11 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>20</pointsize>
+                  <pointsize>16</pointsize>
                  </font>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
                 </property>
                 <property name="minimum">
                  <number>1</number>
@@ -365,7 +372,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>20</pointsize>
+                  <pointsize>16</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -374,7 +381,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="swnt_bundle_Lx_line_edit">
+               <widget class="QLineEdit" name="bundle_Lx_line_edit">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -396,6 +403,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
+                  <pointsize>16</pointsize>
                  </font>
                 </property>
                 <property name="readOnly">
@@ -429,7 +437,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>20</pointsize>
+                  <pointsize>16</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -438,7 +446,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QSpinBox" name="swnt_bundle_ny_spin_box">
+               <widget class="QSpinBox" name="bundle_ny_spin_box">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -454,8 +462,11 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>20</pointsize>
+                  <pointsize>16</pointsize>
                  </font>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
                 </property>
                 <property name="minimum">
                  <number>1</number>
@@ -471,7 +482,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
-                  <pointsize>20</pointsize>
+                  <pointsize>16</pointsize>
                  </font>
                 </property>
                 <property name="text">
@@ -480,7 +491,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="swnt_bundle_Ly_line_edit">
+               <widget class="QLineEdit" name="bundle_Ly_line_edit">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -502,6 +513,7 @@
                 <property name="font">
                  <font>
                   <family>Arial</family>
+                  <pointsize>16</pointsize>
                  </font>
                 </property>
                 <property name="readOnly">

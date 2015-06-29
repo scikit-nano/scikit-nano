@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BulkStructureGeneratorMainWindow</class>
- <widget class="QMainWindow" name="BulkStructureGeneratorMainWindow">
+ <class>BulkStructureGenerator</class>
+ <widget class="QMainWindow" name="BulkStructureGenerator">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -30,12 +30,12 @@
   </property>
   <property name="font">
    <font>
-    <family>Lucida Sans Unicode</family>
+    <family>Arial</family>
     <pointsize>14</pointsize>
    </font>
   </property>
   <property name="windowTitle">
-   <string>NanoGen</string>
+   <string>Bulk Structure Generator</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_6">
