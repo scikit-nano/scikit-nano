@@ -170,7 +170,7 @@ class SWNT(SWNTMixin, StructureBase):
         self.m = m
 
         self.fix_Lz = fix_Lz
-        if Lz is not None:
+        if Lz is not None and nz is None:
             self.nz = 10 * float(Lz) / self.T
         elif nz is not None:
             self.nz = nz
