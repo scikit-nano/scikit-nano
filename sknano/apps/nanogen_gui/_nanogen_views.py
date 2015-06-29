@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-=======================================================
-NanoGen view (:mod:`sknano.apps.nanogen_gui._ng_view`)
-=======================================================
+=======================================================================
+NanoGen model views (:mod:`sknano.apps.nanogen_gui._nanogen_views`)
+=======================================================================
 
-.. currentmodule:: sknano.apps.nanogen_gui._ng_view
+.. currentmodule:: sknano.apps.nanogen_gui._nanogen_views
 
 """
 from __future__ import absolute_import, division, print_function
@@ -21,27 +21,33 @@ try:
     from PyQt5.QtCore import pyqtSlot
     from PyQt5.QtWidgets import QMainWindow
     from ._ui_nanogen import Ui_NanoGen
+    from ._ui_swnt_generator import Ui_SWNTGenerator
+    from ._ui_mwnt_generator import Ui_MWNTGenerator
+    from ._ui_graphene_generator import Ui_GrapheneGenerator
+    from ._ui_fullerene_generator import Ui_FullereneGenerator
+    from ._ui_bulk_structure_generator import Ui_BulkStructureGenerator
 except ImportError as e:
     print(e)
 
 from sknano.core import get_fpath
-from ._view_mixins import MainWindowViewMixin, SWNTViewMixin, MWNTViewMixin, \
-    GrapheneViewMixin, FullereneViewMixin
+# from ._nanogen_controllers import NanoGenController
+# from ._nanogen_models import NanoGenModel
+from ._view_mixins import NanoGenViewMixin, SWNTViewMixin, MWNTViewMixin, \
+    BundleViewMixin, GrapheneViewMixin, FullereneViewMixin, \
+    BulkStructureViewMixin
 
-__all__ = ['NGView']
+__all__ = ['NanoGenView']
 
 
-class NGView(QMainWindow, Ui_NanoGen, MainWindowViewMixin, SWNTViewMixin,
-             MWNTViewMixin, GrapheneViewMixin, FullereneViewMixin):
+class NanoGenView(QMainWindow, Ui_NanoGen):
     """:mod:`~sknano.apps.nanogen_gui` MVC view class.
 
     Parameters
     ----------
-    controller : :class:`~sknano.apps.nanogen_gui._ng_controller.NGController`
-        An instance of
-        :class:`~sknano.apps.nanogen_gui._ng_controller.NGController`.
-    model : :class:`~sknano.apps.nanogen_gui._ng_model.NGModel`
-        An instance of :class:`~sknano.apps.nanogen_gui._ng_model.NGModel`.
+    controller : :class:`NanoGenController`
+        An instance of :class:`NanoGenController`.
+    model : :class:`NanoGenModel`
+        An instance of :class:`NanoGenModel`.
 
     """
     def __init__(self, controller=None, model=None):
@@ -50,236 +56,311 @@ class NGView(QMainWindow, Ui_NanoGen, MainWindowViewMixin, SWNTViewMixin,
         model.register_observer(self)
         super().__init__()
         self.setupUi(self)
-        self.fpath = None
-        self.nanogen_statusBar.showMessage('Ready.')
+        self.generator_controller = None
 
     @pyqtSlot()
-    def on_generate_pushButton_clicked(self):
-        generator_tab = \
-            str(self.nanogen_tabWidget.tabText(
-                self.nanogen_tabWidget.currentIndex()))
-        # args = []
-        kwargs = {}
-        element1 = str(self.element1_comboBox.itemText(
-                       self.element1_comboBox.currentIndex()))
-        element2 = str(self.element2_comboBox.itemText(
-                       self.element2_comboBox.currentIndex()))
-        kwargs['basis'] = [element1, element2]
-        kwargs['bond'] = self.bond_doubleSpinBox.value()
+    def on_swnt_generator_push_button_clicked(self):
+        from ._nanogen_controllers import SWNTGeneratorController
+        from ._nanogen_models import SWNTModel
+        self.generator_controller = \
+            SWNTGeneratorController(model=SWNTModel(), parent=self)
+        self.update_app_view()
 
-        if generator_tab == 'SWNTs':
-            # args.extend([self.n_spinBox.value(), self.m_spinBox.value()])
-            kwargs['Ch'] = (self.swnt_n_spinBox.value(),
-                            self.swnt_m_spinBox.value())
-            kwargs['nz'] = self.swnt_nz_doubleSpinBox.value()
-            kwargs['fix_Lz'] = self.swnt_fix_Lz_checkBox.isChecked()
-            kwargs['Lz'] = self.swnt_Lz_doubleSpinBox.value()
+    @pyqtSlot()
+    def on_mwnt_generator_push_button_clicked(self):
+        from ._nanogen_controllers import MWNTGeneratorController
+        from ._nanogen_models import MWNTModel
+        self.generator_controller = \
+            MWNTGeneratorController(model=MWNTModel(), parent=self)
+        self.update_app_view()
 
-            generator_class = 'SWNTGenerator'
-            if self.swnt_bundle_generator_checkBox.isChecked():
-                kwargs['nx'] = self.swnt_bundle_nx_spinBox.value()
-                kwargs['ny'] = self.swnt_bundle_ny_spinBox.value()
-                generator_class = 'SWNTBundleGenerator'
+    @pyqtSlot()
+    def on_graphene_generator_push_button_clicked(self):
+        from ._nanogen_controllers import GrapheneGeneratorController
+        from ._nanogen_models import GrapheneModel
+        self.generator_controller = \
+            GrapheneGeneratorController(model=GrapheneModel(), parent=self)
+        self.update_app_view()
 
-        elif generator_tab == 'MWNTs':
-            generator_class = 'MWNTGenerator'
-            kwargs['Lz'] = self.mwnt_Lz_doubleSpinBox.value()
+    @pyqtSlot()
+    def on_fullerene_generator_push_button_clicked(self):
+        from ._nanogen_controllers import FullereneGeneratorController
+        from ._nanogen_models import FullereneModel
+        self.generator_controller = \
+            FullereneGeneratorController(model=FullereneModel(), parent=self)
+        self.update_app_view()
 
-            if self.mwnt_Ch_list_radioButton.isChecked():
-                pass
-            else:
-                kwargs['Nwalls'] = self.Nwalls_spinBox.value()
-                kwargs['min_wall_diameter'] = \
-                    self.min_wall_diameter_doubleSpinBox.value()
-                kwargs['max_wall_diameter'] = \
-                    self.max_wall_diameter_doubleSpinBox.value()
-                kwargs['wall_spacing'] = \
-                    self.wall_spacing_doubleSpinBox.value()
+    @pyqtSlot()
+    def on_bulk_structure_generator_push_button_clicked(self):
+        from ._nanogen_controllers import BulkStructureGeneratorController
+        from ._nanogen_models import BulkStructureModel
+        self.generator_controller = \
+            BulkStructureGeneratorController(model=BulkStructureModel(),
+                                             parent=self)
+        self.update_app_view()
 
-            if self.mwnt_bundle_generator_checkBox.isChecked():
-                kwargs['nx'] = self.mwnt_bundle_nx_spinBox.value()
-                kwargs['ny'] = self.mwnt_bundle_ny_spinBox.value()
-                generator_class = 'MWNTBundleGenerator'
+    @pyqtSlot()
+    def on_generate_push_button_clicked(self):
+        if self.generator_controller is not None:
 
-        elif generator_tab == 'Graphene':
-            if self.achiral_edge_lengths_radioButton.isChecked():
-                kwargs['armchair_edge_length'] = \
-                    self.armchair_edge_length_doubleSpinBox.value()
-                kwargs['zigzag_edge_length'] = \
-                    self.zigzag_edge_length_doubleSpinBox.value()
-                generator_class = 'GrapheneGenerator'
-            else:
-                kwargs['Ch'] = (self.unrolled_swnt_n_spinBox.value(),
-                                self.unrolled_swnt_m_spinBox.value())
-                kwargs['nx'] = self.unrolled_swnt_nx_spinBox.value()
-                kwargs['nz'] = self.unrolled_swnt_nz_spinBox.value()
-                generator_class = 'UnrolledSWNTGenerator'
+            kwargs = self.generator_controller.get_generator_parameters()
+            generator_class = kwargs['generator_class']
+            del kwargs['generator_class']
 
-            kwargs['layer_rotation_increment'] = \
-                self.layer_rotation_increment_doubleSpinBox.value()
-            kwargs['nlayers'] = self.nlayers_spinBox.value()
-            # edge = 'ZZ' if self.ZZ_edge_radioButton.isChecked() else 'AC'
-            kwargs['stacking_order'] = \
-                'AA' if self.AA_stacking_radioButton.isChecked() else 'AB'
+            fname = None
+            outpath = None
 
-        fname = None
-        outpath = None
-
-        structure_format = \
-            str(self.structure_format_comboBox.itemText(
-                self.structure_format_comboBox.currentIndex()))
-
-        generator = getattr(importlib.import_module('sknano.generators'),
-                            generator_class)
-        self.nanogen_statusBar.showMessage('Generating structure...')
-        generator(**kwargs).save(fname=fname, outpath=outpath,
-                                 structure_format=structure_format)
-        self.nanogen_statusBar.showMessage('Done!')
-        time.sleep(2)
-        self.nanogen_statusBar.showMessage('Ready.')
-
-    # @pyqtSlot()
-    # def on_save_as_pushButton_clicked(self):
-    #     dialog = QFileDialog()
-
-    def _update_main_window_view(self):
-        self.elements_bond_label.setText('-'.join((self.model.element1,
-                                                   self.model.element2,
-                                                   ' bond =')))
-        self.bond_doubleSpinBox.setValue(self.model.bond)
-
-    def _update_swnt_view(self):
-        self.swnt_n_spinBox.setValue(self.model.swnt.n)
-        self.swnt_m_spinBox.setValue(self.model.swnt.m)
-
-        self.swnt_nz_doubleSpinBox.setValue(self.model.swnt.nz)
-        self.swnt_Lz_doubleSpinBox.setValue(self.model.swnt.Lz)
-
-        self.swnt_bundle_nx_spinBox.setValue(self.model.swnt_bundle.nx)
-        self.swnt_bundle_ny_spinBox.setValue(self.model.swnt_bundle.ny)
-
-        self.swnt_bundle_Lx_lineEdit.setText(
-            '{:.4f} nm'.format(self.model.swnt_bundle.Lx))
-        self.swnt_bundle_Ly_lineEdit.setText(
-            '{:.4f} nm'.format(self.model.swnt_bundle.Ly))
-
-    def _update_mwnt_view(self):
-        self.Nwalls_spinBox.setValue(self.model.mwnt.Nwalls)
-        self.min_wall_diameter_doubleSpinBox.setValue(
-            self.model.mwnt.min_wall_diameter)
-        self.max_wall_diameter_doubleSpinBox.setValue(
-            self.model.mwnt.max_wall_diameter)
-        self.wall_spacing_doubleSpinBox.setValue(self.model.mwnt.wall_spacing)
-        self.mwnt_Lz_doubleSpinBox.setValue(self.model.mwnt.Lz)
-
-        self.mwnt_bundle_nx_spinBox.setValue(self.model.mwnt_bundle.nx)
-        self.mwnt_bundle_ny_spinBox.setValue(self.model.mwnt_bundle.ny)
-        self.mwnt_bundle_Lx_lineEdit.setText(
-            '{:.4f} nm'.format(self.model.mwnt_bundle.Lx))
-        self.mwnt_bundle_Ly_lineEdit.setText(
-            '{:.4f} nm'.format(self.model.mwnt_bundle.Ly))
-
-    def _update_graphene_view(self):
-        self.armchair_edge_length_doubleSpinBox.setValue(
-            self.model.graphene.armchair_edge_length)
-        self.zigzag_edge_length_doubleSpinBox.setValue(
-            self.model.graphene.zigzag_edge_length)
-        self.nlayers_spinBox.setValue(self.model.nlayers)
-        self.layer_rotation_increment_doubleSpinBox(
-            self.model.layer_rotation_increment)
-
-        self.unrolled_swnt_n_spinBox.setValue(self.model.unrolled_swnt.n)
-        self.unrolled_swnt_m_spinBox.setValue(self.model.unrolled_swnt.m)
-
-    def _update_fullerene_view(self):
-        pass
-
-    def update_app_view(self):
-        self._update_main_window_view()
-
-        generator_tab = \
-            str(self.nanogen_tabWidget.tabText(
-                self.nanogen_tabWidget.currentIndex()))
-
-        if generator_tab == 'SWNTs':
-            self._update_swnt_view()
-        elif generator_tab == 'MWNTs':
-            self._update_mwnt_view()
-        elif generator_tab == 'Graphene':
-            self._update_graphene_view()
-        elif generator_tab == 'Fullerenes':
-            self._update_fullerene_view()
-
-        if self.fpath is None:
-            # args = []
-            kwargs = {}
-
-            element1 = \
-                str(self.element1_comboBox.itemText(
-                    self.element1_comboBox.currentIndex()))
-            element2 = \
-                str(self.element2_comboBox.itemText(
-                    self.element2_comboBox.currentIndex()))
-            kwargs['basis'] = [element1, element2]
-
-            if generator_tab == 'SWNTs':
-                kwargs['n'] = self.swnt_n_spinBox.value()
-                kwargs['m'] = self.swnt_m_spinBox.value()
-                if self.swnt_bundle_generator_checkBox.isChecked():
-                    kwargs['nx'] = self.swnt_bundle_nx_spinBox.value()
-                    kwargs['ny'] = self.swnt_bundle_ny_spinBox.value()
-                    generator_class = 'SWNTBundleGenerator'
-                else:
-                    generator_class = 'SWNTGenerator'
-                kwargs['nz'] = self.swnt_nz_doubleSpinBox.value()
-            elif generator_tab == 'MWNTs':
-                if self.mwnt_bundle_generator_checkBox.isChecked():
-                    kwargs['nx'] = self.mwnt_bundle_nx_spinBox.value()
-                    kwargs['ny'] = self.mwnt_bundle_ny_spinBox.value()
-                    generator_class = 'MWNTBundleGenerator'
-                else:
-                    generator_class = 'MWNTGenerator'
-            elif generator_tab == 'Graphene':
-                if self.achiral_edge_lengths_radioButton.isChecked():
-                    kwargs['armchair_edge_length'] = \
-                        self.armchair_edge_length_doubleSpinBox.value()
-                    kwargs['zigzag_edge_length'] = \
-                        self.zigzag_edge_length_doubleSpinBox.value()
-                    generator_class = 'GrapheneGenerator'
-                else:
-                    kwargs['nx'] = self.unrolled_swnt_nx_spinBox.value()
-                    kwargs['nz'] = self.unrolled_swnt_nz_spinBox.value()
-                    generator_class = 'UnrolledSWNTGenerator'
-
-                kwargs['nlayers'] = self.nlayers_spinBox.value()
+            structure_format = \
+                str(self.structure_format_combo_box.itemText(
+                    self.structure_format_combo_box.currentIndex()))
 
             generator = getattr(importlib.import_module('sknano.generators'),
                                 generator_class)
+            self.nanogen_status_bar.showMessage('Generating structure...')
+            generator(**kwargs).save(fname=fname, outpath=outpath,
+                                     structure_format=structure_format)
+            self.nanogen_status_bar.showMessage('Done!')
+            time.sleep(2)
+            self.nanogen_status_bar.showMessage('Ready.')
+        self.update_app_view()
+
+    # @pyqtSlot()
+    # def on_save_as_push_button_clicked(self):
+    #     dialog = QFileDialog()
+
+    def update_app_view(self):
+        self.nanogen_status_bar.showMessage('Ready.')
+        if self.generator_controller is not None:
+            kwargs = self.generator_controller.get_generator_parameters()
+            generator = getattr(importlib.import_module('sknano.generators'),
+                                kwargs['generator_class'])
             structure_format = \
-                str(self.structure_format_comboBox.itemText(
-                    self.structure_format_comboBox.currentIndex()))
+                str(self.structure_format_combo_box.itemText(
+                    self.structure_format_combo_box.currentIndex()))
 
-            self.fpath = \
-                get_fpath(fname=generator.generate_fname(**kwargs),
-                          ext=structure_format, outpath=os.getcwd(),
-                          overwrite=False, add_fnum=True)
-            self.fpath_lineEdit.setText(self.fpath)
+            fpath = get_fpath(fname=generator.generate_fname(**kwargs),
+                              ext=structure_format, outpath=os.getcwd(),
+                              overwrite=False, add_fnum=True)
+            self.fpath_line_edit.setText(fpath)
 
-        # self.Ch_lineEdit.setText('{:.3f}'.format(self.model.Ch))
-        # self.dt_lineEdit.setText('{:.3f}'.format(self.model.dt))
-        # self.T_lineEdit.setText('{:.3f}'.format(self.model.T))
-        # self.chiral_angle_lineEdit.setText(
+        # self.Ch_line_edit.setText('{:.3f}'.format(self.model.Ch))
+        # self.dt_line_edit.setText('{:.3f}'.format(self.model.dt))
+        # self.T_line_edit.setText('{:.3f}'.format(self.model.T))
+        # self.chiral_angle_line_edit.setText(
         #    '{:.2f}'.format(self.model.chiral_angle))
-        # self.N_lineEdit.setText(str(self.model.N))
-        # self.Natoms_lineEdit.setText(str(self.model.Natoms))
-        # self.tube_mass_lineEdit.setText(
+        # self.N_line_edit.setText(str(self.model.N))
+        # self.Natoms_line_edit.setText(str(self.model.Natoms))
+        # self.tube_mass_line_edit.setText(
         #    '{:.3e}'.format(self.model.tube_mass))
-        # self.Natoms_per_tube_lineEdit.setText(
+        # self.Natoms_per_tube_line_edit.setText(
         #    str(self.model.Natoms_per_tube))
-        # self.Ntubes_mantissa_spinBox.setValue(
+        # self.Ntubes_mantissa_spin_box.setValue(
         #    str(self.model.Ntubes))
 
-        # self.d_lineEdit.setText(str(self.model.d))
-        # self.dR_lineEdit.setText(str(self.model.dR))
-        # self.t1_lineEdit.setText(str(self.model.t1))
-        # self.t2_lineEdit.setText(str(self.model.t2))
+        # self.d_line_edit.setText(str(self.model.d))
+        # self.dR_line_edit.setText(str(self.model.dR))
+        # self.t1_line_edit.setText(str(self.model.t1))
+        # self.t2_line_edit.setText(str(self.model.t2))
+
+
+class SWNTGeneratorView(QMainWindow, Ui_SWNTGenerator, NanoGenViewMixin,
+                        SWNTViewMixin, BundleViewMixin):
+
+    def __init__(self, controller=None, model=None, parent=None):
+        self.controller = controller
+        self.model = model
+        self.parent = parent
+        model.register_observer(self)
+        super().__init__(parent=parent)
+        self.setupUi(self)
+
+    def get_generator_parameters(self):
+        kwargs = {}
+        element1 = str(self.element1_combo_box.itemText(
+                       self.element1_combo_box.currentIndex()))
+        element2 = str(self.element2_combo_box.itemText(
+                       self.element2_combo_box.currentIndex()))
+        kwargs['basis'] = [element1, element2]
+        kwargs['bond'] = self.bond_double_spin_box.value()
+
+        kwargs['n'] = self.swnt_n_spin_box.value()
+        kwargs['m'] = self.swnt_m_spin_box.value()
+        kwargs['fix_Lz'] = self.swnt_fix_Lz_check_box.isChecked()
+        kwargs['Lz'] = self.swnt_Lz_double_spin_box.value()
+        kwargs['nz'] = self.swnt_nz_double_spin_box.value()
+
+        kwargs['generator_class'] = 'SWNTGenerator'
+        if self.bundle_generator_check_box.isChecked():
+            kwargs['bundle_packing'] = 'hcp'
+            kwargs['nx'] = self.bundle_nx_spin_box.value()
+            kwargs['ny'] = self.bundle_ny_spin_box.value()
+            kwargs['generator_class'] = 'SWNTBundleGenerator'
+
+        return kwargs
+
+    def update_app_view(self):
+        self.elements_bond_label.setText('-'.join((self.model.element1,
+                                                   self.model.element2,
+                                                   ' bond =')))
+        self.bond_double_spin_box.setValue(self.model.bond)
+
+        self.swnt_n_spin_box.setValue(self.model.n)
+        self.swnt_m_spin_box.setValue(self.model.m)
+
+        self.swnt_nz_double_spin_box.blockSignals(True)
+        self.swnt_Lz_double_spin_box.blockSignals(True)
+        self.swnt_Lz_double_spin_box.setValue(self.model.Lz)
+        self.swnt_nz_double_spin_box.setValue(self.model.nz)
+        self.swnt_nz_double_spin_box.blockSignals(False)
+        self.swnt_Lz_double_spin_box.blockSignals(False)
+
+        self.bundle_nx_spin_box.setValue(self.model.nx)
+        self.bundle_ny_spin_box.setValue(self.model.ny)
+
+        self.bundle_Lx_line_edit.setText('{:.4f} nm'.format(self.model.Lx))
+        self.bundle_Ly_line_edit.setText('{:.4f} nm'.format(self.model.Ly))
+        self.parent.update_app_view()
+
+
+class MWNTGeneratorView(QMainWindow, Ui_MWNTGenerator, NanoGenViewMixin,
+                        MWNTViewMixin, BundleViewMixin):
+    def __init__(self, controller=None, model=None, parent=None):
+        self.controller = controller
+        self.model = model
+        self.parent = parent
+        model.register_observer(self)
+        super().__init__(parent=parent)
+        self.setupUi(self)
+
+    def get_generator_parameters(self):
+        kwargs = {}
+        kwargs['generator_class'] = 'MWNTGenerator'
+        kwargs['Lz'] = self.mwnt_Lz_double_spin_box.value()
+
+        if self.mwnt_Ch_list_radio_button.isChecked():
+            pass
+        else:
+            kwargs['Nwalls'] = self.Nwalls_spin_box.value()
+            kwargs['min_wall_diameter'] = \
+                self.min_wall_diameter_double_spin_box.value()
+            kwargs['max_wall_diameter'] = \
+                self.max_wall_diameter_double_spin_box.value()
+            kwargs['wall_spacing'] = \
+                self.wall_spacing_double_spin_box.value()
+
+        if self.bundle_generator_check_box.isChecked():
+            kwargs['bundle_packing'] = 'hcp'
+            kwargs['nx'] = self.bundle_nx_spin_box.value()
+            kwargs['ny'] = self.bundle_ny_spin_box.value()
+            kwargs['generator_class'] = 'MWNTBundleGenerator'
+        return kwargs
+
+    def update_app_view(self):
+        self.elements_bond_label.setText('-'.join((self.model.element1,
+                                                   self.model.element2,
+                                                   ' bond =')))
+        self.bond_double_spin_box.setValue(self.model.bond)
+
+        self.Nwalls_spin_box.setValue(self.model.structure.Nwalls)
+        self.min_wall_diameter_double_spin_box.setValue(
+            self.model.mwnt.min_wall_diameter)
+        self.max_wall_diameter_double_spin_box.setValue(
+            self.model.structure.max_wall_diameter)
+        self.wall_spacing_double_spin_box.setValue(
+            self.model.structure.wall_spacing)
+        self.mwnt_Lz_double_spin_box.setValue(self.model.Lz)
+
+        self.bundle_nx_spin_box.setValue(self.model.nx)
+        self.bundle_ny_spin_box.setValue(self.model.ny)
+        self.bundle_Lx_line_edit.setText('{:.4f} nm'.format(self.model.Lx))
+        self.bundle_Ly_line_edit.setText('{:.4f} nm'.format(self.model.Ly))
+        self.parent.update_app_view()
+
+
+class GrapheneGeneratorView(QMainWindow, Ui_GrapheneGenerator,
+                            NanoGenViewMixin, GrapheneViewMixin):
+    def __init__(self, controller=None, model=None, parent=None):
+        self.controller = controller
+        self.model = model
+        self.parent = parent
+        model.register_observer(self)
+        super().__init__(parent=parent)
+        self.setupUi(self)
+
+    def get_generator_parameters(self):
+        kwargs = {}
+        if self.achiral_edge_lengths_radio_button.isChecked():
+            kwargs['armchair_edge_length'] = \
+                self.armchair_edge_length_double_spin_box.value()
+            kwargs['zigzag_edge_length'] = \
+                self.zigzag_edge_length_double_spin_box.value()
+            kwargs['generator_class'] = 'GrapheneGenerator'
+        else:
+            kwargs['n'] = self.swnt_n_spin_box.value()
+            kwargs['m'] = self.swnt_m_spin_box.value()
+            kwargs['nx'] = self.unrolled_swnt_nx_spin_box.value()
+            kwargs['nz'] = self.unrolled_swnt_nz_spin_box.value()
+            kwargs['generator_class'] = 'UnrolledSWNTGenerator'
+
+        kwargs['layer_rotation_increment'] = \
+            self.layer_rotation_increment_double_spin_box.value()
+        kwargs['nlayers'] = self.nlayers_spin_box.value()
+        # edge = 'ZZ' if self.ZZ_edge_radio_button.isChecked() else 'AC'
+        kwargs['stacking_order'] = \
+            'AA' if self.AA_stacking_radio_button.isChecked() else 'AB'
+
+        return kwargs
+
+    def update_app_view(self):
+        self.elements_bond_label.setText('-'.join((self.model.element1,
+                                                   self.model.element2,
+                                                   ' bond =')))
+        self.bond_double_spin_box.setValue(self.model.bond)
+
+        self.armchair_edge_length_double_spin_box.setValue(
+            self.model.armchair_edge_length)
+        self.zigzag_edge_length_double_spin_box.setValue(
+            self.model.zigzag_edge_length)
+        self.nlayers_spin_box.setValue(self.model.nlayers)
+        self.layer_rotation_increment_double_spin_box(
+            self.model.layer_rotation_increment)
+
+        self.unrolled_swnt_n_spin_box.setValue(self.model.n)
+        self.unrolled_swnt_m_spin_box.setValue(self.model.m)
+        self.parent.update_app_view()
+
+
+class FullereneGeneratorView(QMainWindow, Ui_FullereneGenerator,
+                             FullereneViewMixin):
+    def __init__(self, controller=None, model=None, parent=None):
+        self.controller = controller
+        self.model = model
+        self.parent = parent
+        model.register_observer(self)
+        super().__init__(parent=parent)
+        self.setupUi(self)
+
+    def get_generator_parameters(self):
+        kwargs = {}
+        return kwargs
+
+    def update_app_view(self):
+        self.parent.update_app_view()
+
+
+class BulkStructureGeneratorView(QMainWindow, Ui_BulkStructureGenerator,
+                                 BulkStructureViewMixin):
+    def __init__(self, controller=None, model=None, parent=None):
+        self.controller = controller
+        self.model = model
+        self.parent = parent
+        model.register_observer(self)
+        super().__init__(parent=parent)
+        self.setupUi(self)
+
+    def get_generator_parameters(self):
+        kwargs = {}
+        return kwargs
+
+    def update_app_view(self):
+        self.parent.update_app_view()
