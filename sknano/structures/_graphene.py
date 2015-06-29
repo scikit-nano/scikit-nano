@@ -150,7 +150,7 @@ class Graphene(StructureBase):
         super().__init__(basis=basis, bond=bond, **kwargs)
 
         self.unit_cell = GrapheneConventionalCell(bond=self.bond,
-                                                  basis=self.basis)
+                                                  basis=2 * self.basis)
 
         self.armchair_edge_length = armchair_edge_length
         self.zigzag_edge_length = zigzag_edge_length
