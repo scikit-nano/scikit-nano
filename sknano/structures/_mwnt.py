@@ -9,18 +9,15 @@ MWNT structure class (:mod:`sknano.structures._mwnt`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-from builtins import range
 __docformat__ = 'restructuredtext en'
 
-import numpy as np
+# import numpy as np
 
 from sknano.core.crystallography import Crystal3DLattice, UnitCell
 from sknano.core.refdata import aCC, dVDW
 
 from ._base import StructureBase
-from ._swnt import SWNT
 from ._compute_funcs import compute_dt, compute_T
-from ._extras import generate_Ch_list
 from ._mixins import MWNTMixin
 
 __all__ = ['MWNT']
@@ -87,50 +84,12 @@ class MWNT(MWNTMixin, StructureBase):
         super().__init__(basis=basis, bond=bond, **kwargs)
 
         if Ch_list is None or not isinstance(Ch_list, list):
-
-            if Nwalls is not None:
-                max_walls = Nwalls
-
-            if max_walls is None:
-                max_walls = 10
-
-            if max_wall_diameter is None:
-                max_wall_diameter = np.inf
-
-            if min_wall_diameter is None:
-                min_wall_diameter = 5.0
-
-            delta_dt = 2 * wall_spacing
-
-            imax = 100
-
-            self._Ch_pool = \
-                np.asarray(generate_Ch_list(imax=imax,
-                                            chiral_type=chiral_types))
-            self._dt_pool = np.asarray([compute_dt(_Ch, bond=self.bond) for _Ch
-                                       in self._Ch_pool])
-
-            dt_mask = np.logical_and(self._dt_pool >= min_wall_diameter,
-                                     self._dt_pool <= max_wall_diameter)
-
-            self._Ch_pool = self._Ch_pool[dt_mask]
-            self._dt_pool = self._dt_pool[dt_mask]
-
-            if max_wall_diameter < np.inf:
-                dt_list = []
-                dt = self._dt_pool.min()
-                while dt <= max_wall_diameter and len(dt_list) < max_walls:
-                    dt_list.append(dt)
-                    dt += delta_dt
-            else:
-                dt_list = [self._dt_pool.min() + i * delta_dt
-                           for i in range(max_walls)]
-
-            dt_masks = [self.generate_dt_mask(_dt) for _dt in dt_list]
-
-            Ch_list = [tuple(self._Ch_pool[_mask][
-                np.random.choice(list(range(len(self._Ch_pool[_mask]))))].tolist())
-                for _mask in dt_masks]
+            Ch_list = \
+                self.generate_Ch_list(Nwalls=Nwalls, max_walls=max_walls,
+                                      min_wall_diameter=min_wall_diameter,
+                                      max_wall_diameter=max_wall_diameter,
+                                      chiral_types=chiral_types,
+                                      wall_spacing=wall_spacing)
 
         self.Ch_list = Ch_list[:]
         self.min_wall_diameter = min_wall_diameter
@@ -141,11 +100,6 @@ class MWNT(MWNTMixin, StructureBase):
         if Lz is None:
             Lz = 1.0
         self.Lz = Lz
-
-        self.walls = \
-            [SWNT(Ch, Lz=Lz, fix_Lz=True, basis=self.basis, bond=self.bond,
-                  **kwargs)
-             for Ch in self.Ch_list]
 
         a = compute_dt(self.Ch_list[-1], bond=bond) + dVDW
         c = compute_T(self.Ch_list[-1], bond=bond, length=True)
