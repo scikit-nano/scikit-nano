@@ -132,12 +132,12 @@ class SWNTGenerator(SWNT, GeneratorBase):
             self.atoms.clip_bounds(region_bounds)
 
     @classmethod
-    def generate_fname(cls, n=None, m=None, nz=None, integer_nz=True,
+    def generate_fname(cls, n=None, m=None, nz=None, fix_Lz=False,
                        **kwargs):
 
         chirality = '{}{}'.format('{}'.format(n).zfill(2),
                                   '{}'.format(m).zfill(2))
-        nz_fmtstr = '{}' if integer_nz else '{:.2f}'
+        nz_fmtstr = '{:.2f}' if fix_Lz else '{:.0f}'
         nz = ''.join((nz_fmtstr.format(nz), pluralize('cell', nz)))
         fname_wordlist = (chirality, nz)
         fname = '_'.join(fname_wordlist)
@@ -153,7 +153,7 @@ class SWNTGenerator(SWNT, GeneratorBase):
         """
         if fname is None:
             fname = self.generate_fname(n=self.n, m=self.m, nz=self.nz,
-                                        integer_nz=self._integral_nz)
+                                        fix_Lz=self.fix_Lz)
 
         super().save(fname=fname, outpath=outpath,
                      structure_format=structure_format,

@@ -123,14 +123,14 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
 
     @classmethod
     def generate_fname(self, n=None, m=None, nx=None, nz=None,
-                       integer_nx=True, integer_nz=True, **kwargs):
+                       fix_Lx=False, fix_Lz=False, **kwargs):
         chirality = '{}{}'.format('{}'.format(n).zfill(2),
                                   '{}'.format(m).zfill(2))
 
-        nx_fmtstr = '{}' if integer_nx else '{:.2f}'
+        nx_fmtstr = '{:.2f}' if fix_Lx else '{:.0f}'
         nx = ''.join((nx_fmtstr.format(nx), pluralize('cell', nx)))
 
-        nz_fmtstr = '{}' if integer_nz else '{:.2f}'
+        nz_fmtstr = '{:.2f}' if fix_Lz else '{:.0f}'
         nz = ''.join((nz_fmtstr.format(nz), pluralize('cell', nz)))
 
         cells = 'x'.join((nx, nz))
@@ -150,8 +150,8 @@ class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
         if fname is None:
             fname = self.generate_fname(n=self.n, m=self.m,
                                         nx=self.nx, nz=self.nz,
-                                        integer_nx=self._integral_nx,
-                                        integer_nz=self._integral_nz)
+                                        fix_Lx=self.fix_Lx,
+                                        fix_Lz=self.fix_Lz)
 
         if center_CM:
             self.atoms.center_CM()

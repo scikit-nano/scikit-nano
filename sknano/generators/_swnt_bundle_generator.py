@@ -170,7 +170,7 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
 
     @classmethod
     def generate_fname(cls, n=None, m=None, nx=None, ny=None, nz=None,
-                       integer_nz=True, Ntubes=None, bundle_geometry=None,
+                       fix_Lz=False, Ntubes=None, bundle_geometry=None,
                        bundle_packing=None, **kwargs):
         chirality = '{}{}'.format('{}'.format(n).zfill(2),
                                   '{}'.format(m).zfill(2))
@@ -183,12 +183,8 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
                          pluralize('cell', nx)))
             ny = ''.join(('{}'.format(ny),
                          pluralize('cell', ny)))
-            if integer_nz:
-                nz = ''.join(('{}'.format(nz),
-                              pluralize('cell', nz)))
-            else:
-                nz = ''.join(('{:.2f}'.format(nz),
-                              pluralize('cell', nz)))
+            nz_fmtstr = '{:.2f}' if fix_Lz else '{:.0f}'
+            nz = ''.join((nz_fmtstr.format(nz), pluralize('cell', nz)))
             cells = 'x'.join((nx, ny, nz))
             fname_wordlist = (chirality, packing, cells)
         else:
@@ -209,7 +205,7 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
         if fname is None:
             fname = self.generate_fname(n=self.n, m=self.m,
                                         nx=self.nx, ny=self.ny, nz=self.nz,
-                                        integer_nz=self._integral_nz,
+                                        fix_Lz=self.fix_Lz,
                                         Ntubes=self.Ntubes,
                                         bundle_geometry=self.bundle_geometry,
                                         bundle_packing=self.bundle_packing)
