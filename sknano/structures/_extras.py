@@ -18,15 +18,16 @@ import numpy as np
 from sknano.core.math import comparison_symbol_operator_mappings
 
 __all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'generate_Ch_list',
-           'generate_Ch_property_grid', 'get_Ch_indices', 'get_Ch_type',
-           'map_Ch', 'chiral_type_name_mappings', 'Ch_types', 'edge_types',
+           'generate_Ch_property_grid', 'get_Ch_indices',
+           'get_chiral_type', 'get_Ch_type',
+           'map_Ch', 'chiral_type_name_mappings', 'CHIRAL_TYPES',
            'filter_key_type_mappings', 'attr_units', 'attr_symbols',
            'attr_strfmt', 'get_chiral_indices', 'get_chiral_indices_from_str']
 
-chiral_type_name_mappings = Ch_types = \
+chiral_type_name_mappings = \
     {'achiral': 'aCh', 'armchair': 'AC', 'zigzag': 'ZZ', 'chiral': 'Ch'}
-
-edge_types = {'armchair': 'AC', 'zigzag': 'ZZ'}
+CHIRAL_TYPES = list(chiral_type_name_mappings.keys()) + \
+    list(chiral_type_name_mappings.values())
 
 filter_key_type_mappings = {}
 filter_key_type_mappings['Ch_type'] = str
@@ -231,7 +232,7 @@ def filter_Ch_list(Ch_list, property_filters=None, **kwargs):
 
 def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
                      ms=None, mi=None, mf=None, dm=None,
-                     imax=None, chiral_type=None, handedness=None,
+                     imax=None, chiral_types=None, handedness=None,
                      echo_zsh_str=False):
     """Generate a list of :math:`(n, m)` chiralities.
 
@@ -251,7 +252,7 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
         `mi` only required if `ms` sequence kwarg is `None`.
     imax : int, optional
         maximum chiral index :math:`n = m = i_{max}`.
-    chiral_type : {'all', 'achiral', 'chiral', 'armchair', 'zigzag'}, optional
+    chiral_types : {'all', 'achiral', 'chiral', 'armchair', 'zigzag'}, optional
     handedness : {'all', 'left', 'right'}, optional
     echo_zsh_str : bool, optional
 
@@ -304,46 +305,20 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
                             ns = [int(float(ni))]
         if (not ms or isinstance(ms, list) and ms[0] is None) and \
                 not mi and not mf:
-            if chiral_type in \
-                    (list(Ch_types.keys()) + list(Ch_types.values())):
-                if chiral_type in ('achiral', 'aCh'):
-                    for n in ns:
-                        Ch_list.append((n, n))
-                    for n in ns:
-                        Ch_list.append((n, 0))
-                elif chiral_type in ('armchair', 'AC'):
-                    for n in ns:
-                        Ch_list.append((n, n))
-                elif chiral_type in ('zigzag', 'ZZ'):
-                    for n in ns:
-                        Ch_list.append((n, 0))
-                else:
-                    for n in ns:
-                        m = 1
-                        while m < n:
-                            if handedness == 'left':
-                                Ch_list.append((m, n))
-                            elif handedness == 'right':
-                                Ch_list.append((n, m))
-                            else:
-                                Ch_list.append((n, m))
-                                Ch_list.append((m, n))
-                            m += 1
-            else:
-                for n in ns:
-                    m = 0
-                    while m <= n:
-                        if (m == 0) or (m == n):
+            for n in ns:
+                m = 0
+                while m <= n:
+                    if (m == 0) or (m == n):
+                        Ch_list.append((n, m))
+                    else:
+                        if handedness == 'left':
+                            Ch_list.append((m, n))
+                        elif handedness == 'right':
                             Ch_list.append((n, m))
                         else:
-                            if handedness == 'left':
-                                Ch_list.append((m, n))
-                            elif handedness == 'right':
-                                Ch_list.append((n, m))
-                            else:
-                                Ch_list.append((n, m))
-                                Ch_list.append((m, n))
-                        m += 1
+                            Ch_list.append((n, m))
+                            Ch_list.append((m, n))
+                    m += 1
         elif (not ms or isinstance(ms, list) and ms[0] is None) and \
                 (isinstance(mi, int) or isinstance(mf, int)):
             try:
@@ -373,45 +348,50 @@ def generate_Ch_list(ns=None, ni=None, nf=None, dn=None,
                     elif (n == 0) or (m == 0):
                         nm = (n, m)
                         mn = (m, n)
-                        if chiral_type not in \
-                                ('chiral', 'Ch', 'armchair', 'AC'):
-                            if handedness == 'left':
-                                if m != 0 and nm not in Ch_list:
-                                    Ch_list.append(nm)
-                            elif handedness == 'right':
-                                if n != 0 and nm not in Ch_list:
-                                    Ch_list.append(nm)
-                            else:
-                                if nm not in Ch_list:
-                                    Ch_list.append(nm)
-                                if mn not in Ch_list:
-                                    Ch_list.append(mn)
-                    elif (n == m):
-                        Ch = (n, n)
-                        if chiral_type not in \
-                                ('chiral', 'Ch', 'zigzag', 'ZZ') \
-                                and Ch not in Ch_list:
-                            Ch_list.append(Ch)
+                        if handedness == 'left':
+                            if m != 0 and nm not in Ch_list:
+                                Ch_list.append(nm)
+                        elif handedness == 'right':
+                            if n != 0 and nm not in Ch_list:
+                                Ch_list.append(nm)
+                        else:
+                            if nm not in Ch_list:
+                                Ch_list.append(nm)
+                            if mn not in Ch_list:
+                                Ch_list.append(mn)
+                    elif (n == m) and (n, m) not in Ch_list:
+                        Ch_list.append((n, m))
                     else:
                         nm = (n, m)
                         mn = (m, n)
-                        if chiral_type not in ('achiral', 'aCh', 'armchair',
-                                               'AC', 'zigzag', 'ZZ'):
-                            if handedness == 'left':
-                                if n < m and nm not in Ch_list:
-                                    Ch_list.append(nm)
-                            elif handedness == 'right':
-                                if n > m and nm not in Ch_list:
-                                    Ch_list.append(nm)
-                            else:
-                                if nm not in Ch_list:
-                                    Ch_list.append(nm)
-                                if mn not in Ch_list:
-                                    Ch_list.append(mn)
+                        if handedness == 'left':
+                            if n < m and nm not in Ch_list:
+                                Ch_list.append(nm)
+                        elif handedness == 'right':
+                            if n > m and nm not in Ch_list:
+                                Ch_list.append(nm)
+                        else:
+                            if nm not in Ch_list:
+                                Ch_list.append(nm)
+                            if mn not in Ch_list:
+                                Ch_list.append(mn)
     finally:
         if echo_zsh_str and Ch_list is not None:
             print(' '.join([repr(str(Ch)) for Ch in Ch_list]))
+        if chiral_types is not None:
+            if not isinstance(chiral_types, list):
+                chiral_types = [chiral_types]
+            chiral_types = chiral_types[:]
 
+            if any([chiral_type in CHIRAL_TYPES for chiral_type in
+                    chiral_types]):
+                if 'achiral' in chiral_types or 'aCh' in chiral_types:
+                    if 'armchair' not in chiral_types:
+                        chiral_types.append('armchair')
+                    if 'zigzag' not in chiral_types:
+                        chiral_types.append('zigzag')
+                Ch_list = [Ch for Ch in Ch_list
+                           if get_Ch_type(Ch) in chiral_types]
         return Ch_list
 
 
@@ -447,7 +427,7 @@ def generate_Ch_property_grid(compute=str, imax=10, **kwargs):
         return None
 
 
-def get_Ch_type(Ch):
+def get_chiral_type(Ch):
     """Identify the type of nanotube based on its chirality
 
     Parameters
@@ -473,6 +453,7 @@ def get_Ch_type(Ch):
     else:
         return 'chiral'
 
+get_Ch_type = get_chiral_type
 
 def map_Ch(Ch, compute=None, **kwargs):
     """Map compute function using `Ch` as input.
