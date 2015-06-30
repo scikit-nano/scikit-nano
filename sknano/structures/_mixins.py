@@ -381,11 +381,26 @@ NanotubeMixin = SWNTMixin
 
 class MWNTMixin:
     """Mixin class for MWNTs."""
+    @property
+    def Ch_list(self):
+        return self._Ch_list
+
+    @Ch_list.setter
+    def Ch_list(self, value):
+        if not isinstance(value, list):
+            raise TypeError('Expected a list')
+        self._Ch_list = value[:]
 
     @property
     def chiral_types(self):
         """List of chiral types for each `MWNT` wall."""
         return [swnt.chiral_type for swnt in self.walls]
+
+    @chiral_types.setter
+    def chiral_types(self, value):
+        if not isinstance(value, list):
+            raise TypeError('Expected a list')
+        self.update_Ch_list(chiral_types=value)
 
     @property
     def chiral_set(self):
@@ -438,7 +453,38 @@ class MWNTMixin:
     @property
     def Nwalls(self):
         """Number of `MWNT` walls."""
-        return len(self.walls)
+        return len(self.Ch_list)
+
+    @Nwalls.setter
+    def Nwalls(self, value):
+        self.update_Ch_list(Nwalls=value)
+
+    @property
+    def min_wall_diameter(self):
+        return self._min_wall_diameter
+
+    @min_wall_diameter.setter
+    def min_wall_diameter(self, value):
+        self._min_wall_diameter = value
+        self.update_Ch_list()
+
+    @property
+    def max_wall_diameter(self):
+        return self._max_wall_diameter
+
+    @max_wall_diameter.setter
+    def max_wall_diameter(self, value):
+        self._max_wall_diameter = value
+        self.update_Ch_list()
+
+    @property
+    def wall_spacing(self):
+        return self._wall_spacing
+
+    @wall_spacing.setter
+    def wall_spacing(self, value):
+        self._wall_spacing = value
+        self.update_Ch_list()
 
     @property
     def tube_mass(self):
@@ -561,6 +607,24 @@ class MWNTMixin:
         return [tuple(self._Ch_pool[_mask][np.random.choice(
             list(range(len(self._Ch_pool[_mask]))))].tolist())
             for _mask in dt_masks]
+
+    def update_Ch_list(self, Nwalls=None, min_wall_diameter=None,
+                       max_wall_diameter=None, wall_spacing=None,
+                       chiral_types=None):
+        if Nwalls is None:
+            Nwalls = self.Nwalls
+        if min_wall_diameter is None:
+            min_wall_diameter = self.min_wall_diameter
+        if max_wall_diameter is None:
+            max_wall_diameter = self.max_wall_diameter
+        if wall_spacing is None:
+            wall_spacing = self.wall_spacing
+        self.Ch_list = \
+            self.generate_Ch_list(Nwalls=Nwalls,
+                                  min_wall_diameter=min_wall_diameter,
+                                  max_wall_diameter=max_wall_diameter,
+                                  chiral_types=chiral_types,
+                                  wall_spacing=wall_spacing)
 
 
 class NanotubeBundleMixin:
