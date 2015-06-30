@@ -126,7 +126,7 @@ class MWNTGenerator(MWNT, GeneratorBase):
 
     @classmethod
     def generate_fname(cls, Ch_list=None, Nwalls=None, **kwargs):
-        Nwalls = '{}wall_mwnt'.format(Nwalls)
+        Nwalls = '{}wall_mwnt'.format(len(Ch_list))
         chiralities = '@'.join([str(Ch).replace(' ', '') for
                                 Ch in Ch_list])
 
@@ -142,8 +142,7 @@ class MWNTGenerator(MWNT, GeneratorBase):
 
         """
         if fname is None:
-            fname = self.generate_fname(Ch_list=self.Ch_list,
-                                        Nwalls=self.Nwalls)
+            fname = self.generate_fname(Ch_list=self.Ch_list)
 
         super().save(fname=fname, outpath=outpath,
                      structure_format=structure_format,
