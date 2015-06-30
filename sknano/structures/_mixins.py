@@ -15,9 +15,16 @@ import numbers
 
 import numpy as np
 
+import sknano.structures
 from sknano.core.math import Vector
-from ._compute_funcs import *
-from ._extras import get_Ch_type
+from sknano.core.refdata import dVDW
+from ._compute_funcs import compute_N, compute_Ch, compute_chiral_angle, \
+    compute_T, compute_M, compute_R, compute_Natoms_per_unit_cell, \
+    compute_Natoms, compute_d, compute_dR, compute_dt, compute_rt, \
+    compute_t1, compute_t2, compute_electronic_type, compute_unit_cell_mass, \
+    compute_symmetry_operation, compute_linear_mass_density, \
+    compute_tube_mass
+from ._extras import get_Ch_type, generate_Ch_list
 
 __all__ = ['MWNTMixin', 'NanotubeMixin', 'SWNTMixin', 'NanotubeBundleMixin',
            'UnrolledSWNTMixin']
@@ -438,25 +445,6 @@ class MWNTMixin:
         """MWNT mass in **grams**."""
         return np.asarray([swnt.tube_mass for swnt in self.walls]).sum()
 
-    def generate_dt_mask(self, dt, max_dt_diff=0.5):
-        """Generate boolean mask array.
-
-        Parameters
-        ----------
-        dt : float
-        max_dt_diff : float, optional
-
-        Returns
-        -------
-        dt_mask : :class:`~numpy:numpy.ndarray`
-
-        """
-        dt_mask = np.abs(self._dt_pool - dt) <= max_dt_diff
-        while not np.any(dt_mask):
-            max_dt_diff += max_dt_diff
-            dt_mask = np.abs(self._dt_pool - dt) <= max_dt_diff
-        return dt_mask
-
     # @property
     # def Lz(self):
     #     return self._Lz
@@ -498,6 +486,81 @@ class MWNTMixin:
     @property
     def wall_radii(self):
         return self.rt_list
+
+    @property
+    def walls(self):
+        return [sknano.structures.SWNT(Ch, Lz=self.Lz, fix_Lz=True,
+                                       basis=self.basis, bond=self.bond)
+                for Ch in self.Ch_list]
+
+    def generate_dt_mask(self, dt, max_dt_diff=0.5):
+        """Generate boolean mask array.
+
+        Parameters
+        ----------
+        dt : float
+        max_dt_diff : float, optional
+
+        Returns
+        -------
+        dt_mask : :class:`~numpy:numpy.ndarray`
+
+        """
+        dt_mask = np.abs(self._dt_pool - dt) <= max_dt_diff
+        while not np.any(dt_mask):
+            max_dt_diff += max_dt_diff
+            dt_mask = np.abs(self._dt_pool - dt) <= max_dt_diff
+        return dt_mask
+
+    def generate_Ch_list(self, Nwalls=None, max_walls=None,
+                         min_wall_diameter=None, max_wall_diameter=None,
+                         chiral_types=None, wall_spacing=None):
+        if Nwalls is not None:
+            max_walls = Nwalls
+
+        if max_walls is None:
+            max_walls = 10
+
+        if max_wall_diameter is None:
+            max_wall_diameter = np.inf
+
+        if min_wall_diameter is None:
+            min_wall_diameter = 5.0
+
+        if wall_spacing is None:
+            wall_spacing = dVDW
+
+        delta_dt = 2 * wall_spacing
+
+        imax = 100
+
+        self._Ch_pool = \
+            np.asarray(generate_Ch_list(imax=imax,
+                                        chiral_type=chiral_types))
+        self._dt_pool = np.asarray([compute_dt(_Ch, bond=self.bond) for _Ch
+                                   in self._Ch_pool])
+
+        dt_mask = np.logical_and(self._dt_pool >= min_wall_diameter,
+                                 self._dt_pool <= max_wall_diameter)
+
+        self._Ch_pool = self._Ch_pool[dt_mask]
+        self._dt_pool = self._dt_pool[dt_mask]
+
+        if max_wall_diameter < np.inf:
+            dt_list = []
+            dt = self._dt_pool.min()
+            while dt <= max_wall_diameter and len(dt_list) < max_walls:
+                dt_list.append(dt)
+                dt += delta_dt
+        else:
+            dt_list = [self._dt_pool.min() + i * delta_dt
+                       for i in range(max_walls)]
+
+        dt_masks = [self.generate_dt_mask(_dt) for _dt in dt_list]
+
+        return [tuple(self._Ch_pool[_mask][np.random.choice(
+            list(range(len(self._Ch_pool[_mask]))))].tolist())
+            for _mask in dt_masks]
 
 
 class NanotubeBundleMixin:
@@ -571,7 +634,7 @@ class NanotubeBundleMixin:
             raise ValueError('Expected value to be `hcp` or `ccp`')
 
         self._bundle_packing = value
-        #self.generate_bundle_coords()
+        # self.generate_bundle_coords()
 
     @bundle_packing.deleter
     def bundle_packing(self):
@@ -588,7 +651,7 @@ class NanotubeBundleMixin:
     @property
     def Natoms_per_tube(self):
         """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
-        return super(NanotubeBundleMixin, self).Natoms_per_tube
+        return super().Natoms_per_tube
 
     @property
     def Natoms_per_bundle(self):
