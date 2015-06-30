@@ -24,7 +24,7 @@ from ._compute_funcs import compute_N, compute_Ch, compute_chiral_angle, \
     compute_t1, compute_t2, compute_electronic_type, compute_unit_cell_mass, \
     compute_symmetry_operation, compute_linear_mass_density, \
     compute_tube_mass
-from ._extras import get_Ch_type, generate_Ch_list
+from ._extras import get_chiral_type, generate_Ch_list
 
 __all__ = ['MWNTMixin', 'NanotubeMixin', 'SWNTMixin', 'NanotubeBundleMixin',
            'UnrolledSWNTMixin']
@@ -181,7 +181,7 @@ class SWNTMixin:
     @property
     def chiral_type(self):
         """`SWNT` chiral type."""
-        return get_Ch_type((self.n, self.m))
+        return get_chiral_type((self.n, self.m))
 
     @property
     def Tvec(self):
@@ -536,7 +536,7 @@ class MWNTMixin:
 
         self._Ch_pool = \
             np.asarray(generate_Ch_list(imax=imax,
-                                        chiral_type=chiral_types))
+                                        chiral_types=chiral_types))
         self._dt_pool = np.asarray([compute_dt(_Ch, bond=self.bond) for _Ch
                                    in self._Ch_pool])
 
