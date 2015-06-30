@@ -30,6 +30,7 @@ except ImportError as e:
     print(e)
 
 from sknano.core import get_fpath
+from sknano.structures import get_chiral_indices_from_str
 # from ._nanogen_controllers import NanoGenController
 # from ._nanogen_models import NanoGenModel
 from ._view_mixins import NanoGenViewMixin, SWNTViewMixin, MWNTViewMixin, \
@@ -107,9 +108,6 @@ class NanoGenView(QMainWindow, Ui_NanoGen):
             generator_class = kwargs['generator_class']
             del kwargs['generator_class']
 
-            fname = None
-            outpath = None
-
             structure_format = \
                 str(self.structure_format_combo_box.itemText(
                     self.structure_format_combo_box.currentIndex()))
@@ -117,6 +115,7 @@ class NanoGenView(QMainWindow, Ui_NanoGen):
             generator = getattr(importlib.import_module('sknano.generators'),
                                 generator_class)
             self.nanogen_status_bar.showMessage('Generating structure...')
+            outpath, fname = os.path.split(self.fpath_line_edit.text())
             generator(**kwargs).save(fname=fname, outpath=outpath,
                                      structure_format=structure_format)
             self.nanogen_status_bar.showMessage('Done!')
@@ -194,6 +193,7 @@ class SWNTGeneratorView(QMainWindow, Ui_SWNTGenerator, NanoGenViewMixin,
             kwargs['bundle_packing'] = 'hcp'
             kwargs['nx'] = self.bundle_nx_spin_box.value()
             kwargs['ny'] = self.bundle_ny_spin_box.value()
+            # kwargs['Ntubes'] = self.model.structure.Ntubes
             kwargs['generator_class'] = 'SWNTBundleGenerator'
 
         return kwargs
@@ -236,6 +236,10 @@ class MWNTGeneratorView(QMainWindow, Ui_MWNTGenerator, NanoGenViewMixin,
         kwargs = {}
         kwargs['generator_class'] = 'MWNTGenerator'
         kwargs['Lz'] = self.mwnt_Lz_double_spin_box.value()
+        kwargs['Ch_list'] = \
+            [get_chiral_indices_from_str(i.text()) for i in
+             [self.mwnt_Ch_list_widget.item(index) for
+              index in range(self.mwnt_Ch_list_widget.count())]]
 
         if self.mwnt_Ch_list_radio_button.isChecked():
             pass
@@ -252,6 +256,7 @@ class MWNTGeneratorView(QMainWindow, Ui_MWNTGenerator, NanoGenViewMixin,
             kwargs['bundle_packing'] = 'hcp'
             kwargs['nx'] = self.bundle_nx_spin_box.value()
             kwargs['ny'] = self.bundle_ny_spin_box.value()
+            # kwargs['Ntubes'] = self.model.structure.Ntubes
             kwargs['generator_class'] = 'MWNTBundleGenerator'
         return kwargs
 
@@ -261,19 +266,27 @@ class MWNTGeneratorView(QMainWindow, Ui_MWNTGenerator, NanoGenViewMixin,
                                                    ' bond =')))
         self.bond_double_spin_box.setValue(self.model.bond)
 
-        self.Nwalls_spin_box.setValue(self.model.structure.Nwalls)
+        self.mwnt_Ch_list_widget.clear()
+        self.mwnt_Ch_list_widget.addItems(
+            [str(Ch) for Ch in self.model.Ch_list])
+
+        self.Nwalls_spin_box.setValue(self.model.Nwalls)
         self.min_wall_diameter_double_spin_box.setValue(
-            self.model.mwnt.min_wall_diameter)
+            self.model.min_wall_diameter)
         self.max_wall_diameter_double_spin_box.setValue(
-            self.model.structure.max_wall_diameter)
+            self.model.max_wall_diameter)
         self.wall_spacing_double_spin_box.setValue(
-            self.model.structure.wall_spacing)
+            self.model.wall_spacing)
         self.mwnt_Lz_double_spin_box.setValue(self.model.Lz)
 
         self.bundle_nx_spin_box.setValue(self.model.nx)
         self.bundle_ny_spin_box.setValue(self.model.ny)
-        self.bundle_Lx_line_edit.setText('{:.4f} nm'.format(self.model.Lx))
-        self.bundle_Ly_line_edit.setText('{:.4f} nm'.format(self.model.Ly))
+        try:
+            self.bundle_Lx_line_edit.setText('{:.4f} nm'.format(self.model.Lx))
+            self.bundle_Ly_line_edit.setText('{:.4f} nm'.format(self.model.Ly))
+        except IndexError:
+            self.bundle_Lx_line_edit.setText('{:.4f} nm'.format(0.0))
+            self.bundle_Ly_line_edit.setText('{:.4f} nm'.format(0.0))
         self.parent.update_app_view()
 
 

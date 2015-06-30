@@ -91,10 +91,6 @@ class SWNTModelMixin:
 
     @Lz.setter
     def Lz(self, value):
-        # self._nz = \
-        #     10 * value / compute_T(self.Ch, bond=self.bond, length=True)
-        # self.structure.nz = self.nz
-        # if self.structure.fix_Lz:
         nz = 10 * value / compute_T(self.Ch, bond=self.bond, length=True)
         if not self.structure.fix_Lz:
             nz = int(nz)
@@ -120,6 +116,7 @@ class SWNTModelMixin:
     @fix_Lz.setter
     def fix_Lz(self, value):
         self.structure.fix_Lz = value
+        self.notify_observers()
 
 
 class MWNTModelMixin:
@@ -216,6 +213,10 @@ class MWNTModel(GeneratorModelBase, MWNTModelMixin, BundleModelMixin):
         self.notify_observers()
 
     @property
+    def Ch(self):
+        return self.Ch_list[-1]
+
+    @property
     def Ch_list(self):
         # return self._Ch_list
         return self.structure.Ch_list
@@ -226,6 +227,58 @@ class MWNTModel(GeneratorModelBase, MWNTModelMixin, BundleModelMixin):
         # self.structure.Ch_list = self.Ch_list
         self.structure.Ch_list = value
         self.notify_observers()
+
+    @property
+    def chiral_types(self):
+        return self.structure.chiral_types
+
+    @chiral_types.setter
+    def chiral_types(self, value):
+        self.structure.chiral_types = value
+        self.notify_observers()
+
+    @property
+    def Nwalls(self):
+        return self.structure.Nwalls
+
+    @Nwalls.setter
+    def Nwalls(self, value):
+        self.structure.Nwalls = value
+        self.notify_observers()
+
+    @property
+    def min_wall_diameter(self):
+        return self.structure.min_wall_diameter
+
+    @min_wall_diameter.setter
+    def min_wall_diameter(self, value):
+        self.structure.min_wall_diameter = value
+        self.notify_observers()
+
+    @property
+    def max_wall_diameter(self):
+        return self.structure.max_wall_diameter
+
+    @max_wall_diameter.setter
+    def max_wall_diameter(self, value):
+        self.structure.max_wall_diameter = value
+        self.notify_observers()
+
+    @property
+    def wall_spacing(self):
+        return self.structure.wall_spacing
+
+    @wall_spacing.setter
+    def wall_spacing(self, value):
+        self.structure.wall_spacing = value
+        self.notify_observers()
+
+    # def generate_Ch_list(self):
+    #     self.structure = \
+    #         MWNTBundle(Nwalls=self.structure.Nwalls,
+    #                    min_wall_diameter=self.structure.min_wall_diameter,
+    #                    max_wall_diameter=self.structure.max_wall_diameter,
+    #                    wall_spacing=self.structure.wall_spacing)
 
 
 class UnrolledSWNTModelMixin(SWNTModelMixin):

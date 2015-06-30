@@ -14,12 +14,16 @@ __docformat__ = 'restructuredtext en'
 try:
     # from PyQt4.QtCore import pyqtSlot
     from PyQt5.QtCore import pyqtSlot
+    from PyQt5.QtWidgets import QDialog
+    from ._ui_mwnt_Ch_list_item_dialog import Ui_MWNTChListItemDialog
 except ImportError as e:
     print(e)
 
+from sknano.structures import get_chiral_indices_from_str
+
 __all__ = ['NanoGenViewMixin', 'SWNTViewMixin', 'MWNTViewMixin',
            'BundleViewMixin', 'GrapheneViewMixin', 'FullereneViewMixin',
-           'BulkStructureViewMixin']
+           'BulkStructureViewMixin', 'MWNTChListItemDialog']
 
 
 class NanoGenViewMixin:
@@ -66,7 +70,6 @@ class SWNTViewMixin:
 
     @pyqtSlot(float)
     def on_swnt_nz_double_spin_box_valueChanged(self, value):
-        print('on_swnt_nz_double_spin_box_valueChanged')
         self.model.nz = value
 
     # @pyqtSlot()
@@ -75,7 +78,6 @@ class SWNTViewMixin:
 
     @pyqtSlot(float)
     def on_swnt_Lz_double_spin_box_valueChanged(self, value):
-        print('on_swnt_Lz_double_spin_box_valueChanged')
         self.model.Lz = value
 
     @pyqtSlot(int)
@@ -90,7 +92,59 @@ class SWNTViewMixin:
             self.swnt_Lz_double_spin_box.setReadOnly(True)
 
 
+class MWNTChListItemDialog(QDialog, Ui_MWNTChListItemDialog):
+    def __init__(self, item=None, parent=None):
+        self.item = item
+        self.parent = parent
+        super().__init__(parent)
+        self.setupUi(self)
+        if item is not None:
+            n, m = get_chiral_indices_from_str(item.text())
+            self.n_spin_box.setValue(n)
+            self.m_spin_box.setValue(m)
+
+    @pyqtSlot()
+    def on_ok_push_button_clicked(self):
+        Ch = self.n_spin_box.value(), self.m_spin_box.value()
+        if self.item is None:
+            self.parent.model.Ch_list.append(Ch)
+            # self.parent.mwnt_Ch_list_widget.addItem(str(Ch))
+        else:
+            self.item.setText(str(Ch))
+        self.reject()
+
+    @pyqtSlot()
+    def on_cancel_push_button_clicked(self):
+        self.reject()
+
+
 class MWNTViewMixin:
+
+    @pyqtSlot()
+    def on_add_Ch_push_button_clicked(self):
+        dialog = MWNTChListItemDialog(parent=self)
+        dialog.show()
+        self.update_app_view()
+
+    @pyqtSlot()
+    def on_edit_selected_Ch_push_button_clicked(self):
+        selection = self.mwnt_Ch_list_widget.selectedItems()
+        if len(selection) == 1:
+            dialog = MWNTChListItemDialog(item=selection[0], parent=self)
+            dialog.show()
+            self.update_app_view()
+
+    @pyqtSlot()
+    def on_remove_selected_Ch_push_button_clicked(self):
+        print(self.mwnt_Ch_list_widget.currentRow())
+        self.mwnt_Ch_list_widget.takeItem(
+            self.mwnt_Ch_list_widget.currentRow())
+        self.update_app_view()
+
+    @pyqtSlot()
+    def on_clear_Ch_list_push_button_clicked(self):
+        self.model.Ch_list.clear()
+        self.update_app_view()
 
     # @pyqtSlot()
     # def on_mwnt_Lz_spin_box_editingFinished(self):
@@ -100,9 +154,36 @@ class MWNTViewMixin:
     def on_mwnt_Lz_double_spin_box_valueChanged(self, value):
         self.model.Lz = value
 
-    @pyqtSlot(int)
-    def on_mwnt_generator_button_group_buttonClicked(self, value):
-        print(value)
+    @pyqtSlot(float)
+    def on_Nwalls_double_spin_box_valueChanged(self, value):
+        self.model.Nwalls = value
+
+    @pyqtSlot(float)
+    def on_min_wall_diameter_double_spin_box_valueChanged(self, value):
+        self.model.min_wall_diameter = value
+
+    @pyqtSlot(float)
+    def on_max_wall_diameter_double_spin_box_valueChanged(self, value):
+        self.model.max_wall_diameter = value
+
+    @pyqtSlot(float)
+    def on_wall_spacing_double_spin_box_valueChanged(self, value):
+        self.model.wall_spacing = value
+
+    # @pyqtSlot(int)
+    # def on_mwnt_generator_button_group_buttonClicked(self, value):
+    #     if self.mwnt_wall_parameters_radio_button.isChecked():
+    #         self.model.Nwalls = self.Nwalls_spin_box.value()
+    #         self.model.min_wall_diameter = \
+    #             self.min_wall_diameter_double_spin_box.value()
+    #         self.model.max_wall_diameter = \
+    #             self.max_wall_diameter_double_spin_box.value()
+    #         self.model.wall_spacing = \
+    #             self.wall_spacing_double_spin_box.value()
+    #     else:
+    #         self.mwnt_Ch_list_widget.clear()
+    #         self.mwnt_Ch_list_widget.addItems([str(Ch) for Ch in
+    #                                            self.model.Ch_list])
 
 
 class BundleViewMixin:
@@ -111,6 +192,7 @@ class BundleViewMixin:
     def on_bundle_generator_check_box_stateChanged(self, value):
         [spin_box.setReadOnly(False if value else True)
          for spin_box in (self.bundle_nx_spin_box, self.bundle_ny_spin_box)]
+        self.update_app_view()
 
     # @pyqtSlot()
     # def on_bundle_nx_spin_box_editingFinished(self):
