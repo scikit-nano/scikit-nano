@@ -148,7 +148,7 @@ class SWNT(SWNTMixin, StructureBase):
                         'chiral_angle', 'Ch', 'T', 'dt', 'rt',
                         'electronic_type']
 
-    def __init__(self, *Ch, nz=None, bond=aCC, basis=['C', 'C'],
+    def __init__(self, *Ch, nz=None, basis=['C', 'C'], bond=aCC,
                  Lz=None, fix_Lz=False, **kwargs):
 
         n, m, kwargs = get_chiral_indices(*Ch, **kwargs)
@@ -170,7 +170,7 @@ class SWNT(SWNTMixin, StructureBase):
         self.m = m
 
         self.fix_Lz = fix_Lz
-        if Lz is not None and nz is None:
+        if Lz is not None:
             self.nz = 10 * float(Lz) / self.T
         elif nz is not None:
             self.nz = nz
