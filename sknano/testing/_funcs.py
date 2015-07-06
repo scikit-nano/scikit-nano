@@ -20,6 +20,7 @@ __all__ = ['generate_atoms']
 
 
 def generate_atoms(*args, elements=None, generator_class=None, **kwargs):
+    """Helper function to generate sequence of atoms for testing purposes."""
     atoms = None
     if elements is not None:
         if isinstance(elements, str) and elements == 'periodic_table':

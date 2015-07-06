@@ -71,7 +71,7 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin, UnitCellMixin):
         return ['a', 'b', 'gamma']
 
     def todict(self):
-        """Return `dict` of `CrystalLattice` parameters."""
+        """Return `dict` of `Crystal2DLattice` parameters."""
         return dict(a=self.a, b=self.b, gamma=self.gamma)
 
     @property

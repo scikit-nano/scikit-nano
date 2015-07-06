@@ -20,10 +20,11 @@ from sknano.core.math import Vector
 from ._base import LatticeBase, ReciprocalLatticeBase
 from ._mixins import DirectLatticeMixin, ReciprocalLatticeMixin, UnitCellMixin
 
-__all__ = ['CrystalLattice', 'ReciprocalLattice', 'BravaisLattice',
-           'Crystal3DLattice', 'Reciprocal3DLattice', 'Bravais3DLattice',
-           'SimpleCubicLattice', 'BodyCenteredCubicLattice',
-           'FaceCenteredCubicLattice']
+__all__ = ['CrystalLattice', 'ReciprocalLattice',
+           'Crystal3DLattice', 'Reciprocal3DLattice']
+# __all__ += ['BravaisLattice', 'Bravais3DLattice',
+#            'SimpleCubicLattice', 'BodyCenteredCubicLattice',
+#            'FaceCenteredCubicLattice']
 
 
 class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin, UnitCellMixin):
@@ -83,7 +84,7 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin, UnitCellMixin):
         return ['a', 'b', 'c', 'alpha', 'beta', 'gamma']
 
     def todict(self):
-        """Return `dict` of `CrystalLattice` parameters."""
+        """Return `dict` of `Crystal3DLattice` parameters."""
         return dict(a=self.a, b=self.b, c=self.c,
                     alpha=self.alpha, beta=self.beta, gamma=self.gamma)
 
@@ -212,7 +213,7 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin, UnitCellMixin):
 
     @property
     def reciprocal_lattice(self):
-        """Return `CrystalLattice` reciprocal lattice."""
+        """Return `Crystal3DLattice` reciprocal lattice."""
         return ReciprocalLattice(cell_matrix=np.linalg.inv(self.cell_matrix))
 
     @classmethod
@@ -376,7 +377,7 @@ class Reciprocal3DLattice(ReciprocalLatticeBase, DirectLatticeMixin,
     @property
     def reciprocal_lattice(self):
         """`ReciprocalLattice` reciprocal lattice."""
-        return CrystalLattice(cell_matrix=np.linalg.inv(self.cell_matrix))
+        return Crystal3DLattice(cell_matrix=np.linalg.inv(self.cell_matrix))
 
     @classmethod
     def triclinic(cls, a_star, b_star, c_star,
@@ -425,29 +426,29 @@ class Reciprocal3DLattice(ReciprocalLatticeBase, DirectLatticeMixin,
 ReciprocalLattice = Reciprocal3DLattice
 
 
-class Bravais3DLattice:
-    """Class for bravais lattices."""
-    def __init__(self, crystal_system=None, centering=None,
-                 symbol=None):
-        pass
+# class Bravais3DLattice:
+#     """Class for bravais lattices."""
+#     def __init__(self, crystal_system=None, centering=None,
+#                  symbol=None):
+#         pass
 
-BravaisLattice = Bravais3DLattice
-
-
-class SimpleCubicLattice(BravaisLattice):
-    """Abstract representation of simple cubic lattice."""
-    lattice_points = [[0.0, 0.0, 0.0]]
+# BravaisLattice = Bravais3DLattice
 
 
-class BodyCenteredCubicLattice(BravaisLattice):
-    """Abstract representation of body-centered cubic lattice."""
-    lattice_points = [[0.0, 0.0, 0.0],
-                      [0.5, 0.5, 0.5]]
+# class SimpleCubicLattice(BravaisLattice):
+#     """Abstract representation of simple cubic lattice."""
+#     lattice_points = [[0.0, 0.0, 0.0]]
 
 
-class FaceCenteredCubicLattice(BravaisLattice):
-    """Abstract representation of face-centered cubic lattice."""
-    lattice_points = [[0.0, 0.0, 0.0],
-                      [0.5, 0.5, 0.0],
-                      [0.0, 0.5, 0.5],
-                      [0.5, 0.0, 0.5]]
+# class BodyCenteredCubicLattice(BravaisLattice):
+#     """Abstract representation of body-centered cubic lattice."""
+#     lattice_points = [[0.0, 0.0, 0.0],
+#                       [0.5, 0.5, 0.5]]
+
+
+# class FaceCenteredCubicLattice(BravaisLattice):
+#     """Abstract representation of face-centered cubic lattice."""
+#     lattice_points = [[0.0, 0.0, 0.0],
+#                       [0.5, 0.5, 0.0],
+#                       [0.0, 0.5, 0.5],
+#                       [0.5, 0.0, 0.5]]

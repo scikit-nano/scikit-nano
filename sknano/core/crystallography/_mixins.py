@@ -9,17 +9,12 @@ Mixin crystallography classes (:mod:`sknano.core.crystallography._mixins`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-# from builtins import object
-# from builtins import super
-# from future.utils import with_metaclass
-
 __docformat__ = 'restructuredtext en'
 
 # from abc import ABCMeta, abstractproperty
 # from enum import Enum
 
-from sknano.core.math import Point, Vector, zhat, rotation_matrix, \
-    transformation_matrix
+from sknano.core.math import Point, Vector, zhat, rotation_matrix
 
 import numpy as np
 
@@ -199,8 +194,9 @@ class UnitCellMixin:
     """Mixin class for lattice unit cell."""
     @property
     def cell_matrix(self):
-        """Matrix of `CrystalLattice` lattice row vectors. \
-            Same as :attr:`CrystalLattice.ortho_matrix`\ .T."""
+        """Matrix of lattice row vectors. \
+            Same as :attr:`Crystal2DLattice.ortho_matrix`\ .T or \
+            :attr:`Crystal3DLattice.ortho_matrix`\ .T."""
         return self.ortho_matrix.T * self.orientation_matrix.T
 
     @property

@@ -9,17 +9,28 @@ Crystallography modules (:mod:`sknano.core.crystallography`)
 Contents
 ========
 
-Lattice systems
-----------------
+2D lattices and structures
+---------------------------
 .. autosummary::
    :toctree: generated/
 
-   DirectLatticeMixin
-   ReciprocalLatticeMixin
-   UnitCellMixin
+   Direct2DLatticeMixin
+   Reciprocal2DLatticeMixin
+   Crystal2DLattice
+   Reciprocal2DLattice
+   Crystal2DStructure
 
-   CrystalLattice
-   ReciprocalLattice
+3D lattices and structures
+---------------------------
+.. autosummary::
+   :toctree: generated/
+
+   Direct3DLatticeMixin
+   Reciprocal3DLatticeMixin
+   UnitCellMixin
+   Crystal3DLattice
+   Reciprocal3DLattice
+   Crystal3DStructure
 
    SimpleCubicLattice
    BodyCenteredCubicLattice
@@ -30,7 +41,6 @@ Crystal structures
 .. autosummary::
    :toctree: generated/
 
-   CrystalStructure
    DiamondStructure
    HexagonalClosePackedStructure
    CubicClosePackedStructure
