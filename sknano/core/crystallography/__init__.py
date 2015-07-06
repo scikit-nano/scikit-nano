@@ -32,10 +32,6 @@ Contents
    Reciprocal3DLattice
    Crystal3DStructure
 
-   SimpleCubicLattice
-   BodyCenteredCubicLattice
-   FaceCenteredCubicLattice
-
 Crystal structures
 -------------------
 .. autosummary::
