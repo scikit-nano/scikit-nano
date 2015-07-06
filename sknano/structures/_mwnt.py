@@ -94,6 +94,7 @@ class MWNT(MWNTMixin, StructureBase):
         self.Ch_list = Ch_list[:]
         self._min_wall_diameter = min_wall_diameter
         self._max_wall_diameter = max_wall_diameter
+        self._max_walls = max_walls
         self._wall_spacing = wall_spacing
 
         if Lz is None:

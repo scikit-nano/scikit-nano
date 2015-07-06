@@ -478,6 +478,14 @@ class MWNTMixin:
         self.update_Ch_list()
 
     @property
+    def max_walls(self):
+        return self._max_walls
+
+    @max_walls.setter
+    def max_walls(self, value):
+        self._max_walls = value
+
+    @property
     def wall_spacing(self):
         return self._wall_spacing
 
