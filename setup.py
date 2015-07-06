@@ -87,7 +87,7 @@ Topic :: Software Development :: Libraries :: Python Modules
 MAJOR = 0
 MINOR = 3
 MICRO = 10
-ISRELEASED = False
+ISRELEASED = True
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 STABLEVERSION = None
@@ -238,7 +238,7 @@ def setup_package():
         if numpy_version < (1, 9):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
-        install_requires += ['numpy>=1.9']
+        install_requires += ['numpy==1.9.1']
 
     try:
         import scipy
@@ -247,7 +247,7 @@ def setup_package():
         if scipy_version < (0, 14):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
-        install_requires += ['scipy>=0.14']
+        install_requires += ['scipy==0.15.0']
 
     # Add six module to install_requires (used in numpydoc git submodule)
     install_requires += ['six>=1.9']
