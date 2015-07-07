@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ========================================================
-NanoGen GUI front-ends (:mod:`sknano.apps.nanogen_gui`)
+NanoGen GUI app (:mod:`sknano.apps.nanogen_gui`)
 ========================================================
 
 .. currentmodule:: sknano.apps.nanogen_gui
