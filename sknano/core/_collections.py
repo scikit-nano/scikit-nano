@@ -12,11 +12,11 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 try:
-    from collections.abc import MutableSequence, Set
+    from collections.abc import Mapping, MutableSequence, Set
 except ImportError:
-    from collections import MutableSequence, Set
+    from collections import Mapping, MutableSequence, Set
 
-__all__ = ['ListBasedSet', 'UserList']
+__all__ = ['ListBasedSet', 'UserList', 'frozendict']
 
 
 # class AttrDict(dict):
@@ -180,3 +180,18 @@ try:
     from collections import UserList
 except ImportError:
     UserList = _UserList
+
+
+class frozendict(Mapping):
+    """A simple implementation of a read-only *frozen* `dict`."""
+    def __init__(self, data):
+        self._data = data
+
+    def __getitem__(self, key):
+        return self._data[key]
+
+    def __len__(self):
+        return len(self._data)
+
+    def __iter__(self):
+        return iter(self._data)

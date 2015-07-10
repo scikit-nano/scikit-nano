@@ -92,6 +92,7 @@ Custom container datatypes
 
    ListBasedSet
    UserList
+   frozendict
 
 Sub-packages
 -------------
