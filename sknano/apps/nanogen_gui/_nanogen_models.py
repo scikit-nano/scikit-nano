@@ -86,6 +86,32 @@ class SWNTModelMixin:
         return self.n, self.m
 
     @property
+    def n(self):
+        """Chiral index :math:`n`"""
+        # return self._n
+        return self.structure.n
+
+    @n.setter
+    def n(self, value):
+        # self._n = value
+        # self.structure.n = self.n
+        self.structure.n = value
+        self.notify_observers()
+
+    @property
+    def m(self):
+        """Chiral index :math:`m`"""
+        # return self._m
+        return self.structure.m
+
+    @m.setter
+    def m(self, value):
+        # self._m = value
+        # self.structure.m = self.m
+        self.structure.m = value
+        self.notify_observers()
+
+    @property
     def Lz(self):
         return compute_Lz(self.Ch, nz=self.nz, bond=self.bond, gutter=dVDW)
 
@@ -172,32 +198,6 @@ class SWNTModel(GeneratorModelBase, SWNTModelMixin, BundleModelMixin):
         # self._n = self._m = 10
         self.structure = SWNTBundle((10, 10), basis=self.basis, bond=self.bond,
                                     nx=1, ny=1, nz=1, bundle_packing='hcp')
-        self.notify_observers()
-
-    @property
-    def n(self):
-        """Chiral index :math:`n`"""
-        # return self._n
-        return self.structure.n
-
-    @n.setter
-    def n(self, value):
-        # self._n = value
-        # self.structure.n = self.n
-        self.structure.n = value
-        self.notify_observers()
-
-    @property
-    def m(self):
-        """Chiral index :math:`m`"""
-        # return self._m
-        return self.structure.m
-
-    @m.setter
-    def m(self, value):
-        # self._m = value
-        # self.structure.m = self.m
-        self.structure.m = value
         self.notify_observers()
 
 
@@ -312,9 +312,15 @@ class GrapheneModel(GeneratorModelBase, UnrolledSWNTModelMixin):
     def __init__(self):
         super().__init__()
 
-        self.graphene = Graphene(armchair_edge_length=1,
-                                 zigzag_edge_length=1, basis=self.basis,
-                                 bond=self.bond)
+        self.conventional_cell_graphene = \
+            Graphene.from_conventional_cell(armchair_edge_length=1,
+                                            zigzag_edge_length=1,
+                                            basis=self.basis,
+                                            bond=self.bond)
+        self.primitive_cell_graphene = \
+            Graphene.from_primitive_cell(edge_length=1,
+                                         basis=self.basis,
+                                         bond=self.bond)
         # self._n = self._m = 10
         self.structure = UnrolledSWNT((10, 10), basis=self.basis,
                                       bond=self.bond, nx=1, nz=1)
@@ -324,20 +330,29 @@ class GrapheneModel(GeneratorModelBase, UnrolledSWNTModelMixin):
 
     @property
     def armchair_edge_length(self):
-        return self._armchair_edge_length
+        return self.conventional_cell_graphene.armchair_edge_length
 
     @armchair_edge_length.setter
     def armchair_edge_length(self, value):
-        self._armchair_edge_length = value
+        self.conventional_cell_graphene.armchair_edge_length = value
         self.notify_observers()
 
     @property
     def zigzag_edge_length(self):
-        return self._zigzag_edge_length
+        return self.conventional_cell_graphene.zigzag_edge_length
 
     @zigzag_edge_length.setter
     def zigzag_edge_length(self, value):
-        self._zigzag_edge_length = value
+        self.conventional_cell_graphene.zigzag_edge_length = value
+        self.notify_observers()
+
+    @property
+    def edge_length(self):
+        return self.primitive_cell_graphene.edge_length
+
+    @edge_length.setter
+    def edge_length(self, value):
+        self.primitive_cell_graphene.edge_length = value
         self.notify_observers()
 
     @property

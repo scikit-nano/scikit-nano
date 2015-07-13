@@ -302,12 +302,22 @@ class GrapheneGeneratorView(QMainWindow, Ui_GrapheneGenerator,
 
     def get_generator_parameters(self):
         kwargs = {}
-        if self.achiral_edge_lengths_radio_button.isChecked():
+        element1 = str(self.element1_combo_box.itemText(
+                       self.element1_combo_box.currentIndex()))
+        element2 = str(self.element2_combo_box.itemText(
+                       self.element2_combo_box.currentIndex()))
+        kwargs['basis'] = [element1, element2]
+        kwargs['bond'] = self.bond_double_spin_box.value()
+        if self.conventional_unit_cell_radio_button.isChecked():
             kwargs['armchair_edge_length'] = \
                 self.armchair_edge_length_double_spin_box.value()
             kwargs['zigzag_edge_length'] = \
                 self.zigzag_edge_length_double_spin_box.value()
-            kwargs['generator_class'] = 'GrapheneGenerator'
+            kwargs['generator_class'] = 'ConventionalCellGrapheneGenerator'
+        elif self.primitive_unit_cell_radio_button.isChecked():
+            kwargs['edge_length'] = \
+                self.edge_length_double_spin_box.value()
+            kwargs['generator_class'] = 'PrimitiveCellGrapheneGenerator'
         else:
             kwargs['n'] = self.swnt_n_spin_box.value()
             kwargs['m'] = self.swnt_m_spin_box.value()
@@ -334,12 +344,14 @@ class GrapheneGeneratorView(QMainWindow, Ui_GrapheneGenerator,
             self.model.armchair_edge_length)
         self.zigzag_edge_length_double_spin_box.setValue(
             self.model.zigzag_edge_length)
+        self.edge_length_double_spin_box.setValue(
+            self.model.edge_length)
         self.nlayers_spin_box.setValue(self.model.nlayers)
-        self.layer_rotation_increment_double_spin_box(
+        self.layer_rotation_increment_double_spin_box.setValue(
             self.model.layer_rotation_increment)
 
-        self.unrolled_swnt_n_spin_box.setValue(self.model.n)
-        self.unrolled_swnt_m_spin_box.setValue(self.model.m)
+        self.swnt_n_spin_box.setValue(self.model.n)
+        self.swnt_m_spin_box.setValue(self.model.m)
         self.parent.update_app_view()
 
 

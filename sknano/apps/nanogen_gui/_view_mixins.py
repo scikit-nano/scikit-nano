@@ -216,16 +216,24 @@ class GrapheneViewMixin:
 
     @pyqtSlot(int)
     def on_graphene_generator_button_group_buttonClicked(self, value):
-        use_edge_lengths = self.achiral_edge_lengths_radio_button.isChecked()
-        [obj.setReadOnly(use_edge_lengths) for obj in
+        use_unrolled_swnt = True if \
+            self.unrolled_swnt_chirality_radio_button.isChecked() else False
+        use_conventional_unit_cell = True if \
+            self.conventional_unit_cell_radio_button.isChecked() else False
+        use_primitive_unit_cell = True if \
+            self.primitive_unit_cell_radio_button.isChecked() else False
+        [obj.setReadOnly(not use_unrolled_swnt) for obj in
          (self.swnt_n_spin_box, self.swnt_m_spin_box,
           self.unrolled_swnt_nx_spin_box,
           self.unrolled_swnt_nz_spin_box,
           self.unrolled_swnt_Lx_double_spin_box,
           self.unrolled_swnt_Lz_double_spin_box)]
-        [obj.setReadOnly(not use_edge_lengths) for obj in
-         (self.armchair_edge_length_double_spin_box,
-          self.zigzag_edge_length_double_spin_box)]
+        [obj.setReadOnly(not use_conventional_unit_cell) for
+         obj in (self.armchair_edge_length_double_spin_box,
+                 self.zigzag_edge_length_double_spin_box)]
+        self.edge_length_double_spin_box.setReadOnly(
+            not use_primitive_unit_cell)
+        self.update_app_view()
 
     @pyqtSlot(int)
     def on_stacking_order_button_group_buttonClicked(self, value):
@@ -250,6 +258,10 @@ class GrapheneViewMixin:
     @pyqtSlot(float)
     def on_zigzag_edge_length_double_spin_box_valueChanged(self, value):
         self.model.zigzag_edge_length = value
+
+    @pyqtSlot(float)
+    def on_edge_length_double_spin_box_valueChanged(self, value):
+        self.model.edge_length = value
 
     # @pyqtSlot()
     # def on_unrolled_swnt_nx_spin_box_editingFinished(self):
