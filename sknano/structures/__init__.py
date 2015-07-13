@@ -114,5 +114,6 @@ from ._unrolled_swnt import *
 
 from ._compute_funcs import *
 from ._extras import *
+from ._defects import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
