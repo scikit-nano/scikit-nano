@@ -26,8 +26,55 @@ from ._compute_funcs import compute_N, compute_Ch, compute_chiral_angle, \
     compute_tube_mass
 from ._extras import get_chiral_type, generate_Ch_list
 
-__all__ = ['MWNTMixin', 'NanotubeMixin', 'SWNTMixin', 'NanotubeBundleMixin',
-           'UnrolledSWNTMixin']
+__all__ = ['GrapheneMixin', 'MWNTMixin', 'NanotubeMixin', 'SWNTMixin',
+           'NanotubeBundleMixin', 'UnrolledSWNTMixin']
+
+
+class GrapheneMixin:
+    """Mixin class for graphene structure classes."""
+
+    @property
+    def n1(self):
+        return int(np.ceil(10 * self.l1 / self.unit_cell.a1.length))
+
+    @property
+    def n2(self):
+        return int(np.ceil(10 * self.l2 / self.unit_cell.a2.length))
+
+    @property
+    def r1(self):
+        return self.n1 * self.unit_cell.a1
+
+    @property
+    def r2(self):
+        return self.n2 * self.unit_cell.a2
+
+    @property
+    def area(self):
+        return np.abs(self.r1.cross(self.r2))
+
+    @property
+    def N(self):
+        """Number of graphene unit cells.
+
+        .. math::
+
+           N = \\frac{A_{\\mathrm{sheet}}}{A_{\\mathrm{cell}}}
+
+        """
+        return int(self.area / self.unit_cell.area)
+
+    @property
+    def Natoms(self):
+        return self.nlayers * self.Natoms_per_layer
+
+    @property
+    def Natoms_per_layer(self):
+        return self.N * self.Natoms_per_unit_cell
+
+    @property
+    def Natoms_per_unit_cell(self):
+        return self.unit_cell.basis.Natoms
 
 
 class SWNTMixin:
@@ -314,7 +361,7 @@ class SWNTMixin:
         nanotube unit cell and :math:`n_z` is the number of unit cells.
 
         """
-        return self.Natoms_per_tube
+        return compute_Natoms(self.n, self.m, nz=self.nz)
 
     @property
     def Natoms_per_unit_cell(self):
@@ -333,7 +380,7 @@ class SWNTMixin:
     @property
     def Natoms_per_tube(self):
         """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
-        return compute_Natoms(self.n, self.m, nz=self.nz)
+        return self.Natoms
 
     @property
     def Ntubes(self):
@@ -421,29 +468,23 @@ class MWNTMixin:
 
     @property
     def Natoms(self):
-        """Number of atoms in nanotube.
+        """Number of atoms in `MWNT`.
 
-        .. versionchanged:: 0.3.0
-
-           **Returns total number of atoms per nanotube.**
-           Use :attr:`~MWNT.Natoms_per_unit_cell` to get the number of
-           atoms per unit cell.
+           **Returns total number of atoms in `MWNT`.**
+           Use :attr:`~MWNT.Natoms_per_wall` to get a list of the number of
+           atoms in each `MWNT` wall.
 
         .. math::
 
-           N_{\\mathrm{atoms}} = 2N\\times n_z =
-           \\frac{4(n^2 + m^2 + nm)}{d_R}\\times n_z
-
-        where :math:`N` is the number of graphene hexagons mapped to the
-        nanotube unit cell and :math:`n_z` is the number of unit cells.
+           N_{\\mathrm{atoms}} = \\sum_{\\mathrm{walls}}
 
         """
-        return self.Natoms_per_tube
+        return np.asarray(self.Natoms_per_wall).sum()
 
     @property
     def Natoms_per_tube(self):
         """Number of atoms in `MWNT`."""
-        return np.asarray([swnt.Natoms for swnt in self.walls]).sum()
+        return self.Natoms
 
     @property
     def Ntubes(self):
@@ -508,6 +549,17 @@ class MWNTMixin:
     #     self._Lz = value
 
     @property
+    def Natoms_per_wall(self):
+        """Alias for :attr:`MWNT.Natoms_list`"""
+        return self.Natoms_list
+
+    @property
+    def Natoms_list(self):
+        """List of `MWNT` `SWNT` wall's number of atoms \
+        :attr:`~SWNT.Natoms`."""
+        return [swnt.Natoms for swnt in self.walls]
+
+    @property
     def nz_list(self):
         """Number of nanotube unit cells along the :math:`z`-axis."""
         return [swnt.nz for swnt in self.walls]
@@ -524,25 +576,29 @@ class MWNTMixin:
 
     @property
     def dt_list(self):
-        """`MWNT` wall diameters :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}` \
-        in \u212b."""
+        """List of `MWNT` `SWNT` wall diameters :attr:`~SWNT.dt` \
+        :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}` in \u212b."""
         return [swnt.dt for swnt in self.walls]
 
+    @property
     def rt_list(self):
-        """`MWNT` wall radii :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}` \
-        in \u212b."""
+        """List of `MWNT` `SWNT` wall radii :attr:`~SWNT.rt` \
+        :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}` in \u212b."""
         return [swnt.rt for swnt in self.walls]
 
     @property
     def wall_diameters(self):
+        """Alias for :attr:`MWNTMixin.dt_list`."""
         return self.dt_list
 
     @property
     def wall_radii(self):
+        """Alias for :attr:`MWNTMixin.rt_list`."""
         return self.rt_list
 
     @property
     def walls(self):
+        """List of `MWNT` `SWNT` wall structures."""
         return [sknano.structures.SWNT(Ch, Lz=self.Lz, fix_Lz=True,
                                        basis=self.basis, bond=self.bond)
                 for Ch in self.Ch_list]
@@ -718,20 +774,32 @@ class NanotubeBundleMixin:
 
     @property
     def Natoms(self):
-        return self.Natoms_per_bundle
+        """Number of atoms in nanotube bundle.
 
-    @property
-    def Natoms_per_tube(self):
-        """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
-        return super().Natoms_per_tube
+           **Returns total number of atoms in nanotube bundle.**
+           Use :attr:`~NanotubeBundleMixin.Natoms_per_tube` to
+           get a list of the number of atoms in each nanotube in
+           the bundle.
+
+        """
+        return np.asarray(self.Natoms_list).sum()
 
     @property
     def Natoms_per_bundle(self):
-        return self.Ntubes * self.Natoms_per_tube
+        return self.Natoms
+
+    @property
+    def Natoms_list(self):
+        return [nanotube.Natoms for nanotube in self.bundle_list]
 
     @property
     def Ntubes(self):
         return len(self.bundle_coords)
+
+    @property
+    def Natoms_per_tube(self):
+        """Alias for :attr:`~NanotubeBundleMixin.Natoms_list`."""
+        return self.Natoms_list
 
     def generate_bundle_coords(self):
         """Generate coordinates of bundle tubes."""
