@@ -90,6 +90,7 @@ class SWNTViewMixin:
             self.model.fix_Lz = False
             self.swnt_nz_double_spin_box.setReadOnly(False)
             self.swnt_Lz_double_spin_box.setReadOnly(True)
+        self.update_app_view()
 
 
 class MWNTChListItemDialog(QDialog, Ui_MWNTChListItemDialog):
@@ -311,6 +312,7 @@ class GrapheneViewMixin:
             self.layer_rotation_increment_double_spin_box.setValue(0.0)
         self.layer_rotation_increment_double_spin_box.setReadOnly(
             False if self.model.nlayers > 1 else True)
+        self.update_app_view()
         # self.update_stacking_order_buttonGroup()
 
     # def update_stacking_order_buttonGroup(self):
