@@ -22,10 +22,10 @@ class NanotubeBundleBase(NanotubeBundleMixin):
 
     _bundle_geometries = ['square', 'rectangle', 'hexagon']
 
-    def __init__(self, *Ch, nx=1, ny=1, vdw_spacing=dVDW,
+    def __init__(self, *args, nx=1, ny=1, vdw_spacing=dVDW,
                  bundle_packing=None, bundle_geometry=None, **kwargs):
 
-        super().__init__(*Ch, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.nx = nx
         self.ny = ny
@@ -33,7 +33,7 @@ class NanotubeBundleBase(NanotubeBundleMixin):
 
         self.bundle_geometry = bundle_geometry
         self.bundle_packing = bundle_packing
-
+        self.bundle_list = []
         self.generate_bundle_coords()
 
     def todict(self):
