@@ -108,7 +108,7 @@ class GrapheneBase(GrapheneMixin, StructureBase):
     def __init__(self, basis=['C', 'C'], bond=aCC, nlayers=1,
                  layer_spacing=dVDW, layer_rotation_angles=None,
                  layer_rotation_increment=None, stacking_order='AB',
-                 degrees=True, cartesian=True, **kwargs):
+                 degrees=True, **kwargs):
 
         if 'deg2rad' in kwargs:
             degrees = kwargs['deg2rad']
