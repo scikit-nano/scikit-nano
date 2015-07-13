@@ -26,7 +26,7 @@ from ._swnt_generator import SWNTGenerator
 __all__ = ['MWNTGenerator']
 
 
-class MWNTGenerator(MWNT, GeneratorBase):
+class MWNTGenerator(GeneratorBase, MWNT):
     """Class for generating single, `MWNT`.
 
     .. versionchanged:: 0.2.20

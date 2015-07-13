@@ -31,7 +31,7 @@ from ._base import Atom, GeneratorBase
 __all__ = ['UnrolledSWNTGenerator']
 
 
-class UnrolledSWNTGenerator(UnrolledSWNT, GeneratorBase):
+class UnrolledSWNTGenerator(GeneratorBase, UnrolledSWNT):
     """Class for generating unrolled nanotube structures.
 
     .. versionadded:: 0.2.23

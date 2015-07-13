@@ -32,7 +32,7 @@ from ._base import Atom, GeneratorBase
 __all__ = ['SWNTGenerator']
 
 
-class SWNTGenerator(SWNT, GeneratorBase):
+class SWNTGenerator(GeneratorBase, SWNT):
     """Class for generating `SWNT` structures.
 
     Parameters
