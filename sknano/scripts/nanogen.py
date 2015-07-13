@@ -97,13 +97,17 @@ import importlib
 import sys
 
 from sknano.core.refdata import CCbond, dVDW
-from sknano.version import short_version as version
+from sknano.version import release, full_version, git_revision
 
 __all__ = ['nanogen']
 
 
 def argparser():
     parser = argparse.ArgumentParser()
+
+    version = full_version
+    if not release:
+        version = '-'.join((full_version, git_revision[:7]))
 
     parser.add_argument('--basis', type=str, nargs=2,
                         metavar=('ELEMENT1', 'ELEMENT2'),
@@ -128,32 +132,54 @@ def argparser():
     subparsers = parser.add_subparsers(title='sub-commands')
 
     graphene_parent_parser = argparse.ArgumentParser(add_help=False)
-    graphene_parent_parser.add_argument('armchair_edge_length', type=float,
-                                        help='length of graphene armchair '
-                                        'edge in **nanometers**')
-    graphene_parent_parser.add_argument('zigzag_edge_length', type=float,
-                                        help='length of graphene zigzag '
-                                        'edge in **nanometers**')
     graphene_parent_parser.add_argument('--layer-spacing', type=float,
                                         default=dVDW, help='distance between '
                                         'graphene layers in **Angstroms**. '
                                         '(default: %(default)s)')
-    graphene_parent_parser.add_argument('--stacking-order', default='AB',
-                                        choices=('AA', 'AB'),
-                                        help='Stacking order of graphene '
-                                        'layers (default: %(default)s)')
+    graphene_parent_parser.add_argument('--layer-rotation-increment',
+                                        type=float,
+                                        default=None,
+                                        help='Layer rotation angles of '
+                                        'each layer in **degrees** '
+                                        '(default: %(default)s)')
     graphene_parent_parser.add_argument('--layer-rotation-angles', type=list,
                                         default=None,
                                         help='Layer rotation angles of '
                                         'each layer in **degrees** '
                                         '(default: %(default)s)')
+    graphene_parent_parser.add_argument('--stacking-order', default='AB',
+                                        choices=('AA', 'AB'),
+                                        help='Stacking order of graphene '
+                                        'layers (default: %(default)s)')
 
     graphene_parser = \
         subparsers.add_parser('graphene', parents=[graphene_parent_parser])
     graphene_parser.add_argument('--nlayers', type=int, default=1,
                                  help='Number of graphene layers. '
                                  '(default: %(default)s)')
-    graphene_parser.set_defaults(generator_class='GrapheneGenerator')
+    graphene_subparsers = \
+        graphene_parser.add_subparsers(title='graphene sub-commands')
+
+    primitive_cell_graphene_parser = \
+        graphene_subparsers.add_parser('from_primitive_cell')
+    primitive_cell_graphene_parser.add_argument(
+        '--edge-length', type=float, default=5,
+        help='graphene edge length in **nanometers**')
+    primitive_cell_graphene_parser.set_defaults(
+        generator_class='PrimitiveCellGrapheneGenerator')
+
+    conventional_cell_graphene_parser = \
+        graphene_subparsers.add_parser('from_conventional_cell')
+    conventional_cell_graphene_parser.add_argument(
+        '--armchair-edge-length', type=float, default=5,
+        help='length of graphene armchair edge in **nanometers**')
+    conventional_cell_graphene_parser.add_argument(
+        '--zigzag-edge-length', type=float, default=5,
+        help='length of graphene zigzag edge in **nanometers**')
+    conventional_cell_graphene_parser.set_defaults(
+        generator_class='ConventionalCellGrapheneGenerator')
+
+    # graphene_parser.set_defaults(generator_class='GrapheneGenerator')
 
     bilayer_graphene_parser = \
         subparsers.add_parser('bilayer_graphene',
