@@ -129,8 +129,13 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin, UnitCellMixin):
 
     @property
     def cell_area(self):
+        """Alias for :attr:`~Crystal2DLattice.area`."""
+        return self.area
+
+    @property
+    def area(self):
         """Unit cell area."""
-        return self.a1.cross(self.a2)
+        return np.abs(self.a1.cross(self.a2))
 
     @property
     def ortho_matrix(self):
