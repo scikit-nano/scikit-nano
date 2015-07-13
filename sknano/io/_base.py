@@ -16,7 +16,11 @@ from abc import ABCMeta, abstractmethod
 from sknano.core import get_fpath
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 # from sknano.utils.analysis import StructureAnalyzer
-from sknano.version import short_version as version
+from sknano.version import release, full_version, git_revision
+
+version = full_version
+if not release:
+    version = '-'.join((full_version, git_revision[:7]))
 
 default_comment_line = \
     'Structure data generated using scikit-nano version {}'.format(version)
