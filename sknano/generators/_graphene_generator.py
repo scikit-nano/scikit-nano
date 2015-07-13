@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Graphene structure generator (:mod:`sknano.generators._graphene_generator`)
+Graphene structure generators (:mod:`sknano.generators._graphene_generator`)
 ==============================================================================
 
 .. currentmodule:: sknano.generators._graphene_generator
@@ -11,17 +11,253 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+import copy
+
 import numpy as np
 
 from sknano.core.math import Vector
-from sknano.structures import Graphene
+from sknano.structures import PrimitiveCellGraphene, ConventionalCellGraphene
 from ._base import Atom, Atoms, GeneratorBase
 
-__all__ = ['GrapheneGenerator']
+__all__ = ['GrapheneGenerator',
+           'GrapheneGeneratorBase',
+           'PrimitiveCellGrapheneGenerator',
+           'HexagonalGrapheneGenerator',
+           'HexagonalCellGrapheneGenerator',
+           'ConventionalCellGrapheneGenerator',
+           'RectangularGrapheneGenerator',
+           'RectangularCellGrapheneGenerator']
 
 
-class GrapheneGenerator(Graphene, GeneratorBase):
+class GrapheneGeneratorBase(GeneratorBase):
     """`N`-layer graphene generator class.
+
+    Parameters
+    ----------
+    basis : {:class:`python:list`}, optional
+        List of :class:`python:str`\ s of element symbols or atomic number
+        of the two atom basis (default: ['C', 'C'])
+    bond : float, optional
+        bond length between nearest-neighbor atoms in **Angstroms**.
+    nlayers : int, optional
+        Number of graphene layers.
+    layer_spacing : float, optional
+        Distance between layers in **Angstroms**.
+    stacking_order : {'AA', 'AB'}, optional
+        Stacking order of graphene layers
+    layer_rotation_angles : list, optional
+        list of rotation angles for each layer in **degrees** if
+        `degrees` is `True` (default), otherwise in radians.
+        The list length must equal the number of layers.
+    layer_rotation_increment : float, optional
+        incremental layer rotation angle in **degrees** if
+        `degrees` is `True` (default), otherwise in radians.
+        Each subsequent layer will
+        be rotated by `layer_rotation_increment` relative to the layer
+        below it.
+    autogen : bool, optional
+        automatically generate unit cell and full structure
+    verbose : bool, optional
+        verbose output
+
+    """
+
+    def __init__(self, autogen=True, **kwargs):
+
+        super().__init__(**kwargs)
+
+        if autogen:
+            self.generate_structure_data()
+
+    def generate_structure_data(self):
+        """Generate the full structure coordinates."""
+
+        self.structure_data.clear()
+        layer0 = Atoms()
+        for i in range(self.n1):
+            for j in range(self.n2):
+                dr = i * self.unit_cell.a1 + j * self.unit_cell.a2
+                for atom in self.unit_cell:
+                    layer_atom = Atom(atom.symbol)
+                    layer_atom.r[:2] = atom.r[:2] + dr
+                    layer0.append(layer_atom)
+
+        layer0.center_CM()
+        # self.Natoms_per_layer = layer0.Natoms
+
+        self.layers = []
+        for nlayer in range(self.nlayers):
+            layer = copy.deepcopy(layer0)
+            layer.translate(Vector([0, 0, nlayer * self.layer_spacing]))
+            if (nlayer % 2) != 0:
+                layer.translate(self.layer_shift)
+            layer.rotate(angle=self.layer_rotation_angles[nlayer], axis='z')
+            self.atoms.extend(layer)
+            self.layers.append(layer)
+
+    @classmethod
+    def generate_fname(cls, nlayers=None, basis=None, **kwargs):
+        nlayer = '{}layer'.format(nlayers)
+        basis = ''.join(basis)
+        fname_wordlist = (nlayer, basis, 'graphene')
+        fname = '_'.join(fname_wordlist)
+        return fname
+
+    def save(self, fname=None, outpath=None, structure_format=None,
+             center_CM=True, rotation_angle=-np.pi/2, rotation_axis='x',
+             **kwargs):
+        """Save structure data.
+
+        See :meth:`~sknano.generators.GeneratorBase.save` method
+        for documentation.
+
+        """
+        if fname is None:
+            fname = \
+                self.generate_fname(nlayers=self.nlayers, basis=self.basis)
+
+        if center_CM and self.nlayers > 1:
+            self.atoms.center_CM()
+
+        super().save(fname=fname, outpath=outpath,
+                     structure_format=structure_format, center_CM=False,
+                     angle=rotation_angle, axis=rotation_axis, **kwargs)
+
+
+class PrimitiveCellGrapheneGenerator(GrapheneGeneratorBase,
+                                     PrimitiveCellGraphene):
+    """`N`-layer graphene generator class using a primitive unit cell.
+
+    Parameters
+    ----------
+    edge_length : float
+        Length of graphene edges in **nanometers**
+    basis : {:class:`python:list`}, optional
+        List of :class:`python:str`\ s of element symbols or atomic number
+        of the two atom basis (default: ['C', 'C'])
+    bond : float, optional
+        bond length between nearest-neighbor atoms in **Angstroms**.
+    nlayers : int, optional
+        Number of graphene layers.
+    layer_spacing : float, optional
+        Distance between layers in **Angstroms**.
+    stacking_order : {'AA', 'AB'}, optional
+        Stacking order of graphene layers
+    layer_rotation_angles : list, optional
+        list of rotation angles for each layer in **degrees** if
+        `degrees` is `True` (default), otherwise in radians.
+        The list length must equal the number of layers.
+    layer_rotation_increment : float, optional
+        incremental layer rotation angle in **degrees** if
+        `degrees` is `True` (default), otherwise in radians.
+        Each subsequent layer will
+        be rotated by `layer_rotation_increment` relative to the layer
+        below it.
+    autogen : bool, optional
+        automatically generate unit cell and full structure
+    verbose : bool, optional
+        verbose output
+
+    """
+    @classmethod
+    def generate_fname(cls, edge_length=None, **kwargs):
+        dimensions = '{}nm'.format(edge_length)
+        fname = '_'.join((dimensions, super().generate_fname(**kwargs)))
+        return fname
+
+    def save(self, fname=None, **kwargs):
+        """Save structure data.
+
+        See :meth:`~sknano.generators.GeneratorBase.save` method
+        for documentation.
+
+        """
+        if fname is None:
+            fname = \
+                self.generate_fname(edge_length=self.edge_length,
+                                    nlayers=self.nlayers, basis=self.basis)
+
+        super().save(fname=fname, **kwargs)
+
+HexagonalGrapheneGenerator = HexagonalCellGrapheneGenerator = \
+    PrimitiveCellGrapheneGenerator
+
+
+class ConventionalCellGrapheneGenerator(GrapheneGeneratorBase,
+                                        ConventionalCellGraphene):
+    """`N`-layer graphene generator class using a conventional unit cell.
+
+    Parameters
+    ----------
+    armchair_edge_length : float, optional
+        Length of armchair edge in **nanometers**
+    zigzag_edge_length : float, optional
+        Length of zigzag edge in **nanometers**
+    basis : {:class:`python:list`}, optional
+        List of :class:`python:str`\ s of element symbols or atomic number
+        of the two atom basis (default: ['C', 'C'])
+    bond : float, optional
+        bond length between nearest-neighbor atoms in **Angstroms**.
+    nlayers : int, optional
+        Number of graphene layers.
+    layer_spacing : float, optional
+        Distance between layers in **Angstroms**.
+    stacking_order : {'AA', 'AB'}, optional
+        Stacking order of graphene layers
+    layer_rotation_angles : list, optional
+        list of rotation angles for each layer in **degrees** if
+        `degrees` is `True` (default), otherwise in radians.
+        The list length must equal the number of layers.
+    layer_rotation_increment : float, optional
+        incremental layer rotation angle in **degrees** if
+        `degrees` is `True` (default), otherwise in radians.
+        Each subsequent layer will
+        be rotated by `layer_rotation_increment` relative to the layer
+        below it.
+    autogen : bool, optional
+        automatically generate unit cell and full structure
+    verbose : bool, optional
+        verbose output
+
+    """
+    @classmethod
+    def generate_fname(cls, armchair_edge_length=None,
+                       zigzag_edge_length=None, **kwargs):
+        dimensions = '{}nmx{}nm'.format(armchair_edge_length,
+                                        zigzag_edge_length)
+        fname = '_'.join((dimensions, super().generate_fname(**kwargs)))
+        return fname
+
+    def save(self, fname=None, **kwargs):
+        """Save structure data.
+
+        See :meth:`~sknano.generators.GeneratorBase.save` method
+        for documentation.
+
+        """
+        if fname is None:
+            fname = \
+                self.generate_fname(
+                    armchair_edge_length=self.armchair_edge_length,
+                    zigzag_edge_length=self.zigzag_edge_length,
+                    nlayers=self.nlayers, basis=self.basis)
+
+        super().save(fname=fname, **kwargs)
+
+RectangularGrapheneGenerator = RectangularCellGrapheneGenerator = \
+    ConventionalCellGrapheneGenerator
+
+
+class GrapheneGenerator(ConventionalCellGrapheneGenerator):
+    """`N`-layer graphene generator class.
+
+    .. versionchanged:: 0.3.11
+
+       `GrapheneGenerator` is now a sub-class of the
+       `ConventionalCellGrapheneGenerator` class to maintain
+       backwards compatibility and also includes 2 new
+       classmethods: :meth:`~GrapheneGenerator.from_primitive_cell`
+       and :meth:`~GrapheneGenerator.from_conventional_cell`.
 
     Parameters
     ----------
@@ -153,72 +389,10 @@ class GrapheneGenerator(Graphene, GeneratorBase):
     .. image:: /images/5nmx5nm_single_layer_UEs_graphene.png
 
     """
-
-    def __init__(self, autogen=True, **kwargs):
-
-        super().__init__(**kwargs)
-
-        if autogen:
-            self.generate_structure_data()
-
-    def generate_structure_data(self):
-        """Generate the full structure coordinates."""
-
-        self.structure_data.clear()
-        for nlayer in range(self.nlayers):
-            layer = Atoms()
-            for nx in range(self.Nx):
-                for ny in range(self.Ny):
-                    dr = Vector([nx * self.unit_cell.a,
-                                 ny * self.unit_cell.b,
-                                 0.0])
-                    for atom in self.unit_cell:
-                        layer_atom = Atom(atom.symbol)
-                        layer_atom.r = atom.r + dr
-                        layer.append(layer_atom)
-
-            if self.Natoms_per_layer is None:
-                self.Natoms_per_layer = layer.Natoms
-
-            # translate layer to put its center of mass at the origin
-            layer.center_CM()
-            layer.translate(Vector([0, 0, nlayer * self.layer_spacing]))
-            if (nlayer % 2) != 0:
-                layer.translate(self.layer_shift)
-            layer.rotate(angle=self.layer_rotation_angles[nlayer], axis='z')
-            self.atoms.extend(layer)
+    @classmethod
+    def from_primitive_cell(cls, **kwargs):
+        return PrimitiveCellGrapheneGenerator(**kwargs)
 
     @classmethod
-    def generate_fname(cls, armchair_edge_length=None,
-                       zigzag_edge_length=None, nlayers=None, basis=None,
-                       **kwargs):
-        dimensions = '{}nmx{}nm'.format(armchair_edge_length,
-                                        zigzag_edge_length)
-        nlayer = '{}layer'.format(nlayers)
-        basis = ''.join(basis)
-        fname_wordlist = (dimensions, nlayer, basis, 'graphene')
-        fname = '_'.join(fname_wordlist)
-        return fname
-
-    def save(self, fname=None, outpath=None, structure_format=None,
-             center_CM=True, rotation_angle=-np.pi/2, rotation_axis='x',
-             **kwargs):
-        """Save structure data.
-
-        See :meth:`~sknano.generators.GeneratorBase.save` method
-        for documentation.
-
-        """
-        if fname is None:
-            fname = \
-                self.generate_fname(
-                    armchair_edge_length=self.armchair_edge_length,
-                    zigzag_edge_length=self.zigzag_edge_length,
-                    nlayers=self.nlayers, basis=self.basis)
-
-        if center_CM and self.nlayers > 1:
-            self.atoms.center_CM()
-
-        super().save(fname=fname, outpath=outpath,
-                     structure_format=structure_format, center_CM=False,
-                     angle=rotation_angle, axis=rotation_axis, **kwargs)
+    def from_conventional_cell(cls, **kwargs):
+        return ConventionalCellGrapheneGenerator(**kwargs)
