@@ -24,6 +24,8 @@ Structure Classes
 
    Fullerene
    Graphene
+   PrimitiveCellGraphene
+   ConventionalCellGraphene
    BilayerGraphene
    SWNT
    SWNTBundle

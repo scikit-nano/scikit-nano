@@ -5,14 +5,58 @@ from __future__ import unicode_literals
 
 import nose
 from nose.tools import *
-from sknano.structures import Graphene
+
+import numpy as np
+
+from sknano.structures import Graphene, PrimitiveCellGraphene, \
+    ConventionalCellGraphene, GraphenePrimitiveCell, GrapheneConventionalCell
 
 
 def test1():
-    graphene = Graphene(armchair_edge_length=5, zigzag_edge_length=5)
-    assert_equals(graphene.zigzag_edge_length, 5)
-    assert_equals(graphene.armchair_edge_length, 5)
-    print(graphene.unit_cell)
+    s = Graphene(armchair_edge_length=5, zigzag_edge_length=5)
+    assert_equals(s.zigzag_edge_length, 5)
+    assert_equals(s.armchair_edge_length, 5)
+    assert_true(isinstance(s, ConventionalCellGraphene))
+    assert_true(isinstance(s.unit_cell, GrapheneConventionalCell))
+    print(s.unit_cell)
+
+
+def test2():
+    s = PrimitiveCellGraphene(edge_length=5)
+    assert_equals(s.edge_length, 5)
+    assert_true(isinstance(s, PrimitiveCellGraphene))
+    assert_true(isinstance(s.unit_cell, GraphenePrimitiveCell))
+    print(np.degrees(s.r1.angle(s.r2)))
+    print(s.unit_cell)
+    print(s.area)
+    print(s)
+
+
+def test3():
+    s = ConventionalCellGraphene(armchair_edge_length=5, zigzag_edge_length=5)
+    assert_equals(s.zigzag_edge_length, 5)
+    assert_equals(s.armchair_edge_length, 5)
+    assert_true(isinstance(s, ConventionalCellGraphene))
+    assert_true(isinstance(s.unit_cell, GrapheneConventionalCell))
+    print(s.unit_cell)
+    print(s.area)
+    print(s)
+
+
+def test4():
+    s = Graphene.from_conventional_cell(armchair_edge_length=5,
+                                        zigzag_edge_length=5)
+    assert_equals(s.zigzag_edge_length, 5)
+    assert_equals(s.armchair_edge_length, 5)
+    assert_true(isinstance(s.unit_cell, GrapheneConventionalCell))
+    print(s.unit_cell)
+    assert_true(isinstance(s, ConventionalCellGraphene))
+
+
+def test5():
+    s = Graphene.from_primitive_cell(edge_length=5)
+    assert_true(isinstance(s, PrimitiveCellGraphene))
+    assert_true(isinstance(s.unit_cell, GraphenePrimitiveCell))
 
 
 if __name__ == '__main__':
