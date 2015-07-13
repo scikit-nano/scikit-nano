@@ -15,6 +15,8 @@ Contents
    GeneratorBase
    FullereneGenerator
    GrapheneGenerator
+   PrimitiveCellGrapheneGenerator
+   ConventionalCellGrapheneGenerator
    BilayerGrapheneGenerator
    MWNTGenerator
    MWNTBundleGenerator
@@ -41,5 +43,6 @@ from ._mwnt_generator import *
 from ._swnt_bundle_generator import *
 from ._mwnt_bundle_generator import *
 from ._unrolled_swnt_generator import *
+# from ._defect_generators import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
