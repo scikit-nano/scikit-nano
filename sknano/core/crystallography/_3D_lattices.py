@@ -183,6 +183,11 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin, UnitCellMixin):
 
     @property
     def cell_volume(self):
+        """Alias for :attr:`~Crystal3DLattice.volume`."""
+        return self.volume
+
+    @property
+    def volume(self):
         """Unit cell volume."""
         return self.a * self.b * self.c * \
             np.sqrt(1 - self.cos_alpha ** 2 - self.cos_beta ** 2 -
