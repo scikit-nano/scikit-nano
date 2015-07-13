@@ -25,12 +25,23 @@ __all__ = ['Atom', 'Atoms', 'GeneratorBase', 'BulkGeneratorBase',
 #: Tuple of structure generator classes.
 STRUCTURE_GENERATORS = ('FullereneGenerator',
                         'GrapheneGenerator',
+                        'PrimitiveCellGrapheneGenerator',
+                        'ConventionalCellGrapheneGenerator',
                         'BilayerGrapheneGenerator',
                         'UnrolledSWNTGenerator',
                         'SWNTGenerator',
                         'SWNTBundleGenerator',
                         'MWNTGenerator',
-                        'MWNTBundleGenerator')
+                        'MWNTBundleGenerator',
+                        'AlphaQuartzGenerator',
+                        'DiamondStructureGenerator',
+                        'FCCStructureGenerator',
+                        'GoldGenerator',
+                        'CopperGenerator',
+                        'CaesiumChlorideStructureGenerator',
+                        'RocksaltStructureGenerator',
+                        'ZincblendeStructureGenerator',
+                        'MoS2Generator')
 
 
 class GeneratorBase:
