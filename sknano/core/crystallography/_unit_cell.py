@@ -17,7 +17,16 @@ __all__ = ['UnitCell']
 
 
 class UnitCell:
-    """Crystal unit cell class."""
+    """Crystal unit cell class.
+
+    Parameters
+    ----------
+    lattice : :class:`~sknano.core.crystallography.LatticeBase` sub-class
+    basis : {:class:`~python:list`, :class:`~sknano.core.atoms.BasisAtoms`}
+    coords : {:class:`~python:list`}, optional
+    cartesian : {:class:`~python:bool`}, optional
+
+    """
 
     def __init__(self, lattice=None, basis=None, coords=None, cartesian=False):
 
@@ -72,6 +81,7 @@ class UnitCell:
     #                     atom.rs = lattice.cartesian_to_fractional(pos)
 
     def rotate(self, **kwargs):
+        """Rotate lattice vectors and basis."""
         self.lattice.rotate(**kwargs)
         self.basis.rotate(**kwargs)
 
