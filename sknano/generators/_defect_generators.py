@@ -15,39 +15,36 @@ import os
 
 import numpy as np
 
-# from sknano.core import frozendict
 from ._base import Atoms, GeneratorBase
 
-# VACANCY_TYPE = frozendict({'single': 1, 'double': 2, 'triple': 3})
-# __all__ += ['VACANCY_TYPE']
-
-# __all__ += ['DefectGenerator']
+__all__ = ['DefectGenerator']
 # __all__ += ['CrossLinkedDefectGenerator']
 # __all__ += ['StoneWalesDefectGenerator']
 # __all__ += ['VacancyDefectGenerator']
 
 
-# class DefectGenerator(GeneratorBase):
-#     """Base class for generating structure data with defects.
+class DefectGenerator(GeneratorBase):
+    """Base class for generating structure data with defects.
 
-#     Parameters
-#     ----------
-#     fname : str
-#         structure data filename
-#     outpath : str, optional
-#         Output path for structure data file.
-#     structure_format : {None, str}, optional
-#         chemical file format of saved structure data.
-#         If `None`, then guess based on `fname` file extension.
-#         Otherwise, must be one of:
+    Parameters
+    ----------
+    fname : str
+        structure data filename
+    outpath : str, optional
+        Output path for structure data file.
+    structure_format : {None, str}, optional
+        chemical file format of saved structure data.
+        If `None`, then guess based on `fname` file extension.
+        Otherwise, must be one of:
 
-#             - `xyz`
-#             - `data`
+            - `xyz`
+            - `data`
 
-#     verbose : bool, optional
-#         Verbose output
+    verbose : bool, optional
+        Verbose output
 
-#     """
+    """
+    pass
 #     def __init__(self, fname, outpath=None, structure_format=None,
 #                  verbose=False):
 
@@ -91,9 +88,9 @@ from ._base import Atoms, GeneratorBase
 #         return self._atom_coords
 
 
-class CrossLinkedDefectGenerator(DefectGenerator):
-    """Cross-linked defect generator class."""
-    pass
+# class CrossLinkedDefectGenerator(DefectGenerator):
+#     """Cross-linked defect generator class."""
+#     pass
 
 
 # class StoneWalesDefectGenerator(DefectGenerator):
