@@ -18,9 +18,10 @@ import operator
 __all__ = ['comparison_symbol_operator_mappings',
            'math_symbol_operator_mappings',
            'symbol_operator_mappings',
+           'math_operators', 'convert_condition_str',
            'totient_func']
 
-symbol_operator_mappings = {}
+math_operators = symbol_operator_mappings = {}
 
 comparison_symbol_operator_mappings = \
     {'==': operator.eq,
@@ -40,6 +41,18 @@ math_symbol_operator_mappings = \
      '/': operator.truediv,
      '//': operator.floordiv}
 symbol_operator_mappings.update(math_symbol_operator_mappings)
+
+
+def convert_condition_str(obj, condition):
+    try:
+        attr, comparison, value = condition.split()
+    except ValueError:
+        print('the condition string must be of the form:\n'
+              'ATTRIBUTE COMPARISON_OPERATOR VALUE')
+    condition = \
+        math_operators[comparison](getattr(obj, attr), float(value))
+
+    return condition
 
 
 def totient_func(n=int):
