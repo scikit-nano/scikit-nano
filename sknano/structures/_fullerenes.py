@@ -11,12 +11,29 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from pkg_resources import resource_filename
+
 import numbers
+import os
 
-__all__ = ['Fullerene']
+from sknano.core import BaseClass, listdir_dirnames, listdir_fnames
+
+__all__ = ['Fullerene', 'Fullerenes', 'load_fullerene_data']
 
 
-class Fullerene:
+def load_fullerene_data():
+    datadir = resource_filename('sknano', 'data/fullerenes')
+    fullerenes = \
+        listdir_dirnames(datadir, filterfunc=lambda name: name.startswith('C'))
+    fullerene_data = {}
+    for fullerene in fullerenes:
+        datapath = os.path.join('data', 'fullerenes', fullerene)
+        datadir = resource_filename('sknano', datapath)
+        fullerene_data[fullerene] = listdir_fnames(datadir)
+    return fullerene_data
+
+
+class Fullerene(BaseClass):
     """Fullerene structure class.
 
     The `fullerene data
@@ -59,3 +76,18 @@ class Fullerene:
     @N.deleter
     def N(self):
         del self._N
+
+    def todict(self):
+        return dict(N=self.N)
+
+
+class Fullerenes(BaseClass):
+    def __init__(self):
+        super().__init__()
+        self.fullerene_data = load_fullerene_data()
+
+        self.fullerenes = list(self.fullerene_data.keys())
+        self.fullerene_files = list(self.fullerene_data.values())
+
+    def todict(self):
+        return dict()
