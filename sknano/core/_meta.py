@@ -12,8 +12,8 @@ Contents
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import object
 
+from abc import ABCMeta, abstractmethod
 from inspect import signature, Signature, Parameter
 from functools import wraps
 import inspect
@@ -29,7 +29,7 @@ __all__ = ['check_type', 'deprecated', 'get_object_signature', 'memoize',
            'method_func', 'optional_debug', 'removed_package_warning',
            'timethis', 'typeassert', 'typed_property', 'with_doc',
            'make_sig', 'ClassSignature', 'Cached', 'NoInstances',
-           'Singleton']
+           'Singleton', 'BaseClass']
 
 
 def check_type(obj, allowed_types=()):
@@ -335,3 +335,29 @@ class Singleton(type):
             return self.__instance
         else:
             return self.__instance
+
+
+class BaseClass(metaclass=ABCMeta):
+    """Base class for base classes."""
+
+    def __init__(self, *args, verbose=False, debug=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.verbose = verbose
+        self.debug = debug
+        self.fmtstr = ""
+
+    def __repr__(self):
+        return "{}({})".format(self.__class__.__name__,
+                               self.fmtstr.format(**self.todict()))
+
+    @property
+    def fmtstr(self):
+        return self._fmtstr
+
+    @fmtstr.setter
+    def fmtstr(self, value):
+        self._fmtstr = value
+
+    @abstractmethod
+    def todict(self):
+        return NotImplementedError
