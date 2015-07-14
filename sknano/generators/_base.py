@@ -89,10 +89,6 @@ class GeneratorBase:
              center_CM=True, region_bounds=None, **kwargs):
         """Save structure data.
 
-        .. todo::
-
-           Use the unit cell to set the bounds on output.
-
         Parameters
         ----------
         fname : {None, str}, optional
@@ -109,6 +105,13 @@ class GeneratorBase:
             default to `xyz` format.
         center_CM : bool, optional
             Center center-of-mass on origin.
+        region_bounds : :class:`GeometricRegion`, optional
+            An instance of a
+            :class:`~sknano.core.geometric_regions.GeometricRegion` having
+            a method
+            :meth:`~sknano.core.geometric_regions.GeometricRegion.contains`
+            to filter the atoms not contained within the
+            `GeometricRegion`.
 
         """
         if fname.endswith(supported_structure_formats) and \
