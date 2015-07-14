@@ -16,7 +16,8 @@ import os
 import re
 import sys
 
-__all__ = ['get_fname', 'get_fpath']
+__all__ = ['get_fname', 'get_fpath', 'listdir_dirnames', 'listdir_fnames',
+           'listdir']
 
 
 def get_fname(fname=None, ext=None, outpath=os.getcwd(), overwrite=False,
@@ -202,3 +203,67 @@ def get_fpath(fname=None, ext=None, outpath=os.getcwd(), overwrite=False,
             return fpath, fname
         else:
             return fpath
+
+
+def listdir_dirnames(path='.', filterfunc=None):
+    """Return list of names of directories in the directory given by `path`.
+
+    Parameters
+    ----------
+    path : :class:`~python:str`, optional
+    filterfunc : `function`, optional
+
+    Returns
+    -------
+    fnames : :class:`~python:list`
+        :class:`~python:list` of names of directories in `path`.
+
+    """
+    return listdir(path, filterfunc=filterfunc,
+                   filter_dirnames=filterfunc is not None)[0]
+
+
+def listdir_fnames(path='.', filterfunc=None):
+    """Return list of names of files in the directory given by `path`.
+
+    Parameters
+    ----------
+    path : :class:`~python:str`, optional
+    filterfunc : `function`, optional
+
+    Returns
+    -------
+    fnames : :class:`~python:list`
+        :class:`~python:list` of names of files in `path`.
+
+    """
+    return listdir(path, filterfunc=filterfunc,
+                   filter_fnames=filterfunc is not None)[-1]
+
+
+def listdir(path='.', filterfunc=None, filter_dirnames=False,
+            filter_fnames=False):
+    """Return a tuple of the names of the directories and files in the
+    directory given by `path`.
+
+    Parameters
+    ----------
+    path : :class:`~python:str`, optional
+    filterfunc : `function`, optional
+    filter_dirnames : :class:`~python:bool`, optional
+    filter_fnames : :class:`~python:bool`, optional
+
+    Returns
+    -------
+    (dirnames, fnames) : :class:`~python:tuple`
+        :class:`~python:tuple` of names of directories and files in `path`.
+
+    """
+    l = os.listdir(path)
+    dirnames = [name for name in l if os.path.isdir(os.path.join(path, name))]
+    fnames = [name for name in l if os.path.isfile(os.path.join(path, name))]
+    if filter_dirnames and filterfunc is not None:
+        dirnames = list(filter(filterfunc, dirnames))
+    if filter_fnames and filterfunc is not None:
+        fnames = list(filter(filterfunc, fnames))
+    return dirnames, fnames

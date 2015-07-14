@@ -75,6 +75,9 @@ I/O functions
 
    get_fname
    get_fpath
+   listdir_dirnames
+   listdir_fnames
+   listdir
 
 String functions
 -----------------
