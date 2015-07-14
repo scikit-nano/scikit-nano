@@ -17,6 +17,7 @@ from operator import attrgetter
 import numpy as np
 
 from sknano.core import UserList
+from sknano.core.math import convert_condition_str
 from ._atom import Atom
 
 __all__ = ['Atoms']
@@ -112,6 +113,32 @@ class Atoms(UserList):
     def filter(self, condition, invert=False):
         """Filter `Atoms` by `condition`.
 
+        .. versionchanged:: 0.3.11
+
+           Filters the list of `Atoms` **in-place**. Use
+           :meth:`~Atoms.filtered` to generate a new filtered list
+           of `Atoms`.
+
+        Parameters
+        ----------
+        condition : :class:`~python:str` or boolean array
+            Boolean index array having same shape as the initial dimensions
+            of the list of `Atoms` being indexed.
+        invert : bool, optional
+            If `True`, the boolean array `condition` is inverted element-wise.
+
+        """
+        if isinstance(condition, str):
+            condition = convert_condition_str(self, condition)
+        if invert:
+            condition = ~condition
+        self.data = np.asarray(self)[condition].tolist()
+
+    def filtered(self, condition, invert=False):
+        """Return new list of `Atoms` filtered by `condition`.
+
+        .. versionadded:: 0.3.11
+
         Parameters
         ----------
         condition : array_like, bool
@@ -137,9 +164,9 @@ class Atoms(UserList):
         >>> from sknano.generators import SWNTGenerator
         >>> swnt = SWNTGenerator(10, 0, Lz=10, fix_Lz=True).atoms
         >>> # select 'left', 'middle', 'right' atoms
-        >>> latoms = swnt.filter(swnt.z <= 25)
-        >>> matoms = swnt.filter((swnt.z < 75) & (swnt.z > 25))
-        >>> ratoms = swnt.filter(swnt.z >= 75)
+        >>> latoms = swnt.filtered(swnt.z <= 25)
+        >>> matoms = swnt.filtered((swnt.z < 75) & (swnt.z > 25))
+        >>> ratoms = swnt.filtered(swnt.z >= 75)
         >>> from pprint import pprint
         >>> pprint([getattr(atoms, 'bounds') for atoms in
         ...         (latoms, matoms, ratoms)])
@@ -153,6 +180,8 @@ class Atoms(UserList):
         True
 
         """
+        if isinstance(condition, str):
+            condition = convert_condition_str(self, condition)
         if invert:
             condition = ~condition
         return self.__class__(atoms=np.asarray(self)[condition].tolist(),
