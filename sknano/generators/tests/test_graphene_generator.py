@@ -28,7 +28,8 @@ class TestCase(GeneratorTestFixtures):
         generator = \
             GrapheneGenerator.from_conventional_cell(armchair_edge_length=5,
                                                      zigzag_edge_length=5)
-        generator.save()
+        generator.atoms.update_attrs()
+        generator.save(deepcopy=False)
         self.tmpdata.append(generator.fname)
 
     def test4(self):
