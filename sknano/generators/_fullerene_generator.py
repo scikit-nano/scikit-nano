@@ -48,9 +48,9 @@ class FullereneGenerator(Fullerene, GeneratorBase):
         super().__init__(**kwargs)
 
         if autogen:
-            self.generate_structure_data()
+            self.generate()
 
-    def generate_structure_data(self):
+    def generate(self):
         """Generate structure data."""
         CNdir = 'C' + str(self.N)
         CNfile = 'C' + str(self.N)

@@ -69,7 +69,7 @@ class UnrolledSWNTGenerator(GeneratorBase, UnrolledSWNT):
     autogen : bool, optional
         if `True`, automatically call
         :meth:`~NanotubeGenerator.generate_unit_cell`,
-        followed by :meth:`~NanotubeGenerator.generate_structure_data`.
+        followed by :meth:`~NanotubeGenerator.generate`.
     verbose : bool, optional
         if `True`, show verbose output
 
@@ -107,9 +107,9 @@ class UnrolledSWNTGenerator(GeneratorBase, UnrolledSWNT):
         super().__init__(*Ch, **kwargs)
 
         if autogen:
-            self.generate_structure_data()
+            self.generate()
 
-    def generate_structure_data(self):
+    def generate(self):
         """Generate structure data."""
 
         self.structure_data.clear()

@@ -61,7 +61,7 @@ class MWNTGenerator(GeneratorBase, MWNT):
         Angstroms.
     autogen : bool, optional
         if `True`, automatically call
-        :meth:`~MWNTGenerator.generate_structure_data`.
+        :meth:`~MWNTGenerator.generate`.
     basis : {:class:`python:list`}, optional
         List of :class:`python:str`\ s of element symbols or atomic number
         of the two atom basis (default: ['C', 'C'])
@@ -108,9 +108,9 @@ class MWNTGenerator(GeneratorBase, MWNT):
         super().__init__(**kwargs)
 
         if autogen:
-            self.generate_structure_data()
+            self.generate()
 
-    def generate_structure_data(self):
+    def generate(self):
         """Generate structure data.
 
         .. todo::

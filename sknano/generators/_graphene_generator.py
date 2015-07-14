@@ -67,9 +67,9 @@ class GrapheneGeneratorBase(GeneratorBase):
         super().__init__(**kwargs)
 
         if autogen:
-            self.generate_structure_data()
+            self.generate()
 
-    def generate_structure_data(self):
+    def generate(self):
         """Generate the full structure coordinates."""
 
         self.structure_data.clear()

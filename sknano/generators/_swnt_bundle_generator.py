@@ -161,11 +161,11 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
         super().__init__(*Ch, autogen=False, **kwargs)
 
         if autogen:
-            self.generate_structure_data()
+            self.generate()
 
-    def generate_structure_data(self):
+    def generate(self):
         """Generate structure data."""
-        super().generate_structure_data()
+        super().generate()
         super().generate_bundle()
 
     @classmethod

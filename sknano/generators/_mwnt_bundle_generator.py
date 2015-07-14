@@ -60,7 +60,7 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
     bundle_geometry : {'triangle', 'hexagon', 'square', 'rectangle'}, optional
     autogen : bool, optional
         if `True`, automatically call
-        :meth:`~MWNTBundleGenerator.generate_structure_data`.
+        :meth:`~MWNTBundleGenerator.generate`.
     basis : {:class:`python:list`}, optional
         List of :class:`python:str`\ s of element symbols or atomic number
         of the two atom basis (default: ['C', 'C'])
@@ -96,11 +96,11 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
         super().__init__(autogen=False, **kwargs)
 
         if autogen:
-            self.generate_structure_data()
+            self.generate()
 
-    def generate_structure_data(self):
+    def generate(self):
         """Generate structure data."""
-        super().generate_structure_data()
+        super().generate()
         super().generate_bundle()
 
     @classmethod
