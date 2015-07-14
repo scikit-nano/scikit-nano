@@ -86,7 +86,8 @@ class GeneratorBase:
         del self.structure_data
 
     def save(self, fname=None, outpath=None, structure_format=None,
-             center_CM=True, region_bounds=None, **kwargs):
+             deepcopy=True, center_CM=True, region_bounds=None,
+             filter_condition=None, **kwargs):
         """Save structure data.
 
         Parameters
@@ -112,6 +113,7 @@ class GeneratorBase:
             :meth:`~sknano.core.geometric_regions.GeometricRegion.contains`
             to filter the atoms not contained within the
             `GeometricRegion`.
+        filter_condition : array_like, optional
 
         """
         if fname.endswith(supported_structure_formats) and \
@@ -138,13 +140,20 @@ class GeneratorBase:
 
         # self._structure_format = structure_format
 
-        atoms = copy.deepcopy(self.atoms)
+        if deepcopy:
+            atoms = copy.deepcopy(self.atoms)
+        else:
+            atoms = self.atoms[:]
 
         if center_CM:
             atoms.center_CM()
 
         if region_bounds is not None:
             atoms.clip_bounds(region_bounds)
+
+        if filter_condition is not None:
+            atoms.filter(filter_condition)
+            # atoms = atoms.filtered(filter_condition)
 
         if kwargs:
             atoms.rotate(**kwargs)
