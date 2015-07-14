@@ -13,14 +13,13 @@ __docformat__ = 'restructuredtext en'
 
 # import numbers
 
-from abc import ABCMeta, abstractmethod
-
+from sknano.core import BaseClass
 from sknano.core.refdata import aCC
 
 __all__ = ['StructureBase']
 
 
-class StructureBase(metaclass=ABCMeta):
+class StructureBase(BaseClass):
     """Base class for creating abstract representation of nano structure.
 
     Parameters
@@ -30,8 +29,7 @@ class StructureBase(metaclass=ABCMeta):
         :class:`~sknano.core.atoms.Atom` 1 and 2
 
     """
-    def __init__(self, *args, basis=None, bond=None, verbose=False,
-                 debug=False, **kwargs):
+    def __init__(self, *args, basis=None, bond=None, **kwargs):
 
         if basis is None:
             basis = ['C', 'C']
@@ -49,30 +47,13 @@ class StructureBase(metaclass=ABCMeta):
             bond = aCC
         self.bond = bond
 
-        self.verbose = verbose
-        self.debug = debug
-
-        self.fmtstr = ""
-
         super().__init__(*args, **kwargs)
-
-    def __repr__(self):
-        return "{}({})".format(self.__class__.__name__,
-                               self.fmtstr.format(**self.todict()))
 
     def __getattr__(self, name):
         try:
             return getattr(self.unit_cell, name)
         except AttributeError:
             return super().__getattr__(name)
-
-    @property
-    def fmtstr(self):
-        return self._fmtstr
-
-    @fmtstr.setter
-    def fmtstr(self, value):
-        self._fmtstr = value
 
     @property
     def element1(self):
@@ -91,7 +72,3 @@ class StructureBase(metaclass=ABCMeta):
     def element2(self, value):
         self.basis[1] = value
         self.unit_cell.basis[1] = value
-
-    @abstractmethod
-    def todict(self):
-        return NotImplementedError
