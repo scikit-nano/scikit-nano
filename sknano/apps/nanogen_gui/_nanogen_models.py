@@ -14,7 +14,7 @@ __docformat__ = 'restructuredtext en'
 from sknano.core.refdata import aCC, dVDW
 from sknano.structures import compute_Lx, compute_Ly, compute_Lz, \
     compute_Ch, compute_T, SWNT, SWNTBundle, MWNT, MWNTBundle, Graphene, \
-    UnrolledSWNT
+    UnrolledSWNT, Fullerenes
 
 __all__ = ['NanoGenModel', 'SWNTModel', 'MWNTModel',
            'GrapheneModel', 'FullereneModel',
@@ -376,7 +376,15 @@ class GrapheneModel(GeneratorModelBase, UnrolledSWNTModelMixin):
 
 
 class FullereneModel(ObserverModelMixin):
-    pass
+    def __init__(self):
+        self._observers = []
+        super().__init__()
+        self.structure = Fullerenes()
+        self.notify_observers()
+
+    @property
+    def fullerenes(self):
+        return self.structure.fullerenes
 
 
 class BulkStructureModel(ObserverModelMixin):

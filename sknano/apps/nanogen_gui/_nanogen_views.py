@@ -370,6 +370,8 @@ class FullereneGeneratorView(QMainWindow, Ui_FullereneGenerator,
         return kwargs
 
     def update_app_view(self):
+        self.fullerene_list_widget.addItems(
+            [fullerene for fullerene in self.model.fullerenes])
         self.parent.update_app_view()
 
 
