@@ -30,9 +30,9 @@ def test2():
     prev_ss_atom = None
     for i, ss in enumerate(traj, start=1):
         atoms = ss.atoms
-        atoms = atoms.filter((atoms.z <= 20) & (atoms.z >= -20))
+        atoms = atoms.filtered((atoms.z <= 20) & (atoms.z >= -20))
         atoms.update_attrs()
-        atoms = atoms.filter((atoms.z <= 15) & (atoms.z >= -15))
+        atoms = atoms.filtered((atoms.z <= 15) & (atoms.z >= -15))
         atom = atoms.get_atom(259)
         # print('ss={}, atom.NN:\n{}'.format(i, atom.NN))
         # print('ss={}, atom.bonds:\n{}\n'.format(i, atom.bonds))
