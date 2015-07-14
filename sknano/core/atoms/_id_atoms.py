@@ -60,7 +60,26 @@ class IDAtoms(Atoms):
          enumerate(self, start=starting_id)]
 
     def filter_ids(self, atom_ids, invert=False):
-        """Return `Atoms` by :attr:`IDAtoms.ids` in `atom_ids`.
+        """Filter `Atoms` by :attr:`IDAtoms.ids` in `atom_ids`.
+
+        .. versionchanged:: 0.3.11
+
+           Filters `Atoms` **in-place**. Use :meth:`~IDAtoms.filtered_ids`
+           to get a new list of `Atoms`.
+
+        Parameters
+        ----------
+        atom_ids : array_like
+        invert : bool, optional
+
+        """
+        mask = np.in1d(self.ids, atom_ids, invert=invert).nonzero()
+        self.data = np.asarray(self)[mask].tolist()
+
+    def filtered_ids(self, atom_ids, invert=False):
+        """Return new `Atoms` filtered by :attr:`IDAtoms.ids` in `atom_ids`.
+
+        .. versionadded:: 0.3.11
 
         Parameters
         ----------
