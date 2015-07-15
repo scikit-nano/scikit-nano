@@ -34,7 +34,8 @@ class Atoms(UserList):
 
     """
     def __init__(self, atoms=None):
-        if atoms is not None and isinstance(atoms, str):
+        if atoms is not None and (isinstance(atoms, str) or
+                                  isinstance(atoms, Atom)):
             atoms = [atoms]
         if not isinstance(atoms, type(self)) and isinstance(atoms, list):
             atoms = atoms[:]
@@ -132,7 +133,10 @@ class Atoms(UserList):
             condition = convert_condition_str(self, condition)
         if invert:
             condition = ~condition
-        self.data = np.asarray(self)[condition].tolist()
+        try:
+            self.data = np.asarray(self)[condition].tolist()
+        except AttributeError:
+            self.data = np.asarray(self)[condition]
 
     def filtered(self, condition, invert=False):
         """Return new list of `Atoms` filtered by `condition`.
@@ -184,8 +188,12 @@ class Atoms(UserList):
             condition = convert_condition_str(self, condition)
         if invert:
             condition = ~condition
-        return self.__class__(atoms=np.asarray(self)[condition].tolist(),
-                              **self.kwargs)
+        try:
+            return self.__class__(atoms=np.asarray(self)[condition].tolist(),
+                                  **self.kwargs)
+        except AttributeError:
+            return self.__class__(atoms=np.asarray(self)[condition],
+                                  **self.kwargs)
 
     def get_atoms(self, asarray=False):
         """Return list of `Atoms`.
