@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 ====================================================
 Command line script (:mod:`sknano.scripts.nanogen`)

@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 ================================================================
 Command line script (:mod:`sknano.scripts.analyze_structure`)
@@ -11,7 +11,7 @@ Command line script (:mod:`sknano.scripts.analyze_structure`)
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 import argparse
 import os
 import sys
