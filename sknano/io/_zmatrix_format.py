@@ -41,7 +41,7 @@ class ZMATRIXReader(StructureIO):
         pass
 
 
-class ZMATRIXWriter(object):
+class ZMATRIXWriter:
     """Class for writing zmatrix chemical file format."""
 
     @classmethod

@@ -15,5 +15,5 @@ __docformat__ = 'restructuredtext en'
 __all__ = ['PointGroup']
 
 
-class PointGroup(object):
+class PointGroup:
     pass

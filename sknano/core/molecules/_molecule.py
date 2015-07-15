@@ -25,7 +25,7 @@ __all__ = ['Molecule']
 
 
 @total_ordering
-class Molecule(object):
+class Molecule:
     """Base class for abstract representation of molecule.
 
     Parameters

@@ -89,7 +89,7 @@ class tselect:
             self.traj.nselect, self.traj.Nsnaps))
 
 
-class Snapshot(object):
+class Snapshot:
     """Container class for MD data at single timestep"""
     def __init__(self, trajectory=None):
 

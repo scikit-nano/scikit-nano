@@ -82,7 +82,7 @@ for i, symbol in enumerate(element_symbols):
 atomic_mass_symbol_map = {v: k for k, v in list(atomic_masses.items())}
 
 
-class PeriodicTable(object):
+class PeriodicTable:
     """Class for creating abstract object representing Periodic Table."""
 
     def __init__(self):

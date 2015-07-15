@@ -15,5 +15,5 @@ __docformat__ = 'restructuredtext en'
 __all__ = ['SpaceGroup']
 
 
-class SpaceGroup(object):
+class SpaceGroup:
     pass

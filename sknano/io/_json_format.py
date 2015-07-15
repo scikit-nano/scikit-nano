@@ -38,7 +38,7 @@ class JSONReader(StructureIO):
         pass
 
 
-class JSONWriter(object):
+class JSONWriter:
     """Class for writing json chemical file format."""
 
     @classmethod

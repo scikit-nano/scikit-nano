@@ -17,7 +17,7 @@ __all__ = ['StructureAnalyzer']
 #import numpy as np
 
 
-class StructureAnalyzer(object):
+class StructureAnalyzer:
     """Class for structure analysis.
 
     Parameters

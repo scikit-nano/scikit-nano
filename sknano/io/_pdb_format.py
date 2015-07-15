@@ -45,7 +45,7 @@ class PDBReader(StructureIO):
                 print(line)
 
 
-class PDBWriter(object):
+class PDBWriter:
     """Class for writing pdb chemical file format."""
 
     @classmethod
@@ -137,7 +137,7 @@ class PDBFormat(StructureFormat):
         return self._records
 
 
-class PDBFormatter(object):
+class PDBFormatter:
     """Formatter class to convert a `PDBAtom` to a formatted string."""
 
     @classmethod

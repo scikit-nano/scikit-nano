@@ -109,7 +109,7 @@ def memoize(f, cache={}):
     return g
 
 
-class method_func(object):
+class method_func:
     """Define functions from existing class methods.
 
     This class is based off of the the `numpy`
@@ -252,7 +252,7 @@ def typed_property(name, expected_type):
     return prop
 
 
-class with_doc(object):
+class with_doc:
     """Decorator class to combine class method docstrings.
 
     Parameters
