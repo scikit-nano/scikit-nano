@@ -97,17 +97,13 @@ import importlib
 import sys
 
 from sknano.core.refdata import CCbond, dVDW
-from sknano.version import release, full_version, git_revision
+from ._parser import add_default_arguments
 
 __all__ = ['nanogen']
 
 
 def argparser():
     parser = argparse.ArgumentParser()
-
-    version = full_version
-    if not release:
-        version = '-'.join((full_version, git_revision[:7]))
 
     parser.add_argument('--basis', type=str, nargs=2,
                         metavar=('ELEMENT1', 'ELEMENT2'),
@@ -122,12 +118,7 @@ def argparser():
     parser.add_argument('--structure-format', default='xyz',
                         choices=('data', 'xyz'),
                         help='structure file format (default: %(default)s)')
-    parser.add_argument('--verbose', action='store_true',
-                        help='verbose output')
-    parser.add_argument('--debug', action='store_true', help='debug output')
-    parser.add_argument('--version', action='version',
-                        version='%(prog)s {}'.format(version),
-                        help="show %(prog)s's version number and exit")
+    parser = add_default_arguments(parser)
 
     subparsers = parser.add_subparsers(title='sub-commands')
 
