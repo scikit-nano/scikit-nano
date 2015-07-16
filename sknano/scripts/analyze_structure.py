@@ -77,7 +77,7 @@ def analyze_structure(rootdir=None, structure_file=None, **kwargs):
         trj = dumpdata.trajectory
         final_snapshot = trj[-1]
         atoms = final_snapshot.atoms
-        atoms.mapatomattr('element', 'type', {1: 'C', 2: 'N'})
+        atoms.mapatomattr('type', 'element', {1: 'C', 2: 'N'})
         atoms.update_attrs()
         ion = atoms.filtered(atoms.elements == 'N')[0]
         graphene = atoms.filtered(atoms.elements == 'C')
