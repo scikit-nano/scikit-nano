@@ -231,12 +231,19 @@ class Atoms(UserList):
         except AttributeError:
             return None
 
-    def mapatomattr(self, attr, from_attr, attrmap):
+    def mapatomattr(self, from_attr=None, to_attr=None, attrmap=None):
         """Set/update atom attribute from another atom attribute with dict.
+
+        .. versionchanged:: 0.3.11
+
+           Made all arguments required keyword arguments and reversed the
+           order of the former positional arguments `from_attr` and
+           `to_attr` to be more natural and consistent with the key, value
+           pairs in the `attrmap` dictionary.
 
         Parameters
         ----------
-        attr, from_attr : :class:`python:str`
+        from_attr, to_attr : :class:`python:str`
         attrmap : :class:`python:dict`
 
         Examples
@@ -244,15 +251,19 @@ class Atoms(UserList):
         Suppose you have an `XAtoms` instance named ``atoms`` that has
         `XAtom` instances of two atom types `1` and `2` and we want to set
         all `XAtom`\ s with `type=1` to Nitrogen and all `XAtom`\ s with
-        `type=2` to Argon.
+        `type=2` to Argon. In other words, we want to map the
+        `XAtom.type` attribute to the `XAtom.element` attribute.
 
         We'd call this method like so::
 
-        >>> atoms.mapatomattr('element', 'type', {1: 'N', 2: 'Ar'})
+        >>> atoms.mapatomattr('type', 'element', {1: 'N', 2: 'Ar'})
 
         """
-        [setattr(atom, attr, attrmap[getattr(atom, from_attr)])
-         for atom in self if getattr(atom, from_attr) is not None]
+        try:
+            [setattr(atom, to_attr, attrmap[getattr(atom, from_attr)])
+             for atom in self if getattr(atom, from_attr) is not None]
+        except (KeyError, TypeError) as e:
+            print(e)
 
     def rotate(self, **kwargs):
         assert not hasattr(super(), 'rotate')
