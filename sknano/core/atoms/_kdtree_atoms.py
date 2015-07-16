@@ -45,9 +45,13 @@ class KDTAtoms(XAtoms):
     atoms : {None, sequence, `KDTAtoms`}, optional
         if not `None`, then a list of `KDTAtom` instance objects or an
         existing `KDTAtoms` instance object.
+    kNN : :class:`~python:int`
+        Number of nearest neighbors to return when querying the kd-tree.
+    NNrc : :class:`~python:float`
+        Nearest neighbor radius cutoff.
 
     """
-    def __init__(self, atoms=None, kNN=3, NNrc=2.0):
+    def __init__(self, atoms=None, kNN=16, NNrc=2.0):
 
         super().__init__(atoms)
         self.kNN = kNN
@@ -73,13 +77,11 @@ class KDTAtoms(XAtoms):
 
     @property
     def NNrc(self):
-        """Only return neighbors within this distance when querying the
-        kd-tree."""
+        """Nearest neighbor radius cutoff."""
         return self._NNrc
 
     @NNrc.setter
     def NNrc(self, value):
-        """Set the cutoff distance to check for neighest neighbors."""
         if not (isinstance(value, numbers.Number) and value >= 0):
             raise TypeError('Expected a real number greater >= 0')
         self._NNrc = self.kwargs['NNrc'] = value
@@ -98,12 +100,12 @@ class KDTAtoms(XAtoms):
         # self._update_nearest_neighbors()
         return np.asarray([atom.NN for atom in self])
 
-    def query_atom_tree(self, k=3, eps=0, p=2, rc=np.inf):
+    def query_atom_tree(self, k=16, eps=0, p=2, rc=np.inf):
         """Query atom tree for nearest neighbors distances and indices.
 
         Parameters
         ----------
-        n : integer
+        k : integer
             The number of nearest neighbors to return.
         eps : nonnegative float
             Return approximate nearest neighbors; the kth returned value
