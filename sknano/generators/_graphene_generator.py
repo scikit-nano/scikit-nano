@@ -91,6 +91,8 @@ class GrapheneGeneratorBase(GeneratorBase):
             layer.translate(Vector([0, 0, nlayer * self.layer_spacing]))
             if (nlayer % 2) != 0:
                 layer.translate(self.layer_shift)
+            if nlayer > 0:
+                [setattr(atom, 'mol', nlayer) for atom in layer]
             layer.rotate(angle=self.layer_rotation_angles[nlayer], axis='z')
             self.atoms.extend(layer)
             self.layers.append(layer)
