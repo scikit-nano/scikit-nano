@@ -24,9 +24,7 @@ C_H = CHbond = 1.09  # angstroms
 dVDW = 3.35  # angstroms
 
 __all__ = ['dump_bond_data', 'load_bond_data',
-           'aCC', 'C_C', 'CCbond', 'C_H', 'CHbond', 'dVDW',
-           'crystal_bonds']
-
+           'aCC', 'C_C', 'CCbond', 'C_H', 'CHbond', 'dVDW']
 
 _bond_file = 'bonds.yaml'
 
@@ -42,17 +40,3 @@ def load_bond_data():
     with open(_bond_file) as f:
         data = yaml.load(f, Loader=Loader)
     return data
-
-# crystal_bonds = load_bond_data()
-
-crystal_bonds = {}
-crystal_bonds.update({'alpha_quartz': {'a': 4.916, 'c': 5.405}})
-crystal_bonds.update({'molybdenum_disulphide': {'a': 3.160, 'c': 12.294}})
-crystal_bonds.update({'diamond': 3.567})
-crystal_bonds.update({'caesium_chloride': 4.123})
-crystal_bonds.update({'rock_salt': 5.406})
-crystal_bonds.update({'zincblende': 5.406})
-
-# crystal_bonds.update({'gold': 4.078})
-# crystal_bonds.update({'copper': 3.615})
-crystal_bonds.update({'cubic': {'FCC': {'Au': 4.078, 'Cu': 3.615}}})

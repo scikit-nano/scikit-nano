@@ -28,7 +28,7 @@ __docformat__ = 'restructuredtext en'
 from sknano.core.crystallography import AlphaQuartz, DiamondStructure, \
     Gold, Copper, FCCStructure, CaesiumChlorideStructure, \
     RocksaltStructure, ZincblendeStructure, MoS2
-from sknano.core.refdata import crystal_bonds as bonds
+from sknano.core.refdata import lattice_parameters as lattparams
 from ._base import BulkGeneratorBase
 
 __all__ = ['AlphaQuartzGenerator', 'DiamondStructureGenerator',
@@ -44,8 +44,8 @@ class AlphaQuartzGenerator(AlphaQuartz, BulkGeneratorBase):
     Parameters
     ----------
     """
-    def __init__(self, a=bonds['alpha_quartz']['a'],
-                 c=bonds['alpha_quartz']['c'],
+    def __init__(self, a=lattparams['alpha_quartz']['a'],
+                 c=lattparams['alpha_quartz']['c'],
                  scaling_matrix=None, autogen=True):
         super().__init__(a=a, c=c, scaling_matrix=scaling_matrix)
         self.generate()
@@ -55,7 +55,7 @@ class AlphaQuartzGenerator(AlphaQuartz, BulkGeneratorBase):
 
 
 class DiamondStructureGenerator(DiamondStructure, BulkGeneratorBase):
-    def __init__(self, a=bonds['diamond'], scaling_matrix=None):
+    def __init__(self, a=lattparams['diamond'], scaling_matrix=None):
         super().__init__(a=a, scaling_matrix=scaling_matrix)
         self.generate()
 
@@ -83,7 +83,7 @@ class CopperGenerator(Copper, BulkGeneratorBase):
 
 class CaesiumChlorideStructureGenerator(CaesiumChlorideStructure,
                                         BulkGeneratorBase):
-    def __init__(self, a=bonds['caesium_chloride'], scaling_matrix=None):
+    def __init__(self, a=lattparams['caesium_chloride'], scaling_matrix=None):
         super().__init__(a=a, scaling_matrix=scaling_matrix)
         self.generate()
 
@@ -92,7 +92,7 @@ class CaesiumChlorideStructureGenerator(CaesiumChlorideStructure,
 
 
 class RocksaltStructureGenerator(RocksaltStructure, BulkGeneratorBase):
-    def __init__(self, a=bonds['rock_salt'], scaling_matrix=None):
+    def __init__(self, a=lattparams['rock_salt'], scaling_matrix=None):
         super().__init__(a=a, scaling_matrix=scaling_matrix)
         self.generate()
 
@@ -101,7 +101,7 @@ class RocksaltStructureGenerator(RocksaltStructure, BulkGeneratorBase):
 
 
 class ZincblendeStructureGenerator(ZincblendeStructure, BulkGeneratorBase):
-    def __init__(self, a=bonds['zincblende'], scaling_matrix=None):
+    def __init__(self, a=lattparams['zincblende'], scaling_matrix=None):
         super().__init__(a=a, scaling_matrix=scaling_matrix)
         self.generate()
 
@@ -110,8 +110,8 @@ class ZincblendeStructureGenerator(ZincblendeStructure, BulkGeneratorBase):
 
 
 class MoS2Generator(MoS2, BulkGeneratorBase):
-    def __init__(self, a=bonds['molybdenum_disulphide']['a'],
-                 c=bonds['molybdenum_disulphide']['c'],
+    def __init__(self, a=lattparams['molybdenum_disulphide']['a'],
+                 c=lattparams['molybdenum_disulphide']['c'],
                  scaling_matrix=None):
         super().__init__(a=a, c=c, scaling_matrix=scaling_matrix)
         self.generate()
