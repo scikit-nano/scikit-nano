@@ -45,14 +45,30 @@ class IDAtoms(Atoms):
 
     @property
     def ids(self):
-        """Return array of `IDAtom` IDs."""
+        """Return array of `IDAtom.id`\ s."""
         if len(set([atom.id for atom in self])) != self.Natoms:
             self.assign_unique_ids()
         return np.asarray([atom.id for atom in self])
 
     @property
+    def mols(self):
+        """Return array of `IDAtom.mol`\ s."""
+        return np.asarray([atom.mol for atom in self])
+
+    @property
     def atom_ids(self):
+        """Alias for :attr:`IDAtoms.ids`."""
         return self.ids
+
+    @property
+    def mol_ids(self):
+        """Alias for :attr:`IDAtoms.mols`."""
+        return self.mols
+
+    @property
+    def molecule_ids(self):
+        """Alias for :attr:`IDAtoms.mols`."""
+        return self.mols
 
     def assign_unique_ids(self, starting_id=1):
         """Assign unique :attr:`IDAtom.id` to each `IDAtom` in `IDAtoms`."""
