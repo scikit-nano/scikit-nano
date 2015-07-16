@@ -177,10 +177,10 @@ class DATAReader(StructureIO):
 
     def _parse_types(self):
         Ntypes = self.atoms.Ntypes
-        atomtypes = self.atoms.types
+        typemap = self.atoms.typemap
         if Ntypes != self.header_data['atom types']:
             for atomtype in range(1, self.header_data['atom types'] + 1):
-                if atomtype not in atomtypes:
+                if atomtype not in typemap:
                     mass = self.section_data['Masses'][atomtype - 1][
                         self.section_attrs_specs['Masses']['mass']['index']]
                     self.atoms.add_type(Atom(type=atomtype, mass=mass))
@@ -292,7 +292,7 @@ class DATAWriter:
 
         atoms.rezero()
         atoms.assign_unique_types()
-        types = atoms.types
+        typemap = atoms.typemap
 
         Natoms = atoms.Natoms
         Natoms_width = \
@@ -320,7 +320,7 @@ class DATAWriter:
 
         boxpad = {'x': xpad, 'y': ypad, 'z': zpad}
         if pad_box:
-            #for dim, pad in boxpad.items():
+            # for dim, pad in boxpad.items():
             for i, dim in enumerate(('x', 'y', 'z')):
                 pad = boxpad[dim]
                 if abs(boxbounds[dim]['min'] - atoms.coords[:, i].min()) \
@@ -352,9 +352,9 @@ class DATAWriter:
                     dim=dim))
 
             f.write('\nMasses\n\n')
-            for type, properties in list(types.items()):
+            for atomtype, properties in list(typemap.items()):
                 f.write('{}{:.4f}\n'.format(
-                    '{:d}'.format(type).ljust(Natoms_width),
+                    '{:d}'.format(atomtype).ljust(Natoms_width),
                     properties['mass']))
 
             f.write('\nAtoms\n\n')
