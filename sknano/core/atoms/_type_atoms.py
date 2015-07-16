@@ -98,12 +98,30 @@ class TypeAtoms(Atoms):
     def add_atomtypes(self, atoms=None):
         self.add_types(atoms=atoms)
 
-    def assign_unique_types(self):
-        """Assign unique :attr:`TypeAtom.type` to each `TypeAtom` in \
-            `TypeAtoms` based on the set of :attr:`TypeAtoms.elements`."""
-        self.mapatomattr('type', 'element',
-                         {element: i for i, element in
-                          enumerate(dedupe(self.elements), start=1)})
+    def assign_unique_types(self, from_attr='element'):
+        """Assign unique :attr:`TypeAtom.type`\s to each `TypeAtom` in \
+            `TypeAtoms` from an existing unique atom attribute.
+
+        .. versionchanged:: 0.3.11
+
+           Now accepts a keyword argument `from_attr`.
+
+        The assignment of unique :attr:`TypeAtom.type`\s is performed
+        by mapping an existing atom attribute (default: element)
+        to a unique integer, starting at 1.
+
+        Parameters
+        ----------
+        from_attr : :class:`~python:str`
+            An existing atom attribute used to generate an attribute
+            mapping that maps the attribute to a unique atom
+            :attr:`~TypeAtom.type`.
+
+        """
+        attrlist = [getattr(atom, from_attr) for atom in self]
+        attrmap = \
+            {attr: i for i, attr in enumerate(dedupe(attrlist), start=1)}
+        self.mapatomattr(from_attr, 'type', attrmap)
 
     def get_types(self, asdict=False):
         """Return list of `TypeAtom` :attr:`TypeAtom.type`\ s.
