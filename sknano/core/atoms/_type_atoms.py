@@ -13,7 +13,7 @@ __docformat__ = 'restructuredtext en'
 
 from operator import attrgetter
 
-# import numpy as np
+import numpy as np
 
 from sknano.core import dedupe
 from ._atoms import Atoms
@@ -38,7 +38,7 @@ class TypeAtoms(Atoms):
     def __init__(self, atoms=None):
 
         super().__init__(atoms)
-        self._types = {}
+        self._typemap = {}
 
     @property
     def __atom_class__(self):
@@ -48,25 +48,45 @@ class TypeAtoms(Atoms):
         super().sort(key=key, reverse=reverse)
 
     @property
-    def Ntypes(self):
-        """Number of :attr:`~TypeAtoms.types`."""
-        return len(list(self.types.keys()))
-
-    @property
     def types(self):
-        """:class:`python:dict` of :attr:`TypeAtom.type`\ s."""
-        self._update_types()
-        return self._types
+        """:class:`~numpy:numpy.ndarray`  of :attr:`TypeAtom.type`\ s.
+
+        .. versionchanged:: 0.3.11
+
+           Returns an :class:`~numpy:numpy.ndarray` of
+           :attr:`TypeAtom.type`\ s instead of a :class:`~python:dict`
+           of type mapping. The :class:`~python:dict` of type
+           mappings is now assigned to the :attr:`~TypeAtoms.typemap`
+           attribute.
+
+        """
+        return np.asarray([atom.type for atom in self])
 
     @property
     def atomtypes(self):
+        """Alias for :attr:`~TypeAtoms.types`."""
         return self.types
 
-    def _update_types(self):
+    @property
+    def Ntypes(self):
+        """Number of unique :attr:`~TypeAtoms.types`."""
+        return len(list(self.typemap.keys()))
+
+    @property
+    def typemap(self):
+        """:class:`python:dict` of :attr:`TypeAtom.type`\ s.
+
+        .. versionadded:: 0.3.11
+
+        """
+        self._update_typemap()
+        return self._typemap
+
+    def _update_typemap(self):
         [self.add_type(atom) for atom in self]
 
     def add_type(self, atom):
-        """Add atom type to :attr:`~TypeAtoms.types`.
+        """Add atom type to :attr:`~TypeAtoms.typemap`.
 
         Parameters
         ----------
@@ -74,14 +94,15 @@ class TypeAtoms(Atoms):
             A :class:`~sknano.core.atoms.TypeAtom` instance.
 
         """
-        self._types[atom.type] = {}
-        self._types[atom.type]['mass'] = atom.mass
+        self._typemap[atom.type] = {}
+        self._typemap[atom.type]['mass'] = atom.mass
 
     def add_atomtype(self, atom):
+        """Alias for :meth:`~TypeAtoms.add_type`."""
         self.add_type(atom)
 
     def add_types(self, atoms=None):
-        """Add atom type for each atom in atoms to :attr:`TypeAtom.types` \
+        """Add atom type for each atom in atoms to :attr:`TypeAtom.typemap` \
             dictionary.
 
         Parameters
@@ -96,6 +117,7 @@ class TypeAtoms(Atoms):
             print('Expected an iterable sequence of `Atom` objects.')
 
     def add_atomtypes(self, atoms=None):
+        """Alias for :meth:`~TypeAtoms.add_types`."""
         self.add_types(atoms=atoms)
 
     def assign_unique_types(self, from_attr='element'):
@@ -137,9 +159,10 @@ class TypeAtoms(Atoms):
 
         """
         if asdict:
-            return self.types
+            return self.typemap
         else:
-            return [atom.type for atom in self]
+            return self.types.tolist()
 
     def get_atomtypes(self, asdict=False):
+        """Alias for :meth:`~TypeAtoms.get_types`."""
         return self.get_types(asdict=asdict)
