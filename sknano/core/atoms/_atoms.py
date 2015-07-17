@@ -9,7 +9,6 @@ Base class for structure data atoms (:mod:`sknano.core.atoms._atoms`)
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import str
 __docformat__ = 'restructuredtext en'
 
 from operator import attrgetter
@@ -33,7 +32,7 @@ class Atoms(UserList):
         existing `Atoms` instance object.
 
     """
-    def __init__(self, atoms=None):
+    def __init__(self, atoms=None, **kwargs):
         if atoms is not None and (isinstance(atoms, str) or
                                   isinstance(atoms, Atom)):
             atoms = [atoms]
@@ -44,9 +43,8 @@ class Atoms(UserList):
                     atoms[i] = self.__atom_class__(**atom.todict())
                 except AttributeError:
                     atoms[i] = self.__atom_class__(atom)
-        super().__init__(initlist=atoms)
+        super().__init__(initlist=atoms, **kwargs)
         self.fmtstr = "{atoms!r}"
-        self.kwargs = {}
 
     @property
     def __atom_class__(self):
@@ -63,7 +61,7 @@ class Atoms(UserList):
     def __getitem__(self, index):
         data = super().__getitem__(index)
         if isinstance(data, list):
-            return self.__class__(data)
+            return self.__class__(data, **self.kwargs)
         return data
 
     def __setitem__(self, index, value):
@@ -73,6 +71,47 @@ class Atoms(UserList):
             else:
                 value = self.__atom_class__(value)
         super().__setitem__(index, value)
+
+    def __atoms_not_in_self(self, other):
+        return [atom for atom in other if atom not in self]
+
+    def __add__(self, other):
+        try:
+            addlist = self.__atoms_not_in_self(other)
+        except TypeError:
+            addlist = self.__atoms_not_in_self(self.__class__(other))
+        return self.__class__(self.data + addlist, **self.kwargs)
+
+    def __radd__(self, other):
+        try:
+            addlist = self.__atoms_not_in_self(other)
+        except TypeError:
+            addlist = self.__atoms_not_in_self(self.__class__(other))
+        return self.__class__(addlist + self.data, **self.kwargs)
+
+    def __iadd__(self, other):
+        try:
+            self.data += self.__atoms_not_in_self(other)
+        except TypeError:
+            self.data += self.__atoms_not_in_self(self.__class__(other))
+        return self
+
+    # def __atoms_not_in_other(self, other):
+    #     return [atom for atom in self if atom not in other]
+
+    # def __sub__(self, other):
+    #     if isinstance(other, self.__class__):
+    #         return self.__class__(self.__atoms_not_in_other(other),
+    #                               **self.kwargs)
+    #     return NotImplemented
+
+    # def __rsub__(self, other):
+    #     return NotImplemented
+
+    # def __isub__(self, other):
+    #     if isinstance(other, self.__class__):
+    #         self.data -= self.__atoms_not_in_other(other)
+    #     return self
 
     @property
     def fmtstr(self):
