@@ -18,7 +18,7 @@ import numbers
 
 import numpy as np
 
-# from sknano.core import ClassSignature
+from sknano.core import BaseClass
 from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols, element_names
 
@@ -26,7 +26,7 @@ __all__ = ['Atom']
 
 
 @total_ordering
-class Atom:
+class Atom(BaseClass):
     """Base class for abstract representation of structure atom.
 
     Parameters
@@ -56,18 +56,10 @@ class Atom:
             if len(args) == 1:
                 element = args.pop(0)
 
+        super().__init__(*args, **kwargs)
         self.mass = mass
         self.element = element
         self.fmtstr = "{element!r}, mass={mass!r}"
-
-    def __str__(self):
-        """Return a nice string representation of `Atom`."""
-        return repr(self)
-
-    def __repr__(self):
-        """Return canonical string representation of `Atom`."""
-        return "{}({})".format(self.__class__.__name__,
-                               self.fmtstr.format(**self.todict()))
 
     def __eq__(self, other):
         """Test equality of two `Atom` object instances."""
@@ -85,14 +77,6 @@ class Atom:
 
     def __dir__(self):
         return ['element', 'Z', 'mass']
-
-    @property
-    def fmtstr(self):
-        return self._fmtstr
-
-    @fmtstr.setter
-    def fmtstr(self, value):
-        self._fmtstr = value
 
     @property
     def Z(self):
