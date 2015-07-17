@@ -40,7 +40,11 @@ class Atoms(UserList):
             atoms = atoms[:]
             for i, atom in enumerate(atoms):
                 try:
-                    atoms[i] = self.__atom_class__(**atom.todict())
+                    # atoms[i] = self.__atom_class__(**atom.todict())
+                    atomdict = atom.todict()
+                    atoms[i] = self.__atom_class__(
+                        **{k: atomdict[k] for k in set(dir(atom)) &
+                           set(dir(self.__atom_class__))})
                 except AttributeError:
                     atoms[i] = self.__atom_class__(atom)
         super().__init__(initlist=atoms, **kwargs)
