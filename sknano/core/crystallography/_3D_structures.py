@@ -166,7 +166,19 @@ SphaleriteStructure = ZincBlendeStructure = ZincblendeStructure
 
 
 class CubicStructure(Crystal3DStructure):
+    """Base class for a cubic `Crystal3DStructure`.
 
+    Parameters
+    ----------
+    centering : :class:`~python:str`
+    lattice : :class:`Crystal3DLattice`, optional
+    a : float, optional
+    basis : :class:`~python:list`, optional
+    coords : :class:`~python:list`, optional
+    scaling_matrix : :class:`~python:int` or :class:`~python:list`, optional
+    structure : :class:`Crystal3DStructure`, optional
+
+    """
     def __init__(self, centering, lattice=None, a=None, basis=None,
                  coords=None, scaling_matrix=None, structure=None, **kwargs):
 
