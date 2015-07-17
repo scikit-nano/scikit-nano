@@ -50,15 +50,17 @@ class ListBasedSet(Set):
         return len(self.elements)
 
 
-class _UserList(MutableSequence):
+class UserList(MutableSequence):
     """Modified implementation of :class:`~python:collections.UserList`.
+
+    Constructor takes an additional variable keyword argument.
 
     Parameters
     ----------
     initlist : {None, sequence, UserList}, optional
         if not `None`, then a list or an instance of `UserList`
     """
-    def __init__(self, initlist=None):
+    def __init__(self, initlist=None, **kwargs):
         self.data = []
         if initlist is not None:
             if type(initlist) == type(self.data):
@@ -67,6 +69,7 @@ class _UserList(MutableSequence):
                 self.data[:] = initlist.data[:]
             else:
                 self.data = list(initlist)
+        self.kwargs = kwargs
 
     def __repr__(self):
         return repr(self.data)
@@ -109,17 +112,17 @@ class _UserList(MutableSequence):
 
     def __add__(self, other):
         if isinstance(other, UserList):
-            return self.__class__(self.data + other.data)
+            return self.__class__(self.data + other.data, **self.kwargs)
         elif isinstance(other, type(self.data)):
-            return self.__class__(self.data + other)
-        return self.__class__(self.data + list(other))
+            return self.__class__(self.data + other, **self.kwargs)
+        return self.__class__(self.data + list(other), **self.kwargs)
 
     def __radd__(self, other):
         if isinstance(other, UserList):
-            return self.__class__(other.data + self.data)
+            return self.__class__(other.data + self.data, **self.kwargs)
         elif isinstance(other, type(self.data)):
-            return self.__class__(other + self.data)
-        return self.__class__(list(other) + self.data)
+            return self.__class__(other + self.data, **self.kwargs)
+        return self.__class__(list(other) + self.data, **self.kwargs)
 
     def __iadd__(self, other):
         if isinstance(other, UserList):
@@ -131,7 +134,7 @@ class _UserList(MutableSequence):
         return self
 
     def __mul__(self, n):
-        return self.__class__(self.data * n)
+        return self.__class__(self.data * n, **self.kwargs)
 
     __rmul__ = __mul__
 
@@ -152,11 +155,13 @@ class _UserList(MutableSequence):
         self.data.remove(item)
 
     def clear(self):
-        # self.data.clear()
-        del self.data[:]
+        try:
+            self.data.clear()
+        except AttributeError:
+            del self.data[:]
 
     def copy(self):
-        return self.__class__(self)
+        return self.__class__(self, **self.kwargs)
 
     def count(self, item):
         return self.data.count(item)
@@ -175,11 +180,6 @@ class _UserList(MutableSequence):
             self.data.extend(other.data)
         else:
             self.data.extend(other)
-
-try:
-    from collections import UserList
-except ImportError:
-    UserList = _UserList
 
 
 class frozendict(Mapping):
