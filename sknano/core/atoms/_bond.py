@@ -15,6 +15,7 @@ from functools import total_ordering
 
 import numpy as np
 
+from sknano.core import BaseClass
 from sknano.core.math import Vector
 
 import sknano.core.atoms
@@ -23,7 +24,7 @@ __all__ = ['Bond']
 
 
 @total_ordering
-class Bond:
+class Bond(BaseClass):
     """Abstract representation of bond between 2 `Atom` objects.
 
     Parameters
@@ -32,6 +33,7 @@ class Bond:
 
     """
     def __init__(self, atom1, atom2):
+        super().__init__()
         self.atoms = sknano.core.atoms.StructureAtoms([atom1, atom2])
         self.vector = Vector(atom2.r - atom1.r, p0=atom1.r.p)
         self.fmtstr = "{atom1!r}, {atom2!r}"
@@ -39,11 +41,6 @@ class Bond:
     def __str__(self):
         """Return nice string representation of `Bond`."""
         return "Bond({!r}->{!r})".format(self.atom1.id, self.atom2.id)
-
-    def __repr__(self):
-        """Return canonical string representation of `Bond`."""
-        return "{}({})".format(self.__class__.__name__,
-                               self.fmtstr.format(**self.todict()))
 
     def __eq__(self, other):
         return self is other or (self.atoms == other.atoms)
@@ -53,14 +50,6 @@ class Bond:
 
     def __dir__(self):
         return ['atoms', 'atom1', 'atom2', 'vector', 'unit_vector', 'length']
-
-    @property
-    def fmtstr(self):
-        return self._fmtstr
-
-    @fmtstr.setter
-    def fmtstr(self, value):
-        self._fmtstr = value
 
     @property
     def atoms(self):
