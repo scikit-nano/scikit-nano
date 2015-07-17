@@ -78,7 +78,6 @@ from ._poav_atom import POAVAtom as StructureAtom
 from ._poav_atoms import POAVAtoms as StructureAtoms
 __all__ = ['StructureAtom', 'StructureAtoms']
 
-# from ._base import *
 from ._atom import *
 from ._atoms import *
 from ._xyz_atom import *
