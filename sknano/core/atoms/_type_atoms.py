@@ -35,9 +35,9 @@ class TypeAtoms(Atoms):
         existing `TypeAtoms` instance object.
 
     """
-    def __init__(self, atoms=None):
+    def __init__(self, atoms=None, **kwargs):
 
-        super().__init__(atoms)
+        super().__init__(atoms, **kwargs)
         self._typemap = {}
 
     @property
