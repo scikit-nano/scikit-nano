@@ -34,7 +34,7 @@ class ForceAtom(Atom):
         A string representation of the element symbol or an integer specifying
         an element atomic number.
     fx, fy, fz : float, optional
-        :math:`v_x, v_y, v_z` components of `ForceAtom` velocity.
+        :math:`f_x, f_y, f_z` components of `ForceAtom` velocity.
 
     """
     def __init__(self, *args, fx=None, fy=None, fz=None, **kwargs):
@@ -54,7 +54,7 @@ class ForceAtom(Atom):
 
     def __dir__(self):
         attrs = super().__dir__()
-        attrs.extend(['f', 'fx', 'fy', 'fz'])
+        attrs.extend(['fx', 'fy', 'fz'])
         return attrs
 
     @property

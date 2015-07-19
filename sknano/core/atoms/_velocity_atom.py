@@ -55,7 +55,7 @@ class VelocityAtom(Atom):
 
     def __dir__(self):
         attrs = super().__dir__()
-        attrs.extend(['v', 'vx', 'vy', 'vz'])
+        attrs.extend(['vx', 'vy', 'vz'])
         return attrs
 
     @property

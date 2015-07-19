@@ -56,7 +56,7 @@ class BasisAtom(XYZAtom):
 
     def __dir__(self):
         attrs = super().__dir__()
-        attrs.extend(['rs', 'xs', 'ys', 'zs'])
+        attrs.extend(['lattice', 'xs', 'ys', 'zs'])
         return attrs
 
     @property

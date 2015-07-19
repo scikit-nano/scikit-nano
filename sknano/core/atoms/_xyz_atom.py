@@ -56,7 +56,7 @@ class XYZAtom(Atom):
 
     def __dir__(self):
         attrs = super().__dir__()
-        attrs.extend(['dr', 'r', 'x', 'y', 'z'])
+        attrs.extend(['x', 'y', 'z'])
         return attrs
 
     @property

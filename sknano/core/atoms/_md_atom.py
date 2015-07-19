@@ -36,6 +36,12 @@ class MDAtom(Atom):
         except AttributeError:
             pass
 
+    def __dir__(self):
+        attrs = super().__dir__()
+        attrs.append('reference_atom')
+        # attrs.extend(['reference_atom', 't0_atom'])
+        return attrs
+
     @property
     def NN(self):
         return super().NN

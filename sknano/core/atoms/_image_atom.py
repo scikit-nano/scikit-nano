@@ -49,7 +49,7 @@ class ImageAtom(Atom):
 
     def __dir__(self):
         attrs = super().__dir__()
-        attrs.extend(['i', 'ix', 'iy', 'iz'])
+        attrs.extend(['ix', 'iy', 'iz'])
         return attrs
 
     @property

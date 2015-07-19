@@ -533,8 +533,3 @@ class POAVAtom(POAVAtomMixin, KDTAtom):
         self._POAV1 = None
         self._POAV2 = None
         self._POAVR = None
-
-    def __dir__(self):
-        attrs = super().__dir__()
-        attrs.extend(['POAV1', 'POAV2', 'POAVR'])
-        return attrs

@@ -27,10 +27,12 @@ class KDTAtom(XAtom):
         super().__init__(*args, **kwargs)
         if NN is not None:
             self.NN = NN
+        # self.fmtstr = super().fmtstr + ", NN={NN!r}"
 
     def __dir__(self):
         attrs = super().__dir__()
-        attrs.extend(['NN', 'bonds'])
+        attrs.append('NN')
+        # attrs.extend(['NN', 'bonds'])
         return attrs
 
     @XAtom.CN.getter
