@@ -11,15 +11,15 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-#import glob
-#import re
+# import glob
+# import re
 import sys
 from operator import attrgetter
 
 import numpy as np
 
 from sknano.core import get_fpath
-from sknano.core.atoms import Trajectory, Snapshot
+from sknano.core.atoms import Trajectory, Snapshot, MDAtom as Atom
 
 from ._base import StructureIO, StructureIOError, StructureFormatSpec, \
     default_comment_line
@@ -48,9 +48,10 @@ class DUMPReader(StructureIO):
         LAMMPS dump file path
 
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, attrmap=None, **kwargs):
         super().__init__(**kwargs)
 
+        self.attrmap = attrmap
         self.trajectory = Trajectory()
         self.dumpattrs = {}
         self.dumpfiles = []
@@ -130,9 +131,7 @@ class DUMPReader(StructureIO):
                 except IndexError:
                     setattr(snapshot, sf, 0.0)
 
-            if self.dumpattrs:
-                f.readline()
-            else:
+            if not self.dumpattrs:
                 self.scale_original = -1
                 xflag = yflag = zflag = -1
                 attrs = f.readline().strip().split()[2:]
@@ -168,13 +167,27 @@ class DUMPReader(StructureIO):
                 self.attr_dtypes = [attr_dtypes[attr] if attr in attr_dtypes
                                     else float for attr in self.atomattrs]
 
+                if self.attrmap is not None:
+                    self.remap_atomattr_names(self.attrmap)
+                    self.attrmap = None
+
+                self.unknown_attrs = \
+                    {attr: self.atomattrs.index(attr) for
+                     attr in set(self.atomattrs) - set(dir(Atom()))}
+
+                [self.atomattrs.remove(attr) for attr in self.unknown_attrs]
+            else:
+                f.readline()
+
             snapshot.atomattrs = self.atomattrs
             snapshot.attr_dtypes = self.attr_dtypes
 
             atoms = \
                 np.zeros((snapshot.Natoms, len(self.atomattrs)), dtype=float)
             for n in range(snapshot.Natoms):
-                line = [float(attr) for attr in f.readline().strip().split()]
+                line = [float(value) for col, value in
+                        enumerate(f.readline().strip().split())
+                        if col not in self.unknown_attrs.values()]
                 atoms[n] = line
 
             snapshot.atoms = atoms
@@ -235,7 +248,6 @@ class DUMPReader(StructureIO):
                     atoms[:, z] = snapshot.zlo + atoms[:, z] * lz
 
     def dumpattrs2str(self):
-        #return self.dumpattrs
         return ' '.join(sorted(self.dumpattrs, key=self.dumpattrs.__getitem__))
 
 
