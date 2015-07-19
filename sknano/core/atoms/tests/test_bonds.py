@@ -22,8 +22,7 @@ def test1():
     assert_equal(bonds.Nbonds, atoms.coordination_numbers.sum())
     print(bonds.mean_length)
     print(bonds.atoms.Natoms)
-
-    #print('bonds.mean_angle: {}'.format(bonds.mean_angle))
+    # print('bonds.mean_angle: {}'.format(bonds.mean_angle))
 
 
 def test2():
@@ -38,7 +37,7 @@ def test3():
     atoms.assign_unique_ids()
     atoms.update_attrs()
     print(np.degrees(atoms.bonds.mean_length))
-    #print(np.degrees(atoms.bonds.mean_angle))
+    print(np.degrees(atoms.bonds.mean_angle))
     atom0 = atoms[0]
     atom0bonds = atom0.bonds
     print('atom0: {}'.format(atom0))
