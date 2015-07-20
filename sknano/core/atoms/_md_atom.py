@@ -38,8 +38,8 @@ class MDAtom(Atom):
 
     def __dir__(self):
         attrs = super().__dir__()
-        attrs.append('reference_atom')
-        # attrs.extend(['reference_atom', 't0_atom'])
+        # attrs.append('reference_atom')
+        attrs.extend(['reference_atom', 't0_atom'])
         return attrs
 
     @property
@@ -49,18 +49,17 @@ class MDAtom(Atom):
     @NN.setter
     def NN(self, value):
         """Set nearest-neighbor `Atoms`."""
-        # if self.reference_atom is not None:
         try:
-            value = sknano.core.atoms.MDAtoms(
-                atoms=[value[value.ids.tolist().index(atom.id)]
-                       if atom.id in value.ids else
-                       self.__class__(reference_atom=atom.reference_atom,
-                                      element=atom.element, id=atom.id,
-                                      mol=atom.mol, type=atom.type,
-                                      mass=atom.mass, q=atom.q,
-                                      x=np.inf, y=np.inf, z=np.inf,
-                                      CN=atom.CN, NN=atom.NN)
-                       for atom in self.reference_atom.NN])
+            atoms = []
+            for atom in self.reference_atom.NN:
+                if atom.id in value.ids:
+                    atoms.append(value[value.ids.tolist().index(atom.id)])
+                else:
+                    atomdict = atom.todict()
+                    [atomdict.update({k: np.inf}) for k in ('x', 'y', 'z')]
+                    print(atomdict)
+                    atoms.append(self.__class__(**atomdict))
+            value = sknano.core.atoms.MDAtoms(atoms)
         except AttributeError:
             pass
         super(MDAtom, MDAtom).NN.__set__(self, value)
@@ -72,5 +71,6 @@ class MDAtom(Atom):
     def todict(self):
         super_dict = super().todict()
         super_dict.update(dict(reference_atom=self.reference_atom,
+                               t0_atom=self.t0_atom,
                                NN=self.NN))
         return super_dict
