@@ -63,9 +63,8 @@ class DUMPReader(StructureIO):
 
         self.read()
 
-    @property
-    def Nsnaps(self):
-        return self.trajectory.Nsnaps
+    def __getattr__(self, name):
+        return getattr(self.trajectory, name)
 
     def read(self):
         """Read all snapshots from each dump file."""
@@ -84,7 +83,7 @@ class DUMPReader(StructureIO):
 
         print("read {:d} snapshots".format(self.Nsnaps))
 
-        self.trajectory.tselect.all()
+        self.trajectory.time_selection.all()
         self.trajectory.t0_snapshot = self.trajectory[0]
 
         if self.dumpattrs:
@@ -110,7 +109,7 @@ class DUMPReader(StructureIO):
             snapshot.timestep = int(f.readline().strip().split()[0])
             f.readline()
             snapshot.Natoms = int(f.readline().strip())
-            snapshot.aselect = np.zeros(snapshot.Natoms)
+            snapshot.atom_selection = np.zeros(snapshot.Natoms, dtype=bool)
 
             item = f.readline().strip()
             try:
@@ -206,8 +205,51 @@ class DUMPReader(StructureIO):
             attribute name.
 
         """
-        for k, v in list(attrmap.items()):
-            self.atomattrs[self.atomattrs.index(k)] = v
+        for k, v in attrmap.items():
+            try:
+                self.atomattrs[self.atomattrs.index(k)] = v
+            except ValueError:
+                pass
+
+    def scale(self):
+        x = self.dumpattrs['x']
+        y = self.dumpattrs['y']
+        z = self.dumpattrs['z']
+        for snapshot in self.trajectory:
+            atoms = snapshot.get_atoms(asarray=True)
+            if atoms is not None:
+                xlo = snapshot.xlo
+                xhi = snapshot.xhi
+                ylo = snapshot.ylo
+                yhi = snapshot.yhi
+                zlo = snapshot.zlo
+                zhi = snapshot.zhi
+                lx = xhi - xlo
+                ly = yhi - ylo
+                lz = zhi - zlo
+                xy = snapshot.xy
+                xz = snapshot.xz
+                yz = snapshot.yz
+                if np.allclose([xy, xz, yz], np.zeros(3)):
+                    atoms[:, x] = (atoms[:, x] - snapshot.xlo) / lx
+                    atoms[:, y] = (atoms[:, y] - snapshot.ylo) / ly
+                    atoms[:, z] = (atoms[:, z] - snapshot.zlo) / lz
+                else:
+                    xlo = xlo - min((0.0, xy, xz, xy + xz))
+                    xhi = xhi - max((0.0, xy, xz, xy + xz))
+                    lx = xhi - xlo
+
+                    ylo = ylo - min((0.0, yz))
+                    yhi = yhi - max((0.0, yz))
+                    ly = yhi - ylo
+
+                    atoms[:, x] = (atoms[:, x] - snapshot.xlo) / lx + \
+                        (atoms[:, y] - snapshot.ylo) * xy / (lx * ly) + \
+                        (atoms[:, z] - snapshot.zlo) * (yz * xy - ly * xz) / \
+                        (lx * ly * lz)
+                    atoms[:, y] = (atoms[:, y] - snapshot.ylo) / ly + \
+                        (atoms[:, z] - snapshot.zlo) * yz / (ly * lz)
+                    atoms[:, z] = (atoms[:, z] - snapshot.zlo) / lz
 
     def unscale(self):
         x = self.dumpattrs['x']
@@ -222,13 +264,13 @@ class DUMPReader(StructureIO):
                 yhi = snapshot.yhi
                 zlo = snapshot.zlo
                 zhi = snapshot.zhi
-                xy = snapshot.xy
-                xz = snapshot.xz
-                yz = snapshot.yz
                 lx = xhi - xlo
                 ly = yhi - ylo
                 lz = zhi - zlo
-                if xy == xz == yz == 0.0:
+                xy = snapshot.xy
+                xz = snapshot.xz
+                yz = snapshot.yz
+                if np.allclose([xy, xz, yz], np.zeros(3)):
                     atoms[:, x] = snapshot.xlo + atoms[:, x] * lx
                     atoms[:, y] = snapshot.ylo + atoms[:, y] * ly
                     atoms[:, z] = snapshot.zlo + atoms[:, z] * lz
