@@ -40,7 +40,7 @@ def test_filtered():
     assert_equal(filtered1, filtered2)
 
 
-def test10():
+def test1():
     atoms = generate_atoms(generator_class='SWNTGenerator', n=3, m=3, nz=10)
     atoms.assign_unique_ids()
     atoms.kNN = 6
@@ -55,6 +55,17 @@ def test10():
     print('Natoms: {}'.format(atoms.Natoms))
     for atom in atoms:
         assert_equals(atom.CN, atoms.kNN)
+
+
+def test2():
+    atoms = generate_atoms(generator_class='SWNTGenerator', n=3, m=3, nz=10)
+    atoms.assign_unique_ids()
+    atoms.kNN = 3
+    atoms.NNrc = 2.0
+    atoms.update_attrs()
+    print(atoms.ids)
+    for atom in atoms:
+        print('atom: {}, bond.lengths: {}'.format(atom.id, atom.bonds.lengths))
 
 
 if __name__ == '__main__':

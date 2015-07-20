@@ -3,9 +3,11 @@
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
+from pkg_resources import resource_filename
+import unittest
+
 import nose
 from nose.tools import *
-from pkg_resources import resource_filename
 
 import numpy as np
 
@@ -21,11 +23,9 @@ def test1():
 
 
 def test2():
-    dump = \
-        DUMPReader(resource_filename('sknano',
-                                     'data/lammpstrj/0500_29cells.dump'),
-                   attrmap={'c_peratom_pe': 'pe', 'c_peratom_ke': 'ke'})
-
+    dump = DUMPReader(resource_filename('sknano',
+                                        'data/lammpstrj/0500_29cells.dump'),
+                      attrmap={'c_peratom_pe': 'pe', 'c_peratom_ke': 'ke'})
     traj = dump.trajectory
     traj.reference_snapshot = traj[0]
     prev_ss_atom = None
@@ -56,15 +56,43 @@ def test2():
         prev_ss_atom = atom
 
 
-def test3():
-    dump = \
-        DUMPReader(resource_filename('sknano',
-                                     'data/lammpstrj/0500_29cells.dump'),
-                   attrmap={'c_peratom_pe': 'pe', 'c_peratom_ke': 'ke'})
+class TrajectoryTestFixture(unittest.TestCase):
 
-    traj = dump.trajectory
-    print(traj)
-    print(traj[0])
+    def setUp(self):
+        self.dump = \
+            DUMPReader(resource_filename('sknano',
+                                         'data/lammpstrj/0500_29cells.dump'),
+                       attrmap={'c_peratom_pe': 'pe', 'c_peratom_ke': 'ke'})
+
+
+class TestCase(TrajectoryTestFixture):
+
+    def test1(self):
+        traj = self.dump.trajectory
+        assert_true('{!s}'.format(traj).startswith('Trajectory(snapshots='))
+        assert_true('{!s}'.format(traj[0]).startswith('Snapshot(trajectory='))
+
+    def test2(self):
+        traj = self.dump.trajectory
+        assert_equal(traj.Nsnaps, self.dump.Nsnaps)
+
+    def test3(self):
+        traj = self.dump.trajectory
+        assert_equal(traj.nselect, traj.nselected)
+        assert_true(traj.aselect is traj.atom_selection)
+        assert_true(traj.tselect is traj.time_selection)
+        assert_true(traj.Nsnaps == len(traj.timesteps))
+        traj.time_selection.one(2975)
+        assert_true(len(traj.timesteps) == 1)
+
+    def test4(self):
+        traj = self.dump.trajectory
+        traj.time_selection.one(2975)
+        assert_true(len(traj.timesteps) == 1)
+        self.dump.time_selection.all()
+        assert_equal(traj.nselected, self.dump.nselected)
+        assert_equal(self.dump.nselected, self.dump.Nsnaps)
+        assert_equal(self.dump.Nsnaps, len(self.dump.timesteps))
 
 
 if __name__ == '__main__':
