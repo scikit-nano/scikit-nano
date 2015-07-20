@@ -17,6 +17,7 @@ from sknano.io import DUMPReader
 def test1():
     traj = Trajectory()
     assert_equal(traj.Nsnaps, 0)
+    print(traj)
 
 
 def test2():
@@ -53,6 +54,17 @@ def test2():
             assert_true(np.all(atom.NN.ids == prev_ss_atom.NN.ids))
 
         prev_ss_atom = atom
+
+
+def test3():
+    dump = \
+        DUMPReader(resource_filename('sknano',
+                                     'data/lammpstrj/0500_29cells.dump'),
+                   attrmap={'c_peratom_pe': 'pe', 'c_peratom_ke': 'ke'})
+
+    traj = dump.trajectory
+    print(traj)
+    print(traj[0])
 
 
 if __name__ == '__main__':

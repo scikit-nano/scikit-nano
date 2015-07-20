@@ -2,7 +2,6 @@
 
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import range
 
 import nose
 from nose.tools import *
@@ -12,7 +11,6 @@ from sknano.core.atoms import POAVAtom, POAVAtoms
 from sknano.generators import SWNTGenerator
 from sknano.io import DATAReader
 from sknano.testing import generate_atoms
-#from sknano.core.geometric_regions import Ellipsoid
 
 
 def test_instantiation():
@@ -91,12 +89,8 @@ def test_atom_selections():
     a200 = atoms.get_atom(200)
     assert_true(a200 is atoms[199])
     assert_true(a200 == atoms[199])
-    #coords = atoms.coords
     atom_bounds = atoms.bounds
     print('atom bounds: {}'.format(atom_bounds))
-
-    #a200NN = atoms.select_within(Ellipsoid(center=a200.r, r=2.5))
-    #assert_equals(a200NN.Natoms, 4)
 
 
 def test_atom_bonds():
@@ -106,7 +100,6 @@ def test_atom_bonds():
     atoms.compute_POAVs()
     atoms.NNrc = 2.0
     bonds = atoms.bonds
-    #print('bonds: {!s}'.format(bonds))
     assert_equal(len(bonds), atoms.coordination_numbers.sum())
     assert_equal(bonds.Nbonds, atoms.coordination_numbers.sum())
 
@@ -136,9 +129,8 @@ def test_POAV_angles():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=0, nz=2)
     atoms.assign_unique_ids()
-    atoms.update_attrs()
     #atoms.NNrc = 2.0
-    #atoms.compute_POAVs()
+    atoms.compute_POAVs()
 
     for i, atom in enumerate(atoms):
         for POAV in ('POAV1', 'POAV2', 'POAVR'):
@@ -152,13 +144,6 @@ def test_POAV_angles():
                 print('atom{}.{}.misalignment_angles:\n{}\n'.format(
                     atom.id, POAV,
                     np.degrees(atom_POAV.misalignment_angles)))
-
-
-#def test_list_mods():
-#    atoms = generate_atoms(elements='periodic_table')
-#    atoms.assign_unique_ids()
-#    #atoms.compute_POAVs()
-#    #print(atoms)
 
 
 if __name__ == '__main__':
