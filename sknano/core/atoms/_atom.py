@@ -47,19 +47,19 @@ class Atom(BaseClass):
 
         if element is None:
 
-            if len(args) == 0 and (mass is not None or Z is not None):
+            if mass is not None or Z is not None:
                 if Z is not None:
                     args.append(Z)
                 else:
                     args.append(mass)
 
-            if len(args) == 1:
-                element = args.pop(0)
+            if len(args) > 0:
+                element = args.pop()
 
         super().__init__(*args, **kwargs)
         self.mass = mass
         self.element = element
-        self.fmtstr = "{element!r}, mass={mass!r}"
+        self.fmtstr = "{element!r}, Z={Z!r}, mass={mass!r}"
 
     def __eq__(self, other):
         """Test equality of two `Atom` object instances."""
