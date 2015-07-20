@@ -17,7 +17,7 @@ from operator import attrgetter
 
 import numpy as np
 
-from sknano.core import UserList
+from sknano.core import BaseClass, UserList
 from ._md_atom import MDAtom as Atom
 from ._md_atoms import MDAtoms as Atoms
 
@@ -89,9 +89,11 @@ class tselect:
             self.traj.nselect, self.traj.Nsnaps))
 
 
-class Snapshot:
+class Snapshot(BaseClass):
     """Container class for MD data at single timestep"""
     def __init__(self, trajectory=None):
+
+        super().__init__()
 
         self.trajectory = trajectory
 
@@ -100,6 +102,8 @@ class Snapshot:
         self.timestep = None
 
         self._atoms = None
+
+        self.fmtstr = "trajectory={trajectory!r}"
 
     @property
     def atoms(self):
@@ -134,12 +138,16 @@ class Snapshot:
             return self._atoms
         return self.atoms
 
+    def todict(self):
+        return dict(trajectory=self.trajectory)
 
-class Trajectory(UserList):
+
+class Trajectory(BaseClass, UserList):
     """Base class for trajectory analysis."""
 
     def __init__(self, snapshots=None):
         super().__init__(initlist=snapshots)
+        self.fmtstr = "snapshots={snapshots!r}"
         self.tselect = tselect(self)
         self.aselect = aselect(self)
         self.nselect = 0
@@ -195,3 +203,6 @@ class Trajectory(UserList):
             if snapshot.tselect:
                 v[i] = snapshot.timestep
         return v
+
+    def todict(self):
+        return dict(snapshots=self.data)
