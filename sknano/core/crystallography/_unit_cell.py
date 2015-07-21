@@ -11,13 +11,14 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from sknano.core import BaseClass
 from sknano.core.atoms import BasisAtoms as Atoms
 
 __all__ = ['UnitCell']
 
 
-class UnitCell:
-    """Crystal unit cell class.
+class UnitCell(BaseClass):
+    """Base class for abstract representations of crystallographic unit cells.
 
     Parameters
     ----------
@@ -29,6 +30,8 @@ class UnitCell:
     """
 
     def __init__(self, lattice=None, basis=None, coords=None, cartesian=False):
+
+        super().__init__()
 
         if basis is None:
             basis = Atoms()
@@ -46,10 +49,6 @@ class UnitCell:
         self.lattice = lattice
         self.basis = basis
         self.fmtstr = "{lattice!r}, {basis!r}, {coords!r}, cartesian=False"
-
-    def __repr__(self):
-        return "{}({})".format(self.__class__.__name__,
-                               self.fmtstr.format(**self.todict()))
 
     def __getattr__(self, name):
         try:
