@@ -13,8 +13,10 @@ include tox.ini
 prune */__pycache__
 prune */.ropeproject
 prune doc/build
+prune doc/sphinxext
 prune doc/source/generated
 prune doc/source/sknano
+prune doc/source/proBlue
 prune doc/source/images
 prune doc/source/_static
 prune doc/source/_templates
