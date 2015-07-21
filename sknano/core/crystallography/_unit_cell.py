@@ -11,12 +11,15 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from functools import total_ordering
+
 from sknano.core import BaseClass
 from sknano.core.atoms import BasisAtoms as Atoms
 
 __all__ = ['UnitCell']
 
 
+@total_ordering
 class UnitCell(BaseClass):
     """Base class for abstract representations of crystallographic unit cells.
 
@@ -49,6 +52,18 @@ class UnitCell(BaseClass):
         self.lattice = lattice
         self.basis = basis
         self.fmtstr = "{lattice!r}, {basis!r}, {coords!r}, cartesian=False"
+
+    def __dir__(self):
+        return ['lattice', 'basis']
+
+    def __eq__(self, other):
+        return self is other or \
+            all([(getattr(self, attr) == getattr(other, attr)) for attr
+                 in dir(self)])
+
+    def __lt__(self, other):
+        return (self.lattice < other.lattice and self.basis <= other.basis) \
+            or (self.lattice <= other.lattice and self.basis < other.basis)
 
     def __getattr__(self, name):
         try:
