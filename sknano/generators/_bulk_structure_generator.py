@@ -38,11 +38,13 @@ __all__ = ['AlphaQuartzGenerator', 'DiamondStructureGenerator',
            'MoS2Generator']
 
 
-class AlphaQuartzGenerator(AlphaQuartz, BulkGeneratorBase):
-    """Class for generating bulk crystal structures.
+class AlphaQuartzGenerator(BulkGeneratorBase, AlphaQuartz):
+    """:class:`AlphaQuartz` generator class.
 
     Parameters
     ----------
+    a, c : :class:`~python:float`
+    scaling_matrix : {None, :class:`~python:float`, :class:`~python:list`}
     """
     def __init__(self, a=lattparams['alpha_quartz']['a'],
                  c=lattparams['alpha_quartz']['c'],
@@ -54,7 +56,14 @@ class AlphaQuartzGenerator(AlphaQuartz, BulkGeneratorBase):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
 
-class DiamondStructureGenerator(DiamondStructure, BulkGeneratorBase):
+class DiamondStructureGenerator(BulkGeneratorBase, DiamondStructure):
+    """:class:`DiamondStructure` generator class.
+
+    Parameters
+    ----------
+    a : class:`~python:float`
+
+    """
     def __init__(self, a=lattparams['diamond'], scaling_matrix=None):
         super().__init__(a=a, scaling_matrix=scaling_matrix)
         self.generate()
@@ -63,26 +72,30 @@ class DiamondStructureGenerator(DiamondStructure, BulkGeneratorBase):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
 
-class FCCStructureGenerator(FCCStructure, BulkGeneratorBase):
+class FCCStructureGenerator(BulkGeneratorBase, FCCStructure):
+    """:class:`FCCStructure` generator class.
+
+    """
     def __init__(self, a, basis, coords, scaling_matrix=None):
         pass
 
 
-class GoldGenerator(Gold, BulkGeneratorBase):
+class GoldGenerator(BulkGeneratorBase, Gold):
+    """:class:`Gold` generator class."""
 
     def save(self, fname='gold', **kwargs):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
 
-class CopperGenerator(Copper, BulkGeneratorBase):
+class CopperGenerator(BulkGeneratorBase, Copper):
     # self.fname = 'copper'
 
     def save(self, fname='copper', **kwargs):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
 
-class CaesiumChlorideStructureGenerator(CaesiumChlorideStructure,
-                                        BulkGeneratorBase):
+class CaesiumChlorideStructureGenerator(BulkGeneratorBase,
+                                        CaesiumChlorideStructure):
     def __init__(self, a=lattparams['caesium_chloride'], scaling_matrix=None):
         super().__init__(a=a, scaling_matrix=scaling_matrix)
         self.generate()
@@ -91,7 +104,7 @@ class CaesiumChlorideStructureGenerator(CaesiumChlorideStructure,
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
 
-class RocksaltStructureGenerator(RocksaltStructure, BulkGeneratorBase):
+class RocksaltStructureGenerator(BulkGeneratorBase, RocksaltStructure):
     def __init__(self, a=lattparams['rock_salt'], scaling_matrix=None):
         super().__init__(a=a, scaling_matrix=scaling_matrix)
         self.generate()
@@ -100,7 +113,8 @@ class RocksaltStructureGenerator(RocksaltStructure, BulkGeneratorBase):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
 
-class ZincblendeStructureGenerator(ZincblendeStructure, BulkGeneratorBase):
+class ZincblendeStructureGenerator(BulkGeneratorBase, ZincblendeStructure):
+    """:class:`ZincblendeStructure` generator class."""
     def __init__(self, a=lattparams['zincblende'], scaling_matrix=None):
         super().__init__(a=a, scaling_matrix=scaling_matrix)
         self.generate()
@@ -109,7 +123,8 @@ class ZincblendeStructureGenerator(ZincblendeStructure, BulkGeneratorBase):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
 
-class MoS2Generator(MoS2, BulkGeneratorBase):
+class MoS2Generator(BulkGeneratorBase, MoS2):
+    """:class:`MoS2` generator class."""
     def __init__(self, a=lattparams['molybdenum_disulphide']['a'],
                  c=lattparams['molybdenum_disulphide']['c'],
                  scaling_matrix=None):
