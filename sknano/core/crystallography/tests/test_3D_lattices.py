@@ -28,6 +28,7 @@ def test1():
 def test2():
     a = np.sqrt(3) * aCC
     latt = CrystalLattice(a=a, b=a, c=dVDW, alpha=90, beta=90, gamma=120)
+    print(latt)
     a1 = latt.a1
     a2 = latt.a2
     a3 = latt.a3
@@ -39,6 +40,7 @@ def test2():
         v.rotate(angle=rotangle)
 
     latt.rotate(angle=rotangle, axis='z')
+    print(latt)
 
     assert_equal(latt.a1, a1)
     assert_equal(latt.a2, a2)
@@ -50,13 +52,16 @@ def test2():
 def test3():
     a = np.sqrt(3) * aCC
     latt = CrystalLattice(a=a, b=a, c=dVDW, alpha=90, beta=90, gamma=120)
+    print(latt)
     hex_latt = CrystalLattice.hexagonal(a, dVDW)
+    print(hex_latt)
     assert_equal(latt, hex_latt)
 
 
 def test4():
     a = np.sqrt(3) * aCC
     latt = CrystalLattice(a=a, b=a, c=dVDW, alpha=90, beta=90, gamma=120)
+    print(latt)
     recip_latt = \
         ReciprocalLattice(a_star=latt.reciprocal_lattice.a_star,
                           b_star=latt.reciprocal_lattice.b_star,
@@ -77,6 +82,7 @@ def test5():
 def test6():
     latt = CrystalLattice(a=4.0, b=4.0, c=4.0,
                           alpha=90, beta=90, gamma=90)
+    print(latt)
     p = [2.1, 0.9, 0.5]
     assert_true(np.allclose(latt.wrap_fractional_coordinate(p),
                 Point((0.1, 0.9, 0.5))))
@@ -85,6 +91,7 @@ def test6():
 def test7():
     latt = CrystalLattice(a=4.0, b=4.0, c=4.0,
                           alpha=90, beta=90, gamma=90)
+    print(latt)
 
     a = latt.a1
     b = latt.a2
@@ -99,8 +106,10 @@ def test7():
 def test8():
     latt = CrystalLattice(a=4.0, b=4.0, c=4.0,
                           alpha=90, beta=90, gamma=90)
+    print(latt)
 
     recip_latt = CrystalLattice(a1=latt.b1, a2=latt.b2, a3=latt.b3)
+    print(recip_latt)
 
     assert_equal(latt.a1, recip_latt.b1)
     assert_equal(latt.a2, recip_latt.b2)

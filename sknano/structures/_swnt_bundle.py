@@ -19,7 +19,7 @@ __all__ = ['SWNTBundle']
 
 
 class SWNTBundle(NanotubeBundleBase, SWNT):
-    """SWNT bundle structure class.
+    """:class:`SWNT` bundle structure class.
 
     Parameters
     ----------
@@ -78,7 +78,7 @@ class SWNTBundle(NanotubeBundleBase, SWNT):
     --------
 
     Create a :math:`\\mathbf{C}_{h} = (10, 10)` hexagonally close packed
-    (*hcp*)  :math:`5\\times 3\\times 10` SWNT bundle.
+    (*hcp*)  :math:`5\\times 3\\times 10` :class:`SWNT` bundle.
 
     >>> from sknano.structures import SWNTBundle
     >>> swnt_bundle = SWNTBundle((10, 10), nx=5, ny=3, nz=10,

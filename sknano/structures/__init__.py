@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Nanostructure objects (:mod:`sknano.structures`)
+Structure classes (:mod:`sknano.structures`)
 ===============================================================================
 
 .. currentmodule:: sknano.structures
@@ -16,8 +16,8 @@ including fullerenes, graphene, and nanotubes.
 See the specific class doc pages below for detailed documentation on its use.
 
 
-Structure Classes
-------------------
+Nanostructure Classes
+----------------------
 
 .. autosummary::
    :toctree: generated/

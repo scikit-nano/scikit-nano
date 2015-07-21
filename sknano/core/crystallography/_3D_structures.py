@@ -30,8 +30,18 @@ __all__ = ['CrystalStructure', 'Crystal3DStructure',
 
 
 class Crystal3DStructure(StructureBase):
-    """Abstract base class for crystal structures."""
+    """Base class for 3D crystal structures.
 
+    Parameters
+    ----------
+    lattice : :class:`~sknano.core.crystallography.LatticeBase` sub-class
+    basis : {:class:`~python:list`, :class:`~sknano.core.atoms.BasisAtoms`}
+    coords : {:class:`~python:list`}, optional
+    cartesian : {:class:`~python:bool`}, optional
+    scaling_matrix : {:class:`~python:int`, :class:`~python:list`}, optional
+    structure : `Crystal3DStructure`, optional
+
+    """
     def __init__(self, lattice=None, basis=None, coords=None, cartesian=False,
                  scaling_matrix=None, structure=None, **kwargs):
 
@@ -49,6 +59,18 @@ class Crystal3DStructure(StructureBase):
 
     @classmethod
     def from_pymatgen_structure(cls, structure, scaling_matrix=None):
+        """Return a `Crystal3DStructure` from a :class:`~pymatgen:Structure`.
+
+        Parameters
+        ----------
+        structure : :class:`~pymatgen:Structure`
+        scaling_matrix : {class:`~python:int` or :class:`~python:list`}
+
+        Returns
+        -------
+        :class:`Crystal3DStructure`
+
+        """
         atoms = Atoms()
         for site in structure.sites:
             atoms.append(Atom(site.specie.symbol,
@@ -59,6 +81,29 @@ class Crystal3DStructure(StructureBase):
 
     @classmethod
     def from_spacegroup(cls, sg, lattice, basis, coords, scaling_matrix=None):
+        """Return a `Crystal3DStructure` from a spacegroup number/symbol.
+
+        Parameters
+        ----------
+        sg : :class:`~python:int` or :class:`~python:str`
+        lattice : :class:`Crystal3DLattice`
+        basis : :class:`~python:list` of :class:`~python:str`\ s
+        coords : :class:`~python:list` of :class:`~python:float`\ s
+        scaling_matrix : {None, :class:`~python:int`, :class:`~python:list`}
+
+        Returns
+        -------
+        :class:`Crystal3DStructure`
+
+        Notes
+        -----
+        Under the hood this method first s a pymatgen :class:`~pymatgen:Structure`
+
+        See Also
+        --------
+        :func:`~sknano.core.crystallography.pymatgen_structure`
+
+        """
         if not isinstance(basis, list):
             basis = [basis]
         if len(basis) != len(coords):

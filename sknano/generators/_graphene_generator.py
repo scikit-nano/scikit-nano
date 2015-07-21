@@ -43,7 +43,7 @@ class GrapheneGeneratorBase(GeneratorBase):
         Number of graphene layers.
     layer_spacing : float, optional
         Distance between layers in **Angstroms**.
-    stacking_order : {'AA', 'AB'}, optional
+    stacking_order : {'AB', 'AA'}, optional
         Stacking order of graphene layers
     layer_rotation_angles : list, optional
         list of rotation angles for each layer in **degrees** if

@@ -18,7 +18,20 @@ __all__ = ['pymatgen_structure']
 
 
 def pymatgen_structure(*args, classmethod=None, scaling_matrix=None, **kwargs):
-    """Helper function to generate a `pymatgen` Structure object."""
+    """Helper function to generate a `pymatgen` Structure object.
+
+    Parameters
+    ----------
+    *args : variable number of positional arguments
+    classmethod : {None, str}, optional
+    scaling_matrix : {class:`~python:int` or :class:`~python:list`}
+    **kwargs : variable number of keyword arguments
+
+    Returns
+    -------
+    :class:`pymatgen:Structure`
+
+    """
     try:
         from pymatgen import Structure
     except ImportError as e:

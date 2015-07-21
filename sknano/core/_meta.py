@@ -296,6 +296,7 @@ class ClassSignatureMeta(type):
 
 class ClassSignature(metaclass=ClassSignatureMeta):
     _fields = []
+
     def __init__(self, *args, **kwargs):
         bound_values = self.__signature__.bind(*args, **kwargs)
         for name, value in bound_values.arguments.items():
@@ -338,7 +339,13 @@ class Singleton(type):
 
 
 class BaseClass(metaclass=ABCMeta):
-    """Base class for base classes."""
+    """ABC defining a common set of attributes/methods for other base classes.
+
+    Attributes
+    ----------
+    fmtstr
+
+    """
 
     def __init__(self, *args, verbose=False, debug=False, **kwargs):
         super().__init__(*args, **kwargs)
@@ -352,6 +359,15 @@ class BaseClass(metaclass=ABCMeta):
 
     @property
     def fmtstr(self):
+        """:func:`~python:repr` format :class:`~python:str` template.
+
+        Sub-classes should define a `fmtstr` attribute which is a
+        format :class:`~python:str` template containing replacement
+        fields that are the named keyword arguments contained in the
+        :class:`~python:dict` returned by the sub-classes implementation
+        of the :meth:`~BaseClass.todict` method, which is required
+        to be defined by any callable sub-class of `BaseClass`.
+        """
         return self._fmtstr
 
     @fmtstr.setter
@@ -360,4 +376,10 @@ class BaseClass(metaclass=ABCMeta):
 
     @abstractmethod
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters.
+
+        The :class:`~python:dict` should contain the same named
+        keyword arguments defined in the replacement fields of the
+        :attr:`~BaseClass.fmtstr` defined by any subclass of `BaseClass`.
+        """
         return NotImplementedError

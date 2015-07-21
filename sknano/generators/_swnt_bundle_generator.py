@@ -135,9 +135,9 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
     Now, just because we can, let's make a big ass hexagon bundle with
     :math:`C_{\\mathrm{h}} = (10, 0)`.
 
-    >>> BIGASSHEXABUN = SWNTBundleGenerator(10, 0, nx=25, ny=25, nz=1,
-    ...                                     bundle_geometry='hexagon')
-    >>> BIGASSHEXABUN.save()
+    >>> big_hexagonal_bundle = SWNTBundleGenerator(10, 0, nx=25, ny=25, nz=1,
+    ...                                            bundle_geometry='hexagon')
+    >>> big_hexagonal_bundle.save()
 
     Take a look at the 469 :math:`(10, 0)` unit cells in this big ass bundle!
 

@@ -173,6 +173,7 @@ class Point(np.ndarray):
         return np.matrix(self.__array__())
 
     def euclidean_distance(self, pt):
+        """Compute the euclidean distance between `pt` and `self`."""
         return np.sqrt(((self.__array__() - pt.__array__())**2).sum())
 
     def rezero_coords(self, epsilon=1.0e-10):
@@ -208,6 +209,10 @@ class Point(np.ndarray):
         degrees : bool, optional
         transform_matrix : :class:`~numpy:numpy.ndarray`
 
+        See Also
+        --------
+        :func:`~sknano.core.math.rotate`
+
         """
         self[:] = rotate(self, angle=angle, axis=axis,
                          anchor_point=anchor_point, rot_point=rot_point,
@@ -222,6 +227,10 @@ class Point(np.ndarray):
         Parameters
         ----------
         t : :class:`~sknano.core.math.Vector`
+
+        See Also
+        --------
+        :func:`~sknano.core.math.translate`
 
         """
         self += t

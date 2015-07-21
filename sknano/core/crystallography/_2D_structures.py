@@ -20,7 +20,20 @@ __all__ = ['Crystal2DStructure']
 
 
 class Crystal2DStructure(StructureBase):
-    """Abstract base class for 2D crystal structures."""
+    """Base class for 2D crystal structures.
+
+    .. warning:: The implementation of this class is not complete.
+
+    Parameters
+    ----------
+    lattice : :class:`~sknano.core.crystallography.LatticeBase` sub-class
+    basis : {:class:`~python:list`, :class:`~sknano.core.atoms.BasisAtoms`}
+    coords : {:class:`~python:list`}, optional
+    cartesian : {:class:`~python:bool`}, optional
+    scaling_matrix : {:class:`~python:int`, :class:`~python:list`}, optional
+    structure : `Crystal3DStructure`, optional
+
+    """
     def __init__(self, lattice=None, basis=None, coords=None, cartesian=False,
                  scaling_matrix=None, **kwargs):
         if not isinstance(lattice, Crystal2DLattice):

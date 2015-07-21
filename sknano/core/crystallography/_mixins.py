@@ -38,14 +38,14 @@ class Direct2DLatticeMixin:
 
     @property
     def a1(self):
-        """Lattice vector :math:`\\mathbf{a}_1=\\mathbf{a}`."""
+        """2D lattice vector :math:`\\mathbf{a}_1=\\mathbf{a}`."""
         b2 = Vector()
         b2[:2] = self.b2
         return b2.cross(zhat) / self.cell_area
 
     @property
     def a2(self):
-        """Lattice vector :math:`\\mathbf{a}_2=\\mathbf{b}`."""
+        """2D lattice vector :math:`\\mathbf{a}_2=\\mathbf{b}`."""
         b1 = Vector()
         b1[:2] = self.b1
         return zhat.cross(b1) / self.cell_area
@@ -66,14 +66,16 @@ class Reciprocal2DLatticeMixin:
 
     @property
     def b1(self):
-        """Reciprocal lattice vector :math:`\\mathbf{b}_1=\\mathbf{a}^{*}`."""
+        """2D reciprocal lattice vector :math:`\\mathbf{b}_1=\\mathbf{a}^{*}`.
+        """
         a2 = Vector()
         a2[:2] = self.a2
         return a2.cross(zhat)[:2] / self.cell_area
 
     @property
     def b2(self):
-        """Reciprocal lattice vector :math:`\\mathbf{b}_2=\\mathbf{b}^{*}`."""
+        """2D reciprocal lattice vector :math:`\\mathbf{b}_2=\\mathbf{b}^{*}`.
+        """
         a1 = Vector()
         a1[:2] = self.a1
         return zhat.cross(a1)[:2] / self.cell_area
@@ -81,7 +83,7 @@ class Reciprocal2DLatticeMixin:
 
 class Direct3DLatticeMixin:
     """Mixin class for computing the 3D direct lattice parameters from \
-        reciprocal lattice parameters."""
+        3D reciprocal lattice parameters."""
     @property
     def cos_alpha(self):
         """:math:`\\cos\\alpha`"""
@@ -120,17 +122,17 @@ class Direct3DLatticeMixin:
 
     @property
     def a1(self):
-        """Lattice vector :math:`\\mathbf{a}_1=\\mathbf{a}`."""
+        """3D lattice vector :math:`\\mathbf{a}_1=\\mathbf{a}`."""
         return self.b2.cross(self.b3) / self.cell_volume
 
     @property
     def a2(self):
-        """Lattice vector :math:`\\mathbf{a}_2=\\mathbf{b}`."""
+        """3D lattice vector :math:`\\mathbf{a}_2=\\mathbf{b}`."""
         return self.b3.cross(self.b1) / self.cell_volume
 
     @property
     def a3(self):
-        """Lattice vector :math:`\\mathbf{a}_3=\\mathbf{c}`."""
+        """3D lattice vector :math:`\\mathbf{a}_3=\\mathbf{c}`."""
         return self.b1.cross(self.b2) / self.cell_volume
 
 DirectLatticeMixin = Direct3DLatticeMixin
@@ -138,7 +140,7 @@ DirectLatticeMixin = Direct3DLatticeMixin
 
 class Reciprocal3DLatticeMixin:
     """Mixin class for computing the 3D reciprocal lattice parameters from \
-        the direct lattice parameters."""
+        the 3D direct lattice parameters."""
     @property
     def cos_alpha_star(self):
         """:math:`\\cos\\alpha^*`"""
@@ -174,17 +176,20 @@ class Reciprocal3DLatticeMixin:
 
     @property
     def b1(self):
-        """Reciprocal lattice vector :math:`\\mathbf{b}_1=\\mathbf{a}^{*}`."""
+        """3D reciprocal lattice vector :math:`\\mathbf{b}_1=\\mathbf{a}^{*}`.
+        """
         return self.a2.cross(self.a3) / self.cell_volume
 
     @property
     def b2(self):
-        """Reciprocal lattice vector :math:`\\mathbf{b}_2=\\mathbf{b}^{*}`."""
+        """3D reciprocal lattice vector :math:`\\mathbf{b}_2=\\mathbf{b}^{*}`.
+        """
         return self.a3.cross(self.a1) / self.cell_volume
 
     @property
     def b3(self):
-        """Reciprocal lattice vector :math:`\\mathbf{b}_3=\\mathbf{c}^{*}`."""
+        """3D reciprocal lattice vector :math:`\\mathbf{b}_3=\\mathbf{c}^{*}`.
+        """
         return self.a1.cross(self.a2) / self.cell_volume
 
 ReciprocalLatticeMixin = Reciprocal3DLatticeMixin
@@ -194,9 +199,12 @@ class UnitCellMixin:
     """Mixin class for lattice unit cell."""
     @property
     def cell_matrix(self):
-        """Matrix of lattice row vectors. \
-            Same as :attr:`Crystal2DLattice.ortho_matrix`\ .T or \
-            :attr:`Crystal3DLattice.ortho_matrix`\ .T."""
+        """Matrix of lattice row vectors.
+
+        Same as :attr:`Crystal2DLattice.ortho_matrix`\ .T or
+        :attr:`Crystal3DLattice.ortho_matrix`\ .T.
+
+        """
         return self.ortho_matrix.T * self.orientation_matrix.T
 
     @property
@@ -296,6 +304,10 @@ class UnitCellMixin:
         degrees : bool, optional
         transform_matrix : :class:`~numpy:numpy.ndarray`
 
+        See Also
+        --------
+        :func:`~sknano.core.math.rotate`
+
         """
         if self.nd == 2:
             axis = 'z'
@@ -325,6 +337,10 @@ class UnitCellMixin:
         Parameters
         ----------
         t : :class:`Vector`
+
+        See Also
+        --------
+        :func:`~sknano.core.math.translate`
 
         """
         self.offset.translate(t)

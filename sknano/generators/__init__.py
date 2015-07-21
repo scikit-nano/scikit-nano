@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 """
 ======================================================================
-Nanostructure generators (:mod:`sknano.generators`)
+Structure generators (:mod:`sknano.generators`)
 ======================================================================
 
 .. currentmodule:: sknano.generators
 
 Contents
 ========
+
+Nanostructure generators
+------------------------
 
 .. autosummary::
    :toctree: generated/
@@ -23,6 +26,24 @@ Contents
    SWNTGenerator
    SWNTBundleGenerator
    UnrolledSWNTGenerator
+
+Bulk structure generators
+--------------------------
+
+.. autosummary::
+   :toctree: generated/
+
+   BulkGeneratorBase
+   AlphaQuartzGenerator
+   GoldGenerator
+   CopperGenerator
+   MoS2Generator
+   CaesiumChlorideStructureGenerator
+   DiamondStructureGenerator
+   BCCStructureGenerator
+   FCCStructureGenerator
+   RocksaltStructureGenerator
+   ZincblendeStructureGenerator
 
 .. autodata:: STRUCTURE_GENERATORS
    :annotation: = tuple of recognized generator classes.

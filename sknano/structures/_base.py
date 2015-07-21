@@ -20,12 +20,12 @@ __all__ = ['StructureBase']
 
 
 class StructureBase(BaseClass):
-    """Base class for creating abstract representation of nano structure.
+    """Base class for creating abstract representations of nanostructure.
 
     Parameters
     ----------
-    basis : {str, int, list}, optional
-        Element symbol or atomic number of basis
+    basis : {:class:`~python:str`, :class:`~python:int`, list}, optional
+        Element chemical symbols or atomic numbers of basis
         :class:`~sknano.core.atoms.Atom` 1 and 2
 
     """
@@ -57,6 +57,7 @@ class StructureBase(BaseClass):
 
     @property
     def element1(self):
+        "Basis element 1"
         return self.basis[0]
 
     @element1.setter

@@ -553,6 +553,10 @@ class Vector(np.ndarray):
         degrees : bool, optional
         transform_matrix : :class:`~numpy:numpy.ndarray`
 
+        See Also
+        --------
+        :func:`~sknano.core.math.rotate`
+
         """
         if transform_matrix is None:
             transform_matrix = \
@@ -576,6 +580,8 @@ class Vector(np.ndarray):
         ----------
         t : :class:`Vector`
         fix_anchor_point : bool, optional
+
+        :func:`~sknano.core.math.translate`
 
         """
         self.p += t

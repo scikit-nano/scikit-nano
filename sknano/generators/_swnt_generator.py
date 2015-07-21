@@ -33,7 +33,7 @@ __all__ = ['SWNTGenerator']
 
 
 class SWNTGenerator(GeneratorBase, SWNT):
-    """Class for generating `SWNT` structures.
+    """Class for generating :class:`SWNT` structures.
 
     Parameters
     ----------
@@ -93,7 +93,7 @@ class SWNTGenerator(GeneratorBase, SWNT):
     >>> from sknano.generators import SWNTGenerator
 
     Now let's generate a :math:`\\mathbf{C}_{\\mathrm{h}} = (10, 5)`
-    SWNT unit cell.
+    :class:`SWNT` unit cell.
 
     >>> swnt = SWNTGenerator((10, 5))
     >>> swnt.save(fname='10,5_unit_cell.xyz')
@@ -102,7 +102,7 @@ class SWNTGenerator(GeneratorBase, SWNT):
     >>> # SWNTGenerator(10, 5) and SWNTGenerator(n=10, m=5)
 
     Here's a nice ray traced rendering of the generated
-    :math:`(10, 5)` `SWNT` unit cell.
+    :math:`(10, 5)` :class:`SWNT` unit cell.
 
     .. image:: /images/10,5_unit_cell-01.png
 
