@@ -1,3 +1,6 @@
 [submodule "doc/sphinxext/numpydoc"]
     path = doc/sphinxext/numpydoc
     url = https://github.com/numpy/numpydoc.git
+[submodule "doc/source/proBlue"]
+	path = doc/source/proBlue
+	url = https://github.com/kellycreativetech/proBlue.git
