@@ -13,10 +13,10 @@ import numpy as np
 from sknano.core.crystallography import AlphaQuartz, DiamondStructure, \
     CaesiumChlorideStructure, RocksaltStructure, ZincblendeStructure, \
     Gold, Copper, MoS2
-from sknano.generators import AlphaQuartzGenerator, \
-    DiamondStructureGenerator, GoldGenerator, CopperGenerator, \
-    CaesiumChlorideStructureGenerator, RocksaltStructureGenerator, \
-    ZincblendeStructureGenerator, MoS2Generator
+from sknano.generators import BCCStructureGenerator, FCCStructureGenerator, \
+    AlphaQuartzGenerator, DiamondStructureGenerator, IronGenerator, \
+    GoldGenerator, CopperGenerator, CaesiumChlorideStructureGenerator, \
+    RocksaltStructureGenerator, ZincblendeStructureGenerator, MoS2Generator
 from sknano.io import XYZReader, DATAReader
 from sknano.testing import GeneratorTestFixtures
 
@@ -100,6 +100,12 @@ class TestCase(GeneratorTestFixtures):
         self.tmpdata.append(molybdenum_disulphide.fname)
         assert_equals(molybdenum_disulphide.atoms.Natoms,
                       MoS2().basis.Natoms * 3**3)
+
+    def test13(self):
+        assert_equal(GoldGenerator().atoms, FCCStructureGenerator('Au').atoms)
+
+    def test14(self):
+        assert_equal(IronGenerator().atoms, BCCStructureGenerator('Fe').atoms)
 
 
 if __name__ == '__main__':
