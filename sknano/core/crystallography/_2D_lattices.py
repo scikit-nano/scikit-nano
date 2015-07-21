@@ -25,13 +25,21 @@ __all__ = ['Crystal2DLattice', 'Reciprocal2DLattice']
 
 
 class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin, UnitCellMixin):
-    """2D crystal lattice class."""
+    """2D crystal lattice class.
+
+    Parameters
+    ----------
+    a, b : float
+    gamma : float
+    a1, a2 : array_like
+    cell_matrix : array_like
+    orientation_matrix : array_like, optional
+
+    """
 
     def __init__(self, a=None, b=None, gamma=None,
                  a1=None, a2=None, cell_matrix=None,
                  orientation_matrix=None):
-
-        super().__init__(nd=2)
 
         if cell_matrix is not None:
             cell_matrix = np.asarray(cell_matrix)
@@ -55,15 +63,8 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin, UnitCellMixin):
         if None not in (a, b, gamma):
             self._update_ortho_matrix()
 
-        if cell_matrix is not None:
-            orientation_matrix = \
-                cell_matrix.T * self.fractional_matrix
-
-        if orientation_matrix is None:
-            orientation_matrix = np.matrix(np.identity(3))
-
-        self.orientation_matrix = orientation_matrix
-        self.lattice_type = None
+        super().__init__(nd=2, cell_matrix=cell_matrix,
+                         orientation_matrix=orientation_matrix)
 
         self.fmtstr = "a={a!r}, b={b!r}, gamma={gamma!r}"
 
@@ -186,16 +187,26 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin, UnitCellMixin):
 
 class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin,
                           UnitCellMixin):
+    """2D reciprocal lattice class.
+
+    Parameters
+    ----------
+    a_star, b_star : float
+    gamma_star : float
+    b1, b2 : array_like
+    cell_matrix : array_like
+    orientation_matrix : array_like
+
+    """
 
     def __init__(self, a_star=None, b_star=None, gamma_star=None,
                  b1=None, b2=None, cell_matrix=None, orientation_matrix=None):
 
-        super().__init__(nd=2)
-
-        self._direct_lattice = \
+        direct_lattice = \
             Crystal2DLattice(a=a_star, b=b_star, gamma=gamma_star,
                              a1=b1, a2=b2, cell_matrix=cell_matrix,
                              orientation_matrix=orientation_matrix)
+        super().__init__(direct_lattice, nd=2)
 
         self.fmtstr = "a_star={a_star!r}, b_star={b_star!r}, " + \
             "gamma_star={gamma_star!r}"
@@ -210,7 +221,7 @@ class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin,
 
     @property
     def a_star(self):
-        """Length of lattice vector :math:`\\mathbf{a^*}`."""
+        """Length of reciprocal lattice vector :math:`\\mathbf{a^*}`."""
         return self._direct_lattice.a
 
     @a_star.setter
@@ -219,7 +230,7 @@ class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin,
 
     @property
     def b_star(self):
-        """Length of lattice_vector :math:`\\mathbf{b^*}`."""
+        """Length of reciprocal lattice_vector :math:`\\mathbf{b^*}`."""
         return self._direct_lattice.b
 
     @b_star.setter
@@ -228,8 +239,9 @@ class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin,
 
     @property
     def gamma_star(self):
-        """Angle between lattice vectors :math:`\\mathbf{a}` and \
-        :math:`\\mathbf{b}` in **degrees**."""
+        """Angle between reciprocal lattice vectors \
+            :math:`\\mathbf{a}^{\\ast}` and :math:`\\mathbf{b}^{\\ast}` in \
+            **degrees**."""
         try:
             return np.around(self._direct_lattice.gamma, decimals=10)
         except TypeError:
@@ -257,29 +269,29 @@ class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin,
 
     @property
     def reciprocal_lattice(self):
-        """`ReciprocalLattice` reciprocal lattice."""
+        """Reciprocal lattice of this `Reciprocal2DLattice`."""
         return Crystal2DLattice(cell_matrix=np.linalg.inv(self.cell_matrix))
 
     @classmethod
     def oblique(cls, a_star, b_star, gamma_star):
-        """Generate an oblique 2D lattice with lattice parameters \
+        """Generate an oblique 2D reciprocal lattice with lattice parameters \
             :math:`a^*, b^*, \\gamma^*`."""
         return cls(a_star=a_star, b_star=b_star, gamma_star=gamma_star)
 
     @classmethod
     def rectangular(cls, a_star, b_star):
-        """Generate a rectangular 2D lattice with lattice parameters \
-            :math:`a^*, b^*`."""
+        """Generate a rectangular 2D reciprocal lattice with lattice \
+            parameters :math:`a^*, b^*`."""
         return cls(a_star=a_star, b_star=b_star, gamma_star=90)
 
     @classmethod
     def square(cls, a_star):
-        """Generate a square 2D lattice with lattice parameter \
+        """Generate a square 2D reciprocal lattice with lattice parameter \
             :math:`a^*`."""
         return cls(a_star=a_star, b_star=a_star, gamma_star=90)
 
     @classmethod
     def hexagonal(cls, a_star):
-        """Generate a hexagonal 2D lattice with lattice parameter \
+        """Generate a hexagonal 2D reciprocal lattice with lattice parameter \
             :math:`a^*`."""
         return cls(a_star=a_star, b_star=a_star, gamma_star=120)
