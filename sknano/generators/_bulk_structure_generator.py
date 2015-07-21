@@ -26,16 +26,17 @@ __docformat__ = 'restructuredtext en'
 # from sknano.core import pluralize
 # from sknano.core.math import Point, Vector
 from sknano.core.crystallography import AlphaQuartz, DiamondStructure, \
-    Gold, Copper, FCCStructure, CaesiumChlorideStructure, \
+    Iron, Gold, Copper, BCCStructure, FCCStructure, CaesiumChlorideStructure, \
     RocksaltStructure, ZincblendeStructure, MoS2
 from sknano.core.refdata import lattice_parameters as lattparams
 from ._base import BulkGeneratorBase
 
-__all__ = ['AlphaQuartzGenerator', 'DiamondStructureGenerator',
-           'FCCStructureGenerator', 'GoldGenerator', 'CopperGenerator',
+__all__ = ['DiamondStructureGenerator',
+           'BCCStructureGenerator', 'FCCStructureGenerator',
            'CaesiumChlorideStructureGenerator',
            'RocksaltStructureGenerator', 'ZincblendeStructureGenerator',
-           'MoS2Generator']
+           'AlphaQuartzGenerator', 'IronGenerator',
+           'GoldGenerator', 'CopperGenerator', 'MoS2Generator']
 
 
 class AlphaQuartzGenerator(BulkGeneratorBase, AlphaQuartz):
@@ -72,12 +73,22 @@ class DiamondStructureGenerator(BulkGeneratorBase, DiamondStructure):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
 
-class FCCStructureGenerator(BulkGeneratorBase, FCCStructure):
-    """:class:`FCCStructure` generator class.
+class BCCStructureGenerator(BulkGeneratorBase, BCCStructure):
+    """:class:`BCCStructure` generator class."""
+    def save(self, fname='bcc_structure', **kwargs):
+        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
-    """
-    def __init__(self, a, basis, coords, scaling_matrix=None):
-        pass
+
+class IronGenerator(BulkGeneratorBase, Iron):
+    """:class:`Iron` generator class."""
+    def save(self, fname='iron', **kwargs):
+        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+
+
+class FCCStructureGenerator(BulkGeneratorBase, FCCStructure):
+    """:class:`FCCStructure` generator class."""
+    def save(self, fname='fcc_structure', **kwargs):
+        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
 
 class GoldGenerator(BulkGeneratorBase, Gold):
