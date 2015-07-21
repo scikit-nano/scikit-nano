@@ -16,6 +16,7 @@ from functools import total_ordering
 
 import numpy as np
 
+from sknano.core import BaseClass
 from sknano.core.math import Point
 from ._unit_cell import UnitCell
 
@@ -23,15 +24,30 @@ __all__ = ['LatticeBase', 'ReciprocalLatticeBase', 'StructureBase']
 
 
 @total_ordering
-class LatticeBase:
+class LatticeBase(BaseClass):
+    """Base class for crystallographic lattice objects.
 
-    def __init__(self, nd=None):
+    Parameters
+    ----------
+    nd : int
+    cell_matrix : array_like
+    orientation_matrix : array_like, optional
+
+    """
+
+    def __init__(self, nd=None, cell_matrix=None, orientation_matrix=None):
+        super().__init__()
+
         self.nd = nd
         self.offset = Point()
+        if cell_matrix is not None:
+            orientation_matrix = cell_matrix.T * self.fractional_matrix
 
-    def __repr__(self):
-        return "{}({})".format(self.__class__.__name__,
-                               self.fmtstr.format(**self.todict()))
+        if orientation_matrix is None:
+            orientation_matrix = np.matrix(np.identity(3))
+
+        self.orientation_matrix = orientation_matrix
+        self.lattice_type = None
 
     def __eq__(self, other):
         if isinstance(other, type(self)):
@@ -53,16 +69,41 @@ class LatticeBase:
 
 
 class ReciprocalLatticeBase(LatticeBase):
+    """Base class for crystallographic reciprocal lattice objects.
+
+    Parameters
+    ----------
+    direct_lattice : :class:`Crystal2DLattice` or :class:`Crystal3DLattice`
+    nd : int
+    """
+    def __init__(self, direct_lattice, nd):
+        self._direct_lattice = direct_lattice
+        super().__init__(
+            nd=nd, cell_matrix=self._direct_lattice.cell_matrix,
+            orientation_matrix=self._direct_lattice.orientation_matrix)
 
     def __getattr__(self, name):
         if name != '_direct_lattice':
             return getattr(self._direct_lattice, name)
 
 
-class StructureBase:
+class StructureBase(BaseClass):
+    """Base class for abstract representions of crystal structures.
+
+    Parameters
+    ----------
+    lattice : :class:`~sknano.core.crystallography.LatticeBase` sub-class
+    basis : {:class:`~python:list`, :class:`~sknano.core.atoms.BasisAtoms`}
+    coords : {:class:`~python:list`}, optional
+    cartesian : {:class:`~python:bool`}, optional
+    scaling_matrix : {:class:`~python:int`, :class:`~python:list`}, optional
+
+    """
 
     def __init__(self, lattice=None, basis=None, coords=None,
                  cartesian=False, scaling_matrix=None, **kwargs):
+
+        super().__init__(**kwargs)
 
         self.unit_cell = UnitCell(lattice=lattice, basis=basis,
                                   coords=coords, cartesian=cartesian)
@@ -75,12 +116,8 @@ class StructureBase:
                 scaling_matrix = 3 * [scaling_matrix]
             self.scaling_matrix = scaling_matrix
 
-        self.fmtstr = "{lattice!r}, {basis!r}, {coords!r}, cartesian=True"
-        super().__init__(**kwargs)
-
-    def __repr__(self):
-        return "{}({})".format(self.__class__.__name__,
-                               self.fmtstr.format(**self.todict()))
+        self.fmtstr = self.unit_cell.fmtstr + \
+            ", scaling_matrix={scaling_matrix!r}"
 
     def __getattr__(self, name):
         try:
@@ -98,16 +135,11 @@ class StructureBase:
     #         raise TypeError('Expected an `Atoms` object')
     #     self._atoms = value
 
-    @property
-    def fmtstr(self):
-        return self._fmtstr
-
-    @fmtstr.setter
-    def fmtstr(self, value):
-        self._fmtstr = value
-
     def rotate(self, **kwargs):
+        """Rotation the structure unit cell."""
         self.unit_cell.rotate(**kwargs)
 
     def todict(self):
-        return self.unit_cell.todict()
+        attrdict = self.unit_cell.todict()
+        attrdict.update(dict(scaling_matrix=self.scaling_matrix))
+        return attrdict
