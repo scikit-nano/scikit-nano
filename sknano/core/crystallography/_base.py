@@ -49,16 +49,14 @@ class LatticeBase(BaseClass):
         self.orientation_matrix = orientation_matrix
         self.lattice_type = None
 
+    def __dir__(self):
+        return ['nd', 'offset', 'orientation_matrix']
+
     def __eq__(self, other):
         if isinstance(other, type(self)):
-            if self is other:
-                return True
-            else:
-                for attr in self.__dir__():
-                    if abs(getattr(self, attr) - getattr(other, attr)) > 1e-6:
-                        return False
-                return True
-        return False
+            return self is other or \
+                all([np.allclose(getattr(self, attr), getattr(other, attr))
+                     for attr in dir(self)])
 
     def __lt__(self, other):
         if isinstance(other, type(self)):
@@ -87,6 +85,7 @@ class ReciprocalLatticeBase(LatticeBase):
             return getattr(self._direct_lattice, name)
 
 
+@total_ordering
 class StructureBase(BaseClass):
     """Base class for abstract representions of crystal structures.
 
@@ -119,11 +118,30 @@ class StructureBase(BaseClass):
         self.fmtstr = self.unit_cell.fmtstr + \
             ", scaling_matrix={scaling_matrix!r}"
 
+    def __dir__(self):
+        return ['unit_cell', 'scaling_matrix']
+
     def __getattr__(self, name):
         try:
             return getattr(self.unit_cell, name)
         except AttributeError:
             return super().__getattr__(name)
+
+    def __eq__(self, other):
+        if isinstance(other, StructureBase):
+            return self is other or \
+                (self.unit_cell == other.unit_cell and
+                 self.scaling_matrix == other.scaling_matrix)
+
+    def __lt__(self, other):
+        if isinstance(other, StructureBase):
+            try:
+                return ((self.scaling_matrix < other.scaling_matrix and
+                         self.unit_cell <= other.unit_cell) or
+                        (self.scaling_matrix <= other.scaling_matrix and
+                         self.unit_cell < other.unit_cell))
+            except TypeError:
+                return self.unit_cell < other.unit_cell
 
     # @property
     # def atoms(self):
