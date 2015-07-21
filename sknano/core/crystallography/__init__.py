@@ -32,14 +32,23 @@ Contents
    Reciprocal3DLattice
    Crystal3DStructure
 
-Crystal structures
--------------------
-.. autosummary::
-   :toctree: generated/
-
+   CaesiumChlorideStructure
+   CsClStructure
    DiamondStructure
+   RocksaltStructure
+   NaClStructure
+   SphaleriteStructure
+   ZincblendeStructure
+   BCCStructure
+   FCCStructure
    HexagonalClosePackedStructure
    CubicClosePackedStructure
+
+   AlphaQuartz
+   Iron
+   Copper
+   Gold
+   MoS2
 
 """
 from __future__ import absolute_import, unicode_literals

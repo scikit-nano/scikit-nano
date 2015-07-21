@@ -9,7 +9,7 @@ import numpy as np
 
 from sknano.core.crystallography import UnitCell, Crystal3DLattice, \
     Crystal3DStructure, AlphaQuartz, DiamondStructure, HexagonalStructure, \
-    FCCStructure, Gold, Copper, CaesiumChlorideStructure, \
+    BCCStructure, FCCStructure, Gold, Copper, CaesiumChlorideStructure, \
     RocksaltStructure, ZincblendeStructure, MoS2
 from sknano.core.atoms import BasisAtoms
 
@@ -68,6 +68,27 @@ def test8():
     print(structure)
     assert_true(isinstance(structure.basis, BasisAtoms))
     assert_equal(structure.basis.Natoms, 6)
+
+
+def test9():
+    with assert_raises(ValueError):
+        BCCStructure()
+
+
+def test10():
+    s1 = FCCStructure('Au')
+    print(s1)
+    s2 = Gold()
+    print(s2)
+    assert_equal(s1.scaling_matrix, s2.scaling_matrix)
+    assert_equal(s1.lattice, s2.lattice)
+    assert_equal(s1.unit_cell, s2.unit_cell)
+    assert_equal(s2, s1)
+
+
+def test11():
+    assert_equal(FCCStructure('Au'), FCCStructure(basis='Au'))
+
 
 if __name__ == '__main__':
     nose.runmodule()
