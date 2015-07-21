@@ -13,7 +13,6 @@
 # serve to show the default.
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-from builtins import object
 
 import os
 import re
@@ -21,10 +20,10 @@ import sys
 
 # Check Sphinx version
 import sphinx
-if sphinx.__version__ < "1.2":
-    raise RuntimeError("Sphinx 1.2 or newer required")
+if sphinx.__version__ < "1.3":
+    raise RuntimeError("Sphinx 1.3 or newer required")
 
-needs_sphinx = '1.2'
+needs_sphinx = '1.3'
 
 # -- General configuration ----------------------------------------------------
 
@@ -353,6 +352,7 @@ intersphinx_mapping = {
     'python': ('http://docs.python.org/3', None),
     'numpy': ('http://docs.scipy.org/doc/numpy', None),
     'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
+    'pymatgen': ('http://pymatgen.org', None)
 }
 
 # -----------------------------------------------------------------------------
@@ -405,7 +405,7 @@ plot_html_show_formats = False
 import math
 phi = (math.sqrt(5) + 1)/2
 
-font_size = 13*72/96.0  # 13 px
+font_size = 13 * 72 / 96.0  # 13 px
 
 plot_rcparams = {
     'font.size': font_size,
