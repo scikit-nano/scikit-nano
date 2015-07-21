@@ -82,7 +82,9 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin, UnitCellMixin):
             "alpha={alpha!r}, beta={beta!r}, gamma={gamma!r}"
 
     def __dir__(self):
-        return ['a', 'b', 'c', 'alpha', 'beta', 'gamma']
+        attrs = super().__dir__()
+        attrs.extend(['a', 'b', 'c', 'alpha', 'beta', 'gamma'])
+        return attrs
 
     def todict(self):
         """Return `dict` of `Crystal3DLattice` parameters."""
@@ -292,8 +294,10 @@ class Reciprocal3DLattice(ReciprocalLatticeBase, DirectLatticeMixin,
             "beta_star={beta_star!r}, gamma_star={gamma_star!r}"
 
     def __dir__(self):
-        return ['a_star', 'b_star', 'c_star',
-                'alpha_star', 'beta_star', 'gamma_star']
+        attrs = super().__dir__()
+        attrs.extend(['a_star', 'b_star', 'c_star',
+                      'alpha_star', 'beta_star', 'gamma_star'])
+        return attrs
 
     def todict(self):
         """Return `dict` of `Reciprocal3DLattice` parameters."""

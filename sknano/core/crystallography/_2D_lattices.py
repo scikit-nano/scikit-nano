@@ -69,7 +69,9 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin, UnitCellMixin):
         self.fmtstr = "a={a!r}, b={b!r}, gamma={gamma!r}"
 
     def __dir__(self):
-        return ['a', 'b', 'gamma']
+        attrs = super().__dir__()
+        attrs.extend(['a', 'b', 'gamma'])
+        return attrs
 
     def todict(self):
         """Return `dict` of `Crystal2DLattice` parameters."""
@@ -212,7 +214,9 @@ class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin,
             "gamma_star={gamma_star!r}"
 
     def __dir__(self):
-        return ['a_star', 'b_star', 'gamma_star']
+        attrs = super().__dir__()
+        attrs.extend(['a_star', 'b_star', 'gamma_star'])
+        return attrs
 
     def todict(self):
         """Return `dict` of `Reciprocal2DLattice` parameters."""
