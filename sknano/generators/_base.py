@@ -164,8 +164,8 @@ class GeneratorBase:
 
 class BulkGeneratorBase(GeneratorBase):
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.generate()
 
     def generate(self):
