@@ -22,8 +22,7 @@ __all__ = ['CrystalStructure', 'Crystal3DStructure',
            'DiamondStructure',
            'RocksaltStructure', 'RockSaltStructure', 'NaClStructure',
            'SphaleriteStructure', 'ZincblendeStructure', 'ZincBlendeStructure',
-           'BCCStructure',
-           'FCCStructure', 'Copper', 'Gold',
+           'BCCStructure', 'FCCStructure', 'Iron', 'Copper', 'Gold',
            'CubicClosePackedStructure', 'CCPStructure',
            'HexagonalClosePackedStructure', 'HCPStructure',
            'HexagonalStructure', 'AlphaQuartz', 'MoS2']
@@ -80,7 +79,8 @@ class Crystal3DStructure(StructureBase):
                    scaling_matrix=scaling_matrix)
 
     @classmethod
-    def from_spacegroup(cls, sg, lattice, basis, coords, scaling_matrix=None):
+    def from_spacegroup(cls, sg, lattice=None, basis=None, coords=None,
+                        scaling_matrix=None):
         """Return a `Crystal3DStructure` from a spacegroup number/symbol.
 
         Parameters
@@ -97,7 +97,8 @@ class Crystal3DStructure(StructureBase):
 
         Notes
         -----
-        Under the hood this method first s a pymatgen :class:`~pymatgen:Structure`
+        Under the hood this method first s a pymatgen
+        :class:`~pymatgen:Structure`
 
         See Also
         --------
@@ -110,7 +111,8 @@ class Crystal3DStructure(StructureBase):
             if isinstance(coords, list) and len(coords) != 0 and \
                     isinstance(coords[0], (int, float)):
                 coords = [coords]
-                cls.from_spacegroup(sg, lattice, basis, coords,
+                cls.from_spacegroup(sg, lattice=lattice, basis=basis,
+                                    coords=coords,
                                     scaling_matrix=scaling_matrix)
 
         structure = \
@@ -224,24 +226,32 @@ class CubicStructure(Crystal3DStructure):
     structure : :class:`Crystal3DStructure`, optional
 
     """
-    def __init__(self, centering, lattice=None, a=None, basis=None,
-                 coords=None, scaling_matrix=None, structure=None, **kwargs):
+    def __init__(self, *args, a=None, centering=None, lattice=None,
+                 basis=None, coords=None, scaling_matrix=None, structure=None,
+                 **kwargs):
+
+        if len(args) == 1 and basis is None:
+            basis = args[0]
+
+        self.centering = centering
 
         if lattice is None and structure is None:
             lattice = \
                 Crystal3DLattice.cubic(
-                    CubicStructure.get_lattice_parameter(centering, a, basis))
+                    CubicStructure.get_lattice_parameter(
+                        a=a, basis=basis, centering=centering))
         super().__init__(lattice=lattice, basis=basis, coords=coords,
                          scaling_matrix=scaling_matrix, structure=structure,
                          **kwargs)
 
     @classmethod
-    def get_lattice_parameter(cls, centering, a, basis):
+    def get_lattice_parameter(cls, a=None, basis=None, centering=None):
         if a is not None:
             return a
 
-        if basis is None:
-            raise ValueError('Missing required kwarg `basis`')
+        if basis is None or centering is None:
+            raise ValueError('\nBoth the `basis` and `centering` kwargs '
+                             'are required')
         elif isinstance(basis, (tuple, list)):
             if len(basis) != 1:
                 raise ValueError('Expected a single element basis')
@@ -254,50 +264,65 @@ class CubicStructure(Crystal3DStructure):
         if basis not in lattparams['cubic'][centering]:
             raise ValueError('Specify lattice constant `a` for '
                              'given basis {}'.format(basis))
+
         return lattparams['cubic'][centering][basis]
 
     @classmethod
-    def from_spacegroup(cls, centering, sg, a=None, basis=None, coords=None,
-                        scaling_matrix=None):
-        lattice = \
-            Crystal3DLattice.cubic(
-                CubicStructure.get_lattice_parameter(centering, a, basis))
+    def from_spacegroup(cls, *args, lattice=None, basis=None, coords=None,
+                        scaling_matrix=None, a=None, centering=None):
+        if len(args) == 2 and basis is None:
+            sg, basis = args
+
+        if len(args) == 1:
+            sg = args[0]
+
+        if lattice is None:
+            lattice = \
+                Crystal3DLattice.cubic(
+                    CubicStructure.get_lattice_parameter(a=a, basis=basis,
+                                                         centering=centering))
         if coords is None:
             coords = [[0, 0, 0]]
-        return super().from_spacegroup(sg, lattice, basis, coords,
+        return super().from_spacegroup(sg, lattice=lattice, basis=basis,
+                                       coords=coords,
                                        scaling_matrix=scaling_matrix)
 
 
 class BCCStructure(CubicStructure):
-    def __init__(self, **kwargs):
-        super().__init__('BCC', **kwargs)
-
-    @classmethod
-    def from_spacegroup(cls, *args, **kwargs):
-        return super().from_spacegroup('BCC', *args, **kwargs)
+    """BCC structure class."""
+    def __init__(self, *args, **kwargs):
+        kwargs['centering'] = 'BCC'
+        structure = CubicStructure.from_spacegroup(229, *args, **kwargs)
+        super().__init__(*args, structure=structure, **kwargs)
 
 
 class FCCStructure(CubicStructure):
-    def __init__(self, **kwargs):
-        super().__init__('FCC', **kwargs)
+    """FCC structure class."""
+    def __init__(self, *args, **kwargs):
+        kwargs['centering'] = 'FCC'
+        structure = CubicStructure.from_spacegroup(225, *args, **kwargs)
+        super().__init__(*args, structure=structure, **kwargs)
 
-    @classmethod
-    def from_spacegroup(cls, *args, **kwargs):
-        return super().from_spacegroup('FCC', *args, **kwargs)
+
+class Iron(BCCStructure):
+    """Iron structure."""
+    def __init__(self, **kwargs):
+        kwargs['basis'] = 'Fe'
+        super().__init__(**kwargs)
 
 
 class Gold(FCCStructure):
+    """Gold structure."""
     def __init__(self, **kwargs):
         kwargs['basis'] = 'Au'
-        gold = FCCStructure.from_spacegroup(225, **kwargs)
-        super().__init__(structure=gold, **kwargs)
+        super().__init__(**kwargs)
 
 
 class Copper(FCCStructure):
+    """Copper structure."""
     def __init__(self, **kwargs):
         kwargs['basis'] = 'Cu'
-        copper = FCCStructure.from_spacegroup(225, **kwargs)
-        super().__init__(structure=copper, **kwargs)
+        super().__init__(**kwargs)
 
 
 class HexagonalClosePackedStructure(Crystal3DStructure):
@@ -323,6 +348,7 @@ class HexagonalStructure(Crystal3DStructure):
 
 
 class AlphaQuartz(HexagonalStructure):
+    """Alpha quartz structure class."""
     def __init__(self, a=lattparams['alpha_quartz']['a'],
                  c=lattparams['alpha_quartz']['c'], scaling_matrix=None,
                  **kwargs):
