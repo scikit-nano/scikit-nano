@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-===========================================================================
-Crystal structure classes (:mod:`sknano.core.crystallography._structures`)
-===========================================================================
+==============================================================================
+3D crystal structures (:mod:`sknano.core.crystallography._3D_structures`)
+==============================================================================
 
-.. currentmodule:: sknano.core.crystallography._structures
+.. currentmodule:: sknano.core.crystallography._3D_structures
 
 """
 from __future__ import absolute_import, division, print_function, \
@@ -102,7 +102,7 @@ class Crystal3DStructure(StructureBase):
 
         See Also
         --------
-        :func:`~sknano.core.crystallography.pymatgen_structure`
+        pymatgen_structure
 
         """
         if not isinstance(basis, list):

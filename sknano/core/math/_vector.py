@@ -555,7 +555,7 @@ class Vector(np.ndarray):
 
         See Also
         --------
-        :func:`~sknano.core.math.rotate`
+        core.math.rotate
 
         """
         if transform_matrix is None:
@@ -581,7 +581,9 @@ class Vector(np.ndarray):
         t : :class:`Vector`
         fix_anchor_point : bool, optional
 
-        :func:`~sknano.core.math.translate`
+        See Also
+        --------
+        core.math.translate
 
         """
         self.p += t

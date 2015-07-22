@@ -211,7 +211,7 @@ class Point(np.ndarray):
 
         See Also
         --------
-        :func:`~sknano.core.math.rotate`
+        core.math.rotate
 
         """
         self[:] = rotate(self, angle=angle, axis=axis,
@@ -230,7 +230,7 @@ class Point(np.ndarray):
 
         See Also
         --------
-        :func:`~sknano.core.math.translate`
+        core.math.translate
 
         """
         self += t

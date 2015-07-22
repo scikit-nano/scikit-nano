@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-===========================================================================
-Crystal structure classes (:mod:`sknano.core.crystallography._structures`)
-===========================================================================
+==============================================================================
+2D crystal structures (:mod:`sknano.core.crystallography._2D_structures`)
+==============================================================================
 
-.. currentmodule:: sknano.core.crystallography._structures
+.. currentmodule:: sknano.core.crystallography._2D_structures
 
 """
 from __future__ import absolute_import, division, print_function, \

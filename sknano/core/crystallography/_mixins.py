@@ -306,7 +306,7 @@ class UnitCellMixin:
 
         See Also
         --------
-        :func:`~sknano.core.math.rotate`
+        core.math.rotate
 
         """
         if self.nd == 2:
@@ -340,7 +340,7 @@ class UnitCellMixin:
 
         See Also
         --------
-        :func:`~sknano.core.math.translate`
+        core.math.translate
 
         """
         self.offset.translate(t)

@@ -50,19 +50,26 @@ Contents
    Gold
    MoS2
 
+Helper functions
+----------------
+.. autosummary::
+   :toctree: generated/
+
+   pymatgen_structure
+
 """
 from __future__ import absolute_import, unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._base import *
+from ._extras import *
+from ._mixins import *
+from ._unit_cell import *
+
 from ._2D_lattices import *
 from ._2D_structures import *
 
 from ._3D_lattices import *
 from ._3D_structures import *
-
-from ._extras import *
-from ._mixins import *
-from ._unit_cell import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
