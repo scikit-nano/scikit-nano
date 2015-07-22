@@ -11,6 +11,8 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from abc import ABCMeta, abstractmethod
+
 import copy
 import os
 
@@ -44,7 +46,7 @@ STRUCTURE_GENERATORS = ('FullereneGenerator',
                         'MoS2Generator')
 
 
-class GeneratorBase:
+class GeneratorBase(metaclass=ABCMeta):
     """Base class for generator classes"""
 
     def __init__(self, *args, **kwargs):
@@ -54,6 +56,12 @@ class GeneratorBase:
     def __getattr__(self, name):
         if name != '_structure_data':
             return getattr(self._structure_data, name)
+
+    @property
+    @abstractmethod
+    def generate(self):
+        """Generate the structure coordinates."""
+        return NotImplementedError
 
     @property
     def structure_data(self):
@@ -163,12 +171,15 @@ class GeneratorBase:
 
 
 class BulkGeneratorBase(GeneratorBase):
+    """Base class for the *bulk structure generator* classes."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.generate()
 
     def generate(self):
+        """Common :meth:`~GeneratorBase.generate` method for buk structure \
+            generators."""
         self.structure_data.clear()
         for atom in self.unit_cell:
             self.atoms.append(Atom(atom.element, x=atom.x, y=atom.y, z=atom.z))
