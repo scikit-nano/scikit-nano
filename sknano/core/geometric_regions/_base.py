@@ -13,6 +13,7 @@ from __future__ import absolute_import, division, print_function, \
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
+from sknano.core import BaseClass
 from sknano.core.math import Points, Vectors, transformation_matrix
 
 # import numpy as np
@@ -21,6 +22,8 @@ __all__ = ['GeometricRegion', 'GeometricTransformsMixin']
 
 
 class GeometricTransformsMixin:
+    """Mixin class providing methods for applying linear algebra \
+        transforms to geometric regions."""
 
     def rotate(self, angle=None, axis=None, anchor_point=None,
                rot_point=None, from_vector=None, to_vector=None,
@@ -64,17 +67,13 @@ class GeometricTransformsMixin:
         self.vectors.translate(t, fix_anchor_points=fix_anchor_points)
 
 
-class GeometricRegion(metaclass=ABCMeta):
+class GeometricRegion(BaseClass, metaclass=ABCMeta):
     """Abstract base class for geometric regions."""
 
     def __init__(self):
+        super().__init__()
         self.points = Points()
         self.vectors = Vectors()
-        self.fmtstr = ""
-
-    def __repr__(self):
-        return "{}({})".format(self.__class__.__name__,
-                               self.fmtstr.format(**self.todict()))
 
     @property
     @abstractmethod
@@ -96,9 +95,4 @@ class GeometricRegion(metaclass=ABCMeta):
     @abstractmethod
     def contains(self):
         """Check if point is contained within geometric region."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def todict(self):
-        """Return `dict` of `__init__` parameters."""
         raise NotImplementedError
