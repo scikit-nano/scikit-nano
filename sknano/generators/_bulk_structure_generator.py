@@ -73,40 +73,9 @@ class DiamondStructureGenerator(BulkGeneratorBase, DiamondStructure):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
 
-class BCCStructureGenerator(BulkGeneratorBase, BCCStructure):
-    """:class:`BCCStructure` generator class."""
-    def save(self, fname='bcc_structure', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
-
-
-class IronGenerator(BulkGeneratorBase, Iron):
-    """:class:`Iron` generator class."""
-    def save(self, fname='iron', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
-
-
-class FCCStructureGenerator(BulkGeneratorBase, FCCStructure):
-    """:class:`FCCStructure` generator class."""
-    def save(self, fname='fcc_structure', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
-
-
-class GoldGenerator(BulkGeneratorBase, Gold):
-    """:class:`Gold` generator class."""
-
-    def save(self, fname='gold', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
-
-
-class CopperGenerator(BulkGeneratorBase, Copper):
-    # self.fname = 'copper'
-
-    def save(self, fname='copper', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
-
-
 class CaesiumChlorideStructureGenerator(BulkGeneratorBase,
                                         CaesiumChlorideStructure):
+    """:class:`CaesiumChlorideStructure` generator class."""
     def __init__(self, a=lattparams['caesium_chloride'], scaling_matrix=None):
         super().__init__(a=a, scaling_matrix=scaling_matrix)
         self.generate()
@@ -116,6 +85,7 @@ class CaesiumChlorideStructureGenerator(BulkGeneratorBase,
 
 
 class RocksaltStructureGenerator(BulkGeneratorBase, RocksaltStructure):
+    """:class:`RocksaltStructure` generator class."""
     def __init__(self, a=lattparams['rock_salt'], scaling_matrix=None):
         super().__init__(a=a, scaling_matrix=scaling_matrix)
         self.generate()
@@ -131,6 +101,38 @@ class ZincblendeStructureGenerator(BulkGeneratorBase, ZincblendeStructure):
         self.generate()
 
     def save(self, fname='zincblende', **kwargs):
+        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+
+
+class BCCStructureGenerator(BulkGeneratorBase, BCCStructure):
+    """:class:`BCCStructure` generator class."""
+    def save(self, fname='bcc_structure', **kwargs):
+        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+
+
+class FCCStructureGenerator(BulkGeneratorBase, FCCStructure):
+    """:class:`FCCStructure` generator class."""
+    def save(self, fname='fcc_structure', **kwargs):
+        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+
+
+class IronGenerator(BulkGeneratorBase, Iron):
+    """:class:`Iron` generator class."""
+    def save(self, fname='iron', **kwargs):
+        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+
+
+class GoldGenerator(BulkGeneratorBase, Gold):
+    """:class:`Gold` generator class."""
+
+    def save(self, fname='gold', **kwargs):
+        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+
+
+class CopperGenerator(BulkGeneratorBase, Copper):
+    """:class:`Copper` generator class."""
+
+    def save(self, fname='copper', **kwargs):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
 
