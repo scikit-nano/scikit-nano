@@ -62,7 +62,7 @@ atomic_masses_nist_list = [
     91.224,  # Zr
     92.90638,  # Nb
     95.96,  # Mo
-    98,  # Tc
+    None,  # Tc
     101.07,  # Ru
     102.90550,  # Rh
     106.42,  # Pd
@@ -80,7 +80,7 @@ atomic_masses_nist_list = [
     140.116,  # Ce
     140.90765,  # Pr
     144.242,  # Nd
-    145,  # Pm
+    None,  # Pm
     150.36,  # Sm
     151.964,  # Eu
     157.25,  # Gd
@@ -103,38 +103,38 @@ atomic_masses_nist_list = [
     204.383,  # Tl
     207.2,  # Pb
     208.98040,  # Bi
-    209,  # Po
-    210,  # At
-    222,  # Rn
-    223,  # Fr
-    226,  # Ra
-    227,  # Ac
+    None,  # Po
+    None,  # At
+    None,  # Rn
+    None,  # Fr
+    None,  # Ra
+    None,  # Ac
     232.03806,  # Th
     231.03588,  # Pa
     238.02891,  # U
-    237,  # Np
-    244,  # Pu
-    243,  # Am
-    247,  # Cm
-    247,  # Bk
-    251,  # Cf
-    252,  # Es
-    257,  # Fm
-    258,  # Md
-    259,  # No
-    262,  # Lr
-    265,  # Rf
-    268,  # Db
-    271,  # Sg
-    270,  # Bh
-    277,  # Hs
-    276,  # Mt
-    281,  # Ds
-    280,  # Rg
-    285,  # Cn
-    284,  # Uut
-    289,  # Fl
-    288,  # Uup
-    293,  # Lv
-    294,  # Uus
-    294]  # Uuo
+    None,  # Np
+    None,  # Pu
+    None,  # Am
+    None,  # Cm
+    None,  # Bk
+    None,  # Cf
+    None,  # Es
+    None,  # Fm
+    None,  # Md
+    None,  # No
+    None,  # Lr
+    None,  # Rf
+    None,  # Db
+    None,  # Sg
+    None,  # Bh
+    None,  # Hs
+    None,  # Mt
+    None,  # Ds
+    None,  # Rg
+    None,  # Cn
+    None,  # Uut
+    None,  # Fl
+    None,  # Uup
+    None,  # Lv
+    None,  # Uus
+    None]  # Uuo
