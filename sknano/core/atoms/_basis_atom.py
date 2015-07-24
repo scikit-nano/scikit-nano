@@ -30,7 +30,8 @@ class BasisAtom(XYZAtom):
 
     Parameters
     ----------
-
+    lattice : :class:`~sknano.core.crystallography.Crystal3DLattice`
+    xs, ys, zs : float
     """
 
     def __init__(self, *args, lattice=None, xs=None, ys=None, zs=None,

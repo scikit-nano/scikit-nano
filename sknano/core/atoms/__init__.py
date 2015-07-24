@@ -21,6 +21,15 @@ Base classes:
    Atom
    Atoms
 
+`Atom`/`Atoms` sub-classes:
+
+.. autosummary::
+   :toctree: generated/
+
+   XYZAtom
+   XYZAtoms
+
+
 Atoms with an eXtended set of attributes:
 
 .. autosummary::

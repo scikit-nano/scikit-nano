@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Atoms class with a coordination number (:mod:`sknano.core.atoms._cn_atoms`)
+Container class for `CNAtom`\ s (:mod:`sknano.core.atoms._cn_atoms`)
 ===============================================================================
 
 .. currentmodule:: sknano.core.atoms._cn_atoms
@@ -22,10 +22,9 @@ __all__ = ['CNAtoms']
 
 
 class CNAtoms(Atoms):
-    """An eXtended `Atoms` class.
+    """An `Atoms` sub-class for `CNAtom`\ s.
 
-    Sub-class of `Atoms` class, and a container class for lists of
-    :class:`~sknano.core.atoms.CNAtom` instances.
+    A container class for :class:`~sknano.core.atoms.CNAtom` objects.
 
     Parameters
     ----------

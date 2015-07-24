@@ -23,10 +23,9 @@ __all__ = ['VelocityAtoms']
 
 
 class VelocityAtoms(Atoms):
-    """An eXtended `Atoms` class.
+    """An `Atoms` class for `VelocityAtom`\ s.
 
-    Sub-class of `Atoms` class, and a container class for lists of
-    :class:`~sknano.core.atoms.VelocityAtom` instances.
+    A container class for `VelocityAtom` objects.
 
     Parameters
     ----------

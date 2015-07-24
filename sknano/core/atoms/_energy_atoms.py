@@ -22,10 +22,9 @@ __all__ = ['EnergyAtoms']
 
 
 class EnergyAtoms(Atoms):
-    """An eXtended `Atoms` class.
+    """An `Atoms` sub-class for `EnergyAtom`\ s.
 
-    Sub-class of `Atoms` class, and a container class for lists of
-    :class:`~sknano.core.atoms.EnergyAtom` instances.
+    A container class for class:`~sknano.core.atoms.EnergyAtom` objects.
 
     Parameters
     ----------

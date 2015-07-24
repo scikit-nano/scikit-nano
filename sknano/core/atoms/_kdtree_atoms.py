@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Atoms class for KDTree analysis (:mod:`sknano.core.atoms._kdtree_atoms`)
+Container class for `KDTAtom`\ s (:mod:`sknano.core.atoms._kdtree_atoms`)
 ===============================================================================
 
 An `Atoms` class for structure analysis.

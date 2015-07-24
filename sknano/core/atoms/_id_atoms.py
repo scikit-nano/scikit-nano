@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Extended Atoms class feature set (:mod:`sknano.core.atoms._id_atoms`)
+Container class for `IDAtom`\ s (:mod:`sknano.core.atoms._id_atoms`)
 ===============================================================================
-
-An "eXtended" `Atoms` class for structure analysis.
 
 .. currentmodule:: sknano.core.atoms._id_atoms
 
@@ -24,7 +22,7 @@ __all__ = ['IDAtoms']
 
 
 class IDAtoms(Atoms):
-    """An eXtended `Atoms` class.
+    """An `Atoms` sub-class for `IDAtom`\ s.
 
     Sub-class of `Atoms` class, and a container class for lists of
     :class:`~sknano.core.atoms.IDAtom` instances.

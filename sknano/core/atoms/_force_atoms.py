@@ -1,27 +1,18 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Extended Atoms class feature set (:mod:`sknano.core.atoms._force_atoms`)
+Container class for `ForceAtom`\ s (:mod:`sknano.core.atoms._force_atoms`)
 ===============================================================================
-
-An "eXtended" `Atoms` class for structure analysis.
 
 .. currentmodule:: sknano.core.atoms._force_atoms
 
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import zip
 __docformat__ = 'restructuredtext en'
 
-from collections import OrderedDict
 from operator import attrgetter
 
-import numpy as np
-
-from sknano.core import dedupe, xyz
-from sknano.core.math import Vector, transformation_matrix
-from sknano.core.geometric_regions import Cuboid  # , Rectangle
 from ._atoms import Atoms
 from ._force_atom import ForceAtom
 
@@ -29,7 +20,7 @@ __all__ = ['ForceAtoms']
 
 
 class ForceAtoms(Atoms):
-    """An eXtended `Atoms` class.
+    """An `Atoms` sub-class for `ForceAtom`\ s.
 
     Sub-class of `Atoms` class, and a container class for lists of
     :class:`~sknano.core.atoms.ForceAtom` instances.

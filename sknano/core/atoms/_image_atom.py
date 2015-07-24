@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Atom class with extended feature set (:mod:`sknano.core.atoms._extended_atom`)
+Atom class with image number attributes (:mod:`sknano.core.atoms._image_atom`)
 ===============================================================================
 
-An "eXtended" `Atom` class for structure analysis.
-
-.. currentmodule:: sknano.core.atoms._extended_atom
+.. currentmodule:: sknano.core.atoms._image_atom
 
 """
 from __future__ import absolute_import, division, print_function
@@ -26,7 +24,7 @@ __all__ = ['ImageAtom']
 
 @total_ordering
 class ImageAtom(Atom):
-    """An `Atom` class with an eXtended set of attributes.
+    """An `Atom` sub-class with image count attributes.
 
     Parameters
     ----------
@@ -83,7 +81,7 @@ class ImageAtom(Atom):
     def iz(self, value):
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self.i.z = value
+        self.i.z = int(value)
 
     @property
     def i(self):

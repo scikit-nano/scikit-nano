@@ -28,10 +28,9 @@ __all__ = ['XYZAtoms']
 
 
 class XYZAtoms(Atoms):
-    """An eXtended `Atoms` class.
+    """An `Atoms` sub-class for `XYZAtom`\ s.
 
-    Sub-class of `Atoms` class, and a container class for lists of
-    :class:`~sknano.core.atoms.XYZAtom` instances.
+    A container class for :class:`~sknano.core.atoms.XYZAtom` objects.
 
     Parameters
     ----------
@@ -104,7 +103,7 @@ class XYZAtoms(Atoms):
 
     @property
     def coords(self):
-        """Alias for :meth:`Atoms.r`."""
+        """Alias for :attr:`Atoms.r`."""
         return self.r
 
     @property
@@ -226,12 +225,6 @@ class XYZAtoms(Atoms):
         if kwargs.get('transform_matrix', None) is None:
             transform_matrix = transformation_matrix(**kwargs)
         [atom.rotate(transform_matrix=transform_matrix) for atom in self]
-
-    def select(self, cmd):
-        pass
-
-    def select_within(self, volume):
-        pass
 
     def translate(self, t, fix_anchor_points=True):
         """Translate `Atom` position vectors by :class:`Vector` `t`.

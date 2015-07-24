@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Atoms class for :class:`TypeAtom`\ s (:mod:`sknano.core.atoms._type_atoms`)
+Atoms class for `TypeAtom`\ s (:mod:`sknano.core.atoms._type_atoms`)
 ===============================================================================
 
 .. currentmodule:: sknano.core.atoms._type_atoms
@@ -23,10 +23,9 @@ __all__ = ['TypeAtoms']
 
 
 class TypeAtoms(Atoms):
-    """An eXtended `Atoms` class.
+    """An `Atoms` sub-class for `TypeAtom`\ s.
 
-    Sub-class of `Atoms` class, and a container class for lists of
-    :class:`~sknano.core.atoms.TypeAtom` instances.
+    A container class for `TypeAtom` objects.
 
     Parameters
     ----------
