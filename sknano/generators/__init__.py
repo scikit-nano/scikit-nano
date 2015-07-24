@@ -45,6 +45,9 @@ Bulk structure generators
    RocksaltStructureGenerator
    ZincblendeStructureGenerator
 
+Other
+-----
+
 .. autodata:: STRUCTURE_GENERATORS
    :annotation: = tuple of recognized generator classes.
 
