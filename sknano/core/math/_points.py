@@ -23,7 +23,7 @@ __all__ = ['Points']
 
 
 class Points(UserList):
-    """Class for collection of `Point` objects.
+    """Container class for collection of `Point` objects.
 
     Parameters
     ----------
