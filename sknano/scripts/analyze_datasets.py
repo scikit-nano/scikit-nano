@@ -10,7 +10,6 @@ Command line script (:mod:`sknano.scripts.analyze_datasets`)
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import str
 import argparse
 import os
 import sys

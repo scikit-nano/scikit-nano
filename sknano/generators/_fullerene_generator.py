@@ -9,16 +9,15 @@ Fullerene generators (:mod:`sknano.generators._fullerene_generators`)
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import str
 __docformat__ = 'restructuredtext en'
 
 from pkg_resources import resource_filename
 import os
-#import numpy as np
+# import numpy as np
 
 from sknano.io import XYZReader
 from sknano.structures import Fullerene
-#from sknano.core.geometric_regions import Cuboid
+# from sknano.core.geometric_regions import Cuboid
 from ._base import GeneratorBase
 
 __all__ = ['FullereneGenerator']

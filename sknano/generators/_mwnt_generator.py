@@ -9,17 +9,16 @@ MWNT structure generator (:mod:`sknano.generators._mwnt_generator`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-from builtins import str
 __docformat__ = 'restructuredtext en'
 
-#import copy
+# import copy
 
-#import numpy as np
+# import numpy as np
 
-#from sknano.core import pluralize
-#from sknano.core.math import Vector
+# from sknano.core import pluralize
+# from sknano.core.math import Vector
 from sknano.structures import MWNT
-#from sknano.core.geometric_regions import Cuboid
+# from sknano.core.geometric_regions import Cuboid
 from ._base import GeneratorBase
 from ._swnt_generator import SWNTGenerator
 

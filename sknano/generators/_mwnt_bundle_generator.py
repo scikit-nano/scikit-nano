@@ -9,7 +9,6 @@ MWNT Bundle Generator (:mod:`sknano.generators._mwnt_bundle_generator`)
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-from builtins import str
 __docformat__ = 'restructuredtext en'
 
 from sknano.core import pluralize

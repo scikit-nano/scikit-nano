@@ -2,13 +2,12 @@
 
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import range
 
 import nose
 from nose.tools import *
 from sknano.core.atoms import XAtom, XAtoms
 from sknano.testing import generate_atoms
-#from sknano.core.geometric_regions import Ellipsoid
+# from sknano.core.geometric_regions import Ellipsoid
 
 
 def test_instantiation():

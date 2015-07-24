@@ -9,7 +9,6 @@ Base class for structure molecules (:mod:`sknano.core.molecules._molecules`)
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
-from builtins import zip
 __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
