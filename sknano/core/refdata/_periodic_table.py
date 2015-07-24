@@ -69,16 +69,19 @@ element_names = [
     'Ununpentium', 'Livermorium', 'Ununseptium', 'Ununoctium']
 
 atomic_numbers = OrderedDict()
-for Z, symbol in enumerate(element_symbols, start=1):
-    atomic_numbers[symbol] = Z
+[atomic_numbers.update({symbol: Z}) for Z, symbol in
+ enumerate(element_symbols, start=1)]
 
 atomic_number_symbol_map = {v: k for k, v in list(atomic_numbers.items())}
 
 atomic_masses = OrderedDict()
-for i, symbol in enumerate(element_symbols):
-    atomic_masses[symbol] = float(_atomic_masses[i])
+[atomic_masses.update({symbol: float(_atomic_masses[i])})
+ if _atomic_masses[i] is not None else
+ atomic_masses.update({symbol: None}) for i, symbol in
+ enumerate(element_symbols)]
 
-atomic_mass_symbol_map = {v: k for k, v in list(atomic_masses.items())}
+atomic_mass_symbol_map = {v: k for k, v in list(atomic_masses.items()) if
+                          v is not None}
 
 
 class PeriodicTable:
