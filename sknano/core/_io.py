@@ -11,12 +11,23 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 __docformat__ = 'restructuredtext en'
 
+import json
 import os
 import re
 import sys
 
+try:
+    import yaml
+    try:
+        from yaml import CLoader as Loader, CDumper as Dumper
+    except ImportError:
+        from yaml import Loader, Dumper
+except ImportError:
+    yaml = None
+
+
 __all__ = ['get_fname', 'get_fpath', 'listdir_dirnames', 'listdir_fnames',
-           'listdir']
+           'listdir', 'loadobj', 'dumpobj']
 
 
 def get_fname(fname=None, ext=None, outpath=os.getcwd(), overwrite=False,
@@ -266,3 +277,23 @@ def listdir(path='.', filterfunc=None, filter_dirnames=False,
     if filter_fnames and filterfunc is not None:
         fnames = list(filter(filterfunc, fnames))
     return dirnames, fnames
+
+
+def loadobj(fn, *args, **kwargs):
+    with open(fn) as fp:
+        if fn.lower().endswith(("yaml", "yml")):
+            if "Loader" not in kwargs:
+                kwargs["Loader"] = Loader
+            return yaml.load(fp, *args, **kwargs)
+        else:
+            return json.load(fp, *args, **kwargs)
+
+
+def dumpobj(obj, fn, *args, **kwargs):
+    with open(fn, 'wt') as fp:
+        if fn.lower().endswith(("yaml", "yml")):
+            if "Dumper" not in kwargs:
+                kwargs["Dumper"] = Dumper
+            yaml.dump(obj, fp, *args, **kwargs)
+        else:
+            json.dump(obj, fp, *args, **kwargs)
