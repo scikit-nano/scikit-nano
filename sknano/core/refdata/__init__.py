@@ -16,6 +16,8 @@ Periodic table of elements data
 
 .. autodata:: atomic_numbers
 
+.. autodata:: element_data
+
 .. autodata:: element_symbols
 
 .. autodata:: element_names

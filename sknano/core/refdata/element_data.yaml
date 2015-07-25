@@ -1,0 +1,1106 @@
+Ac:
+  Abbreviation: Ac
+  AtomicMass: 227.0
+  AtomicNumber: 89
+  AtomicRadius: null
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [5.67, 5.67, 5.67]
+  Name: actinium
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: null
+Ag:
+  Abbreviation: Ag
+  AtomicMass: 107.8682
+  AtomicNumber: 47
+  AtomicRadius: 1.65
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [4.0853, 4.0853, 4.0853]
+  Name: silver
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: 1.72
+Al:
+  Abbreviation: Al
+  AtomicMass: 26.9815386
+  AtomicNumber: 13
+  AtomicRadius: 1.18
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [4.0495, 4.0495, 4.0495]
+  Name: aluminum
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: null
+Am:
+  Abbreviation: Am
+  AtomicMass: 243.0
+  AtomicNumber: 95
+  AtomicRadius: null
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.4681, 3.4681, 11.241]
+  Name: americium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Ar:
+  Abbreviation: Ar
+  AtomicMass: 39.948
+  AtomicNumber: 18
+  AtomicRadius: 0.71
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [5.256, 5.256, 5.256]
+  Name: argon
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: 1.88
+As:
+  Abbreviation: As
+  AtomicMass: 74.9216
+  AtomicNumber: 33
+  AtomicRadius: 1.14
+  CrystalStructure: SimpleTrigonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.7598, 3.7598, 10.5475]
+  Name: arsenic
+  SpaceGroupNumber: 166
+  VanDerWaalsRadius: 1.85
+At: {Abbreviation: At, AtomicMass: 210.0, AtomicNumber: 85, AtomicRadius: 1.27, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: astatine, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Au:
+  Abbreviation: Au
+  AtomicMass: 196.966569
+  AtomicNumber: 79
+  AtomicRadius: 1.74
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [4.0782, 4.0782, 4.0782]
+  Name: gold
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: 1.66
+B:
+  Abbreviation: B
+  AtomicMass: 10.811
+  AtomicNumber: 5
+  AtomicRadius: 0.87
+  CrystalStructure: SimpleTrigonal
+  LatticeAngles: [58.06, 58.06, 58.06]
+  LatticeConstants: [5.06, 5.06, 5.06]
+  Name: boron
+  SpaceGroupNumber: 166
+  VanDerWaalsRadius: null
+Ba:
+  Abbreviation: Ba
+  AtomicMass: 137.327
+  AtomicNumber: 56
+  AtomicRadius: 2.53
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [5.028, 5.028, 5.028]
+  Name: barium
+  SpaceGroupNumber: 229
+  VanDerWaalsRadius: null
+Be:
+  Abbreviation: Be
+  AtomicMass: 9.012182
+  AtomicNumber: 4
+  AtomicRadius: 1.12
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [2.2858, 2.2858, 3.5843]
+  Name: beryllium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Bh: {Abbreviation: Bh, AtomicMass: 272.0, AtomicNumber: 107, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: bohrium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Bi:
+  Abbreviation: Bi
+  AtomicMass: 208.9804
+  AtomicNumber: 83
+  AtomicRadius: 1.43
+  CrystalStructure: BaseCenteredMonoclinic
+  LatticeAngles: [90.0, 110.33, 90.0]
+  LatticeConstants: [6.674, 6.117, 3.304]
+  Name: bismuth
+  SpaceGroupNumber: 12
+  VanDerWaalsRadius: null
+Bk:
+  Abbreviation: Bk
+  AtomicMass: 247.0
+  AtomicNumber: 97
+  AtomicRadius: null
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.416, 3.416, 11.069]
+  Name: berkelium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Br:
+  Abbreviation: Br
+  AtomicMass: 79.904
+  AtomicNumber: 35
+  AtomicRadius: 0.94
+  CrystalStructure: BaseCenteredOrthorhombic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [6.7265, 4.6451, 8.7023]
+  Name: bromine
+  SpaceGroupNumber: 64
+  VanDerWaalsRadius: 1.85
+C:
+  Abbreviation: C
+  AtomicMass: 12.0107
+  AtomicNumber: 6
+  AtomicRadius: 0.67
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [2.464, 2.464, 6.711]
+  Name: carbon
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: 1.7
+Ca:
+  Abbreviation: Ca
+  AtomicMass: 40.078
+  AtomicNumber: 20
+  AtomicRadius: 1.94
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [5.5884, 5.5884, 5.5884]
+  Name: calcium
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: null
+Cd:
+  Abbreviation: Cd
+  AtomicMass: 112.411
+  AtomicNumber: 48
+  AtomicRadius: 1.61
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [2.9794, 2.9794, 5.6186]
+  Name: cadmium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: 1.58
+Ce:
+  Abbreviation: Ce
+  AtomicMass: 140.116
+  AtomicNumber: 58
+  AtomicRadius: null
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.62, 3.62, 5.99]
+  Name: cerium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Cf:
+  Abbreviation: Cf
+  AtomicMass: 251.0
+  AtomicNumber: 98
+  AtomicRadius: null
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.38, 3.38, 11.025]
+  Name: californium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Cl:
+  Abbreviation: Cl
+  AtomicMass: 35.453
+  AtomicNumber: 17
+  AtomicRadius: 0.79
+  CrystalStructure: BaseCenteredOrthorhombic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [6.2235, 4.4561, 8.1785]
+  Name: chlorine
+  SpaceGroupNumber: 64
+  VanDerWaalsRadius: 1.75
+Cm:
+  Abbreviation: Cm
+  AtomicMass: 247.0
+  AtomicNumber: 96
+  AtomicRadius: null
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.496, 3.496, 11.331]
+  Name: curium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Cn: {Abbreviation: Cn, AtomicMass: 285.0, AtomicNumber: 112, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: copernicium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Co:
+  Abbreviation: Co
+  AtomicMass: 58.933195
+  AtomicNumber: 27
+  AtomicRadius: 1.52
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [2.5071, 2.5071, 4.0695]
+  Name: cobalt
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Cr:
+  Abbreviation: Cr
+  AtomicMass: 51.9961
+  AtomicNumber: 24
+  AtomicRadius: 1.66
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [2.91, 2.91, 2.91]
+  Name: chromium
+  SpaceGroupNumber: 229
+  VanDerWaalsRadius: null
+Cs:
+  Abbreviation: Cs
+  AtomicMass: 132.9054519
+  AtomicNumber: 55
+  AtomicRadius: 2.98
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [6.141, 6.141, 6.141]
+  Name: cesium
+  SpaceGroupNumber: 229
+  VanDerWaalsRadius: null
+Cu:
+  Abbreviation: Cu
+  AtomicMass: 63.546
+  AtomicNumber: 29
+  AtomicRadius: 1.45
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [3.6149, 3.6149, 3.6149]
+  Name: copper
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: 1.4
+Db: {Abbreviation: Db, AtomicMass: 268.0, AtomicNumber: 105, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: dubnium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Ds: {Abbreviation: Ds, AtomicMass: 281.0, AtomicNumber: 110, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: darmstadtium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Dy:
+  Abbreviation: Dy
+  AtomicMass: 162.5
+  AtomicNumber: 66
+  AtomicRadius: 2.28
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.593, 3.593, 5.6537]
+  Name: dysprosium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Er:
+  Abbreviation: Er
+  AtomicMass: 167.259
+  AtomicNumber: 68
+  AtomicRadius: 2.26
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.5588, 3.5588, 5.5874]
+  Name: erbium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Es: {Abbreviation: Es, AtomicMass: 252.0, AtomicNumber: 99, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: einsteinium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Eu:
+  Abbreviation: Eu
+  AtomicMass: 151.964
+  AtomicNumber: 63
+  AtomicRadius: 2.31
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [4.581, 4.581, 4.581]
+  Name: europium
+  SpaceGroupNumber: 229
+  VanDerWaalsRadius: null
+F:
+  Abbreviation: F
+  AtomicMass: 18.9984032
+  AtomicNumber: 9
+  AtomicRadius: 0.42
+  CrystalStructure: BaseCenteredMonoclinic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [5.5, 3.28, 7.28]
+  Name: fluorine
+  SpaceGroupNumber: 15
+  VanDerWaalsRadius: 1.47
+Fe:
+  Abbreviation: Fe
+  AtomicMass: 55.845
+  AtomicNumber: 26
+  AtomicRadius: 1.56
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [2.8665, 2.8665, 2.8665]
+  Name: iron
+  SpaceGroupNumber: 229
+  VanDerWaalsRadius: null
+Fl: {Abbreviation: Fl, AtomicMass: 289.0, AtomicNumber: 114, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: flerovium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Fm: {Abbreviation: Fm, AtomicMass: 257.0, AtomicNumber: 100, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: fermium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Fr: {Abbreviation: Fr, AtomicMass: 223.0, AtomicNumber: 87, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: francium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Ga:
+  Abbreviation: Ga
+  AtomicMass: 69.723
+  AtomicNumber: 31
+  AtomicRadius: 1.36
+  CrystalStructure: BaseCenteredOrthorhombic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [4.5197, 7.6633, 4.526]
+  Name: gallium
+  SpaceGroupNumber: 64
+  VanDerWaalsRadius: 1.87
+Gd:
+  Abbreviation: Gd
+  AtomicMass: 157.25
+  AtomicNumber: 64
+  AtomicRadius: 2.33
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.636, 3.636, 5.7826]
+  Name: gadolinium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Ge:
+  Abbreviation: Ge
+  AtomicMass: 72.63
+  AtomicNumber: 32
+  AtomicRadius: 1.25
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [5.6575, 5.6575, 5.6575]
+  Name: germanium
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: null
+H:
+  Abbreviation: H
+  AtomicMass: 1.00794
+  AtomicNumber: 1
+  AtomicRadius: 0.53
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [4.7, 4.7, 3.4]
+  Name: hydrogen
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: 1.2
+He:
+  Abbreviation: He
+  AtomicMass: 4.002602
+  AtomicNumber: 2
+  AtomicRadius: 0.31
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [4.242, 4.242, 4.242]
+  Name: helium
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: 1.4
+Hf:
+  Abbreviation: Hf
+  AtomicMass: 178.49
+  AtomicNumber: 72
+  AtomicRadius: 2.08
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.1964, 3.1964, 5.0511]
+  Name: hafnium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Hg:
+  Abbreviation: Hg
+  AtomicMass: 200.59
+  AtomicNumber: 80
+  AtomicRadius: 1.71
+  CrystalStructure: SimpleTrigonal
+  LatticeAngles: [70.52, 70.52, 70.52]
+  LatticeConstants: [3.005, 3.005, 3.005]
+  Name: mercury
+  SpaceGroupNumber: 166
+  VanDerWaalsRadius: 1.55
+Ho:
+  Abbreviation: Ho
+  AtomicMass: 164.93032
+  AtomicNumber: 67
+  AtomicRadius: 2.26
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.5773, 3.5773, 5.6158]
+  Name: holmium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Hs: {Abbreviation: Hs, AtomicMass: 270.0, AtomicNumber: 108, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: hassium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+I:
+  Abbreviation: I
+  AtomicMass: 126.90447
+  AtomicNumber: 53
+  AtomicRadius: 1.15
+  CrystalStructure: BaseCenteredOrthorhombic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [7.1802, 4.7102, 9.8103]
+  Name: iodine
+  SpaceGroupNumber: 64
+  VanDerWaalsRadius: 1.98
+In:
+  Abbreviation: In
+  AtomicMass: 114.818
+  AtomicNumber: 49
+  AtomicRadius: 1.56
+  CrystalStructure: CenteredTetragonal
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [3.2523, 3.2523, 4.9461]
+  Name: indium
+  SpaceGroupNumber: 139
+  VanDerWaalsRadius: 1.93
+Ir:
+  Abbreviation: Ir
+  AtomicMass: 192.217
+  AtomicNumber: 77
+  AtomicRadius: 1.8
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [3.839, 3.839, 3.839]
+  Name: iridium
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: null
+K:
+  Abbreviation: K
+  AtomicMass: 39.0983
+  AtomicNumber: 19
+  AtomicRadius: 2.43
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [5.328, 5.328, 5.328]
+  Name: potassium
+  SpaceGroupNumber: 229
+  VanDerWaalsRadius: 2.75
+Kr:
+  Abbreviation: Kr
+  AtomicMass: 83.798
+  AtomicNumber: 36
+  AtomicRadius: 0.87
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [5.706, 5.706, 5.706]
+  Name: krypton
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: 2.02
+La:
+  Abbreviation: La
+  AtomicMass: 138.90547
+  AtomicNumber: 57
+  AtomicRadius: null
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.772, 3.772, 12.144]
+  Name: lanthanum
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Li:
+  Abbreviation: Li
+  AtomicMass: 6.941
+  AtomicNumber: 3
+  AtomicRadius: 1.67
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [3.51, 3.51, 3.51]
+  Name: lithium
+  SpaceGroupNumber: 229
+  VanDerWaalsRadius: 1.82
+Lr: {Abbreviation: Lr, AtomicMass: 262.0, AtomicNumber: 103, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: lawrencium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Lu:
+  Abbreviation: Lu
+  AtomicMass: 174.9668
+  AtomicNumber: 71
+  AtomicRadius: 2.17
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.5031, 3.5031, 5.5509]
+  Name: lutetium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Lv: {Abbreviation: Lv, AtomicMass: 293.0, AtomicNumber: 116, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: livermorium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Md: {Abbreviation: Md, AtomicMass: 258.0, AtomicNumber: 101, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: mendelevium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Mg:
+  Abbreviation: Mg
+  AtomicMass: 24.305
+  AtomicNumber: 12
+  AtomicRadius: 1.45
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.2094, 3.2094, 5.2108]
+  Name: magnesium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: 1.73
+Mn:
+  Abbreviation: Mn
+  AtomicMass: 54.938045
+  AtomicNumber: 25
+  AtomicRadius: 1.61
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [8.9125, 8.9125, 8.9125]
+  Name: manganese
+  SpaceGroupNumber: 217
+  VanDerWaalsRadius: null
+Mo:
+  Abbreviation: Mo
+  AtomicMass: 95.96
+  AtomicNumber: 42
+  AtomicRadius: 1.9
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [3.147, 3.147, 3.147]
+  Name: molybdenum
+  SpaceGroupNumber: 229
+  VanDerWaalsRadius: null
+Mt: {Abbreviation: Mt, AtomicMass: 276.0, AtomicNumber: 109, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: meitnerium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+N:
+  Abbreviation: N
+  AtomicMass: 14.0067
+  AtomicNumber: 7
+  AtomicRadius: 0.56
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.861, 3.861, 6.265]
+  Name: nitrogen
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: 1.55
+Na:
+  Abbreviation: Na
+  AtomicMass: 22.98976928
+  AtomicNumber: 11
+  AtomicRadius: 1.9
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [4.2906, 4.2906, 4.2906]
+  Name: sodium
+  SpaceGroupNumber: 229
+  VanDerWaalsRadius: 2.27
+Nb:
+  Abbreviation: Nb
+  AtomicMass: 92.90638
+  AtomicNumber: 41
+  AtomicRadius: 1.98
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [3.3004, 3.3004, 3.3004]
+  Name: niobium
+  SpaceGroupNumber: 229
+  VanDerWaalsRadius: null
+Nd:
+  Abbreviation: Nd
+  AtomicMass: 144.242
+  AtomicNumber: 60
+  AtomicRadius: 2.06
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.658, 3.658, 11.799]
+  Name: neodymium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Ne:
+  Abbreviation: Ne
+  AtomicMass: 20.1791
+  AtomicNumber: 10
+  AtomicRadius: 0.38
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [4.429, 4.429, 4.429]
+  Name: neon
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: 1.54
+Ni:
+  Abbreviation: Ni
+  AtomicMass: 58.6934
+  AtomicNumber: 28
+  AtomicRadius: 1.49
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [3.524, 3.524, 3.524]
+  Name: nickel
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: 1.63
+'No': {Abbreviation: 'No', AtomicMass: 259.0, AtomicNumber: 102, AtomicRadius: null,
+  CrystalStructure: null, LatticeAngles: null, LatticeConstants: null, Name: nobelium,
+  SpaceGroupNumber: null, VanDerWaalsRadius: null}
+Np:
+  Abbreviation: Np
+  AtomicMass: 237.0
+  AtomicNumber: 93
+  AtomicRadius: null
+  CrystalStructure: SimpleOrthorhombic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [6.663, 4.723, 4.887]
+  Name: neptunium
+  SpaceGroupNumber: 62
+  VanDerWaalsRadius: null
+O:
+  Abbreviation: O
+  AtomicMass: 15.9994
+  AtomicNumber: 8
+  AtomicRadius: 0.48
+  CrystalStructure: BaseCenteredMonoclinic
+  LatticeAngles: [90.0, 132.53, 90.0]
+  LatticeConstants: [5.403, 3.429, 5.086]
+  Name: oxygen
+  SpaceGroupNumber: 12
+  VanDerWaalsRadius: 1.52
+Os:
+  Abbreviation: Os
+  AtomicMass: 190.23
+  AtomicNumber: 76
+  AtomicRadius: 1.85
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [2.7344, 2.7344, 4.3173]
+  Name: osmium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+P:
+  Abbreviation: P
+  AtomicMass: 30.973762
+  AtomicNumber: 15
+  AtomicRadius: 0.98
+  CrystalStructure: SimpleTriclinic
+  LatticeAngles: [71.84, 90.37, 71.56]
+  LatticeConstants: [11.45, 5.503, 11.261]
+  Name: phosphorus
+  SpaceGroupNumber: 2
+  VanDerWaalsRadius: 1.8
+Pa:
+  Abbreviation: Pa
+  AtomicMass: 231.03586
+  AtomicNumber: 91
+  AtomicRadius: null
+  CrystalStructure: CenteredTetragonal
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [3.925, 3.925, 3.238]
+  Name: protactinium
+  SpaceGroupNumber: 139
+  VanDerWaalsRadius: null
+Pb:
+  Abbreviation: Pb
+  AtomicMass: 207.2
+  AtomicNumber: 82
+  AtomicRadius: 1.54
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [4.9508, 4.9508, 4.9508]
+  Name: lead
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: 2.02
+Pd:
+  Abbreviation: Pd
+  AtomicMass: 106.42
+  AtomicNumber: 46
+  AtomicRadius: 1.69
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [3.8907, 3.8907, 3.8907]
+  Name: palladium
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: 1.63
+Pm: {Abbreviation: Pm, AtomicMass: 145.0, AtomicNumber: 61, AtomicRadius: 2.05, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: promethium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Po:
+  Abbreviation: Po
+  AtomicMass: 209.0
+  AtomicNumber: 84
+  AtomicRadius: 1.35
+  CrystalStructure: SimpleCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [3.359, 3.359, 3.359]
+  Name: polonium
+  SpaceGroupNumber: 221
+  VanDerWaalsRadius: null
+Pr:
+  Abbreviation: Pr
+  AtomicMass: 140.90765
+  AtomicNumber: 59
+  AtomicRadius: 2.47
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.6725, 3.6725, 11.8354]
+  Name: praseodymium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Pt:
+  Abbreviation: Pt
+  AtomicMass: 195.084
+  AtomicNumber: 78
+  AtomicRadius: 1.77
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [3.9242, 3.9242, 3.9242]
+  Name: platinum
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: 1.75
+Pu:
+  Abbreviation: Pu
+  AtomicMass: 244.0
+  AtomicNumber: 94
+  AtomicRadius: null
+  CrystalStructure: SimpleMonoclinic
+  LatticeAngles: [90.0, 101.79, 90.0]
+  LatticeConstants: [6.183, 4.822, 10.963]
+  Name: plutonium
+  SpaceGroupNumber: 11
+  VanDerWaalsRadius: null
+Ra:
+  Abbreviation: Ra
+  AtomicMass: 226.0
+  AtomicNumber: 88
+  AtomicRadius: null
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [5.148, 5.148, 5.148]
+  Name: radium
+  SpaceGroupNumber: 229
+  VanDerWaalsRadius: null
+Rb:
+  Abbreviation: Rb
+  AtomicMass: 85.4678
+  AtomicNumber: 37
+  AtomicRadius: 2.65
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [5.585, 5.585, 5.585]
+  Name: rubidium
+  SpaceGroupNumber: 229
+  VanDerWaalsRadius: null
+Re:
+  Abbreviation: Re
+  AtomicMass: 186.207
+  AtomicNumber: 75
+  AtomicRadius: 1.88
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [2.761, 2.761, 4.456]
+  Name: rhenium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Rf: {Abbreviation: Rf, AtomicMass: 265.0, AtomicNumber: 104, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: rutherfordium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Rg: {Abbreviation: Rg, AtomicMass: 280.0, AtomicNumber: 111, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: roentgenium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Rh:
+  Abbreviation: Rh
+  AtomicMass: 102.9055
+  AtomicNumber: 45
+  AtomicRadius: 1.73
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [3.8034, 3.8034, 3.8034]
+  Name: rhodium
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: null
+Rn: {Abbreviation: Rn, AtomicMass: 222.0, AtomicNumber: 86, AtomicRadius: 1.2, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: radon, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Ru:
+  Abbreviation: Ru
+  AtomicMass: 101.07
+  AtomicNumber: 44
+  AtomicRadius: 1.78
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [2.7059, 2.7059, 4.2815]
+  Name: ruthenium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+S:
+  Abbreviation: S
+  AtomicMass: 32.065
+  AtomicNumber: 16
+  AtomicRadius: 0.87
+  CrystalStructure: FaceCenteredOrthorhombic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [10.437, 12.845, 24.369]
+  Name: sulfur
+  SpaceGroupNumber: 70
+  VanDerWaalsRadius: 1.8
+Sb:
+  Abbreviation: Sb
+  AtomicMass: 121.76
+  AtomicNumber: 51
+  AtomicRadius: 1.33
+  CrystalStructure: SimpleTrigonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [4.307, 4.307, 11.273]
+  Name: antimony
+  SpaceGroupNumber: 166
+  VanDerWaalsRadius: null
+Sc:
+  Abbreviation: Sc
+  AtomicMass: 44.955912
+  AtomicNumber: 21
+  AtomicRadius: 1.84
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.309, 3.309, 5.2733]
+  Name: scandium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Se:
+  Abbreviation: Se
+  AtomicMass: 78.96
+  AtomicNumber: 34
+  AtomicRadius: 1.03
+  CrystalStructure: SimpleMonoclinic
+  LatticeAngles: [90.0, 90.81, 90.0]
+  LatticeConstants: [9.054, 9.083, 11.601]
+  Name: selenium
+  SpaceGroupNumber: 14
+  VanDerWaalsRadius: 1.9
+Sg: {Abbreviation: Sg, AtomicMass: 271.0, AtomicNumber: 106, AtomicRadius: null, CrystalStructure: null,
+  LatticeAngles: null, LatticeConstants: null, Name: seaborgium, SpaceGroupNumber: null,
+  VanDerWaalsRadius: null}
+Si:
+  Abbreviation: Si
+  AtomicMass: 28.0855
+  AtomicNumber: 14
+  AtomicRadius: 1.11
+  CrystalStructure: TetrahedralPacking
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [5.4309, 5.4309, 5.4309]
+  Name: silicon
+  SpaceGroupNumber: 227
+  VanDerWaalsRadius: 2.1
+Sm:
+  Abbreviation: Sm
+  AtomicMass: 150.36
+  AtomicNumber: 62
+  AtomicRadius: 2.38
+  CrystalStructure: SimpleTrigonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.621, 3.621, 26.25]
+  Name: samarium
+  SpaceGroupNumber: 166
+  VanDerWaalsRadius: null
+Sn:
+  Abbreviation: Sn
+  AtomicMass: 118.71
+  AtomicNumber: 50
+  AtomicRadius: 1.45
+  CrystalStructure: CenteredTetragonal
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [5.8318, 5.8318, 3.1819]
+  Name: tin
+  SpaceGroupNumber: 141
+  VanDerWaalsRadius: 2.17
+Sr:
+  Abbreviation: Sr
+  AtomicMass: 87.62
+  AtomicNumber: 38
+  AtomicRadius: 2.19
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [6.0849, 6.0849, 6.0849]
+  Name: strontium
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: null
+Ta:
+  Abbreviation: Ta
+  AtomicMass: 180.94788
+  AtomicNumber: 73
+  AtomicRadius: 2.0
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [3.3013, 3.3013, 3.3013]
+  Name: tantalum
+  SpaceGroupNumber: 229
+  VanDerWaalsRadius: null
+Tb:
+  Abbreviation: Tb
+  AtomicMass: 158.92535
+  AtomicNumber: 65
+  AtomicRadius: 2.25
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.601, 3.601, 5.6936]
+  Name: terbium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Tc:
+  Abbreviation: Tc
+  AtomicMass: 98.0
+  AtomicNumber: 43
+  AtomicRadius: 1.83
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [2.735, 2.735, 4.388]
+  Name: technetium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Te:
+  Abbreviation: Te
+  AtomicMass: 127.6
+  AtomicNumber: 52
+  AtomicRadius: 1.23
+  CrystalStructure: SimpleTrigonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [4.4572, 4.4572, 5.929]
+  Name: tellurium
+  SpaceGroupNumber: 152
+  VanDerWaalsRadius: 2.06
+Th:
+  Abbreviation: Th
+  AtomicMass: 232.03806
+  AtomicNumber: 90
+  AtomicRadius: null
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [5.0842, 5.0842, 5.0842]
+  Name: thorium
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: null
+Ti:
+  Abbreviation: Ti
+  AtomicMass: 47.867
+  AtomicNumber: 22
+  AtomicRadius: 1.76
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [2.9508, 2.9508, 4.6855]
+  Name: titanium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Tl:
+  Abbreviation: Tl
+  AtomicMass: 204.3833
+  AtomicNumber: 81
+  AtomicRadius: 1.56
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.4566, 3.4566, 5.5248]
+  Name: thallium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: 1.96
+Tm:
+  Abbreviation: Tm
+  AtomicMass: 168.93421
+  AtomicNumber: 69
+  AtomicRadius: 2.22
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.5375, 3.5375, 5.5546]
+  Name: thulium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+U:
+  Abbreviation: U
+  AtomicMass: 238.02891
+  AtomicNumber: 92
+  AtomicRadius: null
+  CrystalStructure: BaseCenteredOrthorhombic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [2.8537, 5.8695, 4.9548]
+  Name: uranium
+  SpaceGroupNumber: 63
+  VanDerWaalsRadius: 1.86
+Uuo: {Abbreviation: Uuo, AtomicMass: 294.0, AtomicNumber: 118, AtomicRadius: null,
+  CrystalStructure: null, LatticeAngles: null, LatticeConstants: null, Name: ununoctium,
+  SpaceGroupNumber: null, VanDerWaalsRadius: null}
+Uup: {Abbreviation: Uup, AtomicMass: 288.0, AtomicNumber: 115, AtomicRadius: null,
+  CrystalStructure: null, LatticeAngles: null, LatticeConstants: null, Name: ununpentium,
+  SpaceGroupNumber: null, VanDerWaalsRadius: null}
+Uus: {Abbreviation: Uus, AtomicMass: 294.0, AtomicNumber: 117, AtomicRadius: null,
+  CrystalStructure: null, LatticeAngles: null, LatticeConstants: null, Name: ununseptium,
+  SpaceGroupNumber: null, VanDerWaalsRadius: null}
+Uut: {Abbreviation: Uut, AtomicMass: 284.0, AtomicNumber: 113, AtomicRadius: null,
+  CrystalStructure: null, LatticeAngles: null, LatticeConstants: null, Name: ununtrium,
+  SpaceGroupNumber: null, VanDerWaalsRadius: null}
+V:
+  Abbreviation: V
+  AtomicMass: 50.9415
+  AtomicNumber: 23
+  AtomicRadius: 1.71
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [3.03, 3.03, 3.03]
+  Name: vanadium
+  SpaceGroupNumber: 229
+  VanDerWaalsRadius: null
+W:
+  Abbreviation: W
+  AtomicMass: 183.84
+  AtomicNumber: 74
+  AtomicRadius: 1.93
+  CrystalStructure: BodyCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [3.1652, 3.1652, 3.1652]
+  Name: tungsten
+  SpaceGroupNumber: 229
+  VanDerWaalsRadius: null
+Xe:
+  Abbreviation: Xe
+  AtomicMass: 131.293
+  AtomicNumber: 54
+  AtomicRadius: 1.08
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [6.2023, 6.2023, 6.2023]
+  Name: xenon
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: 2.16
+Y:
+  Abbreviation: Y
+  AtomicMass: 88.90585
+  AtomicNumber: 39
+  AtomicRadius: 2.12
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.6474, 3.6474, 5.7306]
+  Name: yttrium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
+Yb:
+  Abbreviation: Yb
+  AtomicMass: 173.054
+  AtomicNumber: 70
+  AtomicRadius: 2.22
+  CrystalStructure: FaceCenteredCubic
+  LatticeAngles: [90.0, 90.0, 90.0]
+  LatticeConstants: [5.4847, 5.4847, 5.4847]
+  Name: ytterbium
+  SpaceGroupNumber: 225
+  VanDerWaalsRadius: null
+Zn:
+  Abbreviation: Zn
+  AtomicMass: 65.38
+  AtomicNumber: 30
+  AtomicRadius: 1.42
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [2.6649, 2.6649, 4.9468]
+  Name: zinc
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: 1.39
+Zr:
+  Abbreviation: Zr
+  AtomicMass: 91.224
+  AtomicNumber: 40
+  AtomicRadius: 2.06
+  CrystalStructure: SimpleHexagonal
+  LatticeAngles: [90.0, 90.0, 120.0]
+  LatticeConstants: [3.232, 3.232, 5.147]
+  Name: zirconium
+  SpaceGroupNumber: 194
+  VanDerWaalsRadius: null
