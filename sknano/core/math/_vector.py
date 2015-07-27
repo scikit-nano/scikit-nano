@@ -119,7 +119,8 @@ class Vector(np.ndarray):
                 p0 = Point(p0, nd=nd, dtype=dtype, copy=copy)
             p = p0 + v
         else:
-            if nd is None or not isinstance(nd, numbers.Number):
+            if p is None and p0 is None and \
+                    (nd is None or not isinstance(nd, numbers.Number)):
                 nd = 3
             if p is None:
                 p = Point(nd=nd, dtype=dtype)
