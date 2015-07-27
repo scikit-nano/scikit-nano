@@ -292,11 +292,10 @@ class Vector(np.ndarray):
     def __eq__(self, other):
         if not isinstance(other, Vector):
             other = Vector(other)
-        if self is other or (np.allclose(self.__array__(), other.__array__())
-                             and np.allclose(self.p0, other.p0)
-                             and np.allclose(self.p, other.p)):
-            return True
-        return False
+        return self is other or (np.allclose(self.__array__(),
+                                             other.__array__())
+                                 and np.allclose(self.p0, other.p0)
+                                 and np.allclose(self.p, other.p))
 
     def __lt__(self, other):
         if not isinstance(other, Vector):
@@ -617,7 +616,7 @@ def cross(u, v, p0=None):
 
     Returns
     -------
-    np.number or `Vector`
+    :class:`~numpy:numpy.number` or :class:`Vector`
 
     """
     val = np.cross(np.asarray(u), np.asarray(v))
@@ -638,7 +637,7 @@ def dot(u, v):
 
     Returns
     -------
-    val
+    :class:`~numpy:numpy.number`
 
     """
     return np.dot(np.asarray(u), np.asarray(v))
@@ -653,7 +652,7 @@ def scalar_triple_product(u, v, w):
 
     Returns
     -------
-    float
+    :class:`~numpy:numpy.number`
 
     """
     return dot(u, cross(v, w))
@@ -668,7 +667,7 @@ def vector_triple_product(u, v, w):
 
     Returns
     -------
-    `Vector`
+    :class:`Vector`
 
     """
 
@@ -685,7 +684,7 @@ def scalar_projection(a, b):
 
     Returns
     -------
-    v : :class:`~numpy:numpy.number`
+    :class:`~numpy:numpy.number`
 
     """
     return dot(a, b) / b.norm
@@ -701,7 +700,7 @@ def vector_projection(a, b):
 
     Returns
     -------
-    v : `Vector`
+    :class:`Vector`
 
     """
     return dot(a, b) / dot(b, b) * b
@@ -719,7 +718,7 @@ def vector_rejection(a, b):
 
     Returns
     -------
-    v : `Vector`
+    :class:`Vector`
 
     """
     a1 = vector_projection(a, b)

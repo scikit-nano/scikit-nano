@@ -10,6 +10,17 @@ Contents
 ========
 Core code for package development and general use.
 
+Sub-packages
+-------------
+
+* atoms (:mod:`sknano.core.atoms`)
+* crystallography (:mod:`sknano.core.crystallography`)
+* geometric regions (:mod:`sknano.core.geometric_regions`)
+* math (:mod:`sknano.core.math`)
+* molecules (:mod:`sknano.core.molecules`)
+* physics (:mod:`sknano.core.physics`)
+* refdata (:mod:`sknano.core.refdata`)
+
 Data structures & algorithms
 -----------------------------
 .. autosummary::
@@ -60,11 +71,18 @@ Meta functions/classes
    deprecated
    get_object_signature
    memoize
+   optional_debug
    timethis
+   typeassert
+   typed_property
+   make_sig
+   BaseClass
+   Cached
+   ClassSignature
+   NoInstances
+   Singleton
    method_func
    with_doc
-   make_sig
-   ClassSignature
 
 
 I/O functions
@@ -78,6 +96,8 @@ I/O functions
    listdir_dirnames
    listdir_fnames
    listdir
+   loadobj
+   dumpobj
 
 String functions
 -----------------
@@ -96,17 +116,6 @@ Custom container datatypes
    ListBasedSet
    UserList
    frozendict
-
-Sub-packages
--------------
-
-* atoms (:mod:`sknano.core.atoms`)
-* crystallography (:mod:`sknano.core.crystallography`)
-* geometric regions (:mod:`sknano.core.geometric_regions`)
-* math (:mod:`sknano.core.math`)
-* molecules (:mod:`sknano.core.molecules`)
-* physics (:mod:`sknano.core.physics`)
-* refdata (:mod:`sknano.core.refdata`)
 
 """
 from __future__ import absolute_import, division, print_function, \

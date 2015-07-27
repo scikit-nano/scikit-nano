@@ -9,14 +9,15 @@ Abstract geometric data structures (:mod:`sknano.core.geometric_regions`)
 Contents
 ========
 
-Abstract Base Classes for defining new geometric regions
---------------------------------------------------------
+Base/mixin classes for all geometric regions
+-----------------------------------------------------------
 .. autosummary::
    :toctree: generated/
 
    GeometricRegion
    Geometric2DRegion
    Geometric3DRegion
+   GeometricTransformsMixin
 
 2D Regions
 ----------

@@ -28,7 +28,8 @@ class GeometricTransformsMixin:
     def rotate(self, angle=None, axis=None, anchor_point=None,
                rot_point=None, from_vector=None, to_vector=None,
                degrees=False, transform_matrix=None, verbose=False, **kwargs):
-        """Rotate `GeometricRegion` `Points` and `Vectors`.
+        """Rotate `GeometricRegion` :attr:`~GeometricRegion.points` and \
+            :attr:`~GeometricRegion.vectors`.
 
         Parameters
         ----------
@@ -39,6 +40,11 @@ class GeometricTransformsMixin:
         from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
         degrees : bool, optional
         transform_matrix : :class:`~numpy:numpy.ndarray`
+
+
+        See Also
+        --------
+        sknano.core.math.rotate
 
         """
         if transform_matrix is None:
@@ -54,7 +60,8 @@ class GeometricTransformsMixin:
         self.vectors.rotate(transform_matrix=transform_matrix)
 
     def translate(self, t, fix_anchor_points=False):
-        """Translate `GeometricRegion`\ s `Points` and `Vectors` by \
+        """Translate `GeometricRegion` :attr:`~GeometricRegion.points` and \
+            :attr:`~GeometricRegion.vectors` by \
             :class:`~sknano.core.math.Vector` `t`.
 
         Parameters
@@ -62,13 +69,28 @@ class GeometricTransformsMixin:
         t : :class:`~sknano.core.math.Vector`
         fix_anchor_points : bool, optional
 
+        See Also
+        --------
+        sknano.core.math.translate
+
         """
         self.points.translate(t)
         self.vectors.translate(t, fix_anchor_points=fix_anchor_points)
 
 
 class GeometricRegion(BaseClass, metaclass=ABCMeta):
-    """Abstract base class for geometric regions."""
+    """Abstract base class for all geometric regions.
+
+    Attributes
+    ----------
+    points : :class:`Points`
+        Collection of all :class:`~sknano.core.math.Point` objects
+        defining the :class:`GeometricRegion`.
+    vectors : :class:`Vectors`
+        Collection of all :class:`~sknano.core.math.Vector` objects
+        defining the :class:`GeometricRegion`
+
+    """
 
     def __init__(self):
         super().__init__()
@@ -83,7 +105,7 @@ class GeometricRegion(BaseClass, metaclass=ABCMeta):
 
     @property
     def center(self):
-        """Alias for :attr:`GeometricRegion.centroid`."""
+        """Alias for :attr:`~GeometricRegion.centroid`."""
         return self.centroid
 
     @property
@@ -93,6 +115,6 @@ class GeometricRegion(BaseClass, metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def contains(self):
-        """Check if point is contained within geometric region."""
+    def contains(self, point):
+        """Test region membership of `point` in :class:`GeometricRegion`."""
         raise NotImplementedError

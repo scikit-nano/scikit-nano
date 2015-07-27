@@ -9,7 +9,7 @@ import numpy as np
 
 from sknano.core.geometric_regions import Parallelepiped, Cuboid, Cube, \
     Ellipsoid, Sphere, Cylinder, Cone
-from sknano.core.math import Point
+from sknano.core.math import Point, Vector
 
 
 def test_parallelepiped():
@@ -20,6 +20,7 @@ def test_parallelepiped():
     assert_equal(r.centroid, Point([1, 1, 0.5]))
     assert_true(r.contains([0.5, 0.5, 0.5]))
     assert_false(r.contains([0, 0, 1]))
+    assert_is_instance(r.centroid, Point)
 
 
 def test_cuboid():
@@ -29,6 +30,7 @@ def test_cuboid():
     assert_true(np.allclose(r.measure, 1.0))
     assert_true(r.contains(r.centroid))
     assert_false(r.contains([-0.1, 0, 0]))
+    assert_is_instance(r.centroid, Point)
 
 
 def test_cube():
@@ -38,6 +40,7 @@ def test_cube():
     assert_true(np.allclose(r.measure, 1.0))
     assert_true(r.contains([0, 0, 0]))
     assert_false(r.contains([1, 1, 1]))
+    assert_is_instance(r.centroid, Point)
 
 
 def test_ellipsoid():
@@ -47,6 +50,7 @@ def test_ellipsoid():
     assert_true(np.allclose(r.measure, 4 / 3 * np.pi))
     assert_true(r.contains(r.centroid))
     assert_false(r.contains([1.01, 1.01, 1.01]))
+    assert_is_instance(r.centroid, Point)
 
 
 def test_sphere():
@@ -57,6 +61,7 @@ def test_sphere():
     assert_true(np.allclose(r.measure, 4 / 3 * np.pi))
     assert_true(r.contains([0, 0, 0]))
     assert_false(r.contains([1.1, 1.1, 1.1]))
+    assert_is_instance(r.centroid, Point)
 
 
 def test_cylinder():
@@ -67,6 +72,11 @@ def test_cylinder():
     assert_equal(r.p2, Point([0, 0, 1]))
     assert_true(r.contains([0, 0, 0]))
     assert_false(r.contains([1.1, 0, 0]))
+    assert_equal(r.centroid, Point())
+    r.p2 = [0, 0, 2]
+    assert_equal(r.centroid, Point([0, 0, 0.5]))
+    assert_is_instance(r.centroid, Point)
+    assert_is_instance(r.axis, Vector)
 
 
 def test_cone():
@@ -77,6 +87,8 @@ def test_cone():
     assert_equal(r.p2, Point([0, 0, 2]))
     assert_true(r.contains([0, 0, 1]))
     assert_false(r.contains([0, 0, 2.1]))
+    assert_is_instance(r.centroid, Point)
+    assert_is_instance(r.axis, Vector)
 
 
 if __name__ == '__main__':
