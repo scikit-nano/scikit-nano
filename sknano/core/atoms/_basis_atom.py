@@ -185,6 +185,7 @@ class BasisAtom(XYZAtom):
 
     @property
     def lattice(self):
+        """:class:`~sknano.core.crystallography.Crystal3DLattice`."""
         return self._lattice
 
     @lattice.setter
