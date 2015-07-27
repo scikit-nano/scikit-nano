@@ -79,7 +79,19 @@ class Atoms(UserList):
             if isinstance(index, slice):
                 value = self.__class__(value)
             else:
-                value = self.__atom_class__(value)
+                try:
+                    atomdict = super().__getitem__(index).todict()
+                    if isinstance(value, str):
+                        atomdict['element'] = value
+                    elif isinstance(value, int):
+                        atomdict['Z'] = value
+                    elif isinstance(value, float):
+                        atomdict['mass'] = value
+                    else:
+                        raise ValueError
+                    value = self.__atom_class__(**atomdict)
+                except (IndexError, AttributeError, ValueError):
+                    value = self.__atom_class__(value)
         super().__setitem__(index, value)
 
     def __atoms_not_in_self(self, other):
