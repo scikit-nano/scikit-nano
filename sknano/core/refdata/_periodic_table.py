@@ -16,7 +16,8 @@ __docformat__ = 'restructuredtext'
 
 from collections import OrderedDict
 
-from ._nist import atomic_masses_nist_list as _atomic_masses
+from ._element_data import element_data
+# from ._nist import atomic_masses_nist_list as _atomic_masses
 
 __all__ = ['atomic_masses', 'atomic_mass_symbol_map',
            'atomic_numbers', 'atomic_number_symbol_map',
@@ -69,16 +70,18 @@ element_names = [
     'Ununpentium', 'Livermorium', 'Ununseptium', 'Ununoctium']
 
 atomic_numbers = OrderedDict()
-[atomic_numbers.update({symbol: Z}) for Z, symbol in
- enumerate(element_symbols, start=1)]
+[atomic_numbers.update({symbol: element_data[symbol]['AtomicNumber']})
+ for symbol in element_symbols]
 
 atomic_number_symbol_map = {v: k for k, v in list(atomic_numbers.items())}
 
 atomic_masses = OrderedDict()
-[atomic_masses.update({symbol: float(_atomic_masses[i])})
- if _atomic_masses[i] is not None else
- atomic_masses.update({symbol: None}) for i, symbol in
- enumerate(element_symbols)]
+# [atomic_masses.update({symbol: float(_atomic_masses[i])})
+#  if _atomic_masses[i] is not None else
+#  atomic_masses.update({symbol: None}) for i, symbol in
+#  enumerate(element_symbols)]
+[atomic_masses.update({symbol: element_data[symbol]['AtomicMass']})
+ for symbol in element_symbols]
 
 atomic_mass_symbol_map = {v: k for k, v in list(atomic_masses.items()) if
                           v is not None}
