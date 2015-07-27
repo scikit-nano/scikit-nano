@@ -39,9 +39,14 @@ class BasisAtom(XYZAtom):
 
         super().__init__(*args, **kwargs)
 
+        # if None in (xs, ys, zs) and lattice is not None:
+        #     xs, ys, zs = lattice.cartesian_to_fractional
+
         self.lattice = lattice
         try:
             self.rs = Vector([xs, ys, zs])
+            # print(self.rs)
+            # print(self.r)
         except AttributeError:
             pass
         self.fmtstr = super().fmtstr + \
@@ -176,7 +181,7 @@ class BasisAtom(XYZAtom):
         self._update_cartesian_coordinate(rs)
 
     def _update_cartesian_coordinate(self, rs):
-        self.r = self.lattice.fractional_to_cartesian(rs)
+        self.r = Vector(self.lattice.fractional_to_cartesian(rs))
 
     @property
     def lattice(self):
