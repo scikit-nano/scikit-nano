@@ -122,6 +122,7 @@ def test6():
     assert_equal(swnt.element1, 'B')
     assert_equal(swnt.element2, 'N')
     print(swnt)
+    print(swnt.unit_cell)
     swnt.element1 = 'N'
     swnt.element2 = 'B'
 
