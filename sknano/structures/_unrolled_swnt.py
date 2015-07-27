@@ -113,9 +113,9 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
 
         a = compute_dt(n, m, bond=bond) + dVDW
         c = compute_T(n, m, bond=bond, length=True)
-        lattice = Crystal3DLattice.hexagonal(a, c)
 
-        self.unit_cell = UnitCell(lattice, basis=self.basis)
+        self.unit_cell = UnitCell(lattice=Crystal3DLattice.hexagonal(a, c),
+                                  basis=self.basis)
 
         self.n = n
         self.m = m
@@ -183,6 +183,7 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
 
         psi, tau, dpsi, dtau = self.unit_cell_symmetry_params
 
+        lattice = self.unit_cell.lattice
         self.unit_cell.basis.clear()
 
         if self.verbose:
@@ -207,10 +208,11 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
                 if z < 0:
                     z += T
 
+                xs, ys, zs = lattice.cartesian_to_fractional([x, 0, z])
                 if self.debug:
                     print('i={}: x, z = ({:.6f}, {:.6f})'.format(i, x, z))
 
-                atom = Atom(element, x=x, z=z)
+                atom = Atom(element, lattice=lattice, xs=xs, ys=ys, zs=zs)
                 atom.rezero()
 
                 if self.verbose:
