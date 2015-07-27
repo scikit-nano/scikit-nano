@@ -103,9 +103,9 @@ class MWNT(MWNTMixin, StructureBase):
 
         a = compute_dt(self.Ch_list[-1], bond=bond) + dVDW
         c = compute_T(self.Ch_list[-1], bond=bond, length=True)
-        lattice = Crystal3DLattice.hexagonal(a, c)
 
-        self.unit_cell = UnitCell(lattice, basis=self.basis)
+        self.unit_cell = UnitCell(lattice=Crystal3DLattice.hexagonal(a, c),
+                                  basis=self.basis)
 
         if self.verbose:
             print(self.walls)
