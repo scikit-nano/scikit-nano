@@ -63,7 +63,8 @@ class StructureBase(BaseClass):
     @element1.setter
     def element1(self, value):
         self.basis[0] = value
-        self.unit_cell.basis[0] = value
+        [self.unit_cell.basis.__setitem__(i, value)
+         for i in range(0, len(self.unit_cell.basis), 2)]
 
     @property
     def element2(self):
@@ -72,4 +73,5 @@ class StructureBase(BaseClass):
     @element2.setter
     def element2(self, value):
         self.basis[1] = value
-        self.unit_cell.basis[1] = value
+        [self.unit_cell.basis.__setitem__(i, value)
+         for i in range(1, len(self.unit_cell.basis), 2)]
