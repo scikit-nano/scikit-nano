@@ -4,8 +4,6 @@
 Atom class for KDTree analysis (:mod:`sknano.core.atoms._kdtree_atom`)
 ===============================================================================
 
-An `XAtom` sub-class for structure analysis.
-
 .. currentmodule:: sknano.core.atoms._kdtree_atom
 
 """
@@ -14,7 +12,6 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 import sknano.core.atoms
-# from ._extended_atom import XAtom
 from ._cn_atom import CNAtom
 from ._id_atom import IDAtom
 from ._xyz_atom import XYZAtom
@@ -28,6 +25,8 @@ class KDTAtom(CNAtom, XYZAtom, IDAtom):
     """An `Atom` class for KDTree analysis."""
     def __init__(self, *args, NN=None, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self._neighbors = None
         if NN is not None:
             self.NN = NN
         # self.fmtstr = super().fmtstr + ", NN={NN!r}"
@@ -72,6 +71,17 @@ class KDTAtom(CNAtom, XYZAtom, IDAtom):
             return Bonds([Bond(self, nn) for nn in self.NN])
         except (AttributeError, TypeError):
             return Bonds()
+
+    @property
+    def neighbors(self):
+        """Neighbor atoms."""
+        return self._neighbors
+
+    @neighbors.setter
+    def neighbors(self, value):
+        if not isinstance(value, sknano.core.atoms.Atoms):
+            raise TypeError('Expected an `Atoms` object.')
+        self._neighbors = value
 
     def todict(self):
         super_dict = super().todict()
