@@ -14,14 +14,17 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 import sknano.core.atoms
-from ._extended_atom import XAtom
+# from ._extended_atom import XAtom
+from ._cn_atom import CNAtom
+from ._id_atom import IDAtom
+from ._xyz_atom import XYZAtom
 from ._bond import Bond
 from ._bonds import Bonds
 
 __all__ = ['KDTAtom']
 
 
-class KDTAtom(XAtom):
+class KDTAtom(CNAtom, XYZAtom, IDAtom):
     """An `Atom` class for KDTree analysis."""
     def __init__(self, *args, NN=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -35,7 +38,7 @@ class KDTAtom(XAtom):
         # attrs.extend(['NN', 'bonds'])
         return attrs
 
-    @XAtom.CN.getter
+    @CNAtom.CN.getter
     def CN(self):
         """`KDTAtom` coordination number."""
         try:

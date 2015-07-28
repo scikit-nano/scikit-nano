@@ -27,14 +27,17 @@ except ImportError:
     raise ImportError('Install scipy version >= 0.13.0 to allow '
                       'nearest-neighbor queries between atoms.')
 
-from ._extended_atoms import XAtoms
+# from ._extended_atoms import XAtoms
+from ._cn_atoms import CNAtoms
+from ._id_atoms import IDAtoms
+from ._xyz_atoms import XYZAtoms
 from ._bonds import Bonds
 from ._kdtree_atom import KDTAtom
 
 __all__ = ['KDTAtoms']
 
 
-class KDTAtoms(XAtoms):
+class KDTAtoms(CNAtoms, XYZAtoms, IDAtoms):
     """An `Atoms` sub-class for KDTree analysis.
 
     Sub-class of `XAtoms` class, and a container class for lists of
