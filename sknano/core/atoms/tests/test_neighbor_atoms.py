@@ -9,7 +9,7 @@ from sknano.testing import generate_atoms
 
 
 def test1():
-    atoms = generate_atoms(generator_class='SWNTGenerator', n=3, m=3, nz=10)
+    atoms = generate_atoms(generator_class='SWNTGenerator', n=3, m=0, nz=5)
     atoms.assign_unique_ids()
     atoms.kNN = 6
     atoms.NNrc = 9.0

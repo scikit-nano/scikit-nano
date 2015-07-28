@@ -5,14 +5,9 @@ from __future__ import unicode_literals
 
 import nose
 from nose.tools import *
-from sknano.core.atoms import POAVAtom, POAV1, POAV2, POAVR
+import sknano.core.atoms
+from sknano.core.atoms import POAVAtom
 from sknano.testing import generate_atoms
-
-
-def test_instantiation():
-    from sknano.core.atoms import Atom, XAtom, KDTAtom
-    atom = POAVAtom()
-    assert_is_instance(atom, (Atom, XAtom, KDTAtom, POAVAtom))
 
 
 def test_attributes():
@@ -22,40 +17,17 @@ def test_attributes():
         assert_equals(atom.element, element)
 
 
-def test_POAV1():
-    #atom = POAVAtom(element='C')
+def test_POAVs():
     atoms = \
-        generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    atoms.update_neighbors()
-    atom100 = atoms.get_atom(100)
-    assert_equals(atom100.id, 100)
-    assert_true(atom100.POAV1 is None)
-    assert_equals(atom100.bonds.Nbonds, 3)
-    setattr(atom100, 'POAV1', POAV1(atom100.bonds))
-
-
-def test_POAV2():
-    #atom = POAVAtom(element='C')
-    atoms = \
-        generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    atoms.update_attrs()
-    atom100 = atoms.get_atom(100)
-    assert_equals(atom100.id, 100)
-    assert_true(atom100.POAV2 is None)
-    assert_equals(atom100.bonds.Nbonds, 3)
-    setattr(atom100, 'POAV2', POAV2(atom100.bonds))
-
-
-def test_POAVR():
-    #atom = POAVAtom(element='C')
-    atoms = \
-        generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    atoms.update_neighbors()
-    atom100 = atoms.get_atom(100)
-    assert_equals(atom100.id, 100)
-    assert_true(atom100.POAVR is None)
-    assert_equals(atom100.bonds.Nbonds, 3)
-    setattr(atom100, 'POAVR', POAVR(atom100.bonds))
+        generate_atoms(generator_class='SWNTGenerator', n=5, m=0, nz=5)
+    atoms.compute_POAVs()
+    atoms.filter(atoms.coordination_numbers == 3)
+    atom = atoms[10]
+    assert_equals(atom.bonds.Nbonds, 3)
+    for POAV in ('POAV1', 'POAV2', 'POAVR'):
+        assert_is_instance(getattr(atom, POAV),
+                           getattr(sknano.core.atoms, POAV))
+        print(getattr(atom, POAV))
 
 
 if __name__ == '__main__':

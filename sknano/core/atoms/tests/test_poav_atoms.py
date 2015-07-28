@@ -13,27 +13,6 @@ from sknano.io import DATAReader
 from sknano.testing import generate_atoms
 
 
-def test_instantiation():
-    from sknano.core.atoms import Atoms, XAtoms, KDTAtoms
-    atoms = POAVAtoms()
-    assert_is_instance(atoms, (Atoms, XAtoms, KDTAtoms, POAVAtoms))
-    swnt_atoms = \
-        generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=1)
-    for atom in swnt_atoms:
-        atoms.append(atom)
-
-    assert_equal(len(atoms), len(swnt_atoms))
-
-    atoms = POAVAtoms(atoms=atoms)
-    assert_equal(len(atoms), len(swnt_atoms))
-
-    atoms = POAVAtoms(atoms=atoms.data)
-    assert_equal(len(atoms), len(swnt_atoms))
-
-    atoms = POAVAtoms(atoms=atoms)
-    assert_equal(len(atoms), len(swnt_atoms))
-
-
 def test_list_methods():
     atoms1 = POAVAtoms()
     for Z in range(100, 0, -1):
@@ -45,60 +24,12 @@ def test_list_methods():
     assert_equal(atoms1, atoms2)
 
 
-def test_atom_tree():
-    Catoms = POAVAtoms()
-    for Z in range(1, 101):
-        Catoms.append(POAVAtom(Z=Z))
-    assert_equals(Catoms.Natoms, 100)
-
-
-def test_structure_analysis():
-    atoms = \
-        generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    atoms.assign_unique_ids()
-    atoms.compute_POAVs()
-    assert_equals(atoms.Natoms, 400)
-
-    atoms = POAVAtoms(atoms=atoms)
-    assert_equals(atoms.Natoms, 400)
-
-    atoms.kNN = 3
-    atoms.NNrc = 2.0
-    NNatoms = atoms.nearest_neighbors
-    assert_equals(len(NNatoms), atoms.Natoms)
-
-    atomCN = atoms.coordination_numbers
-    assert_equals(len(atomCN), atoms.Natoms)
-
-    a100 = atoms.get_atom(100)
-    assert_true(a100 is atoms[99])
-    assert_equals(atoms.index(a100), 99)
-    a200 = atoms.get_atom(200)
-    assert_true(a200 is atoms[199])
-    assert_equals(atoms.index(a200), 199)
-    a300 = atoms.get_atom(300)
-    assert_true(a300 is atoms[299])
-    assert_equals(atoms.index(a300), 299)
-
-
-def test_atom_selections():
-    atoms = \
-        generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    atoms.assign_unique_ids()
-    atoms.compute_POAVs()
-    a200 = atoms.get_atom(200)
-    assert_true(a200 is atoms[199])
-    assert_true(a200 == atoms[199])
-    atom_bounds = atoms.bounds
-    print('atom bounds: {}'.format(atom_bounds))
-
-
 def test_atom_bonds():
     atoms = \
-        generate_atoms(generator_class='SWNTGenerator', n=20, m=10, nz=2)
-    atoms.assign_unique_ids()
-    atoms.compute_POAVs()
+        generate_atoms(generator_class='SWNTGenerator', n=10, m=5, nz=1)
+    atoms.kNN = 3
     atoms.NNrc = 2.0
+    atoms.compute_POAVs()
     bonds = atoms.bonds
     assert_equal(len(bonds), atoms.coordination_numbers.sum())
     assert_equal(bonds.Nbonds, atoms.coordination_numbers.sum())
@@ -116,11 +47,9 @@ def test_structure_data():
     fname = resource_filename('sknano', 'data/nanotubes/1005_5cells.data')
     swnt = SWNTGenerator(n=10, m=5, nz=5)
     swnt_atoms = swnt.atoms
-    swnt_atoms.assign_unique_ids()
     swnt_atoms.compute_POAVs()
     data = DATAReader(fname)
     atoms = data.atoms
-    atoms.assign_unique_ids()
     atoms.compute_POAVs()
     assert_equals(swnt_atoms.Natoms, atoms.Natoms)
 
@@ -128,11 +57,11 @@ def test_structure_data():
 def test_POAV_angles():
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=0, nz=2)
-    atoms.assign_unique_ids()
-    #atoms.NNrc = 2.0
+    # atoms.NNrc = 2.0
     atoms.compute_POAVs()
 
     for i, atom in enumerate(atoms):
+        print('atom{}: {}'.format(atom.id, atom))
         for POAV in ('POAV1', 'POAV2', 'POAVR'):
             if getattr(atom, POAV) is not None:
                 atom_POAV = getattr(atom, POAV)

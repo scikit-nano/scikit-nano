@@ -6,29 +6,8 @@ from __future__ import unicode_literals
 import nose
 from nose.tools import *
 from sknano.core.atoms import XAtom, XAtoms
-from sknano.testing import generate_atoms
+# from sknano.testing import generate_atoms
 # from sknano.core.geometric_regions import Ellipsoid
-
-
-def test_instantiation():
-    from sknano.core.atoms import Atoms
-    xatoms = XAtoms()
-    assert_is_instance(xatoms, (Atoms, XAtoms))
-    swnt_atoms = \
-        generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=1)
-    for atom in swnt_atoms:
-        xatoms.append(atom)
-
-    assert_equal(len(xatoms), len(swnt_atoms))
-
-    atoms = XAtoms(atoms=xatoms)
-    assert_equal(len(atoms), len(swnt_atoms))
-
-    atoms = XAtoms(atoms=xatoms.data)
-    assert_equal(len(atoms), len(swnt_atoms))
-
-    atoms = XAtoms(atoms=atoms)
-    assert_equal(len(atoms), len(swnt_atoms))
 
 
 def test_list_methods():
@@ -44,8 +23,8 @@ def test_list_methods():
 
 def test_generator_atoms():
     from sknano.generators import SWNTGenerator
-    n, m = 10, 10
-    nz = 10
+    n, m = 5, 5
+    nz = 2
     swnt = SWNTGenerator(n=n, m=m, nz=nz)
     assert_equals(swnt.N, 2 * n)
     assert_equals(swnt.Natoms, 2 * swnt.N * swnt.nz)
@@ -55,28 +34,14 @@ def test_generator_atoms():
     atoms = swnt.atoms
     assert_equals(atoms.Natoms, swnt.Natoms_per_tube)
 
-    atoms = \
-        generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    assert_equals(atoms.Natoms, 400)
 
-    a100 = atoms.get_atom(100)
-    assert_true(a100 is atoms[99])
-    assert_equals(atoms.index(a100), 99)
-    a200 = atoms.get_atom(200)
-    assert_true(a200 is atoms[199])
-    assert_equals(atoms.index(a200), 199)
-    a300 = atoms.get_atom(300)
-    assert_true(a300 is atoms[299])
-    assert_equals(atoms.index(a300), 299)
-
-
-def test_atom_selections():
-    atoms = \
-        generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    #assert_true(a200 is atoms[20])
-    #a200NN = atoms.select_within(Ellipsoid(center=a200.r, r=2.5))
-    #assert_equals(a200NN.Natoms, 4)
-    #atoms.select(
+# def test_atom_selections():
+#     atoms = \
+#         generate_atoms(generator_class='SWNTGenerator', n=5, m=5, nz=2)
+#     #assert_true(a200 is atoms[20])
+#     #a200NN = atoms.select_within(Ellipsoid(center=a200.r, r=2.5))
+#     #assert_equals(a200NN.Natoms, 4)
+#     #atoms.select(
 
 
 if __name__ == '__main__':
