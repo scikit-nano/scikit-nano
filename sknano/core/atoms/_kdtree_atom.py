@@ -11,6 +11,8 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+import numpy as np
+
 import sknano.core.atoms
 from ._cn_atom import CNAtom
 from ._id_atom import IDAtom
@@ -82,6 +84,14 @@ class KDTAtom(CNAtom, XYZAtom, IDAtom):
         if not isinstance(value, sknano.core.atoms.Atoms):
             raise TypeError('Expected an `Atoms` object.')
         self._neighbors = value
+
+    @property
+    def neighbor_distances(self):
+        return self._neighbor_distances
+
+    @neighbor_distances.setter
+    def neighbor_distances(self, value):
+        self._neighbor_distances = np.asarray(value)
 
     def todict(self):
         super_dict = super().todict()
