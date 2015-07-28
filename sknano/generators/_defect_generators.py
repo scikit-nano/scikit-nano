@@ -270,7 +270,7 @@ class DefectGenerator(GeneratorBase):
 #         vac_props = vac_type_properties[self._vac_type]
 #         self._cluster_size = vac_props['cluster_size']
 #         self._atoms.NN_cutoff = vac_props['NN_cutoff']
-#         self._atoms.update_nearest_neighbors()
+#         self._atoms.update_neighbors()
 
 #         vac_atoms = Atoms()
 #         for vac_id in self._vac_ids:

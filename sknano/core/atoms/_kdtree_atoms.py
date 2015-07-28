@@ -99,7 +99,7 @@ class KDTAtoms(CNAtoms, XYZAtoms, IDAtoms):
     @property
     def nearest_neighbors(self):
         """Return array of nearest-neighbor atoms for each `KDTAtom`."""
-        # self._update_nearest_neighbors()
+        # self._update_neighbors()
         return np.asarray([atom.NN for atom in self])
 
     def query_atom_tree(self, k=16, eps=0, p=2, rc=np.inf):
@@ -171,17 +171,19 @@ class KDTAtoms(CNAtoms, XYZAtoms, IDAtoms):
 
     def update_attrs(self):
         """Update :class:`KDTAtom`\ s attributes."""
-        self.update_nearest_neighbors()
+        self.update_neighbors()
         self.update_bonds()
 
-    def update_nearest_neighbors(self):
+    def update_neighbors(self):
         """Update :attr:`KDTAtom.NN`."""
         try:
             NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
             for j, atom in enumerate(self):
                 # NN = NeighborAtoms(**self.kwargs)
-                atom.NN = NeighborAtoms([self[NNi[j][k]] for k, d in
-                                         enumerate(NNd[j]) if d <= self.NNrc])
+                atom.neighbors = \
+                    NeighborAtoms([self[NNi[j][k]] for k, d in
+                                   enumerate(NNd[j]) if d <= self.NNrc])
+                atom.NN = atom.neighbors
         except ValueError:
             pass
 

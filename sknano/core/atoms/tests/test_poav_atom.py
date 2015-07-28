@@ -26,7 +26,7 @@ def test_POAV1():
     #atom = POAVAtom(element='C')
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    atoms.update_nearest_neighbors()
+    atoms.update_neighbors()
     atom100 = atoms.get_atom(100)
     assert_equals(atom100.id, 100)
     assert_true(atom100.POAV1 is None)
@@ -50,7 +50,7 @@ def test_POAVR():
     #atom = POAVAtom(element='C')
     atoms = \
         generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=10)
-    atoms.update_nearest_neighbors()
+    atoms.update_neighbors()
     atom100 = atoms.get_atom(100)
     assert_equals(atom100.id, 100)
     assert_true(atom100.POAVR is None)

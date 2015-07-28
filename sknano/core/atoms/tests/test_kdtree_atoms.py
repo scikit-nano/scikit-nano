@@ -95,5 +95,21 @@ def test5():
     # print(atoms.ids)
 
 
+def test6():
+    atoms = generate_atoms(generator_class='SWNTGenerator', n=3, m=0, nz=5)
+    atoms.update_attrs()
+    assert_equal(atoms.filtered(atoms.coordination_numbers == 1).Natoms,
+                 atoms.coordination_counts[1])
+    assert_equal(atoms.filtered(atoms.coordination_numbers == 3).Natoms,
+                 atoms.coordination_counts[3])
+
+
+def test7():
+    atoms = generate_atoms(generator_class='SWNTGenerator', n=3, m=0, nz=5)
+    atoms.update_attrs()
+    assert_true(np.allclose(atoms.coordination_numbers,
+                            atoms.neighbor_counts(2.0)))
+
+
 if __name__ == '__main__':
     nose.runmodule()
