@@ -33,7 +33,7 @@ class Atoms(UserList):
 
     """
     def __init__(self, atoms=None, casttype=True, **kwargs):
-        verbose = kwargs['verbose'] if 'verbose' in kwargs else False
+        verbose = kwargs.get('verbose', False)
         if atoms is not None and (isinstance(atoms, str) or
                                   isinstance(atoms, Atom)):
             atoms = [atoms]
