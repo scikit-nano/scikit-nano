@@ -97,6 +97,16 @@ class KDTAtoms(CNAtoms, XYZAtoms, IDAtoms):
             return None
 
     @property
+    def neighbors(self):
+        return np.asarray([atom.neighbors for atom in self])
+
+    @property
+    def neighbor_distances(self):
+        distances = []
+        [distances.extend(atom.neighbor_distances.tolist()) for atom in self]
+        return distances
+
+    @property
     def nearest_neighbors(self):
         """Return array of nearest-neighbor atoms for each `KDTAtom`."""
         # self._update_neighbors()
@@ -127,7 +137,7 @@ class KDTAtoms(CNAtoms, XYZAtoms, IDAtoms):
         Returns
         -------
         d : array of floats
-            The distances to the nearest neighbors.
+            The distances to the nearest neighbors, sorted by distance.
         i : array of integers
             The locations of the neighbors in self.atom_tree.data. `i` is the
             same shape as `d`.
@@ -183,6 +193,8 @@ class KDTAtoms(CNAtoms, XYZAtoms, IDAtoms):
                 atom.neighbors = \
                     NeighborAtoms([self[NNi[j][k]] for k, d in
                                    enumerate(NNd[j]) if d <= self.NNrc])
+                atom.neighbor_distances = \
+                    [NNd[j][k] for k, d in enumerate(NNd[j]) if d <= self.NNrc]
                 atom.NN = atom.neighbors
         except ValueError:
             pass
