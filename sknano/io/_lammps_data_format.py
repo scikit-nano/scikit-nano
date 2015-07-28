@@ -143,14 +143,16 @@ class DATAReader(StructureIO):
             velocities_section_attrs = {}
 
         for line in atoms_section:
-            atom_kwargs = {'id': None, 'mol': None, 'q': None, 'type': None,
-                           'mass': None, 'x': None, 'y': None, 'z': None,
-                           'vx': None, 'vy': None, 'vz': None}
+            atom_kwargs = {}
 
-            for kw in list(atom_kwargs.keys()):
+            for kw in dir(Atom()):
                 if kw in atoms_section_attrs:
-                    atom_kwargs[kw] = \
-                        line[self.section_attrs_specs['Atoms'][kw]['index']]
+                    try:
+                        atom_kwargs[kw] = \
+                            line[
+                                self.section_attrs_specs['Atoms'][kw]['index']]
+                    except IndexError:
+                        pass
                 elif kw in masses_section_attrs:
                     type = \
                         line[self.section_attrs_specs[
@@ -683,7 +685,7 @@ attr_dtypes = {'id': int, 'type': int, 'mol': int, 'q': float, 'mass': float,
                'quatw': float, 'quati': float, 'quatj': float, 'quatk': float,
                'atom1': int, 'atom2': int, 'atom3': int, 'atom4': int}
 
-atom_styles = {}
+atom_styles = OrderedDict()
 atom_styles['angle'] = ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z']
 atom_styles['atomic'] = ['atom-ID', 'atom-type', 'x', 'y', 'z']
 atom_styles['body'] = \
@@ -717,26 +719,24 @@ atom_styles['tri'] = \
 atom_styles['wavepacket'] = \
     ['atom-ID', 'atom-type', 'charge', 'spin', 'eradius', 'etag',
      'cs_re', 'cs_im', 'x', 'y', 'z']
-#atom_styles['hybrid'] = ['atom-ID', 'atom-type', 'x', 'y', 'z', '...']
+# atom_styles['hybrid'] = ['atom-ID', 'atom-type', 'x', 'y', 'z', '...']
 
 lammps_atom_styles = atom_styles
 
-atoms_section_attrs = {}
-for atom_style, attrs in list(atom_styles.items()):
-    atom_style_attrs = atoms_section_attrs[atom_style] = []
-    for attr in attrs:
-        attr = attr.replace('atom-', '').replace('molecule-ID', 'mol').lower()
-        #attr = attr.replace('-', '_')
-        atom_style_attrs.append(attr)
-    atom_style_attrs.extend(['ix', 'iy', 'iz'])
+atoms_section_attrs = OrderedDict()
 
-velocities_section_attrs = {}
-velocities_section_attrs.update(dict.fromkeys(list(atom_styles.keys()),
-                                              ['id', 'vx', 'vy', 'vz']))
+[atoms_section_attrs.update(
+ {atom_style: [attr.replace('atom-', '').replace('molecule-ID', 'mol').lower()
+  for attr in attrs]}) for atom_style, attrs in atom_styles.items()]
+[attrs.extend(['ix', 'iy', 'iz']) for attrs in atoms_section_attrs.values()]
+
+velocities_section_attrs = OrderedDict()
+[velocities_section_attrs.update({atom_style: ['id', 'vx', 'vy', 'vz']})
+ for atom_style in atom_styles.keys()]
 velocities_section_attrs['electron'].append('ervel')
 velocities_section_attrs['ellipsoid'].extend(['lx', 'ly', 'lz'])
 velocities_section_attrs['sphere'].extend(['wx', 'wy', 'wz'])
-#velocities_section_attrs['hybrid'].append('...')
+# velocities_section_attrs['hybrid'].append('...')
 
 bonds_section_attrs = ['id', 'type', 'atom1', 'atom2']
 angles_section_attrs = ['id', 'type', 'atom1', 'atom2', 'atom3']
