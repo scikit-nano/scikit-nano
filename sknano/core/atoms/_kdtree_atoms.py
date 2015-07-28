@@ -179,11 +179,9 @@ class KDTAtoms(CNAtoms, XYZAtoms, IDAtoms):
         try:
             NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
             for j, atom in enumerate(self):
-                NN = NeighborAtoms(**self.kwargs)
-                for k, d in enumerate(NNd[j]):
-                    if d <= self.NNrc:
-                        NN.append(self[NNi[j][k]])
-                atom.NN = NN
+                # NN = NeighborAtoms(**self.kwargs)
+                atom.NN = NeighborAtoms([self[NNi[j][k]] for k, d in
+                                         enumerate(NNd[j]) if d <= self.NNrc])
         except ValueError:
             pass
 
@@ -191,3 +189,8 @@ class KDTAtoms(CNAtoms, XYZAtoms, IDAtoms):
         """Update :attr:`KDTAtom.bonds`."""
         self.bonds.clear()
         [self.bonds.extend(atom.bonds) for atom in self]
+
+    def neighbor_counts(self, r):
+        return np.asarray([KDTree([atom.r]).count_neighbors(
+                           self.filtered(self.ids != atom.id).atom_tree,
+                           np.asarray(r)) for atom in self])
