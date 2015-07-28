@@ -16,15 +16,8 @@ __docformat__ = 'restructuredtext en'
 # import numbers
 # import numpy as np
 
-# from sknano.core.math import Vector, vector as vec
-# from ._bond import Bond
-# from ._bonds import Bonds
-# from . import StructureAtoms as Atoms
-# from ._extended_atoms import XAtoms
-# from ._poav_atoms import POAVAtoms
 from ._energy_atoms import EnergyAtoms
 from ._force_atoms import ForceAtoms
-from ._charged_atoms import ChargedAtoms
 from ._structure_atoms import StructureAtoms
 from ._md_atom import MDAtom
 
