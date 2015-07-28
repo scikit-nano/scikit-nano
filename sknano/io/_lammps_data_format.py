@@ -43,6 +43,7 @@ class DATAReader(StructureIO):
         self.header_data = {}
         self.section_data = {}
         self.boxbounds = {}
+        self.kwargs = {}
 
         formatspec = DATAFormatSpec(atom_style=atom_style, **kwargs)
         self.section_attrs = formatspec.section_attrs
@@ -53,11 +54,26 @@ class DATAReader(StructureIO):
 
     @property
     def headers(self):
-        """:class:`python:dict` of dump file header values"""
+        """Alias for :attr:`~DATAReader.header_data`.
+
+        Returns
+        -------
+        :class:`python:dict`
+            :class:`python:dict` of dump file header values
+
+        """
         return self.header_data
 
     @property
     def sections(self):
+        """Alias for :attr:`~DATAReader.section_data`.
+
+        Returns
+        -------
+        :class:`python:dict`
+            :class:`python:dict` of dump file section data
+
+        """
         return self.section_data
 
     def read(self):
@@ -113,9 +129,16 @@ class DATAReader(StructureIO):
                     line = f.readline().strip()
                     if len(line) == 0:
                         break
-            self._parse_atoms()
-            self._parse_types()
             self._parse_boxbounds()
+            self._parse_atoms()
+            self._parse_atom_types()
+            # self._parse_bonds()
+            # self._parse_dihedrals()
+            # self._parse_impropers()
+            # self._parse_ellipsoids()
+            # self._parse_lines()
+            # self._parse_triangles()
+            # self._parse_bodies()
         except (IOError, OSError) as e:
             print(e)
 
@@ -177,7 +200,7 @@ class DATAReader(StructureIO):
             atom = Atom(**atom_kwargs)
             self.atoms.append(atom)
 
-    def _parse_types(self):
+    def _parse_atom_types(self):
         Ntypes = self.atoms.Ntypes
         typemap = self.atoms.typemap
         if Ntypes != self.header_data['atom types']:
