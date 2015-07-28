@@ -7,7 +7,6 @@ import nose
 from nose.tools import *
 from pkg_resources import resource_filename
 import numpy as np
-#from sknano.core.atoms import Bond, Bonds
 from sknano.generators import SWNTGenerator
 from sknano.io import DATAReader
 

@@ -67,6 +67,13 @@ def test2():
     for atom in atoms:
         print('atom: {}, bond.lengths: {}'.format(atom.id, atom.bonds.lengths))
 
+def test3():
+
+    atoms = generate_atoms(elements='periodic_table')
+    atoms.kNN = 3
+    atoms_cp = atoms.copy()
+    assert_equal(atoms.kNN, atoms_cp.kNN)
+
 
 if __name__ == '__main__':
     nose.runmodule()

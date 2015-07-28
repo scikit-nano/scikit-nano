@@ -3,7 +3,7 @@
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
-import numpy as np
+# import numpy as np
 
 import nose
 from nose.tools import *
@@ -51,7 +51,6 @@ def test4():
 
 def test5():
     atoms = generate_atoms(elements='periodic_table')
-    atoms.assign_unique_types()
     a1 = atoms[:10]
     a2 = atoms[:5]
     assert_equal(a1 + a2, atoms[:10])
@@ -67,14 +66,6 @@ def test5():
     a2 = atoms[25:]
     assert_equal((a1 + a2).elements.tolist(), element_symbols)
     assert_equal((a1 + a2), atoms)
-
-
-def test6():
-
-    atoms = generate_atoms(elements='periodic_table')
-    atoms.kNN = 3
-    atoms_cp = atoms.copy()
-    assert_equal(atoms.kNN, atoms_cp.kNN)
 
 
 if __name__ == '__main__':
