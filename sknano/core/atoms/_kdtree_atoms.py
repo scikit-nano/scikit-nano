@@ -53,9 +53,9 @@ class KDTAtoms(CNAtoms, XYZAtoms, IDAtoms):
         Nearest neighbor radius cutoff.
 
     """
-    def __init__(self, atoms=None, kNN=16, NNrc=2.0):
+    def __init__(self, atoms=None, kNN=16, NNrc=2.0, **kwargs):
 
-        super().__init__(atoms)
+        super().__init__(atoms, **kwargs)
         self.kNN = kNN
         self.NNrc = NNrc
         self.bonds = atoms.bonds if hasattr(atoms, 'bonds') else Bonds()
@@ -189,10 +189,22 @@ class KDTAtoms(CNAtoms, XYZAtoms, IDAtoms):
         try:
             NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
             for j, atom in enumerate(self):
-                # NN = NeighborAtoms(**self.kwargs)
+                # atom.neighbors = self.__class__(**self.kwargs)
+
+                # atom.neighbors = NeighborAtoms()
+                # [atom.neighbors.append(self[NNi[j][k]])
+                #  for k, d in enumerate(NNd[j]) if d <= self.NNrc]
+
                 atom.neighbors = \
                     NeighborAtoms([self[NNi[j][k]] for k, d in
-                                   enumerate(NNd[j]) if d <= self.NNrc])
+                                   enumerate(NNd[j]) if d <= self.NNrc],
+                                  casttype=False)
+
+                # atom.neighbors = \
+                #     self.__class__([self[NNi[j][k]] for k, d in
+                #                     enumerate(NNd[j]) if d <= self.NNrc],
+                #                    casttype=False, **self.kwargs)
+
                 atom.neighbor_distances = \
                     [NNd[j][k] for k, d in enumerate(NNd[j]) if d <= self.NNrc]
                 atom.NN = atom.neighbors
