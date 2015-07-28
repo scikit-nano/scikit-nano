@@ -74,25 +74,35 @@ class Atoms(UserList):
             return self.__class__(data, **self.kwargs)
         return data
 
-    def __setitem__(self, index, value):
-        if not isinstance(value, (self.__class__, self.__atom_class__)):
+    def __setitem__(self, index, item):
+        if not isinstance(item, (self.__class__, self.__atom_class__)):
             if isinstance(index, slice):
-                value = self.__class__(value)
+                item = self.__class__(item)
             else:
                 try:
                     atomdict = super().__getitem__(index).todict()
-                    if isinstance(value, str):
-                        atomdict['element'] = value
-                    elif isinstance(value, int):
-                        atomdict['Z'] = value
-                    elif isinstance(value, float):
-                        atomdict['mass'] = value
+                    if isinstance(item, str):
+                        atomdict['element'] = item
+                    elif isinstance(item, int):
+                        atomdict['Z'] = item
+                    elif isinstance(item, float):
+                        atomdict['mass'] = item
                     else:
                         raise ValueError
-                    value = self.__atom_class__(**atomdict)
+                    item = self.__atom_class__(**atomdict)
                 except (IndexError, AttributeError, ValueError):
-                    value = self.__atom_class__(value)
-        super().__setitem__(index, value)
+                    item = self.__atom_class__(item)
+        super().__setitem__(index, item)
+
+    def append(self, atom):
+        if not isinstance(atom, self.__atom_class__):
+            if isinstance(atom, dict):
+                atom = self.__atom_class__(
+                    **{k: atom[k] for k in set(atom) &
+                       set(dir(self.__atom_class__()))})
+            elif isinstance(atom, (str, int, float)):
+                atom = self.__atom_class__(atom)
+        super().append(atom)
 
     def __atoms_not_in_self(self, other):
         return [atom for atom in other if atom not in self]
