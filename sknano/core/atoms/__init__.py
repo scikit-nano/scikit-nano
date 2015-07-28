@@ -125,4 +125,7 @@ from ._trajectory import *
 from ._structure_atom import *
 from ._structure_atoms import *
 
+from ._neighbor_atom import *
+from ._neighbor_atoms import *
+
 __all__ += [s for s in dir() if not s.startswith('_')]
