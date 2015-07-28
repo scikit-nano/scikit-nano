@@ -4,8 +4,6 @@
 Container class for `KDTAtom`\ s (:mod:`sknano.core.atoms._kdtree_atoms`)
 ===============================================================================
 
-An `Atoms` class for structure analysis.
-
 .. currentmodule:: sknano.core.atoms._kdtree_atoms
 
 """
@@ -33,6 +31,7 @@ from ._id_atoms import IDAtoms
 from ._xyz_atoms import XYZAtoms
 from ._bonds import Bonds
 from ._kdtree_atom import KDTAtom
+from ._neighbor_atoms import NeighborAtoms
 
 __all__ = ['KDTAtoms']
 
@@ -180,7 +179,7 @@ class KDTAtoms(CNAtoms, XYZAtoms, IDAtoms):
         try:
             NNd, NNi = self.query_atom_tree(k=self.kNN, rc=self.NNrc)
             for j, atom in enumerate(self):
-                NN = self.__class__(**self.kwargs)
+                NN = NeighborAtoms(**self.kwargs)
                 for k, d in enumerate(NNd[j]):
                     if d <= self.NNrc:
                         NN.append(self[NNi[j][k]])
