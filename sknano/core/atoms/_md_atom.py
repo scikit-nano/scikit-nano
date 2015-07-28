@@ -17,12 +17,18 @@ import numpy as np
 
 import sknano.core.atoms
 
-from . import StructureAtom as Atom
+# from . import StructureAtom as Atom
+# from ._extended_atom import XAtom
+# from ._poav_atom import POAVAtom
+from ._energy_atom import EnergyAtom
+from ._force_atom import ForceAtom
+from ._charged_atom import ChargedAtom
+from ._structure_atom import StructureAtom
 
 __all__ = ['MDAtom']
 
 
-class MDAtom(Atom):
+class MDAtom(StructureAtom, EnergyAtom, ForceAtom):
     """An `Atom` class for molecular dynamics trajectory analysis.
 
     """

@@ -19,13 +19,19 @@ __docformat__ = 'restructuredtext en'
 # from sknano.core.math import Vector, vector as vec
 # from ._bond import Bond
 # from ._bonds import Bonds
-from . import StructureAtoms as Atoms
+# from . import StructureAtoms as Atoms
+# from ._extended_atoms import XAtoms
+# from ._poav_atoms import POAVAtoms
+from ._energy_atoms import EnergyAtoms
+from ._force_atoms import ForceAtoms
+from ._charged_atoms import ChargedAtoms
+from ._structure_atoms import StructureAtoms
 from ._md_atom import MDAtom
 
 __all__ = ['MDAtoms']
 
 
-class MDAtoms(Atoms):
+class MDAtoms(StructureAtoms, EnergyAtoms, ForceAtoms):
     """An `Atoms` sub-class for molecular dynamics trajectory analysis.
 
     Sub-class of :class:`~sknano.core.atoms.StructureAtoms` class,
