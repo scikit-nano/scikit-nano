@@ -32,21 +32,26 @@ class Atoms(UserList):
         existing `Atoms` instance object.
 
     """
-    def __init__(self, atoms=None, **kwargs):
+    def __init__(self, atoms=None, casttype=True, **kwargs):
+        verbose = kwargs['verbose'] if 'verbose' in kwargs else False
         if atoms is not None and (isinstance(atoms, str) or
                                   isinstance(atoms, Atom)):
             atoms = [atoms]
-        if not isinstance(atoms, type(self)) and isinstance(atoms, list):
+        if casttype and not isinstance(atoms, type(self)) and \
+                isinstance(atoms, list):
             atoms = atoms[:]
             for i, atom in enumerate(atoms):
                 try:
                     # atoms[i] = self.__atom_class__(**atom.todict())
-
                     atomdict = atom.todict()
-                    # filtered_atomdict = \
-                    #     {k: atomdict[k] for k in set(dir(atom)) &
-                    #      set(dir(self.__atom_class__()))}
-                    # print('filtered_atomdict: {}'.format(filtered_atomdict))
+                    if verbose and i in list(range(len(atoms), 100)):
+                        print(type(atom))
+                        print(atomdict)
+                        filtered_atomdict = \
+                            {k: atomdict[k] for k in set(dir(atom)) &
+                             set(dir(self.__atom_class__()))}
+                        print('filtered_atomdict: {}'.format(
+                              filtered_atomdict))
 
                     atoms[i] = self.__atom_class__(
                         **{k: atomdict[k] for k in set(dir(atom)) &
