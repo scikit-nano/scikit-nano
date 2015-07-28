@@ -5,6 +5,10 @@ from __future__ import unicode_literals
 
 import nose
 from nose.tools import *
+
+import numpy as np
+
+from sknano.structures import compute_Natoms
 from sknano.testing import generate_atoms
 
 
@@ -67,12 +71,28 @@ def test2():
     for atom in atoms:
         print('atom: {}, bond.lengths: {}'.format(atom.id, atom.bonds.lengths))
 
-def test3():
 
+def test3():
     atoms = generate_atoms(elements='periodic_table')
     atoms.kNN = 3
     atoms_cp = atoms.copy()
     assert_equal(atoms.kNN, atoms_cp.kNN)
+
+
+def test4():
+    atoms = generate_atoms(generator_class='SWNTGenerator', n=3, m=0, nz=5)
+    assert_equal(compute_Natoms((3, 0), nz=5), atoms.Natoms)
+    assert_equal(atoms.Natoms, atoms.ids[-1])
+
+
+def test5():
+    atoms = generate_atoms(generator_class='SWNTGenerator', n=3, m=0, nz=5)
+    assert_true(np.allclose(atoms.coords, atoms.atom_tree.data))
+
+    # atoms.kNN = 3
+    # atoms.NNrc = 2.0
+    # atoms.update_attrs()
+    # print(atoms.ids)
 
 
 if __name__ == '__main__':
