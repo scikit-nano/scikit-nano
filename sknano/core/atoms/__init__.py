@@ -82,9 +82,6 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-
-from ._poav_atom import POAVAtom as StructureAtom
-from ._poav_atoms import POAVAtoms as StructureAtoms
 __all__ = ['StructureAtom', 'StructureAtoms']
 
 from ._atom import *
@@ -124,5 +121,8 @@ from ._bonds import *
 from ._md_atom import *
 from ._md_atoms import *
 from ._trajectory import *
+
+from ._structure_atom import *
+from ._structure_atoms import *
 
 __all__ += [s for s in dir() if not s.startswith('_')]
