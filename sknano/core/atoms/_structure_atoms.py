@@ -44,3 +44,17 @@ class StructureAtoms(POAVAtoms, ChargedAtoms, VelocityAtoms, ImageAtoms,
     def sort(self, key=attrgetter('element', 'Z', 'mass', 'id', 'mol', 'type',
                                   'x', 'y', 'z', 'CN'), reverse=False):
         super().sort(key=key, reverse=reverse)
+
+    def compute_rdf(self):
+        pass
+
+    @property
+    def volume(self):
+        try:
+            return self._volume
+        except AttributeError:
+            return self.bounds.volume
+
+    @volume.setter
+    def volume(self, value):
+        self._volume = float(value)
