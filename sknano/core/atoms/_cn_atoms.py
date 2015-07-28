@@ -11,6 +11,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from collections import Counter
 from operator import attrgetter
 
 import numpy as np
@@ -42,5 +43,28 @@ class CNAtoms(Atoms):
 
     @property
     def coordination_numbers(self):
-        """:class:`~numpy:numpy.ndarray` of `CNAtom.CN`."""
+        """:class:`~numpy:numpy.ndarray` of :attr:`CNAtom.CN`\ s."""
         return np.asarray([atom.CN for atom in self])
+
+    @property
+    def coordination_number_counts(self):
+        """Coordination number counts.
+
+        Returns
+        -------
+        :class:`~python:collections.Counter`
+            :class:`~python:collections.Counter` of
+            :attr:`~CNAtoms.coordination_numbers`.
+
+        """
+        return Counter(self.coordination_numbers)
+
+    @property
+    def coordination_counts(self):
+        """Alias for :attr:`~CNAtoms.coordination_number_counts`."""
+        return self.coordination_number_counts
+
+    @property
+    def CN_counts(self):
+        """Alias for :attr:`~CNAtoms.coordination_number_counts`."""
+        return self.coordination_number_counts
