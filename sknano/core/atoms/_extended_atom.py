@@ -27,8 +27,8 @@ from ._type_atom import TypeAtom
 __all__ = ['XAtom']
 
 
-class XAtom(CNAtom, EnergyAtom, ChargedAtom, ForceAtom, VelocityAtom,
-            IDAtom, ImageAtom, TypeAtom, XYZAtom):
+class XAtom(IDAtom, TypeAtom, XYZAtom, ImageAtom, ChargedAtom, VelocityAtom,
+            ForceAtom, EnergyAtom, CNAtom):
     """An `Atom` class with an eXtended set of attributes.
 
     Parameters

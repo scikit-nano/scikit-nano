@@ -29,8 +29,8 @@ from ._type_atoms import TypeAtoms
 __all__ = ['XAtoms']
 
 
-class XAtoms(CNAtoms, EnergyAtoms, ChargedAtoms, ForceAtoms, VelocityAtoms,
-             IDAtoms, ImageAtoms, TypeAtoms, XYZAtoms):
+class XAtoms(IDAtoms, TypeAtoms, XYZAtoms, ImageAtoms, ChargedAtoms,
+             VelocityAtoms, ForceAtoms, EnergyAtoms, CNAtoms):
     """An eXtended `Atoms` class.
 
     Sub-class of `Atoms` class, and a container class for lists of
@@ -47,7 +47,7 @@ class XAtoms(CNAtoms, EnergyAtoms, ChargedAtoms, ForceAtoms, VelocityAtoms,
     def __atom_class__(self):
         return XAtom
 
-    def sort(self, key=attrgetter('element', 'Z', 'mass', 'type', 'id',
-                                  'mol', 'r', 'x', 'y', 'z', 'CN', 'q',
-                                  'etotal'), reverse=False):
+    def sort(self, key=attrgetter('element', 'Z', 'mass', 'id', 'mol', 'type',
+                                  'x', 'y', 'z', 'q', 'etotal',
+                                  'CN'), reverse=False):
         super().sort(key=key, reverse=reverse)
