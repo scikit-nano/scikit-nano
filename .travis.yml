@@ -2,17 +2,19 @@
 #   http://lint.travis-ci.org/
 
 language: python
-
+sudo: false
 python:
   - "3.4"
-
+addons:
+  apt:
+    packages:
+      - libatlas-base-dev
+      - libatlas-dev
+      - liblapack-dev
+      - gfortran
 virtualenv:
   system_site_packages: true
-
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libatlas-dev libatlas-base-dev liblapack-dev gfortran
-  - sudo apt-get install -qq libgmp-dev libmpfr-dev
   - travis_wait pip install -r requirements.txt
   #- mkdir builds
   #- pushd builds
