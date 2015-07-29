@@ -12,9 +12,8 @@ addons:
       - libatlas-dev
       - liblapack-dev
       - gfortran
-virtualenv:
-  system_site_packages: true
 before_install:
+  - pip install --upgrade pip setuptools
   - travis_wait pip install -r requirements.txt
   #- mkdir builds
   #- pushd builds
