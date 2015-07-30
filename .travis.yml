@@ -12,34 +12,12 @@ addons:
       - libatlas-dev
       - liblapack-dev
       - gfortran
-before_install:
+install:
   - pip install --upgrade pip setuptools
   - travis_wait pip install -r requirements.txt
-  #- mkdir builds
-  #- pushd builds
-  ## Install gmpy2 dependencies
-  #- wget ftp://ftp.gnu.org/gnu/mpc/mpc-1.0.2.tar.gz
-  #- tar xzvf mpc-1.0.2.tar.gz
-  #- pushd mpc-1.0.2
-  #- ./configure
-  #- make
-  #- sudo make install
-  #- popd
-  # End install gmpy2 dependencies
-  #- popd
-
-install:
-  #- pip install --upgrade pip setuptools
-  #- travis_wait pip install -r requirements.txt
-  #- pip install --upgrade nose
   #- pip install --upgrade coverage
   #- pip install --upgrade coveralls
-  #- pip install mpmath
-  #- pip install argparse
-  #- pip install gmpy2
-  #- travis_wait pip install scipy
   - python setup.py install
-
 script: nosetests  # --with-coverage
 
 # after_success:
