@@ -4,11 +4,12 @@ include *.txt
 # Top-level build scripts
 include setup.py setupegg.py
 # All source files
-recursive-include sknano *.py *.json *.yaml
+recursive-include sknano *
 # All documentation
 recursive-include doc *
 # Add build and testing tools
 include tox.ini
+recursive-include tools *
 # Exclude what we don't want to include
 prune */__pycache__
 prune */.ropeproject
