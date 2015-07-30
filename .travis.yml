@@ -12,13 +12,10 @@ addons:
       - libatlas-dev
       - liblapack-dev
       - gfortran
-install:
-  - pip install --upgrade pip setuptools
-  - travis_wait pip install -r requirements.txt
-  #- pip install --upgrade coverage
-  #- pip install --upgrade coveralls
-  - python setup.py install
-script: nosetests  # --with-coverage
-
+      - libgmp-dev
+      - libmpfr-dev
+      - ccache
+install: source tools/ci/install.sh
+script: bash tools/ci/travis_tests.sh
 # after_success:
 #   - coveralls
