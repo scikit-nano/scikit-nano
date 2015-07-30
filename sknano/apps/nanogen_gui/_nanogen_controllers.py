@@ -13,8 +13,15 @@ __docformat__ = 'restructuredtext en'
 
 
 try:
-    # from PyQt4.QtGui import QApplication
     from PyQt5.QtWidgets import QApplication
+except ImportError as e:
+    print(e)
+    try:
+        from PyQt4.QtGui import QApplication
+    except ImportError as e:
+        print(e)
+
+try:
     from ._nanogen_views import NanoGenView, SWNTGeneratorView, \
         MWNTGeneratorView, GrapheneGeneratorView, \
         FullereneGeneratorView, BulkStructureGeneratorView
