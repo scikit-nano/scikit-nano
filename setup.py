@@ -215,7 +215,6 @@ def configuration(parent_package='', top_path=None):
                        quiet=True)
 
     config.add_subpackage('sknano')
-    config.add_data_dir('sknano/data')
     config.get_version('sknano/version.py')
 
     return config
