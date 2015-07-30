@@ -4,7 +4,7 @@ include *.txt
 # Top-level build scripts
 include setup.py setupegg.py
 # All source files
-recursive-include sknano *
+recursive-include sknano *.py *.json *.yaml
 # All documentation
 recursive-include doc *
 # Add build and testing tools
