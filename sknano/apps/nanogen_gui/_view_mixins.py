@@ -12,12 +12,18 @@ from __future__ import absolute_import, division, print_function, \
 __docformat__ = 'restructuredtext en'
 
 try:
-    # from PyQt4.QtCore import pyqtSlot
     from PyQt5.QtCore import pyqtSlot
     from PyQt5.QtWidgets import QDialog
-    from ._ui_mwnt_Ch_list_item_dialog import Ui_MWNTChListItemDialog
+    from ._pyqt5_ui_mwnt_Ch_list_item_dialog import Ui_MWNTChListItemDialog
 except ImportError as e:
     print(e)
+    try:
+        from PyQt4.QtCore import pyqtSlot
+        from PyQt4.QtGui import QDialog
+        from ._pyqt4_ui_mwnt_Ch_list_item_dialog import Ui_MWNTChListItemDialog
+    except ImportError as e:
+        print(e)
+
 
 from sknano.structures import get_chiral_indices_from_str
 
