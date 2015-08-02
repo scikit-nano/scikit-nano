@@ -26,5 +26,6 @@ from ._parser import *
 from .analyze_structure import *
 from .nanogen import *
 from .nanogenui import NanoGen
+from .sknano import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]

@@ -48,6 +48,11 @@ class XYZAtoms(Atoms):
 
     @property
     def CM(self):
+        """Alias for :attr:`~XYZAtoms.center_of_mass`."""
+        return self.center_of_mass
+
+    @property
+    def center_of_mass(self):
         """Center-of-Mass coordinates of `Atoms`.
 
         Computes the position vector of the center-of-mass coordinates:
@@ -80,7 +85,7 @@ class XYZAtoms(Atoms):
         .. math::
            \\mathbf{C} =
            \\frac{\\sum_{i=1}^{N_{\\mathrm{atoms}}}
-           m_i\\mathbf{r}_i}{\\sum_{i=1}^{N_{\\mathrm{atoms}}}m_i}
+           \\mathbf{r}_i}{N_{\\mathrm{atoms}}}
 
         Returns
         -------
@@ -146,8 +151,11 @@ class XYZAtoms(Atoms):
 
     def center_CM(self, axes=None):
         """Center atoms on CM coordinates."""
-        dr = -self.CM
-        self.translate(dr)
+        self.translate(-self.center_of_mass)
+
+    def center_centroid(self):
+        """Center :attr:`~XYZAtoms.centroid` on origin."""
+        self.translate(-self.centroid)
 
     def clip_bounds(self, region, center_before_clipping=False):
         """Remove atoms outside the given region.

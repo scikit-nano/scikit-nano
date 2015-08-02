@@ -274,7 +274,8 @@ def setup_package():
             'console_scripts': [
                 'analyze_structure = sknano.scripts.analyze_structure:main',
                 'nanogen = sknano.scripts.nanogen:main',
-                'nanogenui = sknano.scripts.nanogenui:main'],
+                'nanogenui = sknano.scripts.nanogenui:main',
+                'sknano = sknano.scripts.sknano:main'],
         },
         cmdclass={'clean': CleanCommand},
         zip_safe=False,  # the package can run out of an .egg file
