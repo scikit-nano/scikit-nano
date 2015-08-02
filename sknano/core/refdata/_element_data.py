@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-================================================================
-Reference data (:mod:`sknano.core.refdata._element_data`)
-================================================================
+=============================================================================
+Reference element data (:mod:`sknano.core.refdata._element_data`)
+=============================================================================
 
 .. currentmodule:: sknano.core.refdata._element_data
 
@@ -16,5 +16,8 @@ import os
 
 __all__ = ['element_data']
 
+
 element_data = loadobj(os.path.join(os.path.dirname(__file__),
                                     'element_data.yaml'))
+
+# dVDW = 3.35  # angstroms
