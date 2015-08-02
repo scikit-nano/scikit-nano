@@ -17,7 +17,18 @@ __all__ = ['add_default_arguments', 'base_parser']
 
 
 def add_default_arguments(parser):
+    """Add a set of default arguments to an instance of \
+        :class:`~python:argparse.ArgumentParser`.
 
+    Parameters
+    ----------
+    parser : :class:`~python:argparse.ArgumentParser`
+
+    Returns
+    -------
+    parser : class:`~python:argparse.ArgumentParser`
+
+    """
     version = full_version
     if not release:
         version = '-'.join((full_version, git_revision[:7]))
@@ -32,6 +43,4 @@ def add_default_arguments(parser):
     return parser
 
 
-def base_parser():
-    parser = add_default_arguments(argparse.ArgumentParser())
-    return parser
+base_parser = add_default_arguments(argparse.ArgumentParser())

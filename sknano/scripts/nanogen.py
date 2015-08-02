@@ -99,10 +99,12 @@ import sys
 from sknano.core.refdata import CCbond, dVDW
 from ._parser import add_default_arguments
 
-__all__ = ['nanogen']
+__all__ = ['nanogen', 'nanogen_parser']
 
 
-def argparser():
+def nanogen_parser():
+    """:mod:`~sknano.scripts.nanogen` script \
+        :class:`~python:argparse.ArgumentParser`."""
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--basis', type=str, nargs=2,
@@ -301,11 +303,11 @@ def nanogen(generator_class=None, fname=None, structure_format='xyz',
 
 
 def main():
-    args = argparser().parse_args()
+    args = nanogen_parser().parse_args()
     if hasattr(args, 'generator_class'):
         nanogen(**vars(args))
     else:
-        argparser().print_help()
+        nanogen_parser().print_help()
 
 
 if __name__ == '__main__':

@@ -12,10 +12,18 @@ Contents
 .. autosummary::
    :toctree: generated/
 
+   nanogen
+   sknano
+
+:class:`~python:argparse.ArgumentParser` helper functions
+---------------------------------------------------------
+.. autosummary::
+   :toctree: generated/
+
    add_default_arguments
    base_parser
-   nanogen
-   NanoGen
+   nanogen_parser
+   sknano_parser
 
 """
 from __future__ import absolute_import, division, print_function

@@ -15,7 +15,7 @@ __docformat__ = 'restructuredtext en'
 import sys
 
 try:
-    from ..apps.nanogen_gui import NanoGenController, NanoGenModel
+    from sknano.apps.nanogen_gui import NanoGenController, NanoGenModel
 except ImportError as e:
     print(e)
 
