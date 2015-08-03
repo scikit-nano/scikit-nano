@@ -92,7 +92,8 @@ class Vectors(UserList):
 
     def rotate(self, angle=None, axis=None, anchor_point=None,
                rot_point=None, from_vector=None, to_vector=None,
-               degrees=False, transform_matrix=None, verbose=False, **kwargs):
+               degrees=False, transform_matrix=None,
+               fix_anchor_points=False, verbose=False, **kwargs):
         """Rotate `Vector`\ s coordinates.
 
         Parameters
@@ -106,6 +107,10 @@ class Vectors(UserList):
         transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
+        if 'fix_anchor_point' in kwargs:
+            fix_anchor_points = kwargs['fix_anchor_point']
+            del kwargs['fix_anchor_point']
+
         if transform_matrix is None:
             transform_matrix = \
                 transformation_matrix(angle=angle, axis=axis,
@@ -114,9 +119,10 @@ class Vectors(UserList):
                                       from_vector=from_vector,
                                       to_vector=to_vector, degrees=degrees,
                                       verbose=verbose, **kwargs)
-        [vector.rotate(transform_matrix=transform_matrix) for vector in self]
+        [vector.rotate(fix_anchor_point=fix_anchor_points,
+                       transform_matrix=transform_matrix) for vector in self]
 
-    def translate(self, t, fix_anchor_points=False):
+    def translate(self, t, fix_anchor_points=False, **kwargs):
         """Translate `Vector`\ s by :class:`Vector` `t`.
 
         Parameters

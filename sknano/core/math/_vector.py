@@ -540,7 +540,8 @@ class Vector(np.ndarray):
 
     def rotate(self, angle=None, axis=None, anchor_point=None,
                rot_point=None, from_vector=None, to_vector=None,
-               degrees=False, transform_matrix=None, verbose=False, **kwargs):
+               degrees=False, transform_matrix=None,
+               fix_anchor_point=False, verbose=False, **kwargs):
         """Rotate `Vector` coordinates.
 
         Parameters
@@ -567,8 +568,9 @@ class Vector(np.ndarray):
                                       to_vector=to_vector, degrees=degrees,
                                       verbose=verbose, **kwargs)
 
-        self.p0 = rotate(self.p0, transform_matrix=transform_matrix)
         self.p = rotate(self.p, transform_matrix=transform_matrix)
+        if not fix_anchor_point:
+            self.p0 = rotate(self.p0, transform_matrix=transform_matrix)
 
     def scale(self):
         return NotImplemented
