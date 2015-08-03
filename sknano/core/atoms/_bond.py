@@ -86,13 +86,6 @@ class Bond(BaseClass):
         """
         return Vector(self.atom2.r - self.atom1.r, p0=self.atom1.r.p)
 
-    # @vector.setter
-    # def vector(self, value):
-    #     """Set `Bond` :class:`~sknano.core.math.Vector`."""
-    #     if not isinstance(value, (list, np.ndarray)):
-    #         raise TypeError('Expected an `array_like` object')
-    #     self._vector = Vector(value)
-
     @property
     def unit_vector(self):
         """`Bond` :attr:`~sknano.core.math.Vector.unit_vector`."""
