@@ -15,11 +15,12 @@ __docformat__ = 'restructuredtext en'
 
 from sknano.core import BaseClass
 from sknano.core.refdata import aCC
+from ._mixins import BasisMixin
 
 __all__ = ['StructureBase']
 
 
-class StructureBase(BaseClass):
+class StructureBase(BasisMixin, BaseClass):
     """Base class for creating abstract representations of nanostructure.
 
     Parameters
@@ -42,6 +43,17 @@ class StructureBase(BaseClass):
         if 'element2' in kwargs:
             self.basis[1] = kwargs['element2']
             del kwargs['element2']
+
+        if 'vdw_spacing' in kwargs:
+            vdw_radius = kwargs['vdw_spacing'] / 2
+            del kwargs['vdw_spacing']
+        elif 'vdw_radius' in kwargs:
+            vdw_radius = kwargs['vdw_radius']
+            del kwargs['vdw_radius']
+        else:
+            vdw_radius = None
+
+        self.vdw_radius = vdw_radius
 
         if bond is None:
             bond = aCC

@@ -15,8 +15,8 @@ from fractions import gcd
 import numbers
 import numpy as np
 
-from sknano.core.atoms import Atom
-from sknano.core.refdata import CCbond, dVDW, grams_per_Da
+from sknano.core.atoms import Atom, vdw_radius_from_basis
+from sknano.core.refdata import aCC, element_data, grams_per_Da
 from ._extras import get_chiral_indices
 
 __all__ = ['compute_d', 'compute_dR', 'compute_N', 'compute_t1', 'compute_t2',
@@ -30,6 +30,8 @@ __all__ = ['compute_d', 'compute_dR', 'compute_N', 'compute_t1', 'compute_t2',
            'compute_bundle_density', 'compute_symmetry_chiral_angle',
            'compute_tube_diameter', 'compute_tube_radius',
            'compute_tube_length', 'compute_tube_mass']
+
+_r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
 
 def compute_d(*Ch):
@@ -231,7 +233,7 @@ def compute_Ch(*Ch, bond=None, **kwargs):
     if not (isinstance(m, numbers.Real) or m >= 0):
         raise TypeError('Expected an integer')
     if bond is None:
-        bond = CCbond
+        bond = aCC
 
     return bond * np.sqrt(3 * (n**2 + m**2 + n * m))
 
@@ -317,7 +319,7 @@ def compute_T(*Ch, bond=None, length=True, **kwargs):
 
     if length:
         if bond is None:
-            bond = CCbond
+            bond = aCC
 
         Ch = compute_Ch(n, m, bond=bond)
         dR = compute_dR(n, m)
@@ -503,7 +505,7 @@ def compute_R(*Ch, bond=None, length=False, **kwargs):
 
     if length:
         if bond is None:
-            bond = CCbond
+            bond = aCC
 
         return bond * np.sqrt(3 * (p**2 + q**2 + p * q))
     else:
@@ -926,7 +928,7 @@ def compute_linear_mass_density(*Ch, bond=None, element1=None, element2=None,
         return 0
 
 
-def compute_bundle_density(*Ch, d_vdw=None, bond=None,
+def compute_bundle_density(*Ch, r_vdw=None, bond=None,
                            element1=None, element2=None):
     """Compute nanotube bundle mass density \
     :math:`\\rho_{\\mathrm{bundle}}(n, m)` in :math:`\\mathrm{g/cm^3}`.
@@ -944,8 +946,8 @@ def compute_bundle_density(*Ch, d_vdw=None, bond=None,
         Either a 2-tuple of ints or 2 integers giving the chiral indices
         of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-    d_vdw : int
-        van der Waals distance between nearest-neighbor tubes
+    r_vdw : int
+        van der Waals radius of nanotube atoms
     bond : float, optional
         Bond length.
 
@@ -959,27 +961,22 @@ def compute_bundle_density(*Ch, d_vdw=None, bond=None,
     n, m, _ = get_chiral_indices(*Ch)
 
     if bond is None:
-        bond = CCbond
-
-    if d_vdw is None:
-        if n == m:
-            d_vdw = 3.38
-        elif (m == 0) or (n == 0):
-            d_vdw = 3.41
-        else:
-            d_vdw = 3.39
+        bond = aCC
 
     if element1 is None:
         element1 = 'C'
     if element2 is None:
         element2 = 'C'
 
+    if r_vdw is None:
+        r_vdw = vdw_radius_from_basis(element1, element2)
+
     if element1 == element2:
         bundle_density = 8 * np.pi**2 * Atom(element1).m * \
             np.sqrt(n**2 + m**2 + n*m) / \
             (9 * np.sqrt(3) * bond**3 *
                 (np.sqrt(n**2 + m**2 + n*m) +
-                    np.pi * d_vdw / (np.sqrt(3) * bond))**2)
+                    2 * np.pi * r_vdw / (np.sqrt(3) * bond))**2)
     else:
         bundle_density = 0
 
@@ -988,12 +985,12 @@ def compute_bundle_density(*Ch, d_vdw=None, bond=None,
     return bundle_density
 
 
-def compute_Lx(*Ch, nx=1, bond=None, gutter=dVDW):
-    return nx * (compute_dt(*Ch, bond=bond) + gutter) / 10
+def compute_Lx(*Ch, nx=1, bond=None, gutter=_r_CC_vdw):
+    return nx * (compute_dt(*Ch, bond=bond) + 2 * gutter) / 10
 
 
-def compute_Ly(*Ch, ny=1, bond=None, gutter=dVDW):
-    return ny * (compute_dt(*Ch, bond=bond) + gutter) / 10
+def compute_Ly(*Ch, ny=1, bond=None, gutter=_r_CC_vdw):
+    return ny * (compute_dt(*Ch, bond=bond) + 2 * gutter) / 10
 
 
 def compute_Lz(*Ch, nz=1, bond=None, **kwargs):

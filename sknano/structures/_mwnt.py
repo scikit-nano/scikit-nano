@@ -14,11 +14,13 @@ __docformat__ = 'restructuredtext en'
 # import numpy as np
 
 from sknano.core.crystallography import Crystal3DLattice, UnitCell
-from sknano.core.refdata import aCC, dVDW
+from sknano.core.refdata import aCC, element_data
 
 from ._base import StructureBase
 from ._compute_funcs import compute_dt, compute_T
 from ._mixins import MWNTMixin
+
+_r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
 __all__ = ['MWNT']
 
@@ -75,7 +77,7 @@ class MWNT(MWNTMixin, StructureBase):
     """
     def __init__(self, Ch_list=None, Nwalls=None, Lz=None,
                  min_wall_diameter=None, max_wall_diameter=None,
-                 max_walls=None, chiral_types=None, wall_spacing=dVDW,
+                 max_walls=None, chiral_types=None, wall_spacing=2 * _r_CC_vdw,
                  basis=['C', 'C'], bond=aCC, **kwargs):
         if Ch_list is None and 'Ch' in kwargs:
             Ch_list = kwargs['Ch']
@@ -101,7 +103,7 @@ class MWNT(MWNTMixin, StructureBase):
             Lz = 1.0
         self.Lz = Lz
 
-        a = compute_dt(self.Ch_list[-1], bond=bond) + dVDW
+        a = compute_dt(self.Ch_list[-1], bond=bond) + 2 * self.vdw_radius
         c = compute_T(self.Ch_list[-1], bond=bond, length=True)
 
         self.unit_cell = UnitCell(lattice=Crystal3DLattice.hexagonal(a, c),

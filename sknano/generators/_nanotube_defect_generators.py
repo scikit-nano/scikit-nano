@@ -56,8 +56,6 @@ class NanotubeStoneWalesDefectGenerator(StoneWalesDefectGenerator):
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
-    vdw_spacing : float, optional
-        van der Waals distance between nearest neighbor tubes
     bundle_packing : {None, 'hexagonal', 'cubic'}, optional
         close packing arrangement of bundles
     bundle_geometry : {None, 'triangle', 'hexagon', 'square', 'rectangle',
@@ -119,7 +117,7 @@ class NanotubeStoneWalesDefectGenerator(StoneWalesDefectGenerator):
 
     """
     def __init__(self, n=None, m=None, nx=1, ny=1, nz=1,
-                 element1='C', element2='C', bond=CCbond, vdw_spacing=3.4,
+                 element1='C', element2='C', bond=CCbond,
                  bundle_packing=None, bundle_geometry=None,
                  Lx=None, Ly=None, Lz=None, fix_Lz=False,
                  rotate_structure=False, rotation_angle=None,
@@ -133,7 +131,7 @@ class NanotubeStoneWalesDefectGenerator(StoneWalesDefectGenerator):
         if fname is None and isinstance(n, int) and isinstance(m, int):
             generator = NanotubeBundleGenerator(
                 n=n, m=m, nx=nx, ny=ny, nz=nz, element1=element1,
-                element2=element2, bond=bond, vdw_spacing=vdw_spacing,
+                element2=element2, bond=bond,
                 bundle_packing=bundle_packing, bundle_geometry=bundle_geometry,
                 Lx=Lx, Ly=Ly, Lz=Lz, fix_Lz=fix_Lz, verbose=verbose)
             generator.save(structure_format='data', **kwargs)
@@ -217,8 +215,6 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
-    vdw_spacing : float, optional
-        van der Waals distance between nearest neighbor tubes
     bundle_packing : {None, 'hexagonal', 'cubic'}, optional
         close packing arrangement of bundles
     bundle_geometry : {None, 'triangle', 'hexagon', 'square', 'rectangle',
@@ -296,7 +292,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
 
     """
     def __init__(self, n=None, m=None, nx=1, ny=1, nz=1,
-                 element1='C', element2='C', bond=CCbond, vdw_spacing=3.4,
+                 element1='C', element2='C', bond=CCbond,
                  bundle_packing=None, bundle_geometry=None,
                  Lx=None, Ly=None, Lz=None, fix_Lz=False,
                  rotate_structure=False, rotation_angle=None,
@@ -312,7 +308,6 @@ class NanotubeVacancyGenerator(VacancyGenerator):
                                            element1=element1,
                                            element2=element2,
                                            bond=bond,
-                                           vdw_spacing=vdw_spacing,
                                            bundle_packing=bundle_packing,
                                            bundle_geometry=bundle_geometry,
                                            Lx=Lx, Ly=Ly, Lz=Lz,

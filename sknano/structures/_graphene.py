@@ -19,7 +19,7 @@ import numpy as np
 # from sknano.core.atoms import Atom
 from sknano.core.crystallography import Crystal2DLattice, UnitCell
 from sknano.core.math import Vector
-from sknano.core.refdata import aCC, dVDW  # , grams_per_Da
+from sknano.core.refdata import aCC, element_data  # , grams_per_Da
 from ._base import StructureBase
 from ._mixins import GrapheneMixin
 
@@ -28,6 +28,8 @@ __all__ = ['GraphenePrimitiveCell', 'GrapheneConventionalCell', 'Graphene',
            'HexagonalCellGraphene', 'ConventionalCellGraphene',
            'RectangularGraphene', 'RectangularCellGraphene',
            'GrapheneNanoribbon']
+
+_r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
 
 class GraphenePrimitiveCell(UnitCell):
@@ -106,7 +108,7 @@ class GrapheneBase(GrapheneMixin, StructureBase):
     """
 
     def __init__(self, basis=['C', 'C'], bond=aCC, nlayers=1,
-                 layer_spacing=dVDW, layer_rotation_angles=None,
+                 layer_spacing=2 * _r_CC_vdw, layer_rotation_angles=None,
                  layer_rotation_increment=None, stacking_order='AB',
                  degrees=True, **kwargs):
 

@@ -7,11 +7,10 @@ import nose
 from nose.tools import *
 import numpy as np
 
-from sknano.core.crystallography import CrystalLattice, ReciprocalLattice, \
-    CrystalStructure
-from sknano.core.atoms import Atom, Atoms, XAtom, XAtoms
-from sknano.core.math import Point, rotation_matrix, transformation_matrix
-from sknano.core.refdata import aCC, dVDW
+from sknano.core.crystallography import CrystalLattice, ReciprocalLattice
+# from sknano.core.atoms import Atom, Atoms, XAtom, XAtoms
+from sknano.core.math import Point, transformation_matrix
+from sknano.core.refdata import aCC, element_data
 
 
 def test1():
@@ -27,7 +26,8 @@ def test1():
 
 def test2():
     a = np.sqrt(3) * aCC
-    latt = CrystalLattice(a=a, b=a, c=dVDW, alpha=90, beta=90, gamma=120)
+    latt = CrystalLattice(a=a, b=a, c=2*element_data['C']['VanDerWaalsRadius'],
+                          alpha=90, beta=90, gamma=120)
     print(latt)
     a1 = latt.a1
     a2 = latt.a2
@@ -51,16 +51,19 @@ def test2():
 
 def test3():
     a = np.sqrt(3) * aCC
-    latt = CrystalLattice(a=a, b=a, c=dVDW, alpha=90, beta=90, gamma=120)
+    latt = CrystalLattice(a=a, b=a, c=2*element_data['C']['VanDerWaalsRadius'],
+                          alpha=90, beta=90, gamma=120)
     print(latt)
-    hex_latt = CrystalLattice.hexagonal(a, dVDW)
+    hex_latt = \
+        CrystalLattice.hexagonal(a, 2 * element_data['C']['VanDerWaalsRadius'])
     print(hex_latt)
     assert_equal(latt, hex_latt)
 
 
 def test4():
     a = np.sqrt(3) * aCC
-    latt = CrystalLattice(a=a, b=a, c=dVDW, alpha=90, beta=90, gamma=120)
+    latt = CrystalLattice(a=a, b=a, c=2*element_data['C']['VanDerWaalsRadius'],
+                          alpha=90, beta=90, gamma=120)
     print(latt)
     recip_latt = \
         ReciprocalLattice(a_star=latt.reciprocal_lattice.a_star,

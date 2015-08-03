@@ -16,8 +16,9 @@ import numbers
 import numpy as np
 
 import sknano.structures
+from sknano.core.atoms import vdw_radius_from_basis
 from sknano.core.math import Vector
-from sknano.core.refdata import dVDW
+from sknano.core.refdata import element_data
 from ._compute_funcs import compute_N, compute_Ch, compute_chiral_angle, \
     compute_T, compute_M, compute_R, compute_Natoms_per_unit_cell, \
     compute_Natoms, compute_d, compute_dR, compute_dt, compute_rt, \
@@ -26,8 +27,26 @@ from ._compute_funcs import compute_N, compute_Ch, compute_chiral_angle, \
     compute_tube_mass
 from ._extras import get_chiral_type, generate_Ch_list
 
-__all__ = ['GrapheneMixin', 'MWNTMixin', 'NanotubeMixin', 'SWNTMixin',
-           'NanotubeBundleMixin', 'UnrolledSWNTMixin']
+__all__ = ['BasisMixin', 'GrapheneMixin', 'MWNTMixin', 'NanotubeMixin',
+           'SWNTMixin', 'NanotubeBundleMixin', 'UnrolledSWNTMixin']
+
+
+class BasisMixin:
+    """Mixin class for structure atoms basis."""
+    @property
+    def vdw_radius(self):
+        if self._vdw_radius is not None:
+            return self._vdw_radius
+        else:
+            return vdw_radius_from_basis(self.basis[0], self.basis[1])
+
+    @vdw_radius.setter
+    def vdw_radius(self, value):
+        self._vdw_radius = value
+
+    @property
+    def vdw_distance(self):
+        return 2 * self.vdw_radius
 
 
 class GrapheneMixin:
@@ -281,6 +300,12 @@ class SWNTMixin:
         if self._integral_nz:
             self._nz = int(np.ceil(value))
 
+    def _update_nz(self):
+        try:
+            self.nz = self.nz
+        except AttributeError:
+            pass
+
     @property
     def electronic_type(self):
         """SWNT electronic type.
@@ -341,6 +366,16 @@ class SWNTMixin:
             raise TypeError('Expected `True` or `False`')
         self._fix_Lz = value
         self._integral_nz = False if self.fix_Lz else True
+        self._update_nz()
+        self._update_fmtstr()
+
+    def _update_fmtstr(self):
+        if self.fix_Lz:
+            self.fmtstr = self.fmtstr.replace("nz={nz!r}",
+                                              "Lz={Lz!r}, fix_Lz=True")
+        else:
+            self.fmtstr = self.fmtstr.replace("Lz={Lz!r}, fix_Lz=True",
+                                              "nz={nz!r}")
 
     @property
     def Natoms(self):
@@ -638,7 +673,7 @@ class MWNTMixin:
             min_wall_diameter = 5.0
 
         if wall_spacing is None:
-            wall_spacing = dVDW
+            wall_spacing = 2 * element_data['C']['VanDerWaalsRadius']
 
         delta_dt = 2 * wall_spacing
 
@@ -728,11 +763,11 @@ class NanotubeBundleMixin:
 
     @property
     def Lx(self):
-        return self.nx * (self.dt + self.vdw_spacing) / 10
+        return self.nx * (self.dt + 2 * self.vdw_radius) / 10
 
     @property
     def Ly(self):
-        return self.ny * (self.dt + self.vdw_spacing) / 10
+        return self.ny * (self.dt + 2 * self.vdw_radius) / 10
 
     @property
     def bundle_geometry(self):
@@ -807,7 +842,7 @@ class NanotubeBundleMixin:
         self.r2 = Vector()
         self.bundle_coords = []
 
-        self.r1.x = self.dt + self.vdw_spacing
+        self.r1.x = self.dt + 2 * self.vdw_radius
         if self.bundle_packing in ('cubic', 'ccp'):
             self.r2.y = self.r1.x
         else:

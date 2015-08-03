@@ -17,8 +17,9 @@ import numpy as np
 
 from ._atoms import Atoms
 from ._vdW_atom import VanDerWaalsAtom
+from sknano.core.refdata import element_data
 
-__all__ = ['VanDerWaalsAtom']
+__all__ = ['VanDerWaalsAtom', 'vdw_radius_from_basis']
 
 
 class VanDerWaalsAtoms(Atoms):
@@ -44,3 +45,22 @@ class VanDerWaalsAtoms(Atoms):
     def r_vdw(self):
         """Return array of `VanDerWaalsAtom` van der Waals radii."""
         return np.asarray([atom.r_vdw for atom in self])
+
+
+def vdw_radius_from_basis(*args):
+    r_vdw = 0
+    for atom in args:
+        try:
+            element = atom.element
+        except AttributeError:
+            element = atom
+
+        try:
+            r_vdw = max(r_vdw, element_data[element]['VanDerWaalsRadius'])
+        except TypeError:
+            try:
+                r_vdw = max(r_vdw, element_data[element]['AtomicRadius'])
+            except TypeError:
+                pass
+
+    return r_vdw

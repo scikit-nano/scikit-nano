@@ -11,10 +11,12 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from sknano.core.refdata import aCC, dVDW
+from sknano.core.refdata import aCC, element_data
 from sknano.structures import compute_Lx, compute_Ly, compute_Lz, \
     compute_Ch, compute_T, SWNT, SWNTBundle, MWNT, MWNTBundle, Graphene, \
     UnrolledSWNT, Fullerenes
+
+_r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
 __all__ = ['NanoGenModel', 'SWNTModel', 'MWNTModel',
            'GrapheneModel', 'FullereneModel',
@@ -113,7 +115,7 @@ class SWNTModelMixin:
 
     @property
     def Lz(self):
-        return compute_Lz(self.Ch, nz=self.nz, bond=self.bond, gutter=dVDW)
+        return compute_Lz(self.Ch, nz=self.nz, bond=self.bond)
 
     @Lz.setter
     def Lz(self, value):
@@ -161,11 +163,13 @@ class MWNTModelMixin:
 class BundleModelMixin:
     @property
     def Lx(self):
-        return compute_Lx(self.Ch, nx=self.nx, bond=self.bond, gutter=dVDW)
+        return compute_Lx(self.Ch, nx=self.nx, bond=self.bond,
+                          gutter=_r_CC_vdw)
 
     @property
     def Ly(self):
-        return compute_Ly(self.Ch, ny=self.ny, bond=self.bond, gutter=dVDW)
+        return compute_Ly(self.Ch, ny=self.ny, bond=self.bond,
+                          gutter=_r_CC_vdw)
 
     @property
     def nx(self):
@@ -206,7 +210,7 @@ class MWNTModel(GeneratorModelBase, MWNTModelMixin, BundleModelMixin):
         super().__init__()
         self.structure = \
             MWNTBundle(Ch_list=None, Nwalls=3, min_wall_diameter=5,
-                       max_wall_diameter=100, wall_spacing=dVDW,
+                       max_wall_diameter=100, wall_spacing=2 * _r_CC_vdw,
                        basis=self.basis, bond=self.bond, nx=1, ny=1, Lz=1,
                        bundle_packing='hcp')
 

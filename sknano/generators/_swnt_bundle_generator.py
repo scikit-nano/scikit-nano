@@ -49,8 +49,8 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
-    vdw_spacing : float, optional
-        van der Waals distance between nearest neighbor tubes
+    vdw_radius : float, optional
+        van der Waals radius of nanotube atoms
 
         .. versionadded:: 0.2.5
 

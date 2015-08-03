@@ -18,12 +18,14 @@ import numpy as np
 from sknano.core.atoms import BasisAtom as Atom
 from sknano.core.crystallography import Crystal3DLattice, UnitCell
 from sknano.core.math import Vector
-from sknano.core.refdata import aCC, dVDW
+from sknano.core.refdata import aCC, element_data
 
 from ._base import StructureBase
 from ._compute_funcs import compute_dt, compute_T
 from ._extras import get_chiral_indices
 from ._mixins import NanotubeMixin, UnrolledSWNTMixin
+
+_r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
 __all__ = ['UnrolledSWNT']
 
@@ -102,7 +104,8 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
     """
 
     def __init__(self, *Ch, nx=1, nz=1, basis=['C', 'C'], bond=aCC,
-                 nlayers=1, layer_spacing=dVDW, layer_rotation_angles=None,
+                 nlayers=1, layer_spacing=2*_r_CC_vdw,
+                 layer_rotation_angles=None,
                  layer_rotation_increment=None, degrees=True,
                  stacking_order='AB', Lx=None, fix_Lx=False,
                  Lz=None, fix_Lz=False, **kwargs):
@@ -111,7 +114,7 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
 
         super().__init__(basis=basis, bond=bond, **kwargs)
 
-        a = compute_dt(n, m, bond=bond) + dVDW
+        a = compute_dt(n, m, bond=bond) + 2 * self.vdw_radius
         c = compute_T(n, m, bond=bond, length=True)
 
         self.unit_cell = UnitCell(lattice=Crystal3DLattice.hexagonal(a, c),

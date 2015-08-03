@@ -96,8 +96,10 @@ import argparse
 import importlib
 import sys
 
-from sknano.core.refdata import CCbond, dVDW
+from sknano.core.refdata import aCC, element_data
 from ._parser import add_default_arguments
+
+_r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
 __all__ = ['nanogen', 'nanogen_parser']
 
@@ -112,7 +114,7 @@ def nanogen_parser():
                         default=['C', 'C'],
                         help='2 element symbols or atomic numbers of the two '
                         'atom basis (default: %(default)s)')
-    parser.add_argument('--bond', type=float, default=CCbond,
+    parser.add_argument('--bond', type=float, default=aCC,
                         help='Bond length between nearest-neighbor atoms. '
                         'Must be in units of Angstroms. '
                         '(default: %(default)s)')
@@ -126,7 +128,8 @@ def nanogen_parser():
 
     graphene_parent_parser = argparse.ArgumentParser(add_help=False)
     graphene_parent_parser.add_argument('--layer-spacing', type=float,
-                                        default=dVDW, help='distance between '
+                                        default=2*_r_CC_vdw,
+                                        help='distance between '
                                         'graphene layers in **Angstroms**. '
                                         '(default: %(default)s)')
     graphene_parent_parser.add_argument('--layer-rotation-increment',
@@ -264,9 +267,10 @@ def nanogen_parser():
     bundle_parent_parser.add_argument('--ny', type=int, default=1,
                                       help='Number of repeat unit cells '
                                       'along `y` axis (default: %(default)s)')
-    bundle_parent_parser.add_argument('--vdw-spacing', type=float,
-                                      default=dVDW, help='van der Waals '
-                                      'distance between nanotubes '
+    bundle_parent_parser.add_argument('--vdw-radius', type=float,
+                                      default=_r_CC_vdw,
+                                      help='van der Waals '
+                                      'radius of nanotube atoms '
                                       '(default: %(default)s)')
 
     swnt_bundle_parser = \

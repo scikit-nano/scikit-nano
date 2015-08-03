@@ -85,7 +85,7 @@ class SWNTBundle(NanotubeBundleBase, SWNT):
     ...                          bundle_packing='hcp')
     >>> print(swnt_bundle)
     SWNTBundle((10, 10), nx=5, ny=3, nz=10, basis=['C', 'C'], bond=1.42,
-    vdw_spacing=3.35, bundle_packing='hcp', bundle_geometry=None)
+    bundle_packing='hcp', bundle_geometry=None)
 
     """
     def __init__(self, *args, **kwargs):
@@ -99,11 +99,10 @@ class SWNTBundle(NanotubeBundleBase, SWNT):
             fmtstr += "nz={nz!r}, "
 
         self.fmtstr = fmtstr + "basis={basis!r}, bond={bond!r}, " + \
-            "vdw_spacing={vdw_spacing!r}, " + \
             "bundle_packing={bundle_packing!r}, " + \
             "bundle_geometry={bundle_geometry!r}"
 
     @property
     def bundle_density(self):
-        return compute_bundle_density(self.n, self.m, d_vdw=self.vdw_spacing,
+        return compute_bundle_density(self.n, self.m, r_vdw=self.vdw_radius,
                                       bond=self.bond, basis=self.basis)

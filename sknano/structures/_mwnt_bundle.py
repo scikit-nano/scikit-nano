@@ -47,8 +47,8 @@ class MWNTBundle(NanotubeBundleBase, MWNT):
         Angstroms.
     nx, ny : int, optional
         Number of repeat unit cells in the :math:`x, y` dimensions.
-    vdw_spacing : float, optional
-        van der Waals distance between nearest neighbor tubes
+    vdw_radius : float, optional
+        van der Waals radius of nanotube atoms
     bundle_packing : {'hcp', 'ccp'}, optional
         Packing arrangement of MWNT bundles.  If `bundle_packing` is `None`,
         then it will be determined by the `bundle_geometry` parameter if

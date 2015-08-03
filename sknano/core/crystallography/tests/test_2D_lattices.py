@@ -8,9 +8,8 @@ from nose.tools import *
 import numpy as np
 
 from sknano.core.crystallography import Crystal2DLattice, Reciprocal2DLattice
-from sknano.core.atoms import Atom, Atoms, XAtom, XAtoms
-from sknano.core.math import Point, transformation_matrix
-from sknano.core.refdata import aCC, dVDW
+from sknano.core.math import transformation_matrix
+from sknano.core.refdata import aCC
 
 
 def test1():

@@ -15,7 +15,7 @@ import numpy as np
 
 from sknano.core.atoms import BasisAtom as Atom
 from sknano.core.crystallography import Crystal3DLattice, UnitCell
-from sknano.core.refdata import aCC, dVDW
+from sknano.core.refdata import aCC
 from ._base import StructureBase
 from ._compute_funcs import compute_dt, compute_T
 from ._extras import attr_strfmt, attr_symbols, attr_units, get_chiral_indices
@@ -159,7 +159,7 @@ class SWNT(SWNTMixin, StructureBase):
 
         super().__init__(basis=basis, bond=bond, **kwargs)
 
-        a = compute_dt(n, m, bond=bond) + dVDW
+        a = compute_dt(n, m, bond=bond) + 2 * self.vdw_radius
         c = compute_T(n, m, bond=bond, length=True)
         self.unit_cell = UnitCell(lattice=Crystal3DLattice.hexagonal(a, c),
                                   basis=self.basis)
@@ -184,7 +184,6 @@ class SWNT(SWNTMixin, StructureBase):
             fmtstr += "Lz={Lz!r}, fix_Lz=True, "
         else:
             fmtstr += "nz={nz!r}, "
-
         self.fmtstr = fmtstr + "basis={basis!r}, bond={bond!r}"
 
     def __str__(self):
