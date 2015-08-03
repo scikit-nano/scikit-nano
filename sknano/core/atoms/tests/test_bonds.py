@@ -9,6 +9,7 @@ from pkg_resources import resource_filename
 import numpy as np
 from sknano.generators import SWNTGenerator
 from sknano.io import DATAReader
+from sknano.core.math import Vector
 
 
 def test1():
@@ -47,6 +48,24 @@ def test3():
     print(atom0bonds.atoms.CM)
     print('atoms.bonds.Nbonds: {}'.format(atoms.bonds.Nbonds))
     print('atoms.bonds.atoms.Natoms: {}'.format(atoms.bonds.atoms.Natoms))
+
+
+def test4():
+    atoms = SWNTGenerator(10, 5, nz=2).atoms
+    atoms.assign_unique_ids()
+    atoms.update_attrs()
+    atoms.center_centroid()
+    print(atoms.centroid)
+    bond = atoms.get_atom(atoms.Natoms // 2).bonds[0]
+    print(bond)
+    print('bond.atoms.coords:\n{}'.format(bond.atoms.coords))
+    bond_centroid = bond.centroid
+    print('bond.centroid: {}'.format(bond.centroid))
+    rot_axis = Vector(p0=[0, 0, bond_centroid.z], p=bond_centroid.p)
+    bond.rotate(angle=np.pi/2, axis=rot_axis)
+    print(bond)
+    print('bond.atoms.coords:\n{}'.format(bond.atoms.coords))
+    assert_true(np.allclose(bond_centroid, bond.centroid))
 
 
 if __name__ == '__main__':
