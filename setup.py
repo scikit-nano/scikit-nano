@@ -2,17 +2,8 @@
 # -*- coding: utf-8 -*-
 """Python toolkit for generating and analyzing nanostructure data"""
 
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-from __future__ import absolute_import
-import builtins
-from builtins import dict
-from builtins import open
-from builtins import map
-from builtins import str
-from future import standard_library
-standard_library.install_aliases()
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 
 __docformat__ = 'restructuredtext en'
 
@@ -47,6 +38,11 @@ if sys.version_info[0] < 3:
 if (3, 0) <= sys.version_info[:2] < (3, 4):
     raise RuntimeError("Python 3.4+ required.")
 
+if sys.version_info[0] >= 3:
+    import builtins
+else:
+    import __builtin__ as builtins
+
 try:
     import setuptools
 except ImportError:
@@ -62,7 +58,9 @@ MAINTAINER = AUTHOR
 MAINTAINER_EMAIL = AUTHOR_EMAIL
 URL = 'http://scikit-nano.org/doc'
 DOWNLOAD_URL = 'http://github.com/androomerrill/scikit-nano'
-KEYWORDS = 'nano nano-structures nanostructures nanotubes graphene LAMMPS XYZ'
+KEYWORDS = ['nano', 'nanoscience', 'nano-structure', 'nanostructure',
+            'nanotube', 'graphene', 'LAMMPS', 'XYZ', 'structure',
+            'analysis']
 LICENSE = 'BSD 2-Clause'
 CLASSIFIERS = """\
 Development Status :: 4 - Beta
@@ -174,8 +172,8 @@ def get_version_info():
         GIT_REVISION = "Unknown"
 
     if not ISRELEASED:
-        FULLVERSION += '.dev'
-    #    FULLVERSION += '.dev-' + GIT_REVISION[:7]
+        # FULLVERSION += '.dev'
+        FULLVERSION += '.dev0+' + GIT_REVISION[:7]
 
     return FULLVERSION, GIT_REVISION
 
@@ -248,11 +246,11 @@ def setup_package():
     except (AttributeError, ImportError, RuntimeError):
         install_requires += ['scipy==0.15.0']
 
-    # Add six module to install_requires (used in numpydoc git submodule)
-    install_requires += ['six>=1.9']
+    # # Add six module to install_requires (used in numpydoc git submodule)
+    # install_requires += ['six>=1.9']
 
-    # Add future module to install requires
-    install_requires += ['future>=0.14.3']
+    # # Add future module to install requires
+    # install_requires += ['future>=0.14.3']
 
     metadata = dict(
         name=DISTNAME,
@@ -270,6 +268,9 @@ def setup_package():
         platforms=["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
         test_suite='nose.collector',
         install_requires=install_requires,
+        extras_require={
+            'plotting': ['matplotlib>=1.4.3', 'palettable>=2.1.1']
+        },
         entry_points={
             'console_scripts': [
                 'analyze_structure = sknano.scripts.analyze_structure:main',
