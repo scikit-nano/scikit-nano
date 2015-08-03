@@ -258,10 +258,10 @@ def reflection_matrix(v):
 
     Rmat = np.zeros((v.nd, v.nd))
     for i in range(v.nd):
-        Rmat[i, i] = 1 - 2 * v[i]**2 / v.norm**2
+        Rmat[i, i] = 1 - 2 * v[i] ** 2 / v.norm ** 2
 
     for i, j in combinations(list(range(v.nd)), 2):
-        Rmat[i, j] = Rmat[j, i] = -2 * v[i] * v[j] / v.norm**2
+        Rmat[i, j] = Rmat[j, i] = -2 * v[i] * v[j] / v.norm ** 2
 
     Rmat[np.where(np.abs(Rmat) <= np.finfo(float).eps)] = 0.0
     return Rmat
@@ -316,7 +316,7 @@ def rotation_matrix(angle=None, axis=None, anchor_point=None,
                                  rot_point=rot_point, from_vector=from_vector,
                                  to_vector=to_vector, degrees=degrees,
                                  verbose=verbose, **kwargs)
-    return Rmat[:-1,:-1]
+    return Rmat[:-1, :-1]
 
 
 def scaling_matrix(s=None, v=None):
@@ -345,10 +345,11 @@ def scaling_matrix(s=None, v=None):
 
         Smat = np.zeros((v.nd + 1, v.nd + 1))
         for i in range(v.nd):
-            Smat[i, i] = 1 + (s - 1) * v[i]**2 / v.norm**2
+            Smat[i, i] = 1 + (s - 1) * v[i] ** 2 / v.norm ** 2
 
         for i, j in combinations(list(range(v.nd)), 2):
-            Smat[i, j] = Smat[j, i] = (s - 1) * v[i]**2 * v[j]**2 / v.norm**2
+            Smat[i, j] = Smat[j, i] = \
+                (s - 1) * v[i] ** 2 * v[j] ** 2 / v.norm ** 2
 
         Smat[np.where(np.abs(Smat) <= np.finfo(float).eps)] = 0.0
         return Smat
@@ -464,7 +465,7 @@ def transformation_matrix(angle=None, axis=None, anchor_point=None,
                              'dimensions.')
         angle = vector.angle(from_vector, to_vector)
         if from_vector.nd == 2:
-            if not np.allclose(Vector(np.dot(Rz(angle)[:2,:2], from_vector)),
+            if not np.allclose(Vector(np.dot(Rz(angle)[:2, :2], from_vector)),
                                to_vector):
                 angle = -angle
 
@@ -498,7 +499,7 @@ def transformation_matrix(angle=None, axis=None, anchor_point=None,
             if not np.allclose(p, np.zeros(2)):
                 for i in range(2):
                     j, = list(set(range(2)) - {i})
-                    Tmat[i, 2] = p[i] - p[i] * cosa + (-1)**i * p[j] * sina
+                    Tmat[i, 2] = p[i] - p[i] * cosa + (-1) ** i * p[j] * sina
 
         else:
             # Handle 3D rotation about origin
@@ -519,6 +520,9 @@ def transformation_matrix(angle=None, axis=None, anchor_point=None,
             if anchor_point is None and rot_point is not None:
                 anchor_point = rot_point
 
+            if anchor_point is None and isinstance(axis, Vector):
+                anchor_point = axis.p0
+
             if anchor_point is not None and \
                     isinstance(anchor_point, (list, np.ndarray)) and \
                     len(anchor_point) == 3:
@@ -531,25 +535,25 @@ def transformation_matrix(angle=None, axis=None, anchor_point=None,
             Tmat = np.zeros((4, 4))
 
             if np.allclose(v, I[:3, 0]):
-                Tmat[:3,:3] = Rx(angle)
+                Tmat[:3, :3] = Rx(angle)
             elif np.allclose(v, I[:3, 1]):
-                Tmat[:3,:3] = Ry(angle)
+                Tmat[:3, :3] = Ry(angle)
             elif np.allclose(v, I[:3, 2]):
-                Tmat[:3,:3] = Rz(angle)
+                Tmat[:3, :3] = Rz(angle)
             else:
                 for i in range(3):
-                    Tmat[i, i] = (v[i]**2 +
-                                  (v[(i + 1) % 3]**2 +
-                                   v[(i + 2) % 3]**2) * cosa) / v.norm**2
+                    Tmat[i, i] = (v[i] ** 2 +
+                                  (v[(i + 1) % 3] ** 2 +
+                                   v[(i + 2) % 3] ** 2) * cosa) / v.norm ** 2
 
                 for i, j in combinations(list(range(3)), 2):
                     k = list(set(range(3)) - {i, j})[0]
                     Tmat[i, j] = \
                         (v[i] * v[j] * (1 - cosa) +
-                         (-1)**(i + j) * v[k] * v.norm * sina) / v.norm**2
+                         (-1) ** (i + j) * v[k] * v.norm * sina) / v.norm ** 2
                     Tmat[j, i] = \
                         (v[i] * v[j] * (1 - cosa) -
-                         (-1)**(i + j) * v[k] * v.norm * sina) / v.norm**2
+                         (-1) ** (i + j) * v[k] * v.norm * sina) / v.norm ** 2
 
             if not np.allclose(v.p0, np.zeros(3)):
 
@@ -557,11 +561,11 @@ def transformation_matrix(angle=None, axis=None, anchor_point=None,
 
                 for i in range(3):
                     j, k = list(set(range(3)) - {i})
-                    Tmat[i, 3] = ((p[i] * (v[j]**2 + v[k]**2) -
+                    Tmat[i, 3] = ((p[i] * (v[j] ** 2 + v[k] ** 2) -
                                    v[i] * (p[j] * v[j] + p[k] * v[k])) *
-                                  (1 - cosa) + (-1)**i *
+                                  (1 - cosa) + (-1) ** i *
                                   (p[j] * v[k] - p[k] * v[j]) *
-                                  v.norm * sina) / v.norm**2
+                                  v.norm * sina) / v.norm ** 2
 
             Tmat[3, 3] = 1.0
 
