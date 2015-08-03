@@ -13,7 +13,7 @@ __docformat__ = 'restructuredtext en'
 
 from functools import total_ordering
 
-import numpy as np
+# import numpy as np
 
 from sknano.core import BaseClass
 from sknano.core.math import Vector
@@ -34,8 +34,8 @@ class Bond(BaseClass):
     """
     def __init__(self, atom1, atom2):
         super().__init__()
-        self.atoms = sknano.core.atoms.StructureAtoms([atom1, atom2])
-        self.vector = Vector(atom2.r - atom1.r, p0=atom1.r.p)
+        self.atoms = sknano.core.atoms.StructureAtoms()
+        self.atoms.extend([atom1, atom2])
         self.fmtstr = "{atom1!r}, {atom2!r}"
 
     def __str__(self):
@@ -71,6 +71,12 @@ class Bond(BaseClass):
         return self.atoms[1]
 
     @property
+    def centroid(self):
+        """:attr:`~sknano.core.atoms.XYZAtoms.centroid` of :class:`Bond` \
+            :attr:`~Bond.atoms`."""
+        return self.atoms.centroid
+
+    @property
     def vector(self):
         """`Bond` :class:`~sknano.core.math.Vector`.
 
@@ -78,14 +84,14 @@ class Bond(BaseClass):
         :attr:`Bond.atom1` to :attr:`Bond.atom2`.
 
         """
-        return self._vector
+        return Vector(self.atom2.r - self.atom1.r, p0=self.atom1.r.p)
 
-    @vector.setter
-    def vector(self, value):
-        """Set `Bond` :class:`~sknano.core.math.Vector`."""
-        if not isinstance(value, (list, np.ndarray)):
-            raise TypeError('Expected an `array_like` object')
-        self._vector = Vector(value)
+    # @vector.setter
+    # def vector(self, value):
+    #     """Set `Bond` :class:`~sknano.core.math.Vector`."""
+    #     if not isinstance(value, (list, np.ndarray)):
+    #         raise TypeError('Expected an `array_like` object')
+    #     self._vector = Vector(value)
 
     @property
     def unit_vector(self):
@@ -96,6 +102,10 @@ class Bond(BaseClass):
     def length(self):
         """`Bond` :attr:`~sknano.core.math.Vector.length`."""
         return self.vector.length
+
+    def rotate(self, **kwargs):
+        """Rotate the bond by rotating the :attr:`~Bond.atoms`."""
+        [atom.rotate(fix_anchor_point=True, **kwargs) for atom in self.atoms]
 
     def todict(self):
         return dict(atom1=self.atom1, atom2=self.atom2)
