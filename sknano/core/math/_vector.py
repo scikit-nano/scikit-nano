@@ -547,12 +547,17 @@ class Vector(np.ndarray):
         Parameters
         ----------
         angle : float
+            Rotation angle in radians, unless `degrees` is `True`.
         axis : :class:`~sknano.core.math.Vector`, optional
         anchor_point : :class:`~sknano.core.math.Point`, optional
         rot_point : :class:`~sknano.core.math.Point`, optional
         from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
-        degrees : bool, optional
+        degrees : :class:`~python:bool`, optional
+            If `True`, you are saying that the `angle` is in degrees.
         transform_matrix : :class:`~numpy:numpy.ndarray`
+        fix_anchor_point : :class:`~python:bool`, optional
+            If `True`, leave the *tail* of the vector (:attr:`Vector.p0`)
+            fixed (default: `False`).
 
         See Also
         --------
