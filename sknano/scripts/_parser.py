@@ -11,7 +11,7 @@ __docformat__ = 'restructuredtext en'
 
 import argparse
 
-from sknano.version import release, full_version, git_revision
+from sknano.version import version
 
 __all__ = ['add_default_arguments', 'base_parser']
 
@@ -29,10 +29,6 @@ def add_default_arguments(parser):
     parser : class:`~python:argparse.ArgumentParser`
 
     """
-    version = full_version
-    if not release:
-        version = '-'.join((full_version, git_revision[:7]))
-
     parser.add_argument('--debug', action='store_true', help='debug output')
     parser.add_argument('--verbose', action='store_true',
                         help='verbose output')
