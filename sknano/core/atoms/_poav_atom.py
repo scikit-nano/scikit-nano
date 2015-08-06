@@ -21,8 +21,6 @@ np.seterr(all='warn')
 
 from sknano.core.math import vector as vec
 
-# from ._kdtree_atom import KDTAtom
-
 __all__ = ['POAV', 'POAV1', 'POAV2', 'POAVR', 'POAVAtomMixin']
 
 
@@ -31,8 +29,14 @@ class POAV:
 
     Parameters
     ----------
-    sigma_bonds : `~sknano.core.atoms.Bonds`
-        `~sknano.core.atoms.Bonds` instance.
+    sigma_bonds : :class:`~sknano.core.atoms.Bonds`
+        :class:`~sknano.core.atoms.Bonds` instance.
+
+    Attributes
+    ----------
+    cosa12
+    cosa23
+    cosa31
 
     """
     def __init__(self, sigma_bonds):
@@ -485,7 +489,7 @@ class POAVR(POAV):
 
 
 class POAVAtomMixin:
-    """Mixin class for `POAVAtom`."""
+    """Mixin class for :class:`POAV` analysis."""
     @property
     def POAV1(self):
         """:class:`~sknano.utils.analysis.POAV1` instance."""
