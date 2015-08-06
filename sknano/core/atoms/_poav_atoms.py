@@ -15,13 +15,12 @@ import numpy as np
 
 # from sknano.core import timethis
 from sknano.core.math import vector as vec
-from ._kdtree_atoms import KDTreeAtomsMixin
 from ._poav_atom import POAV1, POAV2, POAVR
 
 __all__ = ['POAVAtomsMixin']
 
 
-class POAVAtomsMixin(KDTreeAtomsMixin):
+class POAVAtomsMixin:
     """Mixin class for POAV analysis."""
 
     # @timethis
