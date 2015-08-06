@@ -51,7 +51,6 @@ class BasisMixin:
 
 class GrapheneMixin:
     """Mixin class for graphene structure classes."""
-
     @property
     def n1(self):
         return int(np.ceil(10 * self.l1 / self.unit_cell.a1.length))
@@ -70,6 +69,7 @@ class GrapheneMixin:
 
     @property
     def area(self):
+        """Total area of graphene supercell."""
         return np.abs(self.r1.cross(self.r2))
 
     @property
@@ -85,14 +85,17 @@ class GrapheneMixin:
 
     @property
     def Natoms(self):
+        """Total number of atoms."""
         return self.nlayers * self.Natoms_per_layer
 
     @property
     def Natoms_per_layer(self):
+        """Number of atoms per layer."""
         return self.N * self.Natoms_per_unit_cell
 
     @property
     def Natoms_per_unit_cell(self):
+        """Number of atoms per unit cell."""
         return self.unit_cell.basis.Natoms
 
 
@@ -224,13 +227,13 @@ class SWNTMixin:
     @property
     def dt(self):
         """Nanotube diameter :math:`d_t = \\frac{|\\mathbf{C}_h|}{\\pi}` \
-        in \u212b."""
+            in \u212b."""
         return compute_dt(self.n, self.m, bond=self.bond)
 
     @property
     def rt(self):
         """Nanotube radius :math:`r_t = \\frac{|\\mathbf{C}_h|}{2\\pi}` \
-        in \u212b."""
+            in \u212b."""
         return compute_rt(self.n, self.m, bond=self.bond)
 
     @property
