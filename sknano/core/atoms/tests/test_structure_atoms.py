@@ -6,8 +6,8 @@ from __future__ import unicode_literals
 from pkg_resources import resource_filename
 
 import nose
-from nose.tools import assert_equal, assert_equals, assert_true, \
-    assert_is_instance
+from nose.tools import assert_equal, assert_equals, assert_false, \
+    assert_true, assert_is_instance
 
 import numpy as np
 
@@ -164,8 +164,22 @@ def test_POAVs():
     atom = atoms[10]
     assert_equals(atom.bonds.Nbonds, 3)
     for POAV in ('POAV1', 'POAV2', 'POAVR'):
-        assert_is_instance(getattr(atom, POAV),
-                           getattr(sknano.core.atoms, POAV))
+        atom_POAV = getattr(atom, POAV)
+        assert_is_instance(atom_POAV, getattr(sknano.core.atoms, POAV))
+
+        sigma_pi_angles = np.degrees(atom_POAV.sigma_pi_angles)
+        assert_false(np.all(np.isclose(sigma_pi_angles, 3 * [np.nan],
+                                       equal_nan=True)))
+        pyramidalization_angles = \
+            np.degrees(atom_POAV.pyramidalization_angles)
+        assert_false(np.all(np.isclose(pyramidalization_angles,
+                                       3 * [np.nan],
+                                       equal_nan=True)))
+        misalignment_angles = \
+            np.degrees(atom_POAV.misalignment_angles)
+        assert_false(np.all(np.isclose(misalignment_angles,
+                                       3 * [np.nan],
+                                       equal_nan=True)))
         print(getattr(atom, POAV))
 
 
@@ -180,14 +194,27 @@ def test_POAV_angles():
         for POAV in ('POAV1', 'POAV2', 'POAVR'):
             if getattr(atom, POAV) is not None:
                 atom_POAV = getattr(atom, POAV)
+                sigma_pi_angles = np.degrees(atom_POAV.sigma_pi_angles)
+                assert_false(np.all(np.isclose(sigma_pi_angles, 3 * [np.nan],
+                                               equal_nan=True)))
                 print('atom{}.{}.sigma_pi_angles:\n{}'.format(
-                    atom.id, POAV, np.degrees(atom_POAV.sigma_pi_angles)))
+                    atom.id, POAV, sigma_pi_angles))
+
+                pyramidalization_angles = \
+                    np.degrees(atom_POAV.pyramidalization_angles)
+                assert_false(np.all(np.isclose(pyramidalization_angles,
+                                               3 * [np.nan],
+                                               equal_nan=True)))
                 print('atom{}.{}.pyramidalization_angles:\n{}'.format(
-                    atom.id, POAV,
-                    np.degrees(atom_POAV.pyramidalization_angles)))
+                    atom.id, POAV, pyramidalization_angles))
+
+                misalignment_angles = \
+                    np.degrees(atom_POAV.misalignment_angles)
+                assert_false(np.all(np.isclose(misalignment_angles,
+                                               3 * [np.nan],
+                                               equal_nan=True)))
                 print('atom{}.{}.misalignment_angles:\n{}\n'.format(
-                    atom.id, POAV,
-                    np.degrees(atom_POAV.misalignment_angles)))
+                    atom.id, POAV, misalignment_angles))
 
 
 if __name__ == '__main__':
