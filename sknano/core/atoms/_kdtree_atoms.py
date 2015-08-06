@@ -25,7 +25,7 @@ except ImportError:
     raise ImportError('Install scipy version >= 0.13.0 to allow '
                       'nearest-neighbor queries between atoms.')
 
-from ._neighbor_atoms import NeighborAtoms
+# from ._neighbor_atoms import NeighborAtoms
 
 __all__ = ['KDTreeAtomsMixin']
 
@@ -163,15 +163,15 @@ class KDTreeAtomsMixin:
                 # [atom.neighbors.append(self[NNi[j][k]])
                 #  for k, d in enumerate(NNd[j]) if d <= self.NNrc]
 
-                atom.neighbors = \
-                    NeighborAtoms([self[NNi[j][k]] for k, d in
-                                   enumerate(NNd[j]) if d <= self.NNrc],
-                                  casttype=False)
-
                 # atom.neighbors = \
-                #     self.__class__([self[NNi[j][k]] for k, d in
-                #                     enumerate(NNd[j]) if d <= self.NNrc],
-                #                    casttype=False, **self.kwargs)
+                #     NeighborAtoms([self[NNi[j][k]] for k, d in
+                #                    enumerate(NNd[j]) if d <= self.NNrc],
+                #                   casttype=False)
+
+                atom.neighbors = \
+                    self.__class__([self[NNi[j][k]] for k, d in
+                                    enumerate(NNd[j]) if d <= self.NNrc],
+                                   casttype=False, **self.kwargs)
 
                 atom.neighbor_distances = \
                     [NNd[j][k] for k, d in enumerate(NNd[j]) if d <= self.NNrc]
