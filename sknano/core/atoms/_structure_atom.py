@@ -12,16 +12,21 @@ from __future__ import unicode_literals
 
 __docformat__ = 'restructuredtext en'
 
+from ._cn_atom import CNAtom
+from ._id_atom import IDAtom
+from ._xyz_atom import XYZAtom
 from ._charged_atom import ChargedAtom
 from ._image_atom import ImageAtom
 from ._type_atom import TypeAtom
 from ._velocity_atom import VelocityAtom
-from ._poav_atom import POAVAtom
+from ._kdtree_atom import KDTreeAtomMixin
+from ._poav_atom import POAVAtomMixin
 
 __all__ = ['StructureAtom']
 
 
-class StructureAtom(POAVAtom, ChargedAtom, VelocityAtom, ImageAtom, TypeAtom):
+class StructureAtom(POAVAtomMixin, KDTreeAtomMixin, CNAtom, VelocityAtom,
+                    ImageAtom, XYZAtom, ChargedAtom, TypeAtom, IDAtom):
     """An `Atom` class for structure analysis.
 
     Parameters
@@ -36,10 +41,34 @@ class StructureAtom(POAVAtom, ChargedAtom, VelocityAtom, ImageAtom, TypeAtom):
     type : int, optional
         atom type
     x, y, z : float, optional
-        :math:`x, y, z` components of `StructureAtom` position vector relative to
-        origin.
+        :math:`x, y, z` components of `StructureAtom` position vector relative
+        to origin.
     vx, vy, vz : float, optional
         :math:`v_x, v_y, v_z` components of `StructureAtom` velocity.
 
     """
-    pass
+    def __init__(self, *args, NN=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._neighbors = None
+        if NN is not None:
+            self.NN = NN
+
+        self._POAV1 = None
+        self._POAV2 = None
+        self._POAVR = None
+        # self.fmtstr = super().fmtstr + ", NN={NN!r}"
+
+    def __dir__(self):
+        attrs = super().__dir__()
+        attrs.append('NN')
+        # attrs.extend(['NN', 'bonds'])
+        return attrs
+
+    @CNAtom.CN.getter
+    def CN(self):
+        """`StructureAtom` coordination number."""
+        try:
+            return self.NN.Natoms
+        except AttributeError:
+            return super().CN
