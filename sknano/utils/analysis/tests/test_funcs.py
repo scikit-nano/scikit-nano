@@ -6,14 +6,14 @@ from __future__ import unicode_literals
 import nose
 from nose.tools import *
 
-#import numpy as np
+# import numpy as np
 
 from sknano.utils.analysis import find_target_atom
 from sknano.testing import generate_atoms
 
 
 def test_find_target_atom():
-    atoms = generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=5)
+    atoms = generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=3)
     atoms.center_CM()
     atoms.assign_unique_ids()
     atoms.update_attrs()

@@ -16,7 +16,7 @@ __all__ = ['find_target_atom']
 
 
 def find_target_atom(atoms, target_coords=None, search_radius=2.0,
-                     nearest_target=False):
+                     nearest_target=False, max_search_radius=None):
     """Search for atom closest to target location.
 
     Parameters
@@ -25,20 +25,23 @@ def find_target_atom(atoms, target_coords=None, search_radius=2.0,
         An :class:`~sknano.core.atoms.Atoms` instance.
     target_coords : array_like
         An array or list of :math:`x,y,z` coordinates
-    search_radius : float
+    search_radius : :class:`~python:float`, optional
         Search radius
-    nearest_target : bool, optional
+    nearest_target : :class:`~python:bool`, optional
+    max_search_radius : :class:`~python:float`, optional
 
     Returns
     -------
-    target_atom :class:`~sknano.core.atoms.XAtom`
-        An :class:`~sknano.core.atoms.XAtom` instance.
+    target_atom :class:`~sknano.core.atoms.Atom`
+        An :class:`~sknano.core.atoms.Atom` instance.
 
     """
     print('Starting search radius: {}'.format(search_radius))
     target_atom = None
+    if max_search_radius is None:
+        max_search_radius = 100. * search_radius
     atom_tree = atoms.atom_tree
-    while True:
+    while search_radius <= max_search_radius:
         try:
             target_index = None
             if nearest_target:
@@ -58,3 +61,6 @@ def find_target_atom(atoms, target_coords=None, search_radius=2.0,
         else:
             print('Found target atom.')
             return target_atom
+    else:
+        print('Maximum search radius exceeded. No target atom found.')
+        return None
