@@ -14,29 +14,14 @@ __docformat__ = 'restructuredtext en'
 
 import sys
 
-try:
-    from sknano.apps.nanogen_gui import NanoGenController, NanoGenModel
-except ImportError as e:
-    print(e)
-
-
-__all__ = ['NanoGen']
-
-
-class NanoGen:
-    """Base class for instantiating the NanoGen MVC.
-
-    .. versionadded:: 0.2.24
-
-    .. seealso:: CLI module :py:mod:`sknano.scripts.nanogen`
-
-    """
-    def __init__(self, args):
-        NanoGenController(args, model=NanoGenModel())
-
 
 def main():
-    NanoGen(sys.argv)
+    try:
+        from sknano.apps.nanogen_gui import NanoGenController, NanoGenModel
+        NanoGenController(sys.argv, model=NanoGenModel())
+    except ImportError:
+        print('PyQt4 or PyQt5 required to run NanoGen GUI')
+
 
 if __name__ == "__main__":
     sys.exit(main())

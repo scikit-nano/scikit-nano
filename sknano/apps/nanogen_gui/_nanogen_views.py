@@ -34,27 +34,16 @@ if PyQt is not None:
         from ._pyqt5_ui_fullerene_generator import Ui_FullereneGenerator
         from ._pyqt5_ui_bulk_structure_generator import \
             Ui_BulkStructureGenerator
-    except ImportError as e:
-        print(e)
-        try:
-            from PyQt4.QtCore import pyqtSlot
-            from PyQt4.QtGui import QMainWindow
-            from ._pyqt4_ui_nanogen import Ui_NanoGen
-            from ._pyqt4_ui_swnt_generator import Ui_SWNTGenerator
-            from ._pyqt4_ui_mwnt_generator import Ui_MWNTGenerator
-            from ._pyqt4_ui_graphene_generator import Ui_GrapheneGenerator
-            from ._pyqt4_ui_fullerene_generator import Ui_FullereneGenerator
-            from ._pyqt4_ui_bulk_structure_generator import \
-                Ui_BulkStructureGenerator
-        except ImportError as e:
-            print(e)
-            QMainWindow = object
-            Ui_NanoGen = object
-            Ui_SWNTGenerator = object
-            Ui_MWNTGenerator = object
-            Ui_GrapheneGenerator = object
-            Ui_FullereneGenerator = object
-            Ui_BulkStructureGenerator = object
+    except ImportError:
+        from PyQt4.QtCore import pyqtSlot
+        from PyQt4.QtGui import QMainWindow
+        from ._pyqt4_ui_nanogen import Ui_NanoGen
+        from ._pyqt4_ui_swnt_generator import Ui_SWNTGenerator
+        from ._pyqt4_ui_mwnt_generator import Ui_MWNTGenerator
+        from ._pyqt4_ui_graphene_generator import Ui_GrapheneGenerator
+        from ._pyqt4_ui_fullerene_generator import Ui_FullereneGenerator
+        from ._pyqt4_ui_bulk_structure_generator import \
+            Ui_BulkStructureGenerator
 
 from sknano.core import get_fpath
 from sknano.structures import get_chiral_indices_from_str
