@@ -11,8 +11,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from ._compute_funcs import compute_bundle_density
-from ._nanotube_bundle import NanotubeBundleBase
+from ._nanotube_bundle import NanotubeBundleBase, compute_bundle_density
 from ._swnt import SWNT
 
 __all__ = ['SWNTBundle']

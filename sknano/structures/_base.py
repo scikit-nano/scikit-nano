@@ -14,10 +14,12 @@ __docformat__ = 'restructuredtext en'
 # import numbers
 
 from sknano.core import BaseClass
-from sknano.core.refdata import aCC
+from sknano.core.refdata import aCC, element_data
 from ._mixins import BasisMixin
 
 __all__ = ['StructureBase']
+
+r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
 
 class StructureBase(BasisMixin, BaseClass):

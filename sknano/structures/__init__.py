@@ -32,7 +32,7 @@ Nanostructure Classes
    MWNT
    MWNTBundle
 
-Mixin/Base Classes
+Base/Mixin Classes
 ------------------
 
 .. autosummary::
@@ -40,6 +40,9 @@ Mixin/Base Classes
 
    StructureBase
    NanotubeBundleBase
+   BasisMixin
+   GrapheneMixin
+   SWNTMixin
    MWNTMixin
    NanotubeBundleMixin
    UnrolledSWNTMixin
@@ -112,7 +115,6 @@ from ._mwnt import *
 from ._mwnt_bundle import *
 from ._unrolled_swnt import *
 
-from ._compute_funcs import *
 from ._extras import *
 from ._defects import *
 

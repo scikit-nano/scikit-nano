@@ -19,17 +19,15 @@ import numpy as np
 # from sknano.core.atoms import Atom
 from sknano.core.crystallography import Crystal2DLattice, UnitCell
 from sknano.core.math import Vector
-from sknano.core.refdata import aCC, element_data  # , grams_per_Da
-from ._base import StructureBase
-from ._mixins import GrapheneMixin
+from sknano.core.refdata import aCC  # , grams_per_Da
+from ._base import StructureBase, r_CC_vdw
 
-__all__ = ['GraphenePrimitiveCell', 'GrapheneConventionalCell', 'Graphene',
-           'GrapheneBase', 'PrimitiveCellGraphene', 'HexagonalGraphene',
+__all__ = ['GraphenePrimitiveCell', 'GrapheneConventionalCell',
+           'GrapheneMixin', 'Graphene', 'GrapheneBase',
+           'PrimitiveCellGraphene', 'HexagonalGraphene',
            'HexagonalCellGraphene', 'ConventionalCellGraphene',
            'RectangularGraphene', 'RectangularCellGraphene',
            'GrapheneNanoribbon']
-
-_r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
 
 class GraphenePrimitiveCell(UnitCell):
@@ -74,6 +72,56 @@ class GrapheneConventionalCell(UnitCell):
         super().__init__(lattice, basis, coords, cartesian)
 
 
+class GrapheneMixin:
+    """Mixin class for graphene structure classes."""
+    @property
+    def n1(self):
+        return int(np.ceil(10 * self.l1 / self.unit_cell.a1.length))
+
+    @property
+    def n2(self):
+        return int(np.ceil(10 * self.l2 / self.unit_cell.a2.length))
+
+    @property
+    def r1(self):
+        return self.n1 * self.unit_cell.a1
+
+    @property
+    def r2(self):
+        return self.n2 * self.unit_cell.a2
+
+    @property
+    def area(self):
+        """Total area of graphene supercell."""
+        return np.abs(self.r1.cross(self.r2))
+
+    @property
+    def N(self):
+        """Number of graphene unit cells.
+
+        .. math::
+
+           N = \\frac{A_{\\mathrm{sheet}}}{A_{\\mathrm{cell}}}
+
+        """
+        return int(self.area / self.unit_cell.area)
+
+    @property
+    def Natoms(self):
+        """Total number of atoms."""
+        return self.nlayers * self.Natoms_per_layer
+
+    @property
+    def Natoms_per_layer(self):
+        """Number of atoms per layer."""
+        return self.N * self.Natoms_per_unit_cell
+
+    @property
+    def Natoms_per_unit_cell(self):
+        """Number of atoms per unit cell."""
+        return self.unit_cell.basis.Natoms
+
+
 class GrapheneBase(GrapheneMixin, StructureBase):
     """Graphene base structure class.
 
@@ -108,7 +156,7 @@ class GrapheneBase(GrapheneMixin, StructureBase):
     """
 
     def __init__(self, basis=['C', 'C'], bond=aCC, nlayers=1,
-                 layer_spacing=2 * _r_CC_vdw, layer_rotation_angles=None,
+                 layer_spacing=2 * r_CC_vdw, layer_rotation_angles=None,
                  layer_rotation_increment=None, stacking_order='AB',
                  degrees=True, **kwargs):
 

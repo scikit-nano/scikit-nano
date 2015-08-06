@@ -18,16 +18,65 @@ import numpy as np
 from sknano.core.atoms import BasisAtom as Atom
 from sknano.core.crystallography import Crystal3DLattice, UnitCell
 from sknano.core.math import Vector
-from sknano.core.refdata import aCC, element_data
+from sknano.core.refdata import aCC
 
-from ._base import StructureBase
-from ._compute_funcs import compute_dt, compute_T
+from ._base import StructureBase, r_CC_vdw
 from ._extras import get_chiral_indices
-from ._mixins import NanotubeMixin, UnrolledSWNTMixin
+from ._swnt import NanotubeMixin, compute_dt, compute_T
 
-_r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
-__all__ = ['UnrolledSWNT']
+__all__ = ['UnrolledSWNTMixin', 'UnrolledSWNT']
+
+
+class UnrolledSWNTMixin:
+    """Mixin class for unrolled nanotubes."""
+
+    @property
+    def Lx(self):
+        return self.nx * self.Ch / 10
+
+    @property
+    def Ly(self):
+        return self.nlayers * self.layer_spacing / 10
+
+    @property
+    def nx(self):
+        """Number of unit cells along the :math:`x`-axis."""
+        return self._nx
+
+    @nx.setter
+    def nx(self, value):
+        """Set :math:`n_x`"""
+        if not (isinstance(value, numbers.Number) or value > 0):
+            raise TypeError('Expected a real positive number.')
+        self._nx = int(value)
+
+    @property
+    def nlayers(self):
+        """Number of layers."""
+        return self._nlayers
+
+    @nlayers.setter
+    def nlayers(self, value):
+        """Set :attr:`nlayers`."""
+        if not (isinstance(value, numbers.Number) or value > 0):
+            raise TypeError('Expected a real positive number.')
+        self._nlayers = int(value)
+
+    @nlayers.deleter
+    def nlayers(self):
+        del self._nlayers
+
+    @property
+    def fix_Lx(self):
+        return self._fix_Lx
+
+    @fix_Lx.setter
+    def fix_Lx(self, value):
+        if not isinstance(value, bool):
+            raise TypeError('Expected `True` or `False`')
+        self._fix_Lx = value
+        self._integral_nx = False if self.fix_Lx else True
 
 
 class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
@@ -104,7 +153,7 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
     """
 
     def __init__(self, *Ch, nx=1, nz=1, basis=['C', 'C'], bond=aCC,
-                 nlayers=1, layer_spacing=2*_r_CC_vdw,
+                 nlayers=1, layer_spacing=2*r_CC_vdw,
                  layer_rotation_angles=None,
                  layer_rotation_increment=None, degrees=True,
                  stacking_order='AB', Lx=None, fix_Lx=False,
