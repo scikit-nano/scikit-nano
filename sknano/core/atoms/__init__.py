@@ -10,10 +10,12 @@ Contents
 ========
 
 The `Atom` class represents a single atom. The `Atoms` class is a container
-class for `Atom` class instances. Every new atom class has a corresponding
-container class.
+class for `Atom` class instances. Sub-classes of `Atom` classes
+add new atom attributes to the `Atom` class. Every `Atom` sub-class
+has a corresponding container class that sub-classes the `Atoms` class.
 
-Base classes:
+Base `Atom`/`Atoms` classes
+---------------------------
 
 .. autosummary::
    :toctree: generated/
@@ -21,61 +23,77 @@ Base classes:
    Atom
    Atoms
 
-`Atom`/`Atoms` sub-classes:
+`Atom`/`Atoms` sub-classes
+---------------------------
 
 .. autosummary::
    :toctree: generated/
 
+   ChargedAtom
+   ChargedAtoms
+   CNAtom
+   CNAtoms
+   EnergyAtom
+   EnergyAtoms
+   ForceAtom
+   ForceAtoms
+   IDAtom
+   IDAtoms
+   ImageAtom
+   ImageAtoms
+   TypeAtom
+   TypeAtoms
+   VanDerWaalsAtom
+   VanDerWaalsAtoms
+   VelocityAtom
+   VelocityAtoms
    XYZAtom
    XYZAtoms
 
-
-Atoms with an eXtended set of attributes:
-
-.. autosummary::
-   :toctree: generated/
-
-   XAtom
-   XAtoms
-
-Atoms for nearest-neighbor structure analysis:
+Mixin `Atom`/`Atoms` classes
+----------------------------
 
 .. autosummary::
    :toctree: generated/
 
-   KDTAtom
-   KDTAtoms
-
-Atoms and data structures for POAV structure analysis:
-
-.. autosummary::
-   :toctree: generated/
-
-   POAVAtom
-   POAVAtoms
+   KDTreeAtomMixin
+   KDTreeAtomsMixin
    POAVAtomMixin
+   POAVAtomsMixin
    POAV
    POAV1
    POAV2
    POAVR
 
-Class representation of atom bonds.
+Combined sub-classes
+---------------------
 
+.. autosummary::
+   :toctree: generated/
+
+   BasisAtom
+   BasisAtoms
+   MDAtom
+   MDAtoms
+   StructureAtom
+   StructureAtoms
+
+`Bond`/`Bonds` classes
+----------------------
 .. autosummary::
    :toctree: generated/
 
    Bond
    Bonds
 
-Classes for molecular dynamics simulations:
+Classes for molecular dynamics simulations
+------------------------------------------
 
 .. autosummary::
    :toctree: generated/
 
    Trajectory
    Snapshot
-   MDAtom
-   MDAtoms
 
 """
 from __future__ import absolute_import, division, print_function
