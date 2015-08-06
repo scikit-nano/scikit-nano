@@ -434,7 +434,7 @@ class Vector(np.ndarray):
     @property
     def norm(self):
         """Return the vector norm."""
-        return np.sqrt((self ** 2).sum())
+        return np.sqrt((self.__array__() ** 2).sum())
 
     @property
     def unit_vector(self):

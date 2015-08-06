@@ -139,9 +139,8 @@ class Point(np.ndarray):
     def __eq__(self, other):
         if not isinstance(other, Point):
             other = Point(other)
-        if self is other or np.allclose(self.__array__(), other.__array__()):
-            return True
-        return False
+        return self is other or np.allclose(self.__array__(),
+                                            other.__array__())
 
     def __lt__(self, other):
         if not isinstance(other, Point):
@@ -174,7 +173,7 @@ class Point(np.ndarray):
 
     def euclidean_distance(self, pt):
         """Compute the euclidean distance between `pt` and `self`."""
-        return np.sqrt(((self.__array__() - pt.__array__())**2).sum())
+        return np.sqrt(((self.__array__() - pt.__array__()) ** 2).sum())
 
     def rezero_coords(self, epsilon=1.0e-10):
         """Alias for :meth:`Point.rezero`."""
