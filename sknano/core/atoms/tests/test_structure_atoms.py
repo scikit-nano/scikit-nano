@@ -6,10 +6,12 @@ from __future__ import unicode_literals
 from pkg_resources import resource_filename
 
 import nose
-from nose.tools import *
+from nose.tools import assert_equal, assert_equals, assert_true, \
+    assert_is_instance
 
 import numpy as np
 
+import sknano.core.atoms
 from sknano.core.atoms import StructureAtom, StructureAtoms
 from sknano.generators import SWNTGenerator
 from sknano.io import DATAReader
