@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Compute functions (:mod:`sknano.structures._compute_funcs`)
+Physics functions (:mod:`sknano.core.physics._compute_funcs`)
 ===============================================================================
 
-.. currentmodule:: sknano.structures._compute_funcs
+.. currentmodule:: sknano.core.physics._compute_funcs
 
 """
 from __future__ import absolute_import, division, print_function, \
