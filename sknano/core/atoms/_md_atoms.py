@@ -24,7 +24,7 @@ from ._md_atom import MDAtom
 __all__ = ['MDAtoms']
 
 
-class MDAtoms(StructureAtoms, EnergyAtoms, ForceAtoms):
+class MDAtoms(StructureAtoms, ForceAtoms, EnergyAtoms):
     """An `Atoms` sub-class for molecular dynamics trajectory analysis.
 
     Sub-class of :class:`~sknano.core.atoms.StructureAtoms` class,

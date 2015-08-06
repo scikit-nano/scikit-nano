@@ -24,7 +24,7 @@ from ._structure_atom import StructureAtom
 __all__ = ['MDAtom']
 
 
-class MDAtom(StructureAtom, EnergyAtom, ForceAtom):
+class MDAtom(StructureAtom, ForceAtom, EnergyAtom):
     """An `Atom` class for molecular dynamics trajectory analysis.
 
     """
