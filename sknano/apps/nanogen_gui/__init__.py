@@ -17,7 +17,7 @@ try:
     from ._nanogen_models import *
     from ._nanogen_views import *
     from ._nanogen_controllers import *
-except ImportError as e:
-	print(e)
+except ImportError:
+	pass
 
 __all__ = [s for s in dir() if not s.startswith('_')]
