@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Container class for `KDTAtom`\ s (:mod:`sknano.core.atoms._kdtree_atoms`)
+Mixin `Atoms` class for KDTree analysis (:mod:`sknano.core.atoms._kdtree_atoms`)
 ===============================================================================
 
 .. currentmodule:: sknano.core.atoms._kdtree_atoms
@@ -25,44 +25,12 @@ except ImportError:
     raise ImportError('Install scipy version >= 0.13.0 to allow '
                       'nearest-neighbor queries between atoms.')
 
-# from ._extended_atoms import XAtoms
-from ._cn_atoms import CNAtoms
-from ._id_atoms import IDAtoms
-from ._xyz_atoms import XYZAtoms
-from ._bonds import Bonds
-from ._kdtree_atom import KDTAtom
 from ._neighbor_atoms import NeighborAtoms
 
-__all__ = ['KDTAtoms']
+__all__ = ['KDTreeAtomsMixin']
 
 
-class KDTAtoms(CNAtoms, XYZAtoms, IDAtoms):
-    """An `Atoms` sub-class for KDTree analysis.
-
-    Sub-class of `XAtoms` class, and a container class for lists of
-    :class:`~sknano.core.atoms.KDTAtom` instances.
-
-    Parameters
-    ----------
-    atoms : {None, sequence, `KDTAtoms`}, optional
-        if not `None`, then a list of `KDTAtom` instance objects or an
-        existing `KDTAtoms` instance object.
-    kNN : :class:`~python:int`
-        Number of nearest neighbors to return when querying the kd-tree.
-    NNrc : :class:`~python:float`
-        Nearest neighbor radius cutoff.
-
-    """
-    def __init__(self, atoms=None, kNN=16, NNrc=2.0, **kwargs):
-
-        super().__init__(atoms, **kwargs)
-        self.kNN = kNN
-        self.NNrc = NNrc
-        self.bonds = atoms.bonds if hasattr(atoms, 'bonds') else Bonds()
-
-    @property
-    def __atom_class__(self):
-        return KDTAtom
+class KDTreeAtomsMixin:
 
     @property
     def kNN(self):

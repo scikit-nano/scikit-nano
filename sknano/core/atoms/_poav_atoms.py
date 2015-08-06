@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Atoms class for POAV analysis (:mod:`sknano.core.atoms._poav_atoms`)
+Mixin `Atoms` class for POAV analysis (:mod:`sknano.core.atoms._poav_atoms`)
 ===============================================================================
-
-An `Atoms` class for POAV analysis
 
 .. currentmodule:: sknano.core.atoms._poav_atoms
 
@@ -17,28 +15,14 @@ import numpy as np
 
 # from sknano.core import timethis
 from sknano.core.math import vector as vec
-from ._kdtree_atoms import KDTAtoms
-from ._poav_atom import POAV1, POAV2, POAVR, POAVAtom
+from ._kdtree_atoms import KDTreeAtomsMixin
+from ._poav_atom import POAV1, POAV2, POAVR
 
-__all__ = ['POAVAtoms']
+__all__ = ['POAVAtomsMixin']
 
 
-class POAVAtoms(KDTAtoms):
-    """An `Atoms` sub-class for POAV analysis.
-
-    Sub-class of `KDTAtoms` class, and a container class for lists of
-    :class:`~sknano.core.atoms.POAVAtom` instances.
-
-    Parameters
-    ----------
-    atoms : {None, sequence, `POAVAtoms`}, optional
-        if not `None`, then a list of `POAVAtom` instance objects or an
-        existing `POAVAtoms` instance object.
-
-    """
-    @property
-    def __atom_class__(self):
-        return POAVAtom
+class POAVAtomsMixin(KDTreeAtomsMixin):
+    """Mixin class for POAV analysis."""
 
     # @timethis
     def compute_POAVs(self):

@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Atom sub-class for POAV analysis (:mod:`sknano.core.atoms._poav_atom`)
+Mixin `Atom` class for POAV analysis (:mod:`sknano.core.atoms._poav_atom`)
 ===============================================================================
-
-An `Atom` sub-class for POAV analysis.
 
 .. currentmodule:: sknano.core.atoms._poav_atom
 
@@ -23,9 +21,9 @@ np.seterr(all='warn')
 
 from sknano.core.math import vector as vec
 
-from ._kdtree_atom import KDTAtom
+# from ._kdtree_atom import KDTAtom
 
-__all__ = ['POAV', 'POAV1', 'POAV2', 'POAVR', 'POAVAtomMixin', 'POAVAtom']
+__all__ = ['POAV', 'POAV1', 'POAV2', 'POAVR', 'POAVAtomMixin']
 
 
 class POAV:
@@ -374,7 +372,7 @@ class POAV1(POAV):
     def m(self):
         """:math:`s` character content of the :math:`\\pi`-orbital \
             (:math:`s^mp`) for :math:`sp^3` normalized hybridization."""
-        cos2sigmapi = np.cos(np.mean(self.sigma_pi_angles))**2
+        cos2sigmapi = np.cos(np.mean(self.sigma_pi_angles)) ** 2
         return 2 * cos2sigmapi / (1 - 3 * cos2sigmapi)
 
     @property
@@ -491,7 +489,10 @@ class POAVAtomMixin:
     @property
     def POAV1(self):
         """:class:`~sknano.utils.analysis.POAV1` instance."""
-        return self._POAV1
+        try:
+            return self._POAV1
+        except AttributeError:
+            return None
 
     @POAV1.setter
     def POAV1(self, value):
@@ -503,7 +504,10 @@ class POAVAtomMixin:
     @property
     def POAV2(self):
         """:class:`~sknano.utils.analysis.POAV2` instance."""
-        return self._POAV2
+        try:
+            return self._POAV2
+        except AttributeError:
+            return None
 
     @POAV2.setter
     def POAV2(self, value):
@@ -515,7 +519,10 @@ class POAVAtomMixin:
     @property
     def POAVR(self):
         """:class:`~sknano.utils.analysis.POAVR` instance."""
-        return self._POAVR
+        try:
+            return self._POAVR
+        except AttributeError:
+            return None
 
     @POAVR.setter
     def POAVR(self, value):
@@ -523,13 +530,3 @@ class POAVAtomMixin:
         if not isinstance(value, POAVR):
             raise TypeError('Expected a `POAVR` instance.')
         self._POAVR = value
-
-
-class POAVAtom(POAVAtomMixin, KDTAtom):
-    """An `Atom` sub-class for POAV analysis."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._POAV1 = None
-        self._POAV2 = None
-        self._POAVR = None
