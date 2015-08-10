@@ -45,13 +45,35 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin, UnitCellMixin):
                  a1=None, a2=None, a3=None, cell_matrix=None,
                  orientation_matrix=None):
 
+        if cell_matrix is None and all([v is None for v in (a1, a2, a3)]) and \
+                all([v is not None for v in (a, b, c, alpha, beta, gamma)]):
+            self._a = a
+            self._b = b
+            self._c = c
+            self._alpha = alpha
+            self._beta = beta
+            self._gamma = gamma
+
+            ax = self.a
+            bx = self.b * self.cos_gamma
+            by = self.b * self.sin_gamma
+            cx = self.c * self.cos_beta
+            cy = self.c * (self.cos_alpha - self.cos_beta * self.cos_gamma) \
+                / self.sin_gamma
+            cz = self.c * self.sin_alpha * self.sin_beta * \
+                self.sin_gamma_star / self.sin_gamma
+
+            cell_matrix = np.matrix([[ax, 0., 0.],
+                                     [bx, by, 0.],
+                                     [cx, cy, cz]])
+
         if cell_matrix is not None:
             cell_matrix = np.asarray(cell_matrix)
             a1 = np.array(cell_matrix[0, :])
             a2 = np.array(cell_matrix[1, :])
             a3 = np.array(cell_matrix[2, :])
 
-        if a1 is not None and a2 is not None and a3 is not None:
+        if all([v is not None for v in (a1, a2, a3)]):
             a1 = Vector(a1)
             a2 = Vector(a2)
             a3 = Vector(a3)
@@ -98,7 +120,7 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin, UnitCellMixin):
 
     @a.setter
     def a(self, value):
-        self._a = value
+        self._a = float(value)
         self._update_ortho_matrix()
 
     @property
@@ -108,7 +130,7 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin, UnitCellMixin):
 
     @b.setter
     def b(self, value):
-        self._b = value
+        self._b = float(value)
         self._update_ortho_matrix()
 
     @property
@@ -118,7 +140,7 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin, UnitCellMixin):
 
     @c.setter
     def c(self, value):
-        self._c = value
+        self._c = float(value)
         self._update_ortho_matrix()
 
     @property
@@ -222,7 +244,8 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin, UnitCellMixin):
     @property
     def reciprocal_lattice(self):
         """Reciprocal lattice of this `Crystal3DLattice`."""
-        return Reciprocal3DLattice(cell_matrix=np.linalg.inv(self.cell_matrix))
+        return Reciprocal3DLattice(
+            cell_matrix=np.linalg.inv(self.ortho_matrix).T)
 
     @classmethod
     def triclinic(cls, a, b, c, alpha, beta, gamma):
@@ -299,12 +322,6 @@ class Reciprocal3DLattice(ReciprocalLatticeBase, DirectLatticeMixin,
                       'alpha_star', 'beta_star', 'gamma_star'])
         return attrs
 
-    def todict(self):
-        """Return `dict` of `Reciprocal3DLattice` parameters."""
-        return dict(a_star=self.a_star, b_star=self.b_star,
-                    c_star=self.c_star, alpha_star=self.alpha_star,
-                    beta_star=self.beta_star, gamma_star=self.gamma_star)
-
     @property
     def a_star(self):
         """Length of lattice vector :math:`\\mathbf{a^*}`."""
@@ -335,70 +352,73 @@ class Reciprocal3DLattice(ReciprocalLatticeBase, DirectLatticeMixin,
     @property
     def alpha_star(self):
         """Angle between lattice vectors :math:`\\mathbf{b}^{\\ast}` and \
-        :math:`\\mathbf{c}^{\\ast}` in **degrees**."""
+            :math:`\\mathbf{c}^{\\ast}` in **degrees**."""
         return self._direct_lattice.alpha
 
     @property
     def beta_star(self):
         """Angle between lattice vectors :math:`\\mathbf{c}^{\\ast}` and \
-        :math:`\\mathbf{a}^{\\ast}` in **degrees**."""
+            :math:`\\mathbf{a}^{\\ast}` in **degrees**."""
         return self._direct_lattice.beta
 
     @property
     def gamma_star(self):
         """Angle between lattice vectors :math:`\\mathbf{a}^{\\ast}` and \
-        :math:`\\mathbf{b}^{\\ast}` in **degrees**."""
+            :math:`\\mathbf{b}^{\\ast}` in **degrees**."""
         return self._direct_lattice.gamma
 
     @property
     def b1(self):
-        """Reciprocal lattice vector :math:`\\mathbf{b}_1=\\mathbf{a}^*`."""
+        """Lattice vector :math:`\\mathbf{b}_1=\\mathbf{a}^{\\ast}`."""
         return self._direct_lattice.a1
 
     @property
     def b2(self):
-        """Reciprocal lattice vector :math:`\\mathbf{b}_2=\\mathbf{b}^*`."""
+        """Lattice vector :math:`\\mathbf{b}_2=\\mathbf{b}^{\\ast}`."""
         return self._direct_lattice.a2
 
     @property
     def b3(self):
-        """Reciprocal lattice vector :math:`\\mathbf{b}_3=\\mathbf{c}^*`."""
+        """Lattice vector :math:`\\mathbf{b}_3=\\mathbf{c}^{\\ast}`."""
         return self._direct_lattice.a3
 
     @property
     def cos_alpha_star(self):
-        """:math:`\\cos\\alpha^*`"""
+        """:math:`\\cos\\alpha^{\\ast}`"""
         return self._direct_lattice.cos_alpha
 
     @property
     def cos_beta_star(self):
-        """:math:`\\cos\\beta^*`"""
+        """:math:`\\cos\\beta^{\\ast}`"""
         return self._direct_lattice.cos_beta
 
     @property
     def cos_gamma_star(self):
-        """:math:`\\cos\\gamma^*`"""
+        """:math:`\\cos\\gamma^{\\ast}`"""
         return self._direct_lattice.cos_gamma
 
     @property
     def sin_alpha_star(self):
-        """:math:`\\sin\\alpha^*`"""
+        """:math:`\\sin\\alpha^{\\ast}`"""
         return self._direct_lattice.sin_alpha
 
     @property
     def sin_beta_star(self):
-        """:math:`\\sin\\beta^*`"""
+        """:math:`\\sin\\beta^{\\ast}`"""
         return self._direct_lattice.sin_beta
 
     @property
     def sin_gamma_star(self):
-        """:math:`\\sin\\gamma^*`"""
+        """:math:`\\sin\\gamma^{\\ast}`"""
         return self._direct_lattice.sin_gamma
 
     @property
     def reciprocal_lattice(self):
         """Reciprocal lattice of this `Reciprocal3DLattice`."""
-        return Crystal3DLattice(cell_matrix=np.linalg.inv(self.cell_matrix))
+        # return Crystal3DLattice(
+        #     cell_matrix=np.linalg.inv(self.cell_matrix).T)
+        return Crystal3DLattice(
+            cell_matrix=np.linalg.inv(self.ortho_matrix).T)
 
     @classmethod
     def triclinic(cls, a_star, b_star, c_star,
@@ -443,6 +463,13 @@ class Reciprocal3DLattice(ReciprocalLatticeBase, DirectLatticeMixin,
             :math:`a^*`."""
         return cls(a_star=a_star, b_star=a_star, c_star=a_star,
                    alpha_star=90, beta_star=90, gamma_star=90)
+
+    def todict(self):
+        """Return `dict` of `Reciprocal3DLattice` parameters."""
+        return dict(a_star=self.a_star, b_star=self.b_star,
+                    c_star=self.c_star, alpha_star=self.alpha_star,
+                    beta_star=self.beta_star, gamma_star=self.gamma_star)
+
 
 ReciprocalLattice = Reciprocal3DLattice
 

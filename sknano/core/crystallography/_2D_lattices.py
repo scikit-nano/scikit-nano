@@ -41,6 +41,20 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin, UnitCellMixin):
                  a1=None, a2=None, cell_matrix=None,
                  orientation_matrix=None):
 
+        if cell_matrix is None and all([v is None for v in (a1, a2)]) and \
+                all([v is not None for v in (a, b, gamma)]):
+            self._a = a
+            self._b = b
+            self._gamma = gamma
+
+            ax = self.a
+            bx = self.b * self.cos_gamma
+            by = self.b * self.sin_gamma
+
+            cell_matrix = np.matrix([[ax, 0., 0.],
+                                     [bx, by, 0.],
+                                     [0., 0., 1.]])
+
         if cell_matrix is not None:
             cell_matrix = np.asarray(cell_matrix)
             a1 = np.array(cell_matrix[0, :])
@@ -160,7 +174,8 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin, UnitCellMixin):
     @property
     def reciprocal_lattice(self):
         """Return `Crystal2DLattice` reciprocal lattice."""
-        return Reciprocal2DLattice(cell_matrix=np.linalg.inv(self.cell_matrix))
+        return Reciprocal2DLattice(
+            cell_matrix=np.linalg.inv(self.ortho_matrix).T)
 
     @classmethod
     def oblique(cls, a, b, gamma):
@@ -274,7 +289,7 @@ class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin,
     @property
     def reciprocal_lattice(self):
         """Reciprocal lattice of this `Reciprocal2DLattice`."""
-        return Crystal2DLattice(cell_matrix=np.linalg.inv(self.cell_matrix))
+        return Crystal2DLattice(cell_matrix=np.linalg.inv(self.ortho_matrix).T)
 
     @classmethod
     def oblique(cls, a_star, b_star, gamma_star):
