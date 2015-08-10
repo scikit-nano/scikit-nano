@@ -90,5 +90,12 @@ def test11():
     assert_equal(FCCStructure('Au'), FCCStructure(basis='Au'))
 
 
+def test12():
+    structure = FCCStructure('Au')
+    print(structure)
+    structure2 = FCCStructure('Au', scaling_matrix=2)
+    print(structure2)
+
+
 if __name__ == '__main__':
     nose.runmodule()

@@ -7,6 +7,8 @@ import nose
 from nose.tools import *
 import numpy as np
 
+import pymatgen as pmg
+
 from sknano.core.crystallography import Crystal2DLattice, Reciprocal2DLattice
 from sknano.core.math import transformation_matrix
 from sknano.core.refdata import aCC
@@ -15,8 +17,6 @@ from sknano.core.refdata import aCC
 def test1():
     latt = Crystal2DLattice(a=4.0, b=8.0, gamma=120)
     print(latt)
-    assert_equal(str(latt),
-                 "Crystal2DLattice(a=4.0, b=8.0, gamma=120.0)")
 
 
 def test2():
