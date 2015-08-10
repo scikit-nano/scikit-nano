@@ -95,8 +95,8 @@ class Direct3DLatticeMixin:
     def cos_beta(self):
         """:math:`\\cos\\beta`"""
         return np.around(
-            (self.cos_gamma * self.cos_alpha - self.cos_beta) /
-            (self.sin_gamma * self.sin_alpha), decimals=10)
+            (self.cos_gamma_star * self.cos_alpha_star - self.cos_beta_star) /
+            (self.sin_gamma_star * self.sin_alpha_star), decimals=10)
 
     @property
     def cos_gamma(self):
@@ -205,7 +205,13 @@ class UnitCellMixin:
         :attr:`Crystal3DLattice.ortho_matrix`\ .T.
 
         """
-        return self.ortho_matrix.T * self.orientation_matrix.T
+        return (self.orientation_matrix * self.ortho_matrix).T
+
+    @property
+    def matrix(self):
+        """Alias for \
+            :attr:`~sknano.core.crystallography.UnitCellMixin.cell_matrix`."""
+        return self.cell_matrix
 
     @property
     def fractional_matrix(self):
@@ -216,7 +222,7 @@ class UnitCellMixin:
     @property
     def metric_tensor(self):
         """Metric tensor."""
-        return self.ortho_matrix * self.ortho_matrix.T
+        return self.ortho_matrix.T * self.ortho_matrix
 
     def fractional_to_cartesian(self, p):
         """Convert fractional coordinate to cartesian coordinate.
