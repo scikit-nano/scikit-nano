@@ -65,6 +65,9 @@ class LatticeBase(BaseClass):
             except AttributeError:
                 return self.cell_area < other.cell_area
 
+    def make_supercell(self, scaling_matrix):
+        pass
+
 
 class ReciprocalLatticeBase(LatticeBase):
     """Base class for crystallographic reciprocal lattice objects.
