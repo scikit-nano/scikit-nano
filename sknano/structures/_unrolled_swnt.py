@@ -22,7 +22,7 @@ from sknano.core.refdata import aCC
 
 from ._base import StructureBase, r_CC_vdw
 from ._extras import get_chiral_indices
-from ._swnt import NanotubeMixin, compute_dt, compute_T
+from ._swnt import NanotubeMixin, compute_Ch, compute_T
 
 
 __all__ = ['UnrolledSWNTMixin', 'UnrolledSWNT']
@@ -153,7 +153,7 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
     """
 
     def __init__(self, *Ch, nx=1, nz=1, basis=['C', 'C'], bond=aCC,
-                 nlayers=1, layer_spacing=2*r_CC_vdw,
+                 gutter=None, nlayers=1, layer_spacing=2 * r_CC_vdw,
                  layer_rotation_angles=None,
                  layer_rotation_increment=None, degrees=True,
                  stacking_order='AB', Lx=None, fix_Lx=False,
@@ -163,11 +163,16 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
 
         super().__init__(basis=basis, bond=bond, **kwargs)
 
-        a = compute_dt(n, m, bond=bond) + 2 * self.vdw_radius
+        if gutter is None:
+            gutter = self.vdw_radius
+
+        a = compute_Ch(n, m, bond=bond)
+        b = layer_spacing
         c = compute_T(n, m, bond=bond, length=True)
 
-        self.unit_cell = UnitCell(lattice=Crystal3DLattice.hexagonal(a, c),
-                                  basis=self.basis)
+        self.unit_cell = \
+            UnitCell(lattice=Crystal3DLattice.orthorhombic(a, b, c),
+                     basis=self.basis)
 
         self.n = n
         self.m = m
@@ -260,7 +265,10 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
                 if z < 0:
                     z += T
 
-                xs, ys, zs = lattice.cartesian_to_fractional([x, 0, z])
+                xs, ys, zs = \
+                    lattice.wrap_fractional_coordinate(
+                        lattice.cartesian_to_fractional([x, 0, z]))
+
                 if self.debug:
                     print('i={}: x, z = ({:.6f}, {:.6f})'.format(i, x, z))
 

@@ -1542,7 +1542,7 @@ class SWNT(SWNTMixin, StructureBase):
                         'electronic_type']
 
     def __init__(self, *Ch, nz=None, basis=['C', 'C'], bond=aCC,
-                 Lz=None, fix_Lz=False, **kwargs):
+                 gutter=None, Lz=None, fix_Lz=False, **kwargs):
 
         n, m, kwargs = get_chiral_indices(*Ch, **kwargs)
 
@@ -1552,7 +1552,9 @@ class SWNT(SWNTMixin, StructureBase):
 
         super().__init__(basis=basis, bond=bond, **kwargs)
 
-        a = compute_dt(n, m, bond=bond) + 2 * self.vdw_radius
+        if gutter is None:
+            gutter = self.vdw_radius
+        a = compute_dt(n, m, bond=bond) + 2 * gutter
         c = compute_T(n, m, bond=bond, length=True)
         self.unit_cell = UnitCell(lattice=Crystal3DLattice.hexagonal(a, c),
                                   basis=self.basis)
@@ -1644,7 +1646,10 @@ class SWNT(SWNTMixin, StructureBase):
                 if z < 0:
                     z += T
 
-                xs, ys, zs = lattice.cartesian_to_fractional([x, y, z])
+                xs, ys, zs = \
+                    lattice.wrap_fractional_coordinate(
+                        lattice.cartesian_to_fractional([x, y, z]))
+
                 if self.debug:
                     print('i={}: x, y, z = ({:.6f}, {:.6f}, {:.6f})'.format(
                         i, x, y, z))
