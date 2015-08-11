@@ -11,7 +11,7 @@ from nose.tools import *
 import numpy as np
 
 from sknano.core.math import e1, e2, e3, xhat, yhat, zhat, \
-    Point, Vector, vector as vec, Rx, Ry, Rz
+    Point, Vector, vector as vec, Rx, Ry, Rz, NullVector
 
 
 def test1():
@@ -546,6 +546,15 @@ def test35():
 def test36():
     v0 = Vector(np.arange(10))
     assert_equal(v0.argmax(), len(v0)-1)
+
+
+def test37():
+    assert_equal(Vector([0, 0, 0]), NullVector())
+    a = NullVector()
+    b = NullVector()
+    assert_equal(a, b)
+    assert_true(a is b)
+
 
 if __name__ == '__main__':
     nose.runmodule()

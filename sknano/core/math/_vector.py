@@ -18,6 +18,7 @@ import warnings
 import numpy as np
 np.seterr(all='warn')
 
+from sknano.core import Singleton
 from ._point import Point
 from ._transforms import rotate, transformation_matrix
 
@@ -25,7 +26,7 @@ __all__ = ['Vector', 'angle', 'cross', 'dot', 'scalar_triple_product',
            'vector_triple_product', 'scalar_projection', 'vector_projection',
            'vector_rejection', 'projection', 'rejection',
            'e1', 'e2', 'e3', 'xhat', 'yhat', 'zhat',
-           '_check_vector_compatibility']
+           '_check_vector_compatibility', 'NullVector']
 
 
 def _check_vector_compatibility(v1, v2):
@@ -736,3 +737,12 @@ rejection = vector_rejection
 e1 = xhat = Vector([1, 0, 0])
 e2 = yhat = Vector([0, 1, 0])
 e3 = zhat = Vector([0, 0, 1])
+
+
+class NullVector(metaclass=Singleton):
+    def __init__(self):
+        self.__instance = Vector([0, 0, 0])
+
+    def __repr__(self):
+        return '{}({})'.format(self.__class__.__name__,
+                               self.__instance.tolist())
