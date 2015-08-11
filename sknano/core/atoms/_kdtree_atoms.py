@@ -27,14 +27,13 @@ except ImportError:
 
 import sknano.core.atoms
 
-from ._bond import Bond
-from ._bonds import Bonds
+from ._bonds import Bond, Bonds
 
 __all__ = ['KDTreeAtomMixin', 'KDTreeAtomsMixin']
 
 
 class KDTreeAtomMixin:
-    """Mixin class for KDTree analysis."""
+    """Mixin Atom class for KDTree analysis."""
 
     @property
     def NN(self):
@@ -90,6 +89,7 @@ class KDTreeAtomMixin:
 
 
 class KDTreeAtomsMixin:
+    """Mixin Atoms class for KDTree analysis."""
 
     @property
     def kNN(self):

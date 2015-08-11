@@ -42,7 +42,7 @@ class VelocityAtom(Atom):
 
         self._v = Vector([vx, vy, vz])
         self.fmtstr = super().fmtstr + \
-            ", vx={x:.6f}, vy={vy:.6f}, vz={vz:.6f}"
+            ", vx={vx:.6f}, vy={vy:.6f}, vz={vz:.6f}"
 
     def __eq__(self, other):
         return self.v == other.v and super().__eq__(other)
@@ -151,9 +151,9 @@ class VelocityAtom(Atom):
         self._v[:] = Vector(value, nd=3)
 
     def rezero(self, epsilon=1.0e-10):
-        """Re-zero position vector components.
+        """Re-zero velocity vector components.
 
-        Set position vector components with absolute value less than
+        Set velocity vector components with absolute value less than
         `epsilon` to zero.
 
         Parameters
@@ -166,7 +166,7 @@ class VelocityAtom(Atom):
         super().rezero(epsilon)
 
     def rotate(self, **kwargs):
-        """Rotate `Atom` position vector.
+        """Rotate `Atom` velocity vector.
 
         Parameters
         ----------
