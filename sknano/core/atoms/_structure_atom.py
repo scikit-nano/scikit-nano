@@ -21,12 +21,14 @@ from ._type_atom import TypeAtom
 from ._velocity_atom import VelocityAtom
 from ._kdtree_atom import KDTreeAtomMixin
 from ._poav_atom import POAVAtomMixin
+from ._neighbor_atom import NeighborAtomMixin
 
 __all__ = ['StructureAtom']
 
 
-class StructureAtom(POAVAtomMixin, KDTreeAtomMixin, CNAtom, VelocityAtom,
-                    ImageAtom, XYZAtom, ChargedAtom, TypeAtom, IDAtom):
+class StructureAtom(NeighborAtomMixin, POAVAtomMixin, KDTreeAtomMixin, CNAtom,
+                    VelocityAtom, ImageAtom, XYZAtom, ChargedAtom, TypeAtom,
+                    IDAtom):
     """An `Atom` class for structure analysis.
 
     Parameters

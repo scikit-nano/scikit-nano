@@ -22,14 +22,17 @@ from ._image_atoms import ImageAtoms
 from ._type_atoms import TypeAtoms
 from ._kdtree_atoms import KDTreeAtomsMixin
 from ._poav_atoms import POAVAtomsMixin
+from ._neighbor_atoms import NeighborAtomsMixin
+
 from ._structure_atom import StructureAtom
 from ._bonds import Bonds
 
 __all__ = ['StructureAtoms']
 
 
-class StructureAtoms(POAVAtomsMixin, KDTreeAtomsMixin, CNAtoms, VelocityAtoms,
-                     ImageAtoms, XYZAtoms, ChargedAtoms, TypeAtoms, IDAtoms):
+class StructureAtoms(NeighborAtomsMixin, POAVAtomsMixin, KDTreeAtomsMixin,
+                     CNAtoms, VelocityAtoms, ImageAtoms, XYZAtoms,
+                     ChargedAtoms, TypeAtoms, IDAtoms):
     """An `Atoms` sub-class for structure analysis.
 
     Sub-class of `Atoms` class, and a container class for lists of
@@ -57,8 +60,9 @@ class StructureAtoms(POAVAtomsMixin, KDTreeAtomsMixin, CNAtoms, VelocityAtoms,
     def __atom_class__(self):
         return StructureAtom
 
-    def sort(self, key=attrgetter('element', 'Z', 'mass', 'id', 'mol', 'type',
-                                  'x', 'y', 'z', 'CN'), reverse=False):
+    def sort(self, key=attrgetter('CN', 'v', 'i', 'r', 'q', 'type', 'mol',
+                                  'id', 'mass', 'Z', 'element'),
+             reverse=False):
         super().sort(key=key, reverse=reverse)
 
     def compute_rdf(self):
@@ -66,6 +70,7 @@ class StructureAtoms(POAVAtomsMixin, KDTreeAtomsMixin, CNAtoms, VelocityAtoms,
 
     @property
     def volume(self):
+        """Volume of region containing atoms."""
         try:
             return self._volume
         except AttributeError:
