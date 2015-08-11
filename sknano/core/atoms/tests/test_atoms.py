@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 # import numpy as np
 
 import nose
-from nose.tools import *
+from nose.tools import assert_equal, assert_true, assert_is_instance
 from sknano.core.atoms import Atom, Atoms
 from sknano.core.refdata import element_symbols
 from sknano.testing import generate_atoms
@@ -17,9 +17,9 @@ def test1():
     assert_is_instance(atoms, Atoms)
     for Z in range(1, 101):
         atoms.append(Atom(Z))
-    assert_equals(atoms.Natoms, 100)
-    assert_equals(Atoms(atoms=atoms).Natoms, atoms.Natoms)
-    assert_equals(Atoms(atoms=atoms.data).Natoms, atoms.Natoms)
+    assert_equal(atoms.Natoms, 100)
+    assert_equal(Atoms(atoms=atoms).Natoms, atoms.Natoms)
+    assert_equal(Atoms(atoms=atoms.data).Natoms, atoms.Natoms)
 
 
 def test2():
@@ -75,7 +75,7 @@ def test5():
     atoms.assign_unique_ids()
     for i, atom in enumerate(atoms):
         assert_true(atoms[i] is atoms.get_atom(atom.id))
-        assert_equals(i, atoms.index(atom))
+        assert_equal(i, atoms.index(atom))
 
 
 def test6():
@@ -109,6 +109,37 @@ def test8():
     assert_equal(filtered1, atoms)
     assert_equal(filtered1, filtered2)
 
+
+def test_instantiation():
+    a = Atom('C')
+    assert_is_instance(a, Atom)
+
+
+def test_attributes():
+    atom = Atom('C')
+    assert_equal(atom.element, 'C')
+    assert_equal(atom.Z, 6)
+
+
+def test_comparisons():
+    B = Atom('B')
+    C = Atom('C')
+    N = Atom('N')
+    assert_true(B < C)
+    assert_true(N > C)
+    assert_true(B < N)
+
+
+def test_property_changes():
+    CAtom = Atom('C')
+    CAtom.Z = 54
+    XeAtom = Atom('Xe')
+    assert_equal(CAtom, XeAtom)
+
+
+def test_str():
+    atom = Atom('C')
+    print(atom)
 
 if __name__ == '__main__':
     nose.runmodule()

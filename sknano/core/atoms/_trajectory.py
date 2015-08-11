@@ -18,8 +18,7 @@ from operator import attrgetter
 import numpy as np
 
 from sknano.core import BaseClass, UserList
-from ._md_atom import MDAtom as Atom
-from ._md_atoms import MDAtoms as Atoms
+from ._md_atoms import MDAtom as Atom, MDAtoms as Atoms
 
 __all__ = ['Snapshot', 'Trajectory']
 

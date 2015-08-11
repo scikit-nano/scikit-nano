@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Extended Atoms class feature set (:mod:`sknano.core.atoms._extended_atoms`)
+Atoms with several attributes (:mod:`sknano.core.atoms._extended_atoms`)
 ===============================================================================
 
 An "eXtended" `Atoms` class.
@@ -15,18 +15,44 @@ __docformat__ = 'restructuredtext en'
 
 from operator import attrgetter
 
-from ._extended_atom import XAtom
-from ._xyz_atoms import XYZAtoms
-from ._velocity_atoms import VelocityAtoms
-from ._force_atoms import ForceAtoms
-from ._cn_atoms import CNAtoms
-from ._energy_atoms import EnergyAtoms
-from ._charged_atoms import ChargedAtoms
-from ._id_atoms import IDAtoms
-from ._image_atoms import ImageAtoms
-from ._type_atoms import TypeAtoms
+from ._xyz_atoms import XYZAtom, XYZAtoms
+from ._velocity_atoms import VelocityAtom, VelocityAtoms
+from ._force_atoms import ForceAtom, ForceAtoms
+from ._cn_atoms import CNAtom, CNAtoms
+from ._energy_atoms import EnergyAtom, EnergyAtoms
+from ._charged_atoms import ChargedAtom, ChargedAtoms
+from ._id_atoms import IDAtom, IDAtoms
+from ._image_atoms import ImageAtom, ImageAtoms
+from ._type_atoms import TypeAtom, TypeAtoms
 
-__all__ = ['XAtoms']
+__all__ = ['XAtom', 'XAtoms']
+
+
+class XAtom(IDAtom, TypeAtom, XYZAtom, ImageAtom, ChargedAtom, VelocityAtom,
+            ForceAtom, EnergyAtom, CNAtom):
+    """An `Atom` class with an eXtended set of attributes.
+
+    Parameters
+    ----------
+    element : {str, int}, optional
+        A string representation of the element symbol or an integer specifying
+        an element atomic number.
+    x, y, z : float, optional
+        :math:`x, y, z` components of `XAtom` position vector relative to
+        origin.
+    id : int, optional
+        atom ID
+    mol : int, optional
+        molecule ID
+    type : int, optional
+        atom type
+    q : {int, float}, optional
+        Net charge of `XAtom`.
+    vx, vy, vz : float, optional
+        :math:`v_x, v_y, v_z` components of `XAtom` velocity.
+
+    """
+    pass
 
 
 class XAtoms(IDAtoms, TypeAtoms, XYZAtoms, ImageAtoms, ChargedAtoms,

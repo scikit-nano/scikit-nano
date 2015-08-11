@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
 import nose
-from nose.tools import *
+from nose.tools import assert_equal
 from sknano.core.atoms import XAtom, XAtoms
 # from sknano.testing import generate_atoms
 # from sknano.core.geometric_regions import Ellipsoid
@@ -26,13 +26,13 @@ def test_generator_atoms():
     n, m = 5, 5
     nz = 2
     swnt = SWNTGenerator(n=n, m=m, nz=nz)
-    assert_equals(swnt.N, 2 * n)
-    assert_equals(swnt.Natoms, 2 * swnt.N * swnt.nz)
-    assert_equals(swnt.Natoms_per_unit_cell, 2 * swnt.N)
-    assert_equals(swnt.nz, nz)
-    assert_equals(swnt.Natoms_per_tube, swnt.Natoms_per_unit_cell * swnt.nz)
+    assert_equal(swnt.N, 2 * n)
+    assert_equal(swnt.Natoms, 2 * swnt.N * swnt.nz)
+    assert_equal(swnt.Natoms_per_unit_cell, 2 * swnt.N)
+    assert_equal(swnt.nz, nz)
+    assert_equal(swnt.Natoms_per_tube, swnt.Natoms_per_unit_cell * swnt.nz)
     atoms = swnt.atoms
-    assert_equals(atoms.Natoms, swnt.Natoms_per_tube)
+    assert_equal(atoms.Natoms, swnt.Natoms_per_tube)
 
 
 # def test_atom_selections():
@@ -40,8 +40,19 @@ def test_generator_atoms():
 #         generate_atoms(generator_class='SWNTGenerator', n=5, m=5, nz=2)
 #     #assert_true(a200 is atoms[20])
 #     #a200NN = atoms.select_within(Ellipsoid(center=a200.r, r=2.5))
-#     #assert_equals(a200NN.Natoms, 4)
+#     #assert_equal(a200NN.Natoms, 4)
 #     #atoms.select(
+
+def test_attributes():
+    elements = ['H', 'He', 'B', 'C', 'N', 'O', 'Ar']
+    for element in elements:
+        xatom = XAtom(element=element)
+        assert_equal(xatom.element, element)
+        assert_equal(xatom.m, xatom.mass)
+
+    xatom = XAtom()
+    for c in ('x', 'y', 'z'):
+        assert_equal(getattr(xatom, c), 0.0)
 
 
 if __name__ == '__main__':
