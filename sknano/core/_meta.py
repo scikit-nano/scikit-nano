@@ -15,8 +15,9 @@ from __future__ import unicode_literals
 
 from abc import ABCMeta, abstractmethod
 from inspect import signature, Signature, Parameter
-from functools import wraps
+from functools import wraps, partial
 import inspect
+import logging
 import time
 import warnings
 import weakref
@@ -25,11 +26,67 @@ import weakref
 import numpy as np
 from numpy.compat import formatargspec, getargspec
 
-__all__ = ['check_type', 'deprecated', 'get_object_signature', 'memoize',
+__all__ = ['attach_wrapper', 'logged', 'check_type', 'deprecated',
+           'get_object_signature', 'memoize',
            'method_func', 'optional_debug', 'removed_package_warning',
            'timethis', 'typeassert', 'typed_property', 'with_doc',
            'make_sig', 'ClassSignature', 'Cached', 'NoInstances',
            'Singleton', 'BaseClass']
+
+
+def attach_wrapper(obj, func=None):
+    """Utility decorator to attach a function as an attribute of `obj`.
+
+    Parameters
+    ----------
+    obj : :class:`~python:object`
+    func : {None, callable}
+
+    """
+    if func is None:
+        return partial(attach_wrapper, obj)
+    setattr(obj, func.__name__, func)
+    return func
+
+
+def logged(func=None, *, level=logging.DEBUG, name=None, message=None):
+    """Decorator to add logging to a function.
+
+    Parameters
+    ----------
+    func : callable
+        Decorated function
+    level : :class:`~python:int`
+        Logging level
+    name : :class:`~python:str`, optional
+        Logger name
+    message : :class:`~python:str`, optional
+        Log message
+    """
+    if func is None:
+        return partial(logged, level=level, name=name, message=message)
+
+    logname = name if name else func.__module__
+    log = logging.getLogger(logname)
+    logmsg = message if message else func.__name__
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        log.log(level, logmsg)
+        return func(*args, **kwargs)
+
+    # Attach setter functions
+    @attach_wrapper(wrapper)
+    def set_level(newlevel):
+        nonlocal level
+        level = newlevel
+
+    @attach_wrapper(wrapper)
+    def set_message(newmsg):
+        nonlocal logmsg
+        logmsg = newmsg
+
+    return wrapper
 
 
 def check_type(obj, allowed_types=()):
@@ -255,10 +312,12 @@ class BaseClass(metaclass=ABCMeta):
 class Cached(type):
     """Cached class type."""
     def __init__(self, *args, **kwargs):
+        # print('in Cached.__init__')
         super().__init__(*args, **kwargs)
         self.__cache = weakref.WeakValueDictionary()
 
     def __call__(self, *args):
+        # print('in Cached.__call__')
         if args in self.__cache:
             return self.__cache[args]
         else:
@@ -298,10 +357,12 @@ class NoInstances(type):
 class Singleton(type):
     """Singleton class type."""
     def __init__(self, *args, **kwargs):
+        # print('in Singleton.__init__')
         self.__instance = None
         super().__init__(*args, **kwargs)
 
     def __call__(self, *args, **kwargs):
+        # print('in Singleton.__call__')
         if self.__instance is None:
             self.__instance = super().__call__(*args, **kwargs)
             return self.__instance
