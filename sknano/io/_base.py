@@ -16,11 +16,7 @@ from abc import ABCMeta, abstractmethod
 from sknano.core import get_fpath
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 # from sknano.utils.analysis import StructureAnalyzer
-from sknano.version import release, full_version, git_revision
-
-version = full_version
-if not release:
-    version = '-'.join((full_version, git_revision[:7]))
+from sknano.version import version
 
 default_comment_line = \
     'Structure data generated using scikit-nano version {}'.format(version)
@@ -173,7 +169,7 @@ class StructureWriter:
                 structure_format == 'dump':
             from ._lammps_dump_format import DUMPWriter
             DUMPWriter.write(fname=fname, atoms=atoms, **kwargs)
-        #elif (structure_format is None and fname.endswith('.xyz')) or \
+        # elif (structure_format is None and fname.endswith('.xyz')) or \
         #        structure_format == 'xyz':
         else:
             from ._xyz_format import XYZWriter
