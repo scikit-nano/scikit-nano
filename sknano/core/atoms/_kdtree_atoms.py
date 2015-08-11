@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Mixin `Atoms` class for KDTree analysis (:mod:`sknano.core.atoms._kdtree_atoms`)
+Mixin class for KDTree analysis (:mod:`sknano.core.atoms._kdtree_atoms`)
 ===============================================================================
 
 .. currentmodule:: sknano.core.atoms._kdtree_atoms
@@ -66,13 +66,24 @@ class KDTreeAtomsMixin:
 
     @property
     def neighbors(self):
+        """Return array of neighbor atoms."""
         return np.asarray([atom.neighbors for atom in self])
+
+    @property
+    def distances(self):
+        """Neighbor atoms distances."""
+        return self._distances
+
+    @distances.setter
+    def distances(self, value):
+        self._distances = np.asarray(value)
 
     @property
     def neighbor_distances(self):
         distances = []
-        [distances.extend(atom.neighbor_distances.tolist()) for atom in self]
-        return distances
+        # [distances.extend(atom.neighbor_distances.tolist()) for atom in self]
+        [distances.extend(atom.neighbors.distances.tolist()) for atom in self]
+        return np.asarray(distances)
 
     @property
     def nearest_neighbors(self):
@@ -149,8 +160,8 @@ class KDTreeAtomsMixin:
 
     def update_attrs(self):
         """Update :class:`KDTAtom`\ s attributes."""
-        self.update_neighbors()
-        self.update_bonds()
+        self.__update_neighbors()
+        self.__update_bonds()
 
     def update_neighbors(self):
         """Update :attr:`KDTAtom.NN`."""
@@ -175,14 +186,20 @@ class KDTreeAtomsMixin:
 
                 atom.neighbor_distances = \
                     [NNd[j][k] for k, d in enumerate(NNd[j]) if d <= self.NNrc]
+
+                atom.neighbors.distances = atom.neighbor_distances
                 atom.NN = atom.neighbors
         except ValueError:
             pass
+
+    __update_neighbors = update_neighbors
 
     def update_bonds(self):
         """Update :attr:`KDTAtom.bonds`."""
         self.bonds.clear()
         [self.bonds.extend(atom.bonds) for atom in self]
+
+    __update_bonds = update_bonds
 
     def neighbor_counts(self, r):
         return np.asarray([KDTree([atom.r]).count_neighbors(
