@@ -50,7 +50,7 @@ class BasisAtom(XYZAtom):
         except AttributeError:
             pass
         self.fmtstr = super().fmtstr + \
-            ", xs={xs:.6f}, ys={ys:.6f}, zs={zs:.6f}, lattice={lattice!r}"
+            ", lattice={lattice!r}, xs={xs:.6f}, ys={ys:.6f}, zs={zs:.6f}"
 
     def __eq__(self, other):
         return self.rs == other.rs and super().__eq__(other)
