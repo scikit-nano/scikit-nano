@@ -68,8 +68,7 @@ class UnrolledSWNTGenerator(GeneratorBase, UnrolledSWNT):
         non integer :math:`n_z` cells are permitted.
     autogen : bool, optional
         if `True`, automatically call
-        :meth:`~NanotubeGenerator.generate_unit_cell`,
-        followed by :meth:`~NanotubeGenerator.generate`.
+        :meth:`~UnrolledSWNTGenerator.generate`.
     verbose : bool, optional
         if `True`, show verbose output
 
@@ -122,7 +121,7 @@ class UnrolledSWNTGenerator(GeneratorBase, UnrolledSWNT):
                     self.atoms.append(nt_atom)
 
     @classmethod
-    def generate_fname(self, n=None, m=None, nx=None, nz=None,
+    def generate_fname(cls, n=None, m=None, nx=None, nz=None,
                        fix_Lx=False, fix_Lz=False, **kwargs):
         chirality = '{}{}'.format('{}'.format(n).zfill(2),
                                   '{}'.format(m).zfill(2))
