@@ -105,6 +105,7 @@ String functions
 .. autosummary::
    :toctree: generated/
 
+   ordinal_form
    pluralize
 
 Custom container datatypes
