@@ -1,8 +1,9 @@
 .. image:: https://travis-ci.org/androomerrill/scikit-nano.svg?branch=master
    :target: https://travis-ci.org/androomerrill/scikit-nano
 
-.. image:: https://coveralls.io/repos/androomerrill/scikit-nano/badge.png
-   :target: https://coveralls.io/r/androomerrill/scikit-nano
+.. image:: https://coveralls.io/repos/androomerrill/scikit-nano/badge.svg?branch=master&service=github
+  :target: https://coveralls.io/github/androomerrill/scikit-nano?branch=master
+
 
 ===========
 scikit-nano
