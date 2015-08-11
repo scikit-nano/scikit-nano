@@ -43,8 +43,8 @@ class XYZAtom(Atom):
     def __init__(self, *args, x=None, y=None, z=None, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.r0 = Vector([x, y, z])
-        self.r = Vector([x, y, z])
+        self._r0 = Vector([x, y, z])
+        self._r = Vector([x, y, z])
         self.fmtstr = super().fmtstr + ", x={x:.6f}, y={y:.6f}, z={z:.6f}"
 
     def __eq__(self, other):
@@ -162,7 +162,7 @@ class XYZAtom(Atom):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        self._r = Vector(value, nd=3)
+        self._r[:] = Vector(value, nd=3)
 
     @property
     def r0(self):
@@ -189,7 +189,7 @@ class XYZAtom(Atom):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        self._r0 = Vector(value, nd=3)
+        self._r0[:] = Vector(value, nd=3)
 
     @property
     def dr(self):
@@ -254,6 +254,7 @@ class XYZAtom(Atom):
 
         """
         self.r.rotate(**kwargs)
+        self.r0.rotate(**kwargs)
         super().rotate(**kwargs)
 
     def translate(self, t, fix_anchor_point=True):
@@ -267,6 +268,7 @@ class XYZAtom(Atom):
         """
         # TODO compare timing benchmarks for translation of position vector.
         self.r.translate(t, fix_anchor_point=fix_anchor_point)
+        self.r0.translate(t, fix_anchor_point=fix_anchor_point)
         super().translate(t, fix_anchor_point=fix_anchor_point)
         # self.r += t
 

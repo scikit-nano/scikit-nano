@@ -41,7 +41,7 @@ class ForceAtom(Atom):
 
         super().__init__(*args, **kwargs)
 
-        self.f = Vector([fx, fy, fz])
+        self._f = Vector([fx, fy, fz])
         self.fmtstr = super().fmtstr + \
             ", fx={fx:.6f}, fy={fy:.6f}, fz={fz:.6f}"
 
@@ -146,7 +146,7 @@ class ForceAtom(Atom):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        self._f = Vector(value, nd=3)
+        self._f[:] = Vector(value, nd=3)
 
     def rezero(self, epsilon=1.0e-10):
         """Re-zero position vector components.

@@ -35,7 +35,7 @@ class ImageAtom(Atom):
     def __init__(self, *args, ix=None, iy=None, iz=None, **kwargs):
 
         super().__init__(*args, **kwargs)
-        self.i = Point([ix, iy, iz], dtype=int)
+        self._i = Point([ix, iy, iz], dtype=int)
         self.fmtstr = super().fmtstr + ", ix={ix:d}, iy={iy:d}, iz={iz:d}"
 
     def __eq__(self, other):
@@ -105,7 +105,7 @@ class ImageAtom(Atom):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        self._i = Point(value, nd=3, dtype=int)
+        self._i[:] = Point(value, nd=3, dtype=int)
 
     def todict(self):
         super_dict = super().todict()

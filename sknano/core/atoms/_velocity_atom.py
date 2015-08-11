@@ -42,7 +42,7 @@ class VelocityAtom(Atom):
 
         super().__init__(*args, **kwargs)
 
-        self.v = Vector([vx, vy, vz])
+        self._v = Vector([vx, vy, vz])
         self.fmtstr = super().fmtstr + \
             ", vx={x:.6f}, vy={vy:.6f}, vz={vz:.6f}"
 
@@ -150,7 +150,7 @@ class VelocityAtom(Atom):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        self._v = Vector(value, nd=3)
+        self._v[:] = Vector(value, nd=3)
 
     def rezero(self, epsilon=1.0e-10):
         """Re-zero position vector components.
