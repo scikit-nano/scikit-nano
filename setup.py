@@ -84,8 +84,8 @@ Topic :: Software Development :: Libraries :: Python Modules
 
 MAJOR = 0
 MINOR = 3
-MICRO = 15
-ISRELEASED = True
+MICRO = 16
+ISRELEASED = False
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 STABLEVERSION = None
@@ -93,7 +93,7 @@ if STABLEVERSION is None:
     if ISRELEASED:
         STABLEVERSION = VERSION
     else:
-        STABLEVERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO-1)
+        STABLEVERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO - 1)
 
 
 # Return the GIT version as a string
