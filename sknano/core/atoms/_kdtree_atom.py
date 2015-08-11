@@ -64,6 +64,7 @@ class KDTreeAtomMixin:
 
     @property
     def neighbor_distances(self):
+        """Neighbor atom distances."""
         return self._neighbor_distances
 
     @neighbor_distances.setter
