@@ -39,16 +39,12 @@ class BasisAtom(XYZAtom):
 
         super().__init__(*args, **kwargs)
 
-        # if None in (xs, ys, zs) and lattice is not None:
-        #     xs, ys, zs = lattice.cartesian_to_fractional
-
         self.lattice = lattice
         try:
             self.rs = Vector([xs, ys, zs])
-            # print(self.rs)
-            # print(self.r)
         except AttributeError:
             pass
+
         self.fmtstr = super().fmtstr + \
             ", lattice={lattice!r}, xs={xs:.6f}, ys={ys:.6f}, zs={zs:.6f}"
 
