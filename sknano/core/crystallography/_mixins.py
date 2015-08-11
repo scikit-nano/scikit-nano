@@ -14,7 +14,7 @@ __docformat__ = 'restructuredtext en'
 # from abc import ABCMeta, abstractproperty
 # from enum import Enum
 
-from sknano.core.math import Point, Vector, zhat, rotation_matrix
+from sknano.core.math import Vector, zhat, rotation_matrix
 
 import numpy as np
 
@@ -224,59 +224,62 @@ class UnitCellMixin:
         """Metric tensor."""
         return self.ortho_matrix.T * self.ortho_matrix
 
-    def fractional_to_cartesian(self, p):
+    def fractional_to_cartesian(self, fcoords):
         """Convert fractional coordinate to cartesian coordinate.
 
         Parameters
         ----------
-        p : `Point`
+        fcoords : array_like
 
         Returns
         -------
-        `Point`
+        :class:`~numpy:numpy.ndarray`
 
         """
-        p = Point(p)
-        c = self.orientation_matrix * self.ortho_matrix * \
-            p.column_matrix + self.offset.column_matrix
-        return p.__class__(c.A.flatten())
+        ccoords = self.orientation_matrix * self.ortho_matrix * \
+            np.asmatrix(fcoords).T + self.offset.column_matrix
+        try:
+            return ccoords.T.A.reshape((3, ))
+        except ValueError:
+            return ccoords.T.A.reshape((len(fcoords), 3))
 
-    def cartesian_to_fractional(self, p):
+    def cartesian_to_fractional(self, ccoords):
         """Convert cartesian coordinate to fractional coordinate.
 
         Parameters
         ----------
-        p : `Point`
+        ccoords : array_like
 
         Returns
         -------
-        `Point`
+        :class:`~numpy:numpy.ndarray`
 
         """
-        p = Point(p)
-        f = self.fractional_matrix * np.linalg.inv(self.orientation_matrix) * \
-            (p - self.offset).column_matrix
-        return p.__class__(f.A.flatten())
+        fcoords = np.linalg.inv(self.ortho_matrix) * \
+            np.linalg.inv(self.orientation_matrix) * \
+            (np.asmatrix(ccoords).T - self.offset.column_matrix)
+        try:
+            return fcoords.T.A.reshape((3, ))
+        except ValueError:
+            return fcoords.T.A.reshape((len(ccoords), 3))
 
     def wrap_fractional_coordinate(self, p, epsilon=1e-8):
         """Wrap fractional coordinate to lie within unit cell.
 
         Parameters
         ----------
-        p : `Point`
+        p : array_like
 
         Returns
         -------
-        `Point`
+        :class:`~numpy:numpy.ndarray`
 
         """
-        p = Point(p)
+        p = np.asarray(p)
         p = np.fmod(p, 1)
-        p[np.where(p.__array__() < 0)] += 1
-        p[np.where(p.__array__() > 1 - epsilon)] -= 1
-        p[np.where(np.logical_or(
-                   (p.__array__() > 1 - epsilon),
-                   (p.__array__() < epsilon)))] = 0
+        p[np.where(p < 0)] += 1
+        p[np.where(p > 1 - epsilon)] -= 1
+        p[np.where(np.logical_or((p > 1 - epsilon), (p < epsilon)))] = 0
         return p
 
     def wrap_cartesian_coordinate(self, p):
@@ -284,11 +287,11 @@ class UnitCellMixin:
 
         Parameters
         ----------
-        p : `Point`
+        p : array_like
 
         Returns
         -------
-        `Point`
+        :class:`~numpy:numpy.ndarray`
 
         """
         return self.fractional_to_cartesian(
