@@ -4,14 +4,16 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
 import nose
-from nose.tools import *
+from nose.tools import assert_equal, assert_not_equal
 import numpy as np
 
 from sknano.core.crystallography import UnitCell, Crystal2DLattice, \
-    Crystal2DStructure, Crystal3DLattice, Crystal3DStructure
-from sknano.core.atoms import BasisAtom, BasisAtoms
-from sknano.core.math import Point
+    Crystal2DStructure, Crystal3DLattice, Crystal3DStructure, \
+    generate_supercell
+# from sknano.core.atoms import BasisAtom, BasisAtoms
+# from sknano.core.math import Point
 from sknano.core.refdata import aCC
+from sknano.generators import GoldGenerator
 
 
 def test1():
@@ -48,6 +50,12 @@ def test3():
     assert_equal(cell1, cell2)
     latt3 = Crystal3DLattice.cubic(10.0)
     assert_not_equal(latt1, latt3)
+
+
+def test4():
+    gold = GoldGenerator()
+    supercell = generate_supercell(gold.unit_cell, scaling_matrix=2)
+    print(supercell)
 
 
 if __name__ == '__main__':

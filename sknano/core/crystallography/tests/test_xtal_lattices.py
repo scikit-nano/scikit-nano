@@ -10,7 +10,8 @@ import numpy as np
 import pymatgen as pmg
 
 from sknano.core import rezero_array
-from sknano.core.crystallography import CrystalLattice, ReciprocalLattice
+from sknano.core.crystallography import Crystal2DLattice, Crystal3DLattice, \
+    Reciprocal2DLattice, Reciprocal3DLattice
 # from sknano.core.atoms import Atom, Atoms, XAtom, XAtoms
 from sknano.core.math import Point, transformation_matrix
 from sknano.core.refdata import aCC, element_data
@@ -19,8 +20,70 @@ r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
 
 def test1():
-    latt = CrystalLattice(a=4.0, b=8.0, c=2.0, alpha=90,
-                          beta=90, gamma=120)
+    latt = Crystal2DLattice(a=4.0, b=8.0, gamma=120)
+    print(latt)
+
+
+def test2():
+    a = np.sqrt(3) * 1.42
+    latt = Crystal2DLattice(a=a, b=a, gamma=120)
+    hexlatt = Crystal2DLattice.hexagonal(a)
+    assert_equal(latt, hexlatt)
+
+
+def test3():
+    a = np.sqrt(3) * 1.42
+    latt = Crystal2DLattice(a=a, b=a, gamma=90)
+    square = Crystal2DLattice.square(a)
+    assert_equal(latt, square)
+
+
+def test4():
+    a = np.sqrt(3) * 1.42
+    latt = Crystal2DLattice(a=a, b=a, gamma=60)
+    a1 = latt.a1
+    a2 = latt.a2
+
+    rotated_a1 = a1.copy()
+    rotated_a2 = a2.copy()
+    xfrm = transformation_matrix(angle=-np.pi/6)
+    rotated_a1.rotate(transform_matrix=xfrm)
+    rotated_a2.rotate(transform_matrix=xfrm)
+
+    latt.rotate(angle=-np.pi/6)
+
+    assert_equal(latt.a1, rotated_a1)
+    assert_equal(latt.a2, rotated_a2)
+    assert_true(np.allclose(latt.orientation_matrix, xfrm))
+
+    rotated_latt = Crystal2DLattice(a1=rotated_a1, a2=rotated_a2)
+    assert_equal(rotated_a1, rotated_latt.a1)
+    assert_equal(rotated_a2, rotated_latt.a2)
+    assert_true(np.allclose(latt.orientation_matrix,
+                            rotated_latt.orientation_matrix))
+
+
+def test5():
+    a = np.sqrt(3) * aCC
+    latt = Crystal2DLattice(a=a, b=a, gamma=60)
+    recip_latt = \
+        Reciprocal2DLattice(a_star=latt.reciprocal_lattice.a_star,
+                            b_star=latt.reciprocal_lattice.b_star,
+                            gamma_star=latt.reciprocal_lattice.gamma_star)
+    assert_equal(latt, recip_latt.reciprocal_lattice)
+    assert_equal(latt.reciprocal_lattice, recip_latt)
+
+
+def test6():
+    a = np.sqrt(3) * aCC
+    l1 = Crystal2DLattice.square(a)
+    l2 = Crystal2DLattice.square(2*a)
+    assert_true(l1 < l2)
+
+
+def test7():
+    latt = Crystal3DLattice(a=4.0, b=8.0, c=2.0, alpha=90,
+                            beta=90, gamma=120)
     assert_true(np.allclose(latt.a, 4.0))
     assert_true(np.allclose(latt.b, 8.0))
     assert_true(np.allclose(latt.c, 2.0))
@@ -29,10 +92,10 @@ def test1():
     assert_true(np.allclose(latt.gamma, 120.))
 
 
-def test2():
+def test8():
     a = np.sqrt(3) * aCC
-    latt = CrystalLattice(a=a, b=a, c=2 * r_CC_vdw,
-                          alpha=90, beta=90, gamma=120)
+    latt = Crystal3DLattice(a=a, b=a, c=2 * r_CC_vdw,
+                            alpha=90, beta=90, gamma=120)
     print(latt)
     a1 = latt.a1
     a2 = latt.a2
@@ -54,38 +117,38 @@ def test2():
     assert_true(np.allclose(latt.orientation_matrix, xfrm))
 
 
-def test3():
+def test9():
     a = np.sqrt(3) * aCC
-    latt = CrystalLattice(a=a, b=a, c=2 * r_CC_vdw,
-                          alpha=90, beta=90, gamma=120)
+    latt = Crystal3DLattice(a=a, b=a, c=2 * r_CC_vdw,
+                            alpha=90, beta=90, gamma=120)
     print(latt)
     hex_latt = \
-        CrystalLattice.hexagonal(a, 2 * r_CC_vdw)
+        Crystal3DLattice.hexagonal(a, 2 * r_CC_vdw)
     print(hex_latt)
     assert_equal(latt, hex_latt)
 
 
-def test4():
+def test10():
     a = np.sqrt(3) * aCC
-    latt = CrystalLattice(a=a, b=a, c=2 * r_CC_vdw,
-                          alpha=90, beta=90, gamma=120)
+    latt = Crystal3DLattice(a=a, b=a, c=2 * r_CC_vdw,
+                            alpha=90, beta=90, gamma=120)
 
     # latt_from_inv_latt_matrix_transpose = \
-    #     CrystalLattice(cell_matrix=np.linalg.inv(latt.matrix).T)
+    #     Crystal3DLattice(cell_matrix=np.linalg.inv(latt.matrix).T)
 
     recip_latt_from_matrix = \
-        ReciprocalLattice(cell_matrix=np.linalg.inv(latt.ortho_matrix).T)
+        Reciprocal3DLattice(cell_matrix=np.linalg.inv(latt.ortho_matrix).T)
     assert_equal(latt.reciprocal_lattice, recip_latt_from_matrix)
     assert_true(np.allclose(latt.reciprocal_lattice.matrix,
                             recip_latt_from_matrix.matrix))
 
     recip_latt_from_params = \
-        ReciprocalLattice(a_star=latt.reciprocal_lattice.a_star,
-                          b_star=latt.reciprocal_lattice.b_star,
-                          c_star=latt.reciprocal_lattice.c_star,
-                          alpha_star=latt.reciprocal_lattice.alpha_star,
-                          beta_star=latt.reciprocal_lattice.beta_star,
-                          gamma_star=latt.reciprocal_lattice.gamma_star)
+        Reciprocal3DLattice(a_star=latt.reciprocal_lattice.a_star,
+                            b_star=latt.reciprocal_lattice.b_star,
+                            c_star=latt.reciprocal_lattice.c_star,
+                            alpha_star=latt.reciprocal_lattice.alpha_star,
+                            beta_star=latt.reciprocal_lattice.beta_star,
+                            gamma_star=latt.reciprocal_lattice.gamma_star)
     # print('latt:\n{}'.format(latt))
     # print('recip_latt_from_matrix:\n{}'.format(
     #       recip_latt_from_matrix))
@@ -202,24 +265,24 @@ def test4():
     assert_equal(latt.reciprocal_lattice, recip_latt_from_params)
 
 
-def test5():
+def test11():
     a = np.sqrt(3) * aCC
-    cubic_latt = CrystalLattice(a=a, b=a, c=a, alpha=90, beta=90, gamma=90)
-    assert_equal(cubic_latt, CrystalLattice.cubic(a))
+    cubic_latt = Crystal3DLattice(a=a, b=a, c=a, alpha=90, beta=90, gamma=90)
+    assert_equal(cubic_latt, Crystal3DLattice.cubic(a))
 
 
-def test6():
-    latt = CrystalLattice(a=4.0, b=4.0, c=4.0,
-                          alpha=90, beta=90, gamma=90)
+def test12():
+    latt = Crystal3DLattice(a=4.0, b=4.0, c=4.0,
+                            alpha=90, beta=90, gamma=90)
     print(latt)
     p = [2.1, 0.9, 0.5]
     assert_true(np.allclose(latt.wrap_fractional_coordinate(p),
                 Point((0.1, 0.9, 0.5))))
 
 
-def test7():
-    latt = CrystalLattice(a=4.0, b=4.0, c=4.0,
-                          alpha=90, beta=90, gamma=90)
+def test13():
+    latt = Crystal3DLattice(a=4.0, b=4.0, c=4.0,
+                            alpha=90, beta=90, gamma=90)
     print(latt)
 
     a = latt.a1
@@ -232,12 +295,12 @@ def test7():
     assert_true(np.allclose(latt.metric_tensor, G))
 
 
-def test8():
-    latt = CrystalLattice(a=4.0, b=4.0, c=4.0,
-                          alpha=90, beta=90, gamma=90)
+def test14():
+    latt = Crystal3DLattice(a=4.0, b=4.0, c=4.0,
+                            alpha=90, beta=90, gamma=90)
     print(latt)
 
-    recip_latt = CrystalLattice(a1=latt.b1, a2=latt.b2, a3=latt.b3)
+    recip_latt = Crystal3DLattice(a1=latt.b1, a2=latt.b2, a3=latt.b3)
     print(recip_latt)
 
     assert_equal(latt.a1, recip_latt.b1)
@@ -245,9 +308,9 @@ def test8():
     assert_equal(latt.a3, recip_latt.b3)
 
 
-def test9():
+def test15():
     a = np.sqrt(3) * aCC
-    assert_true(CrystalLattice.cubic(a) < CrystalLattice.cubic(2 * a))
+    assert_true(Crystal3DLattice.cubic(a) < Crystal3DLattice.cubic(2 * a))
 
 
 if __name__ == '__main__':

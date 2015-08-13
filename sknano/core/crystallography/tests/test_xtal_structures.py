@@ -4,14 +4,15 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
 import nose
-from nose.tools import *
+from nose.tools import assert_equal, assert_true, assert_raises
 import numpy as np
 
-from sknano.core.crystallography import UnitCell, Crystal3DLattice, \
-    Crystal3DStructure, AlphaQuartz, DiamondStructure, HexagonalStructure, \
+from sknano.core.crystallography import Crystal2DLattice, Crystal2DStructure, \
+    AlphaQuartz, DiamondStructure, HexagonalStructure, \
     BCCStructure, FCCStructure, Gold, Copper, CaesiumChlorideStructure, \
     RocksaltStructure, ZincblendeStructure, MoS2
 from sknano.core.atoms import BasisAtoms
+from sknano.testing import generate_atoms, generate_structure
 
 
 def test1():
@@ -95,6 +96,22 @@ def test12():
     print(structure)
     structure2 = FCCStructure('Au', scaling_matrix=2)
     print(structure2)
+
+
+def test13():
+    lattice = Crystal2DLattice(a=3, b=3, gamma=60)
+    lattice.rotate(angle=-np.pi/6)
+    structure = Crystal2DStructure(lattice=lattice, basis=['C', 'C'],
+                                   coords=[[0, 0, 0], [1.5, 0, 0]],
+                                   cartesian=True)
+    assert_true(isinstance(structure.basis, BasisAtoms))
+    assert_equal(structure.basis.Natoms, 2)
+
+
+def test14():
+    structure = \
+        generate_structure(generator_class='SWNTGenerator', n=5, m=0, nz=2)
+    print(structure)
 
 
 if __name__ == '__main__':
