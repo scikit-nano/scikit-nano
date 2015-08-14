@@ -1574,6 +1574,9 @@ class SWNT(SWNTMixin, NanoStructureBase):
 
         self.generate_unit_cell()
 
+        if self._integral_nz and self.nz > 1:
+            self.crystal_cell.scaling_matrix = [1, 1, self.nz]
+
         fmtstr = "{Ch!r}, "
         if self.fix_Lz:
             fmtstr += "Lz={Lz!r}, fix_Lz=True, "
