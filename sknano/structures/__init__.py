@@ -38,7 +38,7 @@ Base/Mixin Classes
 .. autosummary::
    :toctree: generated/
 
-   StructureBase
+   NanoStructureBase
    NanotubeBundleBase
    BasisMixin
    GrapheneMixin

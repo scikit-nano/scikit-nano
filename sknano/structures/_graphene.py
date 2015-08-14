@@ -20,7 +20,7 @@ import numpy as np
 from sknano.core.crystallography import Crystal2DLattice, UnitCell
 from sknano.core.math import Vector
 from sknano.core.refdata import aCC  # , grams_per_Da
-from ._base import StructureBase, r_CC_vdw
+from ._base import NanoStructureBase, r_CC_vdw
 
 __all__ = ['GraphenePrimitiveCell', 'GrapheneConventionalCell',
            'GrapheneMixin', 'Graphene', 'GrapheneBase',
@@ -122,7 +122,7 @@ class GrapheneMixin:
         return self.unit_cell.basis.Natoms
 
 
-class GrapheneBase(GrapheneMixin, StructureBase):
+class GrapheneBase(GrapheneMixin, NanoStructureBase):
     """Graphene base structure class.
 
     .. versionadded:: 0.3.11

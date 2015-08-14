@@ -18,7 +18,7 @@ import numpy as np
 from sknano.core.atoms import Atom, BasisAtom
 from sknano.core.crystallography import Crystal3DLattice, UnitCell
 from sknano.core.refdata import aCC, grams_per_Da
-from ._base import StructureBase, r_CC_vdw
+from ._base import NanoStructureBase, r_CC_vdw
 from ._extras import attr_strfmt, attr_symbols, attr_units, \
     get_chiral_indices, get_chiral_type
 
@@ -1417,7 +1417,7 @@ class SWNTMixin:
 NanotubeMixin = SWNTMixin
 
 
-class SWNT(SWNTMixin, StructureBase):
+class SWNT(SWNTMixin, NanoStructureBase):
     """SWNT structure class.
 
     Parameters

@@ -14,15 +14,16 @@ __docformat__ = 'restructuredtext en'
 # import numbers
 
 from sknano.core import BaseClass
+from sknano.core.crystallography import BaseStructure
 from sknano.core.refdata import aCC, element_data
 from ._mixins import BasisMixin
 
-__all__ = ['StructureBase']
+__all__ = ['NanoStructureBase']
 
 r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
 
-class StructureBase(BasisMixin, BaseClass):
+class NanoStructureBase(BaseStructure, BasisMixin, BaseClass):
     """Base class for creating abstract representations of nanostructure.
 
     Parameters
@@ -60,14 +61,7 @@ class StructureBase(BasisMixin, BaseClass):
         if bond is None:
             bond = aCC
         self.bond = bond
-
         super().__init__(*args, **kwargs)
-
-    def __getattr__(self, name):
-        try:
-            return getattr(self.unit_cell, name)
-        except AttributeError:
-            return super().__getattr__(name)
 
     @property
     def element1(self):
@@ -77,8 +71,8 @@ class StructureBase(BasisMixin, BaseClass):
     @element1.setter
     def element1(self, value):
         self.basis[0] = value
-        [self.unit_cell.basis.__setitem__(i, value)
-         for i in range(0, len(self.unit_cell.basis), 2)]
+        [self.crystal_cell.basis.__setitem__(i, value)
+         for i in range(0, len(self.crystal_cell.basis), 2)]
 
     @property
     def element2(self):
@@ -87,5 +81,5 @@ class StructureBase(BasisMixin, BaseClass):
     @element2.setter
     def element2(self, value):
         self.basis[1] = value
-        [self.unit_cell.basis.__setitem__(i, value)
-         for i in range(1, len(self.unit_cell.basis), 2)]
+        [self.crystal_cell.basis.__setitem__(i, value)
+         for i in range(1, len(self.crystal_cell.basis), 2)]

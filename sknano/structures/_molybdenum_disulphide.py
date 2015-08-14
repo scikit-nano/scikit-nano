@@ -18,12 +18,12 @@ import numpy as np
 
 #from sknano.core.atoms import Atom
 from sknano.core.math import Vector
-from ._base import StructureBase
+from ._base import NanoStructureBase
 
 __all__ = ['MoS2']
 
 
-class MoS2(StructureBase):
+class MoS2(NanoStructureBase):
     """Molybdenum disulphide structure class.
 
     Parameters

@@ -20,7 +20,7 @@ from sknano.core.crystallography import Crystal3DLattice, UnitCell
 from sknano.core.math import Vector
 from sknano.core.refdata import aCC
 
-from ._base import StructureBase, r_CC_vdw
+from ._base import NanoStructureBase, r_CC_vdw
 from ._extras import get_chiral_indices
 from ._swnt import NanotubeMixin, compute_Ch, compute_T
 
@@ -79,7 +79,7 @@ class UnrolledSWNTMixin:
         self._integral_nx = False if self.fix_Lx else True
 
 
-class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, StructureBase):
+class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
     """Unrolled SWNT structure class.
 
     Parameters

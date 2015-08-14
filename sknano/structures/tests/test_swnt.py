@@ -3,8 +3,9 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
 import nose
-from nose.tools import *
+from nose.tools import assert_equal, assert_almost_equal  # , assert_true
 from sknano.structures import SWNT
+from sknano.testing import generate_structure
 
 
 def test1():
@@ -134,6 +135,18 @@ def test6():
     assert_equal(swnt.unit_cell.basis.symbols.tolist()[:2], ['N', 'B'])
     print(swnt.unit_cell)
 
+
+def test7():
+    structure = generate_structure(generator_class='SWNTGenerator',
+                                   n=5, m=0, nz=2)
+    print(structure)
+    print(structure.crystal_cell)
+    print(structure.crystal_cell.lattice)
+    print(structure.crystal_cell.basis)
+    print(structure.unit_cell)
+    print(structure.unit_cell.basis)
+    assert_equal(2 * structure.unit_cell.basis.Natoms,
+                 structure.crystal_cell.basis.Natoms)
 
 if __name__ == '__main__':
     nose.runmodule()

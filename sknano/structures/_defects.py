@@ -17,7 +17,7 @@ from collections import namedtuple
 
 # from sknano.core import frozendict
 
-# from ._base import StructureBase
+# from ._base import NanoStructureBase
 
 __all__ = ['Vacancy', 'SingleVacancy', 'DoubleVacancy', 'TripleVacancy',
            'PointDefect']

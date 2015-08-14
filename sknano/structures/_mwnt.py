@@ -16,7 +16,7 @@ import numpy as np
 from sknano.core.crystallography import Crystal3DLattice, UnitCell
 from sknano.core.refdata import aCC, element_data
 
-from ._base import StructureBase, r_CC_vdw
+from ._base import NanoStructureBase, r_CC_vdw
 from ._swnt import SWNT, compute_dt, compute_T
 from ._extras import generate_Ch_list
 
@@ -287,7 +287,7 @@ class MWNTMixin:
                                   wall_spacing=wall_spacing)
 
 
-class MWNT(MWNTMixin, StructureBase):
+class MWNT(MWNTMixin, NanoStructureBase):
     """MWNT structure class.
 
     Parameters
