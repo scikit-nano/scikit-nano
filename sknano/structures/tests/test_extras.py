@@ -36,9 +36,9 @@ def test4():
 
 
 def test5():
-    Ch_list = generate_Ch_list(ni=5, nf=20, mi=0, mf=20, handedness='right')
-    Ch_list = filter_Ch_list(Ch_list, property_filters=[('n', '<=', 10)])
-    assert_equal(Ch_list, generate_Ch_list(ni=5, nf=10, mi=0, mf=20,
+    Ch_list = generate_Ch_list(ni=5, nf=10, mi=0, mf=5, handedness='right')
+    Ch_list = filter_Ch_list(Ch_list, property_filters=[('n', '<=', 8)])
+    assert_equal(Ch_list, generate_Ch_list(ni=5, nf=8, mi=0, mf=5,
                                            handedness='right'))
 
 if __name__ == '__main__':
