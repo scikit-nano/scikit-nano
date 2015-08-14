@@ -1650,8 +1650,7 @@ class SWNT(SWNTMixin, NanoStructureBase):
                     z += T
 
                 xs, ys, zs = \
-                    lattice.wrap_fractional_coordinate(
-                        lattice.cartesian_to_fractional([x, y, z]))
+                    lattice.cartesian_to_fractional([x, y, z])
 
                 if self.debug:
                     print('i={}: x, y, z = ({:.6f}, {:.6f}, {:.6f})'.format(
