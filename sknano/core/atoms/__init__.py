@@ -41,6 +41,8 @@ Base `Atom`/`Atoms` classes
    IDAtoms
    ImageAtom
    ImageAtoms
+   LatticeAtom
+   LatticeAtoms
    TypeAtom
    TypeAtoms
    VanDerWaalsAtom
@@ -58,6 +60,8 @@ Mixin `Atom`/`Atoms` classes
 
    KDTreeAtomMixin
    KDTreeAtomsMixin
+   NeighborAtomMixin
+   NeighborAtomsMixin
    POAVAtomMixin
    POAVAtomsMixin
    POAV
@@ -112,6 +116,7 @@ from ._charged_atoms import *
 from ._energy_atoms import *
 from ._id_atoms import *
 from ._type_atoms import *
+from ._lattice_atoms import *
 
 from ._basis_atoms import *
 
