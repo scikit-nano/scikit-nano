@@ -23,7 +23,7 @@ __all__ = ['NanoStructureBase']
 r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
 
-class NanoStructureBase(BaseStructure, BasisMixin, BaseClass):
+class NanoStructureBase(BasisMixin, BaseStructure, BaseClass):
     """Base class for creating abstract representations of nanostructure.
 
     Parameters
