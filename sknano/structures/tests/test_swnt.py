@@ -85,8 +85,11 @@ def test4():
     print(type(swnt.basis))
 
     print(swnt)
+    print(swnt.basis)
     print(swnt.basis[:2])
     print(type(swnt.basis[:2]))
+    print(swnt.crystal_cell)
+    print(swnt.crystal_cell.basis)
 
     swnt.element1 = 'N'
     assert_equal(swnt.element1, 'N')
