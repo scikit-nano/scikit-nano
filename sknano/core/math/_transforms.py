@@ -455,9 +455,10 @@ def transformation_matrix(angle=None, axis=None, anchor_point=None,
         axis = kwargs['rot_axis']
         del kwargs['rot_axis']
 
-    from . import vector, Vector, Point
+    from . import vector, Vector, Point, NullVector
 
-    if angle is None and not (from_vector is None and to_vector is None):
+    if angle is None and \
+            all([v is not None for v in (from_vector, to_vector)]):
         from_vector = Vector(from_vector)
         to_vector = Vector(to_vector)
         if from_vector.nd != to_vector.nd:
@@ -473,6 +474,8 @@ def transformation_matrix(angle=None, axis=None, anchor_point=None,
 
         elif from_vector.nd == 3:
             axis = vector.cross(from_vector, to_vector)
+            if axis == NullVector:
+                return I
 
             return transformation_matrix(angle=angle, axis=axis,
                                          anchor_point=anchor_point,
