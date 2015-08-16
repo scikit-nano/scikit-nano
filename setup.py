@@ -227,7 +227,7 @@ def setup_package():
     # 'scipy>=`min version`']``. We don't want to do that unconditionally,
     # because we risk updating an installed numpy/scipy which fails too often.
     # Just if the minimum version is not installed, we may give it a try.
-    install_requires = []
+    build_requires = []
     try:
         import numpy
         numpy_version = \
@@ -235,8 +235,9 @@ def setup_package():
         if numpy_version < (1, 9):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
-        install_requires += ['numpy==1.9.1']
+        build_requires += ['numpy==1.9.1']
 
+    install_requires = build_requires[:]
     try:
         import scipy
         scipy_version = \
@@ -251,6 +252,7 @@ def setup_package():
 
     # # Add future module to install requires
     # install_requires += ['future>=0.14.3']
+    install_requires += ['monty>=0.6.5', 'pymatgen>=3.1.6']
 
     metadata = dict(
         name=DISTNAME,
@@ -267,6 +269,7 @@ def setup_package():
         classifiers=[_f for _f in CLASSIFIERS.split('\n') if _f],
         platforms=["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"],
         test_suite='nose.collector',
+        setup_requires=build_requires,
         install_requires=install_requires,
         extras_require={
             'plotting': ['matplotlib>=1.4.3', 'palettable>=2.1.1']
