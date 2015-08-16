@@ -19,6 +19,18 @@ __all__ = ['BasisMixin']
 class BasisMixin:
     """Mixin class for structure atoms basis."""
     @property
+    def basis(self):
+        return self._basis
+
+    @basis.setter
+    def basis(self, value):
+        self._basis = value
+
+    @basis.deleter
+    def basis(self):
+        del self._basis
+
+    @property
     def vdw_radius(self):
         if self._vdw_radius is not None:
             return self._vdw_radius
