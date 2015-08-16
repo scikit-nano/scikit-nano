@@ -15,6 +15,7 @@ Helper funcs to generate test data
    :toctree: generated/
 
    generate_atoms
+   generate_structure
 
 Tools for timing processes
 ---------------------------
@@ -28,6 +29,7 @@ Test fixtures
 .. autosummary::
    :toctree: generated/
 
+   AtomsTestFixture
    GeneratorTestFixtures
 
 """

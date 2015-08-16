@@ -16,7 +16,7 @@ from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from sknano.core.refdata import element_symbols as periodic_table_of_elements
 from sknano.generators import STRUCTURE_GENERATORS
 
-__all__ = ['generate_atoms']
+__all__ = ['generate_atoms', 'generate_structure']
 
 
 def generate_atoms(*args, elements=None, generator_class=None, **kwargs):
@@ -33,11 +33,22 @@ def generate_atoms(*args, elements=None, generator_class=None, **kwargs):
     elif generator_class is not None and \
             generator_class in STRUCTURE_GENERATORS:
         try:
-            generator = getattr(importlib.import_module('sknano.generators'),
-                                generator_class)
-            structure = generator(*args, **kwargs)
-            atoms = structure.atoms
-        except ImportError as e:
+            atoms = generate_structure(*args, generator_class=generator_class,
+                                       **kwargs).atoms
+        except AttributeError as e:
             print(e)
 
     return atoms
+
+
+def generate_structure(*args, generator_class=None, **kwargs):
+    """Helper function to generate :class:`~sknano.io.StructureData` \
+        for running unit tests.
+
+    """
+    try:
+        generator = getattr(importlib.import_module('sknano.generators'),
+                            generator_class)
+        return generator(*args, **kwargs)
+    except ImportError as e:
+        print(e)
