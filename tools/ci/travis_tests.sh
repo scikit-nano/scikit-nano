@@ -16,9 +16,9 @@ python -c "import scipy; print('scipy %s' % scipy.__version__)"
 export SKNANO_SKIP_GUI_TESTS=1
 
 if [[ "$COVERAGE" == "true" ]]; then
-    nosetests -s --with-coverage sknano
+    nosetests -vs --with-coverage sknano
 else
-    nosetests -s sknano
+    nosetests -vs sknano
 fi
 
 # make test-doc test-sphinxext
