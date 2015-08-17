@@ -13,11 +13,11 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-from sknano.core.crystallography import Crystal3DLattice, UnitCell
+# from sknano.core.crystallography import Crystal3DLattice, UnitCell
 from sknano.core.refdata import aCC, element_data
 
 from ._base import NanoStructureBase, r_CC_vdw
-from ._swnt import SWNT, compute_dt, compute_T
+from ._swnt import SWNT, compute_dt  # , compute_T
 from ._extras import generate_Ch_list
 
 __all__ = ['MWNTMixin', 'MWNT']
@@ -199,6 +199,10 @@ class MWNTMixin:
         return [SWNT(Ch, Lz=self.Lz, fix_Lz=True, basis=self.basis,
                      bond=self.bond) for Ch in self.Ch_list]
 
+    def get_wall(self, Ch):
+        return SWNT(Ch, Lz=self.Lz, fix_Lz=True, basis=self.basis,
+                    bond=self.bond) if Ch in self.Ch_list else None
+
     def generate_dt_mask(self, dt, max_dt_diff=0.5):
         """Generate boolean mask array.
 
@@ -365,11 +369,7 @@ class MWNT(MWNTMixin, NanoStructureBase):
             Lz = 1.0
         self.Lz = Lz
 
-        a = compute_dt(self.Ch_list[-1], bond=bond) + 2 * self.vdw_radius
-        c = compute_T(self.Ch_list[-1], bond=bond, length=True)
-
-        self.unit_cell = UnitCell(lattice=Crystal3DLattice.hexagonal(a, c),
-                                  basis=self.basis)
+        self.unit_cell = self.get_wall(self.Ch_list[-1]).unit_cell
 
         if self.verbose:
             print(self.walls)
