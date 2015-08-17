@@ -14,7 +14,6 @@ Base I/O classes to inherit from when creating new I/O classes
 .. autosummary::
    :toctree: generated/
 
-   StructureData
    StructureIO
    StructureReader
    StructureWriter

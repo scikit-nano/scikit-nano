@@ -15,6 +15,7 @@ from abc import ABCMeta, abstractmethod
 
 from sknano.core import get_fpath
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
+from sknano.core.crystallography import StructureData
 # from sknano.utils.analysis import StructureAnalyzer
 from sknano.version import version
 
@@ -24,7 +25,6 @@ default_structure_format = 'xyz'
 supported_structure_formats = ('xyz', 'data', 'dump')
 
 __all__ = ['Atom', 'Atoms',
-           'StructureData',
            'StructureIO',
            'StructureReader',
            'StructureWriter',
@@ -36,34 +36,7 @@ __all__ = ['Atom', 'Atoms',
            'supported_structure_formats']
 
 
-class StructureData:
-    """Container class for structure data."""
-    def __init__(self):
-        self._atoms = Atoms()
-        super().__init__()
-
-    @property
-    def atoms(self):
-        return self._atoms
-
-    def __getattr__(self, name):
-        if name != '_atoms':
-            return getattr(self._atoms, name)
-
-    def __setattr__(self, name, value):
-        if name.startswith('_'):
-            super().__setattr__(name, value)
-        else:
-            setattr(self._atoms, name, value)
-
-    def __delattr__(self, name):
-        if name.startswith('_'):
-            super().__delattr__(name)
-        else:
-            delattr(self._atoms, name)
-
-
-class StructureIO:
+class StructureIO(StructureData):
     """Base class for structure data file input and output.
 
     Parameters
@@ -72,12 +45,12 @@ class StructureIO:
 
     """
     def __init__(self, fpath=None, fname=None, **kwargs):
+        super().__init__()
         self.comment_line = default_comment_line
         if fpath is None and fname is not None:
             fpath = fname
         self.fpath = fpath
         self.kwargs = kwargs
-        self.structure_data = StructureData()
 
     @property
     def comment_line(self):
@@ -100,9 +73,6 @@ class StructureIO:
     @comment_line.deleter
     def comment_line(self):
         del self._comment_line
-
-    def __getattr__(self, name):
-        return getattr(self.structure_data, name)
 
     def __deepcopy__(self, memo):
         from copy import deepcopy
