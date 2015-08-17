@@ -25,7 +25,9 @@ Nanostructure Classes
    Fullerene
    Graphene
    PrimitiveCellGraphene
+   HexagonalGraphene
    ConventionalCellGraphene
+   RectangularGraphene
    BilayerGraphene
    SWNT
    SWNTBundle
@@ -39,6 +41,7 @@ Base/Mixin Classes
    :toctree: generated/
 
    NanoStructureBase
+   GrapheneBase
    NanotubeBundleBase
    GrapheneMixin
    SWNTMixin
