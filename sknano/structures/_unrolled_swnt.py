@@ -15,7 +15,7 @@ import numbers
 
 import numpy as np
 
-from sknano.core.atoms import BasisAtom as Atom
+from sknano.core.atoms import BasisAtom as Atom, BasisAtoms as Atoms
 from sknano.core.crystallography import Crystal3DLattice, UnitCell
 from sknano.core.math import Vector
 from sknano.core.refdata import aCC
@@ -157,7 +157,7 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
                  layer_rotation_angles=None,
                  layer_rotation_increment=None, degrees=True,
                  stacking_order='AB', Lx=None, fix_Lx=False,
-                 Lz=None, fix_Lz=False, **kwargs):
+                 Lz=None, fix_Lz=False, wrap_coords=False, **kwargs):
 
         n, m, kwargs = get_chiral_indices(*Ch, **kwargs)
 
@@ -166,13 +166,8 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
         if gutter is None:
             gutter = self.vdw_radius
 
-        a = compute_Ch(n, m, bond=bond)
-        b = layer_spacing
-        c = compute_T(n, m, bond=bond, length=True)
-
-        self.unit_cell = \
-            UnitCell(lattice=Crystal3DLattice.orthorhombic(a, b, c),
-                     basis=self.basis)
+        self.gutter = gutter
+        self.wrap_coords = wrap_coords
 
         self.n = n
         self.m = m
@@ -222,6 +217,8 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
             self.layer_shift.x = self.bond
 
         self.generate_unit_cell()
+        self.crystal_cell.scaling_matrix = \
+            [int(np.ceil(self.nx)), self.nlayers, int(np.ceil(self.nz))]
 
         self.fmtstr = "{Ch!r}, nx={nx!r}, nz={nz!r}, bond={bond!r}, " + \
             "basis={basis!r}, nlayers={nlayers!r}, " + \
@@ -240,9 +237,12 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
 
         psi, tau, dpsi, dtau = self.unit_cell_symmetry_params
 
-        lattice = self.unit_cell.lattice
-        self.unit_cell.basis.clear()
+        a = compute_Ch(self.n, self.m, bond=self.bond)
+        b = self.layer_spacing
+        c = compute_T(self.n, self.m, bond=self.bond, length=True)
+        lattice = Crystal3DLattice.orthorhombic(a, b, c)
 
+        basis = Atoms()
         if self.verbose:
             print('dpsi: {}'.format(dpsi))
             print('dtau: {}\n'.format(dtau))
@@ -266,8 +266,10 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
                     z += T
 
                 xs, ys, zs = \
-                    lattice.wrap_fractional_coordinate(
-                        lattice.cartesian_to_fractional([x, 0, z]))
+                    lattice.cartesian_to_fractional([x, 0, z])
+                if self.wrap_coords:
+                    xs, ys, zs = \
+                        lattice.wrap_fractional_coordinate([xs, ys, zs])
 
                 if self.debug:
                     print('i={}: x, z = ({:.6f}, {:.6f})'.format(i, x, z))
@@ -278,7 +280,9 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
                 if self.verbose:
                     print('Basis Atom:\n{}'.format(atom))
 
-                self.unit_cell.basis.append(atom)
+                basis.append(atom)
+
+        self.unit_cell = UnitCell(lattice=lattice, basis=basis)
 
     def todict(self):
         """Return :class:`~python:dict` of `SWNT` attributes."""

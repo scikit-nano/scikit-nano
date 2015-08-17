@@ -15,7 +15,7 @@ from fractions import gcd
 import numbers
 import numpy as np
 
-from sknano.core.atoms import Atom, BasisAtom
+from sknano.core.atoms import Atom, BasisAtom, BasisAtoms
 from sknano.core.crystallography import Crystal3DLattice, UnitCell
 from sknano.core.refdata import aCC, grams_per_Da
 from ._base import NanoStructureBase, r_CC_vdw
@@ -1542,7 +1542,8 @@ class SWNT(SWNTMixin, NanoStructureBase):
                         'electronic_type']
 
     def __init__(self, *Ch, nz=None, basis=['C', 'C'], bond=aCC,
-                 gutter=None, Lz=None, fix_Lz=False, **kwargs):
+                 gutter=None, Lz=None, fix_Lz=False, wrap_coords=False,
+                 **kwargs):
 
         n, m, kwargs = get_chiral_indices(*Ch, **kwargs)
 
@@ -1554,10 +1555,8 @@ class SWNT(SWNTMixin, NanoStructureBase):
 
         if gutter is None:
             gutter = self.vdw_radius
-        a = compute_dt(n, m, bond=bond) + 2 * gutter
-        c = compute_T(n, m, bond=bond, length=True)
-        self.unit_cell = UnitCell(lattice=Crystal3DLattice.hexagonal(a, c),
-                                  basis=self.basis)
+        self.gutter = gutter
+        self.wrap_coords = wrap_coords
 
         self.L0 = Lz  # store initial value of Lz
 
@@ -1573,9 +1572,7 @@ class SWNT(SWNTMixin, NanoStructureBase):
             self.nz = 1
 
         self.generate_unit_cell()
-
-        if self._integral_nz and self.nz > 1:
-            self.crystal_cell.scaling_matrix = [1, 1, self.nz]
+        self.crystal_cell.scaling_matrix = [1, 1, int(np.ceil(self.nz))]
 
         fmtstr = "{Ch!r}, "
         if self.fix_Lz:
@@ -1624,8 +1621,11 @@ class SWNT(SWNTMixin, NanoStructureBase):
 
         psi, tau, dpsi, dtau = self.unit_cell_symmetry_params
 
-        lattice = self.unit_cell.lattice
-        self.unit_cell.basis.clear()
+        a = compute_dt(self.n, self.m, bond=self.bond) + 2 * self.gutter
+        c = compute_T(self.n, self.m, bond=self.bond, length=True)
+        lattice = Crystal3DLattice.hexagonal(a, c)
+        basis = BasisAtoms()
+
         if self.verbose:
             print('dpsi: {}'.format(dpsi))
             print('dtau: {}\n'.format(dtau))
@@ -1652,6 +1652,10 @@ class SWNT(SWNTMixin, NanoStructureBase):
                 xs, ys, zs = \
                     lattice.cartesian_to_fractional([x, y, z])
 
+                if self.wrap_coords:
+                    xs, ys, zs = \
+                        lattice.wrap_fractional_coordinate([xs, ys, zs])
+
                 if self.debug:
                     print('i={}: x, y, z = ({:.6f}, {:.6f}, {:.6f})'.format(
                         i, x, y, z))
@@ -1668,7 +1672,9 @@ class SWNT(SWNTMixin, NanoStructureBase):
                 if self.verbose:
                     print('Basis Atom:\n{}'.format(atom))
 
-                self.unit_cell.basis.append(atom)
+                basis.append(atom)
+
+        self.unit_cell = UnitCell(lattice=lattice, basis=basis)
 
     def todict(self):
         """Return :class:`~python:dict` of `SWNT` attributes."""
