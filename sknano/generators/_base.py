@@ -49,15 +49,6 @@ STRUCTURE_GENERATORS = ('FullereneGenerator',
 class GeneratorBase(metaclass=ABCMeta):
     """Base class for generator classes"""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def __getattr__(self, name):
-        try:
-            return getattr(self.atoms, name)
-        except AttributeError:
-            return super().__getattr__(name)
-
     @property
     @abstractmethod
     def generate(self):
