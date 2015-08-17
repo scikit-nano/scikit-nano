@@ -219,7 +219,7 @@ class LatticeAtom(Atom):
         """
         # TODO compare timing benchmarks for translation of position vector.
         try:
-            self.lattice.translate(t, fix_anchor_point=fix_anchor_point)
+            self.lattice.translate(t)
         except AttributeError:
             pass
         super().translate(t, fix_anchor_point=fix_anchor_point)
