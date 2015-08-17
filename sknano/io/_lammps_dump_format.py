@@ -65,7 +65,16 @@ class DUMPReader(StructureIO):
         self.read()
 
     def __getattr__(self, name):
-        return getattr(self.trajectory, name)
+        try:
+            return getattr(self.trajectory, name)
+        except AttributeError:
+            return super().__getattr__(name)
+
+    def __iter__(self):
+        return iter(self.trajectory)
+
+    def __getitem__(self, index):
+        return self.trajectory[index]
 
     def read(self):
         """Read all snapshots from each dump file."""
