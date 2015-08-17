@@ -13,17 +13,19 @@ __docformat__ = 'restructuredtext en'
 
 from functools import total_ordering
 
-import numpy as np
+# import numpy as np
 
 from sknano.core import BaseClass
-from sknano.core.atoms import BasisAtom as Atom, BasisAtoms as Atoms
+from sknano.core.atoms import BasisAtom as Atom, BasisAtoms as Atoms, \
+    StructureAtoms
 from sknano.core.refdata import lattice_parameters as lattparams
 
 from ._extras import pymatgen_structure
-from ._xtal_cells import UnitCell
+from ._xtal_cells import CrystalCell, UnitCell, SuperCell
 from ._xtal_lattices import Crystal2DLattice, Crystal3DLattice
 
-__all__ = ['StructureBase', 'Crystal2DStructure',
+__all__ = ['BaseStructureMixin', 'BaseStructure',
+           'CrystalStructureBase', 'Crystal2DStructure',
            'CrystalStructure', 'Crystal3DStructure',
            'CaesiumChlorideStructure', 'CsClStructure',
            'DiamondStructure',
@@ -35,8 +37,98 @@ __all__ = ['StructureBase', 'Crystal2DStructure',
            'HexagonalStructure', 'AlphaQuartz', 'MoS2']
 
 
+class BaseStructureMixin:
+    """Mixin class for crystal structures."""
+
+    def __getattr__(self, name):
+        try:
+            return getattr(self.crystal_cell, name)
+        except AttributeError:
+            return super().__getattr__(name)
+
+    @property
+    def atoms(self):
+        return self._atoms
+
+    @property
+    def basis(self):
+        if self.crystal_cell is not None:
+            if self.crystal_cell.basis is not None:
+                return self.crystal_cell.basis
+            else:
+                return self.unit_cell.basis
+
+    @property
+    def lattice(self):
+        if self.crystal_cell is not None:
+            if self.crystal_cell.lattice is not None:
+                return self.crystal_cell.lattice
+            else:
+                return self.unit_cell.lattice
+
+    @property
+    def crystal_cell(self):
+        return self._crystal_cell
+
+    @crystal_cell.setter
+    def crystal_cell(self, value):
+        self._crystal_cell = value
+
+    @property
+    def unit_cell(self):
+        return self.crystal_cell.unit_cell
+
+    @unit_cell.setter
+    def unit_cell(self, value):
+        if self.crystal_cell is None:
+            self._crystal_cell = CrystalCell(unit_cell=value)
+        else:
+            self._crystal_cell.unit_cell = value
+
+    # def __deepcopy__(self, memo):
+    #     from copy import deepcopy
+    #     cp = self.__class__()
+    #     memo[id(self)] = cp
+    #     for attr in dir(self):
+    #         if not attr.startswith('_'):
+    #             setattr(cp, attr, deepcopy(getattr(self, attr), memo))
+    #     return cp
+
+    @property
+    def structure_data(self):
+        return self
+
+    @property
+    def structure(self):
+        return self
+
+    @property
+    def scaling_matrix(self):
+        if self.crystal_cell is not None:
+            return self.crystal_cell.scaling_matrix
+        else:
+            return None
+
+    @scaling_matrix.setter
+    def scaling_matrix(self, value):
+        if self.crystal_cell is not None:
+            self.crystal_cell.scaling_matrix = value
+        else:
+            raise ValueError('No `CrystalCell` to scale')
+
+    def clear(self):
+        self.atoms.clear()
+
+
+class BaseStructure(BaseStructureMixin):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._atoms = StructureAtoms()
+        self._crystal_cell = None
+
+
 @total_ordering
-class StructureBase(BaseClass):
+class CrystalStructureBase(BaseStructure, BaseClass):
     """Base class for abstract representions of crystal structures.
 
     Parameters
@@ -53,58 +145,26 @@ class StructureBase(BaseClass):
                  cartesian=False, scaling_matrix=None, **kwargs):
 
         super().__init__(**kwargs)
-
         self.unit_cell = UnitCell(lattice=lattice, basis=basis,
                                   coords=coords, cartesian=cartesian)
 
         self.scaling_matrix = scaling_matrix
-        if scaling_matrix is not None and \
-                isinstance(scaling_matrix,
-                           (int, float, tuple, list, np.ndarray)):
-            if isinstance(scaling_matrix, (int, float)):
-                scaling_matrix = 3 * [scaling_matrix]
-            self.scaling_matrix = scaling_matrix
-
         self.fmtstr = self.unit_cell.fmtstr + \
             ", scaling_matrix={scaling_matrix!r}"
 
     def __dir__(self):
-        return ['unit_cell', 'scaling_matrix']
-
-    def __getattr__(self, name):
-        try:
-            return getattr(self.unit_cell, name)
-        except AttributeError:
-            return super().__getattr__(name)
+        return dir(self.crystal_cell)
 
     def __eq__(self, other):
-        if isinstance(other, StructureBase):
-            return self is other or \
-                (self.unit_cell == other.unit_cell and
-                 self.scaling_matrix == other.scaling_matrix)
+        if isinstance(other, CrystalStructureBase):
+            return self is other or self.crystal_cell == other.crystal_cell
 
     def __lt__(self, other):
-        if isinstance(other, StructureBase):
-            try:
-                return ((self.scaling_matrix < other.scaling_matrix and
-                         self.unit_cell <= other.unit_cell) or
-                        (self.scaling_matrix <= other.scaling_matrix and
-                         self.unit_cell < other.unit_cell))
-            except TypeError:
-                return self.unit_cell < other.unit_cell
-
-    # @property
-    # def atoms(self):
-    #     return self._atoms
-
-    # @atoms.setter
-    # def atoms(self, value):
-    #     if not isinstance(value, Atoms):
-    #         raise TypeError('Expected an `Atoms` object')
-    #     self._atoms = value
+        if isinstance(other, CrystalStructureBase):
+            return self.crystal_cell < other.crystal_cell
 
     def make_supercell(self, scaling_matrix):
-        pass
+        return SuperCell(self.unit_cell, scaling_matrix)
 
     def rotate(self, **kwargs):
         """Rotation the structure unit cell."""
@@ -112,11 +172,11 @@ class StructureBase(BaseClass):
 
     def todict(self):
         attrdict = self.unit_cell.todict()
-        attrdict.update(dict(scaling_matrix=self.scaling_matrix))
+        attrdict.update(dict(scaling_matrix=self.scaling_matrix.tolist()))
         return attrdict
 
 
-class Crystal2DStructure(StructureBase):
+class Crystal2DStructure(CrystalStructureBase):
     """Base class for 2D crystal structures.
 
     .. warning:: The implementation of this class is not complete.
@@ -150,26 +210,46 @@ class Crystal2DStructure(StructureBase):
                    cell_matrix=structure.lattice.matrix), basis=atoms,
                    scaling_matrix=scaling_matrix)
 
-    @classmethod
-    def from_spacegroup(cls, sg, lattice, basis, coords, scaling_matrix=None):
+    def from_spacegroup(cls, sg, lattice=None, basis=None, coords=None,
+                        **kwargs):
+        """Return a `Crystal2DStructure` from a spacegroup number/symbol.
+
+        Parameters
+        ----------
+        sg : :class:`~python:int` or :class:`~python:str`
+        lattice : :class:`Crystal2DLattice`
+        basis : :class:`~python:list` of :class:`~python:str`\ s
+        coords : :class:`~python:list` of :class:`~python:float`\ s
+
+        Returns
+        -------
+        :class:`Crystal2DStructure`
+
+        Notes
+        -----
+        Under the hood this method first s a pymatgen
+        :class:`~pymatgen:Structure`
+
+        See Also
+        --------
+        pymatgen_structure
+
+        """
         if not isinstance(basis, list):
             basis = [basis]
         if len(basis) != len(coords):
             if isinstance(coords, list) and len(coords) != 0 and \
                     isinstance(coords[0], (int, float)):
                 coords = [coords]
-                cls.from_spacegroup(sg, lattice, basis, coords,
-                                    scaling_matrix=scaling_matrix)
+                cls.from_spacegroup(sg, lattice, basis, coords, **kwargs)
 
         structure = \
             pymatgen_structure(sg, lattice.cell_matrix, basis, coords,
-                               classmethod='from_spacegroup',
-                               scaling_matrix=scaling_matrix)
-        return cls.from_pymatgen_structure(structure,
-                                           scaling_matrix=scaling_matrix)
+                               classmethod='from_spacegroup')
+        return cls.from_pymatgen_structure(structure, **kwargs)
 
 
-class Crystal3DStructure(StructureBase):
+class Crystal3DStructure(CrystalStructureBase):
     """Base class for 3D crystal structures.
 
     Parameters
@@ -221,7 +301,7 @@ class Crystal3DStructure(StructureBase):
 
     @classmethod
     def from_spacegroup(cls, sg, lattice=None, basis=None, coords=None,
-                        scaling_matrix=None):
+                        **kwargs):
         """Return a `Crystal3DStructure` from a spacegroup number/symbol.
 
         Parameters
@@ -230,7 +310,6 @@ class Crystal3DStructure(StructureBase):
         lattice : :class:`Crystal3DLattice`
         basis : :class:`~python:list` of :class:`~python:str`\ s
         coords : :class:`~python:list` of :class:`~python:float`\ s
-        scaling_matrix : {None, :class:`~python:int`, :class:`~python:list`}
 
         Returns
         -------
@@ -253,16 +332,13 @@ class Crystal3DStructure(StructureBase):
                     isinstance(coords[0], (int, float)):
                 coords = [coords]
                 cls.from_spacegroup(sg, lattice=lattice, basis=basis,
-                                    coords=coords,
-                                    scaling_matrix=scaling_matrix)
+                                    coords=coords, **kwargs)
 
         structure = \
             pymatgen_structure(sg, lattice.cell_matrix, basis, coords,
-                               classmethod='from_spacegroup',
-                               scaling_matrix=scaling_matrix)
+                               classmethod='from_spacegroup')
 
-        return cls.from_pymatgen_structure(structure,
-                                           scaling_matrix=scaling_matrix)
+        return cls.from_pymatgen_structure(structure, **kwargs)
 
 CrystalStructure = Crystal3DStructure
 
@@ -277,8 +353,7 @@ class MoS2(Crystal3DStructure):
             pymatgen_structure(194,
                                Crystal3DLattice.hexagonal(a, c).cell_matrix,
                                basis, [[1/3, 2/3, 1/4], [1/3, 2/3, 0.621]],
-                               classmethod='from_spacegroup',
-                               scaling_matrix=scaling_matrix)
+                               classmethod='from_spacegroup')
         molybdenum_disulphide = \
             Crystal3DStructure.from_pymatgen_structure(
                 molybdenum_disulphide, scaling_matrix=scaling_matrix)
@@ -293,8 +368,7 @@ class CaesiumChlorideStructure(Crystal3DStructure):
         caesium_chloride = \
             pymatgen_structure(221, Crystal3DLattice.cubic(a).cell_matrix,
                                basis, [[0, 0, 0], [0.5, 0.5, 0.5]],
-                               classmethod='from_spacegroup',
-                               scaling_matrix=scaling_matrix)
+                               classmethod='from_spacegroup')
         caesium_chloride = \
             Crystal3DStructure.from_pymatgen_structure(
                 caesium_chloride, scaling_matrix=scaling_matrix)
@@ -311,8 +385,7 @@ class DiamondStructure(Crystal3DStructure):
         diamond = \
             pymatgen_structure(227, Crystal3DLattice.cubic(a).cell_matrix,
                                basis, [[0, 0, 0]],
-                               classmethod='from_spacegroup',
-                               scaling_matrix=scaling_matrix)
+                               classmethod='from_spacegroup')
         diamond = \
             Crystal3DStructure.from_pymatgen_structure(
                 diamond, scaling_matrix=scaling_matrix)
@@ -326,8 +399,7 @@ class RocksaltStructure(Crystal3DStructure):
         rock_salt = \
             pymatgen_structure(225, Crystal3DLattice.cubic(a).cell_matrix,
                                basis, [[0, 0, 0], [0.5, 0.5, 0.5]],
-                               classmethod='from_spacegroup',
-                               scaling_matrix=scaling_matrix)
+                               classmethod='from_spacegroup')
         rock_salt = \
             Crystal3DStructure.from_pymatgen_structure(
                 rock_salt, scaling_matrix=scaling_matrix)
@@ -343,8 +415,7 @@ class ZincblendeStructure(Crystal3DStructure):
         zincblende = \
             pymatgen_structure(216, Crystal3DLattice.cubic(a).cell_matrix,
                                basis, [[0, 0, 0], [0.25, 0.25, 0.25]],
-                               classmethod='from_spacegroup',
-                               scaling_matrix=scaling_matrix)
+                               classmethod='from_spacegroup')
         zincblende = \
             Crystal3DStructure.from_pymatgen_structure(
                 zincblende, scaling_matrix=scaling_matrix)
@@ -505,8 +576,7 @@ class AlphaQuartz(HexagonalStructure):
                   [0.8539, 0.5867, 0.4521],
                   [0.1461, 0.7328, 0.8812]]
         alpha_quartz = pymatgen_structure(lattice.cell_matrix,
-                                          basis.symbols, coords,
-                                          scaling_matrix=scaling_matrix)
+                                          basis.symbols, coords)
         alpha_quartz = \
             Crystal3DStructure.from_pymatgen_structure(
                 alpha_quartz, scaling_matrix=scaling_matrix)

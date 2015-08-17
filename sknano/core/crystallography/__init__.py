@@ -55,7 +55,7 @@ Helper functions
 .. autosummary::
    :toctree: generated/
 
-   generate_supercell
+   supercell_lattice_points
    pymatgen_structure
 
 """

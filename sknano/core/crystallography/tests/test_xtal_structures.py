@@ -81,7 +81,7 @@ def test10():
     print(s1)
     s2 = Gold()
     print(s2)
-    assert_equal(s1.scaling_matrix, s2.scaling_matrix)
+    assert_true(np.allclose(s1.scaling_matrix, s2.scaling_matrix))
     assert_equal(s1.lattice, s2.lattice)
     assert_equal(s1.unit_cell, s2.unit_cell)
     assert_equal(s2, s1)
@@ -96,6 +96,7 @@ def test12():
     print(structure)
     structure2 = FCCStructure('Au', scaling_matrix=2)
     print(structure2)
+    assert_equal(4 ** 3 * structure.Natoms, structure2.Natoms)
 
 
 def test13():
@@ -112,6 +113,7 @@ def test14():
     structure = \
         generate_structure(generator_class='SWNTGenerator', n=5, m=0, nz=2)
     print(structure)
+    print(structure.crystal_cell)
 
 
 if __name__ == '__main__':
