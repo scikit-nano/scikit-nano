@@ -14,16 +14,16 @@ __docformat__ = 'restructuredtext en'
 # import numbers
 
 from sknano.core import BaseClass
+from sknano.core.atoms import vdw_radius_from_basis
 from sknano.core.crystallography import BaseStructure
 from sknano.core.refdata import aCC, element_data
-from ._mixins import BasisMixin
 
 __all__ = ['NanoStructureBase']
 
 r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
 
-class NanoStructureBase(BasisMixin, BaseStructure, BaseClass):
+class NanoStructureBase(BaseStructure, BaseClass):
     """Base class for creating abstract representations of nanostructure.
 
     Parameters
@@ -37,14 +37,14 @@ class NanoStructureBase(BasisMixin, BaseStructure, BaseClass):
 
         if basis is None:
             basis = ['C', 'C']
-        self.basis = basis[:]
+        basis = basis[:]
 
         if 'element1' in kwargs:
-            self.basis[0] = kwargs['element1']
+            basis[0] = kwargs['element1']
             del kwargs['element1']
 
         if 'element2' in kwargs:
-            self.basis[1] = kwargs['element2']
+            basis[1] = kwargs['element2']
             del kwargs['element2']
 
         if 'vdw_spacing' in kwargs:
@@ -56,12 +56,49 @@ class NanoStructureBase(BasisMixin, BaseStructure, BaseClass):
         else:
             vdw_radius = None
 
-        self.vdw_radius = vdw_radius
-
         if bond is None:
             bond = aCC
-        self.bond = bond
+
         super().__init__(*args, **kwargs)
+
+        self.bond = bond
+        self.basis = basis
+        self.vdw_radius = vdw_radius
+
+    @property
+    def basis(self):
+        """:class:`NanoStructureBase` basis atoms."""
+        return self._basis
+
+    @basis.setter
+    def basis(self, value):
+        self._basis = value
+        try:
+            [self.crystal_cell.update_basis(element, index=i, step=2) for
+             i, element in enumerate(self.basis)]
+        except AttributeError:
+            pass
+
+    @basis.deleter
+    def basis(self):
+        del self._basis
+
+    @property
+    def vdw_radius(self):
+        """van der Waals radius"""
+        if self._vdw_radius is not None:
+            return self._vdw_radius
+        else:
+            return vdw_radius_from_basis(self.basis[0], self.basis[1])
+
+    @vdw_radius.setter
+    def vdw_radius(self, value):
+        self._vdw_radius = value
+
+    @property
+    def vdw_distance(self):
+        """van der Waals distance."""
+        return 2 * self.vdw_radius
 
     @property
     def element1(self):
@@ -71,15 +108,20 @@ class NanoStructureBase(BasisMixin, BaseStructure, BaseClass):
     @element1.setter
     def element1(self, value):
         self.basis[0] = value
-        [self.crystal_cell.basis.__setitem__(i, value)
-         for i in range(0, len(self.crystal_cell.basis), 2)]
+        try:
+            self.crystal_cell.update_basis(value, index=0, step=2)
+        except AttributeError:
+            pass
 
     @property
     def element2(self):
+        "Basis element 2"
         return self.basis[1]
 
     @element2.setter
     def element2(self, value):
         self.basis[1] = value
-        [self.crystal_cell.basis.__setitem__(i, value)
-         for i in range(1, len(self.crystal_cell.basis), 2)]
+        try:
+            self.crystal_cell.update_basis(value, index=1, step=2)
+        except AttributeError:
+            pass
