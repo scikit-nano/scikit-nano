@@ -175,6 +175,7 @@ class TestCase(AtomsTestFixture):
         atoms = \
             generate_atoms(generator_class='SWNTGenerator', n=10, m=0, nz=2)
         # atoms.NNrc = 2.0
+        atoms.assign_unique_ids()
         atoms.compute_POAVs()
 
         for i, atom in enumerate(atoms):
@@ -191,19 +192,19 @@ class TestCase(AtomsTestFixture):
 
                     pyramidalization_angles = \
                         np.degrees(atom_POAV.pyramidalization_angles)
+                    print('atom{}.{}.pyramidalization_angles:\n{}'.format(
+                        atom.id, POAV, pyramidalization_angles))
                     assert_false(np.all(np.isclose(pyramidalization_angles,
                                                    3 * [np.nan],
                                                    equal_nan=True)))
-                    print('atom{}.{}.pyramidalization_angles:\n{}'.format(
-                        atom.id, POAV, pyramidalization_angles))
 
                     misalignment_angles = \
                         np.degrees(atom_POAV.misalignment_angles)
+                    print('atom{}.{}.misalignment_angles:\n{}\n'.format(
+                        atom.id, POAV, misalignment_angles))
                     assert_false(np.all(np.isclose(misalignment_angles,
                                                    3 * [np.nan],
                                                    equal_nan=True)))
-                    print('atom{}.{}.misalignment_angles:\n{}\n'.format(
-                        atom.id, POAV, misalignment_angles))
 
 
 if __name__ == '__main__':
