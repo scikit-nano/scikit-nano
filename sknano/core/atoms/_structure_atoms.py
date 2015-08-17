@@ -16,14 +16,15 @@ from operator import attrgetter
 
 from ._cn_atoms import CNAtom, CNAtoms
 from ._id_atoms import IDAtom, IDAtoms
-from ._xyz_atoms import XYZAtom, XYZAtoms
 from ._charged_atoms import ChargedAtom, ChargedAtoms
-from ._velocity_atoms import VelocityAtom, VelocityAtoms
 from ._image_atoms import ImageAtom, ImageAtoms
 from ._type_atoms import TypeAtom, TypeAtoms
 from ._kdtree_atoms import KDTreeAtomMixin, KDTreeAtomsMixin
 from ._poav_atoms import POAVAtomMixin, POAVAtomsMixin
 from ._neighbor_atoms import NeighborAtomMixin, NeighborAtomsMixin
+from ._lattice_atoms import LatticeAtom, LatticeAtoms
+from ._xyz_atoms import XYZAtom, XYZAtoms
+from ._velocity_atoms import VelocityAtom, VelocityAtoms
 
 from ._bonds import Bonds
 
@@ -31,8 +32,8 @@ __all__ = ['StructureAtom', 'StructureAtoms']
 
 
 class StructureAtom(NeighborAtomMixin, POAVAtomMixin, KDTreeAtomMixin, CNAtom,
-                    VelocityAtom, ImageAtom, XYZAtom, ChargedAtom, TypeAtom,
-                    IDAtom):
+                    VelocityAtom, ImageAtom, LatticeAtom, XYZAtom,
+                    ChargedAtom, TypeAtom, IDAtom):
     """An `Atom` class for structure analysis.
 
     Parameters
@@ -81,8 +82,8 @@ class StructureAtom(NeighborAtomMixin, POAVAtomMixin, KDTreeAtomMixin, CNAtom,
 
 
 class StructureAtoms(NeighborAtomsMixin, POAVAtomsMixin, KDTreeAtomsMixin,
-                     CNAtoms, VelocityAtoms, ImageAtoms, XYZAtoms,
-                     ChargedAtoms, TypeAtoms, IDAtoms):
+                     CNAtoms, VelocityAtoms, ImageAtoms, LatticeAtoms,
+                     XYZAtoms, ChargedAtoms, TypeAtoms, IDAtoms):
     """An `Atoms` sub-class for structure analysis.
 
     Sub-class of `Atoms` class, and a container class for lists of
