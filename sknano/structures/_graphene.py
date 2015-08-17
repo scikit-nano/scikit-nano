@@ -17,7 +17,7 @@ import numbers
 import numpy as np
 
 # from sknano.core.atoms import Atom
-from sknano.core.crystallography import Crystal2DLattice, UnitCell
+from sknano.core.crystallography import Crystal3DLattice, UnitCell
 from sknano.core.math import Vector
 from sknano.core.refdata import aCC  # , grams_per_Da
 from ._base import NanoStructureBase, r_CC_vdw
@@ -44,10 +44,12 @@ class GraphenePrimitiveCell(UnitCell):
     cartesian : {:class:`~python:bool`}, optional
 
     """
-    def __init__(self, bond=aCC, a=np.sqrt(3)*aCC, gamma=60, basis=['C', 'C'],
-                 coords=[[0, 0, 0], [aCC, 0, 0]], cartesian=True):
-        lattice = Crystal2DLattice(a=a, b=a, gamma=gamma)
-        lattice.rotate(angle=-np.pi/6)
+    def __init__(self, bond=aCC, a=np.sqrt(3) * aCC, c=2 * r_CC_vdw,
+                 gamma=60, basis=['C', 'C'], coords=[[0, 0, 0], [aCC, 0, 0]],
+                 cartesian=True):
+        lattice = Crystal3DLattice(a=a, b=a, c=c, alpha=90., beta=90.,
+                                   gamma=gamma)
+        lattice.rotate(angle=-np.pi / 6, axis='z')
         super().__init__(lattice, basis, coords, cartesian)
 
 
@@ -64,11 +66,13 @@ class GrapheneConventionalCell(UnitCell):
     cartesian : {:class:`~python:bool`}, optional
 
     """
-    def __init__(self, bond=aCC, a=3*aCC, b=np.sqrt(3)*aCC, basis=4*['C'],
+    def __init__(self, bond=aCC, a=3 * aCC, b=np.sqrt(3) * aCC, c=2 * r_CC_vdw,
+                 basis=4 * ['C'],
                  coords=[[0, 0, 0], [aCC, 0, 0],
-                         [3/2*aCC, np.sqrt(3)/2*aCC, 0],
-                         [5/2*aCC, np.sqrt(3)/2*aCC, 0]], cartesian=True):
-        lattice = Crystal2DLattice.rectangular(a=a, b=b)
+                         [3 / 2 * aCC, np.sqrt(3) / 2 * aCC, 0],
+                         [5 / 2 * aCC, np.sqrt(3) / 2 * aCC, 0]],
+                 cartesian=True):
+        lattice = Crystal3DLattice.orthorhombic(a, b, c)
         super().__init__(lattice, basis, coords, cartesian)
 
 
@@ -263,6 +267,7 @@ class PrimitiveCellGraphene(GrapheneBase):
 
         self.unit_cell = GraphenePrimitiveCell(bond=self.bond,
                                                basis=self.basis)
+        self.crystal_cell.scaling_matrix = [self.n1, self.n2, self.nlayers]
         self.fmtstr = 'edge_length={edge_length!r}, ' + self.fmtstr
 
     def todict(self):
@@ -329,6 +334,7 @@ class ConventionalCellGraphene(GrapheneBase):
 
         self.unit_cell = GrapheneConventionalCell(bond=self.bond,
                                                   basis=2 * self.basis)
+        self.crystal_cell.scaling_matrix = [self.n1, self.n2, self.nlayers]
 
         self.fmtstr = 'armchair_edge_length={armchair_edge_length!r}, ' + \
             'zigzag_edge_length={zigzag_edge_length!r}, ' + self.fmtstr
