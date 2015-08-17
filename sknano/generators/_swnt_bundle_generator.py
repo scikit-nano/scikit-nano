@@ -19,8 +19,8 @@ from ._mixins import NanotubeBundleGeneratorMixin
 __all__ = ['SWNTBundleGenerator']
 
 
-class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTBundle,
-                          SWNTGenerator):
+class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTGenerator,
+                          SWNTBundle):
     """Class for generating nanotube bundles.
 
     .. versionadded:: 0.2.4
