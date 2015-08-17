@@ -17,7 +17,7 @@ import copy
 import os
 
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
-from sknano.io import StructureData, StructureWriter, \
+from sknano.io import StructureWriter, \
     default_structure_format, supported_structure_formats
 
 __all__ = ['Atom', 'Atoms', 'GeneratorBase', 'BulkGeneratorBase',
@@ -51,47 +51,18 @@ class GeneratorBase(metaclass=ABCMeta):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.structure_data = StructureData()
 
     def __getattr__(self, name):
-        if name != '_structure_data':
-            return getattr(self._structure_data, name)
+        try:
+            return getattr(self.atoms, name)
+        except AttributeError:
+            return super().__getattr__(name)
 
     @property
     @abstractmethod
     def generate(self):
         """Generate the structure coordinates."""
         return NotImplementedError
-
-    @property
-    def structure_data(self):
-        """Return :class:`~sknano.io.StructureData` instance."""
-        return self._structure_data
-
-    @structure_data.setter
-    def structure_data(self, value):
-        """Set :class:`~sknano.io.StructureData` instance."""
-        if not isinstance(value, StructureData):
-            raise TypeError('Expected a `StructureData` object.')
-        self._structure_data = value
-
-    @structure_data.deleter
-    def structure_data(self):
-        del self._structure_data
-
-    @property
-    def structure(self):
-        """Alias to :attr:`~GeneratorBase.structure_data`."""
-        return self.structure_data
-
-    @structure.setter
-    def structure(self, value):
-        """Alias to :attr:`~GeneratorBase.structure_data`."""
-        self.structure_data = value
-
-    @structure.deleter
-    def structure(self):
-        del self.structure_data
 
     def save(self, fname=None, outpath=None, structure_format=None,
              deepcopy=True, center_CM=True, region_bounds=None,
@@ -173,9 +144,11 @@ class GeneratorBase(metaclass=ABCMeta):
 class BulkGeneratorBase(GeneratorBase):
     """Base class for the *bulk structure generator* classes."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, autogen=True, **kwargs):
         super().__init__(*args, **kwargs)
-        self.generate()
+
+        if autogen:
+            self.generate()
 
     def generate(self):
         """Common :meth:`~GeneratorBase.generate` method for buk structure \
