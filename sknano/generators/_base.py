@@ -11,7 +11,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from abc import ABCMeta, abstractmethod
+# from abc import ABCMeta, abstractmethod
 
 import copy
 import os
@@ -46,14 +46,20 @@ STRUCTURE_GENERATORS = ('FullereneGenerator',
                         'MoS2Generator')
 
 
-class GeneratorBase(metaclass=ABCMeta):
-    """Base class for generator classes"""
+class GeneratorBase:
+    """Base structure generator class."""
+    def __init__(self, *args, autogen=True, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    @property
-    @abstractmethod
+        if autogen:
+            self.generate()
+
     def generate(self):
-        """Generate the structure coordinates."""
-        return NotImplementedError
+        """Common :meth:`~GeneratorBase.generate` method structure \
+            generators."""
+        self.structure_data.clear()
+        for atom in self.crystal_cell:
+            self.atoms.append(Atom(**atom.todict()))
 
     def save(self, fname=None, outpath=None, structure_format=None,
              deepcopy=True, center_CM=True, region_bounds=None,
@@ -134,19 +140,6 @@ class GeneratorBase(metaclass=ABCMeta):
 
 class BulkGeneratorBase(GeneratorBase):
     """Base class for the *bulk structure generator* classes."""
-
-    def __init__(self, *args, autogen=True, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if autogen:
-            self.generate()
-
-    def generate(self):
-        """Common :meth:`~GeneratorBase.generate` method for buk structure \
-            generators."""
-        self.structure_data.clear()
-        for atom in self.unit_cell:
-            self.atoms.append(Atom(atom.element, x=atom.x, y=atom.y, z=atom.z))
 
     def save(self, fname=None, scaling_matrix=None, **kwargs):
         if fname is not None:
