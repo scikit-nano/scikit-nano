@@ -259,7 +259,7 @@ class CrystalCell(BaseClass):
 
     """
 
-    def __init__(self, unit_cell=None, scaling_matrix=None):
+    def __init__(self, unit_cell=None, scaling_matrix=None, wrap_coords=False):
         super().__init__()
 
         # These attributes may be reset in the `@scaling_matrix.setter` method
@@ -272,6 +272,7 @@ class CrystalCell(BaseClass):
             self.unit_cell = unit_cell
 
         self.scaling_matrix = scaling_matrix
+        self.wrap_coords = wrap_coords
         self.fmtstr = \
             "unit_cell={unit_cell!r}, scaling_matrix={scaling_matrix!r}"
 
@@ -381,8 +382,10 @@ class CrystalCell(BaseClass):
         for atom in self.unit_cell.basis:
             for tvec in tvecs:
                 xs, ys, zs = \
-                    self.lattice.wrap_fractional_coordinate(
-                        self.lattice.cartesian_to_fractional(atom.r + tvec))
+                    self.lattice.cartesian_to_fractional(atom.r + tvec)
+                if self.wrap_coords:
+                    xs, ys, zs = \
+                        self.lattice.wrap_fractional_coordinate([xs, ys, zs])
                 self.basis.append(Atom(atom.element, lattice=self.lattice,
                                        xs=xs, ys=ys, zs=zs))
 
@@ -391,6 +394,24 @@ class CrystalCell(BaseClass):
         self.lattice.rotate(**kwargs)
         self.basis.rotate(**kwargs)
         self.unit_cell.rotate(**kwargs)
+
+    def update_basis(self, element, index=None, step=None):
+        """Update a crystal cell basis element."""
+        if index is None:
+            [self.unit_cell.basis.__setitem__(i, element)
+             for i in range(len(self.unit_cell.basis))]
+            [self.basis.__setitem__(i, element)
+             for i in range(len(self.basis))]
+        elif isinstance(index, int):
+            if step is None:
+                step = self.unit_cell.basis.Natoms
+            [self.unit_cell.basis.__setitem__(i, element)
+             for i in range(index, len(self.unit_cell.basis), step)]
+            [self.basis.__setitem__(i, element)
+             for i in range(index, len(self.basis), step)]
+        elif isinstance(index, (list, np.ndarray)):
+            [self.unit_cell.basis.__setitem__(i, element) for i in index]
+            [self.basis.__setitem__(i, element) for i in index]
 
     def todict(self):
         return dict(unit_cell=self.unit_cell,
@@ -407,14 +428,15 @@ class SuperCell(CrystalCell):
 
     """
 
-    def __init__(self, unit_cell, scaling_matrix):
+    def __init__(self, unit_cell, scaling_matrix, wrap_coords=False):
         if not isinstance(unit_cell, UnitCell):
             raise ValueError('Expected a `UnitCell` for `unit_cell`.')
         if not isinstance(scaling_matrix,
                           (int, float, tuple, list, np.ndarray)):
             raise ValueError('Expected an `int` or `array_like` object of\n'
                              'integers for `scaling_matrix`')
-        super().__init__(unit_cell=unit_cell, scaling_matrix=scaling_matrix)
+        super().__init__(unit_cell=unit_cell, scaling_matrix=scaling_matrix,
+                         wrap_coords=wrap_coords)
 
         self.fmtstr = ', '.join((self.unit_cell.fmtstr, super().fmtstr))
 
