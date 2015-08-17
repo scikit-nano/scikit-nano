@@ -98,6 +98,9 @@ def test4():
     swnt.element2 = 'Ar'
     assert_equal(swnt.element2, 'Ar')
     print(swnt)
+    assert_equal(swnt.unit_cell.basis.symbols.tolist()[:2], ['N', 'Ar'])
+    assert_equal(swnt.crystal_cell.basis.symbols.tolist()[:2], ['N', 'Ar'])
+    assert_equal(swnt.basis, ['N', 'Ar'])
 
 
 def test5():
@@ -116,9 +119,10 @@ def test5():
     assert_equal(swnt.element2, 'B')
 
     print(swnt)
-
-    assert_equal(swnt.unit_cell.basis.symbols.tolist()[:2], ['N', 'B'])
     print(swnt.unit_cell)
+    assert_equal(swnt.unit_cell.basis.symbols.tolist()[:2], ['N', 'B'])
+    assert_equal(swnt.crystal_cell.basis.symbols.tolist()[:2], ['N', 'B'])
+    assert_equal(swnt.basis, ['N', 'B'])
 
 
 def test6():
@@ -134,9 +138,11 @@ def test6():
     assert_equal(swnt.element2, 'B')
 
     print(swnt)
+    print(swnt.unit_cell)
 
     assert_equal(swnt.unit_cell.basis.symbols.tolist()[:2], ['N', 'B'])
-    print(swnt.unit_cell)
+    assert_equal(swnt.crystal_cell.basis.symbols.tolist()[:2], ['N', 'B'])
+    assert_equal(swnt.basis, ['N', 'B'])
 
 
 def test7():
