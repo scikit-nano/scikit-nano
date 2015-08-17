@@ -16,6 +16,7 @@ import os
 
 import numpy as np
 
+from monty.io import zopen
 from sknano.core import get_fpath
 from ._base import Atom, StructureIO, StructureIOError, StructureConverter, \
     default_comment_line
@@ -80,7 +81,7 @@ class DATAReader(StructureIO):
         """Read data file."""
         self.structure_data.clear()
         try:
-            with open(self.fpath, 'r') as f:
+            with zopen(self.fpath) as f:
                 self.comment_line = f.readline().strip()
 
                 while True:
@@ -361,7 +362,7 @@ class DATAWriter:
                 max(lohi_width, len('{:.6f} {:.6f}'.format(
                     boxbounds[dim]['min'], boxbounds[dim]['max'])) + 4)
 
-        with open(fpath, 'w') as f:
+        with zopen(fpath, 'wt') as f:
             f.write('# {}\n\n'.format(comment_line.lstrip('#').strip()))
 
             f.write('{}atoms\n'.format(

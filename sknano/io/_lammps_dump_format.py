@@ -18,6 +18,7 @@ from operator import attrgetter
 
 import numpy as np
 
+from monty.io import zopen
 from sknano.core import get_fpath
 from sknano.core.atoms import Trajectory, Snapshot, MDAtom as Atom
 
@@ -69,7 +70,7 @@ class DUMPReader(StructureIO):
     def read(self):
         """Read all snapshots from each dump file."""
         for dumpfile in self.dumpfiles:
-            with open(dumpfile) as f:
+            with zopen(dumpfile) as f:
                 snapshot = self.read_snapshot(f)
                 while snapshot is not None:
                     self.trajectory.append(snapshot)

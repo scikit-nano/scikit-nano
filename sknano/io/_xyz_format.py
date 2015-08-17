@@ -13,6 +13,7 @@ __docformat__ = 'restructuredtext en'
 
 import os
 
+from monty.io import zopen
 from sknano.core import get_fpath
 
 from ._base import Atom, StructureIO, StructureIOError, StructureConverter, \
@@ -40,7 +41,7 @@ class XYZReader(StructureIO):
     def read(self):
         """Read `xyz` file."""
         self.structure_data.clear()
-        with open(self.fpath, 'r') as f:
+        with zopen(self.fpath) as f:
             Natoms = int(f.readline().strip())
             self.comment_line = f.readline().strip()
             lines = f.readlines()
@@ -92,7 +93,7 @@ class XYZWriter:
 
         atoms.rezero_coords()
 
-        with open(fpath, 'w') as f:
+        with zopen(fpath, 'wt') as f:
             f.write('{:d}\n'.format(atoms.Natoms))
             f.write('{}\n'.format(comment_line))
             for atom in atoms:
