@@ -19,7 +19,7 @@ import numbers
 import numpy as np
 
 from sknano.core import xyz
-from sknano.core.math import Vector, transformation_matrix
+from sknano.core.math import Vector, rotation_matrix
 from sknano.core.geometric_regions import Cuboid  # , Rectangle
 
 from ._atoms import Atom, Atoms
@@ -483,7 +483,7 @@ class XYZAtoms(Atoms):
 
         """
         if kwargs.get('transform_matrix', None) is None:
-            transform_matrix = transformation_matrix(**kwargs)
+            transform_matrix = rotation_matrix(**kwargs)
         [atom.rotate(transform_matrix=transform_matrix) for atom in self]
 
     def translate(self, t, fix_anchor_points=True):
