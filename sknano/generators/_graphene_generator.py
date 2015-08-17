@@ -16,6 +16,7 @@ import copy
 import numpy as np
 
 from sknano.core.math import Vector
+from sknano.core.crystallography import SuperCell
 from sknano.structures import PrimitiveCellGraphene, ConventionalCellGraphene
 from ._base import Atom, Atoms, GeneratorBase
 
@@ -61,26 +62,13 @@ class GrapheneGeneratorBase(GeneratorBase):
         verbose output
 
     """
-
-    def __init__(self, autogen=True, **kwargs):
-
-        super().__init__(**kwargs)
-
-        if autogen:
-            self.generate()
-
     def generate(self):
         """Generate the full structure coordinates."""
 
         self.structure_data.clear()
         layer0 = Atoms()
-        for i in range(self.n1):
-            for j in range(self.n2):
-                dr = i * self.unit_cell.a1 + j * self.unit_cell.a2
-                for atom in self.unit_cell:
-                    layer_atom = Atom(atom.symbol)
-                    layer_atom.r[:2] = atom.r[:2] + dr
-                    layer0.append(layer_atom)
+        for atom in SuperCell(self.unit_cell, [self.n1, self.n2, 1]):
+            layer0.append(Atom(**atom.todict()))
 
         layer0.center_CM()
         # self.Natoms_per_layer = layer0.Natoms
@@ -91,8 +79,7 @@ class GrapheneGeneratorBase(GeneratorBase):
             layer.translate(Vector([0, 0, nlayer * self.layer_spacing]))
             if (nlayer % 2) != 0:
                 layer.translate(self.layer_shift)
-            if nlayer > 0:
-                [setattr(atom, 'mol', nlayer) for atom in layer]
+            [setattr(atom, 'mol', nlayer + 1) for atom in layer]
             layer.rotate(angle=self.layer_rotation_angles[nlayer], axis='z')
             self.atoms.extend(layer)
             self.layers.append(layer)
@@ -106,7 +93,7 @@ class GrapheneGeneratorBase(GeneratorBase):
         return fname
 
     def save(self, fname=None, outpath=None, structure_format=None,
-             center_CM=True, rotation_angle=-np.pi/2, rotation_axis='x',
+             center_CM=True, rotation_angle=-np.pi / 2, rotation_axis='x',
              **kwargs):
         """Save structure data.
 

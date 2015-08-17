@@ -24,10 +24,10 @@ __docformat__ = 'restructuredtext en'
 import numpy as np
 
 from sknano.core import pluralize
-from sknano.core.math import Point, Vector
+from sknano.core.math import Point
 from sknano.structures import SWNT
 from sknano.core.geometric_regions import Cuboid
-from ._base import Atom, GeneratorBase
+from ._base import GeneratorBase
 
 __all__ = ['SWNTGenerator']
 
@@ -107,23 +107,10 @@ class SWNTGenerator(GeneratorBase, SWNT):
     .. image:: /images/10,5_unit_cell-01.png
 
     """
-    def __init__(self, *Ch, autogen=True, **kwargs):
-
-        super().__init__(*Ch, **kwargs)
-
-        if autogen:
-            self.generate()
-
     def generate(self):
         """Generate structure data."""
 
-        self.structure_data.clear()
-        for nz in range(int(np.ceil(self.nz))):
-            dr = Vector([0.0, 0.0, nz * self.T])
-            for uc_atom in self.unit_cell:
-                nt_atom = Atom(uc_atom.symbol)
-                nt_atom.r = uc_atom.r + dr
-                self.atoms.append(nt_atom)
+        super().generate()
 
         if self.L0 is not None and self.fix_Lz:
             Lz_cutoff = 10 * self.L0 + 1

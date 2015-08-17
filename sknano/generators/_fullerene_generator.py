@@ -23,7 +23,7 @@ from ._base import GeneratorBase
 __all__ = ['FullereneGenerator']
 
 
-class FullereneGenerator(Fullerene, GeneratorBase):
+class FullereneGenerator(GeneratorBase, Fullerene):
     """Fullerene structure generator class.
 
     Parameters
@@ -41,14 +41,6 @@ class FullereneGenerator(Fullerene, GeneratorBase):
     >>> fg.save(fname='C60.data')
 
     """
-
-    def __init__(self, autogen=True, **kwargs):
-
-        super().__init__(**kwargs)
-
-        if autogen:
-            self.generate()
-
     def generate(self):
         """Generate structure data."""
         CNdir = 'C' + str(self.N)

@@ -102,13 +102,6 @@ class MWNTGenerator(GeneratorBase, MWNT):
     .. image:: /images/5wall_mwnt_(8,7)@(17,8)@(9,24)@(27,18)@(22,32)-04.png
 
     """
-    def __init__(self, autogen=True, **kwargs):
-
-        super().__init__(**kwargs)
-
-        if autogen:
-            self.generate()
-
     def generate(self):
         """Generate structure data.
 

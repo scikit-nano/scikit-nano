@@ -20,13 +20,16 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 __docformat__ = 'restructuredtext en'
 
+import copy
+
 import numpy as np
 
 from sknano.core import pluralize
+from sknano.core.crystallography import SuperCell
 from sknano.core.math import Vector
 from sknano.structures import UnrolledSWNT
 # from sknano.core.geometric_regions import Cuboid
-from ._base import Atom, GeneratorBase
+from ._base import Atom, Atoms, GeneratorBase
 
 __all__ = ['UnrolledSWNTGenerator']
 
@@ -100,25 +103,28 @@ class UnrolledSWNTGenerator(GeneratorBase, UnrolledSWNT):
     The rendered structure looks like:
 
     """
-
-    def __init__(self, *Ch, autogen=True, **kwargs):
-
-        super().__init__(*Ch, **kwargs)
-
-        if autogen:
-            self.generate()
-
     def generate(self):
         """Generate structure data."""
 
         self.structure_data.clear()
-        for nx in range(self.nx):
-            for nz in range(int(np.ceil(self.nz))):
-                dr = Vector([nx * self.Ch, 0.0, nz * self.T])
-                for uc_atom in self.unit_cell:
-                    nt_atom = Atom(element=uc_atom.symbol)
-                    nt_atom.r = uc_atom.r + dr
-                    self.atoms.append(nt_atom)
+        layer0 = Atoms()
+        scaling_matrix = [int(np.ceil(self.nx)), 1, int(np.ceil(self.nz))]
+
+        for atom in SuperCell(self.unit_cell, scaling_matrix):
+            layer0.append(Atom(**atom.todict()))
+
+        layer0.center_CM()
+
+        self.layers = []
+        for nlayer in range(self.nlayers):
+            layer = copy.deepcopy(layer0)
+            layer.translate(Vector([0, nlayer * self.layer_spacing, 0]))
+            [setattr(atom, 'mol', nlayer + 1) for atom in layer]
+            if (nlayer % 2) != 0:
+                layer.translate(self.layer_shift)
+            layer.rotate(angle=self.layer_rotation_angles[nlayer], axis='z')
+            self.atoms.extend(layer)
+            self.layers.append(layer)
 
     @classmethod
     def generate_fname(cls, n=None, m=None, nx=None, nz=None,
