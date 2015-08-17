@@ -33,6 +33,8 @@ Base `Atom`/`Atoms` classes
    ChargedAtoms
    CNAtom
    CNAtoms
+   DipoleAtom
+   DipoleAtoms
    EnergyAtom
    EnergyAtoms
    ForceAtom
@@ -117,7 +119,7 @@ from ._energy_atoms import *
 from ._id_atoms import *
 from ._type_atoms import *
 from ._lattice_atoms import *
-
+from ._dipole_atoms import *
 from ._basis_atoms import *
 
 from ._extended_atoms import *
