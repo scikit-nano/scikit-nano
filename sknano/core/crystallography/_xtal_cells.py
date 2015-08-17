@@ -267,12 +267,12 @@ class CrystalCell(BaseClass):
         # `self.scaling_matrix`.
         self._lattice = None
         self._basis = None
+        self.wrap_coords = wrap_coords
 
         if unit_cell is not None:
             self.unit_cell = unit_cell
 
         self.scaling_matrix = scaling_matrix
-        self.wrap_coords = wrap_coords
         self.fmtstr = \
             "unit_cell={unit_cell!r}, scaling_matrix={scaling_matrix!r}"
 
