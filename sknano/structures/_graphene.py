@@ -97,7 +97,7 @@ class GrapheneMixin:
     @property
     def area(self):
         """Total area of graphene supercell."""
-        return np.abs(self.r1.cross(self.r2))
+        return np.abs(self.r1[:2].cross(self.r2[:2]))
 
     @property
     def N(self):
@@ -108,7 +108,8 @@ class GrapheneMixin:
            N = \\frac{A_{\\mathrm{sheet}}}{A_{\\mathrm{cell}}}
 
         """
-        return int(self.area / self.unit_cell.area)
+        return int(self.area /
+                   np.abs(self.unit_cell.a1[:2].cross(self.unit_cell.a2[:2])))
 
     @property
     def Natoms(self):
