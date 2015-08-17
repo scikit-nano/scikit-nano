@@ -684,8 +684,8 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin, CrystalCellMixin):
 
     @property
     def beta(self):
-        """Angle between lattice vectors :math:`\\mathbf{c}` and \
-        :math:`\\mathbf{a}` in **degrees**."""
+        """Angle between lattice vectors :math:`\\mathbf{a}` and \
+        :math:`\\mathbf{c}` in **degrees**."""
         return np.around(self._beta, decimals=10)
 
     @beta.setter
