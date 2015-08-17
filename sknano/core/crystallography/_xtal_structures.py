@@ -24,7 +24,7 @@ from ._extras import pymatgen_structure
 from ._xtal_cells import CrystalCell, UnitCell, SuperCell
 from ._xtal_lattices import Crystal2DLattice, Crystal3DLattice
 
-__all__ = ['BaseStructureMixin', 'BaseStructure',
+__all__ = ['BaseStructureMixin', 'BaseStructure', 'StructureData',
            'CrystalStructureBase', 'Crystal2DStructure',
            'CrystalStructure', 'Crystal3DStructure',
            'CaesiumChlorideStructure', 'CsClStructure',
@@ -42,9 +42,12 @@ class BaseStructureMixin:
 
     def __getattr__(self, name):
         try:
-            return getattr(self.crystal_cell, name)
+            return getattr(self.atoms, name)
         except AttributeError:
-            return super().__getattr__(name)
+            try:
+                return getattr(self.crystal_cell, name)
+            except AttributeError:
+                return super().__getattr__(name)
 
     @property
     def atoms(self):
@@ -121,10 +124,13 @@ class BaseStructureMixin:
 
 
 class BaseStructure(BaseStructureMixin):
+    """Base structure class for structure data."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._atoms = StructureAtoms()
         self._crystal_cell = None
+
+StructureData = BaseStructure
 
 
 @total_ordering
@@ -210,6 +216,7 @@ class Crystal2DStructure(CrystalStructureBase):
                    cell_matrix=structure.lattice.matrix), basis=atoms,
                    scaling_matrix=scaling_matrix)
 
+    @classmethod
     def from_spacegroup(cls, sg, lattice=None, basis=None, coords=None,
                         **kwargs):
         """Return a `Crystal2DStructure` from a spacegroup number/symbol.
@@ -317,8 +324,8 @@ class Crystal3DStructure(CrystalStructureBase):
 
         Notes
         -----
-        Under the hood this method first s a pymatgen
-        :class:`~pymatgen:Structure`
+        Under the hood this method generates a
+        :class:`~pymatgen:pymatgen.core.Structure`
 
         See Also
         --------
