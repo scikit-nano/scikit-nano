@@ -19,8 +19,6 @@ import numpy as np
 from sknano.core import BaseClass
 from sknano.core.math import Vector, Point, zhat, rotation_matrix
 
-from ._xtal_cells import CrystalCellMixin
-
 __all__ = ['LatticeBase', 'ReciprocalLatticeBase',
            'DirectLatticeMixin', 'ReciprocalLatticeMixin',
            'Direct2DLatticeMixin', 'Direct3DLatticeMixin',
@@ -427,8 +425,7 @@ class Reciprocal3DLatticeMixin:
 ReciprocalLatticeMixin = Reciprocal3DLatticeMixin
 
 
-class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin,
-                       CrystalCellMixin):
+class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin):
     """2D crystal lattice class.
 
     Parameters
@@ -590,9 +587,7 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin,
         return cls(a=a, b=a, gamma=120)
 
 
-class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin,
-                          CrystalCellMixin):
-
+class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin):
     """2D reciprocal lattice class.
 
     Parameters
@@ -709,7 +704,7 @@ class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin,
         return cls(a_star=a_star, b_star=a_star, gamma_star=120)
 
 
-class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin, CrystalCellMixin):
+class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin):
     """3D crystal lattice class.
 
     Parameters
@@ -961,8 +956,7 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin, CrystalCellMixin):
 CrystalLattice = Crystal3DLattice
 
 
-class Reciprocal3DLattice(ReciprocalLatticeBase, DirectLatticeMixin,
-                          CrystalCellMixin):
+class Reciprocal3DLattice(ReciprocalLatticeBase, DirectLatticeMixin):
     """3D reciprocal lattice class.
 
     Parameters
