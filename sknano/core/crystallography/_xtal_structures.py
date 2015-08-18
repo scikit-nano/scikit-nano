@@ -119,6 +119,16 @@ class BaseStructureMixin:
         else:
             raise ValueError('No `CrystalCell` to scale')
 
+    def rotate(self, **kwargs):
+        """Rotate crystal cell lattice, basis, and unit cell."""
+        if self.crystal_cell is not None:
+            self.crystal_cell.rotate(**kwargs)
+
+    def translate(self, t, fix_anchor_points=True):
+        """Translate crystal cell basis."""
+        if self.crystal_cell is not None:
+            self.crystal_cell.translate(t, fix_anchor_points=fix_anchor_points)
+
     def clear(self):
         self.atoms.clear()
 
@@ -171,10 +181,6 @@ class CrystalStructureBase(BaseStructure, BaseClass):
 
     def make_supercell(self, scaling_matrix):
         return SuperCell(self.unit_cell, scaling_matrix)
-
-    def rotate(self, **kwargs):
-        """Rotation the structure unit cell."""
-        self.unit_cell.rotate(**kwargs)
 
     def todict(self):
         attrdict = self.unit_cell.todict()
