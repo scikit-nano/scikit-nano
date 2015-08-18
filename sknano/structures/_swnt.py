@@ -239,7 +239,7 @@ def compute_Ch(*Ch, bond=None, **kwargs):
     return bond * np.sqrt(3 * (n ** 2 + m ** 2 + n * m))
 
 
-def compute_chiral_angle(*Ch, rad2deg=True):
+def compute_chiral_angle(*Ch, degrees=True, **kwargs):
     """Compute chiral angle :math:`\\theta_c`.
 
     .. math::
@@ -252,14 +252,14 @@ def compute_chiral_angle(*Ch, rad2deg=True):
         Either a 2-tuple of ints or 2 integers giving the chiral indices
         of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-    rad2deg : bool, optional
+    degrees : bool, optional
         If `True`, return angle in degrees.
 
     Returns
     -------
     float
         Chiral angle :math:`\\theta_{c}` in
-        degrees (default) or radians (if `rad2deg=False`).
+        degrees (default) or radians (if `degrees=False`).
 
     """
     n, m, _ = get_chiral_indices(*Ch)
@@ -270,7 +270,7 @@ def compute_chiral_angle(*Ch, rad2deg=True):
         raise TypeError('Expected an integer')
     theta = np.arctan(np.sqrt(3) * m / (2 * n + m))
     # return np.arccos((2*n + m) / (2 * np.sqrt(n**2 + m**2 + n*m)))
-    if rad2deg:
+    if degrees or kwargs.get('rad2deg', False):
         return np.degrees(theta)
     else:
         return theta
@@ -513,7 +513,7 @@ def compute_R(*Ch, bond=None, length=False, **kwargs):
         return (p, q)
 
 
-def compute_R_chiral_angle(*Ch, rad2deg=True):
+def compute_R_chiral_angle(*Ch, degrees=True, **kwargs):
     """Compute "chiral angle" of symmetry vector :math:`\\theta_R`.
 
     .. math::
@@ -526,14 +526,14 @@ def compute_R_chiral_angle(*Ch, rad2deg=True):
         Either a 2-tuple of ints or 2 integers giving the chiral indices
         of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-    rad2deg : bool, optional
+    degrees : bool, optional
         If `True`, return angle in degrees
 
     Returns
     -------
     float
         Chiral angle of *symmetry vector* :math:`\\theta_R` in
-        degrees (default) or radians (if `rad2deg=False`).
+        degrees (default) or radians (if `degrees=False`).
 
 
     """
@@ -546,7 +546,7 @@ def compute_R_chiral_angle(*Ch, rad2deg=True):
 
     p, q = compute_R(n, m)
     theta = np.arctan((np.sqrt(3) * q) / (2 * p + q))
-    if rad2deg:
+    if degrees or kwargs.get('rad2deg', False):
         return np.degrees(theta)
     else:
         return theta
@@ -978,9 +978,9 @@ def compute_Lz(*Ch, nz=1, bond=None, **kwargs):
     return nz * T / 10
 
 
-def compute_symmetry_chiral_angle(*Ch, rad2deg=True):
+def compute_symmetry_chiral_angle(*Ch, degrees=True):
     """Alias for :func:`compute_R_chiral_angle`."""
-    return compute_R_chiral_angle(*Ch, rad2deg=rad2deg)
+    return compute_R_chiral_angle(*Ch, degrees=degrees)
 
 
 def compute_tube_diameter(*Ch, bond=None, **kwargs):
@@ -1408,7 +1408,7 @@ class SWNTMixin:
     def unit_cell_symmetry_params(self):
         """Tuple of `SWNT` unit cell *symmetry parameters*."""
         psi, tau = compute_symmetry_operation(self.n, self.m, bond=self.bond)
-        aCh = compute_chiral_angle(self.n, self.m, rad2deg=False)
+        aCh = compute_chiral_angle(self.n, self.m, degrees=False)
         dpsi = self.bond * np.cos(np.pi / 6 - aCh) / self.rt
         dtau = self.bond * np.sin(np.pi / 6 - aCh)
 
