@@ -102,6 +102,80 @@ class LatticeBase(BaseClass):
         """Metric tensor."""
         return self.cell_matrix * self.cell_matrix.T
 
+    def fractional_to_cartesian(self, fcoords):
+        """Convert fractional coordinate to cartesian coordinate.
+
+        Parameters
+        ----------
+        fcoords : array_like
+
+        Returns
+        -------
+        :class:`~numpy:numpy.ndarray`
+
+        """
+        ccoords = self.orientation_matrix * self.ortho_matrix * \
+            np.asmatrix(fcoords).T + self.offset.column_matrix
+        try:
+            return ccoords.T.A.reshape((3, ))
+        except ValueError:
+            return ccoords.T.A.reshape((len(fcoords), 3))
+
+    def cartesian_to_fractional(self, ccoords):
+        """Convert cartesian coordinate to fractional coordinate.
+
+        Parameters
+        ----------
+        ccoords : array_like
+
+        Returns
+        -------
+        :class:`~numpy:numpy.ndarray`
+
+        """
+        fcoords = np.linalg.inv(self.ortho_matrix) * \
+            np.linalg.inv(self.orientation_matrix) * \
+            (np.asmatrix(ccoords).T - self.offset.column_matrix)
+        try:
+            return fcoords.T.A.reshape((3, ))
+        except ValueError:
+            return fcoords.T.A.reshape((len(ccoords), 3))
+
+    def wrap_fractional_coordinate(self, p, epsilon=1e-8):
+        """Wrap fractional coordinate to lie within unit cell.
+
+        Parameters
+        ----------
+        p : array_like
+
+        Returns
+        -------
+        :class:`~numpy:numpy.ndarray`
+
+        """
+        p = np.asarray(p)
+        p = np.fmod(p, 1)
+        p[np.where(p < 0)] += 1
+        p[np.where(p > 1 - epsilon)] -= 1
+        p[np.where(np.logical_or((p > 1 - epsilon), (p < epsilon)))] = 0
+        return p
+
+    def wrap_cartesian_coordinate(self, p):
+        """Wrap cartesian coordinate to lie within unit cell.
+
+        Parameters
+        ----------
+        p : array_like
+
+        Returns
+        -------
+        :class:`~numpy:numpy.ndarray`
+
+        """
+        return self.fractional_to_cartesian(
+            self.wrap_fractional_coordinate(
+                self.cartesian_to_fractional(p)))
+
     def rotate(self, angle=None, axis=None, anchor_point=None,
                rot_point=None, from_vector=None, to_vector=None, degrees=False,
                transform_matrix=None, verbose=False, **kwargs):

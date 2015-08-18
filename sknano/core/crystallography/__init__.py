@@ -27,7 +27,6 @@ Contents
 
    Direct3DLatticeMixin
    Reciprocal3DLatticeMixin
-   UnitCellMixin
    Crystal3DLattice
    Reciprocal3DLattice
    Crystal3DStructure
