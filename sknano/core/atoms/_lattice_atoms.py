@@ -186,7 +186,7 @@ class LatticeAtom(Atom):
 
     @lattice.setter
     def lattice(self, value):
-        self._lattice = copy.copy(value)
+        self._lattice = copy.deepcopy(value)
 
     def rotate(self, **kwargs):
         """Rotate `Atom` position vector.
@@ -217,11 +217,11 @@ class LatticeAtom(Atom):
         fix_anchor_point : bool, optional
 
         """
-        # TODO compare timing benchmarks for translation of position vector.
-        try:
-            self.lattice.translate(t)
-        except AttributeError:
-            pass
+        if not fix_anchor_point:
+            try:
+                self.lattice.translate(t)
+            except AttributeError:
+                pass
         super().translate(t, fix_anchor_point=fix_anchor_point)
 
     def todict(self):
