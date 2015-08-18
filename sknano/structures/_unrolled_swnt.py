@@ -22,7 +22,7 @@ from sknano.core.refdata import aCC
 
 from ._base import NanoStructureBase, r_CC_vdw
 from ._extras import get_chiral_indices
-from ._swnt import NanotubeMixin, compute_Ch, compute_T
+from ._swnt import NanotubeMixin, compute_Ch, compute_T, compute_chiral_angle
 
 
 __all__ = ['UnrolledSWNTMixin', 'UnrolledSWNT']
@@ -214,7 +214,9 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
         self.layer_shift = Vector()
         self.stacking_order = stacking_order
         if nlayers > 1 and stacking_order == 'AB':
-            self.layer_shift.x = self.bond
+            chiral_angle = compute_chiral_angle(self.n, self.m, degrees=False)
+            self.layer_shift.x = self.bond * np.cos(np.pi/6 - chiral_angle)
+            self.layer_shift.z = -self.bond * np.sin(np.pi/6 - chiral_angle)
 
         self.generate_unit_cell()
         self.crystal_cell.scaling_matrix = \
