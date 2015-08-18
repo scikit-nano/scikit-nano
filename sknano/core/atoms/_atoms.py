@@ -17,7 +17,7 @@ import numbers
 import numpy as np
 
 from sknano.core import BaseClass, UserList
-from sknano.core.math import convert_condition_str
+from sknano.core.math import convert_condition_str, rotation_matrix
 from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols, element_names
 
@@ -527,11 +527,48 @@ class Atoms(UserList):
         except (KeyError, TypeError) as e:
             print(e)
 
-    def rotate(self, **kwargs):
-        assert not hasattr(super(), 'rotate')
+    def rezero(self, epsilon=1.0e-10):
+        """Set values with absolute value less than `epsilon` to zero.
 
-    def translate(self, *args, **kwargs):
-        assert not hasattr(super(), 'translate')
+        Calls the `rezero` method on each `atom` in `self`.
+
+        Parameters
+        ----------
+        epsilon : :class:`~python:float`
+            values with absolute value less than `epsilon` are set to zero.
+
+        """
+        [atom.rezero(epsilon=epsilon) for atom in self]
+
+    def rotate(self, **kwargs):
+        """Rotate `Atom` vectors.
+
+        Parameters
+        ----------
+        angle : float
+        axis : :class:`~sknano.core.math.Vector`, optional
+        anchor_point : :class:`~sknano.core.math.Point`, optional
+        rot_point : :class:`~sknano.core.math.Point`, optional
+        from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
+        degrees : bool, optional
+        transform_matrix : :class:`~numpy:numpy.ndarray`
+
+        """
+        if kwargs.get('transform_matrix', None) is None:
+            kwargs['transform_matrix'] = rotation_matrix(**kwargs)
+        [atom.rotate(**kwargs) for atom in self]
+
+    def translate(self, t, fix_anchor_points=True):
+        """Translate `Atom` vectors by :class:`Vector` `t`.
+
+        Parameters
+        ----------
+        t : :class:`Vector`
+        fix_anchor_points : bool, optional
+
+        """
+        [atom.translate(t, fix_anchor_point=fix_anchor_points)
+         for atom in self]
 
     def todict(self):
         return dict(atoms=self.data)

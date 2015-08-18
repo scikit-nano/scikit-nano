@@ -19,7 +19,7 @@ import numbers
 import numpy as np
 
 from sknano.core import xyz
-from sknano.core.math import Vector, rotation_matrix
+from sknano.core.math import Vector
 from sknano.core.geometric_regions import Cuboid  # , Rectangle
 
 from ._atoms import Atom, Atoms
@@ -222,10 +222,23 @@ class XYZAtom(Atom):
             return self.r
 
     def rezero(self, epsilon=1.0e-10):
+        """Alias for :meth:`Atom.rezero_xyz`, but calls `super` class \
+            `rezero` method as well."""
+        self.r.rezero(epsilon)
+        super().rezero(epsilon)
+
+    def rezero_coords(self, epsilon=1.0e-10):
+        """Alias for :meth:`Atom.rezero_xyz`."""
+        self.rezero_xyz(epsilon=epsilon)
+
+    def rezero_xyz(self, epsilon=1.0e-10):
         """Re-zero position vector components.
 
         Set position vector components with absolute value less than
         `epsilon` to zero.
+
+        Unlike the :meth:`Atom.rezero` method, this method does **not**
+        call the super class `rezero` method.
 
         Parameters
         ----------
@@ -233,12 +246,7 @@ class XYZAtom(Atom):
             smallest allowed absolute value of any :math:`x,y,z` component.
 
         """
-        self._r.rezero(epsilon)
-        super().rezero(epsilon)
-
-    def rezero_coords(self, epsilon=1.0e-10):
-        """Alias for :meth:`Atom.rezero`."""
-        self.rezero(epsilon=epsilon)
+        self.r.rezero(epsilon=epsilon)
 
     def rotate(self, **kwargs):
         """Rotate `Atom` position vector.
@@ -447,53 +455,19 @@ class XYZAtoms(Atoms):
             return coords
 
     def rezero_coords(self, epsilon=1.0e-10):
-        """Alias for :meth:`Atoms.rezero`."""
+        """Alias for :meth:`Atoms.rezero_xyz`."""
         self.rezero(epsilon=epsilon)
 
     def rezero_xyz(self, epsilon=1.0e-10):
-        """Alias for :meth:`Atoms.rezero`."""
-        self.rezero(epsilon=epsilon)
+        """Rezero position vector components with absolute value less than \
+            `epsilon`.
 
-    def rezero(self, epsilon=1.0e-10):
-        """Set really really small coordinates to zero.
-
-        Set all coordinates with absolute value less than
-        epsilon to zero.
+        Calls the :meth:`XYZAtom.rezero_xyz` method on each `atom` in `self`.
 
         Parameters
         ----------
-        epsilon : float
-            smallest allowed absolute value of any :math:`x,y,z` component.
+        epsilon : :class:`~python:float`
+            values with absolute value less than `epsilon` are set to zero.
 
         """
-        [atom.rezero(epsilon=epsilon) for atom in self]
-
-    def rotate(self, **kwargs):
-        """Rotate `Atom` position vectors.
-
-        Parameters
-        ----------
-        angle : float
-        axis : :class:`~sknano.core.math.Vector`, optional
-        anchor_point : :class:`~sknano.core.math.Point`, optional
-        rot_point : :class:`~sknano.core.math.Point`, optional
-        from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
-        degrees : bool, optional
-        transform_matrix : :class:`~numpy:numpy.ndarray`
-
-        """
-        if kwargs.get('transform_matrix', None) is None:
-            transform_matrix = rotation_matrix(**kwargs)
-        [atom.rotate(transform_matrix=transform_matrix) for atom in self]
-
-    def translate(self, t, fix_anchor_points=True):
-        """Translate `Atom` position vectors by :class:`Vector` `t`.
-
-        Parameters
-        ----------
-        t : :class:`Vector`
-        fix_anchor_points : bool, optional
-
-        """
-        [atom.translate(t, fix_anchor_point=fix_anchor_points)
-         for atom in self]
+        [atom.rezero_xyz(epsilon=epsilon) for atom in self]
