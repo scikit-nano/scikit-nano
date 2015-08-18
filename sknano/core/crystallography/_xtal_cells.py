@@ -126,12 +126,13 @@ class CrystalCellMixin:
             axis = 'z'
         if transform_matrix is None:
             transform_matrix = \
-                rotation_matrix(angle=angle, axis=axis,
-                                anchor_point=anchor_point,
-                                rot_point=rot_point,
-                                from_vector=from_vector,
-                                to_vector=to_vector, degrees=degrees,
-                                verbose=verbose, **kwargs)
+                np.asmatrix(
+                    rotation_matrix(angle=angle, axis=axis,
+                                    anchor_point=anchor_point,
+                                    rot_point=rot_point,
+                                    from_vector=from_vector,
+                                    to_vector=to_vector, degrees=degrees,
+                                    verbose=verbose, **kwargs))
 
             # transform_matrix = \
             #     transformation_matrix(angle=angle, axis=axis,
@@ -142,7 +143,7 @@ class CrystalCellMixin:
             #                           verbose=verbose, **kwargs)
 
         self.orientation_matrix = \
-            np.dot(transform_matrix, self.orientation_matrix)
+            transform_matrix * self.orientation_matrix
 
     def translate(self, t):
         """Translate unit cell.
@@ -238,9 +239,15 @@ class UnitCell(BaseClass):
     #                     atom.rs = lattice.cartesian_to_fractional(pos)
 
     def rotate(self, **kwargs):
-        """Rotate lattice vectors and basis."""
+        """Rotate unit cell lattice vectors and basis."""
         self.lattice.rotate(**kwargs)
         self.basis.rotate(**kwargs)
+
+    def translate(self, t, fix_anchor_points=True):
+        """Translate unit cell basis."""
+        if not fix_anchor_points:
+            self.lattice.translate(t)
+        self.basis.translate(t, fix_anchor_points=fix_anchor_points)
 
     def todict(self):
         """Return `dict` of `UnitCell` parameters."""
@@ -375,8 +382,10 @@ class CrystalCell(BaseClass):
         self._lattice = self.unit_cell.lattice.__class__(
             cell_matrix=self.scaling_matrix * self.unit_cell.lattice.matrix)
 
-        tvecs = np.asmatrix(supercell_lattice_points(self.scaling_matrix)) * \
-            self.lattice.matrix
+        tvecs = \
+            np.asarray(
+                np.asmatrix(supercell_lattice_points(self.scaling_matrix)) *
+                self.lattice.matrix)
 
         self._basis = Atoms()
         for atom in self.unit_cell.basis:
@@ -390,10 +399,17 @@ class CrystalCell(BaseClass):
                                        xs=xs, ys=ys, zs=zs))
 
     def rotate(self, **kwargs):
-        """Rotate lattice vectors and basis."""
+        """Rotate crystal cell lattice, basis, and unit cell."""
         self.lattice.rotate(**kwargs)
         self.basis.rotate(**kwargs)
         self.unit_cell.rotate(**kwargs)
+
+    def translate(self, t, fix_anchor_points=True):
+        """Translate crystal cell basis."""
+        if not fix_anchor_points:
+            self.lattice.translate(t)
+        self.basis.translate(t, fix_anchor_points=fix_anchor_points)
+        self.unit_cell.translate(t, fix_anchor_points=fix_anchor_points)
 
     def update_basis(self, element, index=None, step=None):
         """Update a crystal cell basis element."""
