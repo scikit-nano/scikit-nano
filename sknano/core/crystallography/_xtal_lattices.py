@@ -17,7 +17,7 @@ from functools import total_ordering
 import numpy as np
 
 from sknano.core import BaseClass
-from sknano.core.math import Vector, Point, zhat
+from sknano.core.math import Vector, Point, zhat, rotation_matrix
 
 from ._xtal_cells import CrystalCellMixin
 
@@ -101,6 +101,64 @@ class LatticeBase(BaseClass):
     def metric_tensor(self):
         """Metric tensor."""
         return self.cell_matrix * self.cell_matrix.T
+
+    def rotate(self, angle=None, axis=None, anchor_point=None,
+               rot_point=None, from_vector=None, to_vector=None, degrees=False,
+               transform_matrix=None, verbose=False, **kwargs):
+        """Rotate unit cell.
+
+        Parameters
+        ----------
+        angle : float
+        axis : :class:`~sknano.core.math.Vector`, optional
+        anchor_point : :class:`~sknano.core.math.Point`, optional
+        rot_point : :class:`~sknano.core.math.Point`, optional
+        from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
+        degrees : bool, optional
+        transform_matrix : :class:`~numpy:numpy.ndarray`
+
+        See Also
+        --------
+        core.math.rotate
+
+        """
+        if self.nd == 2:
+            axis = 'z'
+        if transform_matrix is None:
+            transform_matrix = \
+                np.asmatrix(
+                    rotation_matrix(angle=angle, axis=axis,
+                                    anchor_point=anchor_point,
+                                    rot_point=rot_point,
+                                    from_vector=from_vector,
+                                    to_vector=to_vector, degrees=degrees,
+                                    verbose=verbose, **kwargs))
+            print('transform_matrix: {}'.format(transform_matrix))
+
+            # transform_matrix = \
+            #     transformation_matrix(angle=angle, axis=axis,
+            #                           anchor_point=anchor_point,
+            #                           rot_point=rot_point,
+            #                           from_vector=from_vector,
+            #                           to_vector=to_vector, degrees=degrees,
+            #                           verbose=verbose, **kwargs)
+
+        self.orientation_matrix = \
+            transform_matrix * self.orientation_matrix
+
+    def translate(self, t):
+        """Translate lattice.
+
+        Parameters
+        ----------
+        t : :class:`Vector`
+
+        See Also
+        --------
+        core.math.translate
+
+        """
+        self.offset.translate(t)
 
 
 class ReciprocalLatticeBase(LatticeBase):
