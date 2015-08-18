@@ -18,7 +18,7 @@ def test_find_target_atom():
     atoms.assign_unique_ids()
     atoms.update_attrs()
     target_atom = find_target_atom(atoms, target_coords=[0.0, 5.0, 0.0],
-                                   search_radius=2.0, nearest_target=True)
+                                   search_radius=1.0, nearest_target=True)
 
     print('atoms.z.min(), atoms.z.max(): {}, {}'.format(
         atoms.z.min(), atoms.z.max()))

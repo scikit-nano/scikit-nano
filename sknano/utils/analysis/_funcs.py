@@ -15,7 +15,7 @@ import numpy as np
 __all__ = ['find_target_atom']
 
 
-def find_target_atom(atoms, target_coords=None, search_radius=2.0,
+def find_target_atom(atoms, target_coords=None, search_radius=1.0,
                      nearest_target=False, max_search_radius=None):
     """Search for atom closest to target location.
 
