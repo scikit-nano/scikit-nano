@@ -40,6 +40,15 @@ __all__ = ['BaseStructureMixin', 'BaseStructure', 'StructureData',
 class BaseStructureMixin:
     """Mixin class for crystal structures."""
 
+    # def __deepcopy__(self, memo):
+    #     from copy import deepcopy
+    #     cp = self.__class__()
+    #     memo[id(self)] = cp
+    #     for attr in dir(self):
+    #         if not attr.startswith('_'):
+    #             setattr(cp, attr, deepcopy(getattr(self, attr), memo))
+    #     return cp
+
     def __getattr__(self, name):
         try:
             return getattr(self.atoms, name)
@@ -54,22 +63,6 @@ class BaseStructureMixin:
         return self._atoms
 
     @property
-    def basis(self):
-        if self.crystal_cell is not None:
-            if self.crystal_cell.basis is not None:
-                return self.crystal_cell.basis
-            else:
-                return self.unit_cell.basis
-
-    @property
-    def lattice(self):
-        if self.crystal_cell is not None:
-            if self.crystal_cell.lattice is not None:
-                return self.crystal_cell.lattice
-            else:
-                return self.unit_cell.lattice
-
-    @property
     def crystal_cell(self):
         return self._crystal_cell
 
@@ -78,24 +71,36 @@ class BaseStructureMixin:
         self._crystal_cell = value
 
     @property
+    def basis(self):
+        return self.crystal_cell.basis
+
+    @basis.setter
+    def basis(self, value):
+        self.crystal_cell.basis = value
+
+    @property
+    def lattice(self):
+        return self.crystal_cell.lattice
+
+    @lattice.setter
+    def lattice(self, value):
+        self.crystal_cell.lattice = value
+
+    @property
+    def scaling_matrix(self):
+        return self.crystal_cell.scaling_matrix
+
+    @scaling_matrix.setter
+    def scaling_matrix(self, value):
+        self.crystal_cell.scaling_matrix = value
+
+    @property
     def unit_cell(self):
         return self.crystal_cell.unit_cell
 
     @unit_cell.setter
     def unit_cell(self, value):
-        if self.crystal_cell is None:
-            self._crystal_cell = CrystalCell(unit_cell=value)
-        else:
-            self._crystal_cell.unit_cell = value
-
-    # def __deepcopy__(self, memo):
-    #     from copy import deepcopy
-    #     cp = self.__class__()
-    #     memo[id(self)] = cp
-    #     for attr in dir(self):
-    #         if not attr.startswith('_'):
-    #             setattr(cp, attr, deepcopy(getattr(self, attr), memo))
-    #     return cp
+        self.crystal_cell.unit_cell = value
 
     @property
     def structure_data(self):
@@ -105,32 +110,16 @@ class BaseStructureMixin:
     def structure(self):
         return self
 
-    @property
-    def scaling_matrix(self):
-        if self.crystal_cell is not None:
-            return self.crystal_cell.scaling_matrix
-        else:
-            return None
-
-    @scaling_matrix.setter
-    def scaling_matrix(self, value):
-        if self.crystal_cell is not None:
-            self.crystal_cell.scaling_matrix = value
-        else:
-            raise ValueError('No `CrystalCell` to scale')
+    def clear(self):
+        self.atoms.clear()
 
     def rotate(self, **kwargs):
         """Rotate crystal cell lattice, basis, and unit cell."""
-        if self.crystal_cell is not None:
-            self.crystal_cell.rotate(**kwargs)
+        self.crystal_cell.rotate(**kwargs)
 
     def translate(self, t, fix_anchor_points=True):
         """Translate crystal cell basis."""
-        if self.crystal_cell is not None:
-            self.crystal_cell.translate(t, fix_anchor_points=fix_anchor_points)
-
-    def clear(self):
-        self.atoms.clear()
+        self.crystal_cell.translate(t, fix_anchor_points=fix_anchor_points)
 
 
 class BaseStructure(BaseStructureMixin):
@@ -138,7 +127,7 @@ class BaseStructure(BaseStructureMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._atoms = StructureAtoms()
-        self._crystal_cell = None
+        self._crystal_cell = CrystalCell()
 
 StructureData = BaseStructure
 
