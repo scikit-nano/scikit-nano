@@ -37,13 +37,14 @@ class UnitCell(BaseClass):
 
     """
 
-    def __init__(self, lattice=None, basis=None, coords=None, cartesian=False):
+    def __init__(self, lattice=None, basis=None, coords=None, cartesian=False,
+                 wrap_coords=False):
 
         super().__init__()
 
         if basis is None:
             basis = Atoms()
-        elif basis is not None:
+        else:
             basis = Atoms(basis)
             basis.lattice = lattice
             if lattice is not None and coords is not None:
@@ -56,7 +57,9 @@ class UnitCell(BaseClass):
 
         self.lattice = lattice
         self.basis = basis
-        self.fmtstr = "{lattice!r}, {basis!r}, {coords!r}, cartesian=False"
+        self.wrap_coords = wrap_coords
+        self.fmtstr = "{lattice!r}, {basis!r}, {coords!r}, " + \
+            "cartesian=False, wrap_coords={wrap_coords!r}"
 
     def __dir__(self):
         return ['lattice', 'basis']
@@ -116,7 +119,8 @@ class UnitCell(BaseClass):
     def todict(self):
         """Return `dict` of `UnitCell` parameters."""
         return dict(lattice=self.lattice, basis=self.basis.symbols.tolist(),
-                    coords=self.basis.rs.tolist())
+                    coords=self.basis.rs.tolist(),
+                    wrap_coords=self.wrap_coords)
 
 
 @total_ordering
@@ -130,36 +134,51 @@ class CrystalCell(BaseClass):
 
     """
 
-    def __init__(self, unit_cell=None, scaling_matrix=None, wrap_coords=False):
+    def __init__(self, lattice=None, basis=None, coords=None, cartesian=False,
+                 wrap_coords=False, unit_cell=None, scaling_matrix=None):
         super().__init__()
 
-        # These attributes may be reset in the `@scaling_matrix.setter` method
-        # and so they need to be initialized *before* setting
+        if unit_cell is None and basis is not None:
+            basis = Atoms(basis)
+            basis.lattice = lattice
+            if lattice is not None and coords is not None:
+                for atom, pos in zip(basis, coords):
+                    atom.lattice = lattice
+                    if not cartesian:
+                        atom.rs = pos
+                    else:
+                        atom.rs = lattice.cartesian_to_fractional(pos)
+
+        # if basis is None:
+        #     basis = Atoms()
+
+        # These attributes may be reset in the `@scaling_matrix.setter`
+        # method and so they need to be initialized *before* setting
         # `self.scaling_matrix`.
-        self._lattice = None
-        self._basis = None
+        self.lattice = lattice
+        self.basis = basis
+        self.unit_cell = unit_cell
         self.wrap_coords = wrap_coords
-
-        if unit_cell is not None:
-            self.unit_cell = unit_cell
-
         self.scaling_matrix = scaling_matrix
+
         self.fmtstr = \
+            "lattice={lattice!r}, basis={basis!r}, coords={coords!r}, " + \
+            "cartesian=False, wrap_coords={wrap_coords!r}, " + \
             "unit_cell={unit_cell!r}, scaling_matrix={scaling_matrix!r}"
 
     def __dir__(self):
-        attrs = super().__dir__()
-        attrs.extend(['unit_cell', 'scaling_matrix'])
-        return attrs
+        return ['lattice', 'basis', 'unit_cell', 'scaling_matrix']
 
     def __eq__(self, other):
-        if all([mat is not None for mat in
-                (self.scaling_matrix, other.scaling_matrix)]) and \
+        if all([attr is not None for attr in
+                (self.scaling_matrix, self.unit_cell,
+                 other.scaling_matrix, other.unit_cell)]) and \
                 self.scaling_matrix.shape == other.scaling_matrix.shape:
             return self is other or \
                 (self.unit_cell == other.unit_cell and
                  np.allclose(self.scaling_matrix, other.scaling_matrix))
-        else:
+        elif all([cell is not None for cell in
+                  (self.unit_cell, other.unit_cell)]):
             return self is other or \
                 (self.unit_cell == other.unit_cell and
                  all([mat is None for mat in
@@ -180,7 +199,7 @@ class CrystalCell(BaseClass):
                 return getattr(self.lattice, name)
             except AttributeError:
                 pass
-        if name != 'basis' and self.basis is not None:
+        if name != 'basis' and self.basis.Natoms != 0:
             try:
                 return getattr(self.basis, name)
             except AttributeError:
@@ -192,18 +211,22 @@ class CrystalCell(BaseClass):
 
     @property
     def basis(self):
-        return self._basis if self._basis is not None else \
-            self.unit_cell.basis
+        return self._basis
 
     @basis.setter
     def basis(self, value):
         self._basis = value
-        self.unit_cell.basis[:] = self.basis[:self.unit_cell.basis.Natoms]
+        # if self.unit_cell is not None:
+        #     self.unit_cell.basis[:] = \
+        #         self.basis[:self.unit_cell.basis.Natoms]
 
     @property
     def lattice(self):
-        return self._lattice if self._lattice is not None else \
-            self.unit_cell.lattice
+        return self._lattice
+
+    @lattice.setter
+    def lattice(self, value):
+        self._lattice = value
 
     @property
     def unit_cell(self):
@@ -211,12 +234,18 @@ class CrystalCell(BaseClass):
 
     @unit_cell.setter
     def unit_cell(self, value):
-        if not isinstance(value, UnitCell):
+        if value is not None and not isinstance(value, UnitCell):
             raise ValueError('Expected a `UnitCell` object')
         self._unit_cell = value
+        if value is not None:
+            if self.lattice is None:
+                self._lattice = self.unit_cell.lattice
+            if self.basis is None or self.basis.Natoms == 0:
+                self._basis = self.unit_cell.basis
 
     @property
     def scaling_matrix(self):
+        """Scaling matrix."""
         return self._scaling_matrix
 
     @scaling_matrix.setter
@@ -237,44 +266,47 @@ class CrystalCell(BaseClass):
             return
 
         if isinstance(value, numbers.Number):
-                value = self.unit_cell.lattice.nd * [int(value)]
+            value = self.lattice.nd * [int(value)]
 
         scaling_matrix = np.asmatrix(value, dtype=int)
-        if scaling_matrix.shape != self.unit_cell.lattice.matrix.shape:
+        if scaling_matrix.shape != self.lattice.matrix.shape:
             scaling_matrix = np.diagflat(scaling_matrix)
         self._scaling_matrix = scaling_matrix
-        self._lattice = self.unit_cell.lattice.__class__(
-            cell_matrix=self.scaling_matrix * self.unit_cell.lattice.matrix)
+
+        self.lattice = self.lattice.__class__(
+            cell_matrix=self.scaling_matrix * self.lattice.matrix)
 
         tvecs = \
             np.asarray(
                 np.asmatrix(supercell_lattice_points(self.scaling_matrix)) *
                 self.lattice.matrix)
 
-        self._basis = Atoms()
-        for atom in self.unit_cell.basis:
+        basis = self.basis[:]
+        self.basis = Atoms()
+        for atom in basis:
             for tvec in tvecs:
                 xs, ys, zs = \
                     self.lattice.cartesian_to_fractional(atom.r + tvec)
                 if self.wrap_coords:
                     xs, ys, zs = \
-                        self.lattice.wrap_fractional_coordinate([xs, ys, zs])
+                        self.lattice.wrap_fractional_coordinate(
+                            [xs, ys, zs])
                 self.basis.append(Atom(atom.element, lattice=self.lattice,
                                        xs=xs, ys=ys, zs=zs))
 
     def rotate(self, **kwargs):
         """Rotate crystal cell lattice, basis, and unit cell."""
-        if self._lattice is not None:
+        if self.lattice is not None:
             self.lattice.rotate(**kwargs)
-        if self._basis is not None:
+        if self.basis is not None:
             self.basis.rotate(**kwargs)
         self.unit_cell.rotate(**kwargs)
 
     def translate(self, t, fix_anchor_points=True):
         """Translate crystal cell basis."""
-        if not fix_anchor_points and self._lattice is not None:
+        if not fix_anchor_points and self.lattice is not None:
             self.lattice.translate(t)
-        if self._basis is not None:
+        if self.basis is not None:
             self.basis.translate(t, fix_anchor_points=fix_anchor_points)
         self.unit_cell.translate(t, fix_anchor_points=fix_anchor_points)
 
@@ -297,8 +329,18 @@ class CrystalCell(BaseClass):
             [self.basis.__setitem__(i, element) for i in index]
 
     def todict(self):
-        return dict(unit_cell=self.unit_cell,
-                    scaling_matrix=self.scaling_matrix.tolist())
+        try:
+            return dict(lattice=self.lattice,
+                        basis=self.basis.symbols.tolist(),
+                        coords=self.basis.rs.tolist(),
+                        wrap_coords=self.wrap_coords,
+                        unit_cell=self.unit_cell,
+                        scaling_matrix=self.scaling_matrix.tolist())
+        except AttributeError:
+            return dict(lattice=self.lattice, basis=None, coords=None,
+                        wrap_coords=self.wrap_coords,
+                        unit_cell=self.unit_cell,
+                        scaling_matrix=self.scaling_matrix.tolist())
 
 
 class SuperCell(CrystalCell):
@@ -320,11 +362,3 @@ class SuperCell(CrystalCell):
                              'integers for `scaling_matrix`')
         super().__init__(unit_cell=unit_cell, scaling_matrix=scaling_matrix,
                          wrap_coords=wrap_coords)
-
-        self.fmtstr = ', '.join((self.unit_cell.fmtstr, super().fmtstr))
-
-    def todict(self):
-        """Return `dict` of `SuperCell` parameters."""
-        return dict(lattice=self.lattice, basis=self.basis.symbols.tolist(),
-                    coords=self.basis.rs.tolist(), unit_cell=self.unit_cell,
-                    scaling_matrix=self.scaling_matrix.tolist())
