@@ -18,6 +18,8 @@ import numpy as np
 
 from monty.io import zopen
 from sknano.core import get_fpath
+from sknano.core.crystallography import Crystal3DLattice
+from sknano.core.geometric_regions import Cuboid
 from ._base import Atom, StructureIO, StructureIOError, StructureConverter, \
     default_comment_line
 
@@ -43,7 +45,7 @@ class DATAReader(StructureIO):
 
         self.header_data = {}
         self.section_data = {}
-        self.boxbounds = {}
+        self.bounding_box = Cuboid()
         self.kwargs = {}
 
         formatspec = DATAFormatSpec(atom_style=atom_style, **kwargs)
@@ -111,9 +113,9 @@ class DATAReader(StructureIO):
                         if section in line:
                             found = True
                             f.readline()
-                            Nitems = self.header_data[header]
+                            n = 0
                             data = []
-                            for n in range(Nitems):
+                            while n < self.header_data[header]:
                                 tmp = []
                                 line = f.readline().strip().split()
                                 for i, attrs in enumerate(
@@ -125,12 +127,13 @@ class DATAReader(StructureIO):
                                     except IndexError:
                                         break
                                 data.append(tmp)
+                                n += 1
                             self.section_data[section] = data[:]
                     f.readline()
                     line = f.readline().strip()
                     if len(line) == 0:
                         break
-            self._parse_boxbounds()
+            self._parse_bounding_box()
             self._parse_atoms()
             self._parse_atom_types()
             # self._parse_bonds()
@@ -182,7 +185,7 @@ class DATAReader(StructureIO):
                         line[self.section_attrs_specs[
                             'Atoms']['type']['index']]
                     atom_kwargs[kw] = \
-                        masses_section[type-1][
+                        masses_section[type - 1][
                             self.section_attrs_specs['Masses'][kw]['index']]
                 elif kw in velocities_section_attrs and \
                         len(velocities_section) == len(atoms_section):
@@ -211,13 +214,14 @@ class DATAReader(StructureIO):
                         self.section_attrs_specs['Masses']['mass']['index']]
                     self.atoms.add_type(Atom(type=atomtype, mass=mass))
 
-    def _parse_boxbounds(self):
+    def _parse_bounding_box(self):
         for dim in ('x', 'y', 'z'):
             bounds = \
                 self.header_data[' '.join([dim + lim for lim in ('lo', 'hi')])]
-            self.boxbounds[dim] = {'min': bounds[0], 'max': bounds[-1]}
+            [setattr(self.bounding_box, dim + lim, value) for
+             lim, value in zip(('min', 'max'), bounds)]
 
-        self.kwargs['boxbounds'] = self.boxbounds
+        self.kwargs['bounding_box'] = self.bounding_box
 
     def get(self, section, colnum=None, colname=None, colindex=None):
         """Return section with `section`.
@@ -273,7 +277,7 @@ class DATAWriter:
 
     @classmethod
     def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
-              atom_style='full', boxbounds=None, comment_line=None,
+              atom_style='full', bounding_box=None, comment_line=None,
               assert_unique_ids=False, enforce_consecutive_ids=True,
               pad_box=True, xpad=10., ypad=10., zpad=10., pad_tol=0.01,
               verbose=False, **kwargs):
@@ -289,7 +293,7 @@ class DATAWriter:
             Full path (directory path + file name) to output data file.
         atoms : :class:`~sknano.core.atoms.Atoms`
             An :class:`~sknano.core.atoms.Atoms` instance.
-        boxbounds : dict, optional
+        bounding_box : dict, optional
             If `None`, determined automatically from the `atoms` coordinates.
         comment_line : str, optional
             A string written to the first line of `data` file. If `None`,
@@ -335,32 +339,35 @@ class DATAWriter:
                  len(set(atoms.ids)) != atoms.Natoms):
             atoms.assign_unique_ids()
 
-        if boxbounds is None:
-            boxbounds = {'x': {'min': None, 'max': None},
-                         'y': {'min': None, 'max': None},
-                         'z': {'min': None, 'max': None}}
+        if bounding_box is None:
+            bounding_box = Cuboid()
 
             for i, dim in enumerate(('x', 'y', 'z')):
-                boxbounds[dim]['min'] = atoms.coords[:, i].min()
-                boxbounds[dim]['max'] = atoms.coords[:, i].max()
+                setattr(bounding_box, dim + 'min', atoms.coords[:, i].min())
+                setattr(bounding_box, dim + 'max', atoms.coords[:, i].max())
 
         boxpad = {'x': xpad, 'y': ypad, 'z': zpad}
         if pad_box:
             # for dim, pad in boxpad.items():
             for i, dim in enumerate(('x', 'y', 'z')):
                 pad = boxpad[dim]
-                if abs(boxbounds[dim]['min'] - atoms.coords[:, i].min()) \
-                        < pad - pad_tol:
-                    boxbounds[dim]['min'] = boxbounds[dim]['min'] - pad
-                if abs(boxbounds[dim]['max'] - atoms.coords[:, i].max()) \
-                        < pad - pad_tol:
-                    boxbounds[dim]['max'] = boxbounds[dim]['max'] + pad
+                dmin = dim + 'min'
+                dmax = dim + 'max'
+                if abs(getattr(bounding_box, dmin) -
+                       atoms.coords[:, i].min()) < pad - pad_tol:
+                    setattr(bounding_box, dmin,
+                            getattr(bounding_box, dmin) - pad)
+                if abs(getattr(bounding_box, dmax) -
+                       atoms.coords[:, i].max()) < pad - pad_tol:
+                    setattr(bounding_box, dmax,
+                            getattr(bounding_box, dmax) + pad)
 
         lohi_width = 0
         for dim in ('x', 'y', 'z'):
             lohi_width = \
                 max(lohi_width, len('{:.6f} {:.6f}'.format(
-                    boxbounds[dim]['min'], boxbounds[dim]['max'])) + 4)
+                    getattr(bounding_box, dim + 'min'),
+                    getattr(bounding_box, dim + 'max'))) + 4)
 
         with zopen(fpath, 'wt') as f:
             f.write('# {}\n\n'.format(comment_line.lstrip('#').strip()))
@@ -373,8 +380,8 @@ class DATAWriter:
             for dim in ('x', 'y', 'z'):
                 f.write('{}{dim}lo {dim}hi\n'.format(
                     '{:.6f} {:.6f}'.format(
-                        boxbounds[dim]['min'],
-                        boxbounds[dim]['max']).ljust(lohi_width),
+                        getattr(bounding_box, dim + 'min'),
+                        getattr(bounding_box, dim + 'max')).ljust(lohi_width),
                     dim=dim))
 
             f.write('\nMasses\n\n')
@@ -627,7 +634,7 @@ class DATAFormatSpec:
             self.section_attrs_specs[section] = OrderedDict()
             for i, attr in enumerate(attrs):
                 self.section_attrs_specs[section][attr] = \
-                    {'dtype': attr_dtypes[attr], 'colnum': i+1, 'index': i}
+                    {'dtype': attr_dtypes[attr], 'colnum': i + 1, 'index': i}
 
     @property
     def atom_style(self):

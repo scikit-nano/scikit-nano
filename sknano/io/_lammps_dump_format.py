@@ -21,6 +21,8 @@ import numpy as np
 from monty.io import zopen
 from sknano.core import get_fpath
 from sknano.core.atoms import Trajectory, Snapshot, MDAtom as Atom
+from sknano.core.crystallography import Crystal3DLattice
+from sknano.core.geometric_regions import Cuboid, Parallelepiped
 
 from ._base import StructureIO, StructureIOError, StructureFormatSpec, \
     default_comment_line
@@ -45,7 +47,7 @@ class DUMPReader(StructureIO):
 
     Parameters
     ----------
-    fpath : str
+    fpath : :class:`~python:str`
         LAMMPS dump file path
 
     """
@@ -105,12 +107,12 @@ class DUMPReader(StructureIO):
                 'z' not in self.dumpattrs:
             print('dump scaling status unknown')
         elif self.Nsnaps > 0:
-            if self.scale_original == 1:
+            if self.scale_original:
                 self.unscale()
-            elif self.scale_original == 0:
-                print('dump is already unscaled')
-            else:
+            elif self.scale_original is None:
                 print('dump scaling status unknown')
+            else:
+                print('dump is already unscaled')
 
     def read_snapshot(self, f):
         try:
@@ -128,47 +130,49 @@ class DUMPReader(StructureIO):
                 snapshot.boxstr = ''
 
             snapshot.triclinic = False
+            snapshot.bounding_box = Cuboid()
             if 'xy' in snapshot.boxstr:
                 snapshot.triclinic = True
 
-            for axis, sf in zip(('x', 'y', 'z'), ('xy', 'xz', 'yz')):
+            for dim, tilt_factor in zip(('x', 'y', 'z'), ('xy', 'xz', 'yz')):
                 bounds = f.readline().strip().split()
-                setattr(snapshot, axis + 'lo', float(bounds[0]))
-                setattr(snapshot, axis + 'hi', float(bounds[1]))
+                setattr(snapshot, dim + 'lo', float(bounds[0]))
+                setattr(snapshot, dim + 'hi', float(bounds[1]))
                 try:
-                    setattr(snapshot, sf, float(bounds[-1]))
+                    setattr(snapshot, tilt_factor, float(bounds[2]))
                 except IndexError:
-                    setattr(snapshot, sf, 0.0)
+                    setattr(snapshot, tilt_factor, 0.0)
 
             if not self.dumpattrs:
-                self.scale_original = -1
-                xflag = yflag = zflag = -1
+                xflag = yflag = zflag = None
                 attrs = f.readline().strip().split()[2:]
                 for i, attr in enumerate(attrs):
                     if attr in ('x', 'xu', 'xs', 'xsu'):
                         self.dumpattrs['x'] = i
                         if attr in ('x', 'xu'):
-                            xflag = 0
+                            xflag = False
                         else:
-                            xflag = 1
+                            xflag = True
                     elif attr in ('y', 'yu', 'ys', 'ysu'):
                         self.dumpattrs['y'] = i
                         if attr in ('y', 'yu'):
-                            yflag = 0
+                            yflag = False
                         else:
-                            yflag = 1
+                            yflag = True
                     elif attr in ('z', 'zu', 'zs', 'zsu'):
                         self.dumpattrs['z'] = i
                         if attr in ('z', 'zu'):
-                            zflag = 0
+                            zflag = False
                         else:
-                            zflag = 1
+                            zflag = True
                     else:
                         self.dumpattrs[attr] = i
-                if xflag == yflag == zflag == 0:
-                    self.scale_original = 0
-                if xflag == yflag == zflag == 1:
-                    self.scale_original = 1
+
+                self.scale_original = None
+                if all([flag is False for flag in (xflag, yflag, zflag)]):
+                    self.scale_original = False
+                if all([flag for flag in (xflag, yflag, zflag)]):
+                    self.scale_original = True
 
                 self.atomattrs = \
                     sorted(self.dumpattrs, key=self.dumpattrs.__getitem__)
