@@ -112,7 +112,7 @@ class TimeSelection:
 
 
 class Snapshot(BaseClass):
-    """Container class for MD data at single timestep"""
+    """Container class for :class:`Trajectory` data at single timestep"""
     def __init__(self, trajectory=None):
 
         super().__init__()
@@ -129,6 +129,7 @@ class Snapshot(BaseClass):
 
     @property
     def atoms(self):
+        """Snapshot atoms."""
         atoms = Atoms()
         for atom in self._atoms:
             try:
@@ -212,6 +213,20 @@ class Snapshot(BaseClass):
         self.nselected = value
 
     def get_atoms(self, asarray=False):
+        """Get atoms.
+
+        Parameters
+        ----------
+        asarray : :class:`~python:bool`
+
+        Returns
+        -------
+        :class:`~numpy:numpy.ndarray` or :class:`MDAtoms`
+            if `asarray` is `True`, the atoms are returned as an
+            :class:`~numpy:numpy.ndarray`, otherwise an :class:`MDAtoms`
+            instance is returned.
+
+        """
         if asarray:
             return self._atoms
         return self.atoms
@@ -237,6 +252,7 @@ class Trajectory(BaseClass, UserList):
 
     @property
     def Nsnaps(self):
+        """Number of :class:`Snapshot`\ s in `Trajectory`."""
         return len(self.data)
 
     @property
@@ -298,12 +314,15 @@ class Trajectory(BaseClass, UserList):
 
     @property
     def snapshots(self):
+        """Returns the list of :class:`Snapshot`\ s."""
         return self.data
 
     def sort(self, key=attrgetter('timestep'), reverse=False):
+        """Sort the trajectory :class:`Snapshot`\ s."""
         super().sort(key=key, reverse=reverse)
 
     def cull(self):
+        """Remove duplicate timesteps from `Trajectory`."""
         i = 1
         while i < len(self.data):
             if self.data[i].timestep == self.data[i-1].timestep:
@@ -312,12 +331,14 @@ class Trajectory(BaseClass, UserList):
                 i += 1
 
     def get_snapshot(self, ts):
+        """Return :class:`Snapshot` with timestep `ts`."""
         for snapshot in self:
             if snapshot.timestep == ts:
                 return snapshot
         print("No snapshot at ts={:d} exists".format(ts))
 
     def timestep_index(self, ts):
+        """Return index of :class:`Snapshot` with timestep `ts`."""
         for i, snapshot in enumerate(self):
             if snapshot.timestep == ts:
                 return i
