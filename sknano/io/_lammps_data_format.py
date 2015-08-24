@@ -18,7 +18,7 @@ import numpy as np
 
 from monty.io import zopen
 from sknano.core import get_fpath
-from sknano.core.crystallography import Crystal3DLattice
+# from sknano.core.crystallography import Crystal3DLattice
 from sknano.core.geometric_regions import Cuboid
 from ._base import Atom, StructureIO, StructureIOError, StructureConverter, \
     default_comment_line
@@ -28,6 +28,10 @@ __all__ = ['DATAReader', 'DATAWriter', 'DATAData', 'DATAFormatSpec',
            'LAMMPSDATAWriter', 'LAMMPSDATA', 'LAMMPSDATAFormatSpec',
            'LAMMPSDATAIOError', 'LAMMPSDATA2XYZConverter',
            'atom_styles', 'lammps_atom_styles']
+
+
+class Domain:
+    pass
 
 
 class DATAReader(StructureIO):
@@ -40,15 +44,23 @@ class DATAReader(StructureIO):
     atom_style : {'full', 'atomic'}, optional
 
     """
-    def __init__(self, fpath, atom_style='full', **kwargs):
+    def __init__(self, fpath, atom_style='full', bond_style=None,
+                 angle_style=None, dihedral_style=None, improper_style=None,
+                 pair_style=None, **kwargs):
         super().__init__(fpath=fpath, **kwargs)
 
-        self.header_data = {}
-        self.section_data = {}
+        self.header_data = OrderedDict()
+        self.section_data = OrderedDict()
         self.bounding_box = Cuboid()
-        self.kwargs = {}
+        self.domain = Domain()
+        self.kwargs = OrderedDict()
 
-        formatspec = DATAFormatSpec(atom_style=atom_style, **kwargs)
+        styles = dict(atom_style=atom_style, bond_style=bond_style,
+                      angle_style=angle_style, dihedral_style=dihedral_style,
+                      improper_style=improper_style, pair_style=pair_style)
+
+        formatspec = DATAFormatSpec(**styles)
+        self.atom_style = atom_style
         self.section_attrs = formatspec.section_attrs
         self.section_attrs_specs = formatspec.section_attrs_specs
 
@@ -134,6 +146,7 @@ class DATAReader(StructureIO):
                     if len(line) == 0:
                         break
             self._parse_bounding_box()
+            self._parse_domain()
             self._parse_atoms()
             self._parse_atom_types()
             # self._parse_bonds()
@@ -210,9 +223,13 @@ class DATAReader(StructureIO):
         if Ntypes != self.header_data['atom types']:
             for atomtype in range(1, self.header_data['atom types'] + 1):
                 if atomtype not in typemap:
-                    mass = self.section_data['Masses'][atomtype - 1][
-                        self.section_attrs_specs['Masses']['mass']['index']]
-                    self.atoms.add_type(Atom(type=atomtype, mass=mass))
+                    try:
+                        mass = self.section_data['Masses'][atomtype - 1][
+                            self.section_attrs_specs['Masses']['mass']['index']
+                        ]
+                        self.atoms.add_type(Atom(type=atomtype, mass=mass))
+                    except KeyError:
+                        self.atoms.add_type(Atom(type=atomtype))
 
     def _parse_bounding_box(self):
         for dim in ('x', 'y', 'z'):
@@ -222,6 +239,15 @@ class DATAReader(StructureIO):
              lim, value in zip(('min', 'max'), bounds)]
 
         self.kwargs['bounding_box'] = self.bounding_box
+
+    def _parse_domain(self):
+        tilt_factors = 'xy xz yz'
+        if tilt_factors in self.headers:
+            self.domain.triclinic = True
+            [setattr(self.domain, tilt_factor, value) for tilt_factor, value
+             in zip(tilt_factors.split(), self.headers[tilt_factors])]
+        else:
+            self.domain.triclinic = False
 
     def get(self, section, colnum=None, colname=None, colindex=None):
         """Return section with `section`.
@@ -523,14 +549,161 @@ class DATAData(DATAReader):
                     raise TypeError(error_msg)
                 else:
                     raise ValueError(error_msg)
-            else:
+            elif datafile is None or datafile == '':
                 datafile = self.fpath
 
-            DATAWriter.write(fname=datafile, atoms=self.atoms,
-                             comment_line=self.comment_line, **kwargs)
+            # DATAWriter.write(fname=datafile, atoms=self.atoms,
+            #                  comment_line=self.comment_line, **kwargs)
+
+            self.atoms.rezero()
+            self.atoms.assign_unique_types()
+            self.atoms.assign_unique_ids()
+
+            self._update_attr_fmtstr_widths()
+
+            try:
+                with zopen(datafile, 'wt') as fp:
+                    self._write_header(fp)
+                    self._write_bounding_box(fp)
+                    [getattr(self, '_write_' + section.lower())(fp)
+                     for section in self.sections.keys()]
+            except OSError as e:
+                print(e)
 
         except (TypeError, ValueError) as e:
             print(e)
+
+    def _update_attr_fmtstr_widths(self):
+        attr_fmtstr_width['id'] = len(str(self.atoms.Natoms)) + 1
+        attr_fmtstr_width['type'] = len(str(self.atoms.Ntypes)) + 1
+        attr_fmtstr_width['mol'] = len(str(np.max(self.atoms.mols))) + 1
+        attr_fmtstr_width['q'] = \
+            len('{:f}'.format(np.max(self.atoms.charges))) + 2
+        attr_fmtstr_width['mass'] = \
+            len('{:f}'.format(np.max(self.atoms.masses))) + 4
+        attr_fmtstr_width['x'] = len('{:f}'.format(np.max(self.atoms.x))) + 2
+        attr_fmtstr_width['y'] = len('{:f}'.format(np.max(self.atoms.y))) + 2
+        attr_fmtstr_width['z'] = len('{:f}'.format(np.max(self.atoms.z))) + 2
+        attr_fmtstr_width['ix'] = len(str(np.max(self.atoms.ix))) + 2
+        attr_fmtstr_width['iy'] = len(str(np.max(self.atoms.iy))) + 2
+        attr_fmtstr_width['iz'] = len(str(np.max(self.atoms.iz))) + 2
+        attr_fmtstr_width['vx'] = len('{:f}'.format(np.max(self.atoms.vx))) + 2
+        attr_fmtstr_width['vy'] = len('{:f}'.format(np.max(self.atoms.vy))) + 2
+        attr_fmtstr_width['vz'] = len('{:f}'.format(np.max(self.atoms.vz))) + 2
+
+        # attr_fmtstr_width['lx'] = \
+        #     len('{:f}'.format(np.max(self.atoms.lx))) + 2
+        # attr_fmtstr_width['ly'] = \
+        #     len('{:f}'.format(np.max(self.atoms.ly))) + 2
+        # attr_fmtstr_width['lz'] = \
+        #     len('{:f}'.format(np.max(self.atoms.lz))) + 2
+        # attr_fmtstr_width['wx'] = \
+        #     len('{:f}'.format(np.max(self.atoms.wx))) + 2
+        # attr_fmtstr_width['wy'] = \
+        #     len('{:f}'.format(np.max(self.atoms.wy))) + 2
+        # attr_fmtstr_width['wz'] = \
+        #     len('{:f}'.format(np.max(self.atoms.wz))) + 2
+
+        # attr_fmtstr_width['ervel'] = \
+        #     len('{:f}'.format(np.max(self.atoms.ervel))) + 2
+        # attr_fmtstr_width['shapex'] = \
+        #     len('{:f}'.format(np.max(self.atoms.shapex))) + 2
+        # attr_fmtstr_width['shapey'] = \
+        #     len('{:f}'.format(np.max(self.atoms.shapey))) + 2
+        # attr_fmtstr_width['shapez'] = \
+        #     len('{:f}'.format(np.max(self.atoms.shapez))) + 2
+
+        # attr_fmtstr_width['quatw'] = \
+        #     len('{:f}'.format(np.max(self.atoms.quatw))) + 2
+        # attr_fmtstr_width['quati'] = \
+        #     len('{:f}'.format(np.max(self.atoms.quati))) + 2
+        # attr_fmtstr_width['quatj'] = \
+        #     len('{:f}'.format(np.max(self.atoms.quatj))) + 2
+        # attr_fmtstr_width['quatk'] = \
+        #     len('{:f}'.format(np.max(self.atoms.quatk))) + 2
+
+        attr_fmtstr_width['atom1'] = attr_fmtstr_width['atom2'] = \
+            attr_fmtstr_width['atom3'] = attr_fmtstr_width['atom4'] = \
+            attr_fmtstr_width['id']
+
+        for attr_specs in self.section_attrs_specs.values():
+            for attr, specs in attr_specs.items():
+                specs['width'] = attr_fmtstr_width[attr]
+
+    def _write_header(self, fp):
+        fp.write('# {}\n\n'.format(default_comment_line))
+        for header, value in self.headers.items():
+            if header in list(header_specs.keys())[-4:]:
+                continue
+            try:
+                s = ' '.join(map(str, value[:] + list((header,))))
+            except TypeError:
+                s = ' '.join(map(str, list((value, header))))
+            finally:
+                fp.write('{}\n'.format(s))
+        fp.write('\n')
+
+    def _write_bounding_box(self, fp):
+        lohi_width = 0
+        lohi_fmtstr = '{:.10f} {:.10f}'
+        for dim in ('x', 'y', 'z'):
+            lohi_width = \
+                max(lohi_width, len(lohi_fmtstr.format(
+                    getattr(self.bounding_box, dim + 'min'),
+                    getattr(self.bounding_box, dim + 'max'))) + 4)
+
+        for dim in ('x', 'y', 'z'):
+            fp.write('{}{dim}lo {dim}hi\n'.format(
+                lohi_fmtstr.format(
+                    getattr(self.bounding_box, dim + 'min'),
+                    getattr(self.bounding_box, dim + 'max')).ljust(lohi_width),
+                dim=dim))
+
+        if self.domain.triclinic:
+            fp.write('{xy:.10f} {xz:.10f} {yz:.10f} xy xz yz\n'.format(
+                     xy=self.domain.xy, xz=self.domain.xz, yz=self.domain.yz))
+
+    def _write_masses(self, fp):
+        type_width = self.section_attrs_specs['Masses']['type']['width']
+        fp.write('\nMasses\n\n')
+        for type, mass in self.sections['Masses']:
+            fp.write('{}{:.4f}\n'.format(
+                     '{:d}'.format(type).ljust(type_width), mass))
+
+    def _write_atoms(self, fp):
+        fp.write('\nAtoms # {}\n\n'.format(self.atom_style))
+        for atom in self.atoms:
+            line = ''
+            for attr, specs in self.section_attrs_specs['Atoms'].items():
+                line += "{:>{}}".format(specs['fmtstr'].format(
+                                        getattr(atom, attr)), specs['width'])
+            line += '\n'
+            fp.write(line)
+
+    def _write_velocities(self, fp):
+        fp.write('\nVelocities\n\n')
+        for atom in self.atoms:
+            line = ''
+            for attr, specs in self.section_attrs_specs['Velocities'].items():
+                line += "{:>{}}".format(specs['fmtstr'].format(
+                                        getattr(atom, attr)), specs['width'])
+            line += '\n'
+            fp.write(line)
+
+    def _write_force_fields(self, fp):
+        pass
+
+    def _write_bonds(self, fp):
+        pass
+
+    def _write_angles(self, fp):
+        pass
+
+    def _write_dihedrals(self, fp):
+        pass
+
+    def _write_impropers(self, fp):
+        pass
 
     @classmethod
     def format_spec(cls, atom_style='full', **kwargs):
@@ -622,19 +795,51 @@ class DATAFormatSpec:
         self.improper_style = improper_style
         self.pair_style = pair_style
 
-        self.section_attrs = \
-            {'Atoms': atoms_section_attrs[self.atom_style],
-             'Masses': ['type', 'mass'],
-             'Velocities': velocities_section_attrs[self.atom_style],
-             'Bonds': bonds_section_attrs,
-             'Dihedrals': dihedrals_section_attrs}
+        self.section_attrs = OrderedDict()
+        self.section_attrs['Masses'] = ['type', 'mass']
+        self.section_attrs['Atoms'] = atoms_section_attrs[atom_style]
+        self.section_attrs['Velocities'] = velocities_section_attrs[atom_style]
+        self.section_attrs['Bonds'] = bonds_section_attrs
+        self.section_attrs['Angles'] = angles_section_attrs
+        self.section_attrs['Dihedrals'] = dihedrals_section_attrs
+        self.section_attrs['Impropers'] = impropers_section_attrs
+        self.section_attrs['Pair Coeffs'] = \
+            pair_coeffs_section_attrs[pair_style]
+        self.section_attrs['Bond Coeffs'] = \
+            bond_coeffs_section_attrs[bond_style]
+        self.section_attrs['Angle Coeffs'] = \
+            angle_coeffs_section_attrs[angle_style]
+        self.section_attrs['Dihedral Coeffs'] = \
+            dihedral_coeffs_section_attrs[dihedral_style]
+        self.section_attrs['Improper Coeffs'] = \
+            improper_coeffs_section_attrs[improper_style]
+        self.section_attrs['BondBond Coeffs'] = ['M', 'r1', 'r2']
+        self.section_attrs['BondAngle Coeffs'] = ['N1', 'N2', 'r1', 'r2']
+        self.section_attrs['MiddleBondTorsion Coeffs'] = \
+            ['A1', 'A2', 'A3', 'r2']
+        self.section_attrs['EndBondTorsion Coeffs'] = \
+            ['B1', 'B2', 'B3', 'C1', 'C2', 'C3', 'r1', 'r3']
+        self.section_attrs['AngleTorsion Coeffs'] = \
+            ['D1', 'D2', 'D3', 'E1', 'E2', 'E3', 'theta1', 'theta2']
+        self.section_attrs['AngleAngleTorsion Coeffs'] = \
+            ['M', 'theta1', 'theta2']
+        self.section_attrs['BondBond13 Coeffs'] = ['N', 'r1', 'r3']
+        self.section_attrs['AngleAngle Coeffs'] = \
+            ['M1', 'M2', 'M3', 'theta1', 'theta2', 'theta3']
 
         self.section_attrs_specs = OrderedDict()
         for section, attrs in list(self.section_attrs.items()):
             self.section_attrs_specs[section] = OrderedDict()
             for i, attr in enumerate(attrs):
                 self.section_attrs_specs[section][attr] = \
-                    {'dtype': attr_dtypes[attr], 'colnum': i + 1, 'index': i}
+                    {'dtype': attr_dtypes[attr] if attr in attr_dtypes
+                     else float,
+                     'colnum': i + 1,
+                     'index': i,
+                     'fmtstr': attr_fmtstr[attr] if attr in attr_fmtstr
+                     else '{:f}',
+                     'width': attr_fmtstr_width[attr] if attr in
+                     attr_fmtstr_width else 14}
 
     @property
     def atom_style(self):
@@ -644,7 +849,7 @@ class DATAFormatSpec:
     def atom_style(self, value):
         if value not in atom_styles:
             raise ValueError("Allowed `atom_style`'s:\n{}".format(
-                list(atom_styles.keys())))
+                list(atom_styles)))
         self._atom_style = value
 
     @atom_style.deleter
@@ -654,19 +859,14 @@ class DATAFormatSpec:
 LAMMPSDATAFormatSpec = DATAFormatSpec
 
 header_specs = OrderedDict()
-header_specs.update(dict.fromkeys(['atoms', 'bonds', 'angles',
-                                   'dihedrals', 'impropers',
-                                   'atom types', 'bond types',
-                                   'angle types', 'dihedral types',
-                                   'improper types',
-                                   'extra bond per atom',
-                                   'extra angle per atom',
-                                   'extra dihedral per atom',
-                                   'extra improper per atom',
-                                   'extra special per atom',
-                                   'ellipsoids', 'lines',
-                                   'triangles', 'bodies'],
-                                  {'dtype': int, 'items': 1}))
+[header_specs.update({key: {'dtype': int, 'items': 1} for key in
+                     ['atoms', 'atom types', 'bonds', 'bond types',
+                      'angles', 'angle types', 'dihedrals', 'dihedral types',
+                      'impropers', 'improper types',
+                      'ellipsoids', 'lines', 'triangles', 'bodies',
+                      'extra bond per atom', 'extra angle per atom',
+                      'extra dihedral per atom', 'extra improper per atom',
+                      'extra special per atom']})]
 header_specs.update(dict.fromkeys(['xlo xhi', 'ylo yhi', 'zlo zhi'],
                                   {'dtype': float, 'items': 2}))
 header_specs.update(dict.fromkeys(['xy xz yz'],
@@ -708,70 +908,91 @@ attr_dtypes = {'id': int, 'type': int, 'mol': int, 'q': float, 'mass': float,
                'x': float, 'y': float, 'z': float,
                'ix': int, 'iy': int, 'iz': int,
                'vx': float, 'vy': float, 'vz': float,
-               'fx': float, 'fy': float, 'fz': float,
                'lx': float, 'ly': float, 'lz': float,
                'wx': float, 'wy': float, 'wz': float,
                'ervel': float,
                'shapex': float, 'shapey': float, 'shapez': float,
                'quatw': float, 'quati': float, 'quatj': float, 'quatk': float,
-               'atom1': int, 'atom2': int, 'atom3': int, 'atom4': int}
+               'atom1': int, 'atom2': int, 'atom3': int, 'atom4': int,
+               'bond_id': int, 'bond_type': int,
+               'angle_id': int, 'angle_type': int,
+               'dihedral_id': int, 'dihedral_type': int,
+               'improper_id': int, 'improper_type': int}
 
-atom_styles = OrderedDict()
-atom_styles['angle'] = ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z']
-atom_styles['atomic'] = ['atom-ID', 'atom-type', 'x', 'y', 'z']
-atom_styles['body'] = \
-    ['atom-ID', 'atom-type', 'bodyflag', 'mass', 'x', 'y', 'z']
-atom_styles['bond'] = ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z']
-atom_styles['charge'] = ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z']
-atom_styles['dipole'] = \
-    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z', 'mux', 'muy', 'muz']
-atom_styles['electron'] = \
-    ['atom-ID', 'atom-type', 'q', 'spin', 'eradius', 'x', 'y', 'z']
-atom_styles['ellipsoid'] = \
-    ['atom-ID', 'atom-type', 'ellipsoidflag', 'density', 'x', 'y', 'z']
-atom_styles['full'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'q', 'x', 'y', 'z']
-atom_styles['line'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'lineflag', 'density',
-     'x', 'y', 'z']
-atom_styles['meso'] = ['atom-ID', 'atom-type', 'rho', 'e', 'cv', 'x', 'y', 'z']
-atom_styles['molecular'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z']
-atom_styles['peri'] = \
-    ['atom-ID', 'atom-type', 'volume', 'density', 'x', 'y', 'z']
-atom_styles['sphere'] = \
-    ['atom-ID', 'atom-type', 'diameter', 'density', 'x', 'y', 'z']
-atom_styles['template'] = \
-    ['atom-ID', 'molecule-ID', 'template-index', 'template-atom', 'atom-type',
-     'x', 'y', 'z']
-atom_styles['tri'] = \
-    ['atom-ID', 'molecule-ID', 'atom-type', 'triangleflag', 'density',
-     'x', 'y', 'z']
-atom_styles['wavepacket'] = \
-    ['atom-ID', 'atom-type', 'charge', 'spin', 'eradius', 'etag',
-     'cs_re', 'cs_im', 'x', 'y', 'z']
-# atom_styles['hybrid'] = ['atom-ID', 'atom-type', 'x', 'y', 'z', '...']
-
-lammps_atom_styles = atom_styles
+attr_fmtstr = {key: '{:d}' if dtype == int else '{:f}'
+               for key, dtype in attr_dtypes.items()}
+attr_fmtstr_width = {key: 5 if dtype == int else 16
+                     for key, dtype in attr_dtypes.items()}
 
 atoms_section_attrs = OrderedDict()
 
-[atoms_section_attrs.update(
- {atom_style: [attr.replace('atom-', '').replace('molecule-ID', 'mol').lower()
-  for attr in attrs]}) for atom_style, attrs in atom_styles.items()]
+atoms_section_attrs['angle'] = ['id', 'mol', 'type', 'x', 'y', 'z']
+atoms_section_attrs['atomic'] = ['id', 'type', 'x', 'y', 'z']
+atoms_section_attrs['body'] = ['id', 'type', 'bodyflag', 'mass', 'x', 'y', 'z']
+atoms_section_attrs['bond'] = ['id', 'mol', 'type', 'x', 'y', 'z']
+atoms_section_attrs['charge'] = ['id', 'type', 'q', 'x', 'y', 'z']
+atoms_section_attrs['dipole'] = \
+    ['id', 'type', 'q', 'x', 'y', 'z', 'mux', 'muy', 'muz']
+atoms_section_attrs['electron'] = \
+    ['id', 'type', 'q', 'spin', 'eradius', 'x', 'y', 'z']
+atoms_section_attrs['ellipsoid'] = \
+    ['id', 'type', 'ellipsoidflag', 'density', 'x', 'y', 'z']
+atoms_section_attrs['full'] = ['id', 'mol', 'type', 'q', 'x', 'y', 'z']
+atoms_section_attrs['line'] = \
+    ['id', 'mol', 'type', 'lineflag', 'density', 'x', 'y', 'z']
+atoms_section_attrs['meso'] = ['id', 'type', 'rho', 'e', 'cv', 'x', 'y', 'z']
+atoms_section_attrs['molecular'] = ['id', 'mol', 'type', 'x', 'y', 'z']
+atoms_section_attrs['peri'] = \
+    ['id', 'type', 'volume', 'density', 'x', 'y', 'z']
+atoms_section_attrs['sphere'] = \
+    ['id', 'type', 'diameter', 'density', 'x', 'y', 'z']
+atoms_section_attrs['template'] = \
+    ['id', 'mol', 'template-index', 'template-atom', 'type', 'x', 'y', 'z']
+atoms_section_attrs['tri'] = \
+    ['id', 'mol', 'type', 'triangleflag', 'density', 'x', 'y', 'z']
+atoms_section_attrs['wavepacket'] = \
+    ['id', 'type', 'charge', 'spin', 'eradius', 'etag', 'cs_re', 'cs_im',
+     'x', 'y', 'z']
+# atoms_section_attrs['hybrid'] = ['id', 'type', 'x', 'y', 'z', '...']
+
+atom_styles = list(atoms_section_attrs.keys())
+lammps_atom_styles = atom_styles
+
 [attrs.extend(['ix', 'iy', 'iz']) for attrs in atoms_section_attrs.values()]
 
 velocities_section_attrs = OrderedDict()
 [velocities_section_attrs.update({atom_style: ['id', 'vx', 'vy', 'vz']})
- for atom_style in atom_styles.keys()]
+ for atom_style in atom_styles]
 velocities_section_attrs['electron'].append('ervel')
 velocities_section_attrs['ellipsoid'].extend(['lx', 'ly', 'lz'])
 velocities_section_attrs['sphere'].extend(['wx', 'wy', 'wz'])
 # velocities_section_attrs['hybrid'].append('...')
 
-bonds_section_attrs = ['id', 'type', 'atom1', 'atom2']
-angles_section_attrs = ['id', 'type', 'atom1', 'atom2', 'atom3']
-dihedrals_section_attrs = ['id', 'type', 'atom1', 'atom2', 'atom3', 'atom4']
-impropers_section_attrs = ['id', 'type', 'atom1', 'atom2', 'atom3', 'atom4']
+bonds_section_attrs = ['bond_id', 'bond_type', 'atom1', 'atom2']
+angles_section_attrs = ['angle_id', 'angle_type', 'atom1', 'atom2', 'atom3']
+dihedrals_section_attrs = ['dihedral_id', 'dihedral_type',
+                           'atom1', 'atom2', 'atom3', 'atom4']
+impropers_section_attrs = ['improper_id', 'improper_type',
+                           'atom1', 'atom2', 'atom3', 'atom4']
 ellipsoids_section_attrs = ['id', 'shapex', 'shapey', 'shapez',
                             'quatw', 'quati', 'quatj', 'quatk']
+
+pair_coeffs_section_attrs = OrderedDict()
+pair_coeffs_section_attrs[None] = []
+pair_styles = list(pair_coeffs_section_attrs.keys())
+
+angle_coeffs_section_attrs = OrderedDict()
+angle_coeffs_section_attrs[None] = []
+angle_styles = list(angle_coeffs_section_attrs.keys())
+
+bond_coeffs_section_attrs = OrderedDict()
+bond_coeffs_section_attrs[None] = []
+bond_styles = list(bond_coeffs_section_attrs.keys())
+
+dihedral_coeffs_section_attrs = OrderedDict()
+dihedral_coeffs_section_attrs[None] = []
+dihedral_styles = list(dihedral_coeffs_section_attrs.keys())
+
+improper_coeffs_section_attrs = OrderedDict()
+improper_coeffs_section_attrs[None] = []
+improper_styles = list(improper_coeffs_section_attrs.keys())
