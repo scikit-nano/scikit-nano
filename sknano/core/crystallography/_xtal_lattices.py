@@ -205,7 +205,7 @@ class LatticeBase(BaseClass):
                                     from_vector=from_vector,
                                     to_vector=to_vector, degrees=degrees,
                                     verbose=verbose, **kwargs))
-            print('transform_matrix: {}'.format(transform_matrix))
+            # print('transform_matrix: {}'.format(transform_matrix))
 
             # transform_matrix = \
             #     transformation_matrix(angle=angle, axis=axis,
