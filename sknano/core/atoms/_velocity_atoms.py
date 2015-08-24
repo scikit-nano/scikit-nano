@@ -211,3 +211,26 @@ class VelocityAtoms(Atoms):
     def velocities(self):
         """:class:`~numpy:numpy.ndarray` of `VelocityAtom` velocities."""
         return np.asarray([atom.v for atom in self])
+
+    @property
+    def v(self):
+        """Alias for :attr:`~VelocityAtoms.velocities`."""
+        return self.velocities
+
+    @property
+    def vx(self):
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`v_x` \
+            components."""
+        return self.v[:, 0]
+
+    @property
+    def vy(self):
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`v_y` \
+            components."""
+        return self.v[:, 1]
+
+    @property
+    def vz(self):
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`v_z` \
+            components."""
+        return self.v[:, 2]

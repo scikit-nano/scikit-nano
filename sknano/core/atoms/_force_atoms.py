@@ -204,3 +204,31 @@ class ForceAtoms(Atoms):
 
     def sort(self, key=attrgetter('f'), reverse=False):
         super().sort(key=key, reverse=reverse)
+
+    @property
+    def forces(self):
+        """:class:`~numpy:numpy.ndarray` of `ForceAtom` forces."""
+        return np.asarray([atom.f for atom in self])
+
+    @property
+    def f(self):
+        """Alias for :attr:`~ForceAtoms.forces`."""
+        return self.forces
+
+    @property
+    def fx(self):
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`f_x` \
+            components."""
+        return self.f[:, 0]
+
+    @property
+    def fy(self):
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`f_y` \
+            components."""
+        return self.f[:, 1]
+
+    @property
+    def fz(self):
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`f_z` \
+            components."""
+        return self.f[:, 2]

@@ -134,3 +134,28 @@ class ImageAtoms(Atoms):
 
     def sort(self, key=attrgetter('i'), reverse=False):
         super().sort(key=key, reverse=reverse)
+
+    @property
+    def images(self):
+        """:class:`~numpy:numpy.ndarray` of `ImageAtom` images."""
+        return np.asarray([atom.i for atom in self])
+
+    @property
+    def i(self):
+        """Alias for :attr:`~ImageAtoms.images`."""
+        return self.images
+
+    @property
+    def ix(self):
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`i_x` values."""
+        return self.i[:, 0]
+
+    @property
+    def iy(self):
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`i_y` values."""
+        return self.i[:, 1]
+
+    @property
+    def iz(self):
+        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`i_z` values."""
+        return self.i[:, 2]
