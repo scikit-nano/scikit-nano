@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Atom with a van der Waals radius attribute (:mod:`sknano.core.atoms._vdW_atom`)
+Atom classes with van der Waals radius (:mod:`sknano.core.atoms._vdW_atoms`)
 ===============================================================================
 
-.. currentmodule:: sknano.core.atoms._vdW_atom
+.. currentmodule:: sknano.core.atoms._vdW_atoms
 
 """
 from __future__ import absolute_import, division, print_function
@@ -20,7 +20,7 @@ import numpy as np
 from sknano.core.refdata import element_data
 from ._atoms import Atom, Atoms
 
-__all__ = ['VanDerWaalsAtom', 'VanDerWaalsAtom', 'vdw_radius_from_basis']
+__all__ = ['VanDerWaalsAtom', 'VanDerWaalsAtoms', 'vdw_radius_from_basis']
 
 
 @total_ordering
