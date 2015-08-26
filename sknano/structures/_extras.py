@@ -12,7 +12,9 @@ from __future__ import absolute_import, division, print_function, \
 __docformat__ = 'restructuredtext en'
 
 import importlib
+import numbers
 import re
+
 import numpy as np
 
 from sknano.core.math import comparison_symbol_operator_mappings
@@ -22,7 +24,8 @@ __all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'generate_Ch_list',
            'get_chiral_type', 'get_Ch_type',
            'map_Ch', 'chiral_type_name_mappings', 'CHIRAL_TYPES',
            'filter_key_type_mappings', 'attr_units', 'attr_symbols',
-           'attr_strfmt', 'get_chiral_indices', 'get_chiral_indices_from_str']
+           'attr_strfmt', 'type_check_chiral_indices',
+           'get_chiral_indices', 'get_chiral_indices_from_str']
 
 chiral_type_name_mappings = \
     {'achiral': 'aCh', 'armchair': 'AC', 'zigzag': 'ZZ', 'chiral': 'Ch'}
@@ -205,7 +208,7 @@ def filter_Ch_list(Ch_list, property_filters=None, **kwargs):
         filtered `Ch_list`
 
     """
-    #Ch_list = np.asarray(Ch_list)
+    # Ch_list = np.asarray(Ch_list)
     if property_filters is not None:
         from ._swnt import SWNT
         filtered_list = Ch_list[:]
@@ -455,6 +458,7 @@ def get_chiral_type(Ch):
 
 get_Ch_type = get_chiral_type
 
+
 def map_Ch(Ch, compute=None, **kwargs):
     """Map compute function using `Ch` as input.
 
@@ -485,7 +489,7 @@ def get_Ch_map_from_data(Chlist, Chdata):
     pass
 
 
-def get_chiral_indices(*args, **kwargs):
+def get_chiral_indices(*args, type_check=True, **kwargs):
     """Parse the chiral indices `n` and `m` from a `vararg` `*args`, \
         which may be a `tuple` or 2 ints or from varkwargs `**kwargs`.
 
@@ -505,6 +509,8 @@ def get_chiral_indices(*args, **kwargs):
                 del kwargs['n']
                 m = kwargs['m']
                 del kwargs['m']
+    if type_check:
+        type_check_chiral_indices((n, m))
     return n, m, kwargs
 
 get_Ch_indices = get_chiral_indices
@@ -532,3 +538,30 @@ def get_chiral_indices_from_str(Ch):
         except Exception as e:
             print(e)
             return None
+
+
+def type_check_chiral_indices(*Ch):
+    """Check type of chiral indices.
+
+    Parameters
+    ----------
+    Ch : :class:`~python:tuple`
+
+    Raises
+    ------
+    TypeError
+
+    """
+    n = m = None
+    try:
+        n, m = Ch
+    except ValueError:
+        try:
+            n, m = Ch[0]
+        except IndexError:
+            raise ValueError('Expected an (n, m) tuple of chiral indices')
+
+    if not (isinstance(n, numbers.Real) or n >= 0):
+        raise TypeError('Expected an integer')
+    if not (isinstance(m, numbers.Real) or m >= 0):
+        raise TypeError('Expected an integer')
