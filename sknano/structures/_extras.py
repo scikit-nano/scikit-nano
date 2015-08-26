@@ -489,7 +489,7 @@ def get_Ch_map_from_data(Chlist, Chdata):
     pass
 
 
-def get_chiral_indices(*args, type_check=True, **kwargs):
+def get_chiral_indices(*args, check_type=True, **kwargs):
     """Parse the chiral indices `n` and `m` from a `vararg` `*args`, \
         which may be a `tuple` or 2 ints or from varkwargs `**kwargs`.
 
@@ -509,7 +509,7 @@ def get_chiral_indices(*args, type_check=True, **kwargs):
                 del kwargs['n']
                 m = kwargs['m']
                 del kwargs['m']
-    if type_check:
+    if check_type:
         type_check_chiral_indices((n, m))
     return n, m, kwargs
 
