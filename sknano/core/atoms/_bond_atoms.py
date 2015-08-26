@@ -25,7 +25,7 @@ __all__ = ['BondAtom', 'BondAtoms']
 
 @total_ordering
 class BondAtom(Atom):
-    """An `Atom` class with an eXtended set of attributes.
+    """An `Atom` class for atom bonds.
 
     Parameters
     ----------

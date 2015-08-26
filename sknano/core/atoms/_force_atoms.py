@@ -25,7 +25,7 @@ __all__ = ['ForceAtom', 'ForceAtoms']
 
 @total_ordering
 class ForceAtom(Atom):
-    """An `Atom` class with force attributes
+    """An `Atom` class with force attributes.
 
     Parameters
     ----------

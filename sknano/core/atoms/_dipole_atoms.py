@@ -25,7 +25,7 @@ __all__ = ['DipoleAtom', 'DipoleAtoms']
 
 @total_ordering
 class DipoleAtom(Atom):
-    """An `Atom` class with an eXtended set of attributes.
+    """An `Atom` class with electric dipole moment attributes.
 
     Parameters
     ----------

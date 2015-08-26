@@ -26,7 +26,7 @@ __all__ = ['CNAtom', 'CNAtoms']
 
 @total_ordering
 class CNAtom(Atom):
-    """An `Atom` class with an eXtended set of attributes.
+    """An `Atom` class with a coordination number attribute.
 
     Parameters
     ----------

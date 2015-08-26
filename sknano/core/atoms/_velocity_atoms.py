@@ -25,7 +25,7 @@ __all__ = ['VelocityAtom', 'VelocityAtoms']
 
 @total_ordering
 class VelocityAtom(Atom):
-    """An `Atom` class with an eXtended set of attributes.
+    """An `Atom` class with velocity component attributes.
 
     Parameters
     ----------

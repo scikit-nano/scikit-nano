@@ -25,7 +25,7 @@ __all__ = ['IDAtom', 'IDAtoms']
 
 @total_ordering
 class IDAtom(Atom):
-    """An `Atom` class with an eXtended set of attributes.
+    """An `Atom` class with id attributes.
 
     Parameters
     ----------

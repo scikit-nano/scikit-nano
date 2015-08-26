@@ -24,7 +24,7 @@ __all__ = ['ChargedAtom', 'ChargedAtoms']
 
 @total_ordering
 class ChargedAtom(Atom):
-    """An `Atom` class with an eXtended set of attributes.
+    """An `Atom` class with an electric charge attribute.
 
     Parameters
     ----------

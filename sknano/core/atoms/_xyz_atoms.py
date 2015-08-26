@@ -29,7 +29,7 @@ __all__ = ['XYZAtom', 'XYZAtoms']
 
 @total_ordering
 class XYZAtom(Atom):
-    """An `Atom` class with an eXtended set of attributes.
+    """An `Atom` class with x, y, z attributes.
 
     Parameters
     ----------

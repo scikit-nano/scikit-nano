@@ -24,7 +24,7 @@ __all__ = ['EnergyAtom', 'EnergyAtoms']
 
 @total_ordering
 class EnergyAtom(Atom):
-    """An `Atom` class with an eXtended set of attributes.
+    """An `Atom` class with energy attributes.
 
     Parameters
     ----------

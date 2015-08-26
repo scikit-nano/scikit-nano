@@ -28,7 +28,7 @@ __all__ = ['TypeAtom', 'TypeAtoms']
 
 @total_ordering
 class TypeAtom(Atom):
-    """An `Atom` class with an eXtended set of attributes.
+    """An `Atom` class with an atom type attribute.
 
     Parameters
     ----------
