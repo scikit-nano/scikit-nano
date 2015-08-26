@@ -34,6 +34,7 @@ class UnitCell(BaseClass):
     basis : {:class:`~python:list`, :class:`~sknano.core.atoms.BasisAtoms`}
     coords : {:class:`~python:list`}, optional
     cartesian : {:class:`~python:bool`}, optional
+    wrap_coords : {:class:`~python:bool`}, optional
 
     """
 
@@ -129,6 +130,11 @@ class CrystalCell(BaseClass):
 
     Parameters
     ----------
+    lattice : :class:`~sknano.core.crystallography.LatticeBase` sub-class
+    basis : {:class:`~python:list`, :class:`~sknano.core.atoms.BasisAtoms`}
+    coords : {:class:`~python:list`}, optional
+    cartesian : {:class:`~python:bool`}, optional
+    wrap_coords : {:class:`~python:bool`}, optional
     unit_cell : :class:`~sknano.core.crystallography.UnitCell`
     scaling_matrix : {:class:`~python:int`, :class:`~python:list`}
 
