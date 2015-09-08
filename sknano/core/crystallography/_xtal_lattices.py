@@ -139,7 +139,7 @@ class LatticeBase(BaseClass):
         except ValueError:
             return fcoords.T.A.reshape((len(ccoords), 3))
 
-    def wrap_fractional_coordinate(self, p, epsilon=1e-8):
+    def wrap_fractional_coordinate(self, p, epsilon=1e-6, pbc=None):
         """Wrap fractional coordinate to lie within unit cell.
 
         Parameters
@@ -151,14 +151,18 @@ class LatticeBase(BaseClass):
         :class:`~numpy:numpy.ndarray`
 
         """
-        p = np.asarray(p)
-        p = np.fmod(p, 1)
-        p[np.where(p < 0)] += 1
-        p[np.where(p > 1 - epsilon)] -= 1
-        p[np.where(np.logical_or((p > 1 - epsilon), (p < epsilon)))] = 0
-        return p
+        if pbc is None:
+            pbc = np.asarray(np.ones(3), dtype=bool)
 
-    def wrap_cartesian_coordinate(self, p):
+        p = np.ma.array(p, mask=~pbc)
+        p = np.ma.fmod(p, 1)
+        p[np.ma.where(p < 0)] += 1
+        p[np.ma.where(p > 1 - epsilon)] -= 1
+        p[np.ma.where(np.logical_or((p > 1 - epsilon), (p < epsilon)))] = 0
+        p.mask = np.ma.nomask
+        return p.tolist()
+
+    def wrap_cartesian_coordinate(self, p, pbc=None):
         """Wrap cartesian coordinate to lie within unit cell.
 
         Parameters
@@ -171,8 +175,8 @@ class LatticeBase(BaseClass):
 
         """
         return self.fractional_to_cartesian(
-            self.wrap_fractional_coordinate(
-                self.cartesian_to_fractional(p)))
+            self.wrap_fractional_coordinate(self.cartesian_to_fractional(p),
+                                            pbc=pbc))
 
     def rotate(self, angle=None, axis=None, anchor_point=None,
                rot_point=None, from_vector=None, to_vector=None, degrees=False,
