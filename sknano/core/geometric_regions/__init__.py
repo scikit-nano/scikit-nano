@@ -52,6 +52,7 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._base import *
+from ._funcs import *
 from ._2D_regions import *
 from ._3D_regions import *
 
