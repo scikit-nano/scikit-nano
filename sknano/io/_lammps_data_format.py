@@ -19,7 +19,7 @@ import numpy as np
 from monty.io import zopen
 from sknano.core import get_fpath
 # from sknano.core.crystallography import Crystal3DLattice
-from sknano.core.geometric_regions import Cuboid
+from sknano.core.geometric_regions import generate_bounding_box, Cuboid
 from ._base import Atom, StructureIO, StructureIOError, StructureConverter, \
     default_comment_line
 
@@ -51,7 +51,6 @@ class DATAReader(StructureIO):
 
         self.header_data = OrderedDict()
         self.section_data = OrderedDict()
-        self.bounding_box = Cuboid()
         self.domain = Domain()
         self.kwargs = OrderedDict()
 
@@ -232,6 +231,7 @@ class DATAReader(StructureIO):
                         self.atoms.add_type(Atom(type=atomtype))
 
     def _parse_bounding_box(self):
+        self.bounding_box = Cuboid()
         for dim in ('x', 'y', 'z'):
             bounds = \
                 self.header_data[' '.join([dim + lim for lim in ('lo', 'hi')])]
@@ -302,10 +302,11 @@ class DATAWriter:
     """`StructureWriter` class for writing `LAMMPS data` file format."""
 
     @classmethod
-    def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
-              atom_style='full', bounding_box=None, comment_line=None,
-              assert_unique_ids=False, enforce_consecutive_ids=True,
-              pad_box=True, xpad=10., ypad=10., zpad=10., pad_tol=0.01,
+    def write(cls, fname=None, outpath=None, fpath=None, structure=None,
+              atoms=None, atom_style='full', bounding_box=None,
+              comment_line=None, assert_unique_ids=False,
+              enforce_consecutive_ids=True, pad_box=False,
+              xpad=10., ypad=10., zpad=10., pad_tol=0.01,
               verbose=False, **kwargs):
         """Write structure data to file.
 
@@ -340,6 +341,12 @@ class DATAWriter:
             verbose output
 
         """
+        if structure is None and atoms is None:
+            raise ValueError('Expected either `structure` or `atoms` object.')
+
+        if structure is not None and atoms is None:
+            atoms = structure.atoms
+
         if fpath is None:
             fpath = get_fpath(fname=fname, ext='data', outpath=outpath,
                               overwrite=True, add_fnum=False)
@@ -366,14 +373,16 @@ class DATAWriter:
             atoms.assign_unique_ids()
 
         if bounding_box is None:
-            bounding_box = Cuboid()
+            if structure is not None and structure.lattice is not None:
+                bounding_box = \
+                    generate_bounding_box(from_lattice=structure.lattice,
+                                          center=atoms.centroid)
+            else:
+                bounding_box = \
+                    generate_bounding_box(from_darray=atoms.coords)
 
-            for i, dim in enumerate(('x', 'y', 'z')):
-                setattr(bounding_box, dim + 'min', atoms.coords[:, i].min())
-                setattr(bounding_box, dim + 'max', atoms.coords[:, i].max())
-
-        boxpad = {'x': xpad, 'y': ypad, 'z': zpad}
         if pad_box:
+            boxpad = {'x': xpad, 'y': ypad, 'z': zpad}
             # for dim, pad in boxpad.items():
             for i, dim in enumerate(('x', 'y', 'z')):
                 pad = boxpad[dim]
