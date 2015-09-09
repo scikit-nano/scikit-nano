@@ -163,12 +163,6 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTGenerator,
         if autogen:
             self.generate()
 
-    def generate(self, generate_bundle=True):
-        """Generate structure data."""
-        if generate_bundle:
-            super().generate_bundle()
-        super().generate()
-
     @classmethod
     def generate_fname(cls, n=None, m=None, nx=None, ny=None, nz=None,
                        fix_Lz=False, Ntubes=None, bundle_geometry=None,
