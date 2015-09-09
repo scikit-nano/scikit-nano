@@ -64,6 +64,7 @@ from ._graphene_generator import *
 from ._bilayer_graphene_generator import *
 from ._swnt_generator import *
 from ._mwnt_generator import *
+from ._nanotube_bundle_generator import *
 from ._swnt_bundle_generator import *
 from ._mwnt_bundle_generator import *
 from ._unrolled_swnt_generator import *

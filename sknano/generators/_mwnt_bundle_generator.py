@@ -14,12 +14,12 @@ __docformat__ = 'restructuredtext en'
 from sknano.core import pluralize
 from sknano.structures import MWNTBundle
 from ._mwnt_generator import MWNTGenerator
-from ._mixins import NanotubeBundleGeneratorMixin
+from ._nanotube_bundle_generator import NanotubeBundleGeneratorBase
 
 __all__ = ['MWNTBundleGenerator']
 
 
-class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
+class MWNTBundleGenerator(NanotubeBundleGeneratorBase, MWNTBundle,
                           MWNTGenerator):
     """Class for generating multi-walled nanotube bundles.
 
@@ -90,13 +90,6 @@ class MWNTBundleGenerator(NanotubeBundleGeneratorMixin, MWNTBundle,
     .. image:: /images/5wall_mwnt_(1,6)@(11,7)@(18,9)@(31,2)@(41,0)_hcp_7tube_hexagon-perspective_view-01.png
 
     """
-    def __init__(self, autogen=True, **kwargs):
-
-        super().__init__(autogen=False, **kwargs)
-
-        if autogen:
-            self.generate()
-
     @classmethod
     def generate_fname(cls, Ch_list=None, Nwalls=None, Ntubes=None,
                        nx=None, ny=None, bundle_geometry=None,

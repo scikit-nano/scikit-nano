@@ -14,12 +14,12 @@ __docformat__ = 'restructuredtext en'
 from sknano.core import pluralize
 from sknano.structures import SWNTBundle
 from ._swnt_generator import SWNTGenerator
-from ._mixins import NanotubeBundleGeneratorMixin
+from ._nanotube_bundle_generator import NanotubeBundleGeneratorBase
 
 __all__ = ['SWNTBundleGenerator']
 
 
-class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTGenerator,
+class SWNTBundleGenerator(NanotubeBundleGeneratorBase, SWNTGenerator,
                           SWNTBundle):
     """Class for generating nanotube bundles.
 
@@ -155,14 +155,6 @@ class SWNTBundleGenerator(NanotubeBundleGeneratorMixin, SWNTGenerator,
     .. image:: /images/1010_ccp_3cellsx3cellsx5cells-01.png
 
     """
-
-    def __init__(self, *Ch, autogen=True, **kwargs):
-
-        super().__init__(*Ch, autogen=False, **kwargs)
-
-        if autogen:
-            self.generate()
-
     @classmethod
     def generate_fname(cls, n=None, m=None, nx=None, ny=None, nz=None,
                        fix_Lz=False, Ntubes=None, bundle_geometry=None,
