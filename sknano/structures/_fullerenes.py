@@ -17,11 +17,13 @@ import numbers
 import os
 
 from sknano.core import BaseClass, listdir_dirnames, listdir_fnames
+from sknano.core.crystallography import BaseStructure
 
 __all__ = ['Fullerene', 'Fullerenes', 'load_fullerene_data']
 
 
 def load_fullerene_data():
+    """Helper function to populate dict of fullerene data files."""
     datadir = resource_filename('sknano', 'data/fullerenes')
     fullerenes = \
         listdir_dirnames(datadir, filterfunc=lambda name: name.startswith('C'))
@@ -33,7 +35,7 @@ def load_fullerene_data():
     return fullerene_data
 
 
-class Fullerene(BaseClass):
+class Fullerene(BaseStructure, BaseClass):
     """Fullerene structure class.
 
     The `fullerene data
@@ -81,7 +83,7 @@ class Fullerene(BaseClass):
         return dict(N=self.N)
 
 
-class Fullerenes(BaseClass):
+class Fullerenes(BaseStructure, BaseClass):
     def __init__(self):
         super().__init__()
         self.fullerene_data = load_fullerene_data()
