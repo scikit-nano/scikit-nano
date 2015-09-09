@@ -18,7 +18,7 @@ import numbers
 import numpy as np
 
 from sknano.core import BaseClass
-from sknano.core.atoms import BasisAtom as Atom, BasisAtoms as Atoms
+from sknano.core.atoms import BasisAtom, BasisAtoms
 from ._extras import supercell_lattice_points
 
 __all__ = ['CrystalCell', 'UnitCell', 'SuperCell']
@@ -44,9 +44,9 @@ class UnitCell(BaseClass):
         super().__init__()
 
         if basis is None:
-            basis = Atoms()
+            basis = BasisAtoms()
         else:
-            basis = Atoms(basis)
+            basis = BasisAtoms(basis)
             basis.lattice = lattice
             if lattice is not None and coords is not None:
                 for atom, pos in zip(basis, coords):
@@ -95,9 +95,9 @@ class UnitCell(BaseClass):
     #     lattice = self.lattice
     #     coords = self.coords
     #     if value is None:
-    #         value = Atoms()
+    #         value = BasisAtoms()
     #     elif value is not None:
-    #         value = Atoms(value, lattice=lattice)
+    #         value = BasisAtoms(value, lattice=lattice)
     #         if coords is not None:
     #             for atom, pos in zip(basis, coords):
     #                 atom.lattice = lattice
@@ -145,7 +145,7 @@ class CrystalCell(BaseClass):
         super().__init__()
 
         if unit_cell is None and basis is not None:
-            basis = Atoms(basis)
+            basis = BasisAtoms(basis)
             basis.lattice = lattice
             if lattice is not None and coords is not None:
                 for atom, pos in zip(basis, coords):
@@ -156,13 +156,14 @@ class CrystalCell(BaseClass):
                         atom.rs = lattice.cartesian_to_fractional(pos)
 
         # if basis is None:
-        #     basis = Atoms()
+        #     basis = BasisAtoms()
 
         # These attributes may be reset in the `@scaling_matrix.setter`
         # method and so they need to be initialized *before* setting
         # `self.scaling_matrix`.
-        self.lattice = lattice
         self.basis = basis
+        self.lattice = lattice
+
         self.unit_cell = unit_cell
         self.wrap_coords = wrap_coords
         self.scaling_matrix = scaling_matrix
@@ -233,6 +234,8 @@ class CrystalCell(BaseClass):
     @lattice.setter
     def lattice(self, value):
         self._lattice = value
+        if self.basis is not None:
+            self.basis.lattice = self.lattice
 
     @property
     def unit_cell(self):
@@ -275,6 +278,7 @@ class CrystalCell(BaseClass):
             value = self.lattice.nd * [int(value)]
 
         scaling_matrix = np.asmatrix(value, dtype=int)
+        # scaling_matrix = np.asmatrix(value)
         if scaling_matrix.shape != self.lattice.matrix.shape:
             scaling_matrix = np.diagflat(scaling_matrix)
         self._scaling_matrix = scaling_matrix
@@ -288,7 +292,7 @@ class CrystalCell(BaseClass):
                 self.lattice.matrix)
 
         basis = self.basis[:]
-        self.basis = Atoms()
+        self.basis = BasisAtoms()
         for atom in basis:
             for tvec in tvecs:
                 xs, ys, zs = \
@@ -297,8 +301,8 @@ class CrystalCell(BaseClass):
                     xs, ys, zs = \
                         self.lattice.wrap_fractional_coordinate(
                             [xs, ys, zs])
-                self.basis.append(Atom(atom.element, lattice=self.lattice,
-                                       xs=xs, ys=ys, zs=zs))
+                self.basis.append(BasisAtom(atom.element, lattice=self.lattice,
+                                            xs=xs, ys=ys, zs=zs))
 
     def rotate(self, **kwargs):
         """Rotate crystal cell lattice, basis, and unit cell."""
