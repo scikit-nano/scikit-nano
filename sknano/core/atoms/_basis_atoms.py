@@ -12,12 +12,13 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._lattice_atoms import LatticeAtom, LatticeAtoms
+from ._periodic_atoms import PBCAtom, PBCAtoms
 from ._xyz_atoms import XYZAtom, XYZAtoms
 
 __all__ = ['BasisAtom', 'BasisAtoms']
 
 
-class BasisAtom(LatticeAtom, XYZAtom):
+class BasisAtom(PBCAtom, LatticeAtom, XYZAtom):
     """An abstract object representation of a crystal structure basis atom.
 
     Parameters
@@ -28,7 +29,7 @@ class BasisAtom(LatticeAtom, XYZAtom):
     pass
 
 
-class BasisAtoms(LatticeAtoms, XYZAtoms):
+class BasisAtoms(PBCAtoms, LatticeAtoms, XYZAtoms):
     """An `Atoms` sub-class for crystal structure basis atoms.
 
     Sub-class of `Atoms` class, and a container class for lists of
@@ -41,7 +42,6 @@ class BasisAtoms(LatticeAtoms, XYZAtoms):
         existing `BasisAtoms` instance object.
 
     """
-
     @property
     def __atom_class__(self):
         return BasisAtom
