@@ -17,8 +17,7 @@ import copy
 import os
 
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
-from sknano.io import StructureWriter, \
-    default_structure_format, supported_structure_formats
+from sknano.io import default_structure_format, supported_structure_formats
 
 __all__ = ['Atom', 'Atoms', 'GeneratorBase', 'BulkGeneratorBase',
            'STRUCTURE_GENERATORS']
@@ -131,11 +130,12 @@ class GeneratorBase:
             atoms.filter(filter_condition)
             # atoms = atoms.filtered(filter_condition)
 
-        if kwargs:
-            atoms.rotate(**kwargs)
+        getattr(self, 'write_' + structure_format)(
+            fname=fname, outpath=outpath, structure=self, **kwargs)
 
-        StructureWriter.write(fname=fname, outpath=outpath,
-                              structure_format=structure_format, atoms=atoms)
+        # StructureWriter.write(fname=fname, outpath=outpath,
+        #                       structure_format=structure_format,
+        #                       structure=self.structure)
 
 
 class BulkGeneratorBase(GeneratorBase):
