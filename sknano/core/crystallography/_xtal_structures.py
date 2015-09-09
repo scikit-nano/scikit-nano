@@ -13,14 +13,13 @@ __docformat__ = 'restructuredtext en'
 
 from functools import total_ordering
 
-# import numpy as np
+import numpy as np
 
 from sknano.core import BaseClass
-from sknano.core.atoms import BasisAtom as Atom, BasisAtoms as Atoms, \
-    StructureAtoms
+from sknano.core.atoms import BasisAtom, BasisAtoms, StructureAtoms
 from sknano.core.refdata import lattice_parameters as lattparams
 
-from ._extras import pymatgen_structure
+from ._extras import pymatgen_structure, supercell_lattice_points
 from ._xtal_cells import CrystalCell, UnitCell, SuperCell
 from ._xtal_lattices import Crystal2DLattice, Crystal3DLattice
 
@@ -60,10 +59,12 @@ class BaseStructureMixin:
 
     @property
     def atoms(self):
+        """Structure :class:`~sknano.core.atoms.StructureAtoms`."""
         return self._atoms
 
     @property
     def crystal_cell(self):
+        """Structure :class:`~sknano.core.crystallography.CrystalCell`."""
         return self._crystal_cell
 
     @crystal_cell.setter
@@ -72,6 +73,7 @@ class BaseStructureMixin:
 
     @property
     def basis(self):
+        """Structure :class:`~sknano.core.atoms.BasisAtoms`."""
         return self.crystal_cell.basis
 
     @basis.setter
@@ -80,14 +82,17 @@ class BaseStructureMixin:
 
     @property
     def lattice(self):
+        """Structure :class:`~sknano.core.crystallography.Crystal3DLattice`."""
         return self.crystal_cell.lattice
 
     @lattice.setter
     def lattice(self, value):
         self.crystal_cell.lattice = value
+        self.atoms.lattice = self.crystal_cell.lattice
 
     @property
     def scaling_matrix(self):
+        """:attr:`CrystalCell.scaling_matrix`."""
         return self.crystal_cell.scaling_matrix
 
     @scaling_matrix.setter
@@ -96,6 +101,7 @@ class BaseStructureMixin:
 
     @property
     def unit_cell(self):
+        """Structure :class:`~sknano.core.crystallography.UnitCell`."""
         return self.crystal_cell.unit_cell
 
     @unit_cell.setter
@@ -103,15 +109,23 @@ class BaseStructureMixin:
         self.crystal_cell.unit_cell = value
 
     @property
-    def structure_data(self):
+    def structure(self):
+        """Pointer to self."""
         return self
 
     @property
-    def structure(self):
+    def structure_data(self):
+        """Alias for :attr:`BaseStructureMixin.structure`."""
         return self
 
     def clear(self):
+        """Clear list of :attr:`BaseStructureMixin.atoms`."""
         self.atoms.clear()
+
+    def make_supercell(self, scaling_matrix, wrap_coords=False):
+        """Make supercell."""
+        return SuperCell(self.unit_cell, scaling_matrix,
+                         wrap_coords=wrap_coords)
 
     def rotate(self, **kwargs):
         """Rotate crystal cell lattice, basis, and unit cell."""
@@ -120,6 +134,58 @@ class BaseStructureMixin:
     def translate(self, t, fix_anchor_points=True):
         """Translate crystal cell basis."""
         self.crystal_cell.translate(t, fix_anchor_points=fix_anchor_points)
+
+    def transform_lattice(self, scaling_matrix, wrap_coords=False, pbc=None):
+        if self.lattice is None:
+            return
+        self.lattice = self.lattice.__class__(
+            cell_matrix=np.asmatrix(scaling_matrix) * self.lattice.matrix)
+
+        if wrap_coords:
+            self.crystal_cell.basis.wrap_coords(pbc=pbc)
+            self.atoms.wrap_coords(pbc=pbc)
+
+        # tvecs = \
+        #     np.asarray(
+        #         np.asmatrix(supercell_lattice_points(scaling_matrix)) *
+        #         self.lattice.matrix)
+
+        # if self.crystal_cell.basis is not None:
+        #     basis = self.crystal_cell.basis[:]
+        #     self.crystal_cell.basis = BasisAtoms()
+        #     for atom in basis:
+        #         xs, ys, zs = \
+        #             self.lattice.cartesian_to_fractional(atom.r)
+        #         if wrap_coords:
+        #             xs, ys, zs = \
+        #                 self.lattice.wrap_fractional_coordinate([xs, ys, zs])
+        #         self.crystal_cell.basis.append(
+        #             BasisAtom(atom.element, lattice=self.lattice,
+        #                       xs=xs, ys=ys, zs=zs))
+
+    def read_data(self, *args, **kwargs):
+        from sknano.io import DATAReader
+        return DATAReader(*args, **kwargs)
+
+    def read_dump(self, *args, **kwargs):
+        from sknano.io import DUMPReader
+        return DUMPReader(*args, **kwargs)
+
+    def read_xyz(self, *args, **kwargs):
+        from sknano.io import XYZReader
+        return XYZReader.read(*args, **kwargs)
+
+    def write_data(self, **kwargs):
+        from sknano.io import DATAWriter
+        DATAWriter.write(**kwargs)
+
+    def write_dump(self, **kwargs):
+        from sknano.io import DUMPWriter
+        DUMPWriter.write(**kwargs)
+
+    def write_xyz(self, **kwargs):
+        from sknano.io import XYZWriter
+        XYZWriter.write(**kwargs)
 
 
 class BaseStructure(BaseStructureMixin):
@@ -168,9 +234,6 @@ class CrystalStructureBase(BaseStructure, BaseClass):
         if isinstance(other, CrystalStructureBase):
             return self.crystal_cell < other.crystal_cell
 
-    def make_supercell(self, scaling_matrix):
-        return SuperCell(self.unit_cell, scaling_matrix)
-
     def todict(self):
         attrdict = self.unit_cell.todict()
         attrdict.update(dict(scaling_matrix=self.scaling_matrix.tolist()))
@@ -208,10 +271,10 @@ class Crystal2DStructure(CrystalStructureBase):
 
     @classmethod
     def from_pymatgen_structure(cls, structure):
-        atoms = Atoms()
+        atoms = BasisAtoms()
         for site in structure.sites:
-            atoms.append(Atom(element=site.specie.symbol,
-                              x=site.x, y=site.y, z=site.z))
+            atoms.append(BasisAtom(element=site.specie.symbol,
+                                   x=site.x, y=site.y, z=site.z))
         return cls(lattice=Crystal2DLattice(
                    cell_matrix=structure.lattice.matrix), basis=atoms)
 
@@ -296,10 +359,10 @@ class Crystal3DStructure(CrystalStructureBase):
         :class:`Crystal3DStructure`
 
         """
-        atoms = Atoms()
+        atoms = BasisAtoms()
         for site in structure.sites:
-            atoms.append(Atom(site.specie.symbol,
-                              x=site.x, y=site.y, z=site.z))
+            atoms.append(BasisAtom(site.specie.symbol,
+                                   x=site.x, y=site.y, z=site.z))
         return cls(lattice=Crystal3DLattice(
                    cell_matrix=structure.lattice.matrix), basis=atoms)
 
@@ -561,7 +624,7 @@ class AlphaQuartz(HexagonalStructure):
     def __init__(self, a=lattparams['alpha_quartz']['a'],
                  c=lattparams['alpha_quartz']['c'], **kwargs):
         lattice = Crystal3DLattice.hexagonal(a, c)
-        basis = Atoms(3 * ["Si"] + 6 * ["O"])
+        basis = BasisAtoms(3 * ["Si"] + 6 * ["O"])
         coords = [[0.4697, 0.0000, 0.0000],
                   [0.0000, 0.4697, 0.6667],
                   [0.5305, 0.5303, 0.3333],
