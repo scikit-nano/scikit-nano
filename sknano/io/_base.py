@@ -114,13 +114,12 @@ class StructureReader:
 class StructureWriter:
     """Structure data writer base class."""
     @classmethod
-    def write(cls, fname=None, atoms=None, structure_format=None, **kwargs):
+    def write(cls, fname=None, structure_format=None, **kwargs):
         """Write structure data to file.
 
         Parameters
         ----------
         fname : str, optional
-        atoms : `~sknano.core.atoms.Atoms` instance
         structure_format : {None, str}, optional
 
         """
@@ -134,16 +133,16 @@ class StructureWriter:
         if (structure_format is None and fname.endswith('.data')) or \
                 structure_format == 'data':
             from ._lammps_data_format import DATAWriter
-            DATAWriter.write(fname=fname, atoms=atoms, **kwargs)
+            DATAWriter.write(fname=fname, **kwargs)
         elif (structure_format is None and fname.endswith('.dump')) or \
                 structure_format == 'dump':
             from ._lammps_dump_format import DUMPWriter
-            DUMPWriter.write(fname=fname, atoms=atoms, **kwargs)
+            DUMPWriter.write(fname=fname, **kwargs)
         # elif (structure_format is None and fname.endswith('.xyz')) or \
         #        structure_format == 'xyz':
         else:
             from ._xyz_format import XYZWriter
-            XYZWriter.write(fname=fname, atoms=atoms, **kwargs)
+            XYZWriter.write(fname=fname, **kwargs)
 
 
 class StructureConverter(metaclass=ABCMeta):
