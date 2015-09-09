@@ -58,7 +58,7 @@ class FullereneGenerator(GeneratorBase, Fullerene):
             if CNfile not in files:
                 # TODO: try to *intelligently* pick the best match
                 CNfile = files[0]
-            self.atoms = XYZReader(os.path.join(datadir, CNfile)).atoms
+            self._atoms = XYZReader(os.path.join(datadir, CNfile)).atoms
 
     @classmethod
     def generate_fname(cls, N):
