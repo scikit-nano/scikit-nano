@@ -26,7 +26,7 @@ __all__ = ['LatticeAtom', 'LatticeAtoms']
 
 @total_ordering
 class LatticeAtom(Atom):
-    """An abstract object representation of a crystal structure lattice atom.
+    """Class representation of a crystal structure lattice atom.
 
     Parameters
     ----------
@@ -40,13 +40,13 @@ class LatticeAtom(Atom):
         super().__init__(*args, **kwargs)
 
         self.lattice = lattice
-        try:
+
+        if all([x is not None for x in (xs, ys, zs)]):
             self.rs = Vector([xs, ys, zs])
-        except AttributeError:
-            pass
 
         self.fmtstr = super().fmtstr + \
-            ", lattice={lattice!r}, xs={xs:.6f}, ys={ys:.6f}, zs={zs:.6f}"
+            ", lattice={lattice!r}, xs={xs!r}, ys={ys!r}, zs={zs!r}"
+            # ", lattice={lattice!r}, xs={xs:.6f}, ys={ys:.6f}, zs={zs:.6f}"
 
     def __eq__(self, other):
         return self.rs == other.rs and super().__eq__(other)
@@ -71,7 +71,10 @@ class LatticeAtom(Atom):
             :math:`x`-coordinate in units of **Angstroms**.
 
         """
-        return self.rs.x
+        try:
+            return self.rs.x
+        except AttributeError:
+            return None
 
     @xs.setter
     def xs(self, value):
@@ -85,9 +88,13 @@ class LatticeAtom(Atom):
         """
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        rs = self.rs
-        rs.x = value
-        self._update_cartesian_coordinate(rs)
+
+        try:
+            rs = self.rs
+            rs.x = value
+            self._update_cartesian_coordinate(rs)
+        except AttributeError:
+            pass
 
     @property
     def ys(self):
@@ -99,7 +106,10 @@ class LatticeAtom(Atom):
             :math:`y`-coordinate in units of **Angstroms**.
 
         """
-        return self.rs.y
+        try:
+            return self.rs.y
+        except AttributeError:
+            return None
 
     @ys.setter
     def ys(self, value):
@@ -113,9 +123,12 @@ class LatticeAtom(Atom):
         """
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        rs = self.rs
-        rs.y = value
-        self._update_cartesian_coordinate(rs)
+        try:
+            rs = self.rs
+            rs.y = value
+            self._update_cartesian_coordinate(rs)
+        except AttributeError:
+            pass
 
     @property
     def zs(self):
@@ -127,7 +140,10 @@ class LatticeAtom(Atom):
             :math:`z`-coordinate in units of **Angstroms**.
 
         """
-        return self.rs.z
+        try:
+            return self.rs.z
+        except AttributeError:
+            return None
 
     @zs.setter
     def zs(self, value):
@@ -141,9 +157,12 @@ class LatticeAtom(Atom):
         """
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        rs = self.rs
-        rs.z = value
-        self._update_cartesian_coordinate(rs)
+        try:
+            rs = self.rs
+            rs.z = value
+            self._update_cartesian_coordinate(rs)
+        except AttributeError:
+            pass
 
     @property
     def rs(self):
@@ -158,7 +177,7 @@ class LatticeAtom(Atom):
         try:
             return Vector(self.lattice.cartesian_to_fractional(self.r))
         except AttributeError:
-            return Vector()
+            return None
 
     @rs.setter
     def rs(self, value):
@@ -173,11 +192,13 @@ class LatticeAtom(Atom):
         """
         if not isinstance(value, (list, np.ndarray)):
             raise TypeError('Expected an array_like object')
-        rs = Vector(value, nd=3)
-        self._update_cartesian_coordinate(rs)
+        self._update_cartesian_coordinate(Vector(value, nd=3))
 
     def _update_cartesian_coordinate(self, rs):
-        self.r = Vector(self.lattice.fractional_to_cartesian(rs))
+        try:
+            self.r = self.lattice.fractional_to_cartesian(rs)
+        except AttributeError:
+            pass
 
     @property
     def lattice(self):
@@ -187,6 +208,10 @@ class LatticeAtom(Atom):
     @lattice.setter
     def lattice(self, value):
         self._lattice = copy.deepcopy(value)
+        try:
+            self.rs = self.lattice.cartesian_to_fractional(self.r)
+        except AttributeError:
+            pass
 
     def rotate(self, **kwargs):
         """Rotate `Atom` position vector.
