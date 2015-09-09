@@ -66,8 +66,8 @@ class XYZWriter:
     """`StructureWriter` class for writing `xyz` chemical file format."""
 
     @classmethod
-    def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
-              comment_line=None, **kwargs):
+    def write(cls, fname=None, outpath=None, fpath=None, structure=None,
+              atoms=None, comment_line=None, **kwargs):
         """Write structure data to file.
 
         Parameters
@@ -85,6 +85,12 @@ class XYZWriter:
             then it is set to the full path of the output `xyz` file.
 
         """
+        if structure is None and atoms is None:
+            raise ValueError('Expected either `structure` or `atoms` object.')
+
+        if structure is not None and atoms is None:
+            atoms = structure.atoms
+
         if fpath is None:
             fpath = get_fpath(fname=fname, ext='xyz', outpath=outpath,
                               overwrite=True, add_fnum=False)
