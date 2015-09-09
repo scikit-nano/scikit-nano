@@ -27,8 +27,24 @@ class CappedNanotubeGeneratorMixin:
 class NanotubeBundleGeneratorMixin:
     """Mixin class for generating nanotube bundles."""
 
+    def generate(self, generate_bundle=True,
+                 generate_bundle_from_bundle_coords=False):
+        """Generate structure data."""
+        if generate_bundle and (generate_bundle_from_bundle_coords or
+                                self.bundle_geometry is not None):
+            super().generate()
+            self.generate_bundle_from_bundle_coords()
+        elif generate_bundle:
+            self.generate_bundle()
+            super().generate()
+        else:
+            super().generate()
+
     def generate_bundle(self):
-        self.bundle_list = []
+        self.structure_data.clear()
+        self.crystal_cell.scaling_matrix = [self.nx, self.ny, 1]
+
+    def generate_bundle_from_bundle_coords(self):
         atomsobj0 = copy.deepcopy(self.atoms)
         atomsobj0.center_CM()
         self.structure_data.clear()
