@@ -200,6 +200,10 @@ class MWNTMixin:
                      bond=self.bond) for Ch in self.Ch_list]
 
     def get_wall(self, Ch):
+        """Return the :class:`~sknano.structures.SWNT` structure with \
+            chirality `Ch`.
+
+        """
         return SWNT(Ch, Lz=self.Lz, fix_Lz=True, basis=self.basis,
                     bond=self.bond) if Ch in self.Ch_list else None
 
