@@ -379,7 +379,7 @@ class DATAWriter:
                                           center=atoms.centroid)
             else:
                 bounding_box = \
-                    generate_bounding_box(from_darray=atoms.coords)
+                    generate_bounding_box(from_array=atoms.coords)
 
         if pad_box:
             boxpad = {'x': xpad, 'y': ypad, 'z': zpad}
