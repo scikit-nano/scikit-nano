@@ -45,6 +45,8 @@ Base `Atom`/`Atoms` classes
    ImageAtoms
    LatticeAtom
    LatticeAtoms
+   PBCAtom
+   PBCAtoms
    TypeAtom
    TypeAtoms
    VanDerWaalsAtom
@@ -118,6 +120,7 @@ from ._charged_atoms import *
 from ._energy_atoms import *
 from ._id_atoms import *
 from ._type_atoms import *
+from ._periodic_atoms import *
 from ._lattice_atoms import *
 from ._dipole_atoms import *
 from ._basis_atoms import *
