@@ -55,10 +55,6 @@ def generate_bounding_box(from_region=None, from_lattice=None,
         zhi_bound = zlo + lz
         bounding_box.pmin = [xlo_bound, ylo_bound, zlo_bound]
         bounding_box.pmax = [xhi_bound, yhi_bound, zhi_bound]
-        print('lattice.volume: {}'.format(lattice.volume))
-        print('bounding_box.pmin: {}'.format(bounding_box.pmin))
-        print('bounding_box.pmax: {}'.format(bounding_box.pmax))
-        print('bounding_box.volume: {}'.format(bounding_box.volume))
     else:
         array = from_array
         for i, dim in enumerate(('x', 'y', 'z')):
