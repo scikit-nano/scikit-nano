@@ -235,7 +235,7 @@ def setup_package():
         if numpy_version < (1, 9):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
-        build_requires += ['numpy==1.9.1']
+        build_requires += ['numpy==1.9.2']
 
     install_requires = build_requires[:]
     try:
@@ -245,7 +245,7 @@ def setup_package():
         if scipy_version < (0, 14):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
-        install_requires += ['scipy==0.15.0']
+        install_requires += ['scipy==0.16.0']
 
     # # Add six module to install_requires (used in numpydoc git submodule)
     # install_requires += ['six>=1.9']
