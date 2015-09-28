@@ -62,7 +62,7 @@ class GeneratorBase:
 
     def save(self, fname=None, outpath=None, structure_format=None,
              deepcopy=True, center_CM=True, region_bounds=None,
-             filter_condition=None, **kwargs):
+             filter_condition=None, rotation_parameters=None, **kwargs):
         """Save structure data.
 
         Parameters
@@ -129,6 +129,32 @@ class GeneratorBase:
         if filter_condition is not None:
             atoms.filter(filter_condition)
             # atoms = atoms.filtered(filter_condition)
+
+        rotation_kwargs = ['rotation_angle', 'angle', 'rot_axis', 'axis',
+                           'anchor_point', 'deg2rad', 'degrees', 'rot_point',
+                           'from_vector', 'to_vector', 'transform_matrix']
+
+        if rotation_parameters is None and \
+                any([kw in kwargs for kw in rotation_kwargs]):
+            rotation_parameters = {kw: kwargs[kw] for kw in rotation_kwargs
+                                   if kw in kwargs}
+            if 'rotation_angle' in rotation_parameters:
+                rotation_parameters['angle'] = \
+                    rotation_parameters['rotation_angle']
+                del rotation_parameters['rotation_angle']
+            if 'rot_axis' in rotation_parameters:
+                rotation_parameters['axis'] = rotation_parameters['rot_axis']
+                del rotation_parameters['rot_axis']
+            if 'deg2rad' in rotation_parameters:
+                rotation_parameters['degrees'] = rotation_parameters['deg2rad']
+                del rotation_parameters['deg2rad']
+
+            kwargs = {k: v for k, v in kwargs.items()
+                      if k not in rotation_kwargs}
+
+        if rotation_parameters is not None and \
+                isinstance(rotation_parameters, dict):
+            atoms.rotate(**rotation_parameters)
 
         getattr(self, 'write_' + structure_format)(
             fname=fname, outpath=outpath, structure=self, **kwargs)
