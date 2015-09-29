@@ -130,10 +130,12 @@ class BaseStructureMixin:
     def rotate(self, **kwargs):
         """Rotate crystal cell lattice, basis, and unit cell."""
         self.crystal_cell.rotate(**kwargs)
+        self.atoms.rotate(**kwargs)
 
     def translate(self, t, fix_anchor_points=True):
         """Translate crystal cell basis."""
         self.crystal_cell.translate(t, fix_anchor_points=fix_anchor_points)
+        self.atoms.translate(t, fix_anchor_points=fix_anchor_points)
 
     def transform_lattice(self, scaling_matrix, wrap_coords=False, pbc=None):
         if self.lattice is None:
