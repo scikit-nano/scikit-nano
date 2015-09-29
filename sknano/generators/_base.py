@@ -154,7 +154,7 @@ class GeneratorBase:
 
         if rotation_parameters is not None and \
                 isinstance(rotation_parameters, dict):
-            atoms.rotate(**rotation_parameters)
+            self.rotate(**rotation_parameters)
 
         getattr(self, 'write_' + structure_format)(
             fname=fname, outpath=outpath, structure=self, **kwargs)
