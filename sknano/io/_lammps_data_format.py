@@ -397,6 +397,9 @@ class DATAWriter:
                     setattr(bounding_box, dmax,
                             getattr(bounding_box, dmax) + pad)
 
+        if verbose:
+            print('bounding_box: {}'.format(bounding_box))
+
         lohi_width = 0
         for dim in ('x', 'y', 'z'):
             lohi_width = \
