@@ -590,6 +590,31 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin):
             :math:`a`."""
         return cls(a=a, b=a, gamma=120)
 
+    @property
+    def lengths(self):
+        """Tuple of lattice parameter lengths :math:`a, b`."""
+        return self.a, self.b
+
+    @property
+    def angles(self):
+        """Lattice parameter angle \\gamma`."""
+        return self.gamma
+
+    @property
+    def lattice_parameters(self):
+        """Tuple of lattice parameters `a`, `b`, `gamma`."""
+        return self.a, self.b, self.gamma
+
+    @property
+    def lengths_and_angles(self):
+        """Alias for attr:`Crystal2DLattice.lattice_parameters`."""
+        return self.lattice_parameters
+
+    @property
+    def lattice_vectors(self):
+        """Tuple of lattice vectors :math:`\\mathbf{a}_1, \\mathbf{a}_2`."""
+        return self.a1, self.a2
+
 
 class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin):
     """2D reciprocal lattice class.
@@ -706,6 +731,26 @@ class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin):
         """Generate a hexagonal 2D reciprocal lattice with lattice parameter \
             :math:`a^*`."""
         return cls(a_star=a_star, b_star=a_star, gamma_star=120)
+
+    @property
+    def lengths(self):
+        """Tuple of lattice parameter lengths :math:`a^*, b^*`."""
+        return self.a_star, self.b_star
+
+    @property
+    def angles(self):
+        """Lattice parameter angle \\gamma^*`."""
+        return self.gamma_star
+
+    @property
+    def lattice_parameters(self):
+        """Tuple of lattice parameters `a^*`, `b^*`, `gamma^*`."""
+        return self.a_star, self.b_star, self.gamma_star
+
+    @property
+    def lattice_vectors(self):
+        """Tuple of lattice vectors :math:`\\mathbf{b}_1, \\mathbf{b}_2`."""
+        return self.b1, self.b2
 
 
 class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin):
@@ -957,6 +1002,35 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin):
             :math:`a`."""
         return cls(a=a, b=a, c=a, alpha=90, beta=90, gamma=90)
 
+    @property
+    def lengths(self):
+        """Tuple of lattice vector lengths :math:`a, b, c`."""
+        return self.a, self.b, self.c
+
+    @property
+    def angles(self):
+        """Tuple of lattice parameter angles \
+            :math:`\\alpha, \\beta, \\gamma`."""
+        return self.alpha, self.beta, self.gamma
+
+    @property
+    def lattice_parameters(self):
+        """Tuple of lattice parameters \
+            `a`, `b`, `c`, `alpha`, `beta`, `gamma`."""
+        return self.a, self.b, self.c, self.alpha, self.beta, self.gamma
+
+    @property
+    def lengths_and_angles(self):
+        """Alias for attr:`Crystal3DLattice.lattice_parameters`."""
+        return self.lattice_parameters
+
+    @property
+    def lattice_vectors(self):
+        """Tuple of lattice vectors \
+            :math:`\\mathbf{a}_1, \\mathbf{a}_2, \\mathbf{a}_3`."""
+        return self.a1, self.a2, self.a3
+
+
 CrystalLattice = Crystal3DLattice
 
 
@@ -1150,6 +1224,30 @@ class Reciprocal3DLattice(ReciprocalLatticeBase, DirectLatticeMixin):
         return dict(a_star=self.a_star, b_star=self.b_star,
                     c_star=self.c_star, alpha_star=self.alpha_star,
                     beta_star=self.beta_star, gamma_star=self.gamma_star)
+
+    @property
+    def lengths(self):
+        """Tuple of lattice vector lengths :math:`a^*, b^*, c^*`."""
+        return self.a_star, self.b_star, self.c_star
+
+    @property
+    def angles(self):
+        """Tuple of lattice parameter angles \
+            :math:`\\alpha^*, \\beta^*, \\gamma^*`."""
+        return self.alpha_star, self.beta_star, self.gamma_star
+
+    @property
+    def lattice_parameters(self):
+        """Tuple of lattice parameters \
+            `a^*`, `b^*`, `c^*`, `alpha^*`, `beta^*`, `gamma^*`."""
+        return self.a_star, self.b_star, self.c_star, \
+            self.alpha_star, self.beta_star, self.gamma_star
+
+    @property
+    def lattice_vectors(self):
+        """Tuple of lattice vectors \
+            :math:`\\mathbf{b}_1, \\mathbf{b}_2, \\mathbf{b}_3`."""
+        return self.b1, self.b2, self.b3
 
 
 ReciprocalLattice = Reciprocal3DLattice
