@@ -145,9 +145,13 @@ class Point(np.ndarray):
     def __lt__(self, other):
         if not isinstance(other, Point):
             other = Point(other)
-        origin = Point(nd=self.nd)
-        return self.euclidean_distance(origin) < \
-            other.euclidean_distance(origin)
+        # origin = Point(nd=self.nd)
+        # return self.euclidean_distance(origin) < \
+        #     other.euclidean_distance(origin)
+        return np.all(np.less(self.__array__(), other.__array__())) or \
+            (np.any(np.less(self.__array__(), other.__array__())) and
+             (self.x < other.x) or (self.x <= other.x and self.y < other.y) or
+             (self.x <= other.x and self.y <= other.y and self.z < other.z))
 
     def __le__(self, other):
         return self < other or self == other
