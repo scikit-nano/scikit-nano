@@ -307,11 +307,6 @@ class XYZAtoms(Atoms):
         super().sort(key=key, reverse=reverse)
 
     @property
-    def CM(self):
-        """Alias for :attr:`~XYZAtoms.center_of_mass`."""
-        return self.center_of_mass
-
-    @property
     def center_of_mass(self):
         """Center-of-Mass coordinates of `Atoms`.
 
@@ -319,21 +314,31 @@ class XYZAtoms(Atoms):
 
         .. math::
 
-           \\mathbf{R}_{CM} = \\frac{1}{M}\\sum_{i=1}^{N_{\\mathrm{atoms}}}
+           \\mathbf{R}_{COM} = \\frac{1}{M}\\sum_{i=1}^{N_{\\mathrm{atoms}}}
            m_i\\mathbf{r}_i
 
         Returns
         -------
-        CM : :class:`~sknano.core.math.Vector`
+        com : :class:`~sknano.core.math.Vector`
             The position vector of the center of mass coordinates.
 
         """
         masses = np.asarray([self.masses])
         coords = self.coords
         MxR = masses.T * coords
-        CM = Vector(np.sum(MxR, axis=0) / np.sum(masses))
-        CM.rezero()
-        return CM
+        com = Vector(np.sum(MxR, axis=0) / np.sum(masses))
+        com.rezero()
+        return com
+
+    @property
+    def com(self):
+        """Alias for :attr:`~XYZAtoms.center_of_mass`."""
+        return self.center_of_mass
+
+    @property
+    def CM(self):
+        """Alias for :attr:`~XYZAtoms.center_of_mass`."""
+        return self.center_of_mass
 
     @property
     def centroid(self):
@@ -409,9 +414,17 @@ class XYZAtoms(Atoms):
         Iyz = Izy = (-self.masses * self.y * self.z).sum()
         return np.array([[Ixx, Ixy, Ixz], [Iyx, Iyy, Iyz], [Izx, Izy, Izz]])
 
-    def center_CM(self, axes=None):
-        """Center atoms on CM coordinates."""
+    def center_center_of_mass(self, axis=None):
+        """Center atoms on center-of-mass coordinates."""
         self.translate(-self.center_of_mass)
+
+    def center_com(self, axis=None):
+        """Alias for :attr:`~XYZAtoms.center_center_of_mass`."""
+        self.center_center_of_mass(axis=axis)
+
+    def center_CM(self, axis=None):
+        """Alias for :attr:`~XYZAtoms.center_center_of_mass`."""
+        self.center_center_of_mass(axis=axis)
 
     def center_centroid(self):
         """Center :attr:`~XYZAtoms.centroid` on origin."""
@@ -425,15 +438,15 @@ class XYZAtoms(Atoms):
         region : :class:`~sknano.core.geometric_regions.`GeometricRegion`
 
         """
-        CM0 = None
+        centroid0 = None
         if center_before_clipping:
-            CM0 = self.CM
-            self.translate(-CM0)
+            centroid0 = self.centroid
+            self.translate(-centroid0)
 
         self.data = [atom for atom in self if region.contains(atom.r)]
 
-        if CM0 is not None:
-            self.translate(CM0)
+        if centroid0 is not None:
+            self.translate(centroid0)
 
     def get_coords(self, asdict=False):
         """Return atom coords.
