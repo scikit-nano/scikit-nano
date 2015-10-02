@@ -9,7 +9,7 @@ import numpy as np
 
 from sknano.core.geometric_regions import Parallelepiped, Cuboid, \
     generate_bounding_box
-from sknano.core.math import Point, Vector, xhat, yhat, zhat
+from sknano.core.math import Point, Vector
 from sknano.generators import GrapheneGenerator
 
 
@@ -74,6 +74,64 @@ def test1():
     print('lattice_region.lengths: {}, {}, {}'.format(
           lattice_region.a, lattice_region.b, lattice_region.c))
 
+
+def test2():
+    graphene = GrapheneGenerator(armchair_edge_length=5,
+                                 zigzag_edge_length=5)
+    graphene.rotate(angle=-np.pi/2, axis='x')
+    lattice = graphene.lattice
+
+    bounding_box1 = Cuboid()
+    bounding_box2 = Cuboid()
+
+    lattice_region1 = Cuboid(pmax=lattice.lengths)
+    bounding_box1.pmin = lattice_region1.pmin
+    bounding_box1.pmax = lattice_region1.pmax
+
+    a, b, c = lattice.lengths
+    cos_alpha, cos_beta, cos_gamma = np.cos(np.radians(lattice.angles))
+    lx = a
+    xy = b * cos_gamma
+    xz = c * cos_beta
+    ly = np.sqrt(b ** 2 - xy ** 2)
+    yz = (b * c * cos_alpha - xy * xz) / ly
+    lz = np.sqrt(c ** 2 - xz ** 2 - yz ** 2)
+
+    lattice_region2 = \
+        Parallelepiped(u=Vector(lattice.ortho_matrix[:, 0].A.flatten()),
+                       v=Vector(lattice.ortho_matrix[:, 1].A.flatten()),
+                       w=Vector(lattice.ortho_matrix[:, 2].A.flatten()))
+
+    xlo, ylo, zlo = lattice_region2.o
+    print('xy={}, xz={}, yz={}'.format(xy, xz, yz))
+    print('lx={}, ly={}, lz={}'.format(lx, ly, lz))
+    print('xlo={}, ylo={}, zlo={}'.format(xlo, ylo, zlo))
+    xlo_bound = xlo + min(0.0, xy, xz, xy + xz)
+    xhi_bound = xlo + lx + max(0.0, xy, xz, xy + xz)
+    ylo_bound = ylo + min(0.0, yz)
+    yhi_bound = ylo + ly + max(0.0, yz)
+    zlo_bound = zlo
+    zhi_bound = zlo + lz
+    bounding_box2.pmin = [xlo_bound, ylo_bound, zlo_bound]
+    bounding_box2.pmax = [xhi_bound, yhi_bound, zhi_bound]
+
+    print(bounding_box1)
+    print(bounding_box2)
+
+    [bounding_box.rotate(transform_matrix=lattice.orientation_matrix)
+     for bounding_box in (bounding_box1, bounding_box2)]
+
+    [bounding_box.translate(Vector(Point(graphene.centroid) -
+                                   bounding_box.centroid))
+     for bounding_box in (bounding_box1, bounding_box2)]
+
+    [assert_true(bounding_box.pmin <= bounding_box.pmax) for bounding_box
+     in (bounding_box1, bounding_box2)]
+
+    assert_equal(bounding_box1, bounding_box2)
+
+    print(bounding_box1)
+    print(bounding_box2)
 
 if __name__ == '__main__':
     nose.runmodule()
