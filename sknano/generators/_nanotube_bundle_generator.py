@@ -44,7 +44,7 @@ class NanotubeBundleGeneratorBase:
 
     def generate_bundle_from_bundle_coords(self):
         atomsobj0 = copy.deepcopy(self.atoms)
-        atomsobj0.center_CM()
+        atomsobj0.center_centroid()
         self.structure_data.clear()
         for mol_id, dr in enumerate(self.bundle_coords, start=1):
             atomsobj = copy.deepcopy(atomsobj0)

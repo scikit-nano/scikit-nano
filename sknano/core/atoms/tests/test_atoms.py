@@ -81,7 +81,7 @@ def test5():
 def test6():
     atoms = generate_atoms(generator_class='SWNTGenerator', n=3, m=3, nz=10)
     atoms.assign_unique_ids()
-    atoms.center_CM()
+    atoms.center_centroid()
     atoms.kNN = 6
     atoms.NNrc = 9.0
     new_atoms = atoms.filtered((atoms.z >= -5) & (atoms.z <= 5))

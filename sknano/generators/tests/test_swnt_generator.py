@@ -34,7 +34,7 @@ class TestCase(GeneratorTestFixtures):
     def test3(self):
 
         new_swnt = SWNTGenerator((10, 10))
-        new_swnt.atoms.center_CM()
+        new_swnt.atoms.center_centroid()
         test_swnt = \
             XYZReader(resource_filename('sknano',
                                         'data/nanotubes/1010_1cell.xyz'))

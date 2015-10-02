@@ -70,7 +70,7 @@ class GrapheneGeneratorBase(GeneratorBase):
         for atom in SuperCell(self.unit_cell, [self.n1, self.n2, 1]):
             layer0.append(Atom(**atom.todict()))
 
-        layer0.center_CM()
+        layer0.center_centroid()
         # self.Natoms_per_layer = layer0.Natoms
 
         self.layers = []
@@ -95,7 +95,7 @@ class GrapheneGeneratorBase(GeneratorBase):
         return fname
 
     def save(self, fname=None, outpath=None, structure_format=None,
-             center_CM=True, rotation_angle=-np.pi / 2, rotation_axis='x',
+             center_centroid=True, rotation_angle=-np.pi / 2, rotation_axis='x',
              **kwargs):
         """Save structure data.
 
@@ -107,11 +107,11 @@ class GrapheneGeneratorBase(GeneratorBase):
             fname = \
                 self.generate_fname(nlayers=self.nlayers, basis=self.basis)
 
-        if center_CM and self.nlayers > 1:
-            self.atoms.center_CM()
+        if center_centroid and self.nlayers > 1:
+            self.atoms.center_centroid()
 
         super().save(fname=fname, outpath=outpath,
-                     structure_format=structure_format, center_CM=False,
+                     structure_format=structure_format, center_centroid=False,
                      angle=rotation_angle, axis=rotation_axis, **kwargs)
 
 

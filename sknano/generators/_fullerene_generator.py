@@ -65,7 +65,7 @@ class FullereneGenerator(GeneratorBase, Fullerene):
         return 'C{}'.format(N)
 
     def save(self, fname=None, outpath=None, structure_format=None,
-             center_CM=True, **kwargs):
+             center_centroid=True, **kwargs):
         """Save structure data.
 
         See :py:meth:`~sknano.generators.GeneratorBase.save` method
@@ -77,4 +77,4 @@ class FullereneGenerator(GeneratorBase, Fullerene):
 
         super().save(fname=fname, outpath=outpath,
                      structure_format=structure_format,
-                     center_CM=center_CM, **kwargs)
+                     center_centroid=center_centroid, **kwargs)

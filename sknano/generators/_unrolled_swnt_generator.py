@@ -113,7 +113,7 @@ class UnrolledSWNTGenerator(GeneratorBase, UnrolledSWNT):
         for atom in SuperCell(self.unit_cell, scaling_matrix):
             layer0.append(Atom(**atom.todict()))
 
-        layer0.center_CM()
+        layer0.center_centroid()
 
         self.layers = []
         for nlayer in range(self.nlayers):
@@ -145,7 +145,7 @@ class UnrolledSWNTGenerator(GeneratorBase, UnrolledSWNT):
         return fname
 
     def save(self, fname=None, outpath=None, structure_format=None,
-             center_CM=True, **kwargs):
+             center_centroid=True, **kwargs):
         """Save structure data.
 
         See :meth:`~sknano.generators.GeneratorBase.save` method
@@ -158,9 +158,9 @@ class UnrolledSWNTGenerator(GeneratorBase, UnrolledSWNT):
                                         fix_Lx=self.fix_Lx,
                                         fix_Lz=self.fix_Lz)
 
-        if center_CM:
-            self.atoms.center_CM()
+        if center_centroid:
+            self.atoms.center_centroid()
 
         super().save(fname=fname, outpath=outpath,
                      structure_format=structure_format,
-                     center_CM=False, **kwargs)
+                     center_centroid=False, **kwargs)

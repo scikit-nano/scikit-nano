@@ -131,7 +131,7 @@ class SWNTGenerator(GeneratorBase, SWNT):
         return fname
 
     def save(self, fname=None, outpath=None, structure_format=None,
-             center_CM=True, **kwargs):
+             center_centroid=True, **kwargs):
         """Save structure data.
 
         See :meth:`~sknano.generators.GeneratorBase.save` method
@@ -144,4 +144,4 @@ class SWNTGenerator(GeneratorBase, SWNT):
 
         super().save(fname=fname, outpath=outpath,
                      structure_format=structure_format,
-                     center_CM=center_CM, **kwargs)
+                     center_centroid=center_centroid, **kwargs)

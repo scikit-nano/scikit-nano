@@ -14,7 +14,7 @@ from sknano.testing import generate_atoms
 
 def test_find_target_atom():
     atoms = generate_atoms(generator_class='SWNTGenerator', n=10, m=10, nz=3)
-    atoms.center_CM()
+    atoms.center_centroid()
     atoms.assign_unique_ids()
     atoms.update_attrs()
     target_atom = find_target_atom(atoms, target_coords=[0.0, 5.0, 0.0],
