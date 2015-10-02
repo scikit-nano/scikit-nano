@@ -13,6 +13,7 @@ from __future__ import absolute_import, division, print_function, \
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
+from functools import total_ordering
 from sknano.core import BaseClass
 from sknano.core.math import Points, Vectors, transformation_matrix
 
@@ -78,6 +79,7 @@ class GeometricTransformsMixin:
         self.vectors.translate(t, fix_anchor_points=fix_anchor_points)
 
 
+@total_ordering
 class GeometricRegion(BaseClass, metaclass=ABCMeta):
     """Abstract base class for all geometric regions.
 
@@ -114,7 +116,18 @@ class GeometricRegion(BaseClass, metaclass=ABCMeta):
         """Measure of geometric region."""
         raise NotImplementedError
 
+    def __eq__(self, other):
+        return isinstance(other, type(self)) and \
+            self.points == other.points and self.vectors == other.vectors
+
+    def __lt__(self, other):
+        return isinstance(other, type(self)) and self.measure < other.measure
+
     @abstractmethod
     def contains(self, point):
         """Test region membership of `point` in :class:`GeometricRegion`."""
         raise NotImplementedError
+
+    def center_centroid(self):
+        """Center :attr:`~GeometricRegion.centroid` on origin."""
+        self.translate(-self.centroid)
