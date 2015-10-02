@@ -150,7 +150,7 @@ class PrimitiveCellGrapheneGenerator(GrapheneGeneratorBase,
     """
     @classmethod
     def generate_fname(cls, edge_length=None, **kwargs):
-        dimensions = '{}nm'.format(edge_length)
+        dimensions = '{:.1f}nm'.format(edge_length)
         fname = '_'.join((dimensions, super().generate_fname(**kwargs)))
         return fname
 
@@ -212,8 +212,8 @@ class ConventionalCellGrapheneGenerator(GrapheneGeneratorBase,
     @classmethod
     def generate_fname(cls, armchair_edge_length=None,
                        zigzag_edge_length=None, **kwargs):
-        dimensions = '{}nmx{}nm'.format(armchair_edge_length,
-                                        zigzag_edge_length)
+        dimensions = '{:.1f}nmx{:.1f}nm'.format(armchair_edge_length,
+                                                zigzag_edge_length)
         fname = '_'.join((dimensions, super().generate_fname(**kwargs)))
         return fname
 
