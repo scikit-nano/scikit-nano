@@ -4,18 +4,18 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
 import nose
-from nose.tools import *
+from nose.tools import assert_true, assert_equal, assert_not_equal
 
 import numpy as np
 
-from sknano.core.math import Point
+from sknano.core.math import Point, Points
 
 
 def test_instantiation():
     p = Point()
     assert_true(np.allclose(p, np.zeros(3)))
 
-    p = Point([0,0,0], dtype=float)
+    p = Point([0, 0, 0], dtype=float)
     assert_true(np.allclose(p, np.zeros(3)))
 
     p = Point(np.ones(3))
@@ -29,7 +29,7 @@ def test_instantiation():
 
 
 def test_rezero():
-    p = Point([1e-9,1e-11,-1e-16])
+    p = Point([1e-9, 1e-11, -1e-16])
     p.rezero(epsilon=1e-10)
     assert_not_equal(p.x, 0.0)
     assert_equal(p.y, 0.0)
@@ -55,24 +55,23 @@ def test_total_ordering():
     p1 = Point(np.ones(3))
     p2 = Point(2 * np.ones(3))
     pm2 = Point(-2 * np.ones(3))
-    plist = [p2, p1, p0, pm2]
-    assert_equal(plist.index(p0), 2)
-    assert_true(p0 == Point(p0))
-    assert_equal(plist.index(p1), 1)
-    assert_true(p1 == Point(p1))
-    assert_equal(plist.index(p2), 0)
-    assert_true(p2 == Point(p2))
-    assert_equal(plist.index(pm2), 3)
-    assert_true(pm2 == Point(pm2))
+    p3 = Point([1, 2, 3])
+    pm3 = Point([-1, -2, -3])
+    plist = Points([p2, p1, p0, p3, pm2, pm3])
+    plist = [p2, p1, p0, p3, pm2, pm3]
+    print('initial plist:\n{}\n'.format(plist))
     plist.sort()
-    assert_equal(plist.index(p0), 0)
-    assert_true(p0 == plist[0])
-    assert_equal(plist.index(p1), 1)
-    assert_true(p1 == plist[1])
-    assert_equal(plist.index(p2), 2)
-    assert_true(p2 == plist[2])
-    assert_equal(plist.index(pm2), 3)
-    assert_true(pm2 == plist[-1])
+    print('sorted plist:\n{}\n'.format(plist))
+    assert_equal(plist.index(p0), 2)
+    assert_true(p0 == plist[2])
+    assert_equal(plist.index(p1), 3)
+    assert_true(p1 == plist[3])
+    assert_equal(plist.index(p2), 5)
+    assert_true(p2 == plist[5])
+    assert_equal(plist.index(pm2), 0)
+    assert_true(pm2 == plist[0])
+    assert_true(plist.index(p3), 4)
+    assert_true(plist.index(pm3), 1)
 
 
 if __name__ == '__main__':
