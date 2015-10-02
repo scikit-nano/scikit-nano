@@ -133,9 +133,9 @@ class GeneratorBase:
                 del kwargs['center_center_of_mass']
 
         if center_centroid:
-            self.center_centroid()
+            atoms.center_centroid()
         elif center_com:
-            self.center_com()
+            atoms.center_com()
 
         if region_bounds is not None:
             atoms.clip_bounds(region_bounds)
