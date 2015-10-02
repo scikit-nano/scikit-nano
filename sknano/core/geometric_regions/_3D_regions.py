@@ -345,6 +345,9 @@ class Cuboid(Geometric3DRegion):
             pmax = [xmax, ymax, zmax]
         self.pmax = pmax
 
+        # assert self.pmin <= self.pmax
+        assert np.all(np.less_equal(self.pmin, self.pmax))
+
         self.points.extend([self.pmin, self.pmax])
         self.fmtstr = "pmin={pmin!r}, pmax={pmax!r}"
 
@@ -524,6 +527,14 @@ class Cuboid(Geometric3DRegion):
         return (px >= self.xmin) and (px <= self.xmax) and \
             (py >= self.ymin) and (py <= self.ymax) and \
             (pz >= self.zmin) and (pz <= self.zmax)
+
+    def rotate(self, **kwargs):
+        super().rotate(**kwargs)
+        pmin = self.pmin.copy()
+        pmax = self.pmax.copy()
+        self.pmin = np.minimum(pmin, pmax)
+        self.pmax = np.maximum(pmin, pmax)
+        assert np.all(np.less_equal(self.pmin, self.pmax))
 
     def todict(self):
         """Returns a :class:`~python:dict` of the :class:`Cuboid` \
