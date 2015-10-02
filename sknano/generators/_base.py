@@ -61,8 +61,9 @@ class GeneratorBase:
             self.atoms.append(Atom(**atom.todict()))
 
     def save(self, fname=None, outpath=None, structure_format=None,
-             deepcopy=True, center_CM=True, region_bounds=None,
-             filter_condition=None, rotation_parameters=None, **kwargs):
+             deepcopy=True, center_centroid=True, center_com=False,
+             region_bounds=None, filter_condition=None,
+             rotation_parameters=None, **kwargs):
         """Save structure data.
 
         Parameters
@@ -79,7 +80,9 @@ class GeneratorBase:
 
             If `None`, then guess based on `fname` file extension or
             default to `xyz` format.
-        center_CM : bool, optional
+        center_centroid : bool, optional
+            Center centroid on origin.
+        center_com : bool, optional
             Center center-of-mass on origin.
         region_bounds : :class:`GeometricRegion`, optional
             An instance of a
@@ -120,8 +123,19 @@ class GeneratorBase:
         else:
             atoms = self.atoms[:]
 
-        if center_CM:
-            atoms.center_CM()
+        if any([kw in kwargs for kw
+                in ('center_CM', 'center_center_of_mass')]):
+            if 'center_CM' in kwargs:
+                center_com = kwargs['center_CM']
+                del kwargs['center_CM']
+            else:
+                center_com = kwargs['center_center_of_mass']
+                del kwargs['center_center_of_mass']
+
+        if center_centroid:
+            self.center_centroid()
+        elif center_com:
+            self.center_com()
 
         if region_bounds is not None:
             atoms.clip_bounds(region_bounds)
