@@ -87,8 +87,10 @@ class GrapheneGeneratorBase(GeneratorBase):
     @classmethod
     def generate_fname(cls, nlayers=None, basis=None, **kwargs):
         nlayer = '{}layer'.format(nlayers)
-        basis = ''.join(basis)
-        fname_wordlist = (nlayer, basis, 'graphene')
+        fname_wordlist = [nlayer, 'graphene']
+        basis = '-'.join(basis)
+        if not basis == 'C-C':
+            fname_wordlist.append('_'.join((basis, 'basis')))
         fname = '_'.join(fname_wordlist)
         return fname
 
