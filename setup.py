@@ -84,8 +84,8 @@ Topic :: Software Development :: Libraries :: Python Modules
 
 MAJOR = 0
 MINOR = 3
-MICRO = 19
-ISRELEASED = True
+MICRO = 20
+ISRELEASED = False
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 STABLEVERSION = None
