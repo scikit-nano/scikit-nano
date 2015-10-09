@@ -215,13 +215,14 @@ def get_fpath(fname=None, ext=None, outpath=os.getcwd(), overwrite=False,
             return fpath
 
 
-def listdir_dirnames(path='.', filterfunc=None):
+def listdir_dirnames(path='.', filterfunc=None, include_path=False):
     """Return list of names of directories in the directory given by `path`.
 
     Parameters
     ----------
     path : :class:`~python:str`, optional
     filterfunc : `function`, optional
+    include_path : :class:`~python:bool`, optional
 
     Returns
     -------
@@ -230,16 +231,18 @@ def listdir_dirnames(path='.', filterfunc=None):
 
     """
     return listdir(path, filterfunc=filterfunc,
-                   filter_dirnames=filterfunc is not None)[0]
+                   filter_dirnames=filterfunc is not None,
+                   include_path=include_path)[0]
 
 
-def listdir_fnames(path='.', filterfunc=None):
+def listdir_fnames(path='.', filterfunc=None, include_path=False):
     """Return list of names of files in the directory given by `path`.
 
     Parameters
     ----------
     path : :class:`~python:str`, optional
     filterfunc : `function`, optional
+    include_path : :class:`~python:bool`, optional
 
     Returns
     -------
@@ -248,11 +251,12 @@ def listdir_fnames(path='.', filterfunc=None):
 
     """
     return listdir(path, filterfunc=filterfunc,
-                   filter_fnames=filterfunc is not None)[-1]
+                   filter_fnames=filterfunc is not None,
+                   include_path=include_path)[-1]
 
 
 def listdir(path='.', filterfunc=None, filter_dirnames=False,
-            filter_fnames=False):
+            filter_fnames=False, include_path=False):
     """Return a tuple of the names of the directories and files in the
     directory given by `path`.
 
@@ -262,6 +266,7 @@ def listdir(path='.', filterfunc=None, filter_dirnames=False,
     filterfunc : `function`, optional
     filter_dirnames : :class:`~python:bool`, optional
     filter_fnames : :class:`~python:bool`, optional
+    include_path : :class:`~python:bool`, optional
 
     Returns
     -------
@@ -276,6 +281,11 @@ def listdir(path='.', filterfunc=None, filter_dirnames=False,
         dirnames = list(filter(filterfunc, dirnames))
     if filter_fnames and filterfunc is not None:
         fnames = list(filter(filterfunc, fnames))
+
+    if include_path:
+        dirnames = [os.path.join(path, name) for name in dirnames]
+        fnames = [os.path.join(path, name) for name in fnames]
+
     return dirnames, fnames
 
 
