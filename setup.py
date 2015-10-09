@@ -254,7 +254,7 @@ def setup_package():
 
     # # Add future module to install requires
     # install_requires += ['future>=0.14.3']
-    install_requires += ['monty>=0.6.5', 'pymatgen>=3.2.3']
+    install_requires += ['monty>=0.6.6', 'pymatgen>=3.2.3']
 
     metadata = dict(
         name=DISTNAME,
