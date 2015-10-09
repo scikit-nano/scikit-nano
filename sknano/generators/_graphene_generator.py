@@ -95,7 +95,7 @@ class GrapheneGeneratorBase(GeneratorBase):
         return fname
 
     def save(self, fname=None, outpath=None, structure_format=None,
-             center_centroid=True, rotation_angle=-np.pi / 2, rotation_axis='x',
+             center_centroid=True, rotation_angle=np.pi / 2, rotation_axis='x',
              **kwargs):
         """Save structure data.
 
