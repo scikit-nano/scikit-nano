@@ -231,17 +231,19 @@ def setup_package():
     try:
         import numpy
         numpy_version = \
-            tuple(list(map(int, numpy.version.short_version.split('.')))[:2])
+            tuple(
+                list(map(int, numpy.version.short_version.split('.')[:3]))[:2])
         if numpy_version < (1, 9):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
-        build_requires += ['numpy==1.9.2']
+        build_requires += ['numpy==1.9.3']
 
     install_requires = build_requires[:]
     try:
         import scipy
         scipy_version = \
-            tuple(list(map(int, scipy.version.short_version.split('.')))[:2])
+            tuple(
+                list(map(int, scipy.version.short_version.split('.')[:3]))[:2])
         if scipy_version < (0, 14):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
@@ -252,7 +254,7 @@ def setup_package():
 
     # # Add future module to install requires
     # install_requires += ['future>=0.14.3']
-    install_requires += ['monty>=0.6.5', 'pymatgen>=3.1.6']
+    install_requires += ['monty>=0.6.5', 'pymatgen>=3.2.3']
 
     metadata = dict(
         name=DISTNAME,
