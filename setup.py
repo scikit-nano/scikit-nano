@@ -236,7 +236,7 @@ def setup_package():
         if numpy_version < (1, 9):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
-        build_requires += ['numpy==1.9.3']
+        build_requires += ['numpy==1.10.1']
 
     install_requires = build_requires[:]
     try:
