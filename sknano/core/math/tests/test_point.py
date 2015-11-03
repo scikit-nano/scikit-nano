@@ -11,7 +11,7 @@ import numpy as np
 from sknano.core.math import Point, Points
 
 
-def test_instantiation():
+def test1():
     p = Point()
     assert_true(np.allclose(p, np.zeros(3)))
 
@@ -28,7 +28,7 @@ def test_instantiation():
     assert_true(np.allclose(p, np.arange(10)))
 
 
-def test_rezero():
+def test2():
     p = Point([1e-9, 1e-11, -1e-16])
     p.rezero(epsilon=1e-10)
     assert_not_equal(p.x, 0.0)
@@ -36,7 +36,7 @@ def test_rezero():
     assert_equal(p.z, 0.0)
 
 
-def test_transforms():
+def test3():
     p = Point([1.0, 0.0, 0.0])
     p.rotate(np.pi/2, rot_axis='z')
     assert_true(np.allclose(p, np.array([0, 1, 0])))
@@ -50,7 +50,7 @@ def test_transforms():
     assert_true(np.allclose(p, np.array([2, 1, 0])))
 
 
-def test_total_ordering():
+def test4():
     p0 = Point(np.zeros(3))
     p1 = Point(np.ones(3))
     p2 = Point(2 * np.ones(3))
@@ -72,6 +72,22 @@ def test_total_ordering():
     assert_true(pm2 == plist[0])
     assert_true(plist.index(p3), 4)
     assert_true(plist.index(pm3), 1)
+
+
+def test5():
+    p2 = Point(None, nd=2)
+    p3 = Point(None, nd=3)
+    assert_equal(p2, Point(np.zeros(2)))
+    assert_equal(p3, Point(np.zeros(3)))
+
+
+def test6():
+    p2 = Point(np.zeros(3), nd=2)
+    p3 = Point(np.zeros(2), nd=3)
+    assert_equal(p2, Point(np.zeros(2)))
+    assert_equal(p3, Point(np.zeros(3)))
+    assert_true(len(p2) == 2)
+    assert_true(len(p3) == 3)
 
 
 if __name__ == '__main__':
