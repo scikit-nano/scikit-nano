@@ -67,8 +67,11 @@ class Point(np.ndarray):
             else:
                 p = np.asarray(p, dtype=dtype)
             if nd is not None and isinstance(nd, numbers.Number) and \
-                    len(p) < int(nd):
-                p = np.append(p, np.zeros(int(nd) - len(p)))
+                    len(p) != int(nd):
+                if len(p) < int(nd):
+                    p = np.append(p, np.zeros(int(nd) - len(p)))
+                else:
+                    p = p[:int(nd)]
             nd = len(p)
         else:
             if nd is None or not isinstance(nd, numbers.Number):
