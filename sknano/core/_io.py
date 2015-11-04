@@ -275,8 +275,10 @@ def listdir(path='.', filterfunc=None, filter_dirnames=False,
 
     """
     l = os.listdir(path)
-    dirnames = [name for name in l if os.path.isdir(os.path.join(path, name))]
-    fnames = [name for name in l if os.path.isfile(os.path.join(path, name))]
+    dirnames = \
+        [name for name in l if os.path.isdir(os.path.join(path, name))]
+    fnames = \
+        [name for name in l if os.path.isfile(os.path.join(path, name))]
     if filter_dirnames and filterfunc is not None:
         dirnames = list(filter(filterfunc, dirnames))
     if filter_fnames and filterfunc is not None:
