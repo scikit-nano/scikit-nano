@@ -49,7 +49,7 @@ class LatticeBase(BaseClass):
         super().__init__()
 
         self.nd = nd
-        self.offset = Point(offset, nd=self.nd)
+        self.offset = Point(offset, nd=3)
         if cell_matrix is not None and orientation_matrix is None:
             orientation_matrix = cell_matrix.T * self.fractional_matrix
 
