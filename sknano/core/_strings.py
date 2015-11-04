@@ -11,12 +11,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-__all__ = ['plural_word_check', 'pluralize', 'ordinal_form']
-
-
-def plural_word_check(word, count):
-    """Alias for :func:`pluralize`"""
-    return pluralize(word, count)
+__all__ = ['pluralize', 'plural_word_check', 'ordinal_form']
 
 
 def pluralize(word, count):
@@ -33,8 +28,28 @@ def pluralize(word, count):
     -------
     :class:`~python:str`
 
+    Examples
+    --------
+    On occasion, it is desirable to describe a numerical value in terms of
+    a noun which the number is quantifying. For example, given
+    a function which accepts a numerical parameter `n` and returns
+    a string describing the number of `n` *objects*, then this
+    helper function may be of use. For example::
+
+    >>> from sknano.core import pluralize
+    >>> def apple_count(n):
+    ...     return '{} {}'.format(n, pluralize('apple', n))
+    ...
+    >>> [apple_count(i) for i in range(3)]
+    ['0 apples', '1 apple', '2 apples']
+
     """
     return word if count == 1 else word + 's'
+
+
+def plural_word_check(word, count):
+    """Alias for :func:`pluralize`"""
+    return pluralize(word, count)
 
 
 def ordinal_form(n):
