@@ -19,7 +19,7 @@ from operator import attrgetter
 import numpy as np
 
 from monty.io import zopen
-from sknano.core import get_fpath
+from sknano.core import get_fpath, flatten
 from sknano.core.atoms import Trajectory, Snapshot, MDAtom as Atom
 # from sknano.core.crystallography import Crystal3DLattice
 from sknano.core.geometric_regions import Cuboid
@@ -71,8 +71,42 @@ class DUMPReader(StructureIO):
 
     Parameters
     ----------
-    fpath : :class:`~python:str`
-        LAMMPS dump file path
+    *args : :class:`~python:list`
+        :class:`~python:list` of one or more LAMMPS dump files.
+    attrmap : class:`~python:dict`
+        Python :class:`~python:dict` mapping custom dump attributes
+        to :class:`~sknano.core.atoms.Atom` attributes.
+
+    Examples
+    --------
+    Using LAMMPS, one often saves molecular dynamics atom trajectories
+    to one or more custom dump files containing per-atom attributes of
+    of each atom at a given timestep. Often the per-atom attributes
+    are calculated from custom LAMMPS compute commands that one may
+    want to map to a specific :class:`~sknano.core.atoms.Atom`
+    attribute.
+
+    For example, consider a dump file containing per-atom dump attributes
+    *id*, *mol*, *type*, *x*, *y*, *z*, *vx*, *vy*, *vz*, *c_atom_ke*,
+    *c_atom_pe*, and *c_atom_CN*, where *c_atom_ke*, *c_atom_pe*, and
+    *c_atom_CN* are the LAMMPS *compute-IDs* from custom compute commands
+    in a LAMMPS input script, which calculate per-atom values for
+    kinetic energy, potential energy, and coordination number, respectively.
+    To map these compute-IDs to corresponding
+    :class:`~sknano.core.atoms.Atom` attributes
+    :attr:`~sknano.core.atom.EnergyAtom.ke`,
+    :attr:`~sknano.core.atom.EnergyAtom.pe`,
+    and :attr:`~sknano.core.atom.CNAtom.CN`), respectively, one
+    would use the following :class:`~python:dict` mapping::
+
+    >>> from sknano.io import DUMPReader
+    >>> compute_attrmap = {'c_atom_pe': 'pe', 'c_atom_ke': 'ke',
+    ...                    'c_atom_CN': 'CN'}
+    >>> dumps = DUMPReader('dump.*', attrmap=compute_attrmap)
+    >>> print(repr(dumps.dumpattrs2str()))
+    'id mol type x y z vx vy vz c_atom_ke c_atom_pe c_atom_CN'
+    >>> print(repr(dumps.atomattrs2str()))
+    'id mol type x y z vx vy vz ke pe CN'
 
     """
     def __init__(self, *args, attrmap=None, **kwargs):
@@ -81,7 +115,7 @@ class DUMPReader(StructureIO):
         self.attrmap = attrmap
         self.trajectory = Trajectory()
         self.dumpattrs = {}
-        self.dumpfiles = [glob(f) for f in args[0].split()]
+        self.dumpfiles = list(flatten([glob(f) for f in args[0].split()]))
 
         if len(self.dumpfiles) == 0:
             raise ValueError('No dump file specified.')
@@ -332,6 +366,10 @@ class DUMPReader(StructureIO):
                     atoms[:, yi] = snapshot.ylo + atoms[:, yi] * ly + \
                         atoms[:, zi] * yz
                     atoms[:, zi] = snapshot.zlo + atoms[:, zi] * lz
+
+    def atomattrs2str(self):
+        """Return a space-separated string of parsed atom attributes."""
+        return ' '.join(self.atomattrs)
 
     def dumpattrs2str(self):
         """Return a space-separated string of the dumped atom attributes."""
