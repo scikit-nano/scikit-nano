@@ -11,7 +11,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-# import glob
+from glob import glob
 # import re
 import sys
 from operator import attrgetter
@@ -21,8 +21,8 @@ import numpy as np
 from monty.io import zopen
 from sknano.core import get_fpath
 from sknano.core.atoms import Trajectory, Snapshot, MDAtom as Atom
-from sknano.core.crystallography import Crystal3DLattice
-from sknano.core.geometric_regions import Cuboid, Parallelepiped
+# from sknano.core.crystallography import Crystal3DLattice
+from sknano.core.geometric_regions import Cuboid
 
 from ._base import StructureIO, StructureIOError, StructureFormatSpec, \
     default_comment_line
@@ -42,6 +42,30 @@ attr_dtypes = {'id': int, 'type': int, 'mol': int, 'q': float, 'mass': float,
                'atom1': int, 'atom2': int, 'atom3': int, 'atom4': int}
 
 
+# class LAMMPSBOX(Crystal3DLattice):
+#     """LAMMPS 3D simulation box.
+
+#     Parameters
+#     ----------
+#     lx, ly, lz : float
+#     xy, xz, yz : float
+
+#     """
+
+#     def __init__(self, lx=None, ly=None, lz=None,
+#                  xy=None, xz=None, yz=None, cell_matrix=None,
+#                  orientation_matrix=None, offset=None):
+
+#         a = lx
+#         b = np.sqrt(ly ** 2 + xy ** 2)
+#         c = np.sqrt(lz ** 2 + xz ** 2 + yz ** 2)
+#         alpha = np.degrees(np.arccos((xy * xz + ly * yz) / (b * c)))
+#         beta = np.degrees(np.arccos(xz / c))
+#         gamma = np.degrees(np.arccos(xy / b))
+#         super().__init__(a=a, b=b, c=c, alpha=alpha, beta=beta, gamma=gamma,
+#                          offset=offset)
+
+
 class DUMPReader(StructureIO):
     """Class for reading `LAMMPS dump` file format.
 
@@ -57,9 +81,7 @@ class DUMPReader(StructureIO):
         self.attrmap = attrmap
         self.trajectory = Trajectory()
         self.dumpattrs = {}
-        self.dumpfiles = []
-        for fpath in args:
-            self.dumpfiles.append(fpath)
+        self.dumpfiles = [glob(f) for f in args[0].split()]
 
         if len(self.dumpfiles) == 0:
             raise ValueError('No dump file specified.')
@@ -131,6 +153,7 @@ class DUMPReader(StructureIO):
 
             snapshot.triclinic = False
             snapshot.bounding_box = Cuboid()
+
             if 'xy' in snapshot.boxstr:
                 snapshot.triclinic = True
 
@@ -138,6 +161,10 @@ class DUMPReader(StructureIO):
                 bounds = f.readline().strip().split()
                 setattr(snapshot, dim + 'lo', float(bounds[0]))
                 setattr(snapshot, dim + 'hi', float(bounds[1]))
+                setattr(snapshot.bounding_box, dim + 'min',
+                        getattr(snapshot, dim + 'lo'))
+                setattr(snapshot.bounding_box, dim + 'max',
+                        getattr(snapshot, dim + 'hi'))
                 try:
                     setattr(snapshot, tilt_factor, float(bounds[2]))
                 except IndexError:
@@ -226,9 +253,10 @@ class DUMPReader(StructureIO):
                 pass
 
     def scale(self):
-        x = self.dumpattrs['x']
-        y = self.dumpattrs['y']
-        z = self.dumpattrs['z']
+        """Scale cartesian coordinates to fractional coordinates."""
+        xi = self.dumpattrs['x']
+        yi = self.dumpattrs['y']
+        zi = self.dumpattrs['z']
         for snapshot in self.trajectory:
             atoms = snapshot.get_atoms(asarray=True)
             if atoms is not None:
@@ -244,10 +272,11 @@ class DUMPReader(StructureIO):
                 xy = snapshot.xy
                 xz = snapshot.xz
                 yz = snapshot.yz
+
                 if np.allclose([xy, xz, yz], np.zeros(3)):
-                    atoms[:, x] = (atoms[:, x] - snapshot.xlo) / lx
-                    atoms[:, y] = (atoms[:, y] - snapshot.ylo) / ly
-                    atoms[:, z] = (atoms[:, z] - snapshot.zlo) / lz
+                    atoms[:, xi] = (atoms[:, xi] - snapshot.xlo) / lx
+                    atoms[:, yi] = (atoms[:, yi] - snapshot.ylo) / ly
+                    atoms[:, zi] = (atoms[:, zi] - snapshot.zlo) / lz
                 else:
                     xlo = xlo - min((0.0, xy, xz, xy + xz))
                     xhi = xhi - max((0.0, xy, xz, xy + xz))
@@ -257,18 +286,19 @@ class DUMPReader(StructureIO):
                     yhi = yhi - max((0.0, yz))
                     ly = yhi - ylo
 
-                    atoms[:, x] = (atoms[:, x] - snapshot.xlo) / lx + \
-                        (atoms[:, y] - snapshot.ylo) * xy / (lx * ly) + \
-                        (atoms[:, z] - snapshot.zlo) * (yz * xy - ly * xz) / \
+                    atoms[:, xi] = (atoms[:, xi] - snapshot.xlo) / lx + \
+                        (atoms[:, yi] - snapshot.ylo) * xy / (lx * ly) + \
+                        (atoms[:, zi] - snapshot.zlo) * (yz * xy - ly * xz) / \
                         (lx * ly * lz)
-                    atoms[:, y] = (atoms[:, y] - snapshot.ylo) / ly + \
-                        (atoms[:, z] - snapshot.zlo) * yz / (ly * lz)
-                    atoms[:, z] = (atoms[:, z] - snapshot.zlo) / lz
+                    atoms[:, yi] = (atoms[:, yi] - snapshot.ylo) / ly + \
+                        (atoms[:, zi] - snapshot.zlo) * yz / (ly * lz)
+                    atoms[:, zi] = (atoms[:, zi] - snapshot.zlo) / lz
 
     def unscale(self):
-        x = self.dumpattrs['x']
-        y = self.dumpattrs['y']
-        z = self.dumpattrs['z']
+        """Unscale fractional coordinates to cartesian coordinates."""
+        xi = self.dumpattrs['x']
+        yi = self.dumpattrs['y']
+        zi = self.dumpattrs['z']
         for snapshot in self.trajectory:
             atoms = snapshot.get_atoms(asarray=True)
             if atoms is not None:
@@ -285,9 +315,9 @@ class DUMPReader(StructureIO):
                 xz = snapshot.xz
                 yz = snapshot.yz
                 if np.allclose([xy, xz, yz], np.zeros(3)):
-                    atoms[:, x] = snapshot.xlo + atoms[:, x] * lx
-                    atoms[:, y] = snapshot.ylo + atoms[:, y] * ly
-                    atoms[:, z] = snapshot.zlo + atoms[:, z] * lz
+                    atoms[:, xi] = snapshot.xlo + atoms[:, xi] * lx
+                    atoms[:, yi] = snapshot.ylo + atoms[:, yi] * ly
+                    atoms[:, zi] = snapshot.zlo + atoms[:, zi] * lz
                 else:
                     xlo = xlo - min((0.0, xy, xz, xy + xz))
                     xhi = xhi - max((0.0, xy, xz, xy + xz))
@@ -297,13 +327,14 @@ class DUMPReader(StructureIO):
                     yhi = yhi - max((0.0, yz))
                     ly = yhi - ylo
 
-                    atoms[:, x] = snapshot.xlo + \
-                        atoms[:, x] * lx + atoms[:, y] * xy + atoms[:, z] * xz
-                    atoms[:, y] = snapshot.ylo + \
-                        atoms[:, y] * ly + atoms[:, z] * yz
-                    atoms[:, z] = snapshot.zlo + atoms[:, z] * lz
+                    atoms[:, xi] = snapshot.xlo + atoms[:, xi] * lx + \
+                        atoms[:, yi] * xy + atoms[:, zi] * xz
+                    atoms[:, yi] = snapshot.ylo + atoms[:, yi] * ly + \
+                        atoms[:, zi] * yz
+                    atoms[:, zi] = snapshot.zlo + atoms[:, zi] * lz
 
     def dumpattrs2str(self):
+        """Return a space-separated string of the dumped atom attributes."""
         return ' '.join(sorted(self.dumpattrs, key=self.dumpattrs.__getitem__))
 
 
