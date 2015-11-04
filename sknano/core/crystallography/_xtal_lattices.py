@@ -40,14 +40,16 @@ class LatticeBase(BaseClass):
     nd : int
     cell_matrix : array_like
     orientation_matrix : array_like, optional
+    offset : array_like, optional
 
     """
 
-    def __init__(self, nd=None, cell_matrix=None, orientation_matrix=None):
+    def __init__(self, nd=None, cell_matrix=None, orientation_matrix=None,
+                 offset=None):
         super().__init__()
 
         self.nd = nd
-        self.offset = Point()
+        self.offset = Point(offset, nd=self.nd)
         if cell_matrix is not None and orientation_matrix is None:
             orientation_matrix = cell_matrix.T * self.fractional_matrix
 
@@ -245,11 +247,12 @@ class ReciprocalLatticeBase(LatticeBase):
     direct_lattice : :class:`Crystal2DLattice` or :class:`Crystal3DLattice`
     nd : int
     """
-    def __init__(self, direct_lattice, nd):
+    def __init__(self, direct_lattice, nd, offset=None):
         self._direct_lattice = direct_lattice
         super().__init__(
             nd=nd, cell_matrix=self._direct_lattice.cell_matrix,
-            orientation_matrix=self._direct_lattice.orientation_matrix)
+            orientation_matrix=self._direct_lattice.orientation_matrix,
+            offset=offset)
 
     def __getattr__(self, name):
         if name != '_direct_lattice':
@@ -444,7 +447,7 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin):
 
     def __init__(self, a=None, b=None, gamma=None,
                  a1=None, a2=None, cell_matrix=None,
-                 orientation_matrix=None):
+                 orientation_matrix=None, offset=None):
 
         if cell_matrix is not None:
             cell_matrix = np.asarray(cell_matrix)
@@ -469,7 +472,8 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin):
             self._update_ortho_matrix()
 
         super().__init__(nd=2, cell_matrix=cell_matrix,
-                         orientation_matrix=orientation_matrix)
+                         orientation_matrix=orientation_matrix,
+                         offset=offset)
 
         self.fmtstr = "a={a!r}, b={b!r}, gamma={gamma!r}"
 
@@ -630,13 +634,14 @@ class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin):
     """
 
     def __init__(self, a_star=None, b_star=None, gamma_star=None,
-                 b1=None, b2=None, cell_matrix=None, orientation_matrix=None):
+                 b1=None, b2=None, cell_matrix=None, orientation_matrix=None,
+                 offset=None):
 
         direct_lattice = \
             Crystal2DLattice(a=a_star, b=b_star, gamma=gamma_star,
                              a1=b1, a2=b2, cell_matrix=cell_matrix,
                              orientation_matrix=orientation_matrix)
-        super().__init__(direct_lattice, nd=2)
+        super().__init__(direct_lattice, nd=2, offset=offset)
 
         self.fmtstr = "a_star={a_star!r}, b_star={b_star!r}, " + \
             "gamma_star={gamma_star!r}"
@@ -769,7 +774,15 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin):
     def __init__(self, a=None, b=None, c=None,
                  alpha=None, beta=None, gamma=None,
                  a1=None, a2=None, a3=None, cell_matrix=None,
-                 orientation_matrix=None):
+                 orientation_matrix=None, offset=None):
+
+        if all([p is None for p in (a, b, c, alpha, beta, gamma,
+                                    a1, a2, a3, cell_matrix)]):
+            errmsg = 'Expected lattice parameters ' + \
+                '`a`, `b`, `c`, `alpha`, `beta`, `gamma`\n' + \
+                'or lattice vectors `a1`, `a2`, `a3`\n' + \
+                'or a 3x3 matrix with lattice vectors for columns.'
+            raise ValueError(errmsg)
 
         if cell_matrix is not None:
             cell_matrix = np.asarray(cell_matrix)
@@ -802,7 +815,8 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin):
             self._update_ortho_matrix()
 
         super().__init__(nd=3, cell_matrix=cell_matrix,
-                         orientation_matrix=orientation_matrix)
+                         orientation_matrix=orientation_matrix,
+                         offset=offset)
 
         self.fmtstr = "a={a!r}, b={b!r}, c={c!r}, " + \
             "alpha={alpha!r}, beta={beta!r}, gamma={gamma!r}"
@@ -1049,14 +1063,14 @@ class Reciprocal3DLattice(ReciprocalLatticeBase, DirectLatticeMixin):
     def __init__(self, a_star=None, b_star=None, c_star=None,
                  alpha_star=None, beta_star=None, gamma_star=None,
                  b1=None, b2=None, b3=None,
-                 cell_matrix=None, orientation_matrix=None):
+                 cell_matrix=None, orientation_matrix=None, offset=None):
 
         direct_lattice = \
             Crystal3DLattice(a=a_star, b=b_star, c=c_star, alpha=alpha_star,
                              beta=beta_star, gamma=gamma_star,
                              a1=b1, a2=b2, a3=b3, cell_matrix=cell_matrix,
                              orientation_matrix=orientation_matrix)
-        super().__init__(direct_lattice, nd=3)
+        super().__init__(direct_lattice, nd=3, offset=offset)
 
         self.fmtstr = "a_star={a_star!r}, b_star={b_star!r}, " + \
             "c_star={c_star!r}, alpha_star={alpha_star!r}, " + \
