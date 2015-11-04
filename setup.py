@@ -85,7 +85,7 @@ Topic :: Software Development :: Libraries :: Python Modules
 MAJOR = 0
 MINOR = 3
 MICRO = 21
-ISRELEASED = False
+ISRELEASED = True
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
 STABLEVERSION = None
@@ -247,14 +247,14 @@ def setup_package():
         if scipy_version < (0, 14):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
-        install_requires += ['scipy==0.16.0']
+        install_requires += ['scipy==0.16.1']
 
     # # Add six module to install_requires (used in numpydoc git submodule)
     # install_requires += ['six>=1.9']
 
     # # Add future module to install requires
     # install_requires += ['future>=0.14.3']
-    install_requires += ['monty>=0.7.0', 'pymatgen>=3.2.3']
+    install_requires += ['monty>=0.7.0', 'pymatgen>=3.2.4']
 
     metadata = dict(
         name=DISTNAME,
