@@ -11,6 +11,7 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from collections import Iterable
 import collections
 import operator
 import random
@@ -92,9 +93,13 @@ def dotproduct(vec1, vec2):
     return sum(map(operator.mul, vec1, vec2))
 
 
-def flatten(listOfLists):
-    "Flatten one level of nesting"
-    return chain.from_iterable(listOfLists)
+def flatten(items, ignore_types=(str, bytes)):
+    "Flatten nested sequence into a single list of values."
+    for x in items:
+        if isinstance(x, Iterable) and not isinstance(x, ignore_types):
+            yield from flatten(x)
+        else:
+            yield x
 
 
 def repeatfunc(func, times=None, *args):
