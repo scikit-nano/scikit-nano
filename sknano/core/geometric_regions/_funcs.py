@@ -20,6 +20,22 @@ from ._3D_regions import Cuboid, Parallelepiped
 
 def generate_bounding_box(from_region=None, from_lattice=None,
                           from_array=None, center=None, verbose=False):
+    """Return a :class:`~sknano.core.geometric_regions.Cuboid` \
+        representing an axis-aligned bounding box.
+
+    Parameters
+    ----------
+    from_region : :class:`~sknano.core.geometric_regions.Geometric3DRegion`
+    from_lattice : :class:`~sknano.core.crystallography.Crystal3DLattice`
+    from_array : :class:`~numpy:numpy.ndarray`
+    center : `array_like`
+    verbose : :class:`~python:bool`
+
+    Returns
+    -------
+    bounding_box : :class:`~sknano.core.geometric_regions.Cuboid`
+
+    """
 
     if all([obj is None for obj in (from_region, from_lattice, from_array)]):
         return None
