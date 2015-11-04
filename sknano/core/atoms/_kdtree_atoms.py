@@ -192,22 +192,22 @@ class KDTreeAtomsMixin:
 
         Parameters
         ----------
-        pts : `Point`
-            The `Point` or `Points` to search for neighbors of.
-        r : positive float
-            The radius of `KDTAtoms` to return
+        pts : :class:`~sknano.core.math.Point`
+            The :class:`~sknano.core.math.Point` or
+            :class:`~sknano.core.math.Points` to search for neighbors of.
+        r : positive :class:`~python:float`
+            The radius of :class:`~sknano.core.atoms.KDTAtoms` to return
         p : float, 1<=p<=infinity
             Which Minkowski p-norm to use.
             1 is the sum-of-absolute-values "Manhattan" distance
             2 is the usual Euclidean distance
             infinity is the maximum-coordinate-difference distance
-        eps : nonnegative float, optional
+        eps : nonnegative :class:`~python:float`, optional
             Approximate search.
 
         Returns
         -------
-        list or array of lists
-            `KDTAtoms`
+        :class:`~sknano.core.atoms.KDTAtoms`
 
         """
         atom_tree = self.atom_tree
