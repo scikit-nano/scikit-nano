@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Base class for structure molecules (:mod:`sknano.core.molecules._molecules`)
+Base molecule classes (:mod:`sknano.core.molecules._molecules`)
 ==============================================================================
 
 .. currentmodule:: sknano.core.molecules._molecules
@@ -11,16 +11,54 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from collections import OrderedDict
+from functools import total_ordering
 from operator import attrgetter
 
 import numpy as np
 
-from sknano.core import UserList, xyz
-from sknano.core.math import Vector, transformation_matrix
-from sknano.core.geometric_regions import Cuboid  # , Rectangle
+from sknano.core import BaseClass, UserList
+from sknano.core.math import convert_condition_str, rotation_matrix
 
-__all__ = ['Molecules']
+__all__ = ['Molecule', 'Molecules']
+
+
+@total_ordering
+class Molecule(BaseClass):
+    """Base class for abstract representation of molecule.
+
+    Parameters
+    ----------
+    atoms : {None, sequence, `Atoms`}, optional
+        if not `None`, then a list of `Atom` instances or an
+        `Atoms` instance.
+
+    """
+    def __init__(self, atoms=None, **kwargs):
+        super().__init__(**kwargs)
+        self.atoms = atoms
+        self.fmtstr = "atoms={atoms!r}"
+
+    def __eq__(self, other):
+        """Test equality of two `Molecule` object instances."""
+        return self is other or self.atoms == other.atoms
+
+    def __lt__(self, other):
+        """Test if `self` is *less than* `other`."""
+        return self.atoms < other.atoms
+
+    def rezero(self, *args, **kwargs):
+        assert not hasattr(super(), 'rezero')
+
+    def rotate(self, **kwargs):
+        assert not hasattr(super(), 'rotate')
+
+    def translate(self, *args, **kwargs):
+        assert not hasattr(super(), 'translate')
+
+    def todict(self):
+        """Return :class:`~python:dict` of `Molecule` constructor \
+            parameters."""
+        return dict(atoms=self.atoms)
 
 
 class Molecules(UserList):
@@ -33,17 +71,15 @@ class Molecules(UserList):
         existing `Molecules` instance object.
 
     """
-    _moleculeattrs = []
-
-    def __init__(self, molecules=None):
+    def __init__(self, molecules=None, casttype=True, **kwargs):
         super().__init__(initlist=molecules)
 
-    def __str__(self):
-        return repr(self)
+        self.fmtstr = "{molecules!r}"
 
     def __repr__(self):
         """Return canonical string representation of `Molecules`."""
-        return "Molecules(molecules={!r})".format(self.data)
+        return "{}({})".format(self.__class__.__name__,
+                               self.fmtstr.format(**self.todict()))
 
     def sort(self, key=attrgetter('id'), reverse=False):
         super().sort(key=key, reverse=reverse)
@@ -54,96 +90,9 @@ class Molecules(UserList):
         return len(self)
 
     @property
-    def CM(self):
-        """Center-of-Mass coordinates of `Molecules`.
-
-        Returns
-        -------
-        ndarray
-            3-element ndarray specifying center-of-mass coordinates of
-            `Molecules`.
-
-        """
-        masses = np.asarray([self.masses])
-        coords = self.coords
-        MxR = masses.T * coords
-        return Vector(np.sum(MxR, axis=0) / np.sum(masses))
-
-    @property
-    def M(self):
-        """Total mass of `Molecules`."""
-        #return math.fsum(self.masses)
-        return self.masses.sum()
-
-    @property
-    def coords(self):
-        """Return list of `Molecule` coordinates."""
-        return np.asarray([molecule.r for molecule in self])
-
-    @property
     def masses(self):
         """Return list of `Molecule` masses."""
-        return np.asarray([molecule.m for molecule in self])
-
-    @property
-    def symbols(self):
-        """Return list of `Molecule` symbols."""
-        return np.asarray([molecule.symbol for molecule in self])
-
-    @property
-    def x(self):
-        """Return :math:`x` coordinates of `Molecule` objects as array."""
-        return self.coords[:,0]
-
-    @property
-    def y(self):
-        """Return :math:`y` coordinates of `Molecule` objects as array."""
-        return self.coords[:,1]
-
-    @property
-    def z(self):
-        """Return :math:`z` coordinates of `Molecule` objects as array."""
-        return self.coords[:,2]
-
-    @property
-    def bounds(self):
-        """Return bounds of `Molecules`."""
-        return Cuboid(pmin=[self.x.min(), self.y.min(), self.z.min()],
-                      pmax=[self.x.max(), self.y.max(), self.z.max()])
-
-    def center_CM(self, axes=None):
-        """Center molecules on CM coordinates."""
-        dr = -self.CM
-        self.translate(dr)
-
-    def clip_bounds(self, region, center_before_clipping=False):
-        """Remove molecules outside the given limits along given dimension.
-
-        Parameters
-        ----------
-        region : :class:`~sknano.core.geometric_regions.`GeometricRegion`
-
-        """
-        CM0 = None
-        if center_before_clipping:
-            CM0 = self.CM
-            self.translate(-CM0)
-
-        self.data = \
-            np.asarray(self)[np.logical_and(
-                np.logical_and(
-                    self.x <= region.limits['x']['max'],
-                    np.logical_and(
-                        self.y <= region.limits['y']['max'],
-                        self.z <= region.limits['z']['max'])),
-                np.logical_and(
-                    self.x >= region.limits['x']['min'],
-                    np.logical_and(
-                        self.y >= region.limits['y']['min'],
-                        self.z >= region.limits['z']['min'])))].tolist()
-
-        if CM0 is not None:
-            self.translate(CM0)
+        return np.asarray([molecule.mass for molecule in self])
 
     def filter(self, condition, invert=False):
         """Filter `Molecules` by `condition`.
@@ -158,7 +107,26 @@ class Molecules(UserList):
         filtered_molecules : `Molecules`
 
         """
-        return self.__class__(molecules=np.asarray(self)[condition].tolist())
+        if isinstance(condition, str):
+            condition = convert_condition_str(self, condition)
+        if invert:
+            condition = ~condition
+        try:
+            self.data = np.asarray(self)[condition].tolist()
+        except AttributeError:
+            self.data = np.asarray(self)[condition]
+
+    def filtered(self, condition, invert=False):
+        if isinstance(condition, str):
+            condition = convert_condition_str(self, condition)
+        if invert:
+            condition = ~condition
+        try:
+            return self.__class__(atoms=np.asarray(self)[condition].tolist(),
+                                  **self.kwargs)
+        except AttributeError:
+            return self.__class__(atoms=np.asarray(self)[condition],
+                                  **self.kwargs)
 
     def get_molecules(self, asarray=False):
         """Return list of `Molecules`.
@@ -173,34 +141,9 @@ class Molecules(UserList):
 
         """
         if asarray:
-            return np.asarray(self)
+            return np.asarray(self.data)
         else:
-            return self
-
-    def get_coords(self, asdict=False):
-        """Return molecule coords.
-
-        Parameters
-        ----------
-        asdict : bool, optional
-
-        Returns
-        -------
-        coords : :py:class:`python:~collections.OrderedDict` or ndarray
-
-        """
-        coords = self.coords
-        if asdict:
-            return OrderedDict(list(zip(xyz, coords.T)))
-        else:
-            return coords
-
-    def rezero_coords(self, epsilon=1.0e-10):
-        """Alias for :meth:`Molecules.rezero`."""
-        self.rezero(epsilon=epsilon)
-
-    def rezero_xyz(self, epsilon=1.0e-10):
-        self.rezero(epsilon=epsilon)
+            return self.data
 
     def rezero(self, epsilon=1.0e-10):
         """Set really really small coordinates to zero.
@@ -216,9 +159,7 @@ class Molecules(UserList):
         """
         [molecule.rezero(epsilon=epsilon) for molecule in self]
 
-    def rotate(self, angle=None, axis=None, anchor_point=None,
-               rot_point=None, from_vector=None, to_vector=None,
-               degrees=False, transform_matrix=None, verbose=False, **kwargs):
+    def rotate(self, **kwargs):
         """Rotate `Molecule` position vectors.
 
         Parameters
@@ -232,16 +173,9 @@ class Molecules(UserList):
         transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
-        if transform_matrix is None:
-            transform_matrix = \
-                transformation_matrix(angle=angle, axis=axis,
-                                      anchor_point=anchor_point,
-                                      rot_point=rot_point,
-                                      from_vector=from_vector,
-                                      to_vector=to_vector, degrees=degrees,
-                                      verbose=verbose, **kwargs)
-        [molecule.rotate(transform_matrix=transform_matrix)
-         for molecule in self]
+        if kwargs.get('transform_matrix', None) is None:
+            kwargs['transform_matrix'] = rotation_matrix(**kwargs)
+        [molecule.rotate(**kwargs) for molecule in self]
 
     def translate(self, t, fix_anchor_points=True):
         """Translate `Molecule` position vectors by :class:`Vector` `t`.
@@ -254,3 +188,6 @@ class Molecules(UserList):
         """
         [molecule.translate(t, fix_anchor_point=fix_anchor_points)
          for molecule in self]
+
+    def todict(self):
+        return dict(molecules=self.data)
