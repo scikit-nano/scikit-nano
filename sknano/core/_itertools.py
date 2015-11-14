@@ -6,6 +6,16 @@ Custom iterator functions (:mod:`sknano.core._itertools`)
 
 .. currentmodule:: sknano.core._itertools
 
+The functions defined in this module are from the
+|itertools-recipes|_ for Python 3 or from the
+Python Cookbook, Third Edition [PythonCookbook]_.
+
+.. |itertools-recipes| replace:: Itertools Recipes
+.. _itertools-recipes:
+   https://docs.python.org/3/library/itertools.html#itertools-recipes
+.. [PythonCookbook] Python Cookbook, Third Edition
+   by David Beazley and Brian K. Jones.
+
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
