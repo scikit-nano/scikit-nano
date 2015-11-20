@@ -20,7 +20,6 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from ._molecule import *
 from ._molecules import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
