@@ -19,8 +19,8 @@ from ._nanotube_bundle_generator import NanotubeBundleGeneratorBase
 __all__ = ['MWNTBundleGenerator']
 
 
-class MWNTBundleGenerator(NanotubeBundleGeneratorBase, MWNTBundle,
-                          MWNTGenerator):
+class MWNTBundleGenerator(NanotubeBundleGeneratorBase, MWNTGenerator,
+                          MWNTBundle):
     """Class for generating multi-walled nanotube bundles.
 
     .. versionadded:: 0.2.20
