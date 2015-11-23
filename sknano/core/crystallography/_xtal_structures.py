@@ -19,7 +19,7 @@ from sknano.core import BaseClass
 from sknano.core.atoms import BasisAtom, BasisAtoms, StructureAtoms
 from sknano.core.refdata import lattice_parameters as lattparams
 
-from ._extras import pymatgen_structure, supercell_lattice_points
+from ._extras import pymatgen_structure  # , supercell_lattice_points
 from ._xtal_cells import CrystalCell, UnitCell, SuperCell
 from ._xtal_lattices import Crystal2DLattice, Crystal3DLattice
 

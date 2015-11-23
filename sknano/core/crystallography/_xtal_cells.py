@@ -19,6 +19,7 @@ import numpy as np
 
 from sknano.core import BaseClass
 from sknano.core.atoms import BasisAtom, BasisAtoms
+# from sknano.core.molecules import BasisMolecule, BasisMolecules
 from ._extras import supercell_lattice_points
 
 __all__ = ['CrystalCell', 'UnitCell', 'SuperCell']
