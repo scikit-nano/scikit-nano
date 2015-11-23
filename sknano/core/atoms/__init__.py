@@ -103,6 +103,14 @@ Classes for molecular dynamics simulations
    Trajectory
    Snapshot
 
+Helper functions for atom objects
+---------------------------------
+
+.. autosummary::
+   :toctree: generated/
+
+   vdw_radius_from_basis
+
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals

@@ -292,6 +292,7 @@ def listdir(path='.', filterfunc=None, filter_dirnames=False,
 
 
 def loadobj(fn, *args, **kwargs):
+    """Load serialized data file."""
     with open(fn) as fp:
         if fn.lower().endswith(("yaml", "yml")):
             if "Loader" not in kwargs:
@@ -302,6 +303,7 @@ def loadobj(fn, *args, **kwargs):
 
 
 def dumpobj(obj, fn, *args, **kwargs):
+    """Dump data structure to file."""
     with open(fn, 'wt') as fp:
         if fn.lower().endswith(("yaml", "yml")):
             if "Dumper" not in kwargs:

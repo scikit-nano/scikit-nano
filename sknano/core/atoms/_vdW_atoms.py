@@ -107,6 +107,8 @@ class VanDerWaalsAtoms(Atoms):
 
 
 def vdw_radius_from_basis(*args):
+    """Helper function to return the maximum van der Waals radius from a \
+        tuple of atoms."""
     r_vdw = 0
     for atom in args:
         try:

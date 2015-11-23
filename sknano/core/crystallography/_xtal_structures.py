@@ -166,26 +166,50 @@ class BaseStructureMixin:
         #                       xs=xs, ys=ys, zs=zs))
 
     def read_data(self, *args, **kwargs):
+        """Read LAMMPS Data file.
+
+        Returns
+        -------
+        :class:`~sknano.io.DATAReader`
+
+        """
         from sknano.io import DATAReader
         return DATAReader(*args, **kwargs)
 
     def read_dump(self, *args, **kwargs):
+        """Read LAMMPS Dump file.
+
+        Returns
+        -------
+        :class:`~sknano.io.DUMPReader`
+
+        """
         from sknano.io import DUMPReader
         return DUMPReader(*args, **kwargs)
 
     def read_xyz(self, *args, **kwargs):
+        """Read XYZ file.
+
+        Returns
+        -------
+        :class:`~sknano.io.XYZReader`
+
+        """
         from sknano.io import XYZReader
         return XYZReader.read(*args, **kwargs)
 
     def write_data(self, **kwargs):
+        """Write LAMMPS DATA file."""
         from sknano.io import DATAWriter
         DATAWriter.write(**kwargs)
 
     def write_dump(self, **kwargs):
+        """Write LAMMPS dump file."""
         from sknano.io import DUMPWriter
         DUMPWriter.write(**kwargs)
 
     def write_xyz(self, **kwargs):
+        """Write XYZ file."""
         from sknano.io import XYZWriter
         XYZWriter.write(**kwargs)
 
