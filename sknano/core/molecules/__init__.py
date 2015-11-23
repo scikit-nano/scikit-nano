@@ -21,5 +21,8 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._molecules import *
+from ._basis_molecules import *
+from ._lattice_molecules import *
+from ._periodic_molecules import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]

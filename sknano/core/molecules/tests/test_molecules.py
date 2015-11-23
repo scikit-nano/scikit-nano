@@ -6,11 +6,14 @@ from __future__ import unicode_literals
 import nose
 from nose.tools import *
 #from sknano.core.atoms import Atom, Atoms
-from sknano.core.molecules import Molecules
+from sknano.core.molecules import Molecule, Molecules
 #from sknano.testing import generate_atoms
 
 
 def test_instantiation():
+    m = Molecule()
+    assert_is_instance(m, Molecule)
+
     molecules = Molecules()
     assert_is_instance(molecules, Molecules)
 
