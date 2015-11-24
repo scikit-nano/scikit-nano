@@ -9,6 +9,20 @@ Crystallography code (:mod:`sknano.core.crystallography`)
 Contents
 ========
 
+Base crystallography classes
+------------------------------
+.. autosummary::
+   :toctree: generated/
+
+   CrystalCell
+   UnitCell
+   SuperCell
+   LatticeBase
+   ReciprocalLatticeBase
+   BaseStructureMixin
+   BaseStructure
+   CrystalStructureBase
+
 2D lattices and structures
 ---------------------------
 .. autosummary::

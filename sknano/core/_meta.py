@@ -266,6 +266,11 @@ class BaseClass(metaclass=ABCMeta):
     ----------
     fmtstr
 
+    Parameters
+    ----------
+    verbose : :class:`~python:bool`
+    debug : :class:`~python:bool`
+
     """
 
     def __init__(self, *args, verbose=False, debug=False, **kwargs):
