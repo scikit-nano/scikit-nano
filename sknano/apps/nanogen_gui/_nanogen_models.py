@@ -14,7 +14,7 @@ __docformat__ = 'restructuredtext en'
 from sknano.core.refdata import aCC, element_data
 from sknano.structures import compute_Lx, compute_Ly, compute_Lz, \
     compute_Ch, compute_T, SWNT, SWNTBundle, MWNT, MWNTBundle, Graphene, \
-    UnrolledSWNT, Fullerenes
+    UnrolledSWNT, Fullerene
 
 _r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
@@ -383,7 +383,7 @@ class FullereneModel(ObserverModelMixin):
     def __init__(self):
         self._observers = []
         super().__init__()
-        self.structure = Fullerenes()
+        self.structure = Fullerene()
         self.notify_observers()
 
     @property
