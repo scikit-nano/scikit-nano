@@ -20,6 +20,7 @@ Sub-packages
 * molecules (:mod:`sknano.core.molecules`)
 * physics (:mod:`sknano.core.physics`)
 * refdata (:mod:`sknano.core.refdata`)
+* structures (:mod:`sknano.core.structures`)
 
 Data structures & algorithms
 -----------------------------
