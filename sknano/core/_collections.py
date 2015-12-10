@@ -16,6 +16,10 @@ try:
 except ImportError:
     from collections import Mapping, MutableSequence, Set
 
+from abc import abstractmethod
+
+from ._meta import BaseClass
+
 __all__ = ['ListBasedSet', 'UserList', 'frozendict']
 
 
@@ -50,17 +54,25 @@ class ListBasedSet(Set):
         return len(self.elements)
 
 
-class UserList(MutableSequence):
+class UserList(MutableSequence, BaseClass):
     """Modified implementation of :class:`~python:collections.UserList`.
 
-    Constructor takes an additional variable keyword argument.
+    Sub-class of both :class:`~python:MutableSequence` and
+    :class:`~sknano.core.BaseClass` and is itself an
+    abstract class requiring concrete implementations of
+    :attr:`~sknano.core.UserList.__item_class__` and
+    :meth:`~sknano.core.BaseClass.todict`.
+
+    Constructor takes additional variable arguments and
+    variable keyword arguments.
 
     Parameters
     ----------
-    initlist : {None, sequence, UserList}, optional
-        if not `None`, then a list or an instance of `UserList`
+    initlist : {None, sequence, :class:`UserList`}, optional
+        if not `None`, then a list or an instance of :class:`UserList`
+
     """
-    def __init__(self, initlist=None, **kwargs):
+    def __init__(self, *args, initlist=None, **kwargs):
         self.data = []
         if initlist is not None:
             if type(initlist) == type(self.data):
@@ -70,9 +82,13 @@ class UserList(MutableSequence):
             else:
                 self.data = list(initlist)
         self.kwargs = kwargs
+        super().__init__(*args, **kwargs)
 
-    def __repr__(self):
-        return repr(self.data)
+    @property
+    @abstractmethod
+    def __item_class__(self):
+        """The list item's class."""
+        return NotImplementedError
 
     def __lt__(self, other):
         return self.data < self.__cast(other)
@@ -102,9 +118,20 @@ class UserList(MutableSequence):
         return len(self.data)
 
     def __getitem__(self, i):
-        return self.data[i]
+        data = self.data[i]
+        if isinstance(data, list):
+            return self.__class__(data, **self.kwargs)
+        return data
 
     def __setitem__(self, i, item):
+        if not isinstance(item, (self.__class__, self.__item_class__)):
+            if isinstance(i, slice):
+                item = self.__class__(item, **self.kwargs)
+            else:
+                try:
+                    item = self.__item_class__(**item)
+                except TypeError:
+                    item = self.__item_class__(item)
         self.data[i] = item
 
     def __delitem__(self, i):
@@ -161,7 +188,7 @@ class UserList(MutableSequence):
             del self.data[:]
 
     def copy(self):
-        return self.__class__(self, **self.kwargs)
+        return self.__class__(self.data[:], **self.kwargs)
 
     def count(self, item):
         return self.data.count(item)
