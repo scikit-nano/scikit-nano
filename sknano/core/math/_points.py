@@ -17,7 +17,8 @@ import numpy as np
 
 from sknano.core import UserList
 from ._transforms import transformation_matrix
-#from sknano.core.geometric_regions import Cuboid  # , Rectangle
+# from sknano.core.geometric_regions import Cuboid  # , Rectangle
+from ._point import Point
 
 __all__ = ['Points']
 
@@ -35,13 +36,11 @@ class Points(UserList):
 
     def __init__(self, points=None):
         super().__init__(initlist=points)
+        self.fmtstr = "points={!r}"
 
-    def __str__(self):
-        return repr(self)
-
-    def __repr__(self):
-        """Return canonical string representation of `Points`."""
-        return "Points(points={!r})".format(self.data)
+    @property
+    def __item_class__(self):
+        return Point
 
     def sort(self, key=attrgetter('x', 'y', 'z'), reverse=False):
         super().sort(key=key, reverse=reverse)
@@ -135,3 +134,6 @@ class Points(UserList):
 
         """
         [point.translate(t) for point in self]
+
+    def todict(self):
+        return dict(points=self.data)

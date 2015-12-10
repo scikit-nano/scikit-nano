@@ -18,6 +18,7 @@ import numpy as np
 from sknano.core import UserList
 from ._transforms import transformation_matrix
 # from sknano.core.geometric_regions import Cuboid  # , Rectangle
+from ._vector import Vector
 
 __all__ = ['Vectors']
 
@@ -35,13 +36,11 @@ class Vectors(UserList):
 
     def __init__(self, vectors=None):
         super().__init__(initlist=vectors)
+        self.fmtstr = "vectors={!r}"
 
-    def __str__(self):
-        return repr(self)
-
-    def __repr__(self):
-        """Return canonical string representation of `Vectors`."""
-        return "Vectors(vectors={!r})".format(self.data)
+    @property
+    def __item_class__(self):
+        return Vector
 
     def sort(self, key=attrgetter('p0', 'length'), reverse=False):
         super().sort(key=key, reverse=reverse)
@@ -133,3 +132,6 @@ class Vectors(UserList):
         """
         [vector.translate(t, fix_anchor_point=fix_anchor_points)
          for vector in self]
+
+    def todict(self):
+        return dict(vectors=self.data)
