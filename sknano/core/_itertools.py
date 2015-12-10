@@ -42,17 +42,17 @@ def cyclic_pairs(iterable):
 
     Returns
     -------
-    :class:`~python:list`
+    :class:`~python:iterator`
 
     Examples
     --------
 
-    >>> cyclic_pairs('ABC')
+    >>> list(cyclic_pairs('ABC'))
     [('A', 'B'), ('B', 'C'), ('C', 'A')]
 
     """
     a, b = tee(iterable)
-    return list(zip(a, chain(b, [next(b)])))
+    return zip(a, chain(b, [next(b)]))
 
 
 def take(n, iterable):
