@@ -10,7 +10,8 @@ from sknano.core import cyclic_pairs
 
 def test1():
     lst = ['a', 'b', 'c']
-    assert_equal(cyclic_pairs(lst), [('a', 'b'), ('b', 'c'), ('c', 'a')])
+    assert_equal(list(cyclic_pairs(lst)),
+                 [('a', 'b'), ('b', 'c'), ('c', 'a')])
 
 
 if __name__ == '__main__':
