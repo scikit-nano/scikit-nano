@@ -62,7 +62,6 @@ Mixin `Atom`/`Atoms` classes
 .. autosummary::
    :toctree: generated/
 
-   KDTreeAtomMixin
    KDTreeAtomsMixin
    NeighborAtomMixin
    NeighborAtomsMixin
@@ -147,5 +146,11 @@ from ._structure_atoms import *
 from ._neighbor_atoms import *
 
 from ._vdW_atoms import *
+
+from ._selections import *
+
+from ._topology import *
+
+from ._adapters import *
 
 __all__ += [s for s in dir() if not s.startswith('_')]
