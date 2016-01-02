@@ -14,6 +14,8 @@ __docformat__ = 'restructuredtext en'
 from functools import total_ordering
 from operator import attrgetter
 import numbers
+import re
+
 import numpy as np
 
 from sknano.core import BaseClass, UserList
@@ -126,14 +128,19 @@ class Atom(BaseClass):
     @element.setter
     def element(self, value):
         """Set element symbol."""
+        element_error_msg = 'unrecognized element value: {}'.format(value)
         symbol = None
+
+        if isinstance(value, str) and re.match(r"[\W]+", value):
+            raise ValueError(element_error_msg)
+
         if isinstance(value, numbers.Integral):
             try:
                 Z = int(value)
                 idx = Z - 1
                 symbol = element_symbols[idx]
             except IndexError:
-                print('unrecognized element number: {}'.format(value))
+                print(element_error_msg)
 
         if symbol is None:
             if isinstance(value, str):
@@ -220,8 +227,8 @@ class Atoms(UserList):
     """
     def __init__(self, atoms=None, casttype=True, **kwargs):
         verbose = kwargs.get('verbose', False)
-        if atoms is not None and (isinstance(atoms, str) or
-                                  isinstance(atoms, Atom)):
+        if atoms is not None and \
+                (isinstance(atoms, str) or isinstance(atoms, Atom)):
             atoms = [atoms]
         if casttype and not isinstance(atoms, type(self)) and \
                 isinstance(atoms, list):
@@ -242,6 +249,7 @@ class Atoms(UserList):
                     atoms[i] = self.__atom_class__(
                         **{k: atomdict[k] for k in set(dir(atom)) &
                            set(dir(self.__atom_class__()))})
+
                 except AttributeError:
                     atoms[i] = self.__atom_class__(atom)
         super().__init__(initlist=atoms, **kwargs)
@@ -251,24 +259,17 @@ class Atoms(UserList):
     def __atom_class__(self):
         return Atom
 
-    def __repr__(self):
-        """Return canonical string representation of `Atoms`."""
-        return "{}({})".format(self.__class__.__name__,
-                               self.fmtstr.format(**self.todict()))
+    @property
+    def __item_class__(self):
+        return self.__atom_class__
 
     def sort(self, key=attrgetter('element', 'Z', 'mass'), reverse=False):
         super().sort(key=key, reverse=reverse)
 
-    def __getitem__(self, index):
-        data = super().__getitem__(index)
-        if isinstance(data, list):
-            return self.__class__(data, **self.kwargs)
-        return data
-
     def __setitem__(self, index, item):
         if not isinstance(item, (self.__class__, self.__atom_class__)):
             if isinstance(index, slice):
-                item = self.__class__(item)
+                item = self.__class__(item, **self.kwargs)
             else:
                 try:
                     atomdict = super().__getitem__(index).todict()
@@ -335,14 +336,6 @@ class Atoms(UserList):
     #     if isinstance(other, self.__class__):
     #         self.data -= self.__atoms_not_in_other(other)
     #     return self
-
-    @property
-    def fmtstr(self):
-        return self._fmtstr
-
-    @fmtstr.setter
-    def fmtstr(self, value):
-        self._fmtstr = value
 
     @property
     def Natoms(self):
@@ -456,6 +449,27 @@ class Atoms(UserList):
         except AttributeError:
             return self.__class__(atoms=np.asarray(self)[condition],
                                   **self.kwargs)
+
+    def select(self, selstr):
+        """Return `Atom` or `Atoms` from selection command.
+
+        Parameters
+        ----------
+        selstr : :class:`~python:str`
+
+        Returns
+        -------
+        :class:`Atom` or :class:`Atoms`
+
+        """
+        from ._selections import SelectionParser, SelectionException
+        try:
+            return self.__class__(
+                atoms=SelectionParser(self, selstr).parse().asList(),
+                **self.kwargs)
+        except SelectionException as e:
+            print(e)
+            return None
 
     def get_atoms(self, asarray=False):
         """Return list of `Atoms`.
