@@ -491,6 +491,10 @@ class POAVR(POAV):
 
 class POAVAtomMixin:
     """Mixin class for :class:`POAV` analysis."""
+    _POAV1 = None
+    _POAV2 = None
+    _POAVR = None
+
     @property
     def POAV1(self):
         """:class:`~sknano.utils.analysis.POAV1` instance."""
