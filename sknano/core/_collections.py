@@ -119,8 +119,10 @@ class UserList(MutableSequence, BaseClass):
 
     def __getitem__(self, i):
         data = self.data[i]
-        if isinstance(data, list):
-            return self.__class__(data, **self.kwargs)
+        if isinstance(i, slice) and isinstance(data, list):
+            data = self.__class__(data, **self.kwargs)
+        elif not isinstance(data, self.__item_class__):
+            data = self.__item_class__(data)
         return data
 
     def __setitem__(self, i, item):
@@ -170,6 +172,8 @@ class UserList(MutableSequence, BaseClass):
         return self
 
     def append(self, item):
+        if not isinstance(item, self.__item_class__):
+            item = self.__item_class__(item)
         self.data.append(item)
 
     def insert(self, i, item):
