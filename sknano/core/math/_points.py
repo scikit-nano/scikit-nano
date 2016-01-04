@@ -36,7 +36,7 @@ class Points(UserList):
 
     def __init__(self, points=None):
         super().__init__(initlist=points)
-        self.fmtstr = "points={!r}"
+        self.fmtstr = "points={points!r}"
 
     @property
     def __item_class__(self):
