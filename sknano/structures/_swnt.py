@@ -627,21 +627,21 @@ def compute_electronic_type(*Ch):
     division of :math:`3n/3=n` is always zero.
 
     .. note::
-        Mathematically, :math:`(2n + m)\\,\\mathrm{mod}\\,3` is equivalent
-        to :math:`(n - m)\\,\\mathrm{mod}\\,3` when distinguishing
-        between metallic and semiconducting. However, when
-        distinguishing between semiconducting types,
-        one must be careful to observe the following convention:
+       Mathematically, :math:`(2n + m)\\,\\mathrm{mod}\\,3` is equivalent
+       to :math:`(n - m)\\,\\mathrm{mod}\\,3` when distinguishing
+       between metallic and semiconducting. However, when
+       distinguishing between semiconducting types,
+       one must be careful to observe the following convention:
 
-        * Semiconducting, **type 1** means:
+       * Semiconducting, **type 1** means:
 
-            * :math:`(2n + m)\\,\\mathrm{mod}\\,3=1`
-            * :math:`(n - m)\\,\\mathrm{mod}\\,3=2`
+         * :math:`(2n + m)\\,\\mathrm{mod}\\,3=1`
+         * :math:`(n - m)\\,\\mathrm{mod}\\,3=2`
 
-        * Semiconducting, **type 2** means:
+       * Semiconducting, **type 2** means:
 
-            * :math:`(2n + m)\\,\\mathrm{mod}\\,3=2`
-            * :math:`(n - m)\\,\\mathrm{mod}\\,3=1`
+         * :math:`(2n + m)\\,\\mathrm{mod}\\,3=2`
+         * :math:`(n - m)\\,\\mathrm{mod}\\,3=1`
 
     Parameters
     ----------
@@ -652,7 +652,7 @@ def compute_electronic_type(*Ch):
 
     Returns
     -------
-    str
+    :class:`~python:str`
 
     """
     n, m, _ = get_chiral_indices(*Ch)
