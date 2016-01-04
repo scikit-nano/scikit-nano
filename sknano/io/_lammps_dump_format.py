@@ -76,6 +76,32 @@ class DUMPReader(StructureIO):
     attrmap : class:`~python:dict`
         Python :class:`~python:dict` mapping custom dump attributes
         to :class:`~sknano.core.atoms.Atom` attributes.
+    autoread : :class:`~python:bool`, optional
+        Automatically read dump files. Default is `True`
+
+        .. versionadded:: 0.3.22
+
+    reference_timestep : :class:`~python:int`, optional
+        The `timestep` corresponding to the
+        :attr:`~sknano.core.atoms.Snapshot.timestep` of the
+        :class:`~sknano.core.atoms.Trajectory`\ s
+        :attr:`~sknano.core.atoms.Trajectory.reference_snapshot`.
+        Default is `None`.
+
+        .. note::
+           **Overrides** `reference_index` if not `None`
+
+        .. versionadded:: 0.3.22
+
+    reference_index : :class:`~python:int`, optional
+        The :class:`~python:list` index corresponding to the
+        :attr:`~sknano.core.atoms.Snapshot.timestep` of the
+        :class:`~sknano.core.atoms.Trajectory`\ s
+        :attr:`~sknano.core.atoms.Trajectory.reference_snapshot`.
+        Default is `None`.
+
+        .. versionadded:: 0.3.22
+
 
     Examples
     --------
@@ -109,18 +135,23 @@ class DUMPReader(StructureIO):
     'id mol type x y z vx vy vz ke pe CN'
 
     """
-    def __init__(self, *args, attrmap=None, **kwargs):
+    def __init__(self, *args, autoread=True, attrmap=None,
+                 reference_timestep=None, reference_index=None, **kwargs):
         super().__init__(**kwargs)
 
         self.attrmap = attrmap
         self.trajectory = Trajectory()
         self.dumpattrs = {}
-        self.dumpfiles = list(flatten([glob(f) for f in args[0].split()]))
+        self.dumpfiles = list(flatten([[glob(f) for f in arg.split()]
+                                       for arg in args]))
+        self._reference_timestep = reference_timestep
+        self._reference_index = reference_index
 
         if len(self.dumpfiles) == 0:
             raise ValueError('No dump file specified.')
 
-        self.read()
+        if autoread:
+            self.read()
 
     def __getattr__(self, name):
         try:
@@ -133,6 +164,54 @@ class DUMPReader(StructureIO):
 
     def __getitem__(self, index):
         return self.trajectory[index]
+
+    @property
+    def reference_index(self):
+        return self._reference_index
+
+    @reference_index.setter
+    def reference_index(self, value):
+        self._reference_index = value
+        self._update_reference_snapshot()
+
+    def _update_reference_snapshot(self):
+        try:
+            if len(self.trajectory) > 1:
+                if all([value is None for value in
+                        (self.reference_timestep, self.reference_index)]):
+                    self._reference_index = 0
+                    self._update_reference_snapshot()
+                elif self.reference_timestep is not None and \
+                        self.reference_index is None:
+                    index = \
+                        self.trajectory.timestep_index(self.reference_timestep)
+                    if index is None:
+                        index = 0
+                        self._reference_timestep = None
+                    self._reference_index = index
+                    self._update_reference_snapshot()
+                elif self.reference_timestep is None and \
+                        self.reference_index is not None:
+                    try:
+                        self._reference_timestep = \
+                            self.trajectory.timesteps[self.reference_index]
+                    except IndexError:
+                        self._reference_index = 0
+                    self._update_reference_snapshot()
+                else:
+                    self.trajectory.reference_snapshot = \
+                        self.trajectory[self.reference_index]
+        except IndexError:
+            pass
+
+    @property
+    def reference_timestep(self):
+        return self._reference_timestep
+
+    @reference_timestep.setter
+    def reference_timestep(self, value):
+        self._reference_timestep = value
+        self._update_reference_snapshot()
 
     def read(self):
         """Read all snapshots from each dump file."""
@@ -152,7 +231,7 @@ class DUMPReader(StructureIO):
         print("read {:d} snapshots".format(self.Nsnaps))
 
         self.trajectory.time_selection.all()
-        self.trajectory.t0_snapshot = self.trajectory[0]
+        self._update_reference_snapshot()
 
         if self.dumpattrs:
             print('Dumped Atom attributes: {}'.format(self.dumpattrs2str()))
