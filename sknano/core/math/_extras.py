@@ -16,11 +16,11 @@ import operator
 
 __all__ = ['comparison_symbol_operator_mappings',
            'math_symbol_operator_mappings',
-           'symbol_operator_mappings',
+           'symbol_operator_mappings', 'operator_map',
            'math_operators', 'convert_condition_str',
            'totient_func']
 
-math_operators = symbol_operator_mappings = {}
+math_operators = symbol_operator_mappings = operator_map = {}
 
 comparison_symbol_operator_mappings = \
     {'==': operator.eq,
