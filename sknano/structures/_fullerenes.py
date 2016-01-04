@@ -21,7 +21,7 @@ import os
 from sknano.core import BaseClass, listdir_dirnames, listdir_fnames
 from sknano.core.crystallography import BaseStructure
 
-__all__ = ['Fullerene', 'load_fullerene_data']
+__all__ = ['Fullerene', 'Fullerenes', 'load_fullerene_data']
 
 
 def load_fullerene_data():
@@ -37,7 +37,8 @@ def load_fullerene_data():
         datapath = os.path.join('data', 'fullerenes', fullerene)
         datadir = resource_filename('sknano', datapath)
         dataset = datadict[fullerene] = {}
-        files = dataset['files'] = sorted(listdir_fnames(datadir))
+        files = dataset['files'] = \
+            sorted(listdir_fnames(datadir, include_path=True))
         pg_counter = Counter()
         point_groups = dataset['point_groups'] = []
         # isomer_numbers = dataset['isomer_numbers'] = []
@@ -71,14 +72,14 @@ def load_fullerene_data():
             [t[0] for t in sorted(pg_counter.most_common(),
                                   key=lambda t: (-t[1], t[0]))]
 
-        [setitem(dataset, PG, OrderedDict([('files', dataset[PG]['files']),
-                 ('isomer_numbers', dataset[PG]['isomer_numbers'])]))
-         for PG in dataset['point_groups']]
+        [setitem(dataset, PG_, OrderedDict([('files', dataset[PG_]['files']),
+                 ('isomer_numbers', dataset[PG_]['isomer_numbers'])]))
+         for PG_ in dataset['point_groups']]
 
-        [[setitem(dataset[PG], Niso, dataset[PG]['files']
-                  [dataset[PG]['isomer_numbers'].index(Niso)])
-          for Niso in dataset[PG]['isomer_numbers']]
-         for PG in dataset['point_groups']]
+        [[setitem(dataset[PG_], Niso_, dataset[PG_]['files']
+                  [dataset[PG_]['isomer_numbers'].index(Niso_)])
+          for Niso_ in dataset[PG_]['isomer_numbers']]
+         for PG_ in dataset['point_groups']]
 
         if len(point_groups) == 1 and None in point_groups:
             dataset['point_groups'] = None
@@ -87,7 +88,6 @@ def load_fullerene_data():
 
         # if len(isomer_numbers) == 1 and None in isomer_numbers:
         #     dataset['isomer_numbers'] = None
-
     return datadict
 
 
@@ -116,18 +116,46 @@ class Fullerene(BaseStructure, BaseClass):
     --------
 
     """
-    fullerene_data = load_fullerene_data()
-    fullerenes = list(fullerene_data.keys())
+    _data = load_fullerene_data()
 
     def __init__(self, *args, N=None, PG=None, Niso=None, **kwargs):
 
+        args = list(args)
+        if N is None and len(args) == 1 and isinstance(args[0], int):
+            N = args.pop()
+
         super().__init__(*args, **kwargs)
 
-        self._N = N
-        self._PG = PG
-        self._Niso = Niso
+        if N is not None:
+            self.N = N
+            if PG is not None:
+                self.PG = PG
+                if Niso is not None:
+                    self.Niso = Niso
+        else:
+            self._N = N
+            self._PG = PG
+            self._Niso = Niso
 
         self.fmtstr = "N={N!r}, PG={PG!r}, Niso={Niso!r}"
+
+    def __str__(self):
+        strrep = "C{N!r}".format(N=self.N)
+        return strrep
+
+    @property
+    def data(self):
+        try:
+            return self._data[self.name]
+        except KeyError:
+            return None
+
+    @property
+    def datafile(self):
+        try:
+            return self.data[self.PG][self.Niso]
+        except TypeError:
+            return None
 
     @property
     def N(self):
@@ -140,6 +168,15 @@ class Fullerene(BaseStructure, BaseClass):
                 value > 0 or value % 2 == 0):
             raise TypeError('Expected an even, positive integer.')
         self._N = int(value)
+        try:
+            self._PG = self.point_groups[0]
+        except TypeError:
+            self._PG = None
+
+        try:
+            self._Niso = self.data[self.PG]['isomer_numbers'][0]
+        except TypeError:
+            self._Niso = None
 
     def Natoms(self):
         """Alias for :attr:`~Fullerene.N`."""
@@ -152,9 +189,17 @@ class Fullerene(BaseStructure, BaseClass):
 
     @PG.setter
     def PG(self, value):
-        if not isinstance(value, str):
-            raise TypeError('Expected a string.')
+        if ((self.point_groups is not None and
+                value not in self.point_groups) or
+                (self.point_groups is None and value is not None)):
+            errmsg = 'No PG={} for {}'.format(value, self.name)
+            raise ValueError(errmsg)
         self._PG = value
+
+        try:
+            self._Niso = self.data[self.PG]['isomer_numbers'][0]
+        except TypeError:
+            self._Niso = None
 
     @property
     def Niso(self):
@@ -163,10 +208,42 @@ class Fullerene(BaseStructure, BaseClass):
 
     @Niso.setter
     def Niso(self, value):
-        if not isinstance(value, numbers.Integral):
-            raise TypeError('Expected an integer.')
-        self._Niso = int(value)
+        if value is not None and \
+                value not in self.data[self.PG]['isomer_numbers']:
+            errmsg = \
+                'No isomer Niso={} for {}'.format(value, self.name)
+            raise ValueError(errmsg)
+        self._Niso = int(value) if isinstance(value, numbers.Integral) \
+            else None
+
+    @property
+    def name(self):
+        if self.N is not None:
+            return ''.join(('C', str(self.N)))
+        else:
+            return None
+
+    @property
+    def Nisomers(self):
+        try:
+            return len(self.data['files'])
+        except TypeError:
+            return 0
+
+    @property
+    def point_groups(self):
+        try:
+            return self.data['point_groups']
+        except TypeError:
+            return None
 
     def todict(self):
         """Return :class:`~python:dict` of `Fullerene` attributes."""
         return dict(N=self.N, PG=self.PG, Niso=self.Niso)
+
+
+class Fullerenes:
+
+    data = load_fullerene_data()
+    fullerenes = tuple(data.keys())
+    N = tuple(int(fullerene[1:]) for fullerene in fullerenes)
