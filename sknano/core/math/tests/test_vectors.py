@@ -3,15 +3,17 @@
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
-import warnings
+# import warnings
 
 import nose
-from nose.tools import *
+from nose.tools import assert_true, assert_equal, assert_equals, \
+    assert_false, assert_raises, assert_is_instance, assert_almost_equal, \
+    assert_not_equals
 
 import numpy as np
 
 from sknano.core.math import e1, e2, e3, xhat, yhat, zhat, \
-    Point, Vector, vector as vec, Rx, Ry, Rz, NullVector
+    Point, Vector, Vectors, vector as vec, NullVector
 
 
 def test1():
@@ -99,7 +101,7 @@ def test3():
     v1 = Vector([1.0, 0.0], p0=[5., 5.])
     v2 = Vector([1.0, 1.0], p0=[5., 5.])
     v3 = v1 + v2
-    #print('v3: {}'.format(v3))
+    # print('v3: {}'.format(v3))
     assert_is_instance(v3, Vector)
     assert_true(np.allclose(v3, np.array([2.0, 1.0])))
     assert_true(np.allclose(v3.p0, np.array([5.0, 5.0])))
@@ -280,8 +282,8 @@ def test11():
     v1 = Vector()
     dr = Vector(np.ones(3))
     v2 = v1 + dr
-    #print('v2: {}'.format(v2))
-    #print('v2.p: {}'.format(v2.p))
+    # print('v2: {}'.format(v2))
+    # print('v2.p: {}'.format(v2.p))
     assert_true(np.allclose(v2, np.ones(3)))
     assert_true(np.allclose(v2.p0, np.zeros(3)))
     assert_true(np.allclose(v2.p, np.ones(3)))
@@ -293,9 +295,9 @@ def test12():
     dr = Vector(np.ones(3))
     v3 = Vector()
     v3 = Vector(v1 + dr)
-    #v3[:] = v1 + dr
-    #print('v3: {}'.format(v3))
-    #print('v3.p: {}'.format(v3.p))
+    # v3[:] = v1 + dr
+    # print('v3: {}'.format(v3))
+    # print('v3.p: {}'.format(v3.p))
     assert_true(np.allclose(v3, np.ones(3)))
     assert_true(np.allclose(v3.p0, np.zeros(3)))
     assert_true(np.allclose(v3.p, np.ones(3)))
@@ -398,7 +400,7 @@ def test23():
 
 
 def test24():
-    assert_true(np.allclose(Vector([5,0,0]), 5 * e1))
+    assert_true(np.allclose(Vector([5, 0, 0]), 5 * e1))
 
 
 def test25():
@@ -419,7 +421,7 @@ def test26():
 
     e1copy = e1.copy()
     assert_true(e1 == e1copy)
-    assert_true(not e1 is e1copy)
+    assert_true(e1 is not e1copy)
     assert_true(not (e1 is e1copy))
     assert_true(e1 is not e1copy)
     e1copy *= 5
@@ -434,7 +436,7 @@ def test27():
 
     v += v
     assert_equal(v, Vector([20, 10, 10]))
-    #with assert_raises(Val
+    # with assert_raises(Val
 
 
 def test28():
@@ -461,8 +463,8 @@ def test30():
 
     assert_equal(u, v)
 
-    #v /= np.array([2.0])
-    #assert_equal(u / 2.0, v)
+    # v /= np.array([2.0])
+    # assert_equal(u / 2.0, v)
 
 
 def test31():
@@ -474,8 +476,8 @@ def test31():
 
     assert_equal(u, v)
 
-    #v //= np.array([2.0])
-    #assert_equal(u // 2.0, v)
+    # v //= np.array([2.0])
+    # assert_equal(u // 2.0, v)
 
 
 def test32():
@@ -487,8 +489,8 @@ def test32():
 
     assert_equal(u, v)
 
-    #v **= np.array([2.0])
-    #assert_equal(u**2, v)
+    # v **= np.array([2.0])
+    # assert_equal(u**2, v)
 
 
 def test33():
@@ -554,6 +556,17 @@ def test37():
     b = NullVector()
     assert_equal(a, b)
     assert_true(a is b)
+
+
+def test38():
+    v1 = Vector(np.ones(3))
+    v2 = Vector(np.arange(3) + 1)
+    v3 = Vector(3 * np.ones(3))
+    vecs = Vectors([v1, v2, v3])
+    assert_is_instance(vecs, Vectors)
+    [assert_is_instance(v, Vector) for v in vecs]
+    assert_true(np.allclose(vecs.norms, np.asarray([v.norm for v in vecs])))
+    print(vecs.norms)
 
 
 if __name__ == '__main__':
