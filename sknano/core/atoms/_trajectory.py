@@ -112,7 +112,21 @@ class TimeSelection:
 
 
 class Snapshot(BaseClass):
-    """Container class for :class:`Trajectory` data at single timestep"""
+    """Container class for :class:`Trajectory` data at single timestep
+
+    Attributes
+    ----------
+    trajectory
+    atomattrs
+    attr_dtypes
+    timestep
+    fmtstr
+
+    Parameters
+    ----------
+    trajectory : :class:`Trajectory`, optional
+
+    """
     def __init__(self, trajectory=None):
 
         super().__init__()
@@ -139,16 +153,9 @@ class Snapshot(BaseClass):
             except AttributeError:
                 reference_atom = None
 
-            try:
-                t0_atom = self.trajectory.t0_atoms.get_atom(
-                    int(atom[self.atomattrs.index('id')]))
-            except AttributeError:
-                t0_atom = None
-
             attrs = [dtype(value) for dtype, value in
                      zip(self.attr_dtypes, atom)]
             atoms.append(Atom(reference_atom=reference_atom,
-                              t0_atom=t0_atom,
                               **dict(list(zip(self.atomattrs, attrs)))))
         return atoms
 
@@ -235,7 +242,7 @@ class Snapshot(BaseClass):
         return dict(trajectory=self.trajectory)
 
 
-class Trajectory(BaseClass, UserList):
+class Trajectory(UserList):
     """Base class for trajectory analysis."""
 
     def __init__(self, snapshots=None):
@@ -247,8 +254,9 @@ class Trajectory(BaseClass, UserList):
         self.reference_atoms = None
         self._reference_snapshot = None
 
-        self.t0_atoms = None
-        self._t0_snapshot = None
+    @property
+    def __item_class__(self):
+        return Snapshot
 
     @property
     def Nsnaps(self):
@@ -314,7 +322,7 @@ class Trajectory(BaseClass, UserList):
 
     @property
     def snapshots(self):
-        """Returns the list of :class:`Snapshot`\ s."""
+        """Returns the list of :class:`Trajectory` :class:`Snapshot`\ s."""
         return self.data
 
     def sort(self, key=attrgetter('timestep'), reverse=False):
@@ -336,16 +344,19 @@ class Trajectory(BaseClass, UserList):
             if snapshot.timestep == ts:
                 return snapshot
         print("No snapshot at ts={:d} exists".format(ts))
+        return None
 
     def timestep_index(self, ts):
         """Return index of :class:`Snapshot` with timestep `ts`."""
-        for i, snapshot in enumerate(self):
-            if snapshot.timestep == ts:
-                return i
-        print("No timestep {:d} exists".format(ts))
+        try:
+            return self.timesteps.index(ts)
+        except ValueError:
+            print("No timestep {:d} exists".format(ts))
+            return None
 
     @property
     def reference_snapshot(self):
+        """Reference snapshot for computing changes in atom trajectories."""
         return self._reference_snapshot
 
     @reference_snapshot.setter
@@ -357,24 +368,14 @@ class Trajectory(BaseClass, UserList):
         self.reference_atoms.update_attrs()
 
     @property
-    def t0_snapshot(self):
-        return self._t0_snapshot
-
-    @t0_snapshot.setter
-    def t0_snapshot(self, value):
-        if not isinstance(value, Snapshot):
-            raise TypeError('Expected a `Snapshot` instance.')
-        self._t0_snapshot = value
-        self.t0_atoms = self.t0_snapshot.atoms
-        self.t0_atoms.update_attrs()
-
-    @property
     def timesteps(self):
+        """List of selected :class:`Trajectory` :class:`Snapshot` \
+            :attr:`~Snapshot.timestep`\ s."""
         v = np.zeros(self.nselected, dtype=int)
         for i, snapshot in enumerate(self.data):
             if snapshot.selected:
                 v[i] = snapshot.timestep
-        return v
+        return v.tolist()
 
     def todict(self):
         return dict(snapshots=self.data)
