@@ -16,7 +16,8 @@ from operator import attrgetter
 
 import numpy as np
 
-from sknano.core import BaseClass, UserList, cyclic_pairs, dedupe
+from sknano.core import BaseClass, UserList, cyclic_pairs, dedupe, flatten, \
+    pairwise
 from sknano.core.math import Vector, vector as vec
 
 import sknano.core.atoms
@@ -118,35 +119,12 @@ class Bonds(UserList):
         super().__init__(initlist=bonds)
         self.fmtstr = "{bonds!r}"
 
-    def __repr__(self):
-        """Return canonical string representation of `Bonds`."""
-        return "{}({})".format(self.__class__.__name__,
-                               self.fmtstr.format(**self.todict()))
+    @property
+    def __item_class__(self):
+        return Bond
 
     def sort(self, key=attrgetter('length'), reverse=False):
         super().sort(key=key, reverse=reverse)
-
-    # def __getitem__(self, index):
-    #     data = super().__getitem__(index)
-    #     if isinstance(data, list):
-    #         return self.__class__(data)
-    #     return data
-
-    # def __setitem__(self, index, value):
-    #     if not isinstance(value, (self.__class__, Bond)):
-    #         if isinstance(index, slice):
-    #             value = self.__class__(value)
-    #         else:
-    #             value = Bond(value)
-    #     super().__setitem__(index, value)
-
-    @property
-    def fmtstr(self):
-        return self._fmtstr
-
-    @fmtstr.setter
-    def fmtstr(self, value):
-        self._fmtstr = value
 
     @property
     def Nbonds(self):
@@ -176,26 +154,39 @@ class Bonds(UserList):
     @property
     def bond_angle_pairs(self):
         """`cyclic_pairs` of `Bond`\ s."""
-        return cyclic_pairs(self.data)
+        return list(cyclic_pairs(self.data)) if self.Nbonds > 2 \
+            else (list(pairwise(self.data)) if self.Nbonds > 1 else None)
 
     @property
     def angles(self):
         """:class:`~numpy:numpy.ndarray` of `Bond` pair angles."""
-        return np.asarray([vec.angle(b1.vector, b2.vector) for (b1, b2) in
-                           cyclic_pairs(self)])
+        if self.Nbonds > 2:
+            try:
+                return np.asarray([vec.angle(b1.vector, b2.vector) for
+                                   (b1, b2) in cyclic_pairs(self)])
+            except TypeError:
+                return None
+        elif self.Nbonds == 2:
+            return vec.angle(self[0].vector, self[-1].vector)
+        else:
+            return None
 
     @property
     def mean_angle(self):
         """Mean bond angle."""
-        return np.mean(self.angles)
+        try:
+            return np.mean(self.angles)
+        except TypeError:
+            return None
 
     @property
     def atoms(self):
         """`Atoms` :class:`python:set` in `Bonds`."""
         atoms = []
         [atoms.extend(bond.atoms) for bond in self]
-        atoms = dedupe(atoms, key=attrgetter('id'))
-        return sknano.core.atoms.StructureAtoms(list(atoms))
+        atoms = list(dedupe(list(flatten([bond.atoms for bond in self])),
+                            key=attrgetter('id')))
+        return sknano.core.atoms.StructureAtoms(atoms)
 
     def todict(self):
         return dict(bonds=self.data)
