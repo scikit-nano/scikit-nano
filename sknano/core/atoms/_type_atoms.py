@@ -108,7 +108,7 @@ class TypeAtoms(Atoms):
     """
     def __init__(self, atoms=None, **kwargs):
 
-        super().__init__(atoms, **kwargs)
+        super().__init__(atoms=atoms, **kwargs)
         self._typemap = {}
 
     @property
