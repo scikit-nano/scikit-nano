@@ -13,6 +13,7 @@ import numpy as np
 
 import sknano.core.atoms
 from sknano.core.atoms import StructureAtom, StructureAtoms
+from sknano.core.math import Vectors
 from sknano.generators import SWNTGenerator
 from sknano.io import DATAReader
 from sknano.structures import compute_Natoms
@@ -85,7 +86,7 @@ class TestCase(AtomsTestFixture):
         atoms = self.atoms
         atoms.update_attrs()
         assert_true(np.allclose(atoms.coordination_numbers,
-                                atoms.neighbor_counts(2.0)))
+                                atoms.count_neighbors(2.0)))
 
     def test8(self):
         atoms = self.atoms
@@ -105,6 +106,19 @@ class TestCase(AtomsTestFixture):
         assert_equal(atom.CN, 0)
         atom.CN = 3
         assert_equal(atom.CN, 3)
+
+    def test11(self):
+        atoms = self.atoms
+        atoms.update_attrs()
+        [assert_equal(atoms.get_atom(i),
+                      atoms.get_atom_from_vmd_atom_id(i - 1))
+         for i in atoms.ids]
+
+    def test12(self):
+        atoms = self.atoms
+        assert_equal(len(atoms.x), len(atoms.r))
+        assert_is_instance(atoms.r, Vectors)
+        assert_is_instance(atoms.x, np.ndarray)
 
     def test_list_methods(self):
         atoms1 = StructureAtoms()

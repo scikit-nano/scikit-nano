@@ -49,9 +49,9 @@ class TestCase(AtomsTestFixture):
         print('len(third_neighbors): {}'.format(
               [len(atom.third_neighbors) for atom in atoms]))
         print('len(4th_neighbors): {}'.format(
-              [len(atom.get_neighbors(4)) for atom in atoms]))
+              [len(atom.get_nth_nearest_neighbors(4)) for atom in atoms]))
         print('len(5th_neighbors): {}'.format(
-              [len(atom.get_neighbors(5)) for atom in atoms]))
+              [len(atom.get_nth_nearest_neighbors(5)) for atom in atoms]))
 
 
 if __name__ == '__main__':

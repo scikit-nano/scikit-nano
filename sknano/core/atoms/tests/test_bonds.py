@@ -4,12 +4,15 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
 import nose
-from nose.tools import *
+from nose.tools import assert_equal, assert_true
 from pkg_resources import resource_filename
 import numpy as np
 from sknano.generators import SWNTGenerator
 from sknano.io import DATAReader
 from sknano.core.math import Vector
+from sknano.testing import AtomsTestFixture
+from sknano.core.atoms import get_angle, Bonds
+# from sknano.core import dedupe, flatten
 
 
 def test1():
@@ -67,6 +70,40 @@ def test4():
     print('bond.atoms.coords:\n{}'.format(bond.atoms.coords))
     assert_true(np.allclose(bond_centroid, bond.centroid))
 
+
+class TestCase(AtomsTestFixture):
+    def test1(self):
+        atoms = self.atoms
+        atoms.update_attrs()
+        for n in range(1, 4):
+            print('n={}'.format(n))
+            bonds = atoms[11].bonds[:n]
+            # print(bonds)
+            angles = bonds.angles
+            bond_angle_pairs = bonds.bond_angle_pairs
+            if bonds is not None:
+                print('Nbonds: {}'.format(bonds.Nbonds))
+                assert_equal(bonds.Nbonds, n)
+            if bond_angle_pairs is not None:
+                print('angles: {}'.format(angles))
+                print('bond_angle_pairs: {}'.format(bond_angle_pairs))
+                for b1, b2 in bond_angle_pairs:
+                    pair_bonds = Bonds(bonds=[b1, b2])
+                    bond_atoms = pair_bonds.atoms
+                    print(bond_atoms.ids)
+                    print(bond_atoms)
+                    assert_equal(bond_atoms.Natoms, 3)
+                    # assert_equal(get_angle(bond_atoms), pair_bonds.angles)
+
+            if n == 1:
+                assert_true(angles is None)
+                assert_true(bond_angle_pairs is None)
+            elif n == 2:
+                assert_true(isinstance(angles, float))
+                assert_true(len(bond_angle_pairs) == 1)
+            else:
+                assert_true(isinstance(angles, np.ndarray))
+                assert_true(len(bond_angle_pairs) == 3)
 
 if __name__ == '__main__':
     nose.runmodule()
