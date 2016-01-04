@@ -505,10 +505,13 @@ def get_chiral_indices(*args, check_type=True, **kwargs):
                 n, m = kwargs['Ch']
                 del kwargs['Ch']
             except KeyError:
-                n = kwargs['n']
-                del kwargs['n']
-                m = kwargs['m']
-                del kwargs['m']
+                try:
+                    n = kwargs['n']
+                    del kwargs['n']
+                    m = kwargs['m']
+                    del kwargs['m']
+                except KeyError:
+                    n = m = 5
     if check_type:
         type_check_chiral_indices((n, m))
     return n, m, kwargs
