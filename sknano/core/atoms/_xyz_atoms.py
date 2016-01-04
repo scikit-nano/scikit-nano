@@ -19,7 +19,7 @@ import numbers
 import numpy as np
 
 from sknano.core import xyz
-from sknano.core.math import Vector
+from sknano.core.math import Vector, Vectors
 from sknano.core.geometric_regions import Cuboid  # , Rectangle
 
 from ._atoms import Atom, Atoms
@@ -380,28 +380,28 @@ class XYZAtoms(Atoms):
     def r(self):
         """:class:`~numpy:numpy.ndarray` of :attr:`Atom.r` position \
             `Vector`\ s"""
-        return np.asarray([atom.r for atom in self])
+        return Vectors([atom.r for atom in self])
 
     @property
     def dr(self):
         """:class:`~numpy:numpy.ndarray` of :attr:`Atom.dr` displacement \
             `Vector`\ s"""
-        return np.asarray([atom.dr for atom in self])
+        return Vectors([atom.dr for atom in self])
 
     @property
     def x(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`x` coordinates."""
-        return self.r[:, 0]
+        return np.asarray(self.r)[:, 0]
 
     @property
     def y(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`y` coordinates."""
-        return self.r[:, 1]
+        return np.asarray(self.r)[:, 1]
 
     @property
     def z(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`z` coordinates."""
-        return self.r[:, 2]
+        return np.asarray(self.r)[:, 2]
 
     @property
     def inertia_tensor(self):
@@ -413,6 +413,18 @@ class XYZAtoms(Atoms):
         Ixz = Izx = (-self.masses * self.x * self.z).sum()
         Iyz = Izy = (-self.masses * self.y * self.z).sum()
         return np.array([[Ixx, Ixy, Ixz], [Iyx, Iyy, Iyz], [Izx, Izy, Izz]])
+
+    @property
+    def volume(self):
+        """Volume of region containing atoms."""
+        try:
+            return self._volume
+        except AttributeError:
+            return self.bounds.volume
+
+    @volume.setter
+    def volume(self, value):
+        self._volume = float(value)
 
     def center_center_of_mass(self, axis=None):
         """Center atoms on center-of-mass coordinates."""

@@ -17,7 +17,7 @@ from operator import attrgetter
 import numbers
 import numpy as np
 
-from sknano.core.math import Vector
+from sknano.core.math import Vector, Vectors
 from ._atoms import Atom, Atoms
 
 __all__ = ['ForceAtom', 'ForceAtoms']
@@ -208,7 +208,7 @@ class ForceAtoms(Atoms):
     @property
     def forces(self):
         """:class:`~numpy:numpy.ndarray` of `ForceAtom` forces."""
-        return np.asarray([atom.f for atom in self])
+        return Vectors([atom.f for atom in self])
 
     @property
     def f(self):
@@ -219,16 +219,16 @@ class ForceAtoms(Atoms):
     def fx(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`f_x` \
             components."""
-        return self.f[:, 0]
+        return np.asarray(self.f)[:, 0]
 
     @property
     def fy(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`f_y` \
             components."""
-        return self.f[:, 1]
+        return np.asarray(self.f)[:, 1]
 
     @property
     def fz(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`f_z` \
             components."""
-        return self.f[:, 2]
+        return np.asarray(self.f)[:, 2]

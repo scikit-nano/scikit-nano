@@ -17,7 +17,7 @@ from operator import attrgetter
 import numbers
 import numpy as np
 
-from sknano.core.math import Vector
+from sknano.core.math import Vector, Vectors
 from ._atoms import Atom, Atoms
 
 __all__ = ['VelocityAtom', 'VelocityAtoms']
@@ -210,7 +210,7 @@ class VelocityAtoms(Atoms):
     @property
     def velocities(self):
         """:class:`~numpy:numpy.ndarray` of `VelocityAtom` velocities."""
-        return np.asarray([atom.v for atom in self])
+        return Vectors([atom.v for atom in self])
 
     @property
     def v(self):
@@ -221,16 +221,16 @@ class VelocityAtoms(Atoms):
     def vx(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`v_x` \
             components."""
-        return self.v[:, 0]
+        return np.asarray(self.v)[:, 0]
 
     @property
     def vy(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`v_y` \
             components."""
-        return self.v[:, 1]
+        return np.asarray(self.v)[:, 1]
 
     @property
     def vz(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`v_z` \
             components."""
-        return self.v[:, 2]
+        return np.asarray(self.v)[:, 2]
