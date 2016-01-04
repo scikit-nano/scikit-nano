@@ -35,7 +35,8 @@ FCC_lattice_parameters = {}
 FCC_lattice_parameters.update({'Ac': 5.67})
 FCC_lattice_parameters.update({'Al': 4.0495})
 FCC_lattice_parameters.update({'Ar': 5.256})
-FCC_lattice_parameters.update({'Au': 4.078})
+FCC_lattice_parameters.update({'Au': 4.0782})
+FCC_lattice_parameters.update({'Ag': 4.0853})
 FCC_lattice_parameters.update({'Cu': 3.615})
 
 HCP_lattice_parameters = {}
