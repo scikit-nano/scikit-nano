@@ -24,7 +24,10 @@ __all__ = ['Molecule', 'Molecules']
 
 @total_ordering
 class Molecule(BaseClass):
-    """Base class for abstract representation of molecule.
+    """Base class for abstract representation of a molecule.
+
+    Per Wikipedia, "a molecule is an electrically neutral group of two
+    or more atoms held together by chemical bonds."
 
     Parameters
     ----------
@@ -73,13 +76,11 @@ class Molecules(UserList):
     """
     def __init__(self, molecules=None, casttype=True, **kwargs):
         super().__init__(initlist=molecules)
-
         self.fmtstr = "{molecules!r}"
 
-    def __repr__(self):
-        """Return canonical string representation of `Molecules`."""
-        return "{}({})".format(self.__class__.__name__,
-                               self.fmtstr.format(**self.todict()))
+    @property
+    def __item_class__(self):
+        return Molecule
 
     def sort(self, key=attrgetter('id'), reverse=False):
         super().sort(key=key, reverse=reverse)
