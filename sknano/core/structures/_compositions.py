@@ -76,6 +76,10 @@ class Compositions(UserList):
 
         self.fmtstr = "{compositions!r}"
 
+    @property
+    def __item_class__(self):
+        return Composition
+
     def sort(self, key=attrgetter('id'), reverse=False):
         super().sort(key=key, reverse=reverse)
 
