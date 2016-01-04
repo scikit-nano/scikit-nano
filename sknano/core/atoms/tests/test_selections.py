@@ -32,11 +32,15 @@ class TestCase(AtomsTestFixture):
             assert_equals(atom.CN, 3)
 
         atoms.update_attrs()
-
-        parser = SelectionParser(atoms)
+        # selected_atoms = SelectionParser(atoms).parse("id 5 10 15")
+        # print(selected_atoms)
+        # selected_atoms = SelectionParser(atoms).parse("id 5 10 15 or z <=-20")
+        # parser.parse("id 5 10 15 or type 1")
+        # print(parser)
+        selected_atoms = SelectionParser(atoms).parse("id 5 10 15 or z <=-20")
+        print(selected_atoms.ids)
         # print(parser.ATOM_ATTRIBUTE)
-
-        print(atoms.select('(z >= -5) and (z <= 5)'))
+        # print(atoms.select('(z >= -5) and (z <= 5)'))
         # atoms = atoms.filtered((atoms.z >= -5) & (atoms.z <= 5))
         # print('Natoms: {}'.format(atoms.Natoms))
         # for atom in atoms:
