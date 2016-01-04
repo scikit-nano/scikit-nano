@@ -67,15 +67,15 @@ class NanoStructureBase(BaseStructure, BaseClass):
 
     @property
     def basis(self):
-        """:class:`NanoStructureBase` basis atoms."""
+        """:class:`NanoStructureBase` basis objects."""
         return self._basis
 
     @basis.setter
     def basis(self, value):
         self._basis = value
         try:
-            [self.crystal_cell.update_basis(element, index=i, step=2) for
-             i, element in enumerate(self.basis)]
+            [self.crystal_cell.update_basis(obj, index=i, step=2) for
+             i, obj in enumerate(self.basis)]
         except AttributeError:
             pass
 
