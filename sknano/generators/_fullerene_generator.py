@@ -11,7 +11,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from pkg_resources import resource_filename
+# from pkg_resources import resource_filename
 import os
 # import numpy as np
 
@@ -37,32 +37,17 @@ class FullereneGenerator(GeneratorBase, Fullerene):
     First, load the :class:`~sknano.generators.FullereneGenerator` class.
 
     >>> from sknano.generators import FullereneGenerator
-    >>> fg = FullereneGenerator(N=60)
+    >>> fg = FullereneGenerator(60)
     >>> fg.save(fname='C60.data')
 
     """
     def generate(self):
         """Generate structure data."""
-        CNdir = 'C' + str(self.N)
-        CNfile = 'C' + str(self.N)
-        if self.PG is not None:
-            CNfile += '-' + self.PG
-        if self.Ni is not None:
-            CNfile += '-{}'.format(self.Ni)
-        CNfile += '.xyz'
-
-        datadir = os.path.join(resource_filename('sknano', 'data/fullerenes'),
-                               CNdir)
-        files = os.listdir(datadir)
-        if len(files) > 0:
-            if CNfile not in files:
-                # TODO: try to *intelligently* pick the best match
-                CNfile = files[0]
-            self._atoms = XYZReader(os.path.join(datadir, CNfile)).atoms
+        self._atoms = XYZReader(self.datafile).atoms
 
     @classmethod
-    def generate_fname(cls, N):
-        return 'C{}'.format(N)
+    def generate_fname(cls, datafile):
+        return os.path.splitext(os.path.basename(datafile))[0]
 
     def save(self, fname=None, outpath=None, structure_format=None,
              center_centroid=True, **kwargs):
@@ -73,7 +58,7 @@ class FullereneGenerator(GeneratorBase, Fullerene):
 
         """
         if fname is None:
-            fname = self.generate_fname(self.N)
+            fname = self.generate_fname(self.datafile)
 
         super().save(fname=fname, outpath=outpath,
                      structure_format=structure_format,

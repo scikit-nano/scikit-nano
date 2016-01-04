@@ -12,7 +12,7 @@ from sknano.testing import GeneratorTestFixtures
 class TestCase(GeneratorTestFixtures):
 
     def test1(self):
-        buckyball = FullereneGenerator()
+        buckyball = FullereneGenerator(60)
         buckyball.save(fname='buckyball.xyz')
         self.tmpdata.append(buckyball.fname)
         buckyball.save(fname='buckyball.data')
