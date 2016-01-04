@@ -35,8 +35,10 @@ class Vectors(UserList):
     """
 
     def __init__(self, vectors=None):
+        # if vectors is not None:
+        #     vectors = np.asarray(vectors).tolist()
         super().__init__(initlist=vectors)
-        self.fmtstr = "vectors={!r}"
+        self.fmtstr = "vectors={vectors!r}"
 
     @property
     def __item_class__(self):
@@ -48,7 +50,12 @@ class Vectors(UserList):
     @property
     def norms(self):
         """Return `Vector` :attr:`Vector.norm`\ s as array."""
-        return [vector.norm for vector in self]
+        return np.asarray([v.norm for v in self])
+
+    @property
+    def magnitudes(self):
+        """Alias for :attr:`~Vectors.norms`."""
+        return self.norms
 
     def filter(self, condition, invert=False):
         """Filter `Vectors` by `condition`.
@@ -134,4 +141,4 @@ class Vectors(UserList):
          for vector in self]
 
     def todict(self):
-        return dict(vectors=self.data)
+        return dict(vectors=np.asarray(self.data).tolist())
