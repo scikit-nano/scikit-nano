@@ -30,6 +30,10 @@ def test_parallelogram():
     print(r.u)
     assert_equal(Vector(r.u, p0=r.o), r.u)
     r.rotate(angle=np.pi/2)
+    print(r.vectors)
+    [print(v) for v in r.vectors]
+    print(r.u)
+    print(r.v)
     assert_equal(r.vectors, Vectors([r.u, r.v]))
     assert_is_instance(r.centroid, Point)
 

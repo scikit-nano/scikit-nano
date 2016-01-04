@@ -90,7 +90,7 @@ def generate_bounding_box(from_region=None, from_lattice=None,
             bounding_box.translate(tvec)
         assert bounding_box.pmin <= bounding_box.pmax
     else:
-        array = from_array
+        array = np.asarray(from_array)
         for i, dim in enumerate(('x', 'y', 'z')):
             setattr(bounding_box, dim + 'min', array[:, i].min())
             setattr(bounding_box, dim + 'max', array[:, i].max())
