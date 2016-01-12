@@ -30,9 +30,7 @@ Nanostructure Classes
    RectangularGraphene
    BilayerGraphene
    SWNT
-   SWNTBundle
    MWNT
-   MWNTBundle
 
 Base/Mixin Classes
 ------------------
@@ -111,9 +109,7 @@ from ._graphene import *
 from ._bilayer_graphene import *
 
 from ._swnt import *
-from ._swnt_bundle import *
 from ._mwnt import *
-from ._mwnt_bundle import *
 from ._unrolled_swnt import *
 
 from ._extras import *

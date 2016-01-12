@@ -17,6 +17,7 @@ import numpy as np
 from sknano.core.refdata import aCC, element_data
 
 from ._base import NanoStructureBase, r_CC_vdw
+from ._nanotube_bundle import NanotubeBundleBase
 from ._swnt import SWNT, compute_dt  # , compute_T
 from ._extras import generate_Ch_list
 
@@ -295,7 +296,7 @@ class MWNTMixin:
                                   wall_spacing=wall_spacing)
 
 
-class MWNT(MWNTMixin, NanoStructureBase):
+class MWNTBase(MWNTMixin, NanoStructureBase):
     """MWNT structure class.
 
     Parameters
@@ -338,11 +339,6 @@ class MWNT(MWNTMixin, NanoStructureBase):
         nearest neighbor atoms, in units of **Angstroms**.
     verbose : bool, optional
         if `True`, show verbose output
-
-    Examples
-    --------
-
-    >>> from sknano.generators import MWNT
 
     """
     def __init__(self, Ch_list=None, Nwalls=None, Lz=None,
@@ -393,3 +389,66 @@ class MWNT(MWNTMixin, NanoStructureBase):
                     max_walls=self.max_walls,
                     chiral_types=self.chiral_types,
                     wall_spacing=self.wall_spacing)
+
+
+class MWNT(NanotubeBundleBase, MWNTBase):
+    """MWNT structure class.
+
+    Parameters
+    ----------
+    Ch_list : :class:`python:list`, optional
+        (:attr:`~SWNT.n`, :attr:`~SWNT.m`) for each `SWNT` wall in `MWNT`.
+    Nwalls : int, optional
+        Number of `SWNT` walls in `MWNT`.
+    Lz : float, optional
+        `MWNT` length in **nanometers**.
+    min_wall_diameter : float, optional
+        Minimum `MWNT` wall diameter, in units of **Angstroms**.
+    max_wall_diameter : float, optional
+        Maximum `MWNT` wall diameter, in units of **Angstroms**.
+    max_walls : int, optional
+        Maximum number of `MWNT` walls.
+    chiral_types : {None, 'armchair', 'zigzag', 'achiral', 'chiral'}, optional
+        If `None`, the :attr:`~SWNT.chiral_type` of each `MWNT` walls
+        will be random and determined by the set of randomly selected
+        chiral indices (:attr:`~SWNT.n`, :attr:`~SWNT.m`).
+    wall_spacing : float, optional
+        Inter-wall spacing in units of **Angstroms**.
+        Default value is the van der Waals interaction distance of 3.35
+        Angstroms.
+    basis : {:class:`python:list`}, optional
+        List of :class:`python:str`\ s of element symbols or atomic number
+        of the two atom basis (default: ['C', 'C'])
+
+        .. versionadded:: 0.3.10
+
+    element1, element2 : {str, int}, optional
+        Element symbol or atomic number of basis
+        :class:`~sknano.core.Atom` 1 and 2
+
+        .. deprecated:: 0.3.10
+           Use `basis` instead
+
+    bond : float, optional
+        :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
+        nearest neighbor atoms, in units of **Angstroms**.
+    nx, ny : int, optional
+        Number of repeat unit cells in the :math:`x, y` dimensions.
+    vdw_radius : float, optional
+        van der Waals radius of nanotube atoms
+    bundle_packing : {'hcp', 'ccp'}, optional
+        Packing arrangement of MWNT bundles.  If `bundle_packing` is `None`,
+        then it will be determined by the `bundle_geometry` parameter if
+        `bundle_geometry` is not `None`.  If both `bundle_packing` and
+        `bundle_geometry` are `None`, then `bundle_packing` defaults to `hcp`.
+    bundle_geometry : {'triangle', 'hexagon', 'square', 'rectangle'}, optional
+    verbose : bool, optional
+        if `True`, show verbose output
+
+    Examples
+    --------
+
+    >>> from sknano.generators import MWNT
+
+    """
+    pass
