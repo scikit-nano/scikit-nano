@@ -6,10 +6,10 @@ from __future__ import unicode_literals
 import nose
 from nose.tools import *
 from sknano.generators import MWNTGenerator
-from sknano.testing import GeneratorTestFixtures
+from sknano.testing import GeneratorTestFixture
 
 
-class TestCase(GeneratorTestFixtures):
+class TestCase(GeneratorTestFixture):
 
     def test1(self):
         mwnt = MWNTGenerator(max_walls=3, Lz=1.0)

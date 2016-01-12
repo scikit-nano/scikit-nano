@@ -7,10 +7,10 @@ import nose
 from nose.tools import *
 from sknano.generators import GrapheneGenerator, \
     PrimitiveCellGrapheneGenerator, ConventionalCellGrapheneGenerator
-from sknano.testing import GeneratorTestFixtures
+from sknano.testing import GeneratorTestFixture
 
 
-class TestCase(GeneratorTestFixtures):
+class TestCase(GeneratorTestFixture):
 
     def test1(self):
         generator = GrapheneGenerator(armchair_edge_length=2,

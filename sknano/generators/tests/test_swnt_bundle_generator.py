@@ -6,10 +6,10 @@ from __future__ import unicode_literals
 import nose
 from nose.tools import *
 from sknano.generators import SWNTGenerator, SWNTBundleGenerator
-from sknano.testing import GeneratorTestFixtures
+from sknano.testing import GeneratorTestFixture
 
 
-class TestCase(GeneratorTestFixtures):
+class TestCase(GeneratorTestFixture):
 
     def test1(self):
         bundle = SWNTBundleGenerator(n=10, m=5, nx=3, ny=3, nz=1,

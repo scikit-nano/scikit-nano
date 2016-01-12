@@ -12,10 +12,10 @@ import numpy as np
 
 from sknano.generators import SWNTGenerator
 from sknano.io import XYZReader, DATAReader
-from sknano.testing import GeneratorTestFixtures
+from sknano.testing import GeneratorTestFixture
 
 
-class TestCase(GeneratorTestFixtures):
+class TestCase(GeneratorTestFixture):
 
     def test1(self):
         swnt = SWNTGenerator(n=10, m=10)

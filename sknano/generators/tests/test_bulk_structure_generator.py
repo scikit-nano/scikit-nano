@@ -18,10 +18,10 @@ from sknano.generators import BCCStructureGenerator, FCCStructureGenerator, \
     GoldGenerator, CopperGenerator, CaesiumChlorideStructureGenerator, \
     RocksaltStructureGenerator, ZincblendeStructureGenerator, MoS2Generator
 from sknano.io import XYZReader, DATAReader
-from sknano.testing import GeneratorTestFixtures
+from sknano.testing import GeneratorTestFixture
 
 
-class TestCase(GeneratorTestFixtures):
+class TestCase(GeneratorTestFixture):
 
     def test1(self):
         quartz = AlphaQuartzGenerator()

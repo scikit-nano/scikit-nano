@@ -6,10 +6,10 @@ from __future__ import unicode_literals
 import nose
 from nose.tools import *
 from sknano.generators import BilayerGrapheneGenerator
-from sknano.testing import GeneratorTestFixtures
+from sknano.testing import GeneratorTestFixture
 
 
-class TestCase(GeneratorTestFixtures):
+class TestCase(GeneratorTestFixture):
 
     def test1(self):
         generator = BilayerGrapheneGenerator(armchair_edge_length=5,

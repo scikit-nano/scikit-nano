@@ -12,10 +12,10 @@ import numpy as np
 
 # from sknano.generators import DefectGenerator
 from sknano.io import XYZReader
-from sknano.testing import GeneratorTestFixtures
+from sknano.testing import GeneratorTestFixture
 
 
-# class TestCase(GeneratorTestFixtures):
+# class TestCase(GeneratorTestFixture):
 
 #     def test1(self):
 #         generator = DefectGenerator()
