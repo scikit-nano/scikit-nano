@@ -22,9 +22,7 @@ Nanostructure generators
    ConventionalCellGrapheneGenerator
    BilayerGrapheneGenerator
    MWNTGenerator
-   MWNTBundleGenerator
    SWNTGenerator
-   SWNTBundleGenerator
    UnrolledSWNTGenerator
 
 Bulk structure generators
@@ -73,8 +71,6 @@ from ._bilayer_graphene_generator import *
 from ._swnt_generator import *
 from ._mwnt_generator import *
 from ._nanotube_bundle_generator import *
-from ._swnt_bundle_generator import *
-from ._mwnt_bundle_generator import *
 from ._unrolled_swnt_generator import *
 from ._layered_structure_generator import *
 # from ._defect_generators import *
