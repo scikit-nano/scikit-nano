@@ -19,7 +19,8 @@ import os
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from sknano.io import default_structure_format, supported_structure_formats
 
-__all__ = ['Atom', 'Atoms', 'GeneratorBase', 'BulkGeneratorBase',
+__all__ = ['Atom', 'Atoms', 'GeneratorBase', 'BaseGenerator',
+           'BulkGeneratorBase', 'BaseBulkGenerator',
            'STRUCTURE_GENERATORS']
 
 
@@ -177,6 +178,8 @@ class GeneratorBase:
         #                       structure_format=structure_format,
         #                       structure=self.structure)
 
+BaseGenerator = GeneratorBase
+
 
 class BulkGeneratorBase(GeneratorBase):
     """Base class for the *bulk structure generator* classes."""
@@ -188,3 +191,5 @@ class BulkGeneratorBase(GeneratorBase):
                                   'x'.join(map(str, scaling_matrix))))
 
         super().save(fname=fname, **kwargs)
+
+BaseBulkGenerator = BulkGeneratorBase
