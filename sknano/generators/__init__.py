@@ -45,6 +45,14 @@ Bulk structure generators
    RocksaltStructureGenerator
    ZincblendeStructureGenerator
 
+Compound structure generators
+------------------------------
+
+.. autosummary::
+   :toctree: generated/
+
+   LayeredStructureGenerator
+
 Other
 -----
 
@@ -68,6 +76,7 @@ from ._nanotube_bundle_generator import *
 from ._swnt_bundle_generator import *
 from ._mwnt_bundle_generator import *
 from ._unrolled_swnt_generator import *
+from ._layered_structure_generator import *
 # from ._defect_generators import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
