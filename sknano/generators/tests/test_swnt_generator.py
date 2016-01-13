@@ -75,6 +75,17 @@ class Tests(GeneratorTestFixture):
         assert_true(bundle.Natoms, bundle.Ntubes * swnt.Natoms)
         assert_equal(bundle.Ntubes, len(set(bundle.mol_ids)))
 
+    def test8(self):
+        n, m = 5, 5
+        nz = 2
+        swnt = SWNTGenerator(n=n, m=m, nz=nz)
+        assert_equal(swnt.N, 2 * n)
+        assert_equal(swnt.Natoms, 2 * swnt.N * swnt.nz)
+        assert_equal(swnt.Natoms_per_unit_cell, 2 * swnt.N)
+        assert_equal(swnt.nz, nz)
+        assert_equal(swnt.Natoms_per_tube, swnt.Natoms_per_unit_cell * swnt.nz)
+        atoms = swnt.atoms
+        assert_equal(atoms.Natoms, swnt.Natoms_per_tube)
 
 if __name__ == '__main__':
     nose.runmodule()

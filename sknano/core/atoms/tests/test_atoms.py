@@ -13,13 +13,15 @@ from sknano.testing import generate_atoms
 
 
 def test1():
-    atoms = Atoms(verbose=True)
-    assert_is_instance(atoms, Atoms)
+    atoms1 = Atoms()
+    for Z in range(100, 0, -1):
+        atoms1.append(Atom(Z))
+    atoms1.sort(key=lambda a: a.Z)
+
+    atoms2 = Atoms()
     for Z in range(1, 101):
-        atoms.append(Atom(Z))
-    assert_equal(atoms.Natoms, 100)
-    assert_equal(Atoms(atoms=atoms).Natoms, atoms.Natoms)
-    assert_equal(Atoms(atoms=atoms.data).Natoms, atoms.Natoms)
+        atoms2.append(Atom(Z))
+    assert_equal(atoms1, atoms2)
 
 
 def test2():
@@ -110,6 +112,16 @@ def test8():
     assert_equal(filtered1, filtered2)
 
 
+def test9():
+    atoms = Atoms(verbose=True)
+    assert_is_instance(atoms, Atoms)
+    for Z in range(1, 101):
+        atoms.append(Atom(Z))
+    assert_equal(atoms.Natoms, 100)
+    assert_equal(Atoms(atoms=atoms).Natoms, atoms.Natoms)
+    assert_equal(Atoms(atoms=atoms.data).Natoms, atoms.Natoms)
+
+
 def test_instantiation():
     a = Atom('C')
     assert_is_instance(a, Atom)
@@ -119,6 +131,12 @@ def test_attributes():
     atom = Atom('C')
     assert_equal(atom.element, 'C')
     assert_equal(atom.Z, 6)
+    for xi in ('x', 'y', 'z'):
+        assert_equal(getattr(atom, xi), 0.0)
+
+    for element in element_symbols:
+        atom = Atom(element=element)
+        assert_equal(atom.element, element)
 
 
 def test_comparisons():
@@ -134,6 +152,7 @@ def test_property_changes():
     CAtom = Atom('C')
     CAtom.Z = 54
     XeAtom = Atom('Xe')
+    [print(atom) for atom in (CAtom, XeAtom)]
     assert_equal(CAtom, XeAtom)
 
 
