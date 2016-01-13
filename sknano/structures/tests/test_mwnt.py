@@ -10,7 +10,6 @@ from sknano.structures import MWNT
 def test1():
     mwnt = MWNT(Ch=[(5, 5), (10, 10)])
     print(mwnt)
-    print(mwnt.todict())
     print(mwnt.chiral_types)
     print(mwnt.chiral_set)
     assert_equal(mwnt.Ntubes, 1)
@@ -19,35 +18,32 @@ def test1():
 
 
 def test2():
-    mwnt = MWNT(max_walls=5)
-    print(mwnt)
-    print(mwnt.todict())
-    print(mwnt.chiral_types)
-    print(mwnt.chiral_set)
+    mwnt = MWNT(max_walls=2)
+    # print(mwnt)
+    # print(mwnt.chiral_types)
+    # print(mwnt.chiral_set)
     assert_equal(mwnt.Ntubes, 1)
-    assert_equal(mwnt.Nwalls, 5)
+    assert_equal(mwnt.Nwalls, 2)
 
 
 def test3():
-    mwnt = MWNT(Ch=[(5, 5), (10, 10), (15, 15), (20, 20)], Lz=2.5)
-    print(mwnt)
-    print(mwnt.todict())
-    print(mwnt.chiral_types)
-    print(mwnt.chiral_set)
+    mwnt = MWNT(Ch=[(5, 5), (10, 10), (15, 15), (20, 20)], Lz=1.0)
+    # print(mwnt)
+    # print(mwnt.chiral_types)
+    # print(mwnt.chiral_set)
     assert_equal(mwnt.Ntubes, 1)
     assert_equal(mwnt.Nwalls, 4)
     assert_equal(mwnt.chiral_set, set(['armchair']))
 
 
 def test4():
-    mwnt = MWNT(Ch=[(5, 0), (5, 5), (10, 5), (10, 0), (10, 10), (20, 10)],
-                Lz=1.0)
-    print(mwnt)
-    print(mwnt.todict())
-    print(mwnt.chiral_types)
-    print(mwnt.chiral_set)
+    mwnt = MWNT(Ch=[(5, 0), (5, 5), (10, 5), (10, 0), (10, 10)],
+                Lz=0.5)
+    # print(mwnt)
+    # print(mwnt.chiral_types)
+    # print(mwnt.chiral_set)
     assert_equal(mwnt.Ntubes, 1)
-    assert_equal(mwnt.Nwalls, 6)
+    assert_equal(mwnt.Nwalls, 5)
     assert_equal(mwnt.chiral_set, set(['armchair', 'chiral', 'zigzag']))
 
 
@@ -58,8 +54,8 @@ def test5():
 
 
 def test6():
-    bundle = MWNT(max_walls=5, nx=5, ny=2)
-    assert_equal(bundle.Nwalls, 5)
+    bundle = MWNT(max_walls=2, nx=5, ny=2)
+    assert_equal(bundle.Nwalls, 2)
     assert_equal(bundle.Ntubes, 10)
 
 
