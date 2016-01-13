@@ -11,7 +11,21 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-__all__ = ['pluralize', 'plural_word_check', 'ordinal_form']
+from sknano.core.math import function_map, operator_map
+
+from pyparsing import Group, Forward, Optional, Regex, Suppress, Keyword, \
+    Literal, Word, StringEnd, ZeroOrMore, alphas, alphanums, delimitedList, \
+    oneOf, replaceWith, quotedString, removeQuotes
+
+__all__ = ['pluralize', 'plural_word_check', 'ordinal_form',
+           'map_operator', 'map_function', 'asint', 'asfloat', 'asbool',
+           'astuple', 'aslist', 'asdict', 'asset', 'integer', 'real',
+           'number', 'boolean', 'string', 'none', 'LPAR', 'RPAR',
+           'LBRACK', 'RBRACK', 'LBRACE', 'RBRACE', 'COLON', 'COMMA', 'EQUAL',
+           'binary_operator', 'hashable_item', 'unhashable_item', 'expr_item',
+           'tuple_expr', 'list_expr', 'dict_expr', 'set_expr', 'kwarg',
+           'kwargs_expr', 'signature_args', 'signature_kwargs',
+           'call_signature']
 
 
 def pluralize(word, count):
@@ -105,3 +119,124 @@ def ordinal_form(n):
     except KeyError:
         last_digit = int(str(n)[-1])
         return ''.join((str(n), ordinal_suffix[last_digit]))
+
+type_map = {
+    'bool': bool,
+    'int': int,
+    'float': float,
+    'list': list,
+    'str': str,
+    'tuple': tuple,
+}
+
+
+def map_type_str(type_str):
+    return type_map[type_str]
+
+
+def cast_type(parameters):
+    pass
+
+
+def asint(s, l, t):
+    return int(t[0])
+
+
+def asfloat(s, l, t):
+    val = float(t[0])
+    if int(val) == val:
+        return int(val)
+    return val
+
+
+def asbool(s, l, t):
+    return t[0] == 'True'
+
+
+def astuple(s, l, t):
+    return tuple(t.asList())
+
+
+def aslist(s, l, t):
+    return [t.asList()]
+
+
+def asdict(s, l, t):
+    return dict(t.asList())
+
+
+def asset(s, l, t):
+    return set(t.asList())
+
+
+def map_function(s, l, t):
+    return function_map[t[0]]
+
+
+def map_operator(s, l, t):
+    return operator_map[t[0]]
+
+
+integer = Regex(r'[+-]?\d+').setParseAction(asint)
+real = Regex(r'[+-]?\d+(\.\d*)?([eE][+-]?\d+)?').setParseAction(asfloat)
+number = real | integer
+
+boolean = oneOf("True False").setParseAction(asbool)
+none = Literal("None").setParseAction(replaceWith(None))
+string = quotedString.setParseAction(removeQuotes)
+
+# point = Literal('.')
+# e = CaselessLiteral('E')
+# plus_or_minus_sign = Word('+-', exact=1)
+# number = Word(nums)
+# positive_integer = number.setParseAction(asint)
+# real_number = \
+#     Combine(Optional(plus_or_minus_sign) +
+#             (number + point + Optional(number) | (point + number)) +
+#             Optional(e) + Optional(plus_or_minus_sign) + number) \
+#     .setParseAction(asfloat)
+
+LPAR, RPAR = map(Suppress, '()')
+LBRACK, RBRACK = map(Suppress, '[]')
+LBRACE, RBRACE = map(Suppress, '{}')
+COLON = Suppress(':')
+COMMA = Suppress(',')
+EQUAL = Suppress('=')
+
+binary_operator = oneOf('< <= == > >= != LT LE EQ GT GE NE', caseless=True)
+binary_operator.setParseAction(map_operator)
+
+tuple_expr = Forward()
+list_expr = Forward()
+dict_expr = Forward()
+set_expr = Forward()
+
+hashable_item = real | integer | string | boolean | none | tuple_expr
+unhashable_item = list_expr | dict_expr | set_expr
+expr_item = hashable_item | unhashable_item
+
+tuple_expr << (LPAR +
+               Optional(delimitedList(expr_item) + Optional(COMMA)) +
+               RPAR).setParseAction(astuple)
+
+list_expr << (LBRACK +
+              Optional(delimitedList(expr_item) + Optional(COMMA)) +
+              RBRACK).setParseAction(aslist)
+
+kwarg = Group(Word(alphas, alphanums + '_') + EQUAL + expr_item)
+kwargs_expr = Forward()
+kwargs_expr << delimitedList(kwarg).setParseAction(asdict)
+
+dict_entry = Group(hashable_item + COLON + expr_item) | kwarg
+dict_entries = Optional(delimitedList(dict_entry) + Optional(COMMA))
+dict_expr << (LBRACE + dict_entries + RBRACE |
+              Suppress(Keyword('dict')) + LPAR +
+              dict_entries + RPAR).setParseAction(asdict)
+
+
+signature_args = Forward()
+signature_args << delimitedList(expr_item).setParseAction(aslist)
+signature_kwargs = kwargs_expr.copy()
+
+call_signature = Group(Optional(signature_args + COMMA) +
+                       ZeroOrMore(signature_kwargs))
