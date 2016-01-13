@@ -201,16 +201,22 @@ class BaseStructureMixin:
     def write_data(self, **kwargs):
         """Write LAMMPS DATA file."""
         from sknano.io import DATAWriter
+        if 'structure' not in kwargs:
+            kwargs['structure'] = self
         DATAWriter.write(**kwargs)
 
     def write_dump(self, **kwargs):
         """Write LAMMPS dump file."""
         from sknano.io import DUMPWriter
+        if 'structure' not in kwargs:
+            kwargs['structure'] = self
         DUMPWriter.write(**kwargs)
 
     def write_xyz(self, **kwargs):
         """Write XYZ file."""
         from sknano.io import XYZWriter
+        if 'structure' not in kwargs:
+            kwargs['structure'] = self
         XYZWriter.write(**kwargs)
 
 
