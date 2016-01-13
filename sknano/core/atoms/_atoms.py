@@ -11,14 +11,14 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from functools import total_ordering
+from collections.abc import Iterable
 from operator import attrgetter
 import numbers
 import re
 
 import numpy as np
 
-from sknano.core import BaseClass, UserList
+from sknano.core import BaseClass, UserList, dedupe
 from sknano.core.math import convert_condition_str, rotation_matrix
 from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols, element_names
@@ -26,7 +26,6 @@ from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
 __all__ = ['Atom', 'Atoms']
 
 
-@total_ordering
 class Atom(BaseClass):
     """Base class for abstract representation of structure atom.
 
@@ -37,7 +36,7 @@ class Atom(BaseClass):
         an element atomic number :math:`\\boldsymbol{Z}`.
 
     """
-    # _fields = ['element']
+    _fields = ['element', 'Z', 'mass']
 
     def __init__(self, *args, element=None, mass=None, Z=None, **kwargs):
         args = list(args)
@@ -62,19 +61,62 @@ class Atom(BaseClass):
         self.element = element
         self.fmtstr = "{element!r}, Z={Z!r}, mass={mass!r}"
 
+    def _is_valid_operand(self, other):
+        return isinstance(other, self.__class__)
+
     def __eq__(self, other):
         """Test equality of two `Atom` object instances."""
-        return self is other or (self.element == other.element and
-                                 self.Z == other.Z and
-                                 np.allclose(self.mass, other.mass))
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        return (self is other or
+                (np.allclose([self.Z, self.mass], [other.Z, other.mass])
+                 and self.element == other.element))
+
+    def __le__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        for attr in Atom._fields:
+            if getattr(self, attr) > getattr(other, attr):
+                return False
+        return True
 
     def __lt__(self, other):
         """Test if `self` is *less than* `other`."""
-        if self.element == other.element == 'X' and \
-                self.Z == other.Z == 0:
-            return self.mass < other.mass
-        else:
-            return self.Z < other.Z
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        # if self.element == other.element == 'X' and \
+        #         self.Z == other.Z == 0:
+        #     test = self.mass < other.mass
+        # else:
+        #     test = self.Z < other.Z
+        # return test and self.__le__(other)
+        for attr in Atom._fields:
+            if getattr(self, attr) >= getattr(other, attr):
+                return False
+        return True
+
+    def __ge__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        for attr in Atom._fields:
+            print(attr)
+            if getattr(self, attr) < getattr(other, attr):
+                return False
+        return True
+
+    def __gt__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        # if self.element == other.element == 'X' and \
+        #         self.Z == other.Z == 0:
+        #     test = self.mass > other.mass
+        # else:
+        #     test = self.Z > other.Z
+        # return test and self.__ge__(other)
+        for attr in Atom._fields:
+            if getattr(self, attr) <= getattr(other, attr):
+                return False
+        return True
 
     def __dir__(self):
         return ['element', 'Z', 'mass']
@@ -263,13 +305,67 @@ class Atoms(UserList):
     def __item_class__(self):
         return self.__atom_class__
 
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return (self is other or self.data == other.data)
+
+    def __lt__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.data < other.data
+
+    def __le__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.data <= other.data
+
+    def __ne__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.data != other.data
+
+    def __gt__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.data > other.data
+
+    def __ge__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self.data >= other.data
+
     def sort(self, key=attrgetter('element', 'Z', 'mass'), reverse=False):
         super().sort(key=key, reverse=reverse)
 
+    @classmethod
+    def _from_iterable(cls, it, **kwargs):
+        return cls(atoms=list(it), **kwargs)
+
+    def _is_valid_operand(self, other):
+        return isinstance(other, (self.__class__, self.__atom_class__))
+
+    def __cast(self, other):
+        if not isinstance(other, self.__class__):
+            if not isinstance(other, Iterable):
+                other = [self.__cast_item(other)]
+            other = self._from_iterable(other, **self.kwargs)
+        return other
+
+    def __cast_item(self, item):
+        if not isinstance(item, self.__item_class__):
+            if isinstance(item, dict):
+                item = self.__item_class__(
+                    **{k: item[k] for k in set(item) &
+                       set(dir(self.__item_class__()))})
+            elif isinstance(item, (str, int, float)):
+                item = self.__item_class__(item)
+        return item
+
     def __setitem__(self, index, item):
-        if not isinstance(item, (self.__class__, self.__atom_class__)):
+        if not self._is_valid_operand(item):
             if isinstance(index, slice):
-                item = self.__class__(item, **self.kwargs)
+                item = self.__cast(item)
             else:
                 try:
                     atomdict = super().__getitem__(index).todict()
@@ -287,55 +383,109 @@ class Atoms(UserList):
         super().__setitem__(index, item)
 
     def append(self, atom):
-        if not isinstance(atom, self.__atom_class__):
-            if isinstance(atom, dict):
-                atom = self.__atom_class__(
-                    **{k: atom[k] for k in set(atom) &
-                       set(dir(self.__atom_class__()))})
-            elif isinstance(atom, (str, int, float)):
-                atom = self.__atom_class__(atom)
+        if not self._is_valid_operand(atom):
+            atom = self.__cast_item(atom)
         super().append(atom)
 
-    def __atoms_not_in_self(self, other):
-        return [atom for atom in other if atom not in self]
+    def insert(self, i, atom):
+        if not self._is_valid_operand(atom):
+            atom = self.__cast_item(atom)
+        super().insert(i, atom)
 
     def __add__(self, other):
-        try:
-            addlist = self.__atoms_not_in_self(other)
-        except TypeError:
-            addlist = self.__atoms_not_in_self(self.__class__(other))
-        return self.__class__(self.data + addlist, **self.kwargs)
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        atoms = self.data + \
+            list(atom for atom in self.__cast(other) if atom not in self)
+        return self._from_iterable(atoms, **self.kwargs)
 
     def __radd__(self, other):
-        try:
-            addlist = self.__atoms_not_in_self(other)
-        except TypeError:
-            addlist = self.__atoms_not_in_self(self.__class__(other))
-        return self.__class__(addlist + self.data, **self.kwargs)
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        other = self.__cast(other)
+        atoms = other.data + list(atom for atom in self if atom not in other)
+        return self._from_iterable(atoms, **self.kwargs)
 
     def __iadd__(self, other):
-        try:
-            self.data += self.__atoms_not_in_self(other)
-        except TypeError:
-            self.data += self.__atoms_not_in_self(self.__class__(other))
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        self.data += list(atom for atom in self.__cast(other)
+                          if atom not in self)
         return self
 
-    # def __atoms_not_in_other(self, other):
-    #     return [atom for atom in self if atom not in other]
+    def __sub__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        return self._from_iterable(atom for atom in self
+                                   if atom not in self.__cast(other),
+                                   **self.kwargs)
 
-    # def __sub__(self, other):
-    #     if isinstance(other, self.__class__):
-    #         return self.__class__(self.__atoms_not_in_other(other),
-    #                               **self.kwargs)
-    #     return NotImplemented
+    def __rsub__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        return self._from_iterable(atom for atom in self.__cast(other)
+                                   if atom not in self,
+                                   **self.kwargs)
 
-    # def __rsub__(self, other):
-    #     return NotImplemented
+    def __isub__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        self.data -= list(atom for atom in self.__cast(other) if atom in self)
+        return self
 
-    # def __isub__(self, other):
-    #     if isinstance(other, self.__class__):
-    #         self.data -= self.__atoms_not_in_other(other)
-    #     return self
+    def __and__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        return self._from_iterable(atom for atom in self.__cast(other)
+                                   if atom in self, **self.kwargs)
+
+    __rand__ = __and__
+
+    def __iand__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        self.data -= list(atom for atom in self.__cast(other)
+                          if atom not in self)
+        return self
+
+    def __or__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        # atoms = self.data + list(atom for atom in other if atom not in self)
+        atoms = dedupe((atom for atoms in (self, self.__cast(other))
+                        for atom in atoms), key=attrgetter('id'))
+        return self._from_iterable(atoms, **self.kwargs)
+
+    __ror__ = __or__
+
+    def __ior__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        self.data += \
+            list(atom for atom in self.__cast(other) if atom not in self)
+        return self
+
+    def __xor__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        other = self.__cast(other)
+        return (self - other) | (other - self)
+
+    __rxor__ = __xor__
+
+    def __ixor__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if other is self:
+            self.clear()
+        else:
+            other = self.__cast(other)
+            for atom in other:
+                if atom in self:
+                    self.remove(atom)
+                else:
+                    self.append(atom)
+        return self
 
     @property
     def Natoms(self):
@@ -464,9 +614,7 @@ class Atoms(UserList):
         """
         from ._selections import SelectionParser, SelectionException
         try:
-            return self.__class__(
-                atoms=SelectionParser(self, selstr).parse().asList(),
-                **self.kwargs)
+            return SelectionParser(self).parse(selstr)
         except SelectionException as e:
             print(e)
             return None

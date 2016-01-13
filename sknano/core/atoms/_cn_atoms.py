@@ -13,7 +13,6 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from collections import Counter
-from functools import total_ordering
 from operator import attrgetter
 import numbers
 
@@ -24,7 +23,6 @@ from ._atoms import Atom, Atoms
 __all__ = ['CNAtom', 'CNAtoms']
 
 
-@total_ordering
 class CNAtom(Atom):
     """An `Atom` class with a coordination number attribute.
 
@@ -41,12 +39,45 @@ class CNAtom(Atom):
         self.CN = CN
         self.fmtstr = super().fmtstr + ", CN={CN!r}"
 
+    # def __eq__(self, other):
+    #     return np.allclose(self.CN, other.CN) and super().__eq__(other)
+
+    # def __lt__(self, other):
+    #     return (self.CN < other.CN and super().__le__(other)) or \
+    #         (self.CN <= other.CN and super().__lt__(other))
+
     def __eq__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
         return np.allclose(self.CN, other.CN) and super().__eq__(other)
 
+    def __le__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.CN > other.CN or not super().__le__(other):
+            return False
+        return True
+
     def __lt__(self, other):
-        return (self.CN < other.CN and super().__le__(other)) or \
-            (self.CN <= other.CN and super().__lt__(other))
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.CN >= other.CN or not super().__lt__(other):
+            return False
+        return True
+
+    def __ge__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.CN < other.CN or not super().__ge__(other):
+            return False
+        return True
+
+    def __gt__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.CN <= other.CN or not super().__gt__(other):
+            return False
+        return True
 
     def __dir__(self):
         attrs = super().__dir__()

@@ -11,7 +11,6 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from functools import total_ordering
 from operator import attrgetter
 
 import numpy as np
@@ -25,7 +24,6 @@ import sknano.core.atoms
 __all__ = ['Bond', 'Bonds']
 
 
-@total_ordering
 class Bond(BaseClass):
     """Abstract representation of bond between 2 `Atom` objects.
 
@@ -44,11 +42,37 @@ class Bond(BaseClass):
         """Return nice string representation of `Bond`."""
         return "Bond({!r}->{!r})".format(self.atom1.id, self.atom2.id)
 
+    def _is_valid_operand(self, other):
+        return isinstance(other, self.__class__)
+
     def __eq__(self, other):
-        return self is other or (self.atoms == other.atoms)
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        return self.atoms == other.atoms and super().__eq__(other)
+
+    def __le__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if not super().__le__(other) or self.atoms > other.atoms:
+            return False
+        return True
 
     def __lt__(self, other):
-        return self.length < other.length
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        return (self.atoms < other.atoms and self.__le__(other))
+
+    def __ge__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if not super().__ge__(other) or self.atoms < other.atoms:
+            return False
+        return True
+
+    def __gt__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        return self.atoms > other.atoms and self.__ge__(other)
 
     def __dir__(self):
         return ['atoms', 'atom1', 'atom2', 'vector', 'unit_vector', 'length']

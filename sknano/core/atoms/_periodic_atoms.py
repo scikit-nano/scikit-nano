@@ -11,7 +11,6 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from functools import total_ordering
 from operator import attrgetter
 
 import numpy as np
@@ -21,7 +20,6 @@ from ._atoms import Atom, Atoms
 __all__ = ['PBCAtom', 'PBCAtoms']
 
 
-@total_ordering
 class PBCAtom(Atom):
     """Atom class with PBC attributes.
 
@@ -46,11 +44,39 @@ class PBCAtom(Atom):
             ", zperiodic={zperiodic!r}"
 
     def __eq__(self, other):
-        return np.allclose(self.pbc, other.pbc) and super().__eq__(other)
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        return np.all(self.pbc == other.pbc) and super().__eq__(other)
+
+    def __le__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if np.any(self.pbc > other.pbc) or not super().__le__(other):
+            return False
+        return True
 
     def __lt__(self, other):
-        return (self.pbc < other.pbc and super().__le__(other)) or \
-            (self.pbc <= other.pbc and super().__lt__(other))
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        # return (self.pbc < other.pbc and super().__le__(other)) or \
+        #     (self.pbc <= other.pbc and super().__lt__(other))
+        if np.any(self.pbc >= other.pbc) or not super().__lt__(other):
+            return False
+        return True
+
+    def __ge__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if np.any(self.pbc < other.pbc) or not super().__ge__(other):
+            return False
+        return True
+
+    def __gt__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if np.any(self.pbc <= other.pbc) or not super().__gt__(other):
+            return False
+        return True
 
     def __dir__(self):
         attrs = super().__dir__()

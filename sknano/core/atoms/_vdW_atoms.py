@@ -12,7 +12,6 @@ from __future__ import unicode_literals
 
 __docformat__ = 'restructuredtext en'
 
-from functools import total_ordering
 from operator import attrgetter
 import numbers
 import numpy as np
@@ -23,7 +22,6 @@ from ._atoms import Atom, Atoms
 __all__ = ['VanDerWaalsAtom', 'VanDerWaalsAtoms', 'vdw_radius_from_basis']
 
 
-@total_ordering
 class VanDerWaalsAtom(Atom):
     """An `Atom` class with a van der Waals radius attribute.
 
@@ -42,12 +40,45 @@ class VanDerWaalsAtom(Atom):
         self.r_vdw = r_vdw
         self.fmtstr = super().fmtstr + ", r_vdw={r_vdw!r}"
 
+    # def __eq__(self, other):
+    #     return np.allclose(self.r_vdw, other.r_vdw) and super().__eq__(other)
+
+    # def __lt__(self, other):
+    #     return (self.r_vdw < other.r_vdw and super().__le__(other)) or \
+    #         (self.r_vdw <= other.r_vdw and super().__lt__(other))
+
     def __eq__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
         return np.allclose(self.r_vdw, other.r_vdw) and super().__eq__(other)
 
+    def __le__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.r_vdw > other.r_vdw or not super().__le__(other):
+            return False
+        return True
+
     def __lt__(self, other):
-        return (self.r_vdw < other.r_vdw and super().__le__(other)) or \
-            (self.r_vdw <= other.r_vdw and super().__lt__(other))
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.r_vdw >= other.r_vdw or not super().__lt__(other):
+            return False
+        return True
+
+    def __ge__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.r_vdw < other.r_vdw or not super().__ge__(other):
+            return False
+        return True
+
+    def __gt__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.r_vdw <= other.r_vdw or not super().__gt__(other):
+            return False
+        return True
 
     def __dir__(self):
         attrs = super().__dir__()

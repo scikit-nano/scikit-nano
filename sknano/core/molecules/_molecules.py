@@ -11,7 +11,6 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from functools import total_ordering
 from operator import attrgetter
 
 import numpy as np
@@ -22,7 +21,6 @@ from sknano.core.math import convert_condition_str, rotation_matrix
 __all__ = ['Molecule', 'Molecules']
 
 
-@total_ordering
 class Molecule(BaseClass):
     """Base class for abstract representation of a molecule.
 
@@ -41,13 +39,42 @@ class Molecule(BaseClass):
         self.atoms = atoms
         self.fmtstr = "atoms={atoms!r}"
 
+    # def __eq__(self, other):
+    #     """Test equality of two `Molecule` object instances."""
+    #     return self is other or self.atoms == other.atoms
+
+    # def __lt__(self, other):
+    #     """Test if `self` is *less than* `other`."""
+    #     return self.atoms < other.atoms
+
     def __eq__(self, other):
-        """Test equality of two `Molecule` object instances."""
-        return self is other or self.atoms == other.atoms
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        return self.atoms == other.atoms and super().__eq__(other)
+
+    def __le__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if not super().__le__(other) or self.atoms > other.atoms:
+            return False
+        return True
 
     def __lt__(self, other):
-        """Test if `self` is *less than* `other`."""
-        return self.atoms < other.atoms
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        return (self.atoms < other.atoms and self.__le__(other))
+
+    def __ge__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if not super().__ge__(other) or self.atoms < other.atoms:
+            return False
+        return True
+
+    def __gt__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        return self.atoms > other.atoms and self.__ge__(other)
 
     def rezero(self, *args, **kwargs):
         assert not hasattr(super(), 'rezero')

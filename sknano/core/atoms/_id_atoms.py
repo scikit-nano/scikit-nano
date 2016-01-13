@@ -12,7 +12,6 @@ from __future__ import unicode_literals
 
 __docformat__ = 'restructuredtext en'
 
-from functools import total_ordering
 from operator import attrgetter
 import numbers
 
@@ -23,7 +22,6 @@ from ._atoms import Atom, Atoms
 __all__ = ['IDAtom', 'IDAtoms']
 
 
-@total_ordering
 class IDAtom(Atom):
     """An `Atom` class with id attributes.
 
@@ -53,17 +51,50 @@ class IDAtom(Atom):
         self.mol = mol
         self.fmtstr = super().fmtstr + ", id={id!r}, mol={mol!r}"
 
+    # def __eq__(self, other):
+    #     return self.id == other.id and self.mol == other.mol and \
+    #         super().__eq__(other)
+
+    # def __lt__(self, other):
+    #     return ((self.id < other.id and self.mol <= other.mol and
+    #              super().__le__(other))
+    #             or (self.id <= other.id and self.mol < other.mol and
+    #                 super().__le__(other))
+    #             or (self.id <= other.id and self.mol <= other.mol and
+    #                 super().__lt__(other)))
+
     def __eq__(self, other):
-        return self.id == other.id and self.mol == other.mol and \
-            super().__eq__(other)
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        return self.id == other.id and super().__eq__(other)
+
+    def __le__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.id > other.id or not super().__le__(other):
+            return False
+        return True
 
     def __lt__(self, other):
-        return ((self.id < other.id and self.mol <= other.mol and
-                 super().__le__(other))
-                or (self.id <= other.id and self.mol < other.mol and
-                    super().__le__(other))
-                or (self.id <= other.id and self.mol <= other.mol and
-                    super().__lt__(other)))
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.id >= other.id or not super().__lt__(other):
+            return False
+        return True
+
+    def __ge__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.id < other.id or not super().__ge__(other):
+            return False
+        return True
+
+    def __gt__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.id <= other.id or not super().__gt__(other):
+            return False
+        return True
 
     def __dir__(self):
         attrs = super().__dir__()

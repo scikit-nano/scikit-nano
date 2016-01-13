@@ -11,7 +11,6 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from functools import total_ordering
 from operator import attrgetter
 import numbers
 
@@ -23,7 +22,6 @@ from ._atoms import Atom, Atoms
 __all__ = ['DipoleAtom', 'DipoleAtoms']
 
 
-@total_ordering
 class DipoleAtom(Atom):
     """An `Atom` class with electric dipole moment attributes.
 
@@ -44,12 +42,42 @@ class DipoleAtom(Atom):
         self.fmtstr = super().fmtstr + \
             ", px={px:.6f}, py={py:.6f}, pz={pz:.6f}"
 
+    # def __lt__(self, other):
+    #     return (self.p < other.p and super().__le__(other)) or \
+    #         (self.p <= other.p and super().__lt__(other))
+
     def __eq__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
         return self.p == other.p and super().__eq__(other)
 
+    def __le__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.p > other.p or not super().__le__(other):
+            return False
+        return True
+
     def __lt__(self, other):
-        return (self.p < other.p and super().__le__(other)) or \
-            (self.p <= other.p and super().__lt__(other))
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.p >= other.p or not super().__lt__(other):
+            return False
+        return True
+
+    def __ge__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.p < other.p or not super().__ge__(other):
+            return False
+        return True
+
+    def __gt__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.p <= other.p or not super().__gt__(other):
+            return False
+        return True
 
     def __dir__(self):
         attrs = super().__dir__()

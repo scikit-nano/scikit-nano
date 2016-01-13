@@ -12,7 +12,6 @@ from __future__ import unicode_literals
 
 __docformat__ = 'restructuredtext en'
 
-from functools import total_ordering
 from operator import attrgetter
 import numbers
 import numpy as np
@@ -23,7 +22,6 @@ from ._atoms import Atom, Atoms
 __all__ = ['ForceAtom', 'ForceAtoms']
 
 
-@total_ordering
 class ForceAtom(Atom):
     """An `Atom` class with force attributes.
 
@@ -44,12 +42,45 @@ class ForceAtom(Atom):
         self.fmtstr = super().fmtstr + \
             ", fx={fx:.6f}, fy={fy:.6f}, fz={fz:.6f}"
 
+    # def __eq__(self, other):
+    #     return self.f == other.f and super().__eq__(other)
+
+    # def __lt__(self, other):
+    #     return (self.f < other.f and super().__le__(other)) or \
+    #         (self.f <= other.f and super().__lt__(other))
+
     def __eq__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
         return self.f == other.f and super().__eq__(other)
 
+    def __le__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.f > other.f or not super().__le__(other):
+            return False
+        return True
+
     def __lt__(self, other):
-        return (self.f < other.f and super().__le__(other)) or \
-            (self.f <= other.f and super().__lt__(other))
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.f >= other.f or not super().__lt__(other):
+            return False
+        return True
+
+    def __ge__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.f < other.f or not super().__ge__(other):
+            return False
+        return True
+
+    def __gt__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.f <= other.f or not super().__gt__(other):
+            return False
+        return True
 
     def __dir__(self):
         attrs = super().__dir__()

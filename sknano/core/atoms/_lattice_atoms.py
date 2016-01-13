@@ -12,7 +12,6 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 # from operator import attrgetter
-from functools import total_ordering
 import copy
 import numbers
 import numpy as np
@@ -24,7 +23,6 @@ from ._atoms import Atom, Atoms
 __all__ = ['LatticeAtom', 'LatticeAtoms']
 
 
-@total_ordering
 class LatticeAtom(Atom):
     """Class representation of a crystal structure lattice atom.
 
@@ -46,15 +44,57 @@ class LatticeAtom(Atom):
 
         self.fmtstr = super().fmtstr + \
             ", lattice={lattice!r}, xs={xs!r}, ys={ys!r}, zs={zs!r}"
-            # ", lattice={lattice!r}, xs={xs:.6f}, ys={ys:.6f}, zs={zs:.6f}"
+        # ", lattice={lattice!r}, xs={xs:.6f}, ys={ys:.6f}, zs={zs:.6f}"
 
     def __eq__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.rs is None or other.rs is None:
+            return super().__eq__(other)
         return self.rs == other.rs and super().__eq__(other)
 
+    # def __lt__(self, other):
+    #     """Test if `self` is *less than* `other`."""
+    #     return (self.rs < other.rs and super().__le__(other)) or \
+    #         (self.rs <= other.rs and super().__lt__(other))
+
+    def __le__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.rs is None or other.rs is None:
+            return super().__le__(other)
+        if self.rs > other.rs or not super().__le__(other):
+            return False
+        return True
+
     def __lt__(self, other):
-        """Test if `self` is *less than* `other`."""
-        return (self.rs < other.rs and super().__le__(other)) or \
-            (self.rs <= other.rs and super().__lt__(other))
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.rs is None or other.rs is None:
+            return super().__lt__(other)
+        # return ((self.rs < other.rs and self.__le__(other)) or
+        #         (self.__le__(other) and super().__lt__(other)))
+        if self.rs >= other.rs or not super().__lt__(other):
+            return False
+        return True
+
+    def __ge__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.rs is None or other.rs is None:
+            return super().__ge__(other)
+        if self.rs < other.rs or not super().__ge__(other):
+            return False
+        return True
+
+    def __gt__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.rs is None or other.rs is None:
+            return super().__gt__(other)
+        if self.rs <= other.rs or not super().__gt__(other):
+            return False
+        return True
 
     def __dir__(self):
         attrs = super().__dir__()

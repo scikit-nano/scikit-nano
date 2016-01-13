@@ -12,7 +12,6 @@ from __future__ import unicode_literals
 
 __docformat__ = 'restructuredtext en'
 
-from functools import total_ordering
 from operator import attrgetter
 
 import numpy as np
@@ -22,7 +21,6 @@ from ._atoms import Atom, Atoms
 __all__ = ['EnergyAtom', 'EnergyAtoms']
 
 
-@total_ordering
 class EnergyAtom(Atom):
     """An `Atom` class with energy attributes.
 
@@ -44,14 +42,49 @@ class EnergyAtom(Atom):
         self.fmtstr = super().fmtstr + \
             ", pe={pe!r}, ke={ke!r}, etotal={etotal!r}"
 
+    # def __eq__(self, other):
+    #     return np.allclose([self.pe, self.ke, self.etotal],
+    #                        [other.pe, other.ke, other.etotal]) and \
+    #         super().__eq__(other)
+
+    # def __lt__(self, other):
+    #     return (self.etotal < other.etotal and super().__le__(other)) or \
+    #         (self.etotal <= other.etotal and super().__lt__(other))
+
     def __eq__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
         return np.allclose([self.pe, self.ke, self.etotal],
                            [other.pe, other.ke, other.etotal]) and \
             super().__eq__(other)
 
+    def __le__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.etotal > other.etotal or not super().__le__(other):
+            return False
+        return True
+
     def __lt__(self, other):
-        return (self.etotal < other.etotal and super().__le__(other)) or \
-            (self.etotal <= other.etotal and super().__lt__(other))
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.etotal >= other.etotal or not super().__lt__(other):
+            return False
+        return True
+
+    def __ge__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.etotal < other.etotal or not super().__ge__(other):
+            return False
+        return True
+
+    def __gt__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.etotal <= other.etotal or not super().__gt__(other):
+            return False
+        return True
 
     def __dir__(self):
         attrs = super().__dir__()

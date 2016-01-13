@@ -12,7 +12,6 @@ from __future__ import unicode_literals
 
 __docformat__ = 'restructuredtext en'
 
-from functools import total_ordering
 from operator import attrgetter
 import numbers
 import numpy as np
@@ -23,7 +22,6 @@ from ._atoms import Atom, Atoms
 __all__ = ['VelocityAtom', 'VelocityAtoms']
 
 
-@total_ordering
 class VelocityAtom(Atom):
     """An `Atom` class with velocity component attributes.
 
@@ -45,11 +43,37 @@ class VelocityAtom(Atom):
             ", vx={vx:.6f}, vy={vy:.6f}, vz={vz:.6f}"
 
     def __eq__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
         return self.v == other.v and super().__eq__(other)
 
+    def __le__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.v > other.v or not super().__le__(other):
+            return False
+        return True
+
     def __lt__(self, other):
-        return (self.v < other.v and super().__le__(other)) or \
-            (self.v <= other.v and super().__lt__(other))
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.v >= other.v or not super().__lt__(other):
+            return False
+        return True
+
+    def __ge__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.v < other.v or not super().__ge__(other):
+            return False
+        return True
+
+    def __gt__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        if self.v <= other.v or not super().__gt__(other):
+            return False
+        return True
 
     def __dir__(self):
         attrs = super().__dir__()
