@@ -13,7 +13,7 @@ __docformat__ = 'restructuredtext en'
 
 from sknano.core.refdata import aCC, element_data
 from sknano.structures import compute_Lx, compute_Ly, compute_Lz, \
-    compute_Ch, compute_T, SWNT, SWNTBundle, MWNT, MWNTBundle, Graphene, \
+    compute_Ch, compute_T, SWNT, MWNT, Graphene, \
     UnrolledSWNT, Fullerene
 
 _r_CC_vdw = element_data['C']['VanDerWaalsRadius']
@@ -200,8 +200,8 @@ class SWNTModel(GeneratorModelBase, SWNTModelMixin, BundleModelMixin):
     def __init__(self):
         super().__init__()
         # self._n = self._m = 10
-        self.structure = SWNTBundle((10, 10), basis=self.basis, bond=self.bond,
-                                    nx=1, ny=1, nz=1, bundle_packing='hcp')
+        self.structure = SWNT((10, 10), basis=self.basis, bond=self.bond,
+                              nx=1, ny=1, nz=1, bundle_packing='hcp')
         self.notify_observers()
 
 
@@ -209,10 +209,10 @@ class MWNTModel(GeneratorModelBase, MWNTModelMixin, BundleModelMixin):
     def __init__(self):
         super().__init__()
         self.structure = \
-            MWNTBundle(Ch_list=None, Nwalls=3, min_wall_diameter=5,
-                       max_wall_diameter=100, wall_spacing=2 * _r_CC_vdw,
-                       basis=self.basis, bond=self.bond, nx=1, ny=1, Lz=1,
-                       bundle_packing='hcp')
+            MWNT(Ch_list=None, Nwalls=3, min_wall_diameter=5,
+                 max_wall_diameter=100, wall_spacing=2 * _r_CC_vdw,
+                 basis=self.basis, bond=self.bond, nx=1, ny=1, Lz=1,
+                 bundle_packing='hcp')
 
         self.notify_observers()
 
@@ -279,7 +279,7 @@ class MWNTModel(GeneratorModelBase, MWNTModelMixin, BundleModelMixin):
 
     # def generate_Ch_list(self):
     #     self.structure = \
-    #         MWNTBundle(Nwalls=self.structure.Nwalls,
+    #         MWNT(Nwalls=self.structure.Nwalls,
     #                    min_wall_diameter=self.structure.min_wall_diameter,
     #                    max_wall_diameter=self.structure.max_wall_diameter,
     #                    wall_spacing=self.structure.wall_spacing)

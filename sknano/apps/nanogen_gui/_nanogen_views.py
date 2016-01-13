@@ -210,7 +210,6 @@ class SWNTGeneratorView(QMainWindow, Ui_SWNTGenerator, NanoGenViewMixin,
             kwargs['nx'] = self.bundle_nx_spin_box.value()
             kwargs['ny'] = self.bundle_ny_spin_box.value()
             # kwargs['Ntubes'] = self.model.structure.Ntubes
-            kwargs['generator_class'] = 'SWNTBundleGenerator'
 
         return kwargs
 
@@ -273,7 +272,6 @@ class MWNTGeneratorView(QMainWindow, Ui_MWNTGenerator, NanoGenViewMixin,
             kwargs['nx'] = self.bundle_nx_spin_box.value()
             kwargs['ny'] = self.bundle_ny_spin_box.value()
             # kwargs['Ntubes'] = self.model.structure.Ntubes
-            kwargs['generator_class'] = 'MWNTBundleGenerator'
         return kwargs
 
     def update_app_view(self):

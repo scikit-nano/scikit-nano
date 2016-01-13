@@ -21,11 +21,7 @@ This module allows for easy structure generation from the command line.
 
    :class:`~sknano.generators.SWNTGenerator`
 
-   :class:`~sknano.generators.SWNTBundleGenerator`
-
    :class:`~sknano.generators.MWNTGenerator`
-
-   :class:`~sknano.generators.MWNTBundleGenerator`
 
 .. code-block:: python
 
@@ -204,10 +200,6 @@ def nanogen_parser():
         'length as close to the specified `Lz` as possible. If `True`, then '
         'non integer `nz` cells are permitted. (default: %(default)s)')
 
-    swnt_parser = \
-        subparsers.add_parser('swnt', parents=[swnt_parent_parser])
-    swnt_parser.set_defaults(generator_class='SWNTGenerator')
-
     unrolled_swnt_parser = \
         subparsers.add_parser('unrolled_swnt', parents=[swnt_parent_parser])
 
@@ -256,10 +248,6 @@ def nanogen_parser():
                                     help='Maximum number of `MWNT` walls '
                                     '(default: %(default)s)')
 
-    mwnt_parser = \
-        subparsers.add_parser('mwnt', parents=[mwnt_parent_parser])
-    mwnt_parser.set_defaults(generator_class='MWNTGenerator')
-
     bundle_parent_parser = argparse.ArgumentParser(add_help=False)
     bundle_parent_parser.add_argument('--nx', type=int, default=1,
                                       help='Number of repeat unit cells '
@@ -273,15 +261,15 @@ def nanogen_parser():
                                       'radius of nanotube atoms '
                                       '(default: %(default)s)')
 
-    swnt_bundle_parser = \
-        subparsers.add_parser('swnt_bundle', parents=[swnt_parent_parser,
-                                                      bundle_parent_parser])
-    swnt_bundle_parser.set_defaults(generator_class='SWNTBundleGenerator')
+    swnt_parser = \
+        subparsers.add_parser('swnt', parents=[swnt_parent_parser,
+                                               bundle_parent_parser])
+    swnt_parser.set_defaults(generator_class='SWNTGenerator')
 
-    mwnt_bundle_parser = \
-        subparsers.add_parser('mwnt_bundle', parents=[mwnt_parent_parser,
-                                                      bundle_parent_parser])
-    mwnt_bundle_parser.set_defaults(generator_class='MWNTBundleGenerator')
+    mwnt_parser = \
+        subparsers.add_parser('mwnt', parents=[mwnt_parent_parser,
+                                               bundle_parent_parser])
+    mwnt_parser.set_defaults(generator_class='MWNTGenerator')
 
     return parser
 
