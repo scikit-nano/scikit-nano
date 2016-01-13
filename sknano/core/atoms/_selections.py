@@ -11,87 +11,127 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-# from operator import attrgetter
+from functools import reduce
+from operator import and_, or_
 
 # import numpy as np
 
-from abc import abstractmethod
+# from abc import abstractmethod
 
-from pyparsing import Forward, Word, Literal, Suppress, Combine, Optional, \
-    Group, CaselessKeyword, CaselessLiteral, StringEnd, And, Or, ZeroOrMore, \
-    OneOrMore, ParseException, delimitedList, infixNotation, alphanums, \
-    alphas, nums, oneOf
+from pyparsing import Forward, Word, Suppress, Optional, CaselessKeyword, \
+    OneOrMore, ParseException, delimitedList, infixNotation, alphas, oneOf, \
+    opAssoc
 
-from sknano.core import BaseClass
-from sknano.core.math import operator_map
+from sknano.core import BaseClass, binary_operator, integer, \
+    number
+from sknano.core.geometric_regions import Sphere
 # from ._md_atoms import MDAtom as Atom, MDAtoms as Atoms
 
 __all__ = ['SelectionException', 'SelectionParser']
 
 
-# def selection_wrapper(cls):
-#     def selection(s, loc, tokens)
+def make_selection(cls):
+    def selection(s, loc, tokens):
+        return cls(tokens)
+    return selection
+
 
 class Selection(BaseClass):
-    def __init__(self):
+    def __init__(self, selection):
         super().__init__()
+        self.selection = selection
+        self.fmtstr = "{selection!r}"
 
-    @abstractmethod
-    def apply(self):
-        return NotImplementedError
+    def apply(self, atoms, filtered):
+        klass, kwargs = atoms.__class__, atoms.kwargs
+        return klass(atoms=filtered[:], **kwargs)
 
-    def todict(self, selection):
+    def todict(self):
         return dict(selection=self.selection)
-
-
-class AndOperator(Selection):
-
-    def __init__(self, left, right):
-        self.left = left
-        self.right = right
-
-    def apply(self, atoms):
-        return self.left.apply(atoms) & self.right.apply(atoms)
-
-
-class AllSelection(Selection):
-    pass
 
 
 class SelectionException(ParseException):
     pass
 
 
-class IDSelection(Selection):
-    def __init__(self, selection):
-        super().__init__()
-        self.selection = selection
+class AndSelection(Selection):
 
     def apply(self, atoms):
-        return atoms.filtered_ids(self.selection[0].asList())
+        reduce_func = \
+            lambda lsel, rsel: and_(lsel, rsel)
+        return reduce(reduce_func,
+                      [sel.apply(atoms) for sel in self.selection[0]])
+
+
+class OrSelection(Selection):
+
+    def apply(self, atoms):
+        reduce_func = \
+            lambda lsel, rsel: or_(lsel.apply(atoms), rsel.apply(atoms))
+        return reduce(reduce_func, self.selection[0])
+
+
+class NotSelection(Selection):
+
+    def apply(self, atoms):
+        return atoms - self.selection[0][0].apply(atoms)
+
+
+class AllSelection(Selection):
+
+    def apply(self, atoms):
+        return super().apply(atoms, [atom for atom in atoms])
+
+
+class NoneSelection(Selection):
+
+    def apply(self, atoms):
+        return super().apply(atoms, [])
+
+
+class IDSelection(Selection):
+
+    def apply(self, atoms):
+        filtered = [atom for atom in atoms if atom.id
+                    in self.selection.asList()]
+        return super().apply(atoms, filtered)
+
+
+class TypeSelection(Selection):
+
+    def apply(self, atoms):
+        filtered = [atom for atom in atoms if atom.type
+                    in self.selection.asList()]
+        return super().apply(atoms, filtered)
 
 
 class AttributeSelection(Selection):
-    def __init__(self, selection):
-        super().__init__()
-        self.selection = selection
-        print(selection)
 
     def apply(self, atoms):
-        attr, op, val = self.selection
-        return atoms.filtered_ids(op(getattr(atoms, attr), val))
+        try:
+            attr, op, val = self.selection
+            filtered = [atom for atom in atoms if op(getattr(atom, attr), val)]
+        except ValueError:
+            attr, val = self.selection
+            filtered = [atom for atom in atoms if getattr(atom, attr) == val]
+        return super().apply(atoms, filtered)
 
 
-def operator_function(s, l, t):
-    return operator_map[t[0]]
+class WithinSelection(Selection):
+
+    def apply(self, atoms):
+        other = self.selection[-1].apply(atoms)
+        filtered = atoms.query_ball_tree(other, self.selection[0])
+        return super().apply(atoms, filtered)
 
 
-def asint(s, l, t):
-    return int(t[0])
+class ExWithinSelection(Selection):
 
-
-def asfloat(s, l, t):
-    return float(t[0])
+    def apply(self, atoms):
+        other = self.selection[-1].apply(atoms)
+        filtered = atoms.query_ball_tree(other, self.selection[0])
+        filtered = super().apply(atoms, filtered) - other
+        return super().apply(atoms, filtered)
 
 
 class SelectionParser(BaseClass):
@@ -102,64 +142,80 @@ class SelectionParser(BaseClass):
     TYPE = CaselessKeyword('type')
     INDEX = CaselessKeyword('index')
     ID = CaselessKeyword('id')
+    WITHIN = CaselessKeyword('within')
+    EXWITHIN = CaselessKeyword('exwithin')
     SERIAL = CaselessKeyword('serial')
     ATOMICNUMBER = CaselessKeyword('atomicnumber')
     ELEMENT = CaselessKeyword('element')
     RESIDUE = CaselessKeyword('residue')
     NUMBONDS = CaselessKeyword('numbonds')
-    BOOLOP = oneOf('and or', caseless=True)
-    BINOP = oneOf('< <= == > >= != LT LE EQ GT GE NE', caseless=True)
-    LPAR = Suppress('(')
-    RPAR = Suppress(')')
 
-    ATOM_ATTRIBUTE = oneOf(' '.join(('x', 'y', 'z', 'r')))
+    OF = CaselessKeyword('of')
 
-    point = Literal('.')
-    e = CaselessLiteral('E')
-    number = Word(nums)
-    plus_or_minus_sign = Word('+-', exact=1)
-    integer = Combine(Optional(plus_or_minus_sign) + number) \
-        .setParseAction(asint)
-    positive_integer = number.setParseAction(asint)
-    real_number = \
-        Combine(Optional(plus_or_minus_sign) +
-                (number + point + Optional(number) | (point + number)) +
-                Optional(e) + Optional(plus_or_minus_sign) + number) \
-        .setParseAction(lambda s, l, t: float(t[0]))
+    NOT = CaselessKeyword('not')
+    AND = CaselessKeyword('and')
+    OR = CaselessKeyword('or')
 
-    NUMBERPATTERN = integer | real_number
+    LPAR, RPAR = map(Suppress, '()')
 
-    selection_pattern = Forward()
+    ATOM_ATTRIBUTE = \
+        oneOf(' '.join(('x', 'y', 'z', 'r', 'vx', 'vy', 'vz', 'v',
+                        'fx', 'fy', 'fz', 'f', 'Z', 'element', 'symbol',
+                        'mass', 'CN')))
 
-    # select_all_pattern = Forward()
+    REGION = ()
 
-    # boolean_expression =
+    # selection_expression = Forward()
+
+    expr_term = Forward()
+    expr = \
+        infixNotation(
+            expr_term,
+            [(Suppress(NOT), 1, opAssoc.RIGHT, make_selection(NotSelection)),
+             (Suppress(AND), 2, opAssoc.LEFT, make_selection(AndSelection)),
+             (Suppress(OR), 2, opAssoc.LEFT, make_selection(OrSelection))])
+    grouped_expr = LPAR + expr_term + RPAR
 
     id_selection_expression = \
-        (Optional(LPAR) + Suppress(ID) +
-         Group(delimitedList(OneOrMore(positive_integer), delim=' ')) +
-         Optional(RPAR)).setParseAction(IDSelection)
+        (Suppress(ID) +
+         delimitedList(OneOrMore(integer), delim=' ')
+         ).setParseAction(make_selection(IDSelection))
+
+    type_selection_expression = \
+        (Suppress(TYPE) +
+         delimitedList(OneOrMore(integer), delim=' ')
+         ).setParseAction(make_selection(TypeSelection))
 
     attr_selection_expression = \
-        (Optional(LPAR) +
-         ATOM_ATTRIBUTE + BINOP.setParseAction(operator_function) +
-         NUMBERPATTERN + Optional(RPAR)).setParseAction(AttributeSelection)
+        (ATOM_ATTRIBUTE +
+         Optional(binary_operator) +
+         (number | Word(alphas))
+         ).setParseAction(make_selection(AttributeSelection))
 
-    selection_pattern << Optional(id_selection_expression) + \
-        Optional(attr_selection_expression) + \
-        ZeroOrMore(BOOLOP + selection_pattern)
+    within_selection_expression = \
+        (Suppress(WITHIN) + number + Suppress(OF) +
+         expr).setParseAction(make_selection(WithinSelection))
 
-    def __init__(self, atoms=None, selstr=None):
-        super().__init__()
+    exwithin_selection_expression = \
+        (Suppress(EXWITHIN) + number + Suppress(OF) +
+         expr).setParseAction(make_selection(ExWithinSelection))
+
+    all_selection_expression = \
+        (Suppress(ALL)).setParseAction(make_selection(AllSelection))
+
+    expr_term << \
+        (id_selection_expression | type_selection_expression |
+         attr_selection_expression | within_selection_expression |
+         exwithin_selection_expression | all_selection_expression |
+         grouped_expr)
+
+    selection_expression = expr.copy()
+
+    def __init__(self, atoms=None, selstr=None, **kwargs):
+        super().__init__(**kwargs)
         self.atoms = atoms
-        # self.ATOM_ATTRIBUTE = \
-        #     oneOf(' '.join([attr for attr in dir(self.atoms) if not
-        #                     attr.startswith('_')]))
         self.selstr = selstr
         self.fmtstr = "atoms={atoms!r}, selstr={selstr!r}"
-        # self.selection_pattern = selection_pattern
-
-        # self.selected_atoms = self.atoms.__class__(**self.atoms.kwargs)
 
         # if selstr is not None:
         #     self.parse(selstr)
@@ -170,19 +226,14 @@ class SelectionParser(BaseClass):
 
         try:
             selection = \
-                self.selection_pattern.parseString(selstr, parseAll=True)[0]
+                self.selection_expression.parseString(selstr, parseAll=True)[0]
+            if self.verbose:
+                print('selstr: {}'.format(selstr))
+                print('selection: {}'.format(selection))
         except ParseException as e:
             raise SelectionException(e.pstr, e.loc, e.msg, e.parseElement)
         else:
             return selection.apply(self.atoms)
-
-    # def id_selection(self, s, l, t):
-    #     # [self.selected_atoms.append(atom) for atom in
-    #     #  self.atoms.filtered_ids(t[0].asList())]
-    #     return self.atoms.filtered_ids(t[0].asList())
-
-    # def attr_selection(self, s, l, t):
-    #     print(t)
 
     def todict(self):
         return dict(atoms=self.atoms, selstr=self.selstr)
