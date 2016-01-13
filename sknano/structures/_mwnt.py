@@ -253,7 +253,7 @@ class MWNTMixin:
             np.asarray(generate_Ch_list(imax=imax,
                                         chiral_types=chiral_types))
         self._dt_pool = np.asarray([compute_dt(_Ch, bond=self.bond) for _Ch
-                                   in self._Ch_pool])
+                                    in self._Ch_pool])
 
         dt_mask = np.logical_and(self._dt_pool >= min_wall_diameter,
                                  self._dt_pool <= max_wall_diameter)
