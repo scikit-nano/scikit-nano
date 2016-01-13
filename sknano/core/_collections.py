@@ -90,6 +90,14 @@ class UserList(MutableSequence, BaseClass):
         """The list item's class."""
         return NotImplementedError
 
+    def __cast(self, other):
+        return other.data if isinstance(other, UserList) else other
+
+    def __cast_item(self, item):
+        if not isinstance(item, self.__item_class__):
+            item = self.__item_class__(item)
+        return item
+
     def __lt__(self, other):
         return self.data < self.__cast(other)
 
@@ -107,9 +115,6 @@ class UserList(MutableSequence, BaseClass):
 
     def __ge__(self, other):
         return self.data >= self.__cast(other)
-
-    def __cast(self, other):
-        return other.data if isinstance(other, UserList) else other
 
     def __contains__(self, item):
         return item in self.data
@@ -172,12 +177,10 @@ class UserList(MutableSequence, BaseClass):
         return self
 
     def append(self, item):
-        if not isinstance(item, self.__item_class__):
-            item = self.__item_class__(item)
-        self.data.append(item)
+        self.data.append(self.__cast_item(item))
 
     def insert(self, i, item):
-        self.data.insert(i, item)
+        self.data.insert(i, self.__cast_item(item))
 
     def pop(self, i=-1):
         return self.data.pop(i)
