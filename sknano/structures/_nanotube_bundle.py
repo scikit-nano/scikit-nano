@@ -189,7 +189,8 @@ class NanotubeBundleMixin:
     @property
     def Natoms_per_tube(self):
         """Alias for :attr:`~NanotubeBundleMixin.Natoms_list`."""
-        return self.Natoms_list
+        val = self.Natoms_list[:]
+        return val if len(val) > 1 else val[0]
 
     def generate_bundle_coords(self):
         """Generate coordinates of bundle tubes."""
