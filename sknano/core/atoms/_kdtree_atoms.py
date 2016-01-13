@@ -25,6 +25,8 @@ except ImportError:
     raise ImportError('Install scipy version >= 0.13.0 to allow '
                       'nearest-neighbor queries between atoms.')
 
+from sknano.core import dedupe, flatten
+
 __all__ = ['KDTreeAtomsMixin']
 
 
@@ -120,12 +122,47 @@ class KDTreeAtomsMixin:
 
         Returns
         -------
-        :class:`~sknano.core.atoms.KDTAtoms`
+        :class:`~sknano.core.atoms.Atoms`
 
         """
         atom_tree = self.atom_tree
         if atom_tree is not None:
-            NNi = atom_tree.query_ball_point(pts, r, p=p, eps=eps)
+            NNi = \
+                list(dedupe(flatten(
+                    atom_tree.query_ball_point(pts, r, p=p, eps=eps))))
+
+        return self.__class__(atoms=np.asarray(self)[NNi].tolist(),
+                              **self.kwargs)
+
+    def query_ball_tree(self, other, r, p=2.0, eps=0):
+        """Find all pairs of `Atoms` whose distance is at more `r`.
+
+        Parameters
+        ----------
+        other : :class:`~scipy:scipy.spatial.KDTree`
+            The tree containing points to search against
+        r : positive :class:`~python:float`
+            The radius of :class:`~sknano.core.atoms.KDTAtoms` to return
+        p : float, 1<=p<=infinity
+            Which Minkowski p-norm to use.
+            1 is the sum-of-absolute-values "Manhattan" distance
+            2 is the usual Euclidean distance
+            infinity is the maximum-coordinate-difference distance
+        eps : nonnegative :class:`~python:float`, optional
+            Approximate search.
+
+        Returns
+        -------
+        :class:`~sknano.core.atoms.Atoms`
+
+        """
+        atom_tree = self.atom_tree
+        if atom_tree is not None:
+            # NNi = \
+            #     atom_tree.query_ball_tree(other.atom_tree, r, p=p, eps=eps)
+            NNi = \
+                other.atom_tree.query_ball_tree(atom_tree, r, p=p, eps=eps)
+            NNi = list(dedupe(flatten(NNi)))
 
         return self.__class__(atoms=np.asarray(self)[NNi].tolist(),
                               **self.kwargs)
