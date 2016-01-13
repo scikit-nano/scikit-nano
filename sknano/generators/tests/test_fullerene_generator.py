@@ -9,7 +9,7 @@ from sknano.generators import FullereneGenerator
 from sknano.testing import GeneratorTestFixture
 
 
-class TestCase(GeneratorTestFixture):
+class Tests(GeneratorTestFixture):
 
     def test1(self):
         buckyball = FullereneGenerator(60)

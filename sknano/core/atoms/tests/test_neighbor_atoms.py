@@ -8,7 +8,7 @@ from nose.tools import assert_equals
 from sknano.testing import AtomsTestFixture, generate_atoms
 
 
-class TestCase(AtomsTestFixture):
+class Tests(AtomsTestFixture):
 
     def test1(self):
         atoms = self.atoms

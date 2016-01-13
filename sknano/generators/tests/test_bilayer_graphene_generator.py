@@ -9,7 +9,7 @@ from sknano.generators import BilayerGrapheneGenerator
 from sknano.testing import GeneratorTestFixture
 
 
-class TestCase(GeneratorTestFixture):
+class Tests(GeneratorTestFixture):
 
     def test1(self):
         generator = BilayerGrapheneGenerator(armchair_edge_length=5,

@@ -9,7 +9,7 @@ from sknano.generators import UnrolledSWNTGenerator
 from sknano.testing import GeneratorTestFixture
 
 
-class TestCase(GeneratorTestFixture):
+class Tests(GeneratorTestFixture):
 
     def test1(self):
         unrolled_swnt = UnrolledSWNTGenerator(n=10, m=10)

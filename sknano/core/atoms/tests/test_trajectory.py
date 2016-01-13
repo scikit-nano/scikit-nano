@@ -66,7 +66,7 @@ class TrajectoryTestFixture(unittest.TestCase):
                        attrmap={'c_peratom_pe': 'pe', 'c_peratom_ke': 'ke'})
 
 
-class TestCase(TrajectoryTestFixture):
+class Tests(TrajectoryTestFixture):
 
     def test1(self):
         traj = self.dump.trajectory

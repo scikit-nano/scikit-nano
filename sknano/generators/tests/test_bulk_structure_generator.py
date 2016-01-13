@@ -21,7 +21,7 @@ from sknano.io import XYZReader, DATAReader
 from sknano.testing import GeneratorTestFixture
 
 
-class TestCase(GeneratorTestFixture):
+class Tests(GeneratorTestFixture):
 
     def test1(self):
         quartz = AlphaQuartzGenerator()

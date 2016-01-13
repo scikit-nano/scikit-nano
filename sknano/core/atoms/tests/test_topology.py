@@ -13,7 +13,7 @@ from sknano.core.atoms import get_angle
 from sknano.testing import AtomsTestFixture, generate_atoms
 
 
-class TestCase(AtomsTestFixture):
+class Tests(AtomsTestFixture):
 
     def test1(self):
         atoms = self.atoms

@@ -29,7 +29,7 @@ class DUMPTestFixture(unittest.TestCase):
         self.atoms = self.snapshot0.atoms
 
 
-class TestCase(DUMPTestFixture):
+class Tests(DUMPTestFixture):
 
     def test1(self):
         print('timesteps: {}'.format(self.dump.timesteps))

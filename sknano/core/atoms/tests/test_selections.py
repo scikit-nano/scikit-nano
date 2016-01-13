@@ -34,7 +34,7 @@ class SelectionTestFixture(AtomsTestFixture):
     #     print('type(selection): {}'.format(type(self.selection)))
 
 
-class TestCase(SelectionTestFixture):
+class Tests(SelectionTestFixture):
 
     def test1(self):
         atoms = self.atoms

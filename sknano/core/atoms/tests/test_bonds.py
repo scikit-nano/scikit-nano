@@ -71,7 +71,7 @@ def test4():
     assert_true(np.allclose(bond_centroid, bond.centroid))
 
 
-class TestCase(AtomsTestFixture):
+class Tests(AtomsTestFixture):
     def test1(self):
         atoms = self.atoms
         atoms.update_attrs()
