@@ -14,11 +14,33 @@ __docformat__ = 'restructuredtext en'
 from fractions import gcd
 import operator
 
-__all__ = ['comparison_symbol_operator_mappings',
+import numpy as np
+
+__all__ = ['math_functions', 'function_map',
+           'comparison_symbol_operator_mappings',
            'math_symbol_operator_mappings',
            'symbol_operator_mappings', 'operator_map',
            'math_operators', 'convert_condition_str',
            'totient_func']
+
+math_functions = function_map = {}
+function_map.update(dict(
+    abs=np.abs,
+    sqrt=np.sqrt,
+    floor=np.floor,
+    ceil=np.ceil,
+    sin=np.sin,
+    cos=np.cos,
+    tan=np.tan,
+    atan=np.arctan,
+    asin=np.arcsin,
+    acos=np.arccos,
+    sinh=np.sinh,
+    cosh=np.cosh,
+    tanh=np.tanh,
+    exp=np.exp,
+    log=np.log,
+    log10=np.log10))
 
 math_operators = symbol_operator_mappings = operator_map = {}
 
@@ -31,7 +53,7 @@ comparison_symbol_operator_mappings = \
      '>=': operator.ge,
      'is': operator.is_,
      'is not': operator.is_not}
-symbol_operator_mappings.update(comparison_symbol_operator_mappings)
+operator_map.update(comparison_symbol_operator_mappings)
 
 math_symbol_operator_mappings = \
     {'+': operator.add,
@@ -39,7 +61,7 @@ math_symbol_operator_mappings = \
      '*': operator.mul,
      '/': operator.truediv,
      '//': operator.floordiv}
-symbol_operator_mappings.update(math_symbol_operator_mappings)
+operator_map.update(math_symbol_operator_mappings)
 
 
 def convert_condition_str(obj, condition):
