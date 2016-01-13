@@ -115,8 +115,6 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-__all__ = ['StructureAtom', 'StructureAtoms']
-
 from ._atoms import *
 from ._xyz_atoms import *
 from ._velocity_atoms import *
@@ -131,26 +129,16 @@ from ._periodic_atoms import *
 from ._lattice_atoms import *
 from ._dipole_atoms import *
 from ._basis_atoms import *
-
-from ._extended_atoms import *
 from ._kdtree_atoms import *
 from ._poav_atoms import *
-
 from ._bonds import *
-
 from ._md_atoms import *
 from ._trajectory import *
-
 from ._structure_atoms import *
-
 from ._neighbor_atoms import *
-
 from ._vdW_atoms import *
-
 from ._selections import *
-
 from ._topology import *
-
 from ._adapters import *
 
-__all__ += [s for s in dir() if not s.startswith('_')]
+__all__ = [s for s in dir() if not s.startswith('_')]
