@@ -51,8 +51,9 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._base import *
-from ._lammps_data_format import *
-from ._lammps_dump_format import *
-from ._xyz_format import *
+from ._lammps_data import *
+from ._lammps_dump import *
+from ._pdb import *
+from ._xyz import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
