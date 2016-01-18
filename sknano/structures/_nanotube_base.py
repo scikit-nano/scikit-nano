@@ -12,6 +12,7 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 import numbers
+import re
 
 import numpy as np
 
@@ -21,7 +22,7 @@ from sknano.core.math import Vector
 from ._extras import get_chiral_indices
 
 __all__ = ['compute_bundle_density', 'NanotubeBundleMixin',
-           'NanotubeBundleBase']
+           'NanotubeBase']
 
 
 def compute_bundle_density(*Ch, r_vdw=None, bond=None,
@@ -83,6 +84,10 @@ def compute_bundle_density(*Ch, r_vdw=None, bond=None,
 
 class NanotubeBundleMixin:
     """Mixin class for nanotube bundles."""
+    @property
+    def bundle_density(self):
+        return compute_bundle_density(self.n, self.m, r_vdw=self.vdw_radius,
+                                      bond=self.bond, basis=self.basis)
 
     @property
     def nx(self):
@@ -252,7 +257,7 @@ class NanotubeBundleMixin:
                     self.bundle_coords.append(dr)
 
 
-class NanotubeBundleBase(NanotubeBundleMixin):
+class NanotubeBase(NanotubeBundleMixin):
     """Nanotube bundle structure base class."""
 
     _bundle_geometries = ['square', 'rectangle', 'hexagon']
@@ -268,6 +273,13 @@ class NanotubeBundleBase(NanotubeBundleMixin):
         self.bundle_packing = bundle_packing
         self.bundle_list = []
         self.generate_bundle_coords()
+        fmtstr = super().fmtstr
+        match = re.search('[nL]z=', fmtstr)
+        if match:
+            self.fmtstr = fmtstr[:match.start()] + \
+                "nx={nx!r}, ny={ny!r}, " + fmtstr[match.start():] + \
+                ", bundle_packing={bundle_packing!r}, " + \
+                "bundle_geometry={bundle_geometry!r}"
 
     def todict(self):
         attrdict = super().todict()
