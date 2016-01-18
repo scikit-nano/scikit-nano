@@ -12,7 +12,7 @@ from sknano.testing import GeneratorTestFixture
 class Tests(GeneratorTestFixture):
 
     def test1(self):
-        mwnt = MWNTGenerator(max_walls=3, Lz=1.0)
+        mwnt = MWNTGenerator(max_walls=2, Lz=1.0)
         print(mwnt)
         print(mwnt.todict())
         mwnt.save()
@@ -21,7 +21,7 @@ class Tests(GeneratorTestFixture):
         self.tmpdata.append(mwnt.fname)
 
     def test2(self):
-        mwnt = MWNTGenerator(Ch=[(10, 10), (50, 50)], Lz=1.0)
+        mwnt = MWNTGenerator(Ch=[(5, 5), (10, 10)], Lz=1.0)
         print(mwnt)
         print(mwnt.todict())
         assert_equal(mwnt.Nwalls, 2)
@@ -32,7 +32,7 @@ class Tests(GeneratorTestFixture):
         self.tmpdata.append(mwnt.fname)
 
     def test3(self):
-        mwnt = MWNTGenerator(Ch=[(5, 5), (10, 10), (20, 20)], Lz=1.0)
+        mwnt = MWNTGenerator(Ch=[(3, 3), (5, 5), (10, 10)], Lz=1.0)
         print(mwnt)
         print(mwnt.todict())
         assert_equal(mwnt.Nwalls, 3)
@@ -50,7 +50,7 @@ class Tests(GeneratorTestFixture):
         self.tmpdata.append(bundle.fname)
 
     def test5(self):
-        Ch = [(5, 5), (10, 10), (15, 15), (20, 20)]
+        Ch = [(5, 5), (6, 6), (7, 7), (8, 8)]
         bundle = MWNTGenerator(Ch=Ch, Lz=0.5, bundle_geometry='hexagon')
         bundle.save()
         self.tmpdata.append(bundle.fname)
