@@ -16,6 +16,7 @@ Nanostructure generators
    :toctree: generated/
 
    GeneratorBase
+   NanotubeGeneratorBase
    FullereneGenerator
    GrapheneGenerator
    PrimitiveCellGrapheneGenerator
@@ -33,15 +34,13 @@ Bulk structure generators
 
    BulkGeneratorBase
    AlphaQuartzGenerator
-   GoldGenerator
-   CopperGenerator
+   DiamondGenerator
+   CaesiumChlorideGenerator
+   RocksaltGenerator
+   ZincblendeGenerator
+   BCCGenerator
+   FCCGenerator
    MoS2Generator
-   CaesiumChlorideStructureGenerator
-   DiamondStructureGenerator
-   BCCStructureGenerator
-   FCCStructureGenerator
-   RocksaltStructureGenerator
-   ZincblendeStructureGenerator
 
 Compound structure generators
 ------------------------------
@@ -68,9 +67,9 @@ from ._mixins import *
 from ._fullerene_generator import *
 from ._graphene_generator import *
 from ._bilayer_graphene_generator import *
+from ._nanotube_generator_base import *
 from ._swnt_generator import *
 from ._mwnt_generator import *
-from ._nanotube_bundle_generator import *
 from ._unrolled_swnt_generator import *
 from ._layered_structure_generator import *
 # from ._defect_generators import *

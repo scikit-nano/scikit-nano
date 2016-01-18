@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Nanotube bundle generator (:mod:`sknano.generators._nanotube_bundle_generator`)
+Nanotube generator base (:mod:`sknano.generators._base_nanotube_generator`)
 ===============================================================================
 
-.. currentmodule:: sknano.generators._nanotube_bundle_generator
+.. currentmodule:: sknano.generators._base_nanotube_generator
 
 """
 from __future__ import absolute_import, division, print_function
@@ -13,15 +13,17 @@ __docformat__ = 'restructuredtext en'
 
 import copy
 
-__all__ = ['NanotubeBundleGeneratorBase']
+from ._base import GeneratorBase
+
+__all__ = ['NanotubeGeneratorBase']
 
 
-class NanotubeBundleGeneratorBase:
-    """Base class for generating nanotube bundles."""
-    def __init__(self, autogen=True, generate_bundle=True,
+class NanotubeGeneratorBase(GeneratorBase):
+    """Base class for generating nanotubes."""
+    def __init__(self, *args, autogen=True, generate_bundle=True,
                  from_bundle_coords=True, from_scaling_matrix=False, **kwargs):
 
-        super().__init__(autogen=False, **kwargs)
+        super().__init__(*args, autogen=False, **kwargs)
 
         if autogen:
             self.generate(generate_bundle=generate_bundle,

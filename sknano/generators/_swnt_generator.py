@@ -27,14 +27,27 @@ from sknano.core import pluralize
 from sknano.core.math import Point
 from sknano.structures import SWNT
 from sknano.core.geometric_regions import Cuboid
-from ._base import GeneratorBase
-from ._nanotube_bundle_generator import NanotubeBundleGeneratorBase
+from ._nanotube_generator_base import NanotubeGeneratorBase
 
 
-__all__ = ['SWNTGenerator']
+__all__ = ['SWNTGeneratorMixin', 'SWNTGenerator']
 
 
-class SWNTGeneratorBase(GeneratorBase, SWNT):
+class SWNTGeneratorMixin:
+    """`SWNTGenerator` mixin."""
+    def generate(self):
+        """Generate structure data."""
+
+        super().generate()
+
+        if self.L0 is not None and self.fix_Lz:
+            Lz_cutoff = 10 * self.L0 + 1
+            region_bounds = Cuboid(pmin=Point([-np.inf, -np.inf, 0]),
+                                   pmax=Point([np.inf, np.inf, Lz_cutoff]))
+            self.atoms.clip_bounds(region_bounds)
+
+
+class SWNTGenerator(NanotubeGeneratorBase, SWNTGeneratorMixin, SWNT):
     """Class for generating :class:`SWNT` structures.
 
     Parameters
@@ -44,9 +57,8 @@ class SWNTGeneratorBase(GeneratorBase, SWNT):
         2 integers (i.e., *Ch = [n, m]) specifying the chiral indices
         of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-    nz : :class:`python:int`, optional
-        Number of repeat unit cells in the :math:`z` direction, along
-        the *length* of the nanotube.
+    nx, ny, nz : int, optional
+        Number of repeat unit cells in the :math:`x, y, z` dimensions.
     basis : {:class:`python:list`}, optional
         List of :class:`python:str`\ s of element symbols or atomic number
         of the two atom basis (default: ['C', 'C'])
@@ -83,101 +95,6 @@ class SWNTGeneratorBase(GeneratorBase, SWNT):
 
         .. versionadded:: 0.2.6
 
-    autogen : bool, optional
-        if `True`, automatically generate structure data.
-    verbose : bool, optional
-        if `True`, show verbose output
-
-    Examples
-    --------
-    First, load the :class:`~sknano.generators.SWNTGenerator` class.
-
-    >>> from sknano.generators import SWNTGenerator
-
-    Now let's generate a :math:`\\mathbf{C}_{\\mathrm{h}} = (10, 5)`
-    :class:`SWNT` unit cell.
-
-    >>> swnt = SWNTGenerator((10, 5))
-    >>> swnt.save(fname='10,5_unit_cell.xyz')
-    >>> # note that there are two other alternative, but equivalent
-    >>> # means of passing arguments to SWNTGenerator constructor:
-    >>> # SWNTGenerator(10, 5) and SWNTGenerator(n=10, m=5)
-
-    Here's a nice ray traced rendering of the generated
-    :math:`(10, 5)` :class:`SWNT` unit cell.
-
-    .. image:: /images/10,5_unit_cell-01.png
-
-    """
-    def generate(self):
-        """Generate structure data."""
-
-        super().generate()
-
-        if self.L0 is not None and self.fix_Lz:
-            Lz_cutoff = 10 * self.L0 + 1
-            region_bounds = Cuboid(pmin=Point([-np.inf, -np.inf, 0]),
-                                   pmax=Point([np.inf, np.inf, Lz_cutoff]))
-            self.atoms.clip_bounds(region_bounds)
-
-    @classmethod
-    def generate_fname(cls, n=None, m=None, nz=None, fix_Lz=False,
-                       **kwargs):
-
-        chirality = '{}{}'.format('{}'.format(n).zfill(2),
-                                  '{}'.format(m).zfill(2))
-        nz_fmtstr = '{:.2f}' if fix_Lz else '{:.0f}'
-        nz = ''.join((nz_fmtstr.format(nz), pluralize('cell', nz)))
-        fname_wordlist = (chirality, nz)
-        fname = '_'.join(fname_wordlist)
-        return fname
-
-    def save(self, fname=None, outpath=None, structure_format=None,
-             center_centroid=True, **kwargs):
-        """Save structure data.
-
-        See :meth:`~sknano.generators.GeneratorBase.save` method
-        for documentation.
-
-        """
-        if fname is None:
-            fname = self.generate_fname(n=self.n, m=self.m, nz=self.nz,
-                                        fix_Lz=self.fix_Lz)
-
-        super().save(fname=fname, outpath=outpath,
-                     structure_format=structure_format,
-                     center_centroid=center_centroid, **kwargs)
-
-
-class SWNTGenerator(NanotubeBundleGeneratorBase, SWNTGeneratorBase):
-    """Class for generating nanotube bundles.
-
-    .. versionadded:: 0.2.4
-
-    Parameters
-    ----------
-    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
-        Either a 2-tuple of ints or 2 integers giving the chiral indices
-        of the nanotube chiral vector
-        :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-    nx, ny, nz : int, optional
-        Number of repeat unit cells in the :math:`x, y, z` dimensions.
-    basis : {:class:`python:list`}, optional
-        List of :class:`python:str`\ s of element symbols or atomic number
-        of the two atom basis (default: ['C', 'C'])
-
-        .. versionadded:: 0.3.10
-
-    element1, element2 : {str, int}, optional
-        Element symbol or atomic number of basis
-        :class:`~sknano.core.Atom` 1 and 2
-
-        .. deprecated:: 0.3.10
-           Use `basis` instead
-
-    bond : float, optional
-        :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
-        nearest neighbor atoms. Must be in units of **Angstroms**.
     vdw_radius : float, optional
         van der Waals radius of nanotube atoms
 
@@ -197,19 +114,6 @@ class SWNTGenerator(NanotubeBundleGeneratorBase, SWNTGeneratorBase):
 
         .. versionadded:: 0.2.5
 
-    Lz : float, optional
-        length of bundle in :math:`z` dimension in **nanometers**.
-        Overrides `nz` value.
-
-        .. versionadded:: 0.2.5
-
-    fix_Lz : bool, optional
-        Generate the nanotube with length as close to the specified
-        :math:`L_z` as possible. If `True`, then
-        non integer :math:`n_z` cells are permitted.
-
-        .. versionadded:: 0.2.6
-
     autogen : bool, optional
         if `True`, automatically generate structure data.
     verbose : bool, optional
@@ -217,11 +121,11 @@ class SWNTGenerator(NanotubeBundleGeneratorBase, SWNTGeneratorBase):
 
     Examples
     --------
-
     Using the `SWNTGenerator` class, you can generate structure
-    data for nanotube *bundles* with either cubic close packed (ccp) or
-    hexagonal close packed (hcp) arrangement of nanotubes. The bundle
-    packing arrangement is set using the `bundle_packing` parameter.
+    data for single-walled nanotubes (SWNTs) or nanotube *bundles* with
+    either cubic close packed (ccp) or hexagonal close packed (hcp)
+    arrangement of nanotubes. The bundle packing arrangement is set using the
+    `bundle_packing` parameter.
 
     You can also enforce a specific
     `bundle geometry` which will try and build the nanotube bundle such
@@ -230,11 +134,28 @@ class SWNTGenerator(NanotubeBundleGeneratorBase, SWNTGeneratorBase):
     hexagonal, or rectangular in shape, as some of the examples below
     illustrate.
 
-    To start, let's generate an hcp bundle of
+    First, load the :class:`~sknano.generators.SWNTGenerator` class.
+
+    >>> from sknano.generators import SWNTGenerator
+
+    Now let's generate a :math:`\\mathbf{C}_{\\mathrm{h}} = (10, 5)`
+    :class:`SWNT` unit cell.
+
+    >>> swnt = SWNTGenerator((10, 5))
+    >>> swnt.save(fname='10,5_unit_cell.xyz')
+    >>> # note that there are two other alternative, but equivalent
+    >>> # means of passing arguments to SWNTGenerator constructor:
+    >>> # SWNTGenerator(10, 5) and SWNTGenerator(n=10, m=5)
+
+    Here's a nice ray traced rendering of the generated
+    :math:`(10, 5)` :class:`SWNT` unit cell.
+
+    .. image:: /images/10,5_unit_cell-01.png
+
+    Next, let's generate an hcp bundle of
     :math:`C_{\\mathrm{h}} = (10, 5)` SWCNTs and cell count
     :math:`n_x=10, n_y=3, n_z=5`.
 
-    >>> from sknano.generators import SWNTGenerator
     >>> SWCNTbundle = SWNTGenerator(n=10, m=5, nx=10, ny=3, nz=5)
     >>> SWCNTbundle.save()
 
@@ -289,6 +210,15 @@ class SWNTGenerator(NanotubeBundleGeneratorBase, SWNTGeneratorBase):
                        bundle_packing=None, **kwargs):
         chirality = '{}{}'.format('{}'.format(n).zfill(2),
                                   '{}'.format(m).zfill(2))
+        chirality = '{}{}'.format('{}'.format(n).zfill(2),
+                                  '{}'.format(m).zfill(2))
+        if nx == ny == 1:
+            nz_fmtstr = '{:.2f}' if fix_Lz else '{:.0f}'
+            nz = ''.join((nz_fmtstr.format(nz), pluralize('cell', nz)))
+            fname_wordlist = (chirality, nz)
+            fname = '_'.join(fname_wordlist)
+            return fname
+
         packing = '{}cp'.format(bundle_packing[0])
         Ntube = '{}tube'.format(Ntubes)
 
