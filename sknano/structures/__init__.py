@@ -40,7 +40,7 @@ Base/Mixin Classes
 
    NanoStructureBase
    GrapheneBase
-   NanotubeBundleBase
+   NanotubeBase
    GrapheneMixin
    SWNTMixin
    MWNTMixin
@@ -101,7 +101,7 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._base import *
-from ._nanotube_bundle import *
+from ._nanotube_base import *
 
 from ._fullerenes import *
 

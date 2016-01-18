@@ -21,7 +21,7 @@ from sknano.core.refdata import aCC, grams_per_Da
 from ._base import NanoStructureBase, r_CC_vdw
 from ._extras import attr_strfmt, attr_symbols, attr_units, \
     get_chiral_indices, get_chiral_type
-from ._nanotube_bundle import NanotubeBundleBase, compute_bundle_density
+from ._nanotube_base import NanotubeBase
 
 __all__ = ['compute_d', 'compute_dR', 'compute_N', 'compute_t1', 'compute_t2',
            'compute_Ch', 'compute_chiral_angle', 'compute_T', 'compute_dt',
@@ -1352,7 +1352,6 @@ class SWNTBase(SWNTMixin, NanoStructureBase):
 
         self.generate_unit_cell()
         self.crystal_cell.scaling_matrix = [1, 1, int(np.ceil(self.nz))]
-
         fmtstr = "{Ch!r}, "
         if self.fix_Lz:
             fmtstr += "Lz={Lz!r}, fix_Lz=True, "
@@ -1462,7 +1461,7 @@ class SWNTBase(SWNTMixin, NanoStructureBase):
                     Lz=self.Lz)
 
 
-class SWNT(NanotubeBundleBase, SWNTBase):
+class SWNT(NanotubeBase, SWNTBase):
     """SWNT structure class.
 
     Parameters
@@ -1593,23 +1592,6 @@ class SWNT(NanotubeBundleBase, SWNTBase):
     bundle_packing='hcp', bundle_geometry=None)
 
     """
-    def __init__(self, *args, **kwargs):
-
-        super().__init__(*args, **kwargs)
-
-        fmtstr = "{Ch!r}, nx={nx!r}, ny={ny!r}, "
-        if self.fix_Lz:
-            fmtstr += "Lz={Lz!r}, fix_Lz=True, "
-        else:
-            fmtstr += "nz={nz!r}, "
-
-        self.fmtstr = fmtstr + "basis={basis!r}, bond={bond!r}, " + \
-            "bundle_packing={bundle_packing!r}, " + \
-            "bundle_geometry={bundle_geometry!r}"
-
-    @property
-    def bundle_density(self):
-        return compute_bundle_density(self.n, self.m, r_vdw=self.vdw_radius,
-                                      bond=self.bond, basis=self.basis)
+    pass
 
 Nanotube = SWNT

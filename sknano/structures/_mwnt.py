@@ -17,7 +17,7 @@ import numpy as np
 from sknano.core.refdata import aCC, element_data
 
 from ._base import NanoStructureBase, r_CC_vdw
-from ._nanotube_bundle import NanotubeBundleBase
+from ._nanotube_base import NanotubeBase
 from ._swnt import SWNT, compute_dt  # , compute_T
 from ._extras import generate_Ch_list
 
@@ -391,7 +391,7 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
                     wall_spacing=self.wall_spacing)
 
 
-class MWNT(NanotubeBundleBase, MWNTBase):
+class MWNT(NanotubeBase, MWNTBase):
     """MWNT structure class.
 
     Parameters
