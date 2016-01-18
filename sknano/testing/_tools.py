@@ -41,5 +41,9 @@ class AtomsTestFixture(unittest.TestCase):
 
     def setUp(self):
         self.atoms = \
-            generate_atoms(generator_class='SWNTGenerator', n=10, m=0, nz=5)
+            generate_atoms(generator_class='SWNTGenerator', n=5, m=0, nz=5)
         self.atoms.assign_unique_ids()
+
+        self.periodic_table = generate_atoms(elements='periodic_table')
+        self.periodic_table.assign_unique_ids()
+        self.periodic_table.assign_unique_types()
