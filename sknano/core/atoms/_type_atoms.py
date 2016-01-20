@@ -178,6 +178,7 @@ class TypeAtoms(Atoms):
         return self._typemap
 
     def _update_typemap(self):
+        self.assign_unique_types()
         [self.add_type(atom) for atom in self]
 
     def add_type(self, atom):
@@ -189,8 +190,10 @@ class TypeAtoms(Atoms):
             A :class:`~sknano.core.atoms.TypeAtom` instance.
 
         """
-        self._typemap[atom.type] = {}
-        self._typemap[atom.type]['mass'] = atom.mass
+        if atom.type not in self._typemap:
+            self._typemap[atom.type] = typemap = {}
+            typemap.update({attr: getattr(atom, attr)
+                            for attr in ('element', 'mass', 'Z')})
 
     def add_atomtype(self, atom):
         """Alias for :meth:`~TypeAtoms.add_type`."""
