@@ -18,7 +18,7 @@ import re
 
 import numpy as np
 
-from sknano.core import BaseClass, UserList, dedupe
+from sknano.core import BaseClass, UserList, dedupe, timethis
 from sknano.core.math import convert_condition_str, rotation_matrix
 from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols, element_names
@@ -267,12 +267,12 @@ class Atoms(UserList):
         existing `Atoms` instance object.
 
     """
-    def __init__(self, atoms=None, casttype=True, **kwargs):
+    def __init__(self, atoms=None, update_item_class=True, **kwargs):
         verbose = kwargs.get('verbose', False)
         if atoms is not None and \
                 (isinstance(atoms, str) or isinstance(atoms, Atom)):
             atoms = [atoms]
-        if casttype and not isinstance(atoms, type(self)) and \
+        if update_item_class and not isinstance(atoms, type(self)) and \
                 isinstance(atoms, list):
             atoms = atoms[:]
             for i, atom in enumerate(atoms):
@@ -340,7 +340,7 @@ class Atoms(UserList):
 
     @classmethod
     def _from_iterable(cls, it, **kwargs):
-        return cls(atoms=list(it), **kwargs)
+        return cls(atoms=it, update_item_class=False, **kwargs)
 
     def _is_valid_operand(self, other):
         return isinstance(other, (self.__class__, self.__atom_class__))
@@ -367,19 +367,21 @@ class Atoms(UserList):
             if isinstance(index, slice):
                 item = self.__cast(item)
             else:
-                try:
-                    atomdict = super().__getitem__(index).todict()
-                    if isinstance(item, str):
-                        atomdict['element'] = item
-                    elif isinstance(item, int):
-                        atomdict['Z'] = item
-                    elif isinstance(item, float):
-                        atomdict['mass'] = item
-                    else:
-                        raise ValueError
-                    item = self.__atom_class__(**atomdict)
-                except (IndexError, AttributeError, ValueError):
-                    item = self.__atom_class__(item)
+                # try:
+                #     # atomdict = item.todict()
+                #     # atomdict = super().__getitem__(index).todict()
+                #     if isinstance(item, str):
+                #         atomdict['element'] = item
+                #     elif isinstance(item, int):
+                #         atomdict['Z'] = item
+                #     elif isinstance(item, float):
+                #         atomdict['mass'] = item
+                #     else:
+                #         raise ValueError
+                #     item = self.__atom_class__(**atomdict)
+                # except (IndexError, AttributeError, ValueError):
+                #     item = self.__atom_class__(item)
+                item = self.__cast_item(item)
         super().__setitem__(index, item)
 
     def append(self, atom):
@@ -416,8 +418,8 @@ class Atoms(UserList):
     def __sub__(self, other):
         if not self._is_valid_operand(other):
             return NotImplemented
-        return self._from_iterable(atom for atom in self
-                                   if atom not in self.__cast(other),
+        return self._from_iterable([atom for atom in self
+                                    if atom not in self.__cast(other)],
                                    **self.kwargs)
 
     def __rsub__(self, other):
@@ -436,8 +438,8 @@ class Atoms(UserList):
     def __and__(self, other):
         if not self._is_valid_operand(other):
             return NotImplemented
-        return self._from_iterable(atom for atom in self.__cast(other)
-                                   if atom in self, **self.kwargs)
+        return self._from_iterable([atom for atom in self.__cast(other)
+                                    if atom in self], **self.kwargs)
 
     __rand__ = __and__
 
@@ -600,7 +602,7 @@ class Atoms(UserList):
             return self.__class__(atoms=np.asarray(self)[condition],
                                   **self.kwargs)
 
-    def select(self, selstr):
+    def select(self, selstr, verbose=False):
         """Return `Atom` or `Atoms` from selection command.
 
         Parameters
@@ -614,7 +616,7 @@ class Atoms(UserList):
         """
         from ._selections import SelectionParser, SelectionException
         try:
-            return SelectionParser(self).parse(selstr)
+            return SelectionParser(self, verbose=verbose).parse(selstr)
         except SelectionException as e:
             print(e)
             return None
