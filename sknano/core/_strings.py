@@ -14,18 +14,18 @@ __docformat__ = 'restructuredtext en'
 from sknano.core.math import function_map, operator_map
 
 from pyparsing import Group, Forward, Optional, Regex, Suppress, Keyword, \
-    Literal, Word, StringEnd, ZeroOrMore, alphas, alphanums, delimitedList, \
+    Literal, Word, ZeroOrMore, alphas, alphanums, delimitedList, \
     oneOf, replaceWith, quotedString, removeQuotes
 
 __all__ = ['pluralize', 'plural_word_check', 'ordinal_form',
            'map_operator', 'map_function', 'asint', 'asfloat', 'asbool',
            'astuple', 'aslist', 'asdict', 'asset', 'integer', 'real',
            'number', 'boolean', 'string', 'none', 'LPAR', 'RPAR',
-           'LBRACK', 'RBRACK', 'LBRACE', 'RBRACE', 'COLON', 'COMMA', 'EQUAL',
-           'binary_operator', 'hashable_item', 'unhashable_item', 'expr_item',
-           'tuple_expr', 'list_expr', 'dict_expr', 'set_expr', 'kwarg',
-           'kwargs_expr', 'signature_args', 'signature_kwargs',
-           'call_signature']
+           'LBRACK', 'RBRACK', 'LBRACE', 'RBRACE', 'COLON', 'SEMICOLON',
+           'SPACE', 'COMMA', 'EQUAL', 'binary_operator', 'hashable_item',
+           'unhashable_item', 'expr_item', 'tuple_expr', 'list_expr',
+           'dict_expr', 'set_expr', 'kwarg', 'kwargs_expr', 'signature_args',
+           'signature_kwargs', 'call_signature']
 
 
 def pluralize(word, count):
@@ -143,9 +143,12 @@ def asint(s, l, t):
 
 
 def asfloat(s, l, t):
-    val = float(t[0])
-    if int(val) == val:
-        return int(val)
+    try:
+        val = int(t[0])
+    except ValueError:
+        val = float(t[0])
+        # if int(val) == val:
+        #     return int(val)
     return val
 
 
@@ -200,6 +203,8 @@ LPAR, RPAR = map(Suppress, '()')
 LBRACK, RBRACK = map(Suppress, '[]')
 LBRACE, RBRACE = map(Suppress, '{}')
 COLON = Suppress(':')
+SEMICOLON = Suppress(';')
+SPACE = Suppress(' ')
 COMMA = Suppress(',')
 EQUAL = Suppress('=')
 
