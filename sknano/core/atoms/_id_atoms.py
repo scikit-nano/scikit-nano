@@ -35,7 +35,7 @@ class IDAtom(Atom):
     mol : int, optional
         molecule ID
     """
-    def __init__(self, *args, id=0, mol=0, **kwargs):
+    def __init__(self, *args, id=0, serial=0, mol=0, **kwargs):
 
         if 'atomID' in kwargs:
             id = kwargs['atomID']
@@ -47,6 +47,8 @@ class IDAtom(Atom):
 
         super().__init__(*args, **kwargs)
 
+        if serial != id and id == 0:
+            id = serial
         self.id = id
         self.mol = mol
         self.fmtstr = super().fmtstr + ", id={id!r}, mol={mol!r}"
@@ -141,6 +143,7 @@ class IDAtom(Atom):
 
     @property
     def atomID(self):
+        """Alias for :attr:`~IDAtom.id`."""
         return self.id
 
     @atomID.setter
@@ -148,7 +151,17 @@ class IDAtom(Atom):
         self.id = value
 
     @property
+    def serial(self):
+        """Alias for :attr:`~IDAtom.id`."""
+        return self.id
+
+    @serial.setter
+    def serial(self, value):
+        self.id = value
+
+    @property
     def moleculeID(self):
+        """Alias for :attr:`~IDAtom.mol`."""
         return self.mol
 
     @moleculeID.setter
@@ -189,23 +202,28 @@ class IDAtoms(Atoms):
         return np.asarray([atom.id for atom in self])
 
     @property
+    def atom_ids(self):
+        """Alias for :attr:`~IDAtoms.ids`."""
+        return self.ids
+
+    @property
+    def serials(self):
+        """Alias for :attr:`~IDAtoms.ids`."""
+        return self.ids
+
+    @property
     def mols(self):
         """Return array of `IDAtom.mol`\ s."""
         return np.asarray([atom.mol for atom in self])
 
     @property
-    def atom_ids(self):
-        """Alias for :attr:`IDAtoms.ids`."""
-        return self.ids
-
-    @property
     def mol_ids(self):
-        """Alias for :attr:`IDAtoms.mols`."""
+        """Alias for :attr:`~IDAtoms.mols`."""
         return self.mols
 
     @property
     def molecule_ids(self):
-        """Alias for :attr:`IDAtoms.mols`."""
+        """Alias for :attr:`~IDAtoms.mols`."""
         return self.mols
 
     def assign_unique_ids(self, starting_id=1):
