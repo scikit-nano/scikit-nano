@@ -54,6 +54,8 @@ Iterator functions
    partition
    powerset
    unique_elements
+   unique_everseen
+   unique_justseen
    iter_except
    first_true
    random_product
