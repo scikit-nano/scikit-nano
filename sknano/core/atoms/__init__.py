@@ -45,8 +45,8 @@ Base `Atom`/`Atoms` classes
    ImageAtoms
    LatticeAtom
    LatticeAtoms
-   PBCAtom
-   PBCAtoms
+   NeighborAtom
+   NeighborAtoms
    TypeAtom
    TypeAtoms
    VanDerWaalsAtom
@@ -55,22 +55,6 @@ Base `Atom`/`Atoms` classes
    VelocityAtoms
    XYZAtom
    XYZAtoms
-
-Mixin `Atom`/`Atoms` classes
-----------------------------
-
-.. autosummary::
-   :toctree: generated/
-
-   KDTreeAtomsMixin
-   NeighborAtomMixin
-   NeighborAtomsMixin
-   POAVAtomMixin
-   POAVAtomsMixin
-   POAV
-   POAV1
-   POAV2
-   POAVR
 
 Combined sub-classes
 ---------------------
@@ -110,6 +94,11 @@ Helper functions for atom objects
 
    vdw_radius_from_basis
 
+Sub-packages
+-------------
+
+* mixins (:mod:`sknano.core.atoms.mixins`)
+
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
@@ -125,20 +114,17 @@ from ._charged_atoms import *
 from ._energy_atoms import *
 from ._id_atoms import *
 from ._type_atoms import *
-from ._periodic_atoms import *
 from ._lattice_atoms import *
 from ._dipole_atoms import *
 from ._basis_atoms import *
-from ._kdtree_atoms import *
-from ._poav_atoms import *
 from ._bonds import *
 from ._md_atoms import *
 from ._trajectory import *
 from ._structure_atoms import *
 from ._neighbor_atoms import *
 from ._vdW_atoms import *
+from ._ring_atoms import *
 from ._selections import *
 from ._topology import *
-from ._adapters import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
