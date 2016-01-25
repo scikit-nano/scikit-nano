@@ -491,9 +491,11 @@ class POAVR(POAV):
 
 class POAVAtomMixin:
     """Mixin class for :class:`POAV` analysis."""
-    _POAV1 = None
-    _POAV2 = None
-    _POAVR = None
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._POAV1 = None
+        self._POAV2 = None
+        self._POAVR = None
 
     @property
     def POAV1(self):
