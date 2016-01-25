@@ -1,0 +1,86 @@
+HEADER    PROTEIN
+TITLE     (10,10) Nanotube
+AUTHOR    TubeGen 3.3, J T Frey, University of Delaware
+EXPDTA    THEORETICAL MODEL
+ATOM      1  C   UNK     1       6.793   0.000  -1.231  1.00  0.00
+ATOM      2  C   UNK     1       6.645   1.413  -1.231  1.00  0.00
+ATOM      3  C   UNK     1       6.461   2.099   0.000  1.00  0.00
+ATOM      4  C   UNK     1       5.883   3.397   0.000  1.00  0.00
+ATOM      5  C   UNK     1       5.496   3.993  -1.231  1.00  0.00
+ATOM      6  C   UNK     1       4.545   5.049  -1.231  1.00  0.00
+ATOM      7  C   UNK     1       3.993   5.496   0.000  1.00  0.00
+ATOM      8  C   UNK     1       2.762   6.206   0.000  1.00  0.00
+ATOM      9  C   UNK     1       2.099   6.461  -1.231  1.00  0.00
+ATOM     10  C   UNK     1       0.709   6.756  -1.231  1.00  0.00
+ATOM     11  C   UNK     1       0.000   6.793   0.000  1.00  0.00
+ATOM     12  C   UNK     1      -1.413   6.645   0.000  1.00  0.00
+ATOM     13  C   UNK     1      -2.099   6.461  -1.231  1.00  0.00
+ATOM     14  C   UNK     1      -3.397   5.883  -1.231  1.00  0.00
+ATOM     15  C   UNK     1      -3.993   5.496   0.000  1.00  0.00
+ATOM     16  C   UNK     1      -5.049   4.545   0.000  1.00  0.00
+ATOM     17  C   UNK     1      -5.496   3.993  -1.231  1.00  0.00
+ATOM     18  C   UNK     1      -6.206   2.762  -1.231  1.00  0.00
+ATOM     19  C   UNK     1      -6.461   2.099  -0.000  1.00  0.00
+ATOM     20  C   UNK     1      -6.756   0.709  -0.000  1.00  0.00
+ATOM     21  C   UNK     1      -6.793   0.000  -1.231  1.00  0.00
+ATOM     22  C   UNK     1      -6.645  -1.413  -1.231  1.00  0.00
+ATOM     23  C   UNK     1      -6.461  -2.099   0.000  1.00  0.00
+ATOM     24  C   UNK     1      -5.883  -3.397   0.000  1.00  0.00
+ATOM     25  C   UNK     1      -5.496  -3.993  -1.231  1.00  0.00
+ATOM     26  C   UNK     1      -4.545  -5.049  -1.231  1.00  0.00
+ATOM     27  C   UNK     1      -3.993  -5.496   0.000  1.00  0.00
+ATOM     28  C   UNK     1      -2.762  -6.206   0.000  1.00  0.00
+ATOM     29  C   UNK     1      -2.099  -6.461  -1.231  1.00  0.00
+ATOM     30  C   UNK     1      -0.709  -6.756  -1.231  1.00  0.00
+ATOM     31  C   UNK     1       0.000  -6.793  -0.000  1.00  0.00
+ATOM     32  C   UNK     1       1.413  -6.645  -0.000  1.00  0.00
+ATOM     33  C   UNK     1       2.099  -6.461  -1.231  1.00  0.00
+ATOM     34  C   UNK     1       3.397  -5.883  -1.231  1.00  0.00
+ATOM     35  C   UNK     1       3.993  -5.496  -0.000  1.00  0.00
+ATOM     36  C   UNK     1       5.049  -4.545  -0.000  1.00  0.00
+ATOM     37  C   UNK     1       5.496  -3.993  -1.231  1.00  0.00
+ATOM     38  C   UNK     1       6.206  -2.762  -1.231  1.00  0.00
+ATOM     39  C   UNK     1       6.461  -2.099  -0.000  1.00  0.00
+ATOM     40  C   UNK     1       6.756  -0.709  -0.000  1.00  0.00
+CONECT    1    2   40
+CONECT    2    1    3
+CONECT    3    2    4
+CONECT    4    3    5
+CONECT    5    4    6
+CONECT    6    5    7
+CONECT    7    6    8
+CONECT    8    7    9
+CONECT    9    8   10
+CONECT   10    9   11
+CONECT   11   10   12
+CONECT   12   11   13
+CONECT   13   12   14
+CONECT   14   13   15
+CONECT   15   14   16
+CONECT   16   15   17
+CONECT   17   16   18
+CONECT   18   17   19
+CONECT   19   18   20
+CONECT   20   19   21
+CONECT   21   20   22
+CONECT   22   21   23
+CONECT   23   22   24
+CONECT   24   23   25
+CONECT   25   24   26
+CONECT   26   25   27
+CONECT   27   26   28
+CONECT   28   27   29
+CONECT   29   28   30
+CONECT   30   29   31
+CONECT   31   30   32
+CONECT   32   31   33
+CONECT   33   32   34
+CONECT   34   33   35
+CONECT   35   34   36
+CONECT   36   35   37
+CONECT   37   36   38
+CONECT   38   37   39
+CONECT   39   38   40
+CONECT   40    1   39
+MASTER        0    0    0    0    0    0    0    0   40    0   40    0
+END   
