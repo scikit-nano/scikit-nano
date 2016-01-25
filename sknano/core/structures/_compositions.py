@@ -71,7 +71,7 @@ class Compositions(UserList):
         existing `Compositions` instance object.
 
     """
-    def __init__(self, compositions=None, casttype=True, **kwargs):
+    def __init__(self, compositions=None, update_item_class=True, **kwargs):
         super().__init__(initlist=compositions)
 
         self.fmtstr = "{compositions!r}"

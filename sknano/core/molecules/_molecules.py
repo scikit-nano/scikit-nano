@@ -101,7 +101,7 @@ class Molecules(UserList):
         existing `Molecules` instance object.
 
     """
-    def __init__(self, molecules=None, casttype=True, **kwargs):
+    def __init__(self, molecules=None, update_item_class=True, **kwargs):
         super().__init__(initlist=molecules)
         self.fmtstr = "{molecules!r}"
 
