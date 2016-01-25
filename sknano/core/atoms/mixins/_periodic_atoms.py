@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Mixin class for PBCs (:mod:`sknano.core.atoms._periodic_atoms`)
+Mixin class for PBCs (:mod:`sknano.core.atoms.mixins._periodic_atoms`)
 ===============================================================================
 
-.. currentmodule:: sknano.core.atoms._periodic_atoms
+.. currentmodule:: sknano.core.atoms.mixins._periodic_atoms
 
 """
 from __future__ import absolute_import, division, print_function
@@ -17,7 +17,7 @@ __all__ = ['PBCAtomsMixin']
 
 
 class PBCAtomsMixin:
-    """:class:`~sknano.core.atoms.Atoms` class for PBC."""
+    """:class:`~sknano.core.atoms.mixins.Atoms` class for PBC."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._xperiodic = False

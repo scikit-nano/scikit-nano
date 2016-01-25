@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Atom adapter mixins for 3rd-party compat (:mod:`sknano.core.atoms._adapters`)
+Mixins for 3rd-party compat. (:mod:`sknano.core.atoms.mixins._adapters`)
 ===============================================================================
 
-.. currentmodule:: sknano.core.atoms._adapters
+.. currentmodule:: sknano.core.atoms.mixins._adapters
 
 """
 from __future__ import absolute_import, division, print_function

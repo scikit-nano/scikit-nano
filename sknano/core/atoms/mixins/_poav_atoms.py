@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Mixin Atom classes for POAV analysis (:mod:`sknano.core.atoms._poav_atoms`)
+Mixin classes for POAV analysis (:mod:`sknano.core.atoms.mixins._poav_atoms`)
 ===============================================================================
 
-.. currentmodule:: sknano.core.atoms._poav_atoms
+.. currentmodule:: sknano.core.atoms.mixins._poav_atoms
 
 """
 from __future__ import absolute_import, division, print_function
@@ -602,24 +602,24 @@ class POAVAtomsMixin:
 
     @property
     def POAV1(self):
-        """List of :class:`~sknano.core.atoms.POAVAtom` :class:`POAV1` \
-            :attr:`~sknano.core.atoms.POAVAtom.POAV1` attribute."""
+        """List of :class:`~sknano.core.atoms.mixins.POAVAtom` :class:`POAV1` \
+            :attr:`~sknano.core.atoms.mixins.POAVAtom.POAV1` attribute."""
         return [atom.POAV1 for atom in self if atom.POAV1 is not None]
 
     @property
     def POAV2(self):
-        """List of :class:`~sknano.core.atoms.POAVAtom` :class:`POAV2` \
-            :attr:`~sknano.core.atoms.POAVAtom.POAV2` attribute."""
+        """List of :class:`~sknano.core.atoms.mixins.POAVAtom` :class:`POAV2` \
+            :attr:`~sknano.core.atoms.mixins.POAVAtom.POAV2` attribute."""
         return [atom.POAV2 for atom in self if atom.POAV2 is not None]
 
     @property
     def POAVR(self):
-        """List of :class:`~sknano.core.atoms.POAVAtom` :class:`POAVR` \
-            :attr:`~sknano.core.atoms.POAVAtom.POAVR` attribute."""
+        """List of :class:`~sknano.core.atoms.mixins.POAVAtom` :class:`POAVR` \
+            :attr:`~sknano.core.atoms.mixins.POAVAtom.POAVR` attribute."""
         return [atom.POAVR for atom in self if atom.POAVR is not None]
 
     def get_POAV_attr(self, POAV_class, attr):
-        """Return list of :class:`~sknano.core.atoms.POAVAtom` :class:`POAV1` \
+        """Return list of :class:`~sknano.core.atoms.mixins.POAVAtom` :class:`POAV1` \
             :class:`POAV2` or :class:`POAVR` attribute.
 
         Parameters
