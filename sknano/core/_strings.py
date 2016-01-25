@@ -139,44 +139,51 @@ def cast_type(parameters):
 
 
 def asint(s, l, t):
+    """parse action to convert token to :class:`~python:int`."""
     return int(t[0])
 
 
 def asfloat(s, l, t):
+    """parse action to convert token to :class:`~python:float`."""
     try:
         val = int(t[0])
     except ValueError:
         val = float(t[0])
-        # if int(val) == val:
-        #     return int(val)
     return val
 
 
 def asbool(s, l, t):
+    """parse action to convert token to :class:`~python:bool`."""
     return t[0] == 'True'
 
 
 def astuple(s, l, t):
+    """parse action to convert token to :class:`~python:tuple`."""
     return tuple(t.asList())
 
 
 def aslist(s, l, t):
+    """parse action to convert token to :class:`~python:list`."""
     return [t.asList()]
 
 
 def asdict(s, l, t):
+    """parse action to convert token to :class:`~python:dict`."""
     return dict(t.asList())
 
 
 def asset(s, l, t):
+    """parse action to convert token to :class:`~python:set`."""
     return set(t.asList())
 
 
 def map_function(s, l, t):
+    """parse action to convert function string to function."""
     return function_map[t[0]]
 
 
 def map_operator(s, l, t):
+    """parse action to convert operator string to function."""
     return operator_map[t[0]]
 
 

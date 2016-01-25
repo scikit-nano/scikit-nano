@@ -317,12 +317,10 @@ class BaseClass(metaclass=ABCMeta):
 class Cached(type):
     """Cached class type."""
     def __init__(self, *args, **kwargs):
-        # print('in Cached.__init__')
         super().__init__(*args, **kwargs)
         self.__cache = weakref.WeakValueDictionary()
 
     def __call__(self, *args):
-        # print('in Cached.__call__')
         if args in self.__cache:
             return self.__cache[args]
         else:
@@ -339,12 +337,14 @@ def make_sig(*names):
 
 
 class ClassSignatureMeta(type):
+    """Custom type for :class:`ClassSignature`."""
     def __new__(cls, clsname, bases, clsdict):
         clsdict['__signature__'] = make_sig(*clsdict.get('_fields', []))
         return super().__new__(cls, clsname, bases, clsdict)
 
 
 class ClassSignature(metaclass=ClassSignatureMeta):
+    """:class:`~python:abc.ABC`."""
     _fields = []
 
     def __init__(self, *args, **kwargs):
@@ -362,12 +362,10 @@ class NoInstances(type):
 class Singleton(type):
     """Singleton class type."""
     def __init__(self, *args, **kwargs):
-        # print('in Singleton.__init__')
         self.__instance = None
         super().__init__(*args, **kwargs)
 
     def __call__(self, *args, **kwargs):
-        # print('in Singleton.__call__')
         if self.__instance is None:
             self.__instance = super().__call__(*args, **kwargs)
             return self.__instance
