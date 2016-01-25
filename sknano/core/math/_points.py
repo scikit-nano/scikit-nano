@@ -22,6 +22,9 @@ from ._point import Point
 
 __all__ = ['Points']
 
+operand_shape_error_msg = \
+    "operands could not be broadcast together with shapes {}, {}"
+
 
 class Points(UserList):
     """Container class for collection of `Point` objects.
@@ -36,7 +39,10 @@ class Points(UserList):
 
     def __init__(self, points=None):
         super().__init__(initlist=points)
-        self.fmtstr = "points={points!r}"
+        self.fmtstr = "{points!r}"
+
+    def __repr__(self):
+        return str(np.asarray([pt.tolist() for pt in self]))
 
     @property
     def __item_class__(self):
@@ -45,20 +51,112 @@ class Points(UserList):
     def sort(self, key=attrgetter('x', 'y', 'z'), reverse=False):
         super().sort(key=key, reverse=reverse)
 
+    def __cast(self, other):
+        return other.data if isinstance(other, UserList) else other
+
+    def _is_valid_operand(self, other):
+        return isinstance(other, (list, np.ndarray, self.__class__,
+                                  self.__item_class__))
+
+    def _is_compatible_shape(self, other):
+        other = np.asarray(self.__cast(other))
+        return np.asarray(self.data).shape[-1] == len(other) if \
+            other.ndim == 1 else np.asarray(self.data).shape == other.shape
+
+    def _check_operands(self, other):
+        if not self._is_compatible_shape(other):
+            self_shape = np.asarray(self.data).shape
+            other_shape = np.asarray(self.__cast(other)).shape
+            raise ValueError(operand_shape_error_msg.format(self_shape,
+                             other_shape))
+
+    def __add__(self, other):
+        if not ((self._is_valid_operand(other) and
+                 self._is_compatible_shape(other)) or np.isscalar(other)):
+            return NotImplemented
+        if np.isscalar(other) or isinstance(other, self.__item_class__):
+            data = [pt.__add__(other) for pt in self]
+        else:
+            other = np.asarray(self.__cast(other))
+            if other.ndim == 1:
+                return self.__add__(self.__item_class__(other))
+            else:
+                data = [pt.__add__(other_pt) for pt, other_pt in
+                        zip(self.data, other)]
+        return self.__class__(data)
+
+    def __radd__(self, other):
+        if not ((self._is_valid_operand(other) and
+                 self._is_compatible_shape(other)) or np.isscalar(other)):
+            return NotImplemented
+        return self.__add__(other)
+
+    def __iadd__(self, other):
+        if not ((self._is_valid_operand(other) and
+                 self._is_compatible_shape(other)) or np.isscalar(other)):
+            return NotImplemented
+        [self.__setitem__(i, pt.__iadd__(other)) for i, pt in
+         enumerate(self)]
+        return self
+
+    def __sub__(self, other):
+        if not ((self._is_valid_operand(other) and
+                 self._is_compatible_shape(other)) or np.isscalar(other)):
+            return NotImplemented
+        if np.isscalar(other) or isinstance(other, self.__item_class__):
+            data = [pt.__sub__(other) for pt in self]
+        else:
+            other = np.asarray(self.__cast(other))
+            if other.ndim == 1:
+                return self.__sub__(self.__item_class__(other))
+            else:
+                data = [pt.__sub__(other_pt) for pt, other_pt in
+                        zip(self.data, other)]
+        return self.__class__(data)
+
+    def __rsub__(self, other):
+        if not ((self._is_valid_operand(other) and
+                 self._is_compatible_shape(other)) or np.isscalar(other)):
+            return NotImplemented
+        return self.__sub__(other)
+
+    def __isub__(self, other):
+        if not ((self._is_valid_operand(other) and
+                 self._is_compatible_shape(other)) or np.isscalar(other)):
+            return NotImplemented
+        [self.__setitem__(i, pt.__isub__(other)) for i, pt in
+         enumerate(self)]
+        return self
+
     @property
     def x(self):
         """Return :math:`x` coordinates of `Point` objects as array."""
-        return [point.x for point in self]
+        return np.asarray([point.x for point in self])
+
+    @x.setter
+    def x(self, values):
+        self._check_operands(values)
+        [setattr(point, 'x', value) for point, value in zip(self, values)]
 
     @property
     def y(self):
         """Return :math:`y` coordinates of `Point` objects as array."""
-        return [point.y for point in self]
+        return np.asarray([point.y for point in self])
+
+    @y.setter
+    def y(self, values):
+        self._check_operands(values)
+        [setattr(point, 'y', value) for point, value in zip(self, values)]
 
     @property
     def z(self):
         """Return :math:`z` coordinates of `Point` objects as array."""
-        return [point.z for point in self]
+        return np.asarray([point.z for point in self])
+
+    @z.setter
+    def z(self, values):
+        self._check_operands(values)
+        [setattr(point, 'z', value) for point, value in zip(self, values)]
 
     def filter(self, condition, invert=False):
         """Filter `Points` by `condition`.
@@ -136,4 +234,4 @@ class Points(UserList):
         [point.translate(t) for point in self]
 
     def todict(self):
-        return dict(points=self.data)
+        return dict(points=[p.tolist() for p in self])

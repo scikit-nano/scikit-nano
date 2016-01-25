@@ -22,6 +22,9 @@ from ._vector import Vector
 
 __all__ = ['Vectors']
 
+operand_shape_error_msg = \
+    "operands could not be broadcast together with shapes {}, {}"
+
 
 class Vectors(UserList):
     """Container class for collection of `Vector` objects.
@@ -38,7 +41,10 @@ class Vectors(UserList):
         # if vectors is not None:
         #     vectors = np.asarray(vectors).tolist()
         super().__init__(initlist=vectors)
-        self.fmtstr = "vectors={vectors!r}"
+        self.fmtstr = "{vectors!r}"
+
+    def __repr__(self):
+        return str(np.asarray([vec.tolist() for vec in self]))
 
     @property
     def __item_class__(self):
@@ -46,6 +52,173 @@ class Vectors(UserList):
 
     def sort(self, key=attrgetter('p0', 'length'), reverse=False):
         super().sort(key=key, reverse=reverse)
+
+    def __cast(self, other):
+        return other.data if isinstance(other, UserList) else other
+
+    def _is_valid_operand(self, other):
+        return isinstance(other, (list, np.ndarray, self.__class__,
+                                  self.__item_class__))
+
+    def _is_compatible_shape(self, other):
+        other = np.asarray(self.__cast(other))
+        return np.asarray(self.data).shape[-1] == len(other) if \
+            other.ndim == 1 else np.asarray(self.data).shape == other.shape
+
+    def _check_operands(self, other):
+        if not self._is_compatible_shape(other):
+            self_shape = np.asarray(self.data).shape
+            other_shape = np.asarray(self.__cast(other)).shape
+            raise ValueError(operand_shape_error_msg.format(self_shape,
+                             other_shape))
+
+    def __add__(self, other):
+        if not ((self._is_valid_operand(other) and
+                 self._is_compatible_shape(other)) or np.isscalar(other)):
+            return NotImplemented
+        if np.isscalar(other) or isinstance(other, self.__item_class__):
+            data = [vec.__add__(other) for vec in self]
+        else:
+            other = np.asarray(self.__cast(other))
+            if other.ndim == 1:
+                return self.__add__(self.__item_class__(other))
+            else:
+                data = [vec.__add__(other_vec) for vec, other_vec in
+                        zip(self.data, other)]
+        return self.__class__(data)
+
+    def __radd__(self, other):
+        if not ((self._is_valid_operand(other) and
+                 self._is_compatible_shape(other)) or np.isscalar(other)):
+            return NotImplemented
+        return self.__add__(other)
+
+    def __iadd__(self, other):
+        if not ((self._is_valid_operand(other) and
+                 self._is_compatible_shape(other)) or np.isscalar(other)):
+            return NotImplemented
+        [self.__setitem__(i, vec.__iadd__(other)) for i, vec in
+         enumerate(self)]
+        return self
+
+    def __sub__(self, other):
+        if not ((self._is_valid_operand(other) and
+                 self._is_compatible_shape(other)) or np.isscalar(other)):
+            return NotImplemented
+        if np.isscalar(other) or isinstance(other, self.__item_class__):
+            data = [vec.__sub__(other) for vec in self]
+        else:
+            other = np.asarray(self.__cast(other))
+            if other.ndim == 1:
+                return self.__sub__(self.__item_class__(other))
+            else:
+                data = [vec.__sub__(other_vec) for vec, other_vec in
+                        zip(self.data, other)]
+        return self.__class__(data)
+
+    def __rsub__(self, other):
+        if not ((self._is_valid_operand(other) and
+                 self._is_compatible_shape(other)) or np.isscalar(other)):
+            return NotImplemented
+        return self.__sub__(other)
+
+    def __isub__(self, other):
+        if not ((self._is_valid_operand(other) and
+                 self._is_compatible_shape(other)) or np.isscalar(other)):
+            return NotImplemented
+        [self.__setitem__(i, vec.__isub__(other)) for i, vec in
+         enumerate(self)]
+        return self
+
+    def __pow__(self, other):
+        if not np.isscalar(other):
+            return NotImplemented
+        data = [vec.__pow__(other) for vec in self]
+        return self.__class__(data)
+
+    # def __and__(self, other):
+    #     if not self._is_valid_operand(other):
+    #         return NotImplemented
+    #     return self.___class__([atom for atom in self.__cast(other)
+    #                             if atom in self])
+
+    # __rand__ = __and__
+
+    # def __iand__(self, other):
+    #     if not self._is_valid_operand(other):
+    #         return NotImplemented
+    #     self.data -= list(atom for atom in self.__cast(other)
+    #                       if atom not in self)
+    #     return self
+
+    # def __or__(self, other):
+    #     if not self._is_valid_operand(other):
+    #         return NotImplemented
+    #     # data = self.data + list(atom for atom in other if atom not in self)
+    #     data = dedupe((atom for data in (self, self.__cast(other))
+    #                    for atom in data), key=attrgetter('id'))
+    #     return self.__class__(data)
+
+    # __ror__ = __or__
+
+    # def __ior__(self, other):
+    #     if not self._is_valid_operand(other):
+    #         return NotImplemented
+    #     self.data += \
+    #         list(atom for atom in self.__cast(other) if atom not in self)
+    #     return self
+
+    # def __xor__(self, other):
+    #     if not self._is_valid_operand(other):
+    #         return NotImplemented
+    #     other = self.__cast(other)
+    #     return (self - other) | (other - self)
+
+    # __rxor__ = __xor__
+
+    # def __ixor__(self, other):
+    #     if not self._is_valid_operand(other):
+    #         return NotImplemented
+    #     if other is self:
+    #         self.clear()
+    #     else:
+    #         other = self.__cast(other)
+    #         for atom in other:
+    #             if atom in self:
+    #                 self.remove(atom)
+    #             else:
+    #                 self.append(atom)
+    #     return self
+
+    @property
+    def x(self):
+        """Return :math:`x` coordinates of `Vector` objects as array."""
+        return np.asarray([vec.x for vec in self])
+
+    @x.setter
+    def x(self, values):
+        self._check_operands(values)
+        [setattr(vec, 'x', val) for vec, val in zip(self, values)]
+
+    @property
+    def y(self):
+        """Return :math:`y` coordinates of `Vector` objects as array."""
+        return np.asarray([vec.y for vec in self])
+
+    @y.setter
+    def y(self, values):
+        self._check_operands(values)
+        [setattr(vec, 'y', val) for vec, val in zip(self, values)]
+
+    @property
+    def z(self):
+        """Return :math:`z` coordinates of `Vector` objects as array."""
+        return np.asarray([vec.z for vec in self])
+
+    @z.setter
+    def z(self, values):
+        self._check_operands(values)
+        [setattr(vec, 'z', val) for vec, val in zip(self, values)]
 
     @property
     def norms(self):
@@ -141,4 +314,4 @@ class Vectors(UserList):
          for vector in self]
 
     def todict(self):
-        return dict(vectors=np.asarray(self.data).tolist())
+        return dict(vectors=[vec.tolist() for vec in self])

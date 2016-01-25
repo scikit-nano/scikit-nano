@@ -46,18 +46,18 @@ def test1():
 def test2():
     v = Vector()
     v.p0 = np.ones(3)
-    assert_true(np.allclose(v, -np.ones(3)))
+    assert_true(np.allclose(v, np.zeros(3)))
     assert_true(np.allclose(v.p0, np.ones(3)))
-    assert_true(np.allclose(v.p, np.zeros(3)))
+    assert_true(np.allclose(v.p, np.ones(3)))
 
     v = Vector(p=[1., 1., 1.], p0=[1., 1., 1.])
     assert_true(np.allclose(v, np.zeros(3)))
     assert_true(np.allclose(v.p0, np.ones(3)))
     assert_true(np.allclose(v.p, np.ones(3)))
     v.p0 = np.zeros(3)
-    assert_true(np.allclose(v, np.ones(3)))
+    assert_true(np.allclose(v, np.zeros(3)))
     assert_true(np.allclose(v.p0, np.zeros(3)))
-    assert_true(np.allclose(v.p, np.ones(3)))
+    assert_true(np.allclose(v.p, np.zeros(3)))
     v.x = 5.0
     assert_equal(v.x, 5.0)
     assert_equal(v.x, v.p.x)
@@ -75,7 +75,7 @@ def test2():
 
 
 def test3():
-    v = Vector(np.zeros(3))
+    v = Vector()
     assert_true(np.allclose(v.p0, np.zeros(3)))
 
     v = Vector(np.ones(3))
@@ -101,11 +101,11 @@ def test3():
     v1 = Vector([1.0, 0.0], p0=[5., 5.])
     v2 = Vector([1.0, 1.0], p0=[5., 5.])
     v3 = v1 + v2
-    # print('v3: {}'.format(v3))
     assert_is_instance(v3, Vector)
     assert_true(np.allclose(v3, np.array([2.0, 1.0])))
     assert_true(np.allclose(v3.p0, np.array([5.0, 5.0])))
     assert_true(np.allclose(v3.p, np.array([7.0, 6.0])))
+
     v3 = v2 + v1
     assert_is_instance(v3, Vector)
     assert_true(np.allclose(v3, np.array([2.0, 1.0])))
@@ -235,6 +235,7 @@ def test9():
     assert_true(np.allclose(v.p, np.array([0, 0, 0])))
     assert_is_instance(v.p0, Point)
     assert_is_instance(v.p, Point)
+
     v.rotate(np.pi/2, rot_axis='z')
     assert_true(np.allclose(v, np.array([1, -1, -1])))
     assert_true(np.allclose(v.p0, np.array([-1, 1, 1])))
@@ -566,7 +567,188 @@ def test38():
     assert_is_instance(vecs, Vectors)
     [assert_is_instance(v, Vector) for v in vecs]
     assert_true(np.allclose(vecs.norms, np.asarray([v.norm for v in vecs])))
-    print(vecs.norms)
+
+
+def test39():
+    v = Vector([1, 0, 0])
+    assert_equal(v.p, Point([1, 0, 0]))
+    assert_equal(v.p0, Point([0, 0, 0]))
+
+    v.translate([1, 0, 0])
+    assert_equal(v.tolist(), [1, 0, 0])
+    assert_equal(v.p, Point([2, 0, 0]))
+    assert_equal(v.p0, Point([1, 0, 0]))
+
+    v.rotate(np.pi/2, axis='z')
+    assert_equal(v.tolist(), [0, 1, 0])
+    assert_equal(v.p, Point([0, 2, 0]))
+    assert_equal(v.p0, Point([0, 1, 0]))
+
+    v.translate([0, -1, 0])
+    assert_equal(v.tolist(), [0, 1, 0])
+    assert_equal(v.p, Point([0, 1, 0]))
+    assert_equal(v.p0, Point([0, 0, 0]))
+
+    v.rotate(-np.pi/2, axis='z')
+    assert_equal(v.tolist(), [1, 0, 0])
+    assert_equal(v.p, Point([1, 0, 0]))
+    assert_equal(v.p0, Point([0, 0, 0]))
+
+    v.p0 = v.p
+    assert_equal(v.tolist(), [1, 0, 0])
+    assert_equal(v.p, Point([2, 0, 0]))
+    assert_equal(v.p0, Point([1, 0, 0]))
+
+    v.rotate(np.pi/2, axis='z')
+    assert_equal(v.tolist(), [0, 1, 0])
+    assert_equal(v.p, Point([0, 2, 0]))
+    assert_equal(v.p0, Point([0, 1, 0]))
+
+
+def test40():
+    v = Vector([1, 0, 0])
+    assert_equal(v.p, Point([1, 0, 0]))
+    assert_equal(v.p0, Point([0, 0, 0]))
+
+    v.p = [2, 0, 0]
+    assert_equal(v.tolist(), [2, 0, 0])
+    assert_equal(v.p, Point([2, 0, 0]))
+    assert_equal(v.p0, Point([0, 0, 0]))
+
+    v.p0 = [2, 0, 0]
+    assert_equal(v.tolist(), [2, 0, 0])
+    assert_equal(v.p, Point([4, 0, 0]))
+    assert_equal(v.p0, Point([2, 0, 0]))
+
+    v.translate([-2, 0, 0])
+    assert_equal(v.tolist(), [2, 0, 0])
+    assert_equal(v.p, Point([2, 0, 0]))
+    assert_equal(v.p0, Point([0, 0, 0]))
+
+
+def test41():
+    u = Vector([1, 0, 0])
+    v = Vector([0, 1, 0])
+    w = Vector([0, 0, 1])
+    vecs = Vectors([u, v, w])
+    assert_equal(vecs[0], u)
+    assert_equal(vecs[1], v)
+    assert_equal(len(vecs[:3]), 3)
+    [assert_equal(vecs[i], vi) for i, vi in enumerate([u, v, w])]
+
+
+def test42():
+    vecs = Vectors([[1, 1, 1], [1, 0, 1], [0, 1, 0]])
+    vecs += Vector([1, 1, 1])
+    assert_equal(vecs[0], Vector([2, 2, 2]))
+    assert_equal(vecs[1], Vector([2, 1, 2]))
+    assert_equal(vecs[2], Vector([1, 2, 1]))
+
+
+def test43():
+    vecs1 = Vectors([[1, 1, 1], [1, 0, 1], [0, 1, 0]])
+    vecs2 = vecs1 + Vector([1, 1, 1])
+    assert_equal(vecs2[0], Vector([2, 2, 2]))
+    assert_equal(vecs2[1], Vector([2, 1, 2]))
+    assert_equal(vecs2[2], Vector([1, 2, 1]))
+
+
+def test44():
+    vecs1 = Vectors([[1, 1, 1], [1, 0, 1], [0, 1, 0]])
+    vecs2 = Vector([1, 1, 1]) + vecs1
+    assert_equal(vecs2[0], Vector([2, 2, 2]))
+    assert_equal(vecs2[1], Vector([2, 1, 2]))
+    assert_equal(vecs2[2], Vector([1, 2, 1]))
+
+
+def test45():
+    vecs1 = Vectors([[1, 1, 1], [1, 0, 1], [0, 1, 0]])
+    vecs2 = [1, 1, 1] + vecs1
+    assert_equal(vecs2[0], Vector([2, 2, 2]))
+    assert_equal(vecs2[1], Vector([2, 1, 2]))
+    assert_equal(vecs2[2], Vector([1, 2, 1]))
+
+
+def test46():
+    vecs = Vectors([[1, 1, 1], [1, 0, 1], [0, 1, 0]])
+    vecs -= [1, 1, 1]
+    assert_equal(vecs[0], Vector([0, 0, 0]))
+    assert_equal(vecs[1], Vector([0, -1, 0]))
+    assert_equal(vecs[2], Vector([-1, 0, -1]))
+
+
+def test47():
+    vecs1 = Vectors([[1, 1, 1], [1, 0, 1], [0, 1, 0]])
+    vecs2 = vecs1 - Vector([1, 1, 1])
+    assert_equal(vecs2[0], Vector([0, 0, 0]))
+    assert_equal(vecs2[1], Vector([0, -1, 0]))
+    assert_equal(vecs2[2], Vector([-1, 0, -1]))
+
+
+def test48():
+    vecs1 = Vectors([[1, 1, 1], [1, 0, 1], [0, 1, 0]])
+    vecs2 = Vector([1, 1, 1]) - vecs1
+    assert_equal(vecs2[0], Vector([0, 0, 0]))
+    assert_equal(vecs2[1], Vector([0, -1, 0]))
+    assert_equal(vecs2[2], Vector([-1, 0, -1]))
+
+
+def test49():
+    vecs1 = Vectors([[1, 1, 1], [1, 0, 1], [0, 1, 0]])
+    vecs2 = [1, 1, 1] - vecs1
+    assert_equal(vecs2[0], Vector([0, 0, 0]))
+    assert_equal(vecs2[1], Vector([0, -1, 0]))
+    assert_equal(vecs2[2], Vector([-1, 0, -1]))
+
+
+def test50():
+    u = Vector([1, 0, 0])
+    v = Vector([0, 1, 0])
+    w = Vector([0, 0, 1])
+    vecs = Vectors([u, v, w])
+
+    vecs += Vector([1, 1, 1])
+    [assert_equal(vecs[i], vi) for i, vi in enumerate([u, v, w])]
+
+
+def test51():
+    u = Vector([1, 0, 0])
+    v = Vector([0, 1, 0])
+    w = Vector([0, 0, 1])
+    vecs = Vectors([u, v, w, u, v, w]) + Vector([1, 1, 1])
+    # vecs = vecs + Vector([1, 1, 1])
+    [assert_equal(vecs[i], vi + Vector([1, 1, 1]))
+     for i, vi in enumerate([u, v, w, u, v, w])]
+
+
+def test52():
+    u = Vector([1, 0, 0])
+    v = Vector([0, 1, 0])
+    w = Vector([0, 0, 1])
+    vecs = Vectors([u, v, w])
+
+    vecs -= Vector([1, 1, 1])
+    [assert_equal(vecs[i], vi) for i, vi in enumerate([u, v, w])]
+
+
+def test53():
+    u = Vector([1, 0, 0])
+    v = Vector([0, 1, 0])
+    w = Vector([0, 0, 1])
+    vecs = Vectors([u, v, w]) - Vector([1, 1, 1])
+    [assert_equal(vecs[i], vi - Vector([1, 1, 1]))
+     for i, vi in enumerate([u, v, w])]
+
+
+def test54():
+    u = Vector([2, 0, 0])
+    v = Vector([0, 2, 0])
+    w = Vector([0, 0, 2])
+    vecs = Vectors([u, v, w]) ** 2
+    assert_equal(vecs[0], Vector([4, 0, 0]))
+    assert_equal(vecs[1], Vector([0, 4, 0]))
+    assert_equal(vecs[2], Vector([0, 0, 4]))
+    [assert_equal(vecs[i], vi ** 2) for i, vi in enumerate([u, v, w])]
 
 
 if __name__ == '__main__':

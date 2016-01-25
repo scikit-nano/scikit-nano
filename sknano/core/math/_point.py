@@ -90,7 +90,6 @@ class Point(np.ndarray):
     def __array_finalize__(self, pt):
         if pt is None:
             return None
-
         self.nd = len(pt)
 
     def __str__(self):
@@ -98,10 +97,6 @@ class Point(np.ndarray):
 
     def __repr__(self):
         return "Point({!r})".format(self.tolist())
-
-    def tolist(self):
-        """List of `Point` coordinates formatted for *pretty* output."""
-        return np.around(self.__array__(), decimals=10).tolist()
 
     def __getattr__(self, name):
         try:
@@ -140,14 +135,16 @@ class Point(np.ndarray):
             super().__setattr__(name, value)
 
     def __eq__(self, other):
-        if not isinstance(other, Point):
-            other = Point(other)
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        other = self.__cast(other)
         return self is other or np.allclose(self.__array__(),
                                             other.__array__())
 
     def __lt__(self, other):
-        if not isinstance(other, Point):
-            other = Point(other)
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        other = self.__cast(other)
         # origin = Point(nd=self.nd)
         # return self.euclidean_distance(origin) < \
         #     other.euclidean_distance(origin)
@@ -157,16 +154,126 @@ class Point(np.ndarray):
              (self.x <= other.x and self.y <= other.y and self.z < other.z))
 
     def __le__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        other = self.__cast(other)
         return self < other or self == other
 
     def __gt__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        other = self.__cast(other)
         return not (self < other or self == other)
 
     def __ge__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        other = self.__cast(other)
         return not (self < other)
 
     def __ne__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        other = self.__cast(other)
         return not self == other
+
+    def __add__(self, other):
+        if not (self._is_valid_operand(other) or np.isscalar(other)):
+            return NotImplemented
+        if np.isscalar(other):
+            return self.__class__(self.__array__() + other)
+        return self.__class__(self.__array__() +
+                              self.__cast(other).__array__())
+
+    def __radd__(self, other):
+        if not (self._is_valid_operand(other) or np.isscalar(other)):
+            return NotImplemented
+        if np.isscalar(other):
+            return self.__add__(other)
+        return self.__class__(self.__cast(other).__array__() +
+                              self.__array__())
+
+    def __sub__(self, other):
+        if not (self._is_valid_operand(other) or np.isscalar(other)):
+            return NotImplemented
+        if np.isscalar(other):
+            return self.__class__(self.__array__() - other)
+        return self.__class__(self.__array__() -
+                              self.__cast(other).__array__())
+
+    def __rsub__(self, other):
+        if not self._is_valid_operand(other):
+            return NotImplemented
+        return self.__class__(self.__cast(other).__array__() -
+                              self.__array__())
+
+    def __mul__(self, other):
+        if not np.isscalar(other):
+            return NotImplemented
+        return self.__class__(self.__array__() * other)
+
+    def __rmul__(self, other):
+        if not np.isscalar(other):
+            return NotImplemented
+        return self.__class__(other * self.__array__())
+
+    def __imul__(self, other):
+        """Multiply self by other in-place."""
+        if not np.isscalar(other):
+            return NotImplemented
+        super().__imul__(other)
+        return self
+
+    def __truediv__(self, other):
+        if not np.isscalar(other):
+            return NotImplemented
+        return self.__class__(self.__array__() / other)
+        return NotImplemented
+
+    __div__ = __truediv__
+
+    def __itruediv__(self, other):
+        if not np.isscalar(other):
+            return NotImplemented
+        super().__itruediv__(other)
+        return self
+
+    __idiv__ = __itruediv__
+
+    def __floordiv__(self, other):
+        if not np.isscalar(other):
+            return NotImplemented
+        return self.__class__(self.__array__() // other)
+
+    def __ifloordiv__(self, other):
+        if not np.isscalar(other):
+            return NotImplemented
+        super().__ifloordiv__(other)
+        return self
+
+    def __pow__(self, other, *modulo):
+        if not np.isscalar(other):
+            return NotImplemented
+        return self.__class__(self.__array__() ** other)
+
+    def __ipow__(self, other):
+        if not np.isscalar(other):
+            return NotImplemented
+        super().__ipow__(other)
+        return self
+
+    def tolist(self):
+        """List of `Point` coordinates formatted for *pretty* output."""
+        return np.around(self.__array__(), decimals=10).tolist()
+
+    def _is_valid_operand(self, other):
+        return isinstance(other, (list, np.ndarray)) and \
+            len(other) == len(self)
+
+    def __cast(self, other):
+        if not isinstance(other, self.__class__):
+            other = self.__class__(other)
+        return other
 
     @property
     def column_matrix(self):
