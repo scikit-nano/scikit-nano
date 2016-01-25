@@ -273,7 +273,7 @@ class IDAtoms(Atoms):
 
         Parameters
         ----------
-        id : int
+        id : :class:`~python:int`
 
         Returns
         -------
