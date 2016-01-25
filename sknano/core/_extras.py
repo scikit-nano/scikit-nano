@@ -15,7 +15,7 @@ __docformat__ = 'restructuredtext en'
 import numpy as np
 
 __all__ = ['components', 'dimensions', 'xyz', 'xyz_axes',
-           'dedupe', 'rezero_array']
+           'dedupe', 'rezero', 'rezero_array']
 
 components = dimensions = xyz = xyz_axes = ('x', 'y', 'z')
 
@@ -53,7 +53,7 @@ def dedupe(items, key=None):
             seen.add(val)
 
 
-def rezero_array(a, epsilon=5.0*np.finfo(float).eps):
+def rezero(a, epsilon=5.0*np.finfo(float).eps):
     """Rezero elements of array `a` with absolute value \
         *less than or equal to* `epsilon`.
 
@@ -73,3 +73,5 @@ def rezero_array(a, epsilon=5.0*np.finfo(float).eps):
     a[np.where(np.abs(a) <= epsilon)] = 0.0
 
     return a
+
+rezero_array = rezero
