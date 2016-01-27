@@ -17,7 +17,7 @@ import re
 
 import numpy as np
 
-from sknano.core.math import comparison_symbol_operator_mappings
+from sknano.core.math import operator_map
 
 __all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'generate_Ch_list',
            'generate_Ch_property_grid', 'get_Ch_indices',
@@ -215,7 +215,7 @@ def filter_Ch_list(Ch_list, property_filters=None, **kwargs):
         try:
             for filter_index, (prop, cmp_symbol, value) in \
                     enumerate(property_filters, start=1):
-                cmp_op = comparison_symbol_operator_mappings[cmp_symbol]
+                cmp_op = operator_map[cmp_symbol]
                 tmp_list = []
                 for Ch in filtered_list:
                     n, m = Ch
