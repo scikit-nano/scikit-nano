@@ -57,10 +57,9 @@ AUTHOR_EMAIL = 'androomerrill@gmail.com'
 MAINTAINER = AUTHOR
 MAINTAINER_EMAIL = AUTHOR_EMAIL
 URL = 'http://scikit-nano.org/doc'
-DOWNLOAD_URL = 'http://github.com/androomerrill/scikit-nano'
-KEYWORDS = ['nano', 'nanoscience', 'nano-structure', 'nanostructure',
-            'nanotube', 'graphene', 'LAMMPS', 'XYZ', 'structure',
-            'analysis']
+DOWNLOAD_URL = 'https://github.com/scikit-nano/scikit-nano'
+KEYWORDS = ['structure data', 'nanoscience', 'nanostructure', 'nanotube',
+            'graphene', 'structure generator', 'structure analysis']
 LICENSE = 'BSD 2-Clause'
 CLASSIFIERS = """\
 Development Status :: 4 - Beta
@@ -236,7 +235,7 @@ def setup_package():
         if numpy_version < (1, 9):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
-        build_requires += ['numpy==1.10.1']
+        build_requires += ['numpy>=1.10.4']
 
     install_requires = build_requires[:]
     try:
@@ -247,14 +246,15 @@ def setup_package():
         if scipy_version < (0, 14):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
-        install_requires += ['scipy==0.16.1']
+        install_requires += ['scipy>=0.16.1']
 
     # # Add six module to install_requires (used in numpydoc git submodule)
     # install_requires += ['six>=1.9']
 
     # # Add future module to install requires
     # install_requires += ['future>=0.14.3']
-    install_requires += ['monty>=0.7.0', 'pymatgen>=3.2.4']
+    install_requires += \
+        ['pyparsing>=2.0.5', 'monty>=0.8.0', 'pymatgen>=3.3.4']
 
     metadata = dict(
         name=DISTNAME,

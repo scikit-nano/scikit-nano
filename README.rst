@@ -1,8 +1,8 @@
-.. image:: https://travis-ci.org/androomerrill/scikit-nano.svg?branch=master
-   :target: https://travis-ci.org/androomerrill/scikit-nano
+.. image:: https://travis-ci.org/scikit-nano/scikit-nano.svg?branch=master
+   :target: https://travis-ci.org/scikit-nano/scikit-nano
 
-.. image:: https://coveralls.io/repos/androomerrill/scikit-nano/badge.svg?branch=master&service=github
-  :target: https://coveralls.io/github/androomerrill/scikit-nano?branch=master
+.. image:: https://coveralls.io/repos/scikit-nano/scikit-nano/badge.svg?branch=master&service=github
+  :target: https://coveralls.io/github/scikit-nano/scikit-nano?branch=master
 
 
 ===========
@@ -29,6 +29,10 @@ for the following classes of nanostructures:
         * Multi-walled nanotubes (MWNTs)
         * MWNT *bundles*
 
+    * Crystal Structures
+
+    * Composite/Layered Structures
+
 
 The following structure data formats are supported:
 
@@ -52,17 +56,17 @@ Important links
 ===============
 
 * Documentation: http://scikit-nano.org/doc
-* Source code repo: https://github.com/androomerrill/scikit-nano
-* Download releases: https://github.com/androomerrill/scikit-nano/releases
-* Issue tracker: https://github.com/androomerrill/scikit-nano/issues
+* Source code repo: https://github.com/scikit-nano/scikit-nano
+* Download releases: https://github.com/scikit-nano/scikit-nano/releases
+* Issue tracker: https://github.com/scikit-nano/scikit-nano/issues
 * PyPI page: https://pypi.python.org/pypi/scikit-nano
 
 Dependencies
 ============
 
 * `Python 3.4+ <http://python.org/download/>`_
-* `numpy 1.8+ <http://sourceforge.net/projects/numpy/files/NumPy/>`_
-* `scipy 0.13+ <http://sourceforge.net/projects/scipy/files/scipy/>`_
+* `numpy 1.10+ <http://sourceforge.net/projects/numpy/files/NumPy/>`_
+* `scipy 0.16+ <http://sourceforge.net/projects/scipy/files/scipy/>`_
 
 
 Installation
@@ -76,10 +80,10 @@ using **pip**::
 
 Alternatively you can download a source code tarball from
 http://pypi.python.org/pypi/scikit-nano or clone the source code
-from the `github repo <http://github.com/androomerrill/scikit-nano>`_
+from the `github repo <http://github.com/scikit-nano/scikit-nano>`_
 using **git**::
 
-    > git clone https://github.com/androomerrill/scikit-nano.git
+    > git clone https://github.com/scikit-nano/scikit-nano.git
 
 **cd** into the source code directory and run::
 
