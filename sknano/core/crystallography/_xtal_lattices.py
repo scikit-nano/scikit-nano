@@ -86,6 +86,12 @@ class LatticeBase(BaseClass):
         return (self.orientation_matrix * self.ortho_matrix).T
 
     @property
+    def cell(self):
+        """Alias for \
+            :attr:`~sknano.core.crystallography.LatticeBase.cell_matrix`."""
+        return self.cell_matrix
+
+    @property
     def matrix(self):
         """Alias for \
             :attr:`~sknano.core.crystallography.LatticeBase.cell_matrix`."""
