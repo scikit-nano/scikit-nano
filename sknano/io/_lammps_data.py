@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ====================================================================
-LAMMPS data format (:mod:`sknano.io._lammps_data_format`)
+LAMMPS data format (:mod:`sknano.io._lammps_data`)
 ====================================================================
 
-.. currentmodule:: sknano.io._lammps_data_format
+.. currentmodule:: sknano.io._lammps_data
 
 """
 from __future__ import absolute_import, division, print_function
@@ -31,6 +31,7 @@ __all__ = ['DATAReader', 'DATAWriter', 'DATAData', 'DATAFormatSpec',
 
 
 class Domain:
+    """Dummy class for periodic boundary conditions."""
     pass
 
 
@@ -765,7 +766,7 @@ class DATA2XYZConverter(StructureConverter):
         `XYZReader` (only if `return_reader` is True)
 
         """
-        from ._xyz_format import XYZReader, XYZWriter
+        from ._xyz import XYZReader, XYZWriter
 
         kwargs.update(self.kwargs)
 
@@ -999,12 +1000,37 @@ angle_styles = list(angle_coeffs_section_attrs.keys())
 
 bond_coeffs_section_attrs = OrderedDict()
 bond_coeffs_section_attrs[None] = []
+bond_coeffs_section_attrs['class2'] = ['bond_type', 'R0', 'K2', 'K3', 'K4']
+bond_coeffs_section_attrs['fene'] = \
+    ['bond_type', 'K', 'R0', 'epsilon', 'sigma']
+bond_coeffs_section_attrs['fene/expand'] = \
+    ['bond_type', 'K', 'R0', 'epsilon', 'sigma', 'delta']
+bond_coeffs_section_attrs['harmonic'] = ['bond_type', 'K', 'r0']
+bond_coeffs_section_attrs['morse'] = ['bond_type', 'D', 'alpha', 'r0']
+bond_coeffs_section_attrs['nonlinear'] = \
+    ['bond_type', 'epsilon', 'r0', 'lambda']
+bond_coeffs_section_attrs['quartic'] = \
+    ['bond_type', 'K', 'B1', 'B2', 'Rc', 'U0']
+bond_coeffs_section_attrs['table'] = ['bond_type', 'filename', 'keyword']
 bond_styles = list(bond_coeffs_section_attrs.keys())
+bond_style_args = OrderedDict()
+bond_style_args['table'] = ['style', 'N']
 
 dihedral_coeffs_section_attrs = OrderedDict()
 dihedral_coeffs_section_attrs[None] = []
+dihedral_coeffs_section_attrs['charmm'] = \
+    ['dihedral_type', 'K', 'n', 'd', 'weight']
+dihedral_coeffs_section_attrs['class2'] = []
+dihedral_coeffs_section_attrs['harmonic'] = []
+dihedral_coeffs_section_attrs['helix'] = []
+dihedral_coeffs_section_attrs['multi/harmonic'] = []
+dihedral_coeffs_section_attrs['opls'] = []
 dihedral_styles = list(dihedral_coeffs_section_attrs.keys())
 
 improper_coeffs_section_attrs = OrderedDict()
 improper_coeffs_section_attrs[None] = []
+improper_coeffs_section_attrs['class2'] = []
+improper_coeffs_section_attrs['cvff'] = []
+improper_coeffs_section_attrs['harmonic'] = []
+improper_coeffs_section_attrs['umbrella'] = []
 improper_styles = list(improper_coeffs_section_attrs.keys())

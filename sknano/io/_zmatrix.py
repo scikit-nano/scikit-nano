@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ============================================================
-ZMATRIX format (:mod:`sknano.io._zmatrix_format`)
+ZMATRIX format (:mod:`sknano.io._zmatrix`)
 ============================================================
 
-.. currentmodule:: sknano.io._zmatrix_format
+.. currentmodule:: sknano.io._zmatrix
 
 """
 from __future__ import absolute_import, division, print_function

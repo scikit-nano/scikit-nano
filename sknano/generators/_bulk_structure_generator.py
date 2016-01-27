@@ -25,7 +25,7 @@ __docformat__ = 'restructuredtext en'
 
 # from sknano.core import pluralize
 # from sknano.core.math import Point, Vector
-from sknano.core.crystallography import AlphaQuartz, DiamondStructure, \
+from sknano.core.structures import AlphaQuartz, DiamondStructure, \
     Iron, Gold, Copper, BCCStructure, FCCStructure, CaesiumChlorideStructure, \
     RocksaltStructure, ZincblendeStructure, MoS2
 from ._base import BulkGeneratorBase
@@ -53,7 +53,7 @@ class AlphaQuartzGenerator(BulkGeneratorBase, AlphaQuartz):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
 
-class DiamondStructureGenerator(BulkGeneratorBase, DiamondStructure):
+class DiamondGenerator(BulkGeneratorBase, DiamondStructure):
     """:class:`DiamondStructure` generator class.
 
     Parameters
@@ -64,48 +64,47 @@ class DiamondStructureGenerator(BulkGeneratorBase, DiamondStructure):
     def save(self, fname='diamond', **kwargs):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
-DiamondGenerator = DiamondStructureGenerator
+DiamondStructureGenerator = DiamondGenerator
 
 
-class CaesiumChlorideStructureGenerator(BulkGeneratorBase,
-                                        CaesiumChlorideStructure):
+class CaesiumChlorideGenerator(BulkGeneratorBase, CaesiumChlorideStructure):
     """:class:`CaesiumChlorideStructure` generator class."""
     def save(self, fname='caesium_chloride', **kwargs):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
-CsClGenerator = CaesiumChlorideGenerator = CaesiumChlorideStructureGenerator
+CaesiumChlorideStructureGenerator = CsClGenerator = CaesiumChlorideGenerator
 
 
-class RocksaltStructureGenerator(BulkGeneratorBase, RocksaltStructure):
+class RocksaltGenerator(BulkGeneratorBase, RocksaltStructure):
     """:class:`RocksaltStructure` generator class."""
     def save(self, fname='rock_salt', **kwargs):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
-NaClGenerator = RocksaltGenerator = RocksaltStructureGenerator
+RocksaltStructureGenerator = NaClGenerator = RocksaltGenerator
 
 
-class ZincblendeStructureGenerator(BulkGeneratorBase, ZincblendeStructure):
+class ZincblendeGenerator(BulkGeneratorBase, ZincblendeStructure):
     """:class:`ZincblendeStructure` generator class."""
     def save(self, fname='zincblende', **kwargs):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
-ZincblendeGenerator = ZincblendeStructureGenerator
+ZincblendeStructureGenerator = ZincblendeGenerator
 
 
-class BCCStructureGenerator(BulkGeneratorBase, BCCStructure):
+class BCCGenerator(BulkGeneratorBase, BCCStructure):
     """:class:`BCCStructure` generator class."""
     def save(self, fname='bcc_structure', **kwargs):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
-BCCGenerator = BCCStructureGenerator
+BCCStructureGenerator = BCCGenerator
 
 
-class FCCStructureGenerator(BulkGeneratorBase, FCCStructure):
+class FCCGenerator(BulkGeneratorBase, FCCStructure):
     """:class:`FCCStructure` generator class."""
     def save(self, fname='fcc_structure', **kwargs):
         super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
 
-FCCGenerator = FCCStructureGenerator
+FCCStructureGenerator = FCCGenerator
 
 
 class MoS2Generator(BulkGeneratorBase, MoS2):

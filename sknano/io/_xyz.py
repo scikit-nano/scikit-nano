@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ====================================================
-XYZ format (:mod:`sknano.io._xyz_format`)
+XYZ format (:mod:`sknano.io._xyz`)
 ====================================================
 
-.. currentmodule:: sknano.io._xyz_format
+.. currentmodule:: sknano.io._xyz
 
 """
 from __future__ import absolute_import, division, print_function
@@ -231,7 +231,7 @@ class XYZ2DATAConverter(StructureConverter):
         `DATAReader` (only if `return_reader` is True)
 
         """
-        from ._lammps_data_format import DATAReader, DATAWriter
+        from ._lammps_data import DATAReader, DATAWriter
 
         kwargs.update(self.kwargs)
 

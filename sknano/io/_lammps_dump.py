@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ====================================================================
-LAMMPS dump format (:mod:`sknano.io._lammps_dump_format`)
+LAMMPS dump format (:mod:`sknano.io._lammps_dump`)
 ====================================================================
 
-.. currentmodule:: sknano.io._lammps_dump_format
+.. currentmodule:: sknano.io._lammps_dump
 
 """
 from __future__ import absolute_import, division, print_function

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ======================================================
-JSON format (:mod:`sknano.io._json_format`)
+JSON format (:mod:`sknano.io._json`)
 ======================================================
 
-.. currentmodule:: sknano.io._json_format
+.. currentmodule:: sknano.io._json
 
 """
 from __future__ import absolute_import, division, print_function

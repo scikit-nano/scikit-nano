@@ -15,7 +15,7 @@ from abc import ABCMeta, abstractmethod
 
 from sknano.core import get_fpath
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
-from sknano.core.crystallography import StructureData
+from sknano.core.structures import StructureData
 # from sknano.utils.analysis import StructureAnalyzer
 from sknano.version import version
 
@@ -97,15 +97,15 @@ class StructureReader:
         """
         if (structure_format is None and fpath.endswith('.data')) or \
                 structure_format == 'data':
-            from ._lammps_data_format import DATAReader
+            from ._lammps_data import DATAReader
             return DATAReader(fpath, **kwargs)
         elif (structure_format is None and fpath.endswith('.dump')) or \
                 structure_format == 'dump':
-            from ._lammps_dump_format import DUMPReader
+            from ._lammps_dump import DUMPReader
             return DUMPReader(fpath, **kwargs)
         elif (structure_format is None and fpath.endswith('.xyz')) or \
                 structure_format == 'xyz':
-            from ._xyz_format import XYZReader
+            from ._xyz import XYZReader
             return XYZReader.read(fpath)
         else:
             raise StructureIOError("Unable to determine `structure_format`")
@@ -132,16 +132,16 @@ class StructureWriter:
 
         if (structure_format is None and fname.endswith('.data')) or \
                 structure_format == 'data':
-            from ._lammps_data_format import DATAWriter
+            from ._lammps_data import DATAWriter
             DATAWriter.write(fname=fname, **kwargs)
         elif (structure_format is None and fname.endswith('.dump')) or \
                 structure_format == 'dump':
-            from ._lammps_dump_format import DUMPWriter
+            from ._lammps_dump import DUMPWriter
             DUMPWriter.write(fname=fname, **kwargs)
         # elif (structure_format is None and fname.endswith('.xyz')) or \
         #        structure_format == 'xyz':
         else:
-            from ._xyz_format import XYZWriter
+            from ._xyz import XYZWriter
             XYZWriter.write(fname=fname, **kwargs)
 
 

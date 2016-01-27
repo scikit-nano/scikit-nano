@@ -8,7 +8,7 @@ from nose.tools import assert_equal, assert_not_equal, assert_true
 import numpy as np
 
 from sknano.core.crystallography import UnitCell, Crystal2DLattice, \
-    Crystal2DStructure, Crystal3DLattice, Crystal3DStructure, SuperCell
+    Crystal3DLattice, SuperCell
 # from sknano.core.atoms import BasisAtom, BasisAtoms
 # from sknano.core.math import Point
 from sknano.core.refdata import aCC
@@ -21,8 +21,6 @@ def test1():
     lattice.rotate(angle=-np.pi/6)
     basis = ['C', 'C']
     coords = [[0, 0, 0], [aCC, 0, 0]]
-    structure = Crystal2DStructure(lattice, basis, coords, cartesian=True)
-    print(structure.unit_cell)
     cell = UnitCell(lattice, basis, coords, cartesian=True)
     print(cell)
 

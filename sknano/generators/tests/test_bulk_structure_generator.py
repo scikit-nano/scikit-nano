@@ -10,7 +10,7 @@ from nose.tools import assert_equal
 
 import numpy as np
 
-from sknano.core.crystallography import AlphaQuartz, DiamondStructure, \
+from sknano.core.structures import AlphaQuartz, DiamondStructure, \
     CaesiumChlorideStructure, RocksaltStructure, ZincblendeStructure, \
     Gold, Copper, MoS2
 from sknano.generators import BCCStructureGenerator, FCCStructureGenerator, \

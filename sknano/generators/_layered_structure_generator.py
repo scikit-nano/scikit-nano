@@ -19,7 +19,7 @@ import importlib
 
 from sknano.core import BaseClass, call_signature
 from sknano.core.atoms import StructureAtoms
-from sknano.core.crystallography import BaseStructure
+from sknano.core.structures import BaseStructure
 from ._base import GeneratorBase
 
 import configparser
