@@ -13,7 +13,7 @@
 
 @import url("basic.css");
 
-@import url("css/sknano.css");
+@import url("css/scikit-nano.css");
 
 
 /*
@@ -31,11 +31,11 @@ div.container-navbar-bottom {
     margin-top: 0;
 }
 
-div.container-navbar-bottom div.sknano-navbar {
+div.container-navbar-bottom div.scikit-nano-navbar {
     margin-top: 0;
 }
 
-div.sknano-navbar {
+div.scikit-nano-navbar {
     margin: 0;
 }
 
@@ -142,19 +142,19 @@ div.sphinxsidebarwrapper {
     overflow: hidden;
 }
 
-div.sknano-rightsidebar h3 {
+div.scikit-nano-rightsidebar h3 {
     font-size: 120%;
     line-height: inherit;
     border-bottom: none;
 }
 
-div.sknano-rightsidebar h4 {
+div.scikit-nano-rightsidebar h4 {
     font-size: 120%;
     line-height: inherit;
     border-bottom: none;
 }
 
-div.top-sknano-logo-header {
+div.top-scikit-nano-logo-header {
     text-align: left;
     background-color: rgb(140, 170, 230);
     border-bottom: 8px solid rgb(0, 51, 153);
@@ -182,12 +182,12 @@ h4 tt { font: inherit; border-bottom: none; }
 h5 tt { font: inherit; border-bottom: none; }
 h6 tt { font: inherit; border-bottom: none; }
 
-div#sknano-section-body h1 { color: rgb(85, 85, 85); }
-div#sknano-section-body h2 { color: rgb(85, 85, 85); }
-div#sknano-section-body h3 { color: rgb(85, 85, 85); }
-div#sknano-section-body h4 { color: rgb(85, 85, 85); border-bottom: none; }
-div#sknano-section-body h5 { color: rgb(85, 85, 85); border-bottom: none; }
-div#sknano-section-body h6 { color: rgb(85, 85, 85); border-bottom: none; }
+div#scikit-nano-section-body h1 { color: rgb(85, 85, 85); }
+div#scikit-nano-section-body h2 { color: rgb(85, 85, 85); }
+div#scikit-nano-section-body h3 { color: rgb(85, 85, 85); }
+div#scikit-nano-section-body h4 { color: rgb(85, 85, 85); border-bottom: none; }
+div#scikit-nano-section-body h5 { color: rgb(85, 85, 85); border-bottom: none; }
+div#scikit-nano-section-body h6 { color: rgb(85, 85, 85); border-bottom: none; }
 
 p.rubric {
     color: rgb(85, 85, 85);

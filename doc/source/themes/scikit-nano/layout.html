@@ -1,5 +1,5 @@
 {#
-    sknano/layout.html
+    scikit-nano/layout.html
     ~~~~~~~~~~~~~~~~~
 
     Master layout template for Sphinx themes.
@@ -50,7 +50,7 @@
 {%- endmacro %}
 
 {%- macro sidebar() %}
-      <div class="sknano-rightsidebar span3">
+      <div class="scikit-nano-rightsidebar span3">
         <div class="sphinxsidebarwrapper">
           {%- block sidebarlogo %}
           {%- if logo %}
@@ -104,8 +104,8 @@
 {%- endmacro %}
 
 {%- macro css() %}
-    <link rel="stylesheet" type="text/css" href="{{ pathto('_static/css/sknano-bootstrap.css', 1) }}">
-    <link rel="stylesheet" type="text/css" href="{{ pathto('_static/css/sknano-extend.css', 1) }}">
+    <link rel="stylesheet" type="text/css" href="{{ pathto('_static/css/scikit-nano-bootstrap.css', 1) }}">
+    <link rel="stylesheet" type="text/css" href="{{ pathto('_static/css/scikit-nano-extend.css', 1) }}">
     <link rel="stylesheet" href="{{ pathto('_static/' + style, 1) }}" type="text/css" >
     <link rel="stylesheet" href="{{ pathto('_static/pygments.css', 1) }}" type="text/css" >
     {%- for cssfile in css_files %}
@@ -160,11 +160,11 @@
   </head>
   <body>
 {%- block header %}
-{% if theme_sknano_logo %}
+{% if theme_scikit-nano_logo %}
 <div class="container">
-  <div class="top-sknano-logo-header">
+  <div class="top-scikit-nano-logo-header">
     <a href="{{ pathto('index') }}">
-      <img style="border: 0;" alt="sknano" src="{{ pathto('_static/img/sknano_logo.gif', 1) }}"></a>
+      <img style="border: 0;" alt="scikit-nano" src="{{ pathto('_static/img/scikit-nano_logo.gif', 1) }}"></a>
     </div>
   </div>
 </div>
@@ -183,7 +183,7 @@
         {% if theme_navigation_links or sidebar == 'left' %}
     <div class="row-fluid">
       <div class="span12">
-        <div class="sknano-navbar">
+        <div class="scikit-nano-navbar">
               {{ relbar_top() }}
               {% if theme_navigation_links %}
               {{ relbar_top_right() }}
@@ -206,7 +206,7 @@
             {% if not theme_navigation_links and sidebar != 'left' %}
           <div class="row-fluid">
         <div class="span9">
-            <div class="sknano-navbar">
+            <div class="scikit-nano-navbar">
             {{ relbar_top() }}
           </div>
         </div>
@@ -214,7 +214,7 @@
             {% endif %}
   {%- block document %}
         <div class="bodywrapper">
-          <div class="body" id="sknano-section-body">
+          <div class="body" id="scikit-nano-section-body">
             {% block body %} {% endblock %}
           </div>
         </div>
@@ -231,7 +231,7 @@
 {%- endblock %}
 
     <div class="container container-navbar-bottom">
-      <div class="sknano-navbar">
+      <div class="scikit-nano-navbar">
         {{ relbar_bottom() }}
       </div>
     </div>

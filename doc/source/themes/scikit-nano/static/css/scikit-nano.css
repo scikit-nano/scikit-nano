@@ -2,7 +2,7 @@
 Styling to add still
 --------------------
 
-div: sknano-notice (general notices: e.g. submission requested is invalid)
+div: scikit-nano-notice (general notices: e.g. submission requested is invalid)
 
 */
 
@@ -20,45 +20,45 @@ body {
                     /* The min-width property does not work in old versions of Internet Explorer */
 }
 
-#sknano-document-container{
+#scikit-nano-document-container{
     position: relative;
     min-width: 50em;
     max-width: 90em;
 }
-#sknano-header {
+#scikit-nano-header {
     clear: both;
     float: left;
     width: 100%;
     display: block;
 }
-.sknano-header-row{
+.scikit-nano-header-row{
     float: left;
     width: 100%;
     clear: both;
 }
-.sknano-header-left{
+.scikit-nano-header-left{
     float: left;
     position: relative;
     left: +1%
 }
-.sknano-header-right{
+.scikit-nano-header-right{
     float: right;
     position: relative;
     left: -1%
 }
-#sknano-contentwrap{
+#scikit-nano-contentwrap{
     display: block;
     overflow: hidden;
 }
-#sknano-content-main{
+#scikit-nano-content-main{
     float: left;
     width: 100%;
 }
 
-#sknano-navigation-bottom{
+#scikit-nano-navigation-bottom{
     clear: both;
 }
-#sknano-footer{
+#scikit-nano-footer{
     clear: both;
 }
 
@@ -67,27 +67,27 @@ body {
 /* -------------------------------------------- */
 
 /* Document container */
-#sknano-document-container {
+#scikit-nano-document-container {
     font: 13px/1.5 'Lucida Grande','Lucida Sans Unicode','Geneva','Verdana',sans-serif;
     background: #FFFFFF;
     margin: auto;              /* display container in the center of the page */
     padding-top: 12px;
 }
-#sknano-document-container img{
+#scikit-nano-document-container img{
     border: 0
 }
-#sknano-document-container a:visited { /* for IE6 */
+#scikit-nano-document-container a:visited { /* for IE6 */
     color: purple;
 }
 /* Header block styling */
-.sknano-header-row{
+.scikit-nano-header-row{
     text-align: center;
 }
-.sknano-header-right{
+.scikit-nano-header-right{
     float: right;
     text-align: right;
 }
-#sknano-site-notice{
+#scikit-nano-site-notice{
     /*display: none;*/
     color: #aaf;
     font-weight: bold;
@@ -96,42 +96,42 @@ body {
     background: #eee;
     /*display: none; Uncomment to remove the site notice*/
 }
-#sknano-site-title{
+#scikit-nano-site-title{
     border-bottom: 1px solid #aaa;
     margin-top: -2em;
 
 }
 
-#sknano-top-menu{
+#scikit-nano-top-menu{
     padding-top: 0.25em;
 }
-#sknano-header h1 a {
+#scikit-nano-header h1 a {
     color: black;
     text-decoration: none;
     text-align: center;
     font: 36px/1.0 'Inconsolata','Lucida Grande','Lucida Sans Unicode','Geneva','Verdana',sans-serif;
     font-weight: bold;
 }
-#sknano-top-menu a {
+#scikit-nano-top-menu a {
     text-decoration: none;
     font-weight: bold;
     font: 20px 'Inconsolata','Lucida Grande','Lucida Sans Unicode','Geneva','Verdana',sans-serif;
 }
-#sknano-top-menu a:hover{
+#scikit-nano-top-menu a:hover{
     text-decoration: underline;
 }
 
 /* contentwrap block: applies to everything in the bulk of the page */
-#sknano-contentwrap {
+#scikit-nano-contentwrap {
 }
 
 /* The major chunk of content (left side); the sidebar comes later */
-#sknano-content-main{
+#scikit-nano-content-main{
     background: #FFFFFF;
 }
 
 /* Border */
-#sknano-border {
+#scikit-nano-border {
     margin-left: 0px;
     background: white;
     padding-top: 0em;     /* Don't remove top and bottom padding: leads to   */
@@ -140,30 +140,30 @@ body {
     padding-right: 2em;
 }
 
-/* sknano-section-body: the current section of the document.  The Sphinx
+/* scikit-nano-section-body: the current section of the document.  The Sphinx
    generated HTML is inserted inside this DIV element.  Specific formatting for
    the HTML should go here */
 /* ----------------------- */
-#sknano-section-body {
+#scikit-nano-section-body {
     margin-bottom: 1em;
 }
 
 /* Styling for the headers */
-div#sknano-section-body h1, h2, h3, h4, h5, h6{
+div#scikit-nano-section-body h1, h2, h3, h4, h5, h6{
     color: #20435C;
     font-family: 'Trebuchet MS', sans-serif;
     font-weight: normal;
     border-bottom: 0px solid #ccc;
     margin-bottom: 0.5em;
 }
-div#sknano-section-body h1 { font-size: 200%; font-weight: bold;}
-div#sknano-section-body h2 { font-size: 160%; font-weight: bold; color: #101074;}
-div#sknano-section-body h3 { font-size: 140%; color: #362A13;}
-div#sknano-section-body h4 { font-size: 120%; }
-div#sknano-section-body h5 { font-size: 110%; }
-div#sknano-section-body h6 { font-size: 100%; }
+div#scikit-nano-section-body h1 { font-size: 200%; font-weight: bold;}
+div#scikit-nano-section-body h2 { font-size: 160%; font-weight: bold; color: #101074;}
+div#scikit-nano-section-body h3 { font-size: 140%; color: #362A13;}
+div#scikit-nano-section-body h4 { font-size: 120%; }
+div#scikit-nano-section-body h5 { font-size: 110%; }
+div#scikit-nano-section-body h6 { font-size: 100%; }
 
-.sknano-title-in-span{font-size: 160%; font-weight: bold; color: #101074; float: left;}
+.scikit-nano-title-in-span{font-size: 160%; font-weight: bold; color: #101074; float: left;}
 
 /* Styling for forms */
 input, select, textarea{
@@ -173,15 +173,15 @@ input, select, textarea{
 }
 
 /* Styling for hyperlinks */
-div#sknano-section-body a{
+div#scikit-nano-section-body a{
     text-decoration: none;
 }
-div#sknano-section-body a:hover{
+div#scikit-nano-section-body a:hover{
     text-decoration: underline;
 }
 
 /* Styling for images and figures: images are inline, figures are centered */
-div#sknano-section-body .align-center{
+div#scikit-nano-section-body .align-center{
     text-align: center;
 }
 
@@ -193,23 +193,23 @@ tt {
 }
 
 /* Main page */
-#sknano-site-statement{
+#scikit-nano-site-statement{
     width: 90%;
     margin: auto;
     text-align: center;
     padding-top: 1em;
 }
-#sknano-search{
+#scikit-nano-search{
     clear: both;
     float: none;
     display: block;
     margin: 0 auto;
     width: 700px;
 }
-#sknano-search-form{
+#scikit-nano-search-form{
     margin-top: 10pt;
 }
-#sknano-search-input {
+#scikit-nano-search-input {
     cursor: auto;
     display: inline;
     height: 31px;
@@ -229,7 +229,7 @@ tt {
     word-spacing: 0px;
     background: none;
 }
-#sknano-search-button{
+#scikit-nano-search-button{
     border: 1px outset #B6A792;
     vertical-align:middle;
     border:none;
@@ -244,10 +244,10 @@ tt {
     display: inline-block;
     overflow: hidden;
 }
-#sknano-search-results{
+#scikit-nano-search-results{
     width: 75%;
 }
-#sknano-search-results li{
+#scikit-nano-search-results li{
     margin: 0 auto;
     list-style-type: none;
     padding: 0.5em 0;
@@ -255,13 +255,13 @@ tt {
 }
 
 /* Submission buttons */
-.sknano-button-container {
+.scikit-nano-button-container {
     float: left;
     width: 100%;
     clear: both;
     margin-bottom:1em;
 }
-#sknano-buttonlist {
+#scikit-nano-buttonlist {
     margin: 0 auto;
     list-style-type: none;
     padding: 0;
@@ -270,18 +270,18 @@ tt {
     position: relative;
     left: 50%;
 }
-#sknano-buttonlist li {
+#scikit-nano-buttonlist li {
     float: left;
     position: relative;
     right: 50%;
     padding: 0em 1em;
 }
-#sknano-buttonlist a {
+#scikit-nano-buttonlist a {
     text-decoration: none;
     margin: 0 auto;
     display: block;
 }
-.sknano-button{
+.scikit-nano-button{
     background-position: 0px 0px;
     background-color: #DDDDDD;
     border: 1px outset #B6A792;
@@ -294,7 +294,7 @@ tt {
 }
 
 /* Portals */
-.sknano-portal-container{
+.scikit-nano-portal-container{
     width: 65%;
     clear: both;
     padding: 0px;
@@ -302,57 +302,57 @@ tt {
     display: block;
     margin: 0 auto;
 }
-.sknano-portal-row-container {
+.scikit-nano-portal-row-container {
     clear:both;
     float:left;
     width:100%;                /* width of whole page */
     overflow:hidden;        /* This chops off any overhanging divs */
 }
-.sknano-portal-row {
+.scikit-nano-portal-row {
     float:left;
     width:100%;
     position:relative;
     right:50%;                /* right column width */
     background:#fff;        /* left column background colour */
     }
-.sknano-portal-left,
-.sknano-portal-right{
+.scikit-nano-portal-left,
+.scikit-nano-portal-right{
     float:left;
     position:relative;
     padding:0 0 1em 0;
     overflow:hidden;
 }
-.sknano-portal-left {
+.scikit-nano-portal-left {
     width:46%;            /* left column content width (column width minus left and right padding) */
     left:52%;            /* right column width plus left column left padding */
 }
-.sknano-portal-right {
+.scikit-nano-portal-right {
     width:46%;            /* right column content width (column width minus left and right padding) */
     left:56%;            /* (right column width) plus (left column left and right padding) plus (right column left padding) */
 }
-.sknano-portal-container h3{
+.scikit-nano-portal-container h3{
     font: 14px/1.0 'Inconsolata', Monaco, Lucida Console, Sans Mono, Courier New, monospace, serif;
     text-align: center;
     border-bottom: 1px solid;
 }
-.sknano-portal-container a{
+.scikit-nano-portal-container a{
     text-decoration: none;
     font-weight: bold;
     font: 14px sans-serif;
 }
-.sknano-portal-container a:hover{
+.scikit-nano-portal-container a:hover{
     text-decoration: underline;
 }
-.sknano-portal-container ul{
+.scikit-nano-portal-container ul{
     list-style-type: square;
 }
-.sknano-portal-container li{
+.scikit-nano-portal-container li{
     margin-left: -1em;
 }
 
 
 /* Submission forms */
-#sknano-form-error-message{
+#scikit-nano-form-error-message{
     margin-bottom: 1em;
     text-align: center;
     border-bottom:solid 1px #000;
@@ -365,11 +365,11 @@ tt {
 .errorlist li{
     font-style: italic;
 }
-.sknano-field-error{
+.scikit-nano-field-error{
     background: #ee8888;
     padding: 4px;
 }
-.sknano-form-button{
+.scikit-nano-form-button{
     padding: 5px;
 }
 
@@ -433,34 +433,34 @@ tt {
 .form-field-auto-width{
     width: auto;
 }
-.sknano-code-description{
+.scikit-nano-code-description{
     height: 15em;
 }
-span.sknano-helptext ul{
+span.scikit-nano-helptext ul{
     margin: 0;
     padding-left: 20px;
 }
-.sknano-odd{
+.scikit-nano-odd{
     background: #DDF;
 }
-.sknano-even{
+.scikit-nano-even{
     background: #CCF;
 }
-li.sknano-odd tt{
+li.scikit-nano-odd tt{
     background-color: #DDF;
 }
-li.sknano-even tt {
+li.scikit-nano-even tt {
     background-color: #CCF;
 }
 
 /* Image upload */
-#sknano-item-upload {
+#scikit-nano-item-upload {
 }
-#sknano-item-upload-button{
+#scikit-nano-item-upload-button{
     padding: 0.5em;
     text-align: center;
 }
-.sknano-item-upload-success{
+.scikit-nano-item-upload-success{
     background: #ffa;
     padding: 4px;
 }
@@ -477,7 +477,7 @@ li.sknano-even tt {
 * html .ui-autocomplete {
     height: 100px;
 }
-.sknano-tag{
+.scikit-nano-tag{
     background-color: #E0EAF1;
     color: #3E6D8E;
     border-bottom: 1px solid #37607D;
@@ -491,11 +491,11 @@ li.sknano-even tt {
     cursor: pointer;
     float:left;
 }
-.sknano-tag:hover{
+.scikit-nano-tag:hover{
     background-color: #3E6D8E;
     color: #E0EAF1;
 }
-.sknano-tag-cloud{
+.scikit-nano-tag-cloud{
     background-color: #FFF;
     color: #3E6D8E;
     border-bottom: 0px solid #37607D;
@@ -507,30 +507,30 @@ li.sknano-even tt {
     white-space: nowrap;
     cursor: pointer;
 }
-.sknano-tag-cloud:hover{
+.scikit-nano-tag-cloud:hover{
     background-color: #FFF;
     color: #1E4D6E;
 }
 
-#sknano-preview-edit-submit{
+#scikit-nano-preview-edit-submit{
     clear: both;
 }
-#sknano-preview-edit-submit form input{
+#scikit-nano-preview-edit-submit form input{
     display: inline;
     padding: 5px;
 }
-#sknano-item-submit{
+#scikit-nano-item-submit{
     margin-left:8em;
     font-weight: bold;
 }
-#sknano-item-preview{
+#scikit-nano-item-preview{
     width:auto;
     min-width:0;
     padding: 0.5em;
     text-align:center;
 }
 
-#sknano-item-header{
+#scikit-nano-item-header{
     clear: both;
     padding: 0px;
     float: left;
@@ -541,21 +541,21 @@ li.sknano-even tt {
     left: -1%;
     top: -20px;
 }
-#sknano-item-header-left{
+#scikit-nano-item-header-left{
     float: left;
     text-align: left;
 }
-#sknano-item-header-right{
+#scikit-nano-item-header-right{
     float: right;
     text-align: right;
 }
 
-div.sknano-item-row {
+div.scikit-nano-item-row {
     clear: both;
     padding-top: 10px;
 }
 
-div.sknano-item-row span.sknano-item-label {
+div.scikit-nano-item-row span.scikit-nano-item-label {
     float: left;
     width: 200px;
     text-align: left;
@@ -564,39 +564,39 @@ div.sknano-item-row span.sknano-item-label {
     font-weight: bold;
 }
 
-div.sknano-item-row span.sknano-item-entry {
+div.scikit-nano-item-row span.scikit-nano-item-entry {
     float: left;
     min-width: 500px;
     max-width: 1000px;
     text-align: left;
 }
 
-div.sknano-item-row span.sknano-item-entry ul{
+div.scikit-nano-item-row span.scikit-nano-item-entry ul{
   padding: 0;
   margin: 0;
   list-style-type: none;
 }
 
-div.sknano-item-row span.sknano-50-50{
+div.scikit-nano-item-row span.scikit-nano-50-50{
     float: left;
     width: 49%;
     text-align: left;
 }
-.sknano-help-section a{
+.scikit-nano-help-section a{
    color: #0069CC;
    margin-top: 1em;
 }
-.sknano-entries-list ul{
+.scikit-nano-entries-list ul{
   padding: 0;
   margin: 0;
   list-style-type: none;
 }
 /* Unstyle certain elements in the code/link description fields */
-.sknano-item-description p{
+.scikit-nano-item-description p{
     margin: 0;
     margin-bottom: 1em;
 }
-.sknano-item-row pre{
+.scikit-nano-item-row pre{
   border: 0px solid #FFF;
   overflow: auto;
   padding: 5px;
@@ -608,7 +608,7 @@ div.sknano-item-row span.sknano-50-50{
 
 
 /* Item display*/
-#sknano-itemdisp-container{
+#scikit-nano-itemdisp-container{
     clear: both;
     padding: 0;
     padding-top: 1em;
@@ -616,116 +616,116 @@ div.sknano-item-row span.sknano-50-50{
     width: 85%;
 }
 
-.sknano-itemdisp-row-container {
+.scikit-nano-itemdisp-row-container {
     clear:both;
     float:left;
     width:100%;
     margin: 0 0 1em 0;
 }
-.sknano-itemdisp-row {
+.scikit-nano-itemdisp-row {
     float:left;
     width:100%;
     }
-.sknano-itemdisp-td{
+.scikit-nano-itemdisp-td{
   float: left;
   padding-right: 1%;
 }
-.sknano-itemdisp-description{
+.scikit-nano-itemdisp-description{
   width: 50%;
 }
-.sknano-itemdisp-link{
+.scikit-nano-itemdisp-link{
   float: right;
   font-size: 80%;
 }
-div .sknano-itemdisp-mainlink{
+div .scikit-nano-itemdisp-mainlink{
     text-decoration: underline;
     float: left;
     width: 100%;
 }
-.sknano-itemdisp-revinfo{
+.scikit-nano-itemdisp-revinfo{
   float: right;
   font-size: 80%;
 }
-.sknano-itemdisp-created{
+.scikit-nano-itemdisp-created{
   width: 23%;
 }
-.sknano-itemdisp-tags{
+.scikit-nano-itemdisp-tags{
   width: 23%;
 }
-.sknano-itemdisp-odd{
+.scikit-nano-itemdisp-odd{
   background: #fff8f1;
 }
-.sknano-itemdisp-even{
+.scikit-nano-itemdisp-even{
   background: #fff;
 }
-.sknano-itemdisp-header{
+.scikit-nano-itemdisp-header{
   background: #f1c79d;
   padding: 0.4em 0 0.4em 0;
   font-weight: bold;
 }
-#sknano-itemdisp-pageheader{
+#scikit-nano-itemdisp-pageheader{
   text-align: center;
   font: 24px/1.0 'Inconsolata','Lucida Grande','Lucida Sans Unicode','Geneva','Verdana',sans-serif;
   font-weight: bold;
 }
-.sknano-itemdisp-pagination{
+.scikit-nano-itemdisp-pagination{
     float: left;
 }
 
-div#sknano-itemdisp-container h1, h2, h3, h4, h5, h6{
+div#scikit-nano-itemdisp-container h1, h2, h3, h4, h5, h6{
     font-weight: normal;
     border-bottom: 1px solid #ccc;}
-div#sknano-itemdisp-container h1 { font-size: 130%; font-weight: bold;}
-div#sknano-itemdisp-container h2 { font-size: 120%; font-weight: bold;}
-div#sknano-itemdisp-container h3 { font-size: 110%;}
-div#sknano-itemdisp-container h4 { font-size: 100%; }
-div#sknano-itemdisp-container h5 { font-size: 100%; }
-div#sknano-itemdisp-container h6 { font-size: 100%; }
+div#scikit-nano-itemdisp-container h1 { font-size: 130%; font-weight: bold;}
+div#scikit-nano-itemdisp-container h2 { font-size: 120%; font-weight: bold;}
+div#scikit-nano-itemdisp-container h3 { font-size: 110%;}
+div#scikit-nano-itemdisp-container h4 { font-size: 100%; }
+div#scikit-nano-itemdisp-container h5 { font-size: 100%; }
+div#scikit-nano-itemdisp-container h6 { font-size: 100%; }
 
 /* Permalinks and other minor info*/
-.sknano-minor-info {
+.scikit-nano-minor-info {
     font-size: 80%;
     float: left;
     border-top: 1px solid #ddd;
 }
-.sknano-minor-info p{
+.scikit-nano-minor-info p{
     margin: 0;
 }
-.sknano-minor-info a{
+.scikit-nano-minor-info a{
     text-decoration: none;
 }
-.sknano-minor-info a:hover{
+.scikit-nano-minor-info a:hover{
     text-decoration: underline;
 }
 
 /* User profile pages */
-#sknano-profile-user-options ul{
+#scikit-nano-profile-user-options ul{
     margin: 0 auto;
     padding: 0 0;
 }
-#sknano-profile-user-options li{
+#scikit-nano-profile-user-options li{
     margin: 0 auto;
     list-style-type: none;
     padding: 0 5px 0 5px;
     float: left;
     border-right: 1px solid;
 }
-#sknano-profile-user-options li:first-child{
+#scikit-nano-profile-user-options li:first-child{
     padding-left: 0px;
 }
-#sknano-profile-user-options li:last-child{
+#scikit-nano-profile-user-options li:last-child{
     border-right: none;
 }
 /* Styling for certain static pages */
-#sknano-static-centering{
+#scikit-nano-static-centering{
     display: block;
     margin: 0 auto;
     min-width: 30em;
     max-width: 50em;
 }
 
-/* sknano-footer: http://www.alistapart.com/articles/practicalcss/   */
-#sknano-footer {
+/* scikit-nano-footer: http://www.alistapart.com/articles/practicalcss/   */
+#scikit-nano-footer {
     clear: both;
     font-size: 90%;
     padding: 0px;
@@ -736,36 +736,36 @@ div#sknano-itemdisp-container h6 { font-size: 100%; }
     margin: 0 auto;
     border-top: 1px solid #aaa;
 }
-#sknano-footer a{
+#scikit-nano-footer a{
     text-decoration: none;
     font-weight: bold;
     font: 15px sans-serif;
 }
-#sknano-footer a:hover{
+#scikit-nano-footer a:hover{
     text-decoration: underline;
 }
-.sknano-footer-left{
+.scikit-nano-footer-left{
     float: left;
     text-align: left;
 }
-.sknano-footer-right{
+.scikit-nano-footer-right{
     float: right;
     text-align: right;
 }
-.sknano-footer-left ul{
+.scikit-nano-footer-left ul{
     margin: 0;
     padding: 0;
 }
-.sknano-footer-left li{
+.scikit-nano-footer-left li{
     display: inline;
     padding-left: 3px;
     padding-right: 7px;
     border-right: 0px solid #aaa;
 }
-.sknano-indent{
+.scikit-nano-indent{
     margin-left: 15px;
 }
-.sknano-flag{
+.scikit-nano-flag{
     padding-left: 1em;
     vertical-align: middle;
 }
@@ -773,16 +773,16 @@ div#sknano-itemdisp-container h6 { font-size: 100%; }
 /* ---------------- */
 /* Form styling     */
 /* ---------------- */
-.sknano-form{
+.scikit-nano-form{
     padding-top: 2em;
 }
 
-.sknano-form-label{
+.scikit-nano-form-label{
     display: block;
     font-size: 14px;
     color: #444;
 }
-.sknano-centering-div-container{
+.scikit-nano-centering-div-container{
     clear: both;
     margin: 0 auto;
     border: 1px;

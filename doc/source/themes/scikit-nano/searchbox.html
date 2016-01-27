@@ -3,9 +3,9 @@
 {%- if sourcename %}
 <div class="this-page-menu">
 {%- if 'generated/' in sourcename %}
-  <a href="/sknano/docs/{{ sourcename.replace('generated/', '').replace('.txt', '') |e }}">{{_('Edit page')}}</a>
+  <a href="/scikit-nano/docs/{{ sourcename.replace('generated/', '').replace('.txt', '') |e }}">{{_('Edit page')}}</a>
 {%- else %}
-  <a href="/sknano/docs/sknano-docs/{{ sourcename.replace('.txt', '.rst') |e }}">{{_('Edit page')}}</a>
+  <a href="/scikit-nano/docs/scikit-nano-docs/{{ sourcename.replace('.txt', '.rst') |e }}">{{_('Edit page')}}</a>
 {%- endif %}
 </div>
 {%- endif %}

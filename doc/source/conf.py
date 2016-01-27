@@ -81,7 +81,7 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'scikit-nano'
-copyright = '2015, Andrew Merrill'
+copyright = '2016, Andrew Merrill'
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -100,7 +100,7 @@ rst_prolog = stable_release
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
-#today = ''
+# today = ''
 # Else, today_fmt is used as the format for a strftime call.
 today_fmt = '%B %d, %Y'
 
@@ -109,7 +109,7 @@ today_fmt = '%B %d, %Y'
 exclude_patterns = []
 
 # List of documents that shouldn't be included in the build.
-#unused_docs = []
+# unused_docs = []
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -124,71 +124,65 @@ add_function_parentheses = False
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
-#add_module_names = True
+# add_module_names = True
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.
 show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-#pygments_style = 'sphinx'
+# pygments_style = 'sphinx'
 
 # A list of ignored prefixes for module index sorting.
-#modindex_common_prefix = []
+# modindex_common_prefix = []
 
 # If true, keep warnings as "system message" paragraphs in the built documents.
-#keep_warnings = False
+# keep_warnings = False
 
 # -- Options for HTML output --------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#html_theme = 'sphinxdoc'
+html_theme = 'scikit-nano'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#html_theme_options = {}
+# html_theme_options = {}
+html_theme_options = {
+    "edit_link": False,
+    "sidebar": "left",
+    "scikit_nano_logo": False,
+    "rootlinks":
+    [("https://github.com/scikit-nano/scikit-nano", "scikit-nano"),
+     ("https://scikit-nano.org/doc", "Docs")]}
 
 # Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
+html_theme_path = ['themes']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-#html_title = None
+# html_title = None
+html_title = "%s v%s Reference Guide" % (project, version)
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-#html_short_title = None
+# html_short_title = None
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-#html_logo = None
+html_logo = '_static/scikit-nano_logo.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-#html_favicon = None
+html_favicon = '_static/favicon.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 
-#themedir = '_theme'
-html_theme = 'sknano'
-html_theme_path = ['.']
-
-html_theme_options = {
-    "edit_link": False,
-    "sidebar": "left",
-    "sknano_logo": False,
-    "rootlinks":
-    [("http://github.com/androomerrill/scikit-nano", "scikit-nano"),
-     ("http://scikit-nano.org/doc", "Docs")]}
-html_logo = '_static/sknano_logo.png'
-html_favicon = '_static/favicon.ico'
 html_sidebars = {'index': 'indexsidebar.html'}
 
-html_title = "%s v%s Reference Guide" % (project, version)
 html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
@@ -200,29 +194,29 @@ html_last_updated_fmt = '%b %d, %Y'
 html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-#html_sidebars = {}
+# html_sidebars = {}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
 html_additional_pages = {}
 
 # If false, no module index is generated.
-#html_domain_indices = True
+# html_domain_indices = True
 
 # If false, no index is generated.
-#html_use_index = True
+# html_use_index = True
 
 # If true, the index is split into individual pages for each letter.
-#html_split_index = False
+# html_split_index = False
 
 # If true, links to the reST sources are added to the pages.
-#html_show_sourcelink = True
+# html_show_sourcelink = True
 
 html_use_modindex = True
 html_copy_source = False
 
-#pngmath_use_preview = True
-#pngmath_dvipng_args = ['-gamma', '1.5', '-D', '96', '-bg', 'Transparent']
+# pngmath_use_preview = True
+# pngmath_dvipng_args = ['-gamma', '1.5', '-D', '96', '-bg', 'Transparent']
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 html_show_sphinx = True
@@ -233,7 +227,7 @@ html_show_copyright = True
 # If true, an OpenSearch description file will be output, and all pages will
 # contain a <link> tag referring to it.  The value of this option must be the
 # base URL from which the finished HTML is served.
-#html_use_opensearch = ''
+# html_use_opensearch = ''
 
 # This is the file name suffix for HTML files (e.g. ".xhtml").
 html_file_suffix = '.html'
@@ -258,11 +252,11 @@ latex_documents = [('index', 'scikit-nano-ref.tex',
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-#latex_logo = None
+# latex_logo = None
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
-#latex_use_parts = False
+# latex_use_parts = False
 
 # Additional stuff for the LaTeX preamble.
 latex_preamble = r'''
@@ -301,7 +295,7 @@ latex_preamble = r'''
 '''
 
 # Documents to append as an appendix to all manuals.
-#latex_appendices = []
+# latex_appendices = []
 
 # If false, no module index is generated.
 latex_use_modindex = False
@@ -317,7 +311,7 @@ man_pages = [
 ]
 
 # If true, show URL addresses after external links.
-#man_show_urls = False
+# man_show_urls = False
 
 
 # -- Options for Texinfo output -----------------------------------------------
@@ -333,16 +327,16 @@ texinfo_documents = [('index', 'scikit-nano',
                       'Miscellaneous')]
 
 # Documents to append as an appendix to all manuals.
-#texinfo_appendices = []
+# texinfo_appendices = []
 
 # If false, no module index is generated.
-#texinfo_domain_indices = True
+# texinfo_domain_indices = True
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
-#texinfo_show_urls = 'footnote'
+# texinfo_show_urls = 'footnote'
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
-#texinfo_no_detailmenu = False
+# texinfo_no_detailmenu = False
 
 
 # -----------------------------------------------------------------------------
@@ -390,9 +384,9 @@ coverage_c_regexes = {}
 coverage_ignore_c_items = {}
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Plot
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 plot_pre_code = """
 import numpy as np
 import scipy as sp
@@ -491,11 +485,11 @@ def linkcode_resolve(domain, info):
     fn = relpath(fn, start=dirname(sknano.__file__))
 
     if 'dev' in sknano.__version__:
-        return("https://github.com/androomerrill/scikit-nano/blob/" +
-               "dev/sknano/{}{}".format(fn, linespec))
+        return("https://github.com/scikit-nano/scikit-nano/blob/" +
+               "dev/scikit-nano/{}{}".format(fn, linespec))
     else:
-        return("https://github.com/androomerrill/scikit-nano/blob/" +
-               "v{}/sknano/{}{}".format(sknano.__version__, fn, linespec))
+        return("https://github.com/scikit-nano/scikit-nano/blob/" +
+               "v{}/scikit-nano/{}{}".format(sknano.__version__, fn, linespec))
 
 
 class Mock(object):
