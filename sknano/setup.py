@@ -11,7 +11,6 @@ def configuration(parent_package='', top_path=None):
     config.add_subpackage('generators')
     config.add_subpackage('io')
     config.add_subpackage('scripts')
-    config.add_subpackage('structures')
     config.add_subpackage('testing')
     config.add_subpackage('utils')
     config.add_data_dir('data')

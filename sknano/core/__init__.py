@@ -13,6 +13,7 @@ Core code for package development and general use.
 Sub-packages
 -------------
 
+* analysis (:mod:`sknano.core.analysis`)
 * atoms (:mod:`sknano.core.atoms`)
 * crystallography (:mod:`sknano.core.crystallography`)
 * geometric regions (:mod:`sknano.core.geometric_regions`)

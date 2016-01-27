@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import Configuration
     config = Configuration('core', parent_package, top_path)
+    config.add_subpackage('analysis')
     config.add_subpackage('atoms')
     config.add_subpackage('crystallography')
     config.add_subpackage('geometric_regions')

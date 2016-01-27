@@ -17,7 +17,6 @@ Subpackages
  generators     --- classes for generating nanostructure data
  io             --- classes for reading/writing nanostructure data
  scripts        --- command-line utilities
- structures     --- abstract representations of nanostructures
  testing        --- modules for testing
  utils          --- utility modules for analysis, testing, and general use
 
@@ -37,7 +36,6 @@ __all__ = ['apps',
            'generators',
            'io',
            'scripts',
-           'structures',
            'testing',
            'utils']
 
