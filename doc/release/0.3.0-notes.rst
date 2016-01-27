@@ -4,6 +4,8 @@ scikit-nano 0.3.0 Release Notes
 
 .. contents::
 
+**Release date:** (November 17, 2014)
+
 scikit-nano 0.3.0 is the culmination of months of hard work
 to refactor the package code base from the ground up.
 One of the most frustrating aspects of the v0.2.25 and earlier releases
@@ -18,3 +20,42 @@ much regard for backwards compatibility, which I hope you'll forgive.
 Of course the great thing about version control is that you'll always be able
 to checkout the v0.2.25 release should you require that code base.
 Add in virtualenv and you can work with both simultaneously!
+
+Highlights of this release include:
+
+- foo
+- bar
+
+
+New Features
+============
+
+
+Improvements
+============
+
+
+API Changes
+===========
+
+
+Future Changes
+==============
+
+
+Compatibility Notes
+===================
+
+
+Deprecated Features
+===================
+
+
+Other Changes
+=============
+
+
+Contributors to this release
+=============================
+
+- Andrew Merrill
