@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Nanotube bundle base class (:mod:`sknano.structures._nanotube_bundle`)
+Nanotube bundle base class (:mod:`sknano.core.structures._nanotube_bundle`)
 ==============================================================================
 
-.. currentmodule:: sknano.structures._nanotube_bundle
+.. currentmodule:: sknano.core.structures._nanotube_bundle
 
 """
 from __future__ import absolute_import, division, print_function

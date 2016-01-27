@@ -10,3 +10,4 @@
    core.molecules.rst
    core.physics.rst
    core.refdata.rst
+   core.structures.rst

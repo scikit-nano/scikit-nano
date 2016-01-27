@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 import nose
 from nose.tools import assert_equal
-from sknano.structures import Fullerene, Fullerenes, load_fullerene_data
+from sknano.core.structures import Fullerene, Fullerenes, load_fullerene_data
 
 
 def test1():

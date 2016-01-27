@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Bilayer Graphene structure class (:mod:`sknano.structures._bilayer_graphene`)
+Bilayer Graphene structure class (:mod:`sknano.core.structures._bilayer_graphene`)
 ===============================================================================
 
-.. currentmodule:: sknano.structures._bilayer_graphene
+.. currentmodule:: sknano.core.structures._bilayer_graphene
 
 """
 from __future__ import absolute_import, division, print_function

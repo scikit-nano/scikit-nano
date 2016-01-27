@@ -16,7 +16,7 @@ import os
 # import numpy as np
 
 from sknano.io import XYZReader
-from sknano.structures import Fullerene
+from sknano.core.structures import Fullerene
 # from sknano.core.geometric_regions import Cuboid
 from ._base import GeneratorBase
 

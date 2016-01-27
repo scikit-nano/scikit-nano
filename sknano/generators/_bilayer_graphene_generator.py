@@ -11,7 +11,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from sknano.structures import BilayerGraphene
+from sknano.core.structures import BilayerGraphene
 from ._graphene_generator import GrapheneGenerator
 
 __all__ = ['BilayerGrapheneGenerator']

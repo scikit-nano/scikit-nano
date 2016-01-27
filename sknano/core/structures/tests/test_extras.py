@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 import nose
 from nose.tools import assert_equal
-from sknano.structures import filter_Ch_list, generate_Ch_list, \
+from sknano.core.structures import filter_Ch_list, generate_Ch_list, \
     generate_Ch_property_grid, get_chiral_type
 
 

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Graphene structure class (:mod:`sknano.structures._graphene`)
+Graphene structure class (:mod:`sknano.core.structures._graphene`)
 ===============================================================================
 
-.. currentmodule:: sknano.structures._graphene
+.. currentmodule:: sknano.core.structures._graphene
 
 """
 from __future__ import absolute_import, division, print_function

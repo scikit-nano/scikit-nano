@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Extra helper functions (:mod:`sknano.structures._extras`)
+Extra helper functions (:mod:`sknano.core.structures._extras`)
 ===============================================================================
 
-.. currentmodule:: sknano.structures._extras
+.. currentmodule:: sknano.core.structures._extras
 
 """
 from __future__ import absolute_import, division, print_function, \
@@ -419,7 +419,7 @@ def generate_Ch_property_grid(compute=str, imax=10, **kwargs):
     """
     try:
         compute_func = \
-            getattr(importlib.import_module('sknano.structures'), compute)
+            getattr(importlib.import_module('sknano.core.structures'), compute)
         grid = np.zeros((imax + 1, imax + 1)) - 1
         for n in range(imax + 1):
             for m in range(imax + 1):
@@ -473,7 +473,7 @@ def map_Ch(Ch, compute=None, **kwargs):
     """
     try:
         compute_func = \
-            getattr(importlib.import_module('sknano.structures'), compute)
+            getattr(importlib.import_module('sknano.core.structures'), compute)
         if isinstance(Ch, tuple):
             n, m = Ch
         else:

@@ -19,7 +19,7 @@ import h5py
 import numpy as np
 
 from sknano.io import DATAReader
-from sknano.structures import get_chiral_indices_from_str
+from sknano.core.structures import get_chiral_indices_from_str
 
 __all__ = ['analyze_datasets']
 

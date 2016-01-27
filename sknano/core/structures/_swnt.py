@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-SWNT structure class (:mod:`sknano.structures._swnt`)
+SWNT structure class (:mod:`sknano.core.structures._swnt`)
 ==============================================================================
 
-.. currentmodule:: sknano.structures._swnt
+.. currentmodule:: sknano.core.structures._swnt
 
 """
 from __future__ import absolute_import, division, print_function, \
@@ -1520,7 +1520,7 @@ class SWNT(NanotubeBase, SWNTBase):
     Examples
     --------
 
-    >>> from sknano.structures import SWNT
+    >>> from sknano.core.structures import SWNT
 
     Create a SWNT with :math:`\\mathbf{C}_{h} = (10, 10)` chirality.
 

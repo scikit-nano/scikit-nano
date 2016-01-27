@@ -20,7 +20,7 @@ import sys
 
 from sknano.core import listdir_dirnames
 from sknano.io import StructureReader
-# from sknano.structures import get_chiral_indices_from_str
+# from sknano.core.structures import get_chiral_indices_from_str
 from ._parser import add_default_arguments
 
 __all__ = ['analyze_structure']

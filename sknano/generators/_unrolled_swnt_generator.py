@@ -27,7 +27,7 @@ import numpy as np
 from sknano.core import pluralize
 from sknano.core.crystallography import SuperCell
 from sknano.core.math import Vector
-from sknano.structures import UnrolledSWNT
+from sknano.core.structures import UnrolledSWNT
 # from sknano.core.geometric_regions import Cuboid
 from ._base import Atom, Atoms, GeneratorBase
 

@@ -17,7 +17,7 @@ __docformat__ = 'restructuredtext en'
 
 from sknano.core import pluralize
 # from sknano.core.math import Vector
-from sknano.structures import MWNT
+from sknano.core.structures import MWNT
 # from sknano.core.geometric_regions import Cuboid
 from ._nanotube_generator_base import NanotubeGeneratorBase
 from ._swnt_generator import SWNTGenerator

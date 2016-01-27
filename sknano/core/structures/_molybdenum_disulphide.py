@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-MoS2 structure class (:mod:`sknano.structures._molybdenum_disulphide`)
+MoS2 structure class (:mod:`sknano.core.structures._molybdenum_disulphide`)
 ===============================================================================
 
-.. currentmodule:: sknano.structures._molybdenum_disulphide
+.. currentmodule:: sknano.core.structures._molybdenum_disulphide
 
 """
 from __future__ import absolute_import, division, print_function

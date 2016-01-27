@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 import nose
 from nose.tools import assert_equal
-from sknano.structures import MWNT
+from sknano.core.structures import MWNT
 
 
 def test1():

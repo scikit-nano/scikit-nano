@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Unrolled SWNT structure class (:mod:`sknano.structures._unrolled_swnt`)
+Unrolled SWNT structure class (:mod:`sknano.core.structures._unrolled_swnt`)
 ==============================================================================
 
-.. currentmodule:: sknano.structures._unrolled_swnt
+.. currentmodule:: sknano.core.structures._unrolled_swnt
 
 """
 from __future__ import absolute_import, division, print_function
@@ -148,7 +148,7 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
     Examples
     --------
 
-    >>> from sknano.structures import UnrolledSWNT
+    >>> from sknano.core.structures import UnrolledSWNT
 
     """
 

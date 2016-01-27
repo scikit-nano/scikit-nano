@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-MWNT structure class (:mod:`sknano.structures._mwnt`)
+MWNT structure class (:mod:`sknano.core.structures._mwnt`)
 ==============================================================================
 
-.. currentmodule:: sknano.structures._mwnt
+.. currentmodule:: sknano.core.structures._mwnt
 
 """
 from __future__ import absolute_import, division, print_function, \
@@ -201,7 +201,7 @@ class MWNTMixin:
                      bond=self.bond) for Ch in self.Ch_list]
 
     def get_wall(self, Ch):
-        """Return the :class:`~sknano.structures.SWNT` structure with \
+        """Return the :class:`~sknano.core.structures.SWNT` structure with \
             chirality `Ch`.
 
         """

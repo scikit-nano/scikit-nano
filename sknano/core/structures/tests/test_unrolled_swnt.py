@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 import nose
 from nose.tools import *
-from sknano.structures import UnrolledSWNT
+from sknano.core.structures import UnrolledSWNT
 
 
 def test1():

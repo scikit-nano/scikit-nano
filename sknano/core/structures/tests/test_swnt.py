@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 import nose
 from nose.tools import assert_equal, assert_almost_equal  # , assert_true
-from sknano.structures import SWNT
+from sknano.core.structures import SWNT
 from sknano.testing import generate_structure
 
 

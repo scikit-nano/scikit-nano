@@ -8,7 +8,7 @@ from nose.tools import *
 
 import numpy as np
 
-from sknano.structures import Graphene, PrimitiveCellGraphene, \
+from sknano.core.structures import Graphene, PrimitiveCellGraphene, \
     ConventionalCellGraphene, GraphenePrimitiveCell, GrapheneConventionalCell
 
 

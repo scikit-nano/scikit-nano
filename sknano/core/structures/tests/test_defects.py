@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 import nose
 from nose.tools import *
-from sknano.structures import Vacancy, SingleVacancy, DoubleVacancy, \
+from sknano.core.structures import Vacancy, SingleVacancy, DoubleVacancy, \
     TripleVacancy
 
 

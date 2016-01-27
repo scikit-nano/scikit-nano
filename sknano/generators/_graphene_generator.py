@@ -17,7 +17,7 @@ import numpy as np
 
 from sknano.core.math import Vector
 from sknano.core.crystallography import SuperCell
-from sknano.structures import PrimitiveCellGraphene, ConventionalCellGraphene
+from sknano.core.structures import PrimitiveCellGraphene, ConventionalCellGraphene
 from ._base import Atom, Atoms, GeneratorBase
 
 __all__ = ['GrapheneGenerator',

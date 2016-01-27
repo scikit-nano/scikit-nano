@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===================================================================
-Fullerene structure classes (:mod:`sknano.structures._fullerenes`)
+Fullerene structure classes (:mod:`sknano.core.structures._fullerenes`)
 ===================================================================
 
-.. currentmodule:: sknano.structures._fullerenes
+.. currentmodule:: sknano.core.structures._fullerenes
 
 """
 from __future__ import absolute_import, division, print_function

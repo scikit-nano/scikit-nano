@@ -41,7 +41,6 @@ Reference
    generators.rst
    io.rst
    scripts.rst
-   structures.rst
    testing.rst
    utils.rst
 

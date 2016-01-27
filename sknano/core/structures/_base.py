@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Base structure classes (:mod:`sknano.structures._base`)
+Base structure classes (:mod:`sknano.core.structures._base`)
 ==============================================================================
 
-.. currentmodule:: sknano.structures._base
+.. currentmodule:: sknano.core.structures._base
 
 """
 from __future__ import absolute_import, division, print_function, \

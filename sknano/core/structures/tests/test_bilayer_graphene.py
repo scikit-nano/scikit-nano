@@ -8,7 +8,7 @@ from nose.tools import *
 
 import numpy as np
 
-from sknano.structures import BilayerGraphene
+from sknano.core.structures import BilayerGraphene
 
 
 def test1():

@@ -25,7 +25,7 @@ import numpy as np
 
 from sknano.core import pluralize
 from sknano.core.math import Point
-from sknano.structures import SWNT
+from sknano.core.structures import SWNT
 from sknano.core.geometric_regions import Cuboid
 from ._nanotube_generator_base import NanotubeGeneratorBase
 

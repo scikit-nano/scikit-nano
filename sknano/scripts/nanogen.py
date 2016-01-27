@@ -76,7 +76,7 @@ capabilities of the shell or from within an interactive Python session.
 For example, if you have a list of chiralities that you want structure data
 for, you can do something like this from within an interactive session::
 
-    >>> from sknano.structures import generate_Ch_list
+    >>> from sknano.core.structures import generate_Ch_list
     >>> from sknano.generators import SWNTGenerator
     >>> # Generate your list of (n, m) chiralities
     >>> Ch_list = generate_Ch_list(ni=5, nf=25, mi=0, mf=25, handedness='right')

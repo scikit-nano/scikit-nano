@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Defect structure classes (:mod:`sknano.structures._defects`)
+Defect structure classes (:mod:`sknano.core.structures._defects`)
 ==============================================================================
 
-.. currentmodule:: sknano.structures._defects
+.. currentmodule:: sknano.core.structures._defects
 
 """
 from __future__ import absolute_import, division, print_function, \

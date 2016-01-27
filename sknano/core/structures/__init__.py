@@ -4,7 +4,7 @@
 Core structure classes (:mod:`sknano.core.structures`)
 ===============================================================================
 
-.. currentmodule:: sknano.structures
+.. currentmodule:: sknano.core.structures
 
 Contents
 ========
