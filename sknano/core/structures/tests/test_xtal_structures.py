@@ -7,7 +7,8 @@ import nose
 from nose.tools import assert_equal, assert_true, assert_raises
 import numpy as np
 
-from sknano.core.crystallography import Crystal2DLattice, Crystal2DStructure, \
+from sknano.core.crystallography import Crystal2DLattice
+from sknano.core.structures import Crystal2DStructure, \
     AlphaQuartz, DiamondStructure, HexagonalStructure, \
     BCCStructure, FCCStructure, Gold, Copper, CaesiumChlorideStructure, \
     RocksaltStructure, ZincblendeStructure, MoS2

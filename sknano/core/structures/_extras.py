@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, print_function, \
 __docformat__ = 'restructuredtext en'
 
 import importlib
+import inspect
 import numbers
 import re
 
@@ -25,7 +26,8 @@ __all__ = ['cmp_Ch', 'filter_Ch', 'filter_Ch_list', 'generate_Ch_list',
            'map_Ch', 'chiral_type_name_mappings', 'CHIRAL_TYPES',
            'filter_key_type_mappings', 'attr_units', 'attr_symbols',
            'attr_strfmt', 'type_check_chiral_indices',
-           'get_chiral_indices', 'get_chiral_indices_from_str']
+           'get_chiral_indices', 'get_chiral_indices_from_str',
+           'pymatgen_structure']
 
 chiral_type_name_mappings = \
     {'achiral': 'aCh', 'armchair': 'AC', 'zigzag': 'ZZ', 'chiral': 'Ch'}
@@ -568,3 +570,39 @@ def type_check_chiral_indices(*Ch):
         raise TypeError('Expected an integer')
     if not (isinstance(m, numbers.Real) or m >= 0):
         raise TypeError('Expected an integer')
+
+
+def pymatgen_structure(*args, classmethod=None, **kwargs):
+    """Helper function to generate a :class:`pymatgen:pymatgen.core.Structure`.
+
+    Parameters
+    ----------
+    args : :class:`~python:tuple`
+        variable number of positional arguments to pass to the
+        :class:`~pymatgen:pymatgen.core.Structure` constructor
+    classmethod : {None, str}, optional
+        name of :class:`~pymatgen:pymatgen.core.Structure` classmethod
+        to call instead of calling :class:`~pymatgen:pymatgen.core.Structure`.
+    kwargs : :class:`~python:dict`
+        variable number of keyword arguments to pass to the
+        :class:`~pymatgen:pymatgen.core.Structure` constructor
+
+    Returns
+    -------
+    :class:`~pymatgen:pymatgen.core.Structure`
+
+    """
+    try:
+        from pymatgen import Structure
+    except ImportError as e:
+        print(e)
+    else:
+        constructor = None
+        if classmethod is None:
+            constructor = Structure
+        else:
+            constructor = getattr(Structure, classmethod, None)
+
+        pmg_sig = inspect.signature(constructor)
+        bound_sig = pmg_sig.bind(*args, **kwargs)
+        return constructor(*bound_sig.args, **bound_sig.kwargs)

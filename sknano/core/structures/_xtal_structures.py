@@ -1,31 +1,23 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Crystal structure classes (:mod:`sknano.core.crystallography._xtal_structures`)
+Crystal structure classes (:mod:`sknano.core.structures._xtal_structures`)
 ===============================================================================
 
-.. currentmodule:: sknano.core.crystallography._xtal_structures
+.. currentmodule:: sknano.core.structures._xtal_structures
 
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from functools import total_ordering
-
-import numpy as np
-
-from sknano.core import BaseClass
-from sknano.core.atoms import BasisAtom, BasisAtoms, StructureAtoms
+from sknano.core.atoms import BasisAtom, BasisAtoms
 from sknano.core.refdata import lattice_parameters as lattparams
-
+from sknano.core.crystallography import Crystal2DLattice, Crystal3DLattice
+from ._base import CrystalStructureBase
 from ._extras import pymatgen_structure  # , supercell_lattice_points
-from ._xtal_cells import CrystalCell, UnitCell, SuperCell
-from ._xtal_lattices import Crystal2DLattice, Crystal3DLattice
 
-__all__ = ['BaseStructureMixin', 'BaseStructure', 'StructureData',
-           'CrystalStructureBase', 'Crystal2DStructure',
-           'CrystalStructure', 'Crystal3DStructure',
+__all__ = ['Crystal2DStructure', 'CrystalStructure', 'Crystal3DStructure',
            'CaesiumChlorideStructure', 'CsClStructure',
            'DiamondStructure',
            'RocksaltStructure', 'RockSaltStructure', 'NaClStructure',
@@ -34,188 +26,6 @@ __all__ = ['BaseStructureMixin', 'BaseStructure', 'StructureData',
            'CubicClosePackedStructure', 'CCPStructure',
            'HexagonalClosePackedStructure', 'HCPStructure',
            'HexagonalStructure', 'AlphaQuartz', 'MoS2']
-
-
-class BaseStructureMixin:
-    """Mixin class for crystal structures."""
-
-    # def __deepcopy__(self, memo):
-    #     from copy import deepcopy
-    #     cp = self.__class__()
-    #     memo[id(self)] = cp
-    #     for attr in dir(self):
-    #         if not attr.startswith('_'):
-    #             setattr(cp, attr, deepcopy(getattr(self, attr), memo))
-    #     return cp
-
-    def __getattr__(self, name):
-        try:
-            return getattr(self.atoms, name)
-        except AttributeError:
-            try:
-                return getattr(self.crystal_cell, name)
-            except AttributeError:
-                return super().__getattr__(name)
-
-    @property
-    def atoms(self):
-        """Structure :class:`~sknano.core.atoms.StructureAtoms`."""
-        return self._atoms
-
-    @property
-    def crystal_cell(self):
-        """Structure :class:`~sknano.core.crystallography.CrystalCell`."""
-        return self._crystal_cell
-
-    @crystal_cell.setter
-    def crystal_cell(self, value):
-        self._crystal_cell = value
-
-    @property
-    def basis(self):
-        """Structure :class:`~sknano.core.atoms.BasisAtoms`."""
-        return self.crystal_cell.basis
-
-    @basis.setter
-    def basis(self, value):
-        self.crystal_cell.basis = value
-
-    @property
-    def lattice(self):
-        """Structure :class:`~sknano.core.crystallography.Crystal3DLattice`."""
-        return self.crystal_cell.lattice
-
-    @lattice.setter
-    def lattice(self, value):
-        self.crystal_cell.lattice = value
-        self.atoms.lattice = self.crystal_cell.lattice
-
-    @property
-    def scaling_matrix(self):
-        """:attr:`CrystalCell.scaling_matrix`."""
-        return self.crystal_cell.scaling_matrix
-
-    @scaling_matrix.setter
-    def scaling_matrix(self, value):
-        self.crystal_cell.scaling_matrix = value
-
-    @property
-    def unit_cell(self):
-        """Structure :class:`~sknano.core.crystallography.UnitCell`."""
-        return self.crystal_cell.unit_cell
-
-    @unit_cell.setter
-    def unit_cell(self, value):
-        self.crystal_cell.unit_cell = value
-
-    @property
-    def structure(self):
-        """Pointer to self."""
-        return self
-
-    @property
-    def structure_data(self):
-        """Alias for :attr:`BaseStructureMixin.structure`."""
-        return self
-
-    def clear(self):
-        """Clear list of :attr:`BaseStructureMixin.atoms`."""
-        self.atoms.clear()
-
-    def make_supercell(self, scaling_matrix, wrap_coords=False):
-        """Make supercell."""
-        return SuperCell(self.unit_cell, scaling_matrix,
-                         wrap_coords=wrap_coords)
-
-    def rotate(self, **kwargs):
-        """Rotate crystal cell lattice, basis, and unit cell."""
-        self.crystal_cell.rotate(**kwargs)
-        self.atoms.rotate(**kwargs)
-
-    def translate(self, t, fix_anchor_points=True):
-        """Translate crystal cell basis."""
-        self.crystal_cell.translate(t, fix_anchor_points=fix_anchor_points)
-        self.atoms.translate(t, fix_anchor_points=fix_anchor_points)
-
-    def transform_lattice(self, scaling_matrix, wrap_coords=False, pbc=None):
-        if self.lattice is None:
-            return
-        self.lattice = self.lattice.__class__(
-            cell_matrix=np.asmatrix(scaling_matrix) * self.lattice.matrix)
-
-        if wrap_coords:
-            self.crystal_cell.basis.wrap_coords(pbc=pbc)
-            self.atoms.wrap_coords(pbc=pbc)
-
-        # tvecs = \
-        #     np.asarray(
-        #         np.asmatrix(supercell_lattice_points(scaling_matrix)) *
-        #         self.lattice.matrix)
-
-        # if self.crystal_cell.basis is not None:
-        #     basis = self.crystal_cell.basis[:]
-        #     self.crystal_cell.basis = BasisAtoms()
-        #     for atom in basis:
-        #         xs, ys, zs = \
-        #             self.lattice.cartesian_to_fractional(atom.r)
-        #         if wrap_coords:
-        #             xs, ys, zs = \
-        #                 self.lattice.wrap_fractional_coordinate([xs, ys, zs])
-        #         self.crystal_cell.basis.append(
-        #             BasisAtom(atom.element, lattice=self.lattice,
-        #                       xs=xs, ys=ys, zs=zs))
-
-
-class BaseStructure(BaseStructureMixin):
-    """Base structure class for structure data."""
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._atoms = StructureAtoms()
-        self._crystal_cell = CrystalCell()
-
-StructureData = BaseStructure
-
-
-@total_ordering
-class CrystalStructureBase(BaseStructure, BaseClass):
-    """Base class for abstract representions of crystal structures.
-
-    Parameters
-    ----------
-    lattice : :class:`~sknano.core.crystallography.LatticeBase` sub-class
-    basis : {:class:`~python:list`, :class:`~sknano.core.atoms.BasisAtoms`}
-    coords : {:class:`~python:list`}, optional
-    cartesian : {:class:`~python:bool`}, optional
-    scaling_matrix : {:class:`~python:int`, :class:`~python:list`}, optional
-
-    """
-
-    def __init__(self, lattice=None, basis=None, coords=None,
-                 cartesian=False, scaling_matrix=None, **kwargs):
-
-        super().__init__(**kwargs)
-        self.unit_cell = UnitCell(lattice=lattice, basis=basis,
-                                  coords=coords, cartesian=cartesian)
-
-        self.scaling_matrix = scaling_matrix
-        self.fmtstr = self.unit_cell.fmtstr + \
-            ", scaling_matrix={scaling_matrix!r}"
-
-    def __dir__(self):
-        return dir(self.crystal_cell)
-
-    def __eq__(self, other):
-        if isinstance(other, CrystalStructureBase):
-            return self is other or self.crystal_cell == other.crystal_cell
-
-    def __lt__(self, other):
-        if isinstance(other, CrystalStructureBase):
-            return self.crystal_cell < other.crystal_cell
-
-    def todict(self):
-        attrdict = self.unit_cell.todict()
-        attrdict.update(dict(scaling_matrix=self.scaling_matrix.tolist()))
-        return attrdict
 
 
 class Crystal2DStructure(CrystalStructureBase):

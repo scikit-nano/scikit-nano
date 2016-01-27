@@ -19,11 +19,8 @@ Base crystallography classes
    SuperCell
    LatticeBase
    ReciprocalLatticeBase
-   BaseStructureMixin
-   BaseStructure
-   CrystalStructureBase
 
-2D lattices and structures
+2D crystal lattices
 ---------------------------
 .. autosummary::
    :toctree: generated/
@@ -32,9 +29,8 @@ Base crystallography classes
    Reciprocal2DLatticeMixin
    Crystal2DLattice
    Reciprocal2DLattice
-   Crystal2DStructure
 
-3D lattices and structures
+3D crystal lattices
 ---------------------------
 .. autosummary::
    :toctree: generated/
@@ -43,25 +39,6 @@ Base crystallography classes
    Reciprocal3DLatticeMixin
    Crystal3DLattice
    Reciprocal3DLattice
-   Crystal3DStructure
-
-   CaesiumChlorideStructure
-   CsClStructure
-   DiamondStructure
-   RocksaltStructure
-   NaClStructure
-   SphaleriteStructure
-   ZincblendeStructure
-   BCCStructure
-   FCCStructure
-   HexagonalClosePackedStructure
-   CubicClosePackedStructure
-
-   AlphaQuartz
-   Iron
-   Copper
-   Gold
-   MoS2
 
 Helper functions
 ----------------
@@ -69,16 +46,13 @@ Helper functions
    :toctree: generated/
 
    supercell_lattice_points
-   pymatgen_structure
 
 """
 from __future__ import absolute_import, unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._extras import *
-
 from ._xtal_cells import *
 from ._xtal_lattices import *
-from ._xtal_structures import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]

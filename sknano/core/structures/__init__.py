@@ -15,13 +15,15 @@ including fullerenes, graphene, and nanotubes.
 
 See the specific class doc pages below for detailed documentation on its use.
 
-
 Base/Mixin Classes
 ------------------
 
 .. autosummary::
    :toctree: generated/
 
+   BaseStructureMixin
+   BaseStructure
+   CrystalStructureBase
    NanoStructureBase
    GrapheneBase
    NanotubeBase
@@ -30,6 +32,27 @@ Base/Mixin Classes
    MWNTMixin
    NanotubeBundleMixin
    UnrolledSWNTMixin
+
+Crystal structure classes
+--------------------------
+.. autosummary::
+   :toctree: generated/
+
+   Crystal2DStructure
+   Crystal3DStructure
+   CaesiumChlorideStructure
+   CsClStructure
+   DiamondStructure
+   RocksaltStructure
+   NaClStructure
+   SphaleriteStructure
+   ZincblendeStructure
+   BCCStructure
+   FCCStructure
+   HexagonalClosePackedStructure
+   CubicClosePackedStructure
+   AlphaQuartz
+   MoS2
 
 Nanostructure Classes
 ----------------------
@@ -56,6 +79,12 @@ Composite structure classes
    Composition
    Compositions
 
+Helper functions for nanotube properties
+------------------------------------------
+.. autosummary::
+   :toctree: generated/
+
+   pymatgen_structure
 
 Helper functions for nanotube properties
 ------------------------------------------
@@ -111,6 +140,7 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._base import *
+from ._xtal_structures import *
 from ._compositions import *
 from ._nanotube_base import *
 from ._fullerenes import *
