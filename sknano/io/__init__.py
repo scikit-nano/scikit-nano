@@ -45,6 +45,11 @@ I/O classes for the `xyz` structure data format
    XYZIOError
    XYZ2DATAConverter
 
+Sub-packages
+-------------
+
+* tokenizers (:mod:`sknano.io.tokenizers`)
+
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals

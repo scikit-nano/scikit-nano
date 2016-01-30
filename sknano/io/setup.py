@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import Configuration
     config = Configuration('io', parent_package, top_path)
+    config.add_subpackage('tokenizers')
     config.add_data_dir('tests')
     return config
 
