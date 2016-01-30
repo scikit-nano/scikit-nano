@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ====================================================
-PDB format (:mod:`sknano.io._pdb_format`)
+PDB format (:mod:`sknano.io._pdb`)
 ====================================================
 
-.. currentmodule:: sknano.io._pdb_format
+.. currentmodule:: sknano.io._pdb
 
 """
 from __future__ import absolute_import, division, print_function
@@ -13,12 +13,15 @@ __docformat__ = 'restructuredtext en'
 
 from collections import OrderedDict
 
-from sknano.core import get_fpath
+from monty.io import zopen
+from pyparsing import ParseException
 
-from ._base import StructureIO, StructureIOError, StructureFormat, \
+from sknano.core import get_fpath
+from .tokenizers import PDBTokenizer
+from ._base import Atom, StructureIO, StructureIOError, StructureFormatSpec, \
     default_comment_line
 
-__all__ = ['PDBData', 'PDBReader', 'PDBWriter', 'PDBFormat']
+__all__ = ['PDBData', 'PDBReader', 'PDBWriter', 'PDBFormatSpec']
 
 
 class PDBReader(StructureIO):
@@ -31,17 +34,38 @@ class PDBReader(StructureIO):
 
     """
     def __init__(self, fpath):
-        super(PDBReader, self).__init__(fpath=fpath)
+        super().__init__(fpath=fpath)
 
-        if fpath is not None:
+        self.records = OrderedDict()
+        self.tokenizer = PDBTokenizer()
+
+        if self.fpath is not None:
             self.read()
 
     def read(self):
         """Read PDB file."""
-        with open(self.fpath, 'r') as f:
-            lines = f.readlines()
-            for line in lines:
-                print(line)
+        tokenizer = self.tokenizer
+        self.structure.clear()
+        with zopen(self.fpath) as f:
+            while True:
+                line = f.readline().strip()
+                record = line[:6].strip()
+                if record == 'END':
+                    break
+
+                parse_method = '_parse_{}'.format(record.lower())
+                if not hasattr(tokenizer, parse_method):
+                    print('No parser for {} records'.format(record))
+                    continue
+
+                try:
+                    record = getattr(tokenizer, parse_method)(line)
+                except ParseException as e:
+                    print('Error in PDB file format')
+                    raise StructureIOError(e)
+                else:
+                    if isinstance(record, Atom):
+                        self.structure.append(record)
 
 
 class PDBWriter:
@@ -73,7 +97,7 @@ class PDBWriter:
 
         atoms.rezero_coords()
 
-        with open(fpath, 'w') as f:
+        with zopen(fpath, 'wt') as f:
             for atom in atoms:
                 f.write(PDBFormatter.format(atom))
 
@@ -96,7 +120,7 @@ class PDBData(PDBReader):
         pass
 
 
-class PDBFormat(StructureFormat):
+class PDBFormatSpec(StructureFormatSpec):
     """Class defining the structure file format for PDB data.
 
     Parameters
@@ -104,36 +128,9 @@ class PDBFormat(StructureFormat):
 
     """
     def __init__(self):
-        super(PDBFormat, self).__init__()
+        super().__init__()
 
-        self._records = OrderedDict()
-
-        self._records['HEADER'] = header = {}
-        header['format'] = ''
-
-        self._records['TITLE'] = title = {}
-        title['format'] = ''
-
-        self._records['ATOM'] = atom = {}
-        atom['format'] = \
-            '{:6}{:>5} {:>4}{:1}{:>3} {:1}{:>4}{:1}' + \
-            '{:3}'.format('') + \
-            '{:>8.3f}{:>8.3f}{:>8.3f}' + \
-            '{:>6.2f}{:>6.2f}' + \
-            '{:10}'.format('') + \
-            '{:2}{:2}'
-
-        self._records['CONECT'] = {}
-
-        self._records['MASTER'] = {}
-
-        self._records['END'] = None
-
-        self._properties['RECORDS'] = self._records
-
-    @property
-    def records(self):
-        return self._records
+        # self._properties['RECORDS'] = records
 
 
 class PDBFormatter:
@@ -142,3 +139,18 @@ class PDBFormatter:
     @classmethod
     def format(cls):
         pass
+
+
+mandatory_records = ['HEADER', 'TITLE', 'COMPND', 'SOURCE', 'KEYWDS',
+                     'EXPDTA', 'AUTHOR', 'REVDAT', 'REMARK 2',
+                     'REMARK 3', 'SEQRES', 'CRYST1', 'ORIGX1',
+                     'ORIGX2', 'ORIGX3', 'SCALE1', 'SCALE2', 'SCALE3',
+                     'MASTER', 'END']
+optional_records = ['OBSLTE', 'SPLIT', 'CAVEAT', 'NUMMDL', 'MDLTYP',
+                    'SPRSDE', 'JRNL', 'REMARK 0', 'REMARK 1',
+                    'REMARK N', 'DBREF', 'DBREF1', 'DBREF2',
+                    'SEQADV', 'MODRES', 'HET', 'HETNAM', 'HETSYN',
+                    'FORMUL', 'HELIX', 'SHEET', 'SSBOND', 'LINK',
+                    'CISPEP', 'SITE', 'MTRIX1', 'MTRIX2', 'MTRIX3',
+                    'MODEL', 'ATOM', 'ANISOU', 'TER', 'HETATM',
+                    'ENDMDL', 'CONECT']
