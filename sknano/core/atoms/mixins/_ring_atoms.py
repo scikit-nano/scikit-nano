@@ -23,8 +23,8 @@ __all__ = ['RingAtomMixin', 'RingAtomsMixin']
 
 
 class RingAtomMixin:
-    """An `Atom` class for neighbor analysis."""
-
+    """Mixin `Atom` class for analysis of ring statistics/network \
+        connectivity."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.visited = False
@@ -62,8 +62,8 @@ class RingAtomMixin:
 
 
 class RingAtomsMixin:
-    """Atoms class for ring statistics."""
-
+    """Mixin `Atoms` class for analysis of ring statistics/network \
+        connectivity."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # self.connectivity_matrix = None

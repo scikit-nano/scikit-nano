@@ -99,7 +99,6 @@ class Atom(BaseClass):
         if not self._is_valid_operand(other):
             return NotImplemented
         for attr in Atom._fields:
-            print(attr)
             if getattr(self, attr) < getattr(other, attr):
                 return False
         return True

@@ -265,7 +265,7 @@ class Trajectory(UserList):
 
     @property
     def atom_selection(self):
-        """`AtomSelection` class."""
+        """:class:`AtomSelection` class."""
         return self._atom_selection
 
     @atom_selection.setter
@@ -286,7 +286,7 @@ class Trajectory(UserList):
 
     @property
     def aselect(self):
-        """Alias for :attr:`Trajectory.atom_selection`."""
+        """Alias for :attr:`~Trajectory.atom_selection`."""
         return self.atom_selection
 
     @aselect.setter
@@ -295,7 +295,7 @@ class Trajectory(UserList):
 
     @property
     def tselect(self):
-        """Alias for :attr:`Trajectory.time_selection`."""
+        """Alias for :attr:`~Trajectory.time_selection`."""
         return self.time_selection
 
     @tselect.setter
@@ -313,7 +313,7 @@ class Trajectory(UserList):
 
     @property
     def nselect(self):
-        """Alias for :attr:`Trajectory.nselected`."""
+        """Alias for :attr:`~Trajectory.nselected`."""
         return self.nselected
 
     @nselect.setter

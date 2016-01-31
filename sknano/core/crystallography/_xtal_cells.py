@@ -199,6 +199,7 @@ class CrystalCell(BaseClass):
                 self.scaling_matrix < other.scaling_matrix)
 
     def __iter__(self):
+        """Return iterator over the :attr:`CrystalCell.basis`."""
         return iter(self.basis)
 
     def __getattr__(self, name):
@@ -219,6 +220,7 @@ class CrystalCell(BaseClass):
 
     @property
     def basis(self):
+        """:class:`~sknano.core.atoms.BasisAtoms`."""
         return self._basis
 
     @basis.setter
@@ -230,6 +232,7 @@ class CrystalCell(BaseClass):
 
     @property
     def lattice(self):
+        """:class:`~sknano.core.crystallography.CrystalLattice`."""
         return self._lattice
 
     @lattice.setter
@@ -240,6 +243,7 @@ class CrystalCell(BaseClass):
 
     @property
     def unit_cell(self):
+        """:class:`UnitCell`."""
         return self._unit_cell
 
     @unit_cell.setter

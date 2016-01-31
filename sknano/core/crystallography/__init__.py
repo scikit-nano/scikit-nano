@@ -45,6 +45,7 @@ Helper functions
 .. autosummary::
    :toctree: generated/
 
+   pbc_diff
    supercell_lattice_points
 
 """
