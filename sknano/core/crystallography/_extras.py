@@ -13,7 +13,41 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-__all__ = ['supercell_lattice_points']
+__all__ = ['pbc_diff', 'supercell_lattice_points']
+
+
+def pbc_diff(fcoords1, fcoords2):
+    """Return the 'fractional distance' between two sets of
+    fractional coordinates, accounting for periodic boundary conditions.
+
+    Modified implementation of \
+        :func:`pymatgen:pymatgen.util.coord_utils.pbc_diff`
+
+    Parameters
+    ----------
+        fcoords1: First set of fractional coordinates. e.g., [0.5, 0.6,
+            0.7] or [[1.1, 1.2, 4.3], [0.5, 0.6, 0.7]]. It can be a single
+            coord or any array of coords.
+        fcoords2: Second set of fractional coordinates.
+
+    Returns
+    -------
+    :class:`~numpy:numpy.ndarray`
+        :class:`~numpy:numpy.ndarray` of fractional coordinates.
+        Each coordinate must have the property that abs(a) <= 0.5.
+
+    Examples
+    --------
+    >>> from sknano.core.crystallography import pbc_diff
+    >>> fc1 = [0.1, 0.1, 0.1]; fc2 = [0.3, 0.5, 0.9];
+    >>> pbc_diff(fc1, fc2)
+    [-0.2, -0.4, 0.2]
+    >>> fc3 = [0.9, 0.1, 1.01]; fc4 = [0.3, 0.5, 0.9];
+    >>> pbc_diff(fc3, fc4)
+    [-0.4, -0.4, 0.11]
+    """
+    fdiff = np.subtract(fcoords1, fcoords2)
+    return fdiff - np.round(fdiff)
 
 
 def supercell_lattice_points(supercell_matrix):
