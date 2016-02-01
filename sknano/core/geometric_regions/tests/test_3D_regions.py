@@ -4,7 +4,8 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
 import nose
-from nose.tools import *
+from nose.tools import assert_equal, assert_false, assert_true, \
+    assert_is_instance
 import numpy as np
 
 from sknano.core.geometric_regions import Parallelepiped, Cuboid, Cube, \

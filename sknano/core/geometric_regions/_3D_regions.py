@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, print_function, \
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
-
+from functools import reduce
 import numbers
 import numpy as np
 
@@ -20,7 +20,7 @@ from sknano.core.math import Point, Vector, vector as vec
 from ._base import GeometricRegion, GeometricTransformsMixin
 
 __all__ = ['Geometric3DRegion', 'Parallelepiped', 'Cuboid', 'Cube',
-           'Ellipsoid', 'Sphere', 'Cylinder', 'Cone']
+           'Ellipsoid', 'Sphere', 'Cylinder', 'Cone', 'geometric_3D_regions']
 
 
 class Geometric3DRegion(GeometricRegion, GeometricTransformsMixin,
@@ -38,6 +38,10 @@ class Geometric3DRegion(GeometricRegion, GeometricTransformsMixin,
         """Alias for :attr:`~Geometric3DRegion.volume`, which is the measure \
             of a 3D geometric region."""
         return self.volume
+
+    @property
+    def bounding_box(self):
+        return Cuboid(pmin=self.pmin.tolist(), pmax=self.pmax.tolist())
 
 
 class Parallelepiped(Geometric3DRegion):
@@ -130,7 +134,8 @@ class Parallelepiped(Geometric3DRegion):
     def u(self, value):
         if not isinstance(value, (tuple, list, np.ndarray)) or len(value) != 3:
             raise TypeError('Expected a 3-element array_like object')
-        self._u[:] = Vector(value, p0=self.o)
+        self._u[:] = Vector(value)
+        self._u.p0 = self.o
 
     @property
     def v(self):
@@ -142,7 +147,8 @@ class Parallelepiped(Geometric3DRegion):
     def v(self, value):
         if not isinstance(value, (tuple, list, np.ndarray)) or len(value) != 3:
             raise TypeError('Expected a 3-element array_like object')
-        self._v[:] = Vector(value, p0=self.o)
+        self._v[:] = Vector(value)
+        self._v.p0 = self.o
 
     @property
     def w(self):
@@ -154,20 +160,8 @@ class Parallelepiped(Geometric3DRegion):
     def w(self, value):
         if not isinstance(value, (tuple, list, np.ndarray)) or len(value) != 3:
             raise TypeError('Expected a 3-element array_like object')
-        self._w[:] = Vector(value, p0=self.o)
-
-    @property
-    def volume(self):
-        """Parallelepiped volume, :math:`V`.
-
-        Computed as:
-
-        .. math::
-
-           V = |\\mathbf{u}\\cdot\\mathbf{v}\\times\\mathbf{w}|
-
-        """
-        return np.abs(vec.scalar_triple_product(self.u, self.v, self.w))
+        self._w[:] = Vector(value)
+        self._w.p0 = self.o
 
     @property
     def centroid(self):
@@ -206,6 +200,35 @@ class Parallelepiped(Geometric3DRegion):
         cz = oz + (uz + vz + wz) / 2
 
         return Point([cx, cy, cz])
+
+    @property
+    def pmin(self):
+        """3D :class:`Point` at \
+            (:attr:`~Cuboid.xmin`, :attr:`~Cuboid.ymin`, :attr:`~Cuboid.zmin`)
+        """
+        return reduce(lambda x1, x2: np.minimum(x1, x2),
+                      [self.o, self.u.p, self.v.p, self.w.p])
+
+    @property
+    def pmax(self):
+        """3D :class:`Point` at \
+            (:attr:`~Cuboid.xmax`, :attr:`~Cuboid.ymax`, :attr:`~Cuboid.zmax`)
+        """
+        return reduce(lambda x1, x2: np.maximum(x1, x2),
+                      [self.o, self.u.p, self.v.p, self.w.p])
+
+    @property
+    def volume(self):
+        """Parallelepiped volume, :math:`V`.
+
+        Computed as:
+
+        .. math::
+
+           V = |\\mathbf{u}\\cdot\\mathbf{v}\\times\\mathbf{w}|
+
+        """
+        return np.abs(vec.scalar_triple_product(self.u, self.v, self.w))
 
     def contains(self, point):
         """Test region membership of `point` in :class:`Parallelepiped`.
@@ -363,6 +386,7 @@ class Cuboid(Geometric3DRegion):
         if not isinstance(value, (tuple, list, np.ndarray)) or len(value) != 3:
             raise TypeError('Expected a 3-element array_like object')
         self._pmin[:] = Point(value)
+        self._update_pminmax()
 
     @property
     def pmax(self):
@@ -376,6 +400,7 @@ class Cuboid(Geometric3DRegion):
         if not isinstance(value, (tuple, list, np.ndarray)) or len(value) != 3:
             raise TypeError('Expected a 3-element array_like object')
         self._pmax[:] = Point(value)
+        self._update_pminmax()
 
     @property
     def xmin(self):
@@ -442,6 +467,10 @@ class Cuboid(Geometric3DRegion):
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
         self.pmax.z = float(value)
+
+    @property
+    def abc(self):
+        return self.a, self.b, self.c
 
     @property
     def a(self):
@@ -528,12 +557,11 @@ class Cuboid(Geometric3DRegion):
             (py >= self.ymin) and (py <= self.ymax) and \
             (pz >= self.zmin) and (pz <= self.zmax)
 
-    def rotate(self, **kwargs):
-        super().rotate(**kwargs)
+    def _update_pminmax(self):
         pmin = self.pmin.copy()
         pmax = self.pmax.copy()
-        self.pmin = np.minimum(pmin, pmax)
-        self.pmax = np.maximum(pmin, pmax)
+        self._pmin[:] = np.minimum(pmin, pmax)
+        self._pmax[:] = np.maximum(pmin, pmax)
         assert np.all(np.less_equal(self.pmin, self.pmax))
 
     def todict(self):
@@ -1253,3 +1281,6 @@ class Cone(Geometric3DRegion):
         """Returns a :class:`~python:dict` of the :class:`Cone` \
             constructor parameters."""
         return dict(p1=self.p1, p2=self.p2, r=self.r)
+
+geometric_3D_regions = \
+    [Parallelepiped, Cuboid, Cube, Ellipsoid, Sphere, Cylinder, Cone]

@@ -45,6 +45,15 @@ Base/mixin classes for all geometric regions
    Cylinder
    Cone
 
+Other
+-----
+
+.. autodata:: geometric_2D_regions
+   :annotation: = list of :class:`Geometric2DRegion`\ s classes.
+
+.. autodata:: geometric_3D_regions
+   :annotation: = list of :class:`Geometric3DRegion`\ s classes.
+
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals

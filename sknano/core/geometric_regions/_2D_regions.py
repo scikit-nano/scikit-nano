@@ -19,7 +19,7 @@ from sknano.core.math import Point, Vector
 from ._base import GeometricRegion, GeometricTransformsMixin
 
 __all__ = ['Geometric2DRegion', 'Parallelogram', 'Rectangle', 'Square',
-           'Ellipse', 'Circle', 'Triangle']
+           'Ellipse', 'Circle', 'Triangle', 'geometric_2D_regions']
 
 
 class Geometric2DRegion(GeometricRegion, GeometricTransformsMixin,
@@ -119,7 +119,8 @@ class Parallelogram(Geometric2DRegion):
     def u(self, value):
         if not isinstance(value, (tuple, list, np.ndarray)) or len(value) != 2:
             raise TypeError('Expected a 2-element array_like object')
-        self._u[:] = Vector(value, p0=self.o)
+        self._u[:] = Vector(value)
+        self._u.p0 = self.o
 
     @property
     def v(self):
@@ -131,7 +132,8 @@ class Parallelogram(Geometric2DRegion):
     def v(self, value):
         if not isinstance(value, (tuple, list, np.ndarray)) or len(value) != 2:
             raise TypeError('Expected a 2-element array_like object')
-        self._v[:] = Vector(value, p0=self.o)
+        self._v[:] = Vector(value)
+        self._v.p0 = self.o
 
     @property
     def area(self):
@@ -270,8 +272,8 @@ class Rectangle(Geometric2DRegion):
             pmax = [xmax, ymax]
         self.pmax = pmax
 
-        self.points.append([self.pmin, self.pmax])
-
+        assert np.all(np.less_equal(self.pmin, self.pmax))
+        self.points.extend([self.pmin, self.pmax])
         self.fmtstr = "pmin={pmin!r}, pmax={pmax!r}"
 
     @property
@@ -933,3 +935,7 @@ class Circle(Geometric2DRegion):
         """Returns a :class:`~python:dict` of the :class:`Circle` \
             constructor parameters."""
         return dict(center=self.center, r=self.r)
+
+
+geometric_2D_regions = \
+    [Parallelogram, Rectangle, Square, Ellipse, Circle, Triangle]
