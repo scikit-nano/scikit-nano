@@ -25,13 +25,15 @@ This module allows for easy structure generation from the command line.
 
    :class:`~sknano.generators.MWNTGenerator`
 
+   :class:`~sknano.generators.LayeredStructureGenerator`
+
 .. code-block:: sh
 
    > nanogen --help
 
      usage: nanogen [-h] [--fname FNAME] [--structure-format {data,xyz}]
                [--debug] [--verbose] [--version]
-               {fullerene,graphene,bilayer_graphene,unrolled_swnt,swnt,mwnt}
+               {fullerene,graphene,bilayer_graphene,unrolled_swnt,swnt,mwnt,layered_structure}
                ...
 
      optional arguments:
@@ -44,7 +46,7 @@ This module allows for easy structure generation from the command line.
        --version             show nanogen's version number and exit
 
      sub-commands:
-       {fullerene,graphene,bilayer_graphene,unrolled_swnt,swnt,mwnt}
+       {fullerene,graphene,bilayer_graphene,unrolled_swnt,swnt,mwnt,layered_structure}
 
 .. autofunction:: nanogen
 
@@ -263,6 +265,10 @@ def nanogen_parser():
                                                bundle_parent_parser])
     mwnt_parser.set_defaults(generator_class='MWNTGenerator')
 
+    layered_structure_parser = subparsers.add_parser('layered_structure')
+    layered_structure_parser.add_argument('cfgfile')
+    layered_structure_parser.set_defaults(
+        generator_class='LayeredStructureGenerator')
     return parser
 
 
