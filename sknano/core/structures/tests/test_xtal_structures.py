@@ -94,10 +94,9 @@ def test11():
 
 def test12():
     structure = FCCStructure('Au')
-    print(structure)
+    assert_equal(structure.Natoms, 4)
     structure2 = FCCStructure('Au', scaling_matrix=2)
-    print(structure2)
-    assert_equal(4 ** 3 * structure.Natoms, structure2.Natoms)
+    assert_equal(2 ** 3 * structure.Natoms, structure2.Natoms)
 
 
 def test13():
