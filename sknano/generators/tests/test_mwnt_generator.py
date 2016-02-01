@@ -75,15 +75,8 @@ class Tests(GeneratorTestFixture):
         assert_true(mwnt.bounding_box.zmax < 11 and
                     mwnt.bounding_box.zmax > 10)
         mwnt.save()
-        print('\nmwnt.Natoms')
-        print(mwnt.Natoms)
-        # print('\nmwnt.Natoms_list')
-        # print(mwnt.Natoms_list)
-        print([swnt.unit_cell.basis.Natoms for swnt in mwnt.walls])
-        # print('mwnt.walls')
-        # print(mwnt.walls)
-        print('\nmwnt.crystal_cell.Natoms')
-        print(mwnt.crystal_cell.Natoms)
+        self.tmpdata.append(mwnt.fname)
+        assert_equal(sum([swnt.Natoms for swnt in mwnt.walls]), mwnt.Natoms)
 
 
 if __name__ == '__main__':
