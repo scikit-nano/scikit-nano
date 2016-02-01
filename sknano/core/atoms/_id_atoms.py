@@ -114,13 +114,18 @@ class IDAtom(Atom):
 
         Parameters
         ----------
-        value : int
+        value : :class:`~python:int`
             atom ID
 
         """
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
         self._id = int(value)
+
+    @property
+    def index(self):
+        """Return list index."""
+        return self.id - 1
 
     @property
     def mol(self):
@@ -196,10 +201,15 @@ class IDAtoms(Atoms):
 
     @property
     def ids(self):
-        """Return array of `IDAtom.id`\ s."""
+        """Return array of :attr:`IDAtom.id`\ s."""
         if len(set([atom.id for atom in self])) != self.Natoms:
             self.assign_unique_ids()
         return np.asarray([atom.id for atom in self])
+
+    @property
+    def indices(self):
+        """Return array of :attr:`IDAtom.index`\ s."""
+        return np.asarray([atom.index for atom in self])
 
     @property
     def atom_ids(self):
