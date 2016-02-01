@@ -10,13 +10,37 @@ Test fixtures (:mod:`sknano.testing._tools`)
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
+from pkg_resources import resource_filename
+
+from sknano.io import DATAReader, DUMPReader, PDBReader, XYZReader
+
 from ._funcs import generate_atoms
 
-__all__ = ['GeneratorTestFixture', 'AtomsTestFixture']
+__all__ = ['AtomsTestFixture', 'GeneratorTestFixture', 'IOTestFixture']
 
 
 import os
 import unittest
+
+
+class AtomsTestFixture(unittest.TestCase):
+    """Mixin unittest.TestCase class defining setUp method to generate list
+    of atoms."""
+
+    def setUp(self):
+        self.swnt = \
+            generate_atoms(generator_class='SWNTGenerator', n=5, m=0, nz=5)
+        self.swnt.update_attrs()
+
+        self.periodic_table = generate_atoms(elements='periodic_table')
+        self.periodic_table.assign_unique_ids()
+        self.periodic_table.assign_unique_types()
+
+        self.buckyball = \
+            generate_atoms(generator_class='FullereneGenerator', N=60)
+        self.buckyball.update_attrs()
+
+        self.atoms = self.swnt
 
 
 class GeneratorTestFixture(unittest.TestCase):
@@ -35,15 +59,30 @@ class GeneratorTestFixture(unittest.TestCase):
                 continue
 
 
-class AtomsTestFixture(unittest.TestCase):
-    """Mixin unittest.TestCase class defining setUp method to generate list
-    of atoms."""
+class IOTestFixture(unittest.TestCase):
+    """Mixin :class:`~python:unittest.TestCase` defining lazy properties
+    to generate IO test data."""
 
-    def setUp(self):
-        self.atoms = \
-            generate_atoms(generator_class='SWNTGenerator', n=5, m=0, nz=5)
-        self.atoms.assign_unique_ids()
+    @property
+    def dump_reader(self):
+        dumpfile = \
+            resource_filename('sknano', 'data/lammpstrj/0500_29cells.dump')
 
-        self.periodic_table = generate_atoms(elements='periodic_table')
-        self.periodic_table.assign_unique_ids()
-        self.periodic_table.assign_unique_types()
+        return DUMPReader(dumpfile, attrmap={'c_peratom_pe': 'pe',
+                                             'c_peratom_ke': 'ke'})
+
+    @property
+    def data_reader(self):
+        datafile = \
+            resource_filename('sknano', 'data/nanotubes/1010_1cell.data')
+        return DATAReader(datafile)
+
+    @property
+    def pdb_reader(self):
+        pdbfile = resource_filename('sknano', 'data/nanotubes/1010_1cell.pdb')
+        return PDBReader(pdbfile)
+
+    @property
+    def xyz_reader(self):
+        xyzfile = resource_filename('sknano', 'data/nanotubes/1010_1cell.xyz')
+        return XYZReader(xyzfile)
