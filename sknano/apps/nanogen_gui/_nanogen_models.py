@@ -12,7 +12,7 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from sknano.core.refdata import aCC, element_data
-from sknano.structures import compute_Lx, compute_Ly, compute_Lz, \
+from sknano.core.structures import compute_Lx, compute_Ly, compute_Lz, \
     compute_Ch, compute_T, SWNT, MWNT, Graphene, \
     UnrolledSWNT, Fullerene
 

@@ -46,7 +46,7 @@ if PyQt is not None:
             Ui_BulkStructureGenerator
 
 from sknano.core import get_fpath
-from sknano.structures import get_chiral_indices_from_str
+from sknano.core.structures import get_chiral_indices_from_str
 # from ._nanogen_controllers import NanoGenController
 # from ._nanogen_models import NanoGenModel
 from ._view_mixins import NanoGenViewMixin, SWNTViewMixin, MWNTViewMixin, \

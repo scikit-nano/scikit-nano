@@ -20,7 +20,7 @@ except ImportError:
     from PyQt4.QtGui import QDialog
     from ._pyqt4_ui_mwnt_Ch_list_item_dialog import Ui_MWNTChListItemDialog
 
-from sknano.structures import get_chiral_indices_from_str
+from sknano.core.structures import get_chiral_indices_from_str
 
 __all__ = ['NanoGenViewMixin', 'SWNTViewMixin', 'MWNTViewMixin',
            'BundleViewMixin', 'GrapheneViewMixin', 'FullereneViewMixin',
