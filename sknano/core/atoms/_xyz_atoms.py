@@ -15,11 +15,12 @@ __docformat__ = 'restructuredtext en'
 from collections import OrderedDict
 from operator import attrgetter
 import numbers
+
 import numpy as np
 
-from sknano.core import xyz
+from sknano.core import rezero_array, xyz
 from sknano.core.math import Vector, Vectors
-from sknano.core.geometric_regions import Cuboid  # , Rectangle
+from sknano.core.geometric_regions import Cuboid, Sphere  # , Rectangle
 
 from ._atoms import Atom, Atoms
 
@@ -386,8 +387,8 @@ class XYZAtoms(Atoms):
         return C
 
     @property
-    def bounds(self):
-        """Bounds of `Atoms`.
+    def bounding_box(self):
+        """Axis-aligned bounding box of `Atoms`.
 
         Returns
         -------
@@ -396,7 +397,27 @@ class XYZAtoms(Atoms):
                       pmax=[self.x.max(), self.y.max(), self.z.max()])
 
     @property
+    def bounding_sphere(self):
+        """Axis-aligned bounding box of `Atoms`.
+
+        Returns
+        -------
+        :class:`~sknano.core.geometric_regions.Cuboid`"""
+        return Sphere(center=self.centroid,
+                      r=np.max((self.r - self.centroid).norms))
+
+    @property
+    def bounds(self):
+        """Alias for :attr:`~XYZAtoms.bounding_box`."""
+        return self.bounding_box
+
+    @property
     def coords(self):
+        """Alias for :attr:`Atoms.r`."""
+        return self.r
+
+    @property
+    def positions(self):
         """Alias for :attr:`Atoms.r`."""
         return self.r
 
@@ -415,28 +436,52 @@ class XYZAtoms(Atoms):
     @property
     def x(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`x` coordinates."""
-        return np.asarray(self.r)[:, 0]
+        # return np.asarray(self.r)[:, 0]
+        return self.r.x
 
     @property
     def y(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`y` coordinates."""
-        return np.asarray(self.r)[:, 1]
+        # return np.asarray(self.r)[:, 1]
+        return self.r.y
 
     @property
     def z(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`z` coordinates."""
-        return np.asarray(self.r)[:, 2]
+        # return np.asarray(self.r)[:, 2]
+        return self.r.z
 
     @property
     def inertia_tensor(self):
         """Inertia tensor."""
-        Ixx = (self.masses * (self.y**2 + self.z**2)).sum()
-        Iyy = (self.masses * (self.x**2 + self.z**2)).sum()
-        Izz = (self.masses * (self.x**2 + self.y**2)).sum()
-        Ixy = Iyx = (-self.masses * self.x * self.y).sum()
-        Ixz = Izx = (-self.masses * self.x * self.z).sum()
-        Iyz = Izy = (-self.masses * self.y * self.z).sum()
-        return np.array([[Ixx, Ixy, Ixz], [Iyx, Iyy, Iyz], [Izx, Izy, Izz]])
+        masses = self.masses
+        r = self.r - self.center_of_mass
+        x, y, z = r.x, r.y, r.z
+
+        Ixx = (masses * (y**2 + z**2)).sum()
+        Iyy = (masses * (x**2 + z**2)).sum()
+        Izz = (masses * (x**2 + y**2)).sum()
+        Ixy = Iyx = (-masses * x * y).sum()
+        Ixz = Izx = (-masses * x * z).sum()
+        Iyz = Izy = (-masses * y * z).sum()
+        return rezero_array(np.array([[Ixx, Ixy, Ixz],
+                                      [Iyx, Iyy, Iyz],
+                                      [Izx, Izy, Izz]]), epsilon=1e-12)
+
+    @property
+    def moment_of_inertia(self):
+        """Alias for :attr:`~XYZAtoms.inertia_tensor`."""
+        return self.inertia_tensor
+
+    @property
+    def principal_axes(self):
+        """Return principal axes."""
+        w, v = np.linalg.eig(self.inertia_tensor)
+        print(w)
+        print(v)
+        v = rezero_array(v, epsilon=1e-12)
+        I1, I2, I3 = list(map(Vector, [v[i] for i in range(3)]))
+        return Vectors([I1, I2, I3])
 
     @property
     def volume(self):
