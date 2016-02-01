@@ -11,7 +11,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-# from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod
 
 import copy
 import os
@@ -19,7 +19,7 @@ import os
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from sknano.io import default_structure_format, supported_structure_formats
 
-__all__ = ['Atom', 'Atoms', 'GeneratorBase', 'BaseGenerator',
+__all__ = ['Atom', 'Atoms', 'GeneratorBase', 'BaseGenerator', 'GeneratorMixin',
            'BulkGeneratorBase', 'BaseBulkGenerator',
            'STRUCTURE_GENERATORS']
 
@@ -42,20 +42,25 @@ STRUCTURE_GENERATORS = ('FullereneGenerator',
                         'MoS2Generator')
 
 
-class GeneratorBase:
+class GeneratorBase(metaclass=ABCMeta):
     """Base structure generator class."""
     def __init__(self, *args, autogen=True, **kwargs):
+
         super().__init__(*args, **kwargs)
 
         if autogen:
             self.generate()
 
+    @abstractmethod
     def generate(self):
-        """Common :meth:`~GeneratorBase.generate` method structure \
-            generators."""
-        self.structure_data.clear()
-        for atom in self.crystal_cell:
-            self.atoms.append(Atom(**atom.todict()))
+        """Generate structure data."""
+        return NotImplementedError
+
+    def finalize(self):
+        """Finalize structure data by assigning unique ids and types to \
+            structure atoms."""
+        self.assign_unique_ids()
+        self.assign_unique_types()
 
     def save(self, fname=None, outpath=None, structure_format=None,
              deepcopy=True, center_centroid=True, center_com=False,
@@ -232,9 +237,17 @@ class GeneratorBase:
 BaseGenerator = GeneratorBase
 
 
-class BulkGeneratorBase(GeneratorBase):
-    """Base class for the *bulk structure generator* classes."""
+class GeneratorMixin:
+    "Mixin class providing concrete :meth:`~GeneratorBase.generate` method."
+    def generate(self):
+        self.structure.clear()
+        for atom in self.crystal_cell:
+            self.atoms.append(Atom(**atom.todict()))
+        self.finalize()
 
+
+class BulkGeneratorBase(GeneratorMixin, GeneratorBase):
+    """Base class for the *bulk structure generator* classes."""
     def save(self, fname=None, scaling_matrix=None, **kwargs):
         if fname is not None:
             if scaling_matrix is not None:
