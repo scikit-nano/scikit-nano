@@ -7,7 +7,7 @@ from pkg_resources import resource_filename
 import unittest
 
 import nose
-from nose.tools import *
+from nose.tools import assert_equal, assert_true
 
 import numpy as np
 
@@ -19,42 +19,6 @@ from sknano.io import DUMPReader
 def test1():
     traj = Trajectory()
     assert_equal(traj.Nsnaps, 0)
-    print(traj)
-
-
-def test2():
-    dump = DUMPReader(resource_filename('sknano',
-                                        'data/lammpstrj/0500_29cells.dump'),
-                      attrmap={'c_peratom_pe': 'pe', 'c_peratom_ke': 'ke'})
-    traj = dump.trajectory
-    # traj.reference_snapshot = traj[0]
-    prev_ss_atom = None
-    for i, ss in enumerate(traj, start=1):
-        atoms = ss.atoms
-        atoms = atoms.filtered((atoms.z <= 20) & (atoms.z >= -20))
-        atoms.update_attrs()
-        atoms = atoms.filtered((atoms.z <= 15) & (atoms.z >= -15))
-        atom = atoms.get_atom(259)
-        # print('ss={}, atom.NN:\n{}'.format(i, atom.NN))
-        # print('ss={}, atom.bonds:\n{}\n'.format(i, atom.bonds))
-
-        if prev_ss_atom is not None:
-            print('\ntimestep: {}'.format(i))
-            # print('reference_atom')
-            # print(prev_ss_atom.reference_atom)
-            # print(atom.reference_atom)
-            # print(prev_ss_atom.NN)
-            # print(atom.NN)
-            # print(prev_ss_atom.bonds)
-            # print(atom.bonds)
-            print(prev_ss_atom.reference_atom_bonds.lengths)
-            print(atom.reference_atom_bonds.lengths)
-            print(prev_ss_atom.reference_atom_neighbors.ids)
-            print(atom.reference_atom_neighbors.ids)
-            assert_true(np.all(atom.reference_atom_neighbors.ids ==
-                               prev_ss_atom.reference_atom_neighbors.ids))
-
-        prev_ss_atom = atom
 
 
 class TrajectoryTestFixture(unittest.TestCase):
@@ -94,6 +58,40 @@ class Tests(TrajectoryTestFixture):
         assert_equal(traj.nselected, self.dump.nselected)
         assert_equal(self.dump.nselected, self.dump.Nsnaps)
         assert_equal(self.dump.Nsnaps, len(self.dump.timesteps))
+
+    def test5(self):
+        traj = self.dump.trajectory
+        prev_ss_atom = None
+        for ss in traj[10:-1:5]:
+            atoms = ss.atoms
+            # atoms = atoms.filtered((atoms.z <= 20) & (atoms.z >= -20))
+            atoms = atoms.select("(z <= 20) and (z >= -20)")
+            atoms.update_attrs()
+            # atoms = atoms.filtered((atoms.z <= 15) & (atoms.z >= -15))
+            atoms = atoms.select("(z <= 15) and (z >= -15)")
+            # assert_equal(atoms, selection)
+            atom = atoms.get_atom(259)
+            # assert_equal(atom, selection.get_atom(259))
+            # print('ss={}, atom.NN:\n{}'.format(i, atom.NN))
+            # print('ss={}, atom.bonds:\n{}\n'.format(i, atom.bonds))
+
+            if prev_ss_atom is not None:
+                print('\ntimestep: {}'.format(ss.timestep))
+                # print('reference_atom')
+                # print(prev_ss_atom.reference_atom)
+                # print(atom.reference_atom)
+                # print(prev_ss_atom.NN)
+                # print(atom.NN)
+                # print(prev_ss_atom.bonds)
+                # print(atom.bonds)
+                print(prev_ss_atom.reference_atom_bonds.lengths)
+                print(atom.reference_atom_bonds.lengths)
+                print(prev_ss_atom.reference_atom_neighbors.ids)
+                print(atom.reference_atom_neighbors.ids)
+                assert_true(np.all(atom.reference_atom_neighbors.ids ==
+                                   prev_ss_atom.reference_atom_neighbors.ids))
+
+            prev_ss_atom = atom
 
 
 if __name__ == '__main__':

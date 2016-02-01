@@ -27,6 +27,8 @@ Mixin `Atom`/`Atoms` classes
    POAV1
    POAV2
    POAVR
+   RingAtomMixin
+   RingAtomsMixin
 
 """
 from __future__ import absolute_import, division, print_function
@@ -38,5 +40,6 @@ from ._kdtree_atoms import *
 from ._neighbor_atoms import *
 from ._poav_atoms import *
 from ._periodic_atoms import *
+from ._ring_atoms import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]

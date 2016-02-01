@@ -19,6 +19,7 @@ import numpy as np
 from sknano.core.math import Vector
 
 from ._atoms import Atom, Atoms
+from .mixins import PBCAtomsMixin
 
 __all__ = ['LatticeAtom', 'LatticeAtoms']
 
@@ -296,7 +297,7 @@ class LatticeAtom(Atom):
         return super_dict
 
 
-class LatticeAtoms(Atoms):
+class LatticeAtoms(PBCAtomsMixin, Atoms):
     """An `Atoms` sub-class for crystal structure lattice atoms.
 
     Sub-class of `Atoms` class, and a container class for lists of
@@ -345,3 +346,14 @@ class LatticeAtoms(Atoms):
     @lattice.setter
     def lattice(self, value):
         [setattr(atom, 'lattice', value) for atom in self]
+
+    @property
+    def cell_matrix(self):
+        try:
+            return self.lattice.cell_matrix
+        except AttributeError:
+            return None
+
+    @property
+    def cell(self):
+        return self.cell_matrix

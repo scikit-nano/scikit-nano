@@ -10,12 +10,12 @@ from nose.tools import assert_equal, assert_false, assert_true
 
 import numpy as np
 
-from sknano.core import dedupe
+# from sknano.core import dedupe
 # import sknano.core.atoms
 # from sknano.core.atoms import StructureAtom, StructureAtoms
 from sknano.generators import SWNTGenerator
 # from sknano.io import DATAReader
-# from sknano.structures import compute_Natoms
+# from sknano.core.structures import compute_Natoms
 # from sknano.core.atoms import SelectionParser
 from sknano.testing import AtomsTestFixture
 
@@ -50,8 +50,9 @@ class Tests(SelectionTestFixture):
 
     def test3(self):
         atoms = self.atoms
-        atoms = atoms.select("(id 1 2 3 4 5) or (id 100 101)")
-        assert_true(np.allclose(atoms.ids, [1, 2, 3, 4, 5, 100, 101]))
+        atoms = atoms.select("(id 1 2 3 4 5) or (id 99 100)")
+        print(atoms.ids)
+        assert_true(np.allclose(atoms.ids, [1, 2, 3, 4, 5, 99, 100]))
 
     def test4(self):
         atoms = self.atoms
@@ -86,6 +87,7 @@ class Tests(SelectionTestFixture):
     def test9(self):
         atoms = self.atoms
         atoms = atoms.select("within 1.5 of id 4 5 6 9")
+        print(atoms.ids)
         assert_true(all([id in atoms.ids for id in (4, 5, 6, 9)]))
 
     def test10(self):
@@ -140,6 +142,16 @@ class Tests(SelectionTestFixture):
         assert_equal(sorted(list(set(sel1.ids) | set(sel2.ids))),
                      sorted(or_selection.ids.tolist()))
 
+    def test15(self):
+        atoms = self.BNatoms
+        print(atoms.bounds)
+
+        print(atoms.Natoms)
+        parallelepiped = \
+            atoms.select("within Parallelepiped(o=[0, -5.2, 0])")
+        print(parallelepiped.Natoms)
+        sphere = atoms.select("within Sphere(r=6)", verbose=True)
+        print(sphere.Natoms)
 
 if __name__ == '__main__':
     nose.runmodule()

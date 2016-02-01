@@ -123,7 +123,6 @@ from ._trajectory import *
 from ._structure_atoms import *
 from ._neighbor_atoms import *
 from ._vdW_atoms import *
-from ._ring_atoms import *
 from ._selections import *
 from ._topology import *
 

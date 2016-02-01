@@ -20,11 +20,14 @@ import numpy as np
 
 # import sknano.core.atoms
 
-# from ._bonds import Bond, Bonds
-from sknano.core.math import angle, dot, scalar_triple_product
+# from sknano.core import flatten
+from sknano.core.math import angle, dot
+
+from ._bonds import Bond, Bonds
 
 __all__ = ['AngleMixin', 'BondMixin', 'DihedralMixin', 'ImproperMixin',
-           'TopologyMixin', 'get_angle', 'get_dihedral']
+           'AtomTopologyMixin', 'AtomsTopologyMixin',
+           'get_angle', 'get_dihedral']
 
 
 def get_angle(atoms):
@@ -55,13 +58,18 @@ def get_dihedral(atoms):
 
 
 class AngleMixin:
-
     def get_angle(self, *atoms):
         pass
 
 
 class BondMixin:
-    pass
+    @property
+    def bonds(self):
+        """Return atom `Bonds` instance."""
+        try:
+            return Bonds([Bond(self, nn) for nn in self.NN])
+        except (AttributeError, TypeError):
+            return Bonds()
 
 
 class DihedralMixin:
@@ -76,5 +84,16 @@ class ImproperMixin:
         pass
 
 
-class TopologyMixin(ImproperMixin, DihedralMixin, BondMixin, AngleMixin):
+class AtomTopologyMixin(ImproperMixin, DihedralMixin, BondMixin, AngleMixin):
     pass
+
+
+class AtomsTopologyMixin:
+
+    @property
+    def bonds(self):
+        return Bonds([bond for atom in self for bond in atom.bonds])
+
+    @property
+    def max_bond(self):
+        return np.max(self.bonds.lengths)

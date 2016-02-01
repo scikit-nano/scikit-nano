@@ -17,6 +17,7 @@ import numpy as np
 
 from sknano.core import BaseClass, UserList, cyclic_pairs, dedupe, flatten, \
     pairwise
+from sknano.core.crystallography import pbc_diff
 from sknano.core.math import Vector, vector as vec
 
 import sknano.core.atoms
@@ -97,6 +98,14 @@ class Bond(BaseClass):
         return self.atoms[1]
 
     @property
+    def ids(self):
+        return tuple(self.atoms.ids)
+
+    @property
+    def indices(self):
+        return tuple(self.atoms.indices)
+
+    @property
     def centroid(self):
         """:attr:`~sknano.core.atoms.XYZAtoms.centroid` of :class:`Bond` \
             :attr:`~Bond.atoms`."""
@@ -110,7 +119,13 @@ class Bond(BaseClass):
         :attr:`Bond.atom1` to :attr:`Bond.atom2`.
 
         """
-        return Vector(self.atom2.r - self.atom1.r, p0=self.atom1.r.p)
+        try:
+            lattice = self.atom1.lattice
+            dr = lattice.fractional_to_cartesian(pbc_diff(self.atom2.rs,
+                                                          self.atom1.rs))
+        except AttributeError:
+            dr = self.atom2.r - self.atom1.r
+        return Vector(dr, p0=self.atom1.r.p)
 
     @property
     def unit_vector(self):
@@ -136,7 +151,7 @@ class Bonds(UserList):
     Parameters
     ----------
     bonds : {None, sequence, `Bonds`}, optional
-        if not `None`, then a list of `Bond` instance objects
+        if not `None`, then a list of `Bond` objects
 
     """
     def __init__(self, bonds=None):
@@ -156,6 +171,18 @@ class Bonds(UserList):
         return len(self)
 
     @property
+    def unique_set(self):
+        """Return new Bonds object containing the set of unique bonds."""
+        seen = set()
+        unique_bonds = []
+        for bond in self:
+            if bond.ids not in seen and tuple(reversed(bond.ids)) not in seen:
+                unique_bonds.append(bond)
+                seen.add(bond.ids)
+                seen.add(tuple(reversed(bond.ids)))
+        return self.__class__(bonds=unique_bonds)
+
+    @property
     def vectors(self):
         """:class:`~numpy:numpy.ndarray` of :attr:`~Bond.vector`\ s."""
         return np.asarray([bond.vector for bond in self])
@@ -173,6 +200,11 @@ class Bonds(UserList):
     @property
     def mean_length(self):
         """Mean bond length."""
+        if np.all(self.lengths == np.inf):
+            return np.inf
+        if np.any(self.lengths == np.inf):
+            return np.ma.mean(np.ma.array(self.lengths,
+                                          mask=self.lengths == np.inf))
         return np.mean(self.lengths)
 
     @property
@@ -211,6 +243,16 @@ class Bonds(UserList):
         atoms = list(dedupe(list(flatten([bond.atoms for bond in self])),
                             key=attrgetter('id')))
         return sknano.core.atoms.StructureAtoms(atoms)
+
+    @property
+    def ids(self):
+        # return np.asarray([bond.ids for bond in self])
+        return [bond.ids for bond in self]
+
+    @property
+    def indices(self):
+        # return np.asarray([bond.indices for bond in self])
+        return [bond.indices for bond in self]
 
     def todict(self):
         return dict(bonds=self.data)
