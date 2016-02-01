@@ -230,7 +230,7 @@ class MWNTMixin:
             max_walls = Nwalls
 
         if max_walls is None:
-            max_walls = 10
+            max_walls = 5
 
         if max_wall_diameter is None:
             max_wall_diameter = np.inf
@@ -354,6 +354,8 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
                                       max_wall_diameter=max_wall_diameter,
                                       chiral_types=chiral_types,
                                       wall_spacing=wall_spacing)
+        else:
+            Ch_list = [tuple(Ch) for Ch in Ch_list]
 
         self.Ch_list = Ch_list[:]
         self._min_wall_diameter = min_wall_diameter
