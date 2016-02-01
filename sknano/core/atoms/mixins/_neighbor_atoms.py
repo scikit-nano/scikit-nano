@@ -11,11 +11,13 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from collections import OrderedDict
 # import numbers
 
 import numpy as np
 
 from sknano.core import ordinal_form
+from sknano.core.math import Vector, Vectors
 from .._atoms import Atoms
 from .._cn_atoms import CNAtom
 from ._kdtree_atoms import KDTreeAtomsMixin
@@ -166,6 +168,11 @@ class NeighborAtomsMixin(KDTreeAtomsMixin):
         return np.asarray(distances)
 
     @property
+    def NNN(self):
+        """Number of first nearest-neighbors."""
+        return len(self.nn_idx)
+
+    @property
     def nearest_neighbors(self):
         """Return array of nearest-neighbor atoms for each `KDTAtom`."""
         # self._update_neighbors()
@@ -173,51 +180,182 @@ class NeighborAtomsMixin(KDTreeAtomsMixin):
 
     @property
     def first_neighbors(self):
+        """First neighbors."""
         return [atom.first_neighbors for atom in self]
 
     @property
     def second_neighbors(self):
+        """Second neighbors."""
         return [atom.second_neighbors for atom in self]
 
     @property
     def third_neighbors(self):
+        """Third neighbors."""
         return [atom.third_neighbors for atom in self]
 
-    def get_neighbor_list(self, retcodes, cutoffs, types):
-        pass
-
     def get_nth_nearest_neighbors(self, n, exclusive=True):
+        """Return `n`th nearest neighbors."""
         return [getattr(atom, '_{}_neighbors'.format(ordinal_form(n)))
                 for atom in self]
 
     def update_attrs(self, **kwargs):
-        """Update :class:`KDTAtom`\ s attributes."""
+        """Update :class:`NeighborAtom`\ s attributes."""
         self.update_neighbors(**kwargs)
         # self.update_bonds()
 
-    def update_neighbors(self, cutoffs=None):
+    def update_neighbors(self, cutoffs=None, **kwargs):
         """Update :attr:`NeighborAtom.neighbors`."""
+        if 'cutoff' in kwargs and cutoffs is None:
+            cutoffs = kwargs['cutoff']
+            del kwargs['cutoff']
         if cutoffs is None:
             cutoffs = []
-        cutoffs.append(self.NNrc)
+        elif not isinstance(cutoffs, list):
+            cutoffs = [cutoffs]
+        if not any([np.allclose(self.NNrc, cutoff) for cutoff in cutoffs]):
+            cutoffs.append(self.NNrc)
 
         for n, cutoff in enumerate(sorted(cutoffs), start=1):
             try:
                 NNd, NNi = self.query_atom_tree(k=self.kNN, rc=cutoff)
-                for j, atom in enumerate(self):
+                for i, atom in enumerate(self):
                     neighbors = \
-                        self.__class__([self[NNi[j][k]] for k, d in
-                                        enumerate(NNd[j]) if d <= cutoff],
+                        self.__class__([self[NNi[i][j]] for j, d in
+                                        enumerate(NNd[i]) if d <= cutoff],
                                        update_item_class=False, **self.kwargs)
                     distances = \
-                        [NNd[j][k] for k, d in enumerate(NNd[j])
+                        [NNd[i][j] for j, d in enumerate(NNd[i])
                          if d <= cutoff]
                     neighbors.distances = distances
                     if np.allclose(cutoff, self.NNrc):
                         atom.neighbors = neighbors
                     atom.set_nth_nearest_neighbors(n, neighbors[:])
+
             except ValueError:
                 pass
+
+    def update_neighbor_lists(self):
+        self._update_nn_lists()
+        self._update_nn_seed_list()
+        self._update_nn_vectors()
+        self._update_nn_adjacency_matrix()
+
+    @property
+    def nn_adjacency_matrix(self):
+        if self._nn_adjacency_matrix is None:
+            self._update_nn_adjacency_matrix()
+        return self._nn_adjacency_matrix
+
+    @property
+    def nn_adjacency_map(self):
+        if self._nn_adjacency_map is None:
+            self._update_nn_adjacency_map()
+        return self._nn_adjacency_map
+
+    @property
+    def nn_adjacency_list(self):
+        if self._nn_adjacency_list is None:
+            self._update_nn_adjacency_list()
+        return self._nn_adjacency_list
+
+    @property
+    def nn_seed_list(self):
+        if self._nn_seed_list is None:
+            self._update_nn_seed_list()
+        return self._nn_seed_list
+
+    @property
+    def nn_vectors(self):
+        if self._nn_vectors is None:
+            self._update_nn_vectors()
+        return self._nn_vectors
+
+    def _update_nn_lists(self, NNi=None, cutoff=None):
+        if NNi is None:
+            if cutoff is None:
+                cutoff = self.NNrc
+            _, NNi = self.query_atom_tree(k=self.kNN, rc=cutoff)
+        Natoms = self.Natoms
+        idx = []
+        nn_idx = []
+        for i, nn_indices in enumerate(NNi):
+            for ni in nn_indices[:]:
+                if ni < Natoms:
+                    idx.append(i)
+                    nn_idx.append(ni)
+        self.idx = np.asarray(idx, dtype=int)
+        self.nn_idx = np.asarray(nn_idx, dtype=int)
+
+    def _update_nn_seed_list(self):
+        n = self.Natoms
+        idx = self.idx
+        nnn = self.NNN
+        nn_seed_list = (n + 1) * [0]
+        for k in range(n):
+            nn_seed_list[k] = -1
+        nn_seed_list[n] = nnn
+        nn_seed_list[idx[0]] = 0
+        for k in range(1, nnn):
+            if idx[k] != idx[k - 1]:
+                nn_seed_list[idx[k]] = k
+        self._nn_seed_list = nn_seed_list
+
+    def _update_nn_adjacency_matrix(self):
+        Natoms = self.Natoms
+        nn_adjacency_matrix = np.zeros((Natoms, Natoms), dtype=int)
+        # self._update_nn_lists()
+
+        def _update_nn_adjacency_map(nn_map, indices, nindices):
+            for i in indices:
+                for ni in nindices:
+                    if ni not in nn_map:
+                        nn_map[ni] = nn_map[i] + 1
+
+        for i, atom in enumerate(self):
+            nn_map = atom.nn_adjacency_map = {}
+            nn_map[i] = 0
+            indices = [i]
+            nindices = atom.neighbors.indices.tolist()
+            _update_nn_adjacency_map(nn_map, indices, nindices)
+            while len(nindices) > 0:
+                indices = nindices[:]
+                nindices = []
+                for ni in indices[:]:
+                    nindices.extend(
+                        [nj for nj in self[ni].neighbors.indices.tolist()
+                         if nj not in nn_map])
+                    _update_nn_adjacency_map(nn_map, indices, nindices)
+            [nn_adjacency_matrix[i].__setitem__(j, nn_map[j])
+             for j in range(Natoms)]
+        self._nn_adjacency_matrix = nn_adjacency_matrix
+
+    def _update_nn_adjacency_map(self):
+        nn_adjacency_map = OrderedDict()
+        for i, atom in enumerate(self):
+            nn_adjacency_map[i] = atom.neighbors.indices.tolist()
+        self._nn_adjacency_map = nn_adjacency_map
+
+    def _update_nn_adjacency_list(self):
+        nn_adjacency_list = []
+        for atom in self:
+            nn_adjacency_list.append(atom.neighbors.indices.tolist())
+        self._nn_adjacency_list = nn_adjacency_list
+
+    def _update_nn_vectors(self):
+        from sknano.core.crystallography import pbc_diff
+        idx = self.idx
+        nn_idx = self.nn_idx
+        lattice = self.lattice
+        pbc = np.any(self.pbc)
+        nn_vectors = Vectors()
+        for i, ni in zip(idx, nn_idx):
+            if pbc:
+                fdiff = pbc_diff(self[ni].rs, self[i].rs)
+                r = Vector(lattice.fractional_to_cartesian(fdiff))
+            else:
+                r = self[ni].r - self[i].r
+            nn_vectors.append(r)
+        self._nn_vectors = nn_vectors
 
     # def update_bonds(self):
     #     """Update :attr:`KDTAtom.bonds`."""
