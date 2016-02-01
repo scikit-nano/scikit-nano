@@ -4,12 +4,12 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
 import nose
-from nose.tools import assert_equal, assert_true
+from nose.tools import assert_true
 import numpy as np
 
 # import pymatgen as pmg
 
-from sknano.core import rezero_array
+# from sknano.core import rezero_array
 from sknano.core.crystallography import pbc_diff
 
 

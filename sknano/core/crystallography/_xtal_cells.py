@@ -208,7 +208,7 @@ class CrystalCell(BaseClass):
                 return getattr(self.lattice, name)
             except AttributeError:
                 pass
-        if name != 'basis' and self.basis.Natoms != 0:
+        if name != 'basis' and self.basis is not None and len(self.basis) != 0:
             try:
                 return getattr(self.basis, name)
             except AttributeError:
