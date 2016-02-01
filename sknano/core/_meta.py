@@ -16,6 +16,7 @@ from __future__ import unicode_literals
 from abc import ABCMeta, abstractmethod
 from inspect import signature, Signature, Parameter
 from functools import wraps, partial
+from textwrap import dedent
 import inspect
 import logging
 import time
@@ -109,38 +110,129 @@ def check_type(obj, allowed_types=()):
                         '(Allowed type(s): {})'.format(allowed_types))
 
 
-def deprecated(replacement=None):
-    """Decorator to mark functions as deprecated.
+def _generate_deprecation_message(since, message='', name='',
+                                  alternative='', pending=False,
+                                  obj_type='attribute'):
+
+    if not message:
+        altmessage = ''
+
+        if pending:
+            message = (
+                'The %(func)s %(obj_type)s will be deprecated in a '
+                'future version.')
+        else:
+            message = (
+                'The %(func)s %(obj_type)s was deprecated in version '
+                '%(since)s.')
+        if alternative:
+            altmessage = ' Use %s instead.' % alternative
+
+        message = ((message % {
+            'func': name,
+            'name': name,
+            'alternative': alternative,
+            'obj_type': obj_type,
+            'since': since}) +
+            altmessage)
+
+    return message
+
+
+def deprecated(since, message='', name='', alternative='', pending=False,
+               obj_type='function'):
+    """Decorator to mark a function as deprecated.
+
+    Modified implementation of matplotlib's
+    :func:`matplotlib:matplotlib.cbook.deprecated` function.
 
     Parameters
-    ----------
-    replacement : callable, optional
-        callable that will be called with the same args
-        as the decorated function.
+    ------------
+    since : str
+        The release at which this API became deprecated.  This is
+        required.
 
-    Returns
-    -------
-    decorate : decorated function
+    message : str, optional
+        Override the default deprecation message.  The format
+        specifier `%(func)s` may be used for the name of the function,
+        and `%(alternative)s` may be used in the deprecation message
+        to insert the name of an alternative to the deprecated
+        function.  `%(obj_type)` may be used to insert a friendly name
+        for the type of object being deprecated.
+
+    name : str, optional
+        The name of the deprecated function; if not provided the name
+        is automatically determined from the passed in function,
+        though this is useful in the case of renamed functions, where
+        the new function is just assigned to the name of the
+        deprecated function.  For example::
+
+            def new_function():
+                ...
+            oldFunction = new_function
+
+    alternative : str, optional
+        An alternative function that the user may use in place of the
+        deprecated function.  The deprecation warning will tell the user about
+        this alternative if provided.
+
+    pending : bool, optional
+        If True, uses a PendingDeprecationWarning instead of a
+        DeprecationWarning.
+
+    Examples
+    --------
+
+        Basic example::
+
+            @deprecated('1.4.0')
+            def the_function_to_deprecate():
+                pass
 
     """
-    def decorate(func):
-        msg = "{!s} is deprecated".format(func.__name__)
-        if replacement is not None:
-            msg += "; use {!s} instead".format(replacement)
-        if func.__doc__ is None:
-            func.__doc__ = msg
+    def decorated(func, message=message, name=name, alternative=alternative,
+                  pending=pending):
+
+        if isinstance(func, classmethod):
+            func = func.__func__
+            is_classmethod = True
+        else:
+            is_classmethod = False
+
+        if not name:
+            name = func.__name__
+
+        message = _generate_deprecation_message(
+            since, message, name, alternative, pending, obj_type)
 
         @wraps(func)
-        def wrapper(*args, **kwargs):
-            warnings.warn_explicit(
-                "Call to deprecated function {}".format(func.__name__),
-                category=DeprecationWarning,
-                filename=func.__code__.co_filename,
-                lineno=func.__code__.co_firstlineno + 1
-            )
+        def deprecated_func(*args, **kwargs):
+            warnings.warn(message,
+                          DeprecationWarning,
+                          stacklevel=2)
+
             return func(*args, **kwargs)
-        return wrapper
-    return decorate
+
+        old_doc = deprecated_func.__doc__
+        if not old_doc:
+            old_doc = ''
+        old_doc = dedent(old_doc).strip('\n')
+        message = message.strip()
+        new_doc = (('\n.. deprecated:: %(since)s'
+                    '\n    %(message)s\n\n' %
+                    {'since': since, 'message': message}) + old_doc)
+        if not old_doc:
+            # This is to prevent a spurious 'unexected unindent' warning from
+            # docutils when the original docstring was blank.
+            new_doc += r'\ '
+
+        deprecated_func.__doc__ = new_doc
+
+        if is_classmethod:
+            deprecated_func = classmethod(deprecated_func)
+        return deprecated_func
+
+    return decorated
 
 
 def get_object_signature(obj):
