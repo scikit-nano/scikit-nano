@@ -27,27 +27,15 @@ from sknano.core import pluralize
 from sknano.core.math import Point
 from sknano.core.structures import SWNT
 from sknano.core.geometric_regions import Cuboid
+from ._base import GeneratorBase, GeneratorMixin
 from ._nanotube_generator_base import NanotubeGeneratorBase
 
 
-__all__ = ['SWNTGeneratorMixin', 'SWNTGenerator']
+__all__ = ['SWNTGenerator']
 
 
-class SWNTGeneratorMixin:
-    """`SWNTGenerator` mixin."""
-    def generate(self):
-        """Generate structure data."""
-
-        super().generate()
-
-        if self.L0 is not None and self.fix_Lz:
-            Lz_cutoff = 10 * self.L0 + 1
-            region_bounds = Cuboid(pmin=Point([-np.inf, -np.inf, 0]),
-                                   pmax=Point([np.inf, np.inf, Lz_cutoff]))
-            self.atoms.clip_bounds(region_bounds)
-
-
-class SWNTGenerator(NanotubeGeneratorBase, SWNTGeneratorMixin, SWNT):
+class SWNTGenerator(NanotubeGeneratorBase, GeneratorMixin,
+                    GeneratorBase, SWNT):
     """Class for generating :class:`SWNT` structures.
 
     Parameters
@@ -204,6 +192,17 @@ class SWNTGenerator(NanotubeGeneratorBase, SWNTGeneratorMixin, SWNT):
     .. image:: /images/1010_ccp_3cellsx3cellsx5cells-01.png
 
     """
+    def finalize(self):
+        """Finalize structure data by clipping region bounds if \
+                :attr:`~SWNT.fix_Lz` is `True`."""
+        if self.L0 is not None and self.fix_Lz:
+            Lz_cutoff = 10 * self.L0 + 1
+            region_bounds = Cuboid(pmin=Point([-np.inf, -np.inf, 0]),
+                                   pmax=Point([np.inf, np.inf, Lz_cutoff]))
+            self.atoms.clip_bounds(region_bounds)
+
+        super().finalize()
+
     @classmethod
     def generate_fname(cls, n=None, m=None, nx=None, ny=None, nz=None,
                        fix_Lz=False, Ntubes=None, bundle_geometry=None,
@@ -212,7 +211,7 @@ class SWNTGenerator(NanotubeGeneratorBase, SWNTGeneratorMixin, SWNT):
                                   '{}'.format(m).zfill(2))
         chirality = '{}{}'.format('{}'.format(n).zfill(2),
                                   '{}'.format(m).zfill(2))
-        if nx == ny == 1:
+        if nx == ny == 1 and bundle_geometry is None:
             nz_fmtstr = '{:.2f}' if fix_Lz else '{:.0f}'
             nz = ''.join((nz_fmtstr.format(nz), pluralize('cell', nz)))
             fname_wordlist = (chirality, nz)

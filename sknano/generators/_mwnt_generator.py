@@ -19,6 +19,7 @@ from sknano.core import pluralize
 # from sknano.core.math import Vector
 from sknano.core.structures import MWNT
 # from sknano.core.geometric_regions import Cuboid
+from ._base import GeneratorBase
 from ._nanotube_generator_base import NanotubeGeneratorBase
 from ._swnt_generator import SWNTGenerator
 
@@ -27,7 +28,7 @@ __all__ = ['MWNTGeneratorMixin', 'MWNTGenerator']
 
 class MWNTGeneratorMixin:
     """`MWNTGenerator` mixin."""
-    def generate(self):
+    def generate(self, **kwargs):
         """Generate structure data.
 
         .. todo::
@@ -36,12 +37,15 @@ class MWNTGeneratorMixin:
            generating it every time.
 
         """
-        self.structure_data.clear()
+        self.structure.clear()
         for swnt in self.walls:
-            self.atoms.extend(SWNTGenerator(**swnt.todict()).atoms)
+            self.atoms.extend(
+                SWNTGenerator(fix_Lz=True, **swnt.todict()).atoms)
+        self.finalize()
 
 
-class MWNTGenerator(NanotubeGeneratorBase, MWNTGeneratorMixin, MWNT):
+class MWNTGenerator(NanotubeGeneratorBase, MWNTGeneratorMixin,
+                    GeneratorBase, MWNT):
     """Class for generating multi-walled nanotubes (MWNT).
 
     .. versionchanged:: 0.3.22
@@ -140,7 +144,7 @@ class MWNTGenerator(NanotubeGeneratorBase, MWNTGeneratorMixin, MWNT):
                        bundle_packing=None, **kwargs):
         Nwalls = '{}wall_mwnt'.format(Nwalls)
         chiralities = '@'.join([str(Ch).replace(' ', '') for Ch in Ch_list])
-        if nx == ny == 1:
+        if nx == ny == 1 and bundle_geometry is None:
             fname = '_'.join((Nwalls, chiralities))
             return fname
 
@@ -152,11 +156,7 @@ class MWNTGenerator(NanotubeGeneratorBase, MWNTGeneratorMixin, MWNT):
             nx = ''.join(('{}'.format(nx), pluralize('cell', nx)))
             ny = ''.join(('{}'.format(ny), pluralize('cell', ny)))
             cells = 'x'.join((nx, ny))
-
-            if nx == 1 and ny == 1:
-                fname_wordlist = (Nwalls, chiralities, cells)
-            else:
-                fname_wordlist = (Nwalls, chiralities, packing, cells)
+            fname_wordlist = (Nwalls, chiralities, packing, cells)
         else:
             fname_wordlist = \
                 (Nwalls, chiralities, packing, Ntubes, bundle_geometry)

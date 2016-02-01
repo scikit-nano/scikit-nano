@@ -17,7 +17,7 @@ from sknano.generators import BCCStructureGenerator, FCCStructureGenerator, \
     AlphaQuartzGenerator, DiamondStructureGenerator, IronGenerator, \
     GoldGenerator, CopperGenerator, CaesiumChlorideStructureGenerator, \
     RocksaltStructureGenerator, ZincblendeStructureGenerator, MoS2Generator
-from sknano.io import XYZReader, DATAReader
+# from sknano.io import XYZReader, DATAReader
 from sknano.testing import GeneratorTestFixture
 
 

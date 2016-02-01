@@ -7,8 +7,8 @@ Layered structure generator (:mod:`sknano.generators._layered_structure_generato
 .. currentmodule:: sknano.generators._layered_structure_generator
 
 """
-from __future__ import absolute_import, division, print_function
-from __future__ import unicode_literals
+from __future__ import absolute_import, division, print_function, \
+    unicode_literals
 __docformat__ = 'restructuredtext en'
 
 __all__ = ['LayeredStructureGenerator']
@@ -103,7 +103,6 @@ class LayeredStructureGenerator(GeneratorBase, BaseStructure, BaseClass):
         selstr = self.config.get('selection', None)
         if selstr is not None:
             atoms = atoms.select(selstr)
-
         self.structure.extend(atoms)
         # self.structure.extend(
         #     atoms.select(self.config.get('selection', 'all')))

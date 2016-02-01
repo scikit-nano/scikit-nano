@@ -13,33 +13,27 @@ __docformat__ = 'restructuredtext en'
 
 import copy
 
-from ._base import GeneratorBase
+# from ._base import GeneratorBase
 
-__all__ = ['NanotubeGeneratorBase']
+__all__ = ['NanotubeGeneratorBase', 'NanotubeBundleGeneratorMixin']
 
 
-class NanotubeGeneratorBase(GeneratorBase):
-    """Base class for generating nanotubes."""
-    def __init__(self, *args, autogen=True, generate_bundle=True,
-                 from_bundle_coords=True, from_scaling_matrix=False, **kwargs):
-
-        super().__init__(*args, autogen=False, **kwargs)
-
-        if autogen:
-            self.generate(generate_bundle=generate_bundle,
-                          from_bundle_coords=from_bundle_coords,
-                          from_scaling_matrix=from_scaling_matrix)
-
-    def generate(self, generate_bundle=True, from_bundle_coords=False,
-                 from_scaling_matrix=False):
+class NanotubeBundleGeneratorMixin:
+    """Mixin class for generating nanotube bundles."""
+    def generate(self, from_scaling_matrix=False):
         """Generate structure data."""
-        if generate_bundle:
-            if from_bundle_coords or self.bundle_geometry is not None:
-                super().generate()
-                self.generate_bundle_from_bundle_coords()
-            else:
+        if self.is_bundle:
+            if from_scaling_matrix:
+                # First, set the CrystalCell.scaling_matrix, then
+                # generate StructureAtoms from the CrystalCell.BasisAtoms
                 self.generate_bundle_from_scaling_matrix()
                 super().generate()
+            else:
+                # First, generate the StructureAtoms from the
+                # CrystalCell.BasisAtoms, then copy the StructureAtoms to
+                # the bundle coordinates
+                super().generate()
+                self.generate_bundle_from_bundle_coords()
         else:
             super().generate()
 
@@ -48,7 +42,7 @@ class NanotubeGeneratorBase(GeneratorBase):
             bundle coordinates."""
         atomsobj0 = copy.deepcopy(self.atoms)
         atomsobj0.center_centroid()
-        self.structure_data.clear()
+        self.structure.clear()
         for mol_id, dr in enumerate(self.bundle_coords, start=1):
             atomsobj = copy.deepcopy(atomsobj0)
             atomsobj.translate(dr)
@@ -60,5 +54,15 @@ class NanotubeGeneratorBase(GeneratorBase):
         """Generate bundle atoms by setting the \
             :attr:`~sknano.core.crystallography.CrystalCell.scaling_matrix`
             attribute."""
-        self.structure_data.clear()
+        self.structure.clear()
         self.crystal_cell.scaling_matrix = [self.nx, self.ny, 1]
+
+
+class NanotubeGeneratorBase(NanotubeBundleGeneratorMixin):
+    """Base class for generating nanotubes."""
+    def __init__(self, *args, autogen=True, from_scaling_matrix=False,
+                 **kwargs):
+        super().__init__(*args, autogen=False, **kwargs)
+
+        if autogen:
+            self.generate(from_scaling_matrix=from_scaling_matrix)

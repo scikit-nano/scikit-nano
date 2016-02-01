@@ -15,15 +15,14 @@ __docformat__ = 'restructuredtext en'
 import os
 # import numpy as np
 
-from sknano.io import XYZReader
 from sknano.core.structures import Fullerene
 # from sknano.core.geometric_regions import Cuboid
-from ._base import GeneratorBase
+from ._base import GeneratorBase, GeneratorMixin
 
 __all__ = ['FullereneGenerator']
 
 
-class FullereneGenerator(GeneratorBase, Fullerene):
+class FullereneGenerator(GeneratorMixin, GeneratorBase, Fullerene):
     """Fullerene structure generator class.
 
     Parameters
@@ -41,9 +40,6 @@ class FullereneGenerator(GeneratorBase, Fullerene):
     >>> fg.save(fname='C60.data')
 
     """
-    def generate(self):
-        """Generate structure data."""
-        self._atoms = XYZReader(self.datafile).atoms
 
     @classmethod
     def generate_fname(cls, datafile):

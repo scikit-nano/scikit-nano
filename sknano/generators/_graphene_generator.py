@@ -17,7 +17,8 @@ import numpy as np
 
 from sknano.core.math import Vector
 from sknano.core.crystallography import SuperCell
-from sknano.core.structures import PrimitiveCellGraphene, ConventionalCellGraphene
+from sknano.core.structures import PrimitiveCellGraphene, \
+    ConventionalCellGraphene
 from ._base import Atom, Atoms, GeneratorBase
 
 __all__ = ['GrapheneGenerator',
@@ -65,7 +66,7 @@ class GrapheneGeneratorBase(GeneratorBase):
     def generate(self):
         """Generate the full structure coordinates."""
 
-        self.structure_data.clear()
+        self.structure.clear()
         layer0 = Atoms()
         for atom in SuperCell(self.unit_cell, [self.n1, self.n2, 1]):
             layer0.append(Atom(**atom.todict()))
@@ -83,6 +84,7 @@ class GrapheneGeneratorBase(GeneratorBase):
             layer.rotate(angle=self.layer_rotation_angles[nlayer], axis='z')
             self.atoms.extend(layer)
             self.layers.append(layer)
+        self.finalize()
 
     @classmethod
     def generate_fname(cls, nlayers=None, basis=None, **kwargs):
