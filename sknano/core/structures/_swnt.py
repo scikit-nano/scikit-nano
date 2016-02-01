@@ -1269,11 +1269,6 @@ class SWNTMixin:
         return self.Natoms
 
     @property
-    def Ntubes(self):
-        """Number of nanotubes."""
-        return 1
-
-    @property
     def linear_mass_density(self):
         """Linear mass density of nanotube in g/nm."""
         return compute_linear_mass_density(self.n, self.m, bond=self.bond,
@@ -1320,9 +1315,8 @@ class SWNTBase(SWNTMixin, NanoStructureBase):
                         'chiral_angle', 'Ch', 'T', 'dt', 'rt',
                         'electronic_type']
 
-    def __init__(self, *Ch, nz=None, basis=['C', 'C'], bond=aCC,
-                 gutter=None, Lz=None, fix_Lz=False, wrap_coords=False,
-                 **kwargs):
+    def __init__(self, *Ch, nz=None, gutter=None, Lz=None, fix_Lz=False,
+                 wrap_coords=False, **kwargs):
 
         n, m, kwargs = get_chiral_indices(*Ch, **kwargs)
 
@@ -1330,7 +1324,7 @@ class SWNTBase(SWNTMixin, NanoStructureBase):
             Lz = kwargs['tube_length']
             del kwargs['tube_length']
 
-        super().__init__(basis=basis, bond=bond, **kwargs)
+        super().__init__(**kwargs)
 
         if gutter is None:
             gutter = self.vdw_radius

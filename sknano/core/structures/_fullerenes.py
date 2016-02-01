@@ -18,8 +18,12 @@ from pkg_resources import resource_filename
 import numbers
 import os
 
-from sknano.core import BaseClass, listdir_dirnames, listdir_fnames
-from sknano.core.crystallography import BaseStructure
+import numpy as np
+
+from sknano.core import listdir_dirnames, listdir_fnames
+from sknano.core.atoms import BasisAtom, BasisAtoms
+from sknano.core.crystallography import Crystal3DLattice, UnitCell
+from ._base import CrystalStructureBase
 
 __all__ = ['Fullerene', 'Fullerenes', 'load_fullerene_data']
 
@@ -91,7 +95,7 @@ def load_fullerene_data():
     return datadict
 
 
-class Fullerene(BaseStructure, BaseClass):
+class Fullerene(CrystalStructureBase):
     """Fullerene structure class.
 
     The `fullerene data
@@ -137,6 +141,7 @@ class Fullerene(BaseStructure, BaseClass):
             self._PG = PG
             self._Niso = Niso
 
+        self.generate_unit_cell()
         self.fmtstr = "N={N!r}, PG={PG!r}, Niso={Niso!r}"
 
     def __str__(self):
@@ -236,6 +241,20 @@ class Fullerene(BaseStructure, BaseClass):
             return self.data['point_groups']
         except TypeError:
             return None
+
+    def generate_unit_cell(self):
+        from sknano.io import XYZReader
+        atoms = XYZReader(self.datafile).atoms
+        bounding_box = atoms.bounding_box
+        a = np.sqrt(2) * (max(bounding_box.abc) + 3.4)
+        lattice = Crystal3DLattice.cubic(a)
+        basis = BasisAtoms()
+        for atom in atoms:
+            xs, ys, zs = lattice.cartesian_to_fractional(atom.r)
+            basis.append(BasisAtom(atom.element, lattice=lattice,
+                                   xs=xs, ys=ys, zs=zs))
+
+        self.unit_cell = UnitCell(lattice=lattice, basis=basis)
 
     def todict(self):
         """Return :class:`~python:dict` of `Fullerene` attributes."""

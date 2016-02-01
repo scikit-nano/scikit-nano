@@ -26,23 +26,20 @@ __all__ = ['BaseStructureMixin', 'BaseStructure', 'StructureData',
 
 r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
+_list_methods = ('append', 'extend', 'insert', 'remove', 'pop', 'clear',
+                 'index', 'count', 'sort', 'reverse', 'copy')
+
 
 class BaseStructureMixin:
     """Mixin class for crystal structures."""
 
-    # def __deepcopy__(self, memo):
-    #     from copy import deepcopy
-    #     cp = self.__class__()
-    #     memo[id(self)] = cp
-    #     for attr in dir(self):
-    #         if not attr.startswith('_'):
-    #             setattr(cp, attr, deepcopy(getattr(self, attr), memo))
-    #     return cp
-
     def __getattr__(self, name):
         try:
+            if name not in _list_methods and not name.startswith('_') \
+                    and len(self.atoms) == 0:
+                raise ValueError
             return getattr(self.atoms, name)
-        except AttributeError:
+        except (AttributeError, ValueError):
             try:
                 return getattr(self.crystal_cell, name)
             except AttributeError:
@@ -124,11 +121,12 @@ class BaseStructureMixin:
         self.atoms.rotate(**kwargs)
 
     def translate(self, t, fix_anchor_points=True):
-        """Translate crystal cell basis."""
+        """Translate crystal cell lattice, basis, and unit cell."""
         self.crystal_cell.translate(t, fix_anchor_points=fix_anchor_points)
         self.atoms.translate(t, fix_anchor_points=fix_anchor_points)
 
     def transform_lattice(self, scaling_matrix, wrap_coords=False, pbc=None):
+        """Transform structure lattice."""
         if self.lattice is None:
             return
         self.lattice = self.lattice.__class__(
@@ -156,6 +154,15 @@ class BaseStructureMixin:
         #             BasisAtom(atom.element, lattice=self.lattice,
         #                       xs=xs, ys=ys, zs=zs))
 
+    # def __deepcopy__(self, memo):
+    #     from copy import deepcopy
+    #     cp = self.__class__()
+    #     memo[id(self)] = cp
+    #     for attr in dir(self):
+    #         if not attr.startswith('_'):
+    #             setattr(cp, attr, deepcopy(getattr(self, attr), memo))
+    #     return cp
+
 
 class BaseStructure(BaseStructureMixin):
     """Base structure class for structure data."""
@@ -181,10 +188,10 @@ class CrystalStructureBase(BaseStructure, BaseClass):
 
     """
 
-    def __init__(self, lattice=None, basis=None, coords=None,
+    def __init__(self, *args, lattice=None, basis=None, coords=None,
                  cartesian=False, scaling_matrix=None, **kwargs):
 
-        super().__init__(**kwargs)
+        super().__init__(*args, **kwargs)
         self.unit_cell = UnitCell(lattice=lattice, basis=basis,
                                   coords=coords, cartesian=cartesian)
 
@@ -223,15 +230,17 @@ class NanoStructureBase(BaseStructure, BaseClass):
 
         if basis is None:
             basis = ['C', 'C']
-        basis = basis[:]
 
-        if 'element1' in kwargs:
-            basis[0] = kwargs['element1']
-            del kwargs['element1']
+        if isinstance(basis, list):
+            basis = basis[:]
 
-        if 'element2' in kwargs:
-            basis[1] = kwargs['element2']
-            del kwargs['element2']
+            if 'element1' in kwargs:
+                basis[0] = kwargs['element1']
+                del kwargs['element1']
+
+            if 'element2' in kwargs:
+                basis[1] = kwargs['element2']
+                del kwargs['element2']
 
         if 'vdw_spacing' in kwargs:
             vdw_radius = kwargs['vdw_spacing'] / 2

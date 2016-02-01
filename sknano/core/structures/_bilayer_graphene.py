@@ -19,5 +19,4 @@ __all__ = ['BilayerGraphene']
 class BilayerGraphene(Graphene):
     """Bilayer Graphene structure class."""
     def __init__(self, **kwargs):
-
         super().__init__(nlayers=2, **kwargs)

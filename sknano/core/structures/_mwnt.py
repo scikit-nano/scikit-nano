@@ -13,8 +13,9 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-# from sknano.core.crystallography import Crystal3DLattice, UnitCell
-from sknano.core.refdata import aCC, element_data
+from sknano.core.atoms import BasisAtoms
+from sknano.core.crystallography import UnitCell
+from sknano.core.refdata import element_data
 
 from ._base import NanoStructureBase, r_CC_vdw
 from ._nanotube_base import NanotubeBase
@@ -77,17 +78,12 @@ class MWNTMixin:
            N_{\\mathrm{atoms}} = \\sum_{\\mathrm{walls}}
 
         """
-        return np.asarray(self.Natoms_per_wall).sum()
+        return sum(self.Natoms_per_wall)
 
     @property
     def Natoms_per_tube(self):
         """Number of atoms in `MWNT`."""
         return self.Natoms
-
-    @property
-    def Ntubes(self):
-        """Number of `MWNT`\ s."""
-        return 1
 
     @property
     def Nwalls(self):
@@ -136,7 +132,7 @@ class MWNTMixin:
     @property
     def tube_mass(self):
         """MWNT mass in **grams**."""
-        return np.asarray([swnt.tube_mass for swnt in self.walls]).sum()
+        return sum(swnt.tube_mass for swnt in self.walls)
 
     # @property
     # def Lz(self):
@@ -344,12 +340,12 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
     def __init__(self, Ch_list=None, Nwalls=None, Lz=None,
                  min_wall_diameter=None, max_wall_diameter=None,
                  max_walls=None, chiral_types=None, wall_spacing=2 * r_CC_vdw,
-                 basis=['C', 'C'], bond=aCC, **kwargs):
+                 **kwargs):
         if Ch_list is None and 'Ch' in kwargs:
             Ch_list = kwargs['Ch']
             del kwargs['Ch']
 
-        super().__init__(basis=basis, bond=bond, **kwargs)
+        super().__init__(**kwargs)
 
         if Ch_list is None or not isinstance(Ch_list, list):
             Ch_list = \
@@ -369,7 +365,7 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
             Lz = 1.0
         self.Lz = Lz
 
-        self.unit_cell = self.get_wall(self.Ch_list[-1]).unit_cell
+        self.generate_unit_cell()
 
         if self.verbose:
             print(self.walls)
@@ -379,6 +375,13 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
             "max_wall_diameter={max_wall_diameter!r}, " + \
             "max_walls={max_walls!r}, chiral_types={chiral_types!r}, " + \
             "wall_spacing={wall_spacing!r}"
+
+    def generate_unit_cell(self):
+        outside_unit_cell = self.get_wall(self.Ch_list[-1]).unit_cell
+        basis = BasisAtoms()
+        [basis.extend(swnt.unit_cell.basis) for swnt in self.walls]
+        self.unit_cell = UnitCell(lattice=outside_unit_cell.lattice,
+                                  basis=basis)
 
     def todict(self):
         """Return :class:`~python:dict` of `MWNT` attributes."""

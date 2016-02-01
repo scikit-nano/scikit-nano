@@ -131,6 +131,7 @@ class NanotubeBundleMixin:
 
     @property
     def bundle_geometry(self):
+        """Bundle geometry."""
         return self._bundle_geometry
 
     @bundle_geometry.setter
@@ -142,6 +143,7 @@ class NanotubeBundleMixin:
 
     @property
     def bundle_packing(self):
+        """Bundle packing."""
         return self._bundle_packing
 
     @bundle_packing.setter
@@ -165,6 +167,7 @@ class NanotubeBundleMixin:
 
     @property
     def bundle_mass(self):
+        """Bundle mass."""
         return self.Ntubes * self.tube_mass
 
     @property
@@ -177,25 +180,49 @@ class NanotubeBundleMixin:
            the bundle.
 
         """
-        return np.asarray(self.Natoms_list).sum()
+        if self.is_bundle:
+            return sum(self.Natoms_list)
+        return super().Natoms
 
     @property
     def Natoms_per_bundle(self):
+        """Alias for :attr:`~NanotubeBundleMixin.Natoms`."""
         return self.Natoms
 
     @property
     def Natoms_list(self):
-        return [nanotube.Natoms for nanotube in self.bundle_list]
+        """:class:`~python:list` of `Natoms` per nanotube in bundle."""
+        if self.is_bundle:
+            return [nanotube.Natoms for nanotube in self.bundle_list]
+        return super().Natoms_list
 
     @property
     def Ntubes(self):
-        return len(self.bundle_coords)
+        """Number of nanotubes in bundle."""
+        try:
+            return len(self.bundle_coords)
+        except AttributeError:
+            return 1
 
     @property
     def Natoms_per_tube(self):
         """Alias for :attr:`~NanotubeBundleMixin.Natoms_list`."""
-        val = self.Natoms_list[:]
-        return val if len(val) > 1 else val[0]
+        try:
+            val = self.Natoms_list[:]
+            return val if len(val) > 1 else val[0]
+        except AttributeError:
+            return super().Natoms_per_tube
+
+    def init_bundle_parameters(self):
+        self.bundle_list = []
+        self.generate_bundle_coords()
+        fmtstr = super().fmtstr
+        match = re.search('[nL]z=', fmtstr)
+        if match:
+            self.fmtstr = fmtstr[:match.start()] + \
+                "nx={nx!r}, ny={ny!r}, " + fmtstr[match.start():] + \
+                ", bundle_packing={bundle_packing!r}, " + \
+                "bundle_geometry={bundle_geometry!r}"
 
     def generate_bundle_coords(self):
         """Generate coordinates of bundle tubes."""
@@ -262,28 +289,25 @@ class NanotubeBase(NanotubeBundleMixin):
 
     _bundle_geometries = ['square', 'rectangle', 'hexagon']
 
-    def __init__(self, *args, nx=1, ny=1, bundle_packing=None,
-                 bundle_geometry=None, **kwargs):
+    def __init__(self, *args, basis=['C', 'C'], bond=aCC, nx=1, ny=1,
+                 bundle_packing=None, bundle_geometry=None, **kwargs):
 
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, basis=basis, bond=bond, **kwargs)
 
         self.nx = nx
         self.ny = ny
         self.bundle_geometry = bundle_geometry
         self.bundle_packing = bundle_packing
-        self.bundle_list = []
-        self.generate_bundle_coords()
-        fmtstr = super().fmtstr
-        match = re.search('[nL]z=', fmtstr)
-        if match:
-            self.fmtstr = fmtstr[:match.start()] + \
-                "nx={nx!r}, ny={ny!r}, " + fmtstr[match.start():] + \
-                ", bundle_packing={bundle_packing!r}, " + \
-                "bundle_geometry={bundle_geometry!r}"
+
+        self.is_bundle = False
+        if nx != 1 or ny != 1 or bundle_geometry is not None:
+            self.is_bundle = True
+            self.init_bundle_parameters()
 
     def todict(self):
         attrdict = super().todict()
-        attrdict.update(dict(nx=self.nx, ny=self.ny,
-                             bundle_packing=self.bundle_packing,
-                             bundle_geometry=self.bundle_geometry))
+        if self.is_bundle:
+            attrdict.update(dict(nx=self.nx, ny=self.ny,
+                                 bundle_packing=self.bundle_packing,
+                                 bundle_geometry=self.bundle_geometry))
         return attrdict

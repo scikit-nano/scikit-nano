@@ -59,5 +59,19 @@ def test6():
     assert_equal(bundle.Ntubes, 10)
 
 
+def test7():
+    Ch_list = [(5, 0), (10, 0)]
+    mwnt = MWNT(Ch_list=Ch_list, Lz=1.0)
+    print('\nmwnt.Natoms')
+    print(mwnt.Natoms)
+    # print('\nmwnt.Natoms_list')
+    # print(mwnt.Natoms_list)
+    print([swnt.unit_cell.basis.Natoms for swnt in mwnt.walls])
+    # print('mwnt.walls')
+    # print(mwnt.walls)
+    print('\nmwnt.crystal_cell.Natoms')
+    print(mwnt.crystal_cell.Natoms)
+
+
 if __name__ == '__main__':
     nose.runmodule()

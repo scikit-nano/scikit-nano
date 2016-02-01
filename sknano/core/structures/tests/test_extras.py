@@ -29,9 +29,8 @@ def test3():
 def test4():
     Ch_list = generate_Ch_list(ni=5, nf=20, mi=0, mf=20,
                                chiral_types='achiral')
-    print(Ch_list)
+    assert_equal(len(Ch_list), 3 * 16)
     chiral_types = [get_chiral_type(Ch) for Ch in Ch_list]
-    print(set(chiral_types))
     assert_equal(set(chiral_types), {'armchair', 'zigzag'})
 
 

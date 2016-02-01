@@ -80,11 +80,25 @@ class GrapheneMixin:
     """Mixin class for graphene structure classes."""
     @property
     def n1(self):
-        return int(np.ceil(10 * self.l1 / self.unit_cell.a1.length))
+        try:
+            return self._n1
+        except AttributeError:
+            return int(np.ceil(10 * self.l1 / self.unit_cell.a1.length))
+
+    @n1.setter
+    def n1(self, value):
+        self._n1 = int(value)
 
     @property
     def n2(self):
-        return int(np.ceil(10 * self.l2 / self.unit_cell.a2.length))
+        try:
+            return self._n2
+        except AttributeError:
+            return int(np.ceil(10 * self.l2 / self.unit_cell.a2.length))
+
+    @n2.setter
+    def n2(self, value):
+        self._n2 = int(value)
 
     @property
     def r1(self):
@@ -230,7 +244,7 @@ class PrimitiveCellGraphene(GrapheneBase):
 
     Parameters
     ----------
-    edge_length : float
+    edge_length : float, optional
         length of graphene edges
     basis : {:class:`python:list`}, optional
         List of :class:`python:str`\ s of element symbols or atomic number
@@ -259,7 +273,7 @@ class PrimitiveCellGraphene(GrapheneBase):
 
     """
 
-    def __init__(self, edge_length=None, **kwargs):
+    def __init__(self, edge_length=None, ncells=None, **kwargs):
 
         self.edge_length = edge_length
         self.l1 = self.l2 = self.edge_length
@@ -318,7 +332,7 @@ class ConventionalCellGraphene(GrapheneBase):
     """
 
     def __init__(self, armchair_edge_length=None, zigzag_edge_length=None,
-                 **kwargs):
+                 n1=None, n2=None, **kwargs):
 
         if 'length' in kwargs:
             armchair_edge_length = kwargs['length']
