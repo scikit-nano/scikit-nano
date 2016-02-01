@@ -13,6 +13,8 @@ This module allows for easy structure generation from the command line.
 
 .. seealso::
 
+   :class:`~sknano.generators.FullereneGenerator`
+
    :class:`~sknano.generators.GrapheneGenerator`
 
    :class:`~sknano.generators.BilayerGrapheneGenerator`
@@ -23,32 +25,26 @@ This module allows for easy structure generation from the command line.
 
    :class:`~sknano.generators.MWNTGenerator`
 
-.. code-block:: python
+.. code-block:: sh
 
    > nanogen --help
 
-     usage: nanogen [-h] [--basis ELEMENT1 ELEMENT2] [--bond BOND] [--fname FNAME]
-                    [--structure-format {data,xyz}] [--verbose] [--debug]
-                    [--version]
-                    {graphene,bilayer_graphene,swnt,unrolled_swnt,mwnt,swnt_bundle,mwnt_bundle}
-                    ...
+     usage: nanogen [-h] [--fname FNAME] [--structure-format {data,xyz}]
+               [--debug] [--verbose] [--version]
+               {fullerene,graphene,bilayer_graphene,unrolled_swnt,swnt,mwnt}
+               ...
 
      optional arguments:
        -h, --help            show this help message and exit
-       --basis ELEMENT1 ELEMENT2
-                             2 element symbols or atomic numbers of the two atom
-                             basis (default: ['C', 'C'])
-       --bond BOND           Bond length between nearest-neighbor atoms. Must be in
-                             units of Angstroms. (default: 1.42)
        --fname FNAME         structure file name
        --structure-format {data,xyz}
                              structure file format (default: xyz)
-       --verbose             verbose output
        --debug               debug output
+       --verbose             verbose output
        --version             show nanogen's version number and exit
 
      sub-commands:
-       {graphene,bilayer_graphene,swnt,unrolled_swnt,mwnt,swnt_bundle,mwnt_bundle}
+       {fullerene,graphene,bilayer_graphene,unrolled_swnt,swnt,mwnt}
 
 .. autofunction:: nanogen
 
@@ -66,23 +62,6 @@ long and saves the data in `xyz` format.::
 
     > nanogen swnt --Ch 20 0 --nz 5
 
-Notes
------
-The :mod:`nanogen` script calls the :func:`~sknano.scripts.nanogen.nanogen`
-function and neither the script nor the function allow for generating
-multiple structures per call. It's easy to do this using the scripting
-capabilities of the shell or from within an interactive Python session.
-
-For example, if you have a list of chiralities that you want structure data
-for, you can do something like this from within an interactive session::
-
-    >>> from sknano.core.structures import generate_Ch_list
-    >>> from sknano.generators import SWNTGenerator
-    >>> # Generate your list of (n, m) chiralities
-    >>> Ch_list = generate_Ch_list(ni=5, nf=25, mi=0, mf=25, handedness='right')
-    >>> for Ch in Ch_list:
-    ...     SWNTGenerator(Ch).save(structure_format='data')
-
 """
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
@@ -93,6 +72,7 @@ import importlib
 import sys
 
 from sknano.core.refdata import aCC, element_data
+# from sknano.core.structures import get_chiral_indices_from_str
 from ._parser import add_default_arguments
 
 _r_CC_vdw = element_data['C']['VanDerWaalsRadius']
@@ -105,15 +85,6 @@ def nanogen_parser():
         :class:`~python:argparse.ArgumentParser`."""
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--basis', type=str, nargs=2,
-                        metavar=('ELEMENT1', 'ELEMENT2'),
-                        default=['C', 'C'],
-                        help='2 element symbols or atomic numbers of the two '
-                        'atom basis (default: %(default)s)')
-    parser.add_argument('--bond', type=float, default=aCC,
-                        help='Bond length between nearest-neighbor atoms. '
-                        'Must be in units of Angstroms. '
-                        '(default: %(default)s)')
     parser.add_argument('--fname', help='structure file name')
     parser.add_argument('--structure-format', default='xyz',
                         choices=('data', 'xyz'),
@@ -121,6 +92,20 @@ def nanogen_parser():
     parser = add_default_arguments(parser)
 
     subparsers = parser.add_subparsers(title='sub-commands')
+
+    fullerene_parser = subparsers.add_parser('fullerene')
+    fullerene_parser.add_argument('N', type=int, help='The N in C_N')
+    fullerene_parser.set_defaults(generator_class='FullereneGenerator')
+
+    nanostructure_parent_parser = argparse.ArgumentParser(add_help=False)
+    nanostructure_parent_parser.add_argument(
+        '--basis', type=str, nargs=2, metavar=('ELEMENT1', 'ELEMENT2'),
+        default=['C', 'C'], help='2 element symbols or atomic numbers of the '
+        'two atom basis (default: %(default)s)')
+    nanostructure_parent_parser.add_argument(
+        '--bond', type=float, default=aCC, help='Bond length between '
+        'nearest-neighbor atoms. Must be in units of Angstroms. '
+        '(default: %(default)s)')
 
     graphene_parent_parser = argparse.ArgumentParser(add_help=False)
     graphene_parent_parser.add_argument('--layer-spacing', type=float,
@@ -145,7 +130,8 @@ def nanogen_parser():
                                         'layers (default: %(default)s)')
 
     graphene_parser = \
-        subparsers.add_parser('graphene', parents=[graphene_parent_parser])
+        subparsers.add_parser('graphene', parents=[nanostructure_parent_parser,
+                                                   graphene_parent_parser])
     graphene_parser.add_argument('--nlayers', type=int, default=1,
                                  help='Number of graphene layers. '
                                  '(default: %(default)s)')
@@ -175,14 +161,15 @@ def nanogen_parser():
 
     bilayer_graphene_parser = \
         subparsers.add_parser('bilayer_graphene',
-                              parents=[graphene_parent_parser])
+                              parents=[nanostructure_parent_parser,
+                                       graphene_parent_parser])
     bilayer_graphene_parser.set_defaults(
         generator_class='BilayerGrapheneGenerator')
 
     swnt_parent_parser = argparse.ArgumentParser(add_help=False)
     swnt_parent_parser.add_argument('--Ch', type=int, nargs=2,
                                     metavar=('n', 'm'),
-                                    default=(10, 10),
+                                    default=(5, 0),
                                     help='Chiral indices (`n`, `m`) '
                                     '(default: %(default)s)')
     swnt_parent_parser_group = \
@@ -201,7 +188,9 @@ def nanogen_parser():
         'non integer `nz` cells are permitted. (default: %(default)s)')
 
     unrolled_swnt_parser = \
-        subparsers.add_parser('unrolled_swnt', parents=[swnt_parent_parser])
+        subparsers.add_parser('unrolled_swnt',
+                              parents=[nanostructure_parent_parser,
+                                       swnt_parent_parser])
 
     unrolled_swnt_parser_group = \
         unrolled_swnt_parser.add_mutually_exclusive_group()
@@ -221,11 +210,12 @@ def nanogen_parser():
     unrolled_swnt_parser.set_defaults(generator_class='UnrolledSWNTGenerator')
 
     mwnt_parent_parser = argparse.ArgumentParser(add_help=False)
-    mwnt_parent_parser.add_argument('--Ch-list', type=list,
-                                    default=None,
-                                    help='list of (`n`, `m`) chiralities '
-                                    'for each `SWNT` wall in `MWNT` '
-                                    '(default: %(default)s)')
+    mwnt_parent_parser.add_argument('--Ch', default=None, metavar=('n', 'm'),
+                                    type=int, nargs=2, action='append',
+                                    help='Use this command multiple times to '
+                                    'generate a list of (`n`, `m`) '
+                                    'chiralities for each `SWNT` wall in '
+                                    '`MWNT` (default: %(default)s)')
     mwnt_parent_parser.add_argument('--Nwalls', type=int,
                                     default=3,
                                     help='Number of `SWNT` walls in `MWNT` '
@@ -262,12 +252,14 @@ def nanogen_parser():
                                       '(default: %(default)s)')
 
     swnt_parser = \
-        subparsers.add_parser('swnt', parents=[swnt_parent_parser,
+        subparsers.add_parser('swnt', parents=[nanostructure_parent_parser,
+                                               swnt_parent_parser,
                                                bundle_parent_parser])
     swnt_parser.set_defaults(generator_class='SWNTGenerator')
 
     mwnt_parser = \
-        subparsers.add_parser('mwnt', parents=[mwnt_parent_parser,
+        subparsers.add_parser('mwnt', parents=[nanostructure_parent_parser,
+                                               mwnt_parent_parser,
                                                bundle_parent_parser])
     mwnt_parser.set_defaults(generator_class='MWNTGenerator')
 
@@ -276,7 +268,7 @@ def nanogen_parser():
 
 def nanogen(generator_class=None, fname=None, structure_format='xyz',
             **kwargs):
-    """Generate nano-structure data.
+    """Function for the nanogen script.
 
     Parameters
     ----------
