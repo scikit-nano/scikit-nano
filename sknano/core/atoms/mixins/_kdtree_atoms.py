@@ -21,11 +21,13 @@ import numpy as np
 
 try:
     from scipy.spatial import KDTree
+    # from scipy.spatial import cKDTree as KDTree
 except ImportError:
     raise ImportError('Install scipy version >= 0.13.0 to allow '
                       'nearest-neighbor queries between atoms.')
 
 from sknano.core import dedupe, flatten
+from sknano.core.analysis import PeriodicKDTree
 
 __all__ = ['KDTreeAtomsMixin']
 
@@ -61,8 +63,13 @@ class KDTreeAtomsMixin:
     def atom_tree(self):
         """:class:`~scipy:scipy.spatial.KDTree` of :attr:`~XAtoms.coords.`"""
         try:
-            return KDTree(self.coords)
-        except ValueError:
+            if np.any(self.pbc):
+                boxsize = np.asarray(self.lattice.lengths)
+                return PeriodicKDTree(np.asarray(self.coords), boxsize=boxsize,
+                                      lattice=self.lattice)
+            return KDTree(np.asarray(self.coords))
+        except ValueError as e:
+            print(e)
             return None
 
     def query_atom_tree(self, k=16, eps=0, p=2, rc=np.inf):
@@ -98,8 +105,8 @@ class KDTreeAtomsMixin:
         """
         atom_tree = self.atom_tree
         if atom_tree is not None:
-            d, i = atom_tree.query(self.coords, k=k+1, eps=eps, p=p,
-                                   distance_upper_bound=rc)
+            d, i = atom_tree.query(np.asarray(self.coords), k=k+1, eps=eps,
+                                   p=p, distance_upper_bound=rc)
             return d[:, 1:], i[:, 1:]
 
     def query_ball_point(self, pts, r, p=2.0, eps=0):
