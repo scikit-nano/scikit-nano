@@ -26,6 +26,7 @@ __all__ = ['NeighborAtomMixin', 'NeighborAtomsMixin']
 
 
 class NeighborAtomMixin:
+    """Mixin `Atom` class for neighbor analysis."""
 
     @CNAtom.CN.getter
     def CN(self):
@@ -37,6 +38,7 @@ class NeighborAtomMixin:
 
     @property
     def Nneighbors(self):
+        """Number of neighbors."""
         return self.neighbors.Natoms
 
     @property
@@ -82,6 +84,7 @@ class NeighborAtomMixin:
 
     @property
     def first_neighbors(self):
+        """First nearest neighbors."""
         return self.get_nth_nearest_neighbors(1)
 
     @first_neighbors.setter
@@ -90,6 +93,7 @@ class NeighborAtomMixin:
 
     @property
     def second_neighbors(self):
+        """Second nearest neighbors"""
         return self.get_nth_nearest_neighbors(2)
 
     @second_neighbors.setter
@@ -98,6 +102,7 @@ class NeighborAtomMixin:
 
     @property
     def third_neighbors(self):
+        """Third nearest neighbors"""
         return self.get_nth_nearest_neighbors(3)
 
     @third_neighbors.setter
@@ -116,6 +121,7 @@ class NeighborAtomMixin:
             return neighbors
 
     def set_nth_nearest_neighbors(self, n, neighbors):
+        """Set nth nearest neighbors"""
         # Since we're setting the nth set of neighbors, we will remove
         # all 1..n-1 neighbors from the nth set.
         # distances = distances
@@ -133,19 +139,8 @@ class NeighborAtomMixin:
 
 
 class NeighborAtomsMixin(KDTreeAtomsMixin):
-    """Atoms class for KDTree neighbor analysis.
+    """Mixin `Atoms` class for neighbor analysis."""
 
-    Parameters
-    ----------
-    atoms : {None, sequence, `NeighborAtoms`}, optional
-        if not `None`, then a list of `StructureAtom` instance objects or an
-        existing `NeighborAtoms` instance object.
-    kNN : :class:`~python:int`
-        Number of nearest neighbors to return when querying the kd-tree.
-    NNrc : :class:`~python:float`
-        Nearest neighbor radius cutoff.
-
-    """
     @property
     def neighbors(self):
         """Return array of neighbor atoms."""
@@ -162,6 +157,7 @@ class NeighborAtomsMixin(KDTreeAtomsMixin):
 
     @property
     def neighbor_distances(self):
+        """Neighbor distances"""
         distances = []
         # [distances.extend(atom.neighbor_distances.tolist()) for atom in self]
         [distances.extend(atom.neighbors.distances.tolist()) for atom in self]
@@ -235,6 +231,7 @@ class NeighborAtomsMixin(KDTreeAtomsMixin):
                 pass
 
     def update_neighbor_lists(self):
+        """Update neighbor lists"""
         self._update_nn_lists()
         self._update_nn_seed_list()
         self._update_nn_vectors()
@@ -242,30 +239,35 @@ class NeighborAtomsMixin(KDTreeAtomsMixin):
 
     @property
     def nn_adjacency_matrix(self):
+        """Return nearest-neighbor adjacency matrix."""
         if self._nn_adjacency_matrix is None:
             self._update_nn_adjacency_matrix()
         return self._nn_adjacency_matrix
 
     @property
     def nn_adjacency_map(self):
+        """Return nearest-neighbor adjacency map"""
         if self._nn_adjacency_map is None:
             self._update_nn_adjacency_map()
         return self._nn_adjacency_map
 
     @property
     def nn_adjacency_list(self):
+        """Return nearest-neighbor adjacency list"""
         if self._nn_adjacency_list is None:
             self._update_nn_adjacency_list()
         return self._nn_adjacency_list
 
     @property
     def nn_seed_list(self):
+        """Return nearest-neighbor seed list"""
         if self._nn_seed_list is None:
             self._update_nn_seed_list()
         return self._nn_seed_list
 
     @property
     def nn_vectors(self):
+        """Return nearest-neighbor vectors."""
         if self._nn_vectors is None:
             self._update_nn_vectors()
         return self._nn_vectors
@@ -288,8 +290,8 @@ class NeighborAtomsMixin(KDTreeAtomsMixin):
 
     def _update_nn_seed_list(self):
         n = self.Natoms
-        idx = self.idx
         nnn = self.NNN
+        idx = self.idx
         nn_seed_list = (n + 1) * [0]
         for k in range(n):
             nn_seed_list[k] = -1
@@ -302,6 +304,8 @@ class NeighborAtomsMixin(KDTreeAtomsMixin):
 
     def _update_nn_adjacency_matrix(self):
         Natoms = self.Natoms
+        nn_seed = self.nn_seed_list
+        nn_idx = self.nn_idx
         nn_adjacency_matrix = np.zeros((Natoms, Natoms), dtype=int)
         # self._update_nn_lists()
 
@@ -315,30 +319,39 @@ class NeighborAtomsMixin(KDTreeAtomsMixin):
             nn_map = atom.nn_adjacency_map = {}
             nn_map[i] = 0
             indices = [i]
-            nindices = atom.neighbors.indices.tolist()
+            nindices = [nn_idx[si] for si in range(nn_seed[i], nn_seed[i+1])]
             _update_nn_adjacency_map(nn_map, indices, nindices)
             while len(nindices) > 0:
                 indices = nindices[:]
                 nindices = []
                 for ni in indices[:]:
                     nindices.extend(
-                        [nj for nj in self[ni].neighbors.indices.tolist()
-                         if nj not in nn_map])
+                        [nn_idx[nsi] for nsi in
+                         range(nn_seed[ni], nn_seed[ni+1])
+                         if nn_idx[nsi] not in nn_map])
                     _update_nn_adjacency_map(nn_map, indices, nindices)
             [nn_adjacency_matrix[i].__setitem__(j, nn_map[j])
-             for j in range(Natoms)]
+             for j in range(Natoms) if j in nn_map]
         self._nn_adjacency_matrix = nn_adjacency_matrix
 
     def _update_nn_adjacency_map(self):
+        Natoms = self.Natoms
+        nn_idx = self.nn_idx
+        nn_seed = self.nn_seed_list
         nn_adjacency_map = OrderedDict()
-        for i, atom in enumerate(self):
-            nn_adjacency_map[i] = atom.neighbors.indices.tolist()
+        for i in range(Natoms):
+            nn_adjacency_map[i] = \
+                [nn_idx[si] for si in range(nn_seed[i], nn_seed[i+1])]
         self._nn_adjacency_map = nn_adjacency_map
 
     def _update_nn_adjacency_list(self):
+        Natoms = self.Natoms
+        nn_idx = self.nn_idx
+        nn_seed = self.nn_seed_list
         nn_adjacency_list = []
-        for atom in self:
-            nn_adjacency_list.append(atom.neighbors.indices.tolist())
+        for i in range(Natoms):
+            nn_adjacency_list.append(
+                [nn_idx[si] for si in range(nn_seed[i], nn_seed[i+1])])
         self._nn_adjacency_list = nn_adjacency_list
 
     def _update_nn_vectors(self):
