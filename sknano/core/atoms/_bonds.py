@@ -102,10 +102,6 @@ class Bond(BaseClass):
         return tuple(self.atoms.ids)
 
     @property
-    def indices(self):
-        return tuple(self.atoms.indices)
-
-    @property
     def centroid(self):
         """:attr:`~sknano.core.atoms.XYZAtoms.centroid` of :class:`Bond` \
             :attr:`~Bond.atoms`."""
@@ -171,18 +167,6 @@ class Bonds(UserList):
         return len(self)
 
     @property
-    def unique_set(self):
-        """Return new Bonds object containing the set of unique bonds."""
-        seen = set()
-        unique_bonds = []
-        for bond in self:
-            if bond.ids not in seen and tuple(reversed(bond.ids)) not in seen:
-                unique_bonds.append(bond)
-                seen.add(bond.ids)
-                seen.add(tuple(reversed(bond.ids)))
-        return self.__class__(bonds=unique_bonds)
-
-    @property
     def vectors(self):
         """:class:`~numpy:numpy.ndarray` of :attr:`~Bond.vector`\ s."""
         return np.asarray([bond.vector for bond in self])
@@ -246,13 +230,21 @@ class Bonds(UserList):
 
     @property
     def ids(self):
+        """Return array of :attr:`~Bond.ids`."""
         # return np.asarray([bond.ids for bond in self])
         return [bond.ids for bond in self]
 
     @property
-    def indices(self):
-        # return np.asarray([bond.indices for bond in self])
-        return [bond.indices for bond in self]
+    def unique_set(self):
+        """Return new Bonds object containing the set of unique bonds."""
+        seen = set()
+        unique_bonds = []
+        for bond in self:
+            if bond.ids not in seen and tuple(reversed(bond.ids)) not in seen:
+                unique_bonds.append(bond)
+                seen.add(bond.ids)
+                seen.add(tuple(reversed(bond.ids)))
+        return self.__class__(bonds=unique_bonds)
 
     def todict(self):
         return dict(bonds=self.data)
