@@ -35,6 +35,7 @@ class IDAtom(Atom):
     mol : int, optional
         molecule ID
     """
+
     def __init__(self, *args, id=0, serial=0, mol=0, **kwargs):
 
         if 'atomID' in kwargs:
@@ -123,11 +124,6 @@ class IDAtom(Atom):
         self._id = int(value)
 
     @property
-    def index(self):
-        """Return list index."""
-        return self.id - 1
-
-    @property
     def mol(self):
         """:attr:`~IDAtom.mol`."""
         return self._mol
@@ -202,14 +198,9 @@ class IDAtoms(Atoms):
     @property
     def ids(self):
         """Return array of :attr:`IDAtom.id`\ s."""
-        if len(set([atom.id for atom in self])) != self.Natoms:
+        if len(set([atom.id for atom in self])) != len(self):
             self.assign_unique_ids()
         return np.asarray([atom.id for atom in self])
-
-    @property
-    def indices(self):
-        """Return array of :attr:`IDAtom.index`\ s."""
-        return np.asarray([atom.index for atom in self])
 
     @property
     def atom_ids(self):
@@ -235,6 +226,11 @@ class IDAtoms(Atoms):
     def molecule_ids(self):
         """Alias for :attr:`~IDAtoms.mols`."""
         return self.mols
+
+    @property
+    def indices(self):
+        """Return array of :attr:`IDAtom.index`\ s."""
+        return np.asarray([self.index(atom) for atom in self])
 
     def assign_unique_ids(self, starting_id=1):
         """Assign unique :attr:`IDAtom.id` to each `IDAtom` in `IDAtoms`."""
