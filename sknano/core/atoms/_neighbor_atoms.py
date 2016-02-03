@@ -40,7 +40,23 @@ class NeighborAtom(NeighborAtomMixin, Atom):
 
 
 class NeighborAtoms(NeighborAtomsMixin, Atoms):
+    """`Atoms` class for neighbor analysis.
 
+    Parameters
+    ----------
+    atoms : {None, sequence, `NeighborAtoms`}, optional
+        if not `None`, then a list of `StructureAtom` instance objects or an
+        existing `NeighborAtoms` instance object.
+    kNN : :class:`~python:int`
+        Number of nearest neighbors to return when querying the kd-tree.
+    NNrc : :class:`~python:float`
+        Nearest neighbor radius cutoff.
+
+    Attributes
+    ----------
+    idx, nn_idx : :class:`~python:list`
+
+    """
     def __init__(self, *args, kNN=16, NNrc=2.0, **kwargs):
 
         super().__init__(*args, **kwargs)

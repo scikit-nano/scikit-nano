@@ -109,8 +109,10 @@ class VMDAtomsAdapterMixin:
 
 
 class AtomAdapterMixin(VMDAtomAdapterMixin):
+    """Mixin `Atom` class for 3rd party package compatibility."""
     pass
 
 
 class AtomsAdapterMixin(VMDAtomsAdapterMixin):
+    """Mixin `Atoms` class for 3rd party package compatibility."""
     pass

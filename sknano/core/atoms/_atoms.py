@@ -18,7 +18,7 @@ import re
 
 import numpy as np
 
-from sknano.core import BaseClass, UserList, dedupe, timethis
+from sknano.core import BaseClass, UserList, dedupe
 from sknano.core.math import convert_condition_str, rotation_matrix
 from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols, element_names
@@ -501,20 +501,17 @@ class Atoms(UserList):
 
     @property
     def elements(self):
-        """:class:`~numpy:numpy.ndarray` of :attr:`Atom.element`\ s \
-            in `Atoms`."""
+        """:class:`~numpy:numpy.ndarray` of :attr:`Atom.element`\ s."""
         return np.asarray([atom.element for atom in self])
 
     @property
     def masses(self):
-        """:class:`~numpy:numpy.ndarray` of :attr:`Atom.mass`\ s \
-            in `Atoms`."""
+        """:class:`~numpy:numpy.ndarray` of :attr:`Atom.mass`\ s."""
         return np.asarray([atom.mass for atom in self])
 
     @property
     def symbols(self):
-        """:class:`~numpy:numpy.ndarray` of :attr:`Atom.symbol`\ s \
-            in `Atoms`."""
+        """:class:`~numpy:numpy.ndarray` of :attr:`Atom.symbol`\ s."""
         return np.asarray([atom.symbol for atom in self])
 
     def filter(self, condition, invert=False):

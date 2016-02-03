@@ -9,13 +9,17 @@ Class representations of nature's building blocks (:mod:`sknano.core.atoms`)
 Contents
 ========
 
+Sub-package
+--------------
+
+* Mixin `Atom`/`Atoms` classes (:mod:`sknano.core.atoms.mixins`)
+
+Base `Atom`/`Atoms` classes
+---------------------------
 The `Atom` class represents a single atom. The `Atoms` class is a container
 class for `Atom` class instances. Sub-classes of `Atom` classes
 add new atom attributes to the `Atom` class. Every `Atom` sub-class
 has a corresponding container class that sub-classes the `Atoms` class.
-
-Base `Atom`/`Atoms` classes
----------------------------
 
 .. autosummary::
    :toctree: generated/
@@ -25,7 +29,6 @@ Base `Atom`/`Atoms` classes
 
 `Atom`/`Atoms` sub-classes
 ---------------------------
-
 .. autosummary::
    :toctree: generated/
 
@@ -56,9 +59,8 @@ Base `Atom`/`Atoms` classes
    XYZAtom
    XYZAtoms
 
-Combined sub-classes
----------------------
-
+Composite `Atom`/`Atoms` classes
+--------------------------------
 .. autosummary::
    :toctree: generated/
 
@@ -79,7 +81,6 @@ Combined sub-classes
 
 Classes for molecular dynamics simulations
 ------------------------------------------
-
 .. autosummary::
    :toctree: generated/
 
@@ -93,11 +94,6 @@ Helper functions for atom objects
    :toctree: generated/
 
    vdw_radius_from_basis
-
-Sub-packages
--------------
-
-* mixins (:mod:`sknano.core.atoms.mixins`)
 
 """
 from __future__ import absolute_import, division, print_function
