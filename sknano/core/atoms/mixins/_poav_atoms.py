@@ -19,7 +19,7 @@ import warnings
 import numpy as np
 np.seterr(all='warn')
 
-from sknano.core.math import vector as vec
+from sknano.core.math import vector as vec, Vectors
 
 __all__ = ['POAV', 'POAV1', 'POAV2', 'POAVR',
            'POAVAtomMixin', 'POAVAtomsMixin']
@@ -546,6 +546,10 @@ class POAVAtomMixin:
 class POAVAtomsMixin:
     """Mixin class for POAV analysis."""
 
+    def analyze_POAVs(self):
+        """Alias for :meth:`~POAVAtomsMixin.compute_POAVs`."""
+        self.compute_POAVs()
+
     # @timethis
     def compute_POAVs(self):
         """Compute `POAV1`, `POAV2`, `POAVR`."""
@@ -624,7 +628,7 @@ class POAVAtomsMixin:
 
         Parameters
         ----------
-        POAV_class : :class:`~python:str`
+        POAV_class : {'POAV1', 'POAV2', 'POAVR'}
         attr : :class:`~python:str`
 
         Returns
@@ -632,5 +636,22 @@ class POAVAtomsMixin:
         :class:`~python:list`
 
         """
-        return [getattr(getattr(atom, POAV_class), attr) for atom in self
-                if getattr(atom, POAV_class) is not None]
+        attr_values = []
+        attr_list = attr.split('.')
+        for atom in self:
+            POAV = getattr(atom, POAV_class)
+            if POAV is not None:
+                val = POAV
+                for attr in attr_list:
+                    val = getattr(val, attr)
+                attr_values.append(val)
+
+        if len(attr_list) == 1 and attr_list[0] in POAV_vectors:
+            attr_values = Vectors(attr_values)
+        return attr_values
+
+        # return [getattr(getattr(atom, POAV_class), attr) for atom in self
+        #         if getattr(atom, POAV_class) is not None]
+
+POAV_vectors = ('v1', 'v2', 'v3', 'vpi', 'V1', 'V2', 'V3', 'Vpi',
+                'reciprocal_v1', 'reciprocal_v2', 'reciprocal_v3')
