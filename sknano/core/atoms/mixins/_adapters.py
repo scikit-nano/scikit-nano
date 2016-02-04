@@ -22,6 +22,13 @@ __all__ = ['AtomAdapterMixin', 'AtomsAdapterMixin',
            'VMDAtomAdapterMixin', 'VMDAtomsAdapterMixin']
 
 
+vmd_keyword_map = {}
+vmd_keyword_map['index'] = 'vmd_indices'
+vmd_keyword_map['serial'] = 'ids'
+vmd_keyword_map['type'] = 'types'
+vmd_keyword_map['element'] = 'elements'
+
+
 class VMDAtomAdapterMixin:
     """An `Atom` mixin adapter class with atom attributes consistent
     with VMD atom attributes.
@@ -29,53 +36,47 @@ class VMDAtomAdapterMixin:
     """
 
     @property
-    def vmd_atom_id(self):
+    def vmd_index(self):
         """VMD atom index attribute."""
         return self.id - 1
-
-    @vmd_atom_id.setter
-    def vmd_atom_id(self, value):
-        """Set VMD atom index attribute.
-
-        Parameters
-        ----------
-        value : int
-            atom index
-
-        """
-        self.id = value + 1
 
 
 class VMDAtomsAdapterMixin:
     """An `Atoms` mixin adapter class with atom attributes consistent
-    with VMD atom attributes."""
+    with VMD atom attributes.
+
+
+    Notes
+    -----
+    The VMD indices are only consistent with VMD when the number of atoms
+    equals the maximum :class:`~sknano.core.atoms.IDAtom.id`.
+
+    """
 
     @property
-    def vmd_atom_ids(self):
+    def vmd_indices(self):
         """Array of VMD atom index attribute."""
         return np.asarray(self.ids) - 1
 
-    def filter_vmd_atom_ids(self, vmd_atom_ids, invert=False):
-        """Filter `Atoms` by :attr:`VMDAtomsAdapterMixin.ids` in
-        `vmd_atom_ids`.
+    def filter_vmd_indices(self, vmd_indices, invert=False):
+        """Filter `Atoms` by :attr:`VMDAtomsAdapterMixin.vmd_indices`.
 
         Parameters
         ----------
-        vmd_atom_ids : array_like
+        vmd_indices : array_like
         invert : bool, optional
 
         """
         mask = \
-            np.in1d(self.vmd_atom_ids, vmd_atom_ids, invert=invert).nonzero()
+            np.in1d(self.vmd_indices, vmd_indices, invert=invert).nonzero()
         self.data = np.asarray(self)[mask].tolist()
 
-    def filtered_vmd_atom_ids(self, vmd_atom_ids, invert=False):
-        """Return new `Atoms` filtered by :attr:`VMDAtomsAdapterMixin.ids` in
-        `vmd_atom_ids`.
+    def filtered_vmd_indices(self, vmd_indices, invert=False):
+        """Return new `Atoms` filtered by `vmd_indices`.
 
         Parameters
         ----------
-        vmd_atom_ids : array_like
+        vmd_indices : array_like
         invert : bool, optional
 
         Returns
@@ -85,16 +86,16 @@ class VMDAtomsAdapterMixin:
 
         """
         mask = \
-            np.in1d(self.vmd_atom_ids, vmd_atom_ids, invert=invert).nonzero()
+            np.in1d(self.vmd_indices, vmd_indices, invert=invert).nonzero()
         return self.__class__(atoms=np.asarray(self)[mask].tolist(),
                               **self.kwargs)
 
-    def get_atom_from_vmd_atom_id(self, vmd_atom_id):
+    def get_atom_from_vmd_index(self, vmd_index):
         """Get `Atom` by VMD atom index.
 
         Parameters
         ----------
-        vmd_atom_id : :class:`~python:int`
+        vmd_index : :class:`~python:int`
 
         Returns
         -------
@@ -102,10 +103,17 @@ class VMDAtomsAdapterMixin:
 
         """
         try:
-            return self[np.where(self.vmd_atom_ids == vmd_atom_id)[0]]
+            return self[np.where(self.vmd_indices == vmd_index)[0]]
         except TypeError:
-            print('No atom with id = {}'.format(vmd_atom_id))
+            print('No atom with id = {}'.format(vmd_index))
             return None
+
+    def get_vmd_selection_string(self, keyword):
+        """Get a VMD selection string for the VMD keyword."""
+        attr = vmd_keyword_map.get(keyword, keyword)
+        if hasattr(self, attr):
+            return ' '.join((keyword, ' '.join(map(str, getattr(self, attr)))))
+        return None
 
 
 class AtomAdapterMixin(VMDAtomAdapterMixin):
