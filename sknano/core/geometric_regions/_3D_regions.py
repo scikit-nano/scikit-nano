@@ -41,6 +41,7 @@ class Geometric3DRegion(GeometricRegion, GeometricTransformsMixin,
 
     @property
     def bounding_box(self):
+        """Bounding :class:`Cuboid`."""
         return Cuboid(pmin=self.pmin.tolist(), pmax=self.pmax.tolist())
 
 
@@ -357,16 +358,14 @@ class Cuboid(Geometric3DRegion):
     def __init__(self, pmin=None, pmax=None, xmin=0, ymin=0, zmin=0,
                  xmax=1, ymax=1, zmax=1):
         super().__init__()
-        self._pmin = Point()
-        self._pmax = Point()
 
         if pmin is None:
             pmin = [xmin, ymin, zmin]
-        self.pmin = pmin
+        self._pmin = Point(pmin)
 
         if pmax is None:
             pmax = [xmax, ymax, zmax]
-        self.pmax = pmax
+        self._pmax = Point(pmax)
 
         # assert self.pmin <= self.pmax
         assert np.all(np.less_equal(self.pmin, self.pmax))

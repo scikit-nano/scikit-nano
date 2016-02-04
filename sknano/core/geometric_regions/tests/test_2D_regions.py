@@ -57,6 +57,24 @@ def test_rectangle():
     assert_false(r.contains([1.1, 1.1]))
     assert_is_instance(r.centroid, Point)
 
+    pmin = [-10, -10]
+    pmax = [10, 10]
+    r = Rectangle(pmin=pmin, pmax=pmax)
+    assert_true(np.allclose(r.pmin, pmin))
+    assert_true(np.allclose(r.pmax, pmax))
+
+    pmin = [5, 5]
+    pmax = [10, 10]
+    r = Rectangle(pmin=pmin, pmax=pmax)
+    assert_true(np.allclose(r.pmin, pmin))
+    assert_true(np.allclose(r.pmax, pmax))
+
+    pmin = [-10, -10]
+    pmax = [-5, -5]
+    r = Rectangle(pmin=pmin, pmax=pmax)
+    assert_true(np.allclose(r.pmin, pmin))
+    assert_true(np.allclose(r.pmax, pmax))
+
 
 def test_circle():
     r = Circle()

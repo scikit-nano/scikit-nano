@@ -261,16 +261,13 @@ class Rectangle(Geometric2DRegion):
 
         super().__init__()
 
-        self._pmin = Point(nd=2)
-        self._pmax = Point(nd=2)
-
         if pmin is None:
             pmin = [xmin, ymin]
-        self.pmin = pmin
+        self._pmin = Point(pmin)
 
         if pmax is None:
             pmax = [xmax, ymax]
-        self.pmax = pmax
+        self._pmax = Point(pmax)
 
         assert np.all(np.less_equal(self.pmin, self.pmax))
         self.points.extend([self.pmin, self.pmax])
@@ -414,6 +411,13 @@ class Rectangle(Geometric2DRegion):
         ymax = self.ymax
 
         return (px >= xmin) and (px <= xmax) and (py >= ymin) and (py <= ymax)
+
+    def _update_pminmax(self):
+        pmin = self.pmin.copy()
+        pmax = self.pmax.copy()
+        self._pmin[:] = np.minimum(pmin, pmax)
+        self._pmax[:] = np.maximum(pmin, pmax)
+        assert np.all(np.less_equal(self.pmin, self.pmax))
 
     def todict(self):
         """Returns a :class:`~python:dict` of the :class:`Rectangle` \

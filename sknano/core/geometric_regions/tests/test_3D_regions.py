@@ -3,6 +3,8 @@
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
+import unittest
+
 import nose
 from nose.tools import assert_equal, assert_false, assert_true, \
     assert_is_instance
@@ -11,6 +13,37 @@ import numpy as np
 from sknano.core.geometric_regions import Parallelepiped, Cuboid, Cube, \
     Ellipsoid, Sphere, Cylinder, Cone
 from sknano.core.math import Point, Vector
+
+
+class GeometricRegionsTestFixture(unittest.TestCase):
+
+    @property
+    def parallelepiped(self):
+        return Parallelepiped()
+
+    @property
+    def cuboid(self):
+        return Cuboid()
+
+    @property
+    def cube(self):
+        return Cube()
+
+    @property
+    def ellipsoid(self):
+        return Ellipsoid()
+
+    @property
+    def sphere(self):
+        return Sphere()
+
+    @property
+    def cylinder(self):
+        return Cylinder()
+
+    @property
+    def cone(self):
+        return Cone()
 
 
 def test_parallelepiped():
@@ -32,6 +65,24 @@ def test_cuboid():
     assert_true(r.contains(r.centroid))
     assert_false(r.contains([-0.1, 0, 0]))
     assert_is_instance(r.centroid, Point)
+
+    pmin = [-10, -10, -10]
+    pmax = [10, 10, 10]
+    r = Cuboid(pmin=pmin, pmax=pmax)
+    assert_true(np.allclose(r.pmin, pmin))
+    assert_true(np.allclose(r.pmax, pmax))
+
+    pmin = [5, 5, 5]
+    pmax = [10, 10, 10]
+    r = Cuboid(pmin=pmin, pmax=pmax)
+    assert_true(np.allclose(r.pmin, pmin))
+    assert_true(np.allclose(r.pmax, pmax))
+
+    pmin = [-10, -10, -10]
+    pmax = [-5, -5, -5]
+    r = Cuboid(pmin=pmin, pmax=pmax)
+    assert_true(np.allclose(r.pmin, pmin))
+    assert_true(np.allclose(r.pmax, pmax))
 
 
 def test_cube():
