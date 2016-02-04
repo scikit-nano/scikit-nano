@@ -37,13 +37,11 @@ class KDTreeAtomsMixin:
 
     @property
     def kNN(self):
-        """Number of nearest neighbors to return when querying the kd-tree."""
+        """Max number of nearest-neighbors to return from kd-tree search."""
         return self._kNN
 
     @kNN.setter
     def kNN(self, value):
-        """Set maximum number of neighbors to return when querying
-        the kd-tree."""
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected an integer >= 0')
         self._kNN = self.kwargs['kNN'] = int(value)
@@ -174,7 +172,61 @@ class KDTreeAtomsMixin:
         return self.__class__(atoms=np.asarray(self)[NNi].tolist(),
                               **self.kwargs)
 
-    def count_neighbors(self, r):
+    def query_pairs(self, r, p=2.0, eps=0):
+        """Find all pairs of points within a distance `r`.
+
+        Parameters
+        ----------
+        r : positive float
+        p : float, optional
+        eps : float, optional
+
+        Returns
+        -------
+        results : set
+
+        """
+        atom_tree = self.atom_tree
+        if atom_tree is not None:
+            return atom_tree.query_pairs(r, p=p, eps=eps)
+
+    def count_neighbors(self, other, r, p=2.0):
+        """Count how many nearby neighbor pairs can be formed.
+
+        Count the number of pairs (x1, x2) that can be formed, with
+        `x1` drawn from `self` and `x2` drawn from `other`, and
+        where ``distance(x1, x2, p) <= r``.
+
+        Parameters
+        ----------
+        other : `KDTree`
+        r : float or one-dimensional array of floats
+        p : float, 1<=p<=infinity, optional
+
+        Returns
+        -------
+        result : int or 1-D array of ints
+
+        """
+        atom_tree = self.atom_tree
+        if atom_tree is not None:
+            return atom_tree.count_neighbors(other, r, p=p)
+
+    def count_neighbors_in_self(self, r, p=2.0):
+        """Count number of neighbor pairs for each atom in self.
+
+        Parameters
+        ----------
+        r : float or one-dimensional array of floats
+        p : float, 1<=p<=infinity, optional
+
+        Returns
+        -------
+        result : 1-D array of ints
+
+        """
+        r = np.asarray(r)
+        ids = self.ids
         return np.asarray([KDTree([atom.r]).count_neighbors(
-                           self.filtered(self.ids != atom.id).atom_tree,
-                           np.asarray(r)) for atom in self])
+                           self.filtered(ids != atom.id).atom_tree,
+                           r, p=p) for atom in self])
