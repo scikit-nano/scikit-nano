@@ -11,7 +11,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from collections import Counter, deque
+from collections import Counter, OrderedDict, deque
 
 import numpy as np
 
@@ -21,8 +21,14 @@ __all__ = ['RingAtomMixin', 'RingAtomsMixin']
 
 
 class RingAtomMixin:
-    """Mixin `Atom` class for analysis of ring statistics/network \
-        connectivity."""
+    """Mixin `Atom` class for ring statistics/network connectivity analysis.
+
+    Attributes
+    ----------
+    ring_counter : :class:`~python:collections.Counter`
+    rings : :class:`~python:list`
+
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.rings = []
@@ -31,15 +37,23 @@ class RingAtomMixin:
 
 
 class RingAtomsMixin:
-    """Mixin `Atoms` class for analysis of ring statistics/network \
-        connectivity."""
+    """Mixin `Atoms` class for ring statistics/network connectivity analysis.
+
+    Attributes
+    ----------
+    ring_counter : :class:`~python:collections.Counter`
+    rings : :class:`~python:list`
+
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ring_counter = Counter()
-        self.rings = None
+        # self.rings = []
+        self.rings = OrderedDict()
 
     @property
     def rings_per_atom(self):
+        """Rings per atom list."""
         return [atom.Rn for atom in self]
 
     @property
@@ -52,6 +66,18 @@ class RingAtomsMixin:
 
         """
         return Counter([atom.Rn for atom in self])
+
+    def add_ring(self, nodes):
+        """Append ring atoms to :attr:`~RingAtomsMixin.rings`."""
+        for nidx in nodes:
+            self[abs(nidx)].Rn += 1
+        n = len(nodes)
+        rings = self.rings
+        if n not in rings:
+            rings[n] = []
+
+        rings[n].append(self.__class__([self[abs(nidx)] for nidx in nodes],
+                                       update_item_class=False, **self.kwargs))
 
     def analyze_network(self, cutoff=np.inf, maxlength=None, TOL=0.0001,
                         retcodes=None):
@@ -97,8 +123,8 @@ class RingAtomsMixin:
                             di = amat[root][i]
                             dn = amat[root][ni]
                             if ((dn == di + 1) and
-                                (len(nodes) < (maxlength - 1) / 2
-                                 or maxlength < 0)):
+                                (len(nodes) < (maxlength - 1) / 2 or
+                                 maxlength < 0)):
                                 q.append((node, nodes + [ni], d + r_nn[si]))
                             elif ((dn == di) or (dn == di - 1)):
                                 q.append((node, nodes + [-ni], d + r_nn[si]))
@@ -124,8 +150,7 @@ class RingAtomsMixin:
                                                     abs(nodes[n])] != s:
                                                 is_sp = False
                                     if is_sp:
-                                        for nidx in nodes:
-                                            self[abs(nidx)].Rn += 1
+                                        self.add_ring(nodes)
                                         cntr[ring_size] += 1
                             elif dn == di - 1:
                                 q.append((node, nodes + [-ni], d + r_nn[si]))
