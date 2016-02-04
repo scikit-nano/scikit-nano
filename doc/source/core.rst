@@ -3,6 +3,7 @@
 .. toctree::
    :hidden:
 
+   core.analysis.rst
    core.atoms.rst
    core.crystallography.rst
    core.geometric_regions.rst

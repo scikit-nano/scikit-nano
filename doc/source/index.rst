@@ -1,6 +1,6 @@
-=========================
-scikit-nano documentation
-=========================
+==========================
+scikit-nano |version| docs
+==========================
 
 :Release: |release|
 :Date: |today|
@@ -24,6 +24,7 @@ scikit-nano documentation
 
    contribute.rst
    credits.rst
+
    release.rst
 
 
