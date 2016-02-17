@@ -1,12 +1,13 @@
 # Compiled source #
 ###################
-#*.com
+*.a
+*.com
 *.class
 *.dll
 *.exe
 *.o
 *.so
-*.pyc
+*.py[ocd]
 *.app
 
 # Python files #
@@ -20,6 +21,11 @@ doc/_build
 doc/build
 # sphinx autodoc generated directory
 doc/source/generated
+# misc sphinx generated output
+doc/*.xyz
+doc/*.data
+doc/*.pdb
+
 # setup.py dist directory
 dist
 # Egg metadata
@@ -30,6 +36,8 @@ dist
 .coverage
 # rope generated directory
 .ropeproject
+# cython files
+cythonize.dat
 
 # Packages #
 ############
@@ -46,7 +54,7 @@ dist
 
 # Logs and databases #
 ######################
-#*.log
+*.log
 *.sql
 *.sqlite
 
@@ -76,6 +84,8 @@ sknano/*.pdb
 **/tests/*.data
 **/tests/*.pdb
 
+# Temporary environment/workspace/project/backup files #
+########################################################
 # sublime text project/workspace files
 *.sublime-project
 *.sublime-workspace
@@ -85,3 +95,7 @@ sknano/*.pdb
 
 # Qt Creator autosave files
 *.autosave
+
+# misc stuff #
+##############
+sknano/__config__.py
