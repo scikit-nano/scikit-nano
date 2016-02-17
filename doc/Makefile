@@ -1,7 +1,7 @@
 # Makefile for Sphinx documentation
 #
 
-PYVER = 2.7
+PYVER = 3.4
 PYTHON = python$(PYVER)
 
 # You can set these variables from the command line.
