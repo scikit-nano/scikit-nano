@@ -160,17 +160,17 @@ class PeriodicKDTree(KDTree):
                 super()._KDTree__query_ball_point(xi, r, p, eps))
         return results
 
-    def query_ball_tree(self, other, r, p=2., eps=0):
-        raise NotImplementedError()
+    # def query_ball_tree(self, other, r, p=2., eps=0):
+    #     raise NotImplementedError()
 
-    def query_pairs(self, r, p=2., eps=0):
-        raise NotImplementedError()
+    # def query_pairs(self, r, p=2., eps=0):
+    #     raise NotImplementedError()
 
-    def count_neighbors(self, other, r, p=2.):
-        raise NotImplementedError()
+    # def count_neighbors(self, other, r, p=2.):
+    #     raise NotImplementedError()
 
-    def sparse_distance_matrix(self, other, max_distance, p=2.):
-        raise NotImplementedError()
+    # def sparse_distance_matrix(self, other, max_distance, p=2.):
+    #     raise NotImplementedError()
 
 
 class PeriodicCKDTree(cKDTree):
@@ -410,14 +410,14 @@ class PeriodicCKDTree(cKDTree):
                 result[c] = self.__query_ball_point(x[c], r, p, eps)
             return result
 
-    def query_ball_tree(self, other, r, p=2., eps=0):
-        raise NotImplementedError()
+    # def query_ball_tree(self, other, r, p=2., eps=0):
+    #     raise NotImplementedError()
 
-    def query_pairs(self, r, p=2., eps=0):
-        raise NotImplementedError()
+    # def query_pairs(self, r, p=2., eps=0):
+    #     raise NotImplementedError()
 
-    def count_neighbors(self, other, r, p=2.):
-        raise NotImplementedError()
+    # def count_neighbors(self, other, r, p=2.):
+    #     raise NotImplementedError()
 
-    def sparse_distance_matrix(self, other, max_distance, p=2.):
-        raise NotImplementedError()
+    # def sparse_distance_matrix(self, other, max_distance, p=2.):
+    #     raise NotImplementedError()
