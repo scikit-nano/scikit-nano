@@ -133,17 +133,31 @@ builtins.__SKNANO_SETUP__ = True
 
 class CleanCommand(Clean):
     description = \
-        "Remove build directories, __pycache__ directories, " \
-        ".ropeproject directories, and compiled files in the source tree."
+        "Remove build artifacts from the source tree including " \
+        "__pycache__ directories, .ropeproject directories, and " \
+        "compiled files in the source tree."
 
     def run(self):
         Clean.run(self)
+        cwd = os.path.abspath(os.path.dirname(__file__))
+        remove_c_files = not os.path.exists(os.path.join(cwd, 'PKG-INFO'))
+        if remove_c_files:
+            cython_hash_file = os.path.join(cwd, 'cythonize.dat')
+            if os.path.exists(cython_hash_file):
+                os.unlink(cython_hash_file)
+            print('Will remove generated .c files')
         if os.path.exists('build'):
             shutil.rmtree('build')
         for dirpath, dirnames, filenames in os.walk('sknano'):
             for filename in filenames:
                 if filename.endswith(('.so', '.pyd', '.pyc', '.dll')):
                     os.unlink(os.path.join(dirpath, filename))
+                    continue
+                extension = os.path.splitext(filename)[1]
+                if remove_c_files and extension in ['.c', '.cxx', 'cpp']:
+                    pyx_file = str.replace(filename, extension, '.pyx')
+                    if os.path.exists(os.path.join(dirpath, pyx_file)):
+                        os.unlink(os.path.join(dirpath, filename))
             for dirname in dirnames:
                 if dirname in ('__pycache__', '.ropeproject'):
                     shutil.rmtree(os.path.join(dirpath, dirname))
@@ -201,6 +215,17 @@ if not release:
                        'stable_version': STABLEVERSION})
     finally:
         a.close()
+
+
+def generate_cython():
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    print("Cythonizing sources")
+    p = subprocess.call([sys.executable,
+                         os.path.join(cwd, 'tools', 'cythonize.py'),
+                         'sknano'],
+                        cwd=cwd)
+    if p != 0:
+        raise RuntimeError("Running cythonize failed!")
 
 
 def configuration(parent_package='', top_path=None):
@@ -304,7 +329,18 @@ def setup_package():
         FULLVERSION, GIT_REVISION = get_version_info()
         metadata['version'] = FULLVERSION
     else:
+        if ((len(sys.argv) >= 2 and sys.argv[1] in
+                ('bdist_wheel', 'bdist_egg')) or ('develop' in sys.argv)):
+            # bdist_wheel/bdist_egg needs setuptools
+            import setuptools
+
         from numpy.distutils.core import setup
+
+        cwd = os.path.abspath(os.path.dirname(__file__))
+        if not os.path.exists(os.path.join(cwd, 'PKG-INFO')):
+            # Generate Cython sources, unless building from source release
+            generate_cython()
+
         metadata['configuration'] = configuration
 
     setup(**metadata)
