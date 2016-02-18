@@ -94,6 +94,8 @@ def test_axis_angle_from_rotation_matrix():
 def test_translation_matrix():
     for l in ([1, 1], [1, 1, 1]):
         v = Vector(l)
+        print(translation_matrix(v.tolist()))
+        print(translation_matrix(v.tolist())[:v.nd, v.nd])
         assert_equal(v, Vector(translation_matrix(v.tolist())[:v.nd, v.nd]))
         assert_equal(v, translation_from_matrix(translation_matrix(v)))
 

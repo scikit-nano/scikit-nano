@@ -751,5 +751,15 @@ def test54():
     [assert_equal(vecs[i], vi ** 2) for i, vi in enumerate([u, v, w])]
 
 
+def test55():
+    u = Vector([1, 0, 0])
+    v = Vector([0, 1, 0])
+    w = Vector([0, 0, 1])
+    vecs = Vectors([u, v, w])
+    assert_is_instance(vecs.cross(xhat), Vectors)
+    assert_equal(vecs.cross(xhat), -xhat.cross(vecs))
+    assert_equal(-vecs.cross(xhat), xhat.cross(vecs))
+
+
 if __name__ == '__main__':
     nose.runmodule()
