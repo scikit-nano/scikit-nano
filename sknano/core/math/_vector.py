@@ -25,14 +25,11 @@ from ._transforms import rotate, transformation_matrix
 __all__ = ['Vector', 'angle', 'cross', 'dot', 'scalar_triple_product',
            'vector_triple_product', 'scalar_projection', 'vector_projection',
            'vector_rejection', 'projection', 'rejection',
-           'e1', 'e2', 'e3', 'xhat', 'yhat', 'zhat',
-           '_check_vector_compatibility', 'NullVector']
+           'e1', 'e2', 'e3', 'xhat', 'yhat', 'zhat', 'NullVector']
 
-
-def _check_vector_compatibility(v1, v2):
-    if len(v1) != len(v2):
-        raise ValueError("{!r} and {!r} must have same number "
-                         "of components".format(v1, v2))
+incompatible_shape_error_msg = \
+    "operands could not be broadcast together with shapes {}, {}"
+different_shape_error_msg = "operand shape {} != {}"""
 
 
 class Vector(np.ndarray):
@@ -286,90 +283,118 @@ class Vector(np.ndarray):
         data._p = np.ndarray.view(p, Point)
 
     def __eq__(self, other):
-        if not self._is_valid_operand(other):
+        try:
+            other = self.__cast(other)
+            return self is other or (np.allclose(self.__array__(),
+                                                 other.__array__()) and
+                                     np.allclose(self.p0, other.p0) and
+                                     np.allclose(self.p, other.p))
+        except (TypeError, ValueError):
             return NotImplemented
-        other = self.__cast(other)
-        return self is other or (np.allclose(self.__array__(),
-                                             other.__array__())
-                                 and np.allclose(self.p0, other.p0)
-                                 and np.allclose(self.p, other.p))
 
     def __lt__(self, other):
-        if not self._is_valid_operand(other):
+        try:
+            other = self.__cast(other)
+            return self.norm < other.norm
+        except (TypeError, ValueError):
             return NotImplemented
-        other = self.__cast(other)
-        return self.norm < other.norm
 
     def __le__(self, other):
-        if not self._is_valid_operand(other):
+        try:
+            other = self.__cast(other)
+            return self < other or self == other
+        except (TypeError, ValueError):
             return NotImplemented
-        other = self.__cast(other)
-        return self < other or self == other
 
     def __gt__(self, other):
-        if not self._is_valid_operand(other):
+        try:
+            other = self.__cast(other)
+            return not (self < other or self == other)
+        except (TypeError, ValueError):
             return NotImplemented
-        other = self.__cast(other)
-        return not (self < other or self == other)
 
     def __ge__(self, other):
-        if not self._is_valid_operand(other):
+        try:
+            other = self.__cast(other)
+            return not (self < other)
+        except (TypeError, ValueError):
             return NotImplemented
-        other = self.__cast(other)
-        return not (self < other)
 
     def __ne__(self, other):
-        if not self._is_valid_operand(other):
+        try:
+            other = self.__cast(other)
+            return not (self == other)
+        except (TypeError, ValueError):
             return NotImplemented
-        other = self.__cast(other)
-        return not (self == other)
 
     def __add__(self, other):
-        if not (self._is_valid_operand(other) or np.isscalar(other)):
-            return NotImplemented
         if np.isscalar(other):
             return self.__class__(self.__array__() + other, p0=self.p0)
-        return self.__class__(self.__array__() +
-                              self.__cast(other).__array__(),
-                              p0=self.p0)
+        if isinstance(other, Vectors):
+            return other.__radd__(self)
+        try:
+            return self.__class__(self.__array__() +
+                                  self.__cast(other).__array__(),
+                                  p0=self.p0)
+        except (TypeError, ValueError):
+            return NotImplemented
 
     def __radd__(self, other):
-        if not (self._is_valid_operand(other) or np.isscalar(other)):
-            return NotImplemented
         if np.isscalar(other):
             return self.__add__(other)
-        return self.__class__(self.__cast(other).__array__() +
-                              self.__array__(),
-                              p0=other.p0)
+        if isinstance(other, Vectors):
+            return other.__add__(self)
+        try:
+            return self.__class__(self.__cast(other).__array__() +
+                                  self.__array__(),
+                                  p0=other.p0)
+        except (TypeError, ValueError):
+            return NotImplemented
 
     def __iadd__(self, other):
         """Add other to self in-place."""
-        if not (self._is_valid_operand(other) or np.isscalar(other)):
-            return NotImplemented
+        try:
+            other = self.__cast(other)
+            # self._validate_operand(other, shape='same')
+        except (TypeError, ValueError):
+            if not np.isscalar(other):
+                return NotImplemented
         super().__iadd__(other)
         self._update_p()
         return self
 
     def __sub__(self, other):
-        if not (self._is_valid_operand(other) or np.isscalar(other)):
-            return NotImplemented
         if np.isscalar(other):
             return self.__class__(self.__array__() - other, p0=self.p0)
-        return self.__class__(self.__array__() -
-                              self.__cast(other).__array__(),
-                              p0=self.p0)
+        if isinstance(other, Vectors):
+            return other.__rsub__(self)
+        try:
+            return self.__class__(self.__array__() -
+                                  self.__cast(other).__array__(),
+                                  p0=self.p0)
+        except (TypeError, ValueError):
+            return NotImplemented
 
     def __rsub__(self, other):
-        if not self._is_valid_operand(other):
+        if np.isscalar(other):
+            return self.__class__(other - self.__array__())
+        if isinstance(other, Vectors):
+            return other.__sub__(self)
+        try:
+            return self.__class__(self.__cast(other).__array__() -
+                                  self.__array__(),
+                                  p0=other.p0)
+        except (TypeError, ValueError):
             return NotImplemented
-        return self.__class__(self.__cast(other).__array__() -
-                              self.__array__(),
-                              p0=other.p0)
 
     def __isub__(self, other):
         """Subtract other from self in-place."""
-        if not (self._is_valid_operand(other) or np.isscalar(other)):
-            return NotImplemented
+        try:
+            other = self.__cast(other)
+            # self._validate_operand(other, shape='same')
+        except (TypeError, ValueError):
+            if not np.isscalar(other):
+                return NotImplemented
         super().__isub__(other)
         self._update_p()
         return self
@@ -379,8 +404,6 @@ class Vector(np.ndarray):
             "{!r}.{!r}".format(self, other)
 
     def __mul__(self, other):
-        if not (self._is_valid_operand(other) or np.isscalar(other)):
-            return NotImplemented
         if np.isscalar(other):
             return self.__class__(self.__array__() * other, p0=self.p0)
         # elif isinstance(other, np.matrix):
@@ -389,12 +412,13 @@ class Vector(np.ndarray):
         #         return self.__class__(res.A.flatten(), p0=self.p0)
         #     elif res.shape == (1, 1):
         #         return res.A.flatten()[0]
-        print(self._mul_warn_msg(other))
-        return self.dot(self.__cast(other))
+        try:
+            print(self._mul_warn_msg(other))
+            return self.dot(self.__cast(other))
+        except (TypeError, ValueError):
+            return NotImplemented
 
     def __rmul__(self, other):
-        if not (self._is_valid_operand(other) or np.isscalar(other)):
-            return NotImplemented
         if np.isscalar(other):
             return self.__class__(other * self.__array__(), p0=self.p0)
         # elif isinstance(other, np.matrix):
@@ -403,17 +427,21 @@ class Vector(np.ndarray):
         #         return self.__class__(res.A.flatten(), p0=self.p0)
         #     elif res.shape == (1, 1):
         #         return res.A.flatten()[0]
-        return self.__cast(other).__mul__(self)
+        try:
+            return self.__cast(other).__mul__(self)
+        except (TypeError, ValueError):
+            return NotImplemented
 
     def __imul__(self, other):
         """Multiply self by other in-place."""
-        if not (self._is_valid_operand(other) or np.isscalar(other)):
-            return NotImplemented
-        if np.isscalar(other):
+        try:
+            self = self.__mul__(self.__cast(other))
+            # other = self.__cast(other)
+        except (TypeError, ValueError):
+            if not np.isscalar(other):
+                return NotImplemented
             super().__imul__(other)
             self._update_p()
-        else:
-            self = self.__mul__(other)
         return self
 
     def __truediv__(self, other):
@@ -456,6 +484,13 @@ class Vector(np.ndarray):
         self._update_p()
         return self
 
+    def __neg__(self):
+        return self.__class__(-self.__array__(), p0=self.p0)
+
+    def __abs__(self):
+        # return self.__class__(np.abs(self.__array__()), p0=self.p0)
+        return self.norm
+
     def __copy__(self):
         try:
             return self.__class__(self.__array__(), p0=self.p0.__array__())
@@ -470,18 +505,47 @@ class Vector(np.ndarray):
         return self.__copy__()
 
     def tolist(self):
-        """List of `Vector` coordinates with values formatted for *pretty* \
-            output."""
+        """List of `Vector` coordinates with values formatted for *pretty*
+        output.
+        """
         return np.around(self.__array__(), decimals=10).tolist()
 
-    def _is_valid_operand(self, other):
-        return isinstance(other, (list, np.ndarray)) and \
-            len(other) == len(self)
-
     def __cast(self, other):
-        if not isinstance(other, self.__class__):
-            other = self.__class__(other)
-        return other
+        if isinstance(other, (self.__class__, Vectors)):
+            return other
+        try:
+            self._validate_operand(other, shape='same')
+        except ValueError as e:
+            if not self._is_compatible_shape(other):
+                raise e
+        return self.__class__(other)
+
+    def _is_valid_operand(self, other):
+        return isinstance(other, (tuple, list, np.ndarray, self.__class__,
+                                  Vectors))
+
+    def _is_same_shape(self, other):
+        other = np.asarray(other)
+        return len(self) == len(other) and self.ndim == other.ndim
+
+    def _is_compatible_shape(self, other):
+        other = np.asarray(other)
+        return len(self) == len(other) if other.ndim == 1 else \
+            len(self) == other.shape[-1]
+
+    def _validate_operand(self, other, shape='compatible'):
+        valid = self._is_valid_operand(other)
+        if not valid:
+            raise TypeError('Invalid operand type {!r}.'.format(type(other)))
+        compatible = self._is_compatible_shape(other)
+        same = self._is_same_shape(other)
+        other_shape = np.asarray(other).shape
+        if shape.startswith('compat') and not compatible:
+            raise ValueError(incompatible_shape_error_msg.format(self.shape,
+                             other_shape))
+        elif shape == 'same' and not same:
+            raise ValueError(different_shape_error_msg.format(other_shape,
+                             self.shape))
 
     def _update_p(self):
         self._p[:] = self._p0[:] + self.__array__()
@@ -563,13 +627,19 @@ class Vector(np.ndarray):
 
     def angle(self, other):
         """Angle between two `Vector`\ s."""
-        _check_vector_compatibility(self, other)
+        self._validate_operand(other)
+        if isinstance(other, Vectors):
+            return other.angle(self)
+        other = self.__cast(other)
         return np.arccos(np.dot(self.__array__(), other.__array__()) /
                          (self.norm * other.norm))
 
     def cross(self, other):
         """Cross product of two `Vector`\ s."""
-        _check_vector_compatibility(self, other)
+        self._validate_operand(other)
+        if isinstance(other, Vectors):
+            return -other.cross(self)
+        other = self.__cast(other)
         val = np.cross(self.__array__(), other.__array__())
         if val.shape == ():
             return val[()]
@@ -577,22 +647,29 @@ class Vector(np.ndarray):
 
     def dot(self, other, out=None):
         """Dot product of two `Vector`\ s."""
-        _check_vector_compatibility(self, other)
+        self._validate_operand(other)
+        if isinstance(other, Vectors):
+            return other.dot(self)
+        other = self.__cast(other)
         return self.__array__().dot(other.__array__())
 
     def normalize(self):
         """Normalize the `Vector` to a :attr:`~Vector.unit_vector`."""
         self[:] = self.unit_vector
 
-    def projection(self, v):
-        """Vector projection onto `Vector` `v`."""
-        u = self
-        return dot(u, v) / dot(v, v) * v
+    def projection(self, other):
+        """Vector projection onto `Vector` `other`."""
+        self._validate_operand(other)
+        if isinstance(other, Vectors):
+            return other.projection(self)
+        return dot(self, other) / dot(other, other) * other
 
-    def rejection(self, v):
-        """Vector rejection onto `Vector` `v`."""
-        u = self
-        return u - self.projection(v)
+    def rejection(self, other):
+        """Vector rejection onto `Vector` `other`."""
+        self._validate_operand(other)
+        if isinstance(other, Vectors):
+            return other.rejection(self)
+        return self - self.projection(other)
 
     def rezero_components(self, epsilon=1.0e-10):
         """Alias for :meth:`Vector.rezero`"""
@@ -753,7 +830,6 @@ def vector_triple_product(u, v, w):
     :class:`Vector`
 
     """
-
     return cross(u, cross(v, w))
 
 
@@ -815,9 +891,12 @@ e3 = zhat = Vector([0, 0, 1])
 
 
 class NullVector(Vector, metaclass=Singleton):
+    """:class:`~sknano.core.Singleton` class for a 3D null vector."""
     def __init__(self):
         self.__instance = Vector([0, 0, 0])
 
     def __repr__(self):
         return '{}({})'.format(self.__class__.__name__,
                                self.__instance.tolist())
+
+from ._vectors import Vectors
