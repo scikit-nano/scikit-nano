@@ -14,6 +14,7 @@ def configuration(parent_package='', top_path=None):
     config.add_subpackage('molecules')
     config.add_subpackage('physics')
     config.add_subpackage('refdata')
+    config.add_subpackage('structures')
     # config.add_subpackage('units')
     config.add_data_dir('tests')
     return config
