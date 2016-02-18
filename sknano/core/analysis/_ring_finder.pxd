@@ -19,13 +19,13 @@ cdef struct queue_item
 
 cdef void search_paths(int32_t root, int32_t node, int32_t node_si,
                        vector[int32_t] &visited, int32_t Natoms,
-                       int32_t *nn_idx, int32_t *seed, int32_t *amat,
-                       float64_t *r_nn, int32_t maxlength, float64_t eps,
+                       int32_t *nn_idx, int32_t *nn_seed, int32_t *nn_amat,
+                       float64_t *nn_vecs, int32_t max_ring_size, float64_t eps,
                        vector[int32_t] &ring_counts,
                        vector[vector[int32_t]] &nodes_list)
 
 
 cpdef tuple find_rings(int32_t Natoms, int32_t NNN, int32_t[::1] nn_idx,
-                       int32_t[::1] seed, int32_t[:,::1] amat,
-                       float64_t[:,::1] r_nn, int32_t maxlength,
+                       int32_t[::1] nn_seed, int32_t[:,::1] nn_amat,
+                       float64_t[:,::1] nn_vecs, int32_t max_ring_size,
                        float64_t eps)

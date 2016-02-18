@@ -24,9 +24,9 @@ cdef struct queue_item:
 
 cdef void search_paths(int32_t root, int32_t node, int32_t node_si,
                        vector[int32_t] &visited, int32_t Natoms,
-                       int32_t *nn_idx, int32_t *seed, int32_t *amat,
-                       float64_t *r_nn, int32_t maxlength, float64_t eps,
-                       vector[int32_t] &ring_counts,
+                       int32_t *nn_idx, int32_t *nn_seed, int32_t *nn_amat,
+                       float64_t *nn_vecs, int32_t max_ring_size,
+                       float64_t eps, vector[int32_t] &ring_counts,
                        vector[vector[int32_t]] &nodes_list):
     """Search for closed paths starting from `root` atom.
 
@@ -49,7 +49,7 @@ cdef void search_paths(int32_t root, int32_t node, int32_t node_si,
     qi.prev = root
     qi.nodes.push_back(node)
     for i in range(3):
-        qi.r[i] = r_nn[3 * node_si + i]
+        qi.r[i] = nn_vecs[3 * node_si + i]
     q.push_back(qi)
 
     while q.size() > 0:
@@ -62,14 +62,15 @@ cdef void search_paths(int32_t root, int32_t node, int32_t node_si,
         q.pop_front()
         if last > 0:
             i = last
-            for si in range(seed[i], seed[i+1]):
+            for si in range(nn_seed[i], nn_seed[i+1]):
                 ni = nn_idx[si]
                 if not visited[si] and ni != prev:
-                    di = amat[Natoms * root + i]
-                    dni = amat[Natoms * root + ni]
+                    di = nn_amat[Natoms * root + i]
+                    dni = nn_amat[Natoms * root + ni]
                     tmpnodes = nodes
                     if ((dni == di + 1) and
-                        (nodes.size() < (maxlength - 1) / 2 or maxlength < 0)):
+                        (nodes.size() < (max_ring_size - 1) / 2 or
+                         max_ring_size < 0)):
                         tmpnodes.push_back(ni)
                         new_node = True
                     elif ((dni == di) or (dni == di - 1)):
@@ -80,20 +81,20 @@ cdef void search_paths(int32_t root, int32_t node, int32_t node_si,
                         qi.prev = last
                         qi.nodes = tmpnodes
                         for j in range(3):
-                            qi.r[j] = r0[j] + r_nn[3 * si + j]
+                            qi.r[j] = r0[j] + nn_vecs[3 * si + j]
                         q.push_back(qi)
                         new_node = False
         else:
             i = -last
-            for si in range(seed[i], seed[i + 1]):
+            for si in range(nn_seed[i], nn_seed[i + 1]):
                 ni = nn_idx[si]
                 if not visited[si] and ni != prev:
-                    di = amat[Natoms * root + i]
-                    dni = amat[Natoms * root + ni]
+                    di = nn_amat[Natoms * root + i]
+                    dni = nn_amat[Natoms * root + ni]
                     if ni == root:
                         rsq = 0.0
                         for j in range(3):
-                            rsq += pow(r0[j] + r_nn[3 * si + j], 2)
+                            rsq += pow(r0[j] + nn_vecs[3 * si + j], 2)
                         r = sqrt(rsq)
                         # For a closed ring, the vector sum of the
                         # ring bond vectors will have zero length.
@@ -110,7 +111,7 @@ cdef void search_paths(int32_t root, int32_t node, int32_t node_si,
                                     abs_m = abs(nodes[m])
                                     abs_n = abs(nodes[n])
 
-                                    if amat[Natoms * abs_m + abs_n] != s:
+                                    if nn_amat[Natoms * abs_m + abs_n] != s:
                                         found_ring = False
 
                             if found_ring:
@@ -126,13 +127,13 @@ cdef void search_paths(int32_t root, int32_t node, int32_t node_si,
                         qi.prev = last
                         qi.nodes = tmpnodes
                         for j in range(3):
-                            qi.r[j] = r0[j] + r_nn[3 * si + j]
+                            qi.r[j] = r0[j] + nn_vecs[3 * si + j]
                         q.push_back(qi)
 
 
 cpdef tuple find_rings(int32_t Natoms, int32_t NNN, int32_t[::1] nn_idx,
-                       int32_t[::1] seed, int32_t[:,::1] amat,
-                       float64_t[:,::1] r_nn, int32_t maxlength,
+                       int32_t[::1] nn_seed, int32_t[:,::1] nn_amat,
+                       float64_t[:,::1] nn_vecs, int32_t max_ring_size,
                        float64_t eps):
 
     cdef:
@@ -144,16 +145,16 @@ cpdef tuple find_rings(int32_t Natoms, int32_t NNN, int32_t[::1] nn_idx,
     visited.resize(NNN)
 
     for i in range(Natoms):
-        for si in range(seed[i], seed[i+1]):
+        for si in range(nn_seed[i], nn_seed[i+1]):
             ni = nn_idx[si]
             if i < ni:
                 visited[si] = 1
-                for nsi in range(seed[ni], seed[ni+1]):
+                for nsi in range(nn_seed[ni], nn_seed[ni+1]):
                     nni = nn_idx[nsi]
                     if nni == i:
                         visited[nsi] = 1
-                search_paths(i, ni, si, visited, Natoms, &nn_idx[0], &seed[0],
-                             &amat[0,0], &r_nn[0,0], maxlength, eps,
-                             ring_counts, nodes_list)
+                search_paths(i, ni, si, visited, Natoms, &nn_idx[0],
+                             &nn_seed[0], &nn_amat[0,0], &nn_vecs[0,0],
+                             max_ring_size, eps, ring_counts, nodes_list)
 
     return ring_counts, nodes_list

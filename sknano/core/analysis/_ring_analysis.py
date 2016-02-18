@@ -11,7 +11,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from collections import Counter, deque
+from collections import deque
 
 import numpy as np
 
@@ -26,52 +26,65 @@ except ImportError:
 __all__ = ['find_rings', 'py_find_rings']
 
 
-def find_rings(Natoms, NNN, nn_idx, seed, amat, r_nn, maxlength=None,
-               eps=0.0001, pyversion=False):
+# @timethis
+def find_rings(Natoms, NNN, nn_idx, nn_seed, nn_amat, nn_vecs,
+               max_ring_size=None, eps=0.0001, pyversion=False):
     """Analyze the network connectivity.
 
     Parameters
     ----------
-    cutoff : :class:`~python:float`, optional
-    maxlength : :class:`~python:int`, optional
+    Natoms : :class:`~python:int`
+    NNN : :class:`~python:int`
+    nn_idx : :class:`~numpy:numpy.ndarray`
+    nn_seed : :class:`~numpy:numpy.ndarray`
+    nn_amat : :class:`~numpy:numpy.ndarray`
+    nn_vecs : :class:`~numpy:numpy.ndarray`
+    max_ring_size : :class:`~python:int`, optional
     eps : :class:`~python:float`, optional
 
     """
-    if maxlength is None:
-        maxlength = -1
+    if max_ring_size is None:
+        max_ring_size = -1
 
     if _ring_finder is None or pyversion:
-        return py_find_rings(Natoms, NNN, nn_idx, seed, amat, r_nn,
-                             maxlength, eps)
+        return py_find_rings(Natoms, NNN, nn_idx, nn_seed, nn_amat, nn_vecs,
+                             max_ring_size, eps)
 
     nn_idx = np.asarray(nn_idx, dtype=np.intc)
-    seed = np.asarray(seed, dtype=np.intc)
-    amat = np.asarray(amat, dtype=np.intc)
+    nn_seed = np.asarray(nn_seed, dtype=np.intc)
+    nn_amat = np.asarray(nn_amat, dtype=np.intc)
     try:
-        r_nn = np.asarray([v.__array__() for v in r_nn], dtype=np.double)
+        nn_vecs = np.asarray([v.__array__() for v in nn_vecs], dtype=np.double)
     except AttributeError:
-        r_nn = np.asarray(r_nn, dtype=np.double)
+        nn_vecs = np.asarray(nn_vecs, dtype=np.double)
 
-    return _ring_finder.find_rings(Natoms, NNN, nn_idx, seed,
-                                   amat, r_nn, maxlength, eps)
+    return _ring_finder.find_rings(Natoms, NNN, nn_idx, nn_seed,
+                                   nn_amat, nn_vecs, max_ring_size, eps)
 
 
-def py_find_rings(Natoms, NNN, nn_idx, seed, amat, r_nn, maxlength=None,
-                  eps=0.0001):
+# @timethis
+def py_find_rings(Natoms, NNN, nn_idx, nn_seed, nn_amat, nn_vecs,
+                  max_ring_size=None, eps=0.0001):
     """Analyze the network connectivity.
 
     Parameters
     ----------
-    cutoff : :class:`~python:float`, optional
-    maxlength : :class:`~python:int`, optional
+    Natoms : :class:`~python:int`
+    NNN : :class:`~python:int`
+    nn_idx : :class:`~numpy:numpy.ndarray`
+    nn_seed : :class:`~numpy:numpy.ndarray`
+    nn_amat : :class:`~numpy:numpy.ndarray`
+    nn_vecs : :class:`~numpy:numpy.ndarray`
+    max_ring_size : :class:`~python:int`, optional
     eps : :class:`~python:float`, optional
 
     """
-    if maxlength is None:
-        maxlength = -1
+    if max_ring_size is None:
+        max_ring_size = -1
 
     visited = np.zeros(NNN, dtype=bool)
-    ring_counter = Counter()
+    # ring_counter = Counter()
+    ring_counts = []
     nodes_list = []
 
     def search_paths(root=None, node=None, d=None):
@@ -89,31 +102,31 @@ def py_find_rings(Natoms, NNN, nn_idx, seed, amat, r_nn, maxlength=None,
             node = nodes[-1]
             if node > 0:
                 i = node
-                for si in range(seed[i], seed[i+1]):
+                for si in range(nn_seed[i], nn_seed[i+1]):
                     ni = nn_idx[si]
                     if not visited[si] and ni != prev:
-                        di = amat[root][i]
-                        dni = amat[root][ni]
+                        di = nn_amat[root][i]
+                        dni = nn_amat[root][ni]
                         if (dni == di + 1):
-                            if (len(nodes) < (maxlength - 1) // 2 or
-                                    maxlength < 0):
+                            if (len(nodes) < (max_ring_size - 1) // 2 or
+                                    max_ring_size < 0):
                                 q.append((node, nodes + [ni],
-                                          d + r_nn[si]))
+                                          d + nn_vecs[si]))
                             else:
                                 continue
                         elif ((dni == di) or (dni == di - 1)):
-                            q.append((node, nodes + [-ni], d + r_nn[si]))
+                            q.append((node, nodes + [-ni], d + nn_vecs[si]))
                         else:
                             raise ValueError('bad adjacency matrix')
             else:
                 i = -node
-                for si in range(seed[i], seed[i + 1]):
+                for si in range(nn_seed[i], nn_seed[i + 1]):
                     ni = nn_idx[si]
                     if not visited[si] and ni != prev:
-                        di = amat[root][i]
-                        dni = amat[root][ni]
+                        di = nn_amat[root][i]
+                        dni = nn_amat[root][ni]
                         if ni == root:
-                            dr = r_nn[si] + d
+                            dr = nn_vecs[si] + d
                             # For a closed ring, the vector sum of the
                             # ring bond vectors will have zero length.
                             if dr.norm < eps:
@@ -125,24 +138,26 @@ def py_find_rings(Natoms, NNN, nn_idx, seed, amat, r_nn, maxlength=None,
                                         s = m - n
                                         if s > ring_size // 2:
                                             s = ring_size - s
-                                        if amat[abs(nodes[m])][
+                                        if nn_amat[abs(nodes[m])][
                                                 abs(nodes[n])] != s:
                                             found_ring = False
                                 if found_ring:
                                     nodes_list.append(nodes)
-                                    ring_counter[ring_size] += 1
+                                    while len(ring_counts) < ring_size + 1:
+                                        ring_counts.append(0)
+                                    ring_counts[ring_size] += 1
                         elif dni == di - 1:
-                            q.append((node, nodes + [-ni], d + r_nn[si]))
+                            q.append((node, nodes + [-ni], d + nn_vecs[si]))
 
     for i in range(Natoms):
-        for si in range(seed[i], seed[i+1]):
+        for si in range(nn_seed[i], nn_seed[i+1]):
             ni = nn_idx[si]
             if i < ni:
                 visited[si] = True
-                for nsi in range(seed[ni], seed[ni+1]):
+                for nsi in range(nn_seed[ni], nn_seed[ni+1]):
                     nni = nn_idx[nsi]
                     if nni == i:
                         visited[nsi] = True
-                search_paths(root=i, node=ni, d=r_nn[si])
+                search_paths(root=i, node=ni, d=nn_vecs[si])
 
-    return ring_counter, nodes_list
+    return ring_counts, nodes_list

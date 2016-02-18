@@ -22,7 +22,7 @@ class Tests(AtomsTestFixture):
     def test1(self):
         atoms = self.atoms
         ring_cntr, Rn_cntr = \
-            atoms.analyze_network(cutoff=1.5, maxlength=20,
+            atoms.analyze_network(cutoff=1.5, max_ring_size=20,
                                   retcodes=('ring_counter', 'Rn_counter'))
         assert_equal(ring_cntr[6], 40)
         assert_equal(ring_cntr[10], 9)
@@ -35,11 +35,8 @@ class Tests(AtomsTestFixture):
         atoms = self.atoms
         atoms.set_pbc()
         atoms.update_attrs()
-        # print(atoms.nn_adjacency_matrix)
-        # print(atoms.nn_adjacency_map)
-        # print(atoms.nn_adjacency_list)
         ring_cntr, Rn_cntr = \
-            atoms.analyze_network(cutoff=1.5, maxlength=20,
+            atoms.analyze_network(cutoff=1.5, max_ring_size=20,
                                   retcodes=('ring_counter', 'Rn_counter'))
         # print(rings)
         assert_equal(ring_cntr[6], 50)
@@ -52,14 +49,8 @@ class Tests(AtomsTestFixture):
         bonds = atoms.bonds
 
         ring_cntr, Rn_cntr = \
-            atoms.analyze_network_py(cutoff=1.5, maxlength=20,
-                                     retcodes=('ring_counter', 'Rn_counter'))
-        print('Rn_cntr: {}'.format(Rn_cntr))
-
-        ring_cntr, Rn_cntr = \
-            atoms.analyze_network(cutoff=1.5, maxlength=20,
+            atoms.analyze_network(cutoff=1.5, max_ring_size=20,
                                   retcodes=('ring_counter', 'Rn_counter'))
-        print('Rn_cntr: {}'.format(Rn_cntr))
         bonds = atoms.bonds
         assert_equal(ring_cntr[6], 20)
         assert_equal(ring_cntr[5], 12)
@@ -70,28 +61,42 @@ class Tests(AtomsTestFixture):
         V = atoms.Natoms
         assert_true(V - E + F == 2)
 
+        ring_cntr, Rn_cntr = \
+            atoms.analyze_network(cutoff=1.5, max_ring_size=20,
+                                  retcodes=('ring_counter', 'Rn_counter'),
+                                  pyversion=True)
+        # print('Rn_cntr: {}'.format(Rn_cntr))
+        assert_equal(ring_cntr[6], 20)
+        assert_equal(ring_cntr[5], 12)
+        assert_equal(ring_cntr[18], 10)
+        assert_equal(Rn_cntr[6], 60)
+
     def test4(self):
         atoms = self.atoms
         atoms.set_pbc()
         atoms.update_attrs()
         c_rings, c_ring_cntr = \
-            atoms.analyze_network(cutoff=1.5, maxlength=50,
+            atoms.analyze_network(cutoff=1.5, max_ring_size=50,
                                   retcodes=('rings', 'ring_counter'))
-        print(c_ring_cntr)
+        # print(c_ring_cntr)
         assert_true(len(c_rings), sum(c_ring_cntr.values()))
+        assert_equal(c_ring_cntr[6], 50)
+        assert_equal(c_ring_cntr[10], 10)
 
         py_rings, py_ring_cntr = \
-            atoms.analyze_network_py(cutoff=1.5, maxlength=50,
-                                     retcodes=('rings', 'ring_counter'))
-        print(py_ring_cntr)
+            atoms.analyze_network(cutoff=1.5, max_ring_size=50,
+                                  retcodes=('rings', 'ring_counter'),
+                                  pyversion=True)
+        # print(py_ring_cntr)
         assert_true(len(py_rings), sum(py_ring_cntr.values()))
+        assert_equal(py_ring_cntr[6], 50)
+        assert_equal(py_ring_cntr[10], 10)
 
         assert_true(len(c_rings), len(py_rings))
         assert_true(sum(c_ring_cntr.values()), sum(py_ring_cntr.values()))
 
     # def test5(self):
     #     atoms = self.dumpdata1.trajectory[-1].atoms
-    #     # atoms = atoms.filtered((atoms.mol_ids >= 2) & (atoms.mol_ids <= 4))
     #     max_mol_id = 2
     #     atoms = atoms.filtered((atoms.mol_ids <= max_mol_id) &
     #                            (atoms.types == 1))
@@ -99,13 +104,14 @@ class Tests(AtomsTestFixture):
     #     assert_equal(atoms.Natoms, 1008 * max_mol_id)
     #     atoms.update_attrs()
     #     rings, ring_cntr = \
-    #         atoms.analyze_network(cutoff=2.0, maxlength=40,
+    #         atoms.analyze_network(cutoff=2.0, max_ring_size=40,
     #                               retcodes=('rings', 'ring_counter'))
     #     print(ring_cntr)
 
     #     rings, ring_cntr = \
-    #         atoms.analyze_network_py(cutoff=2.0, maxlength=40,
-    #                                  retcodes=('rings', 'ring_counter'))
+    #         atoms.analyze_network(cutoff=2.0, max_ring_size=40,
+    #                               retcodes=('rings', 'ring_counter'),
+    #                               pyversion=True)
     #     print(ring_cntr)
 
 
