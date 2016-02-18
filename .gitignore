@@ -38,6 +38,11 @@ dist
 .ropeproject
 # cython files
 cythonize.dat
+*.c
+*.cxx
+
+!*/src/*.c
+!*/src/*.cxx
 
 # Packages #
 ############
