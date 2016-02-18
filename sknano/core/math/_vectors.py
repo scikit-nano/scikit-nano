@@ -18,7 +18,6 @@ import numpy as np
 from sknano.core import UserList
 from ._transforms import transformation_matrix
 # from sknano.core.geometric_regions import Cuboid  # , Rectangle
-from ._vector import Vector
 
 __all__ = ['Vectors']
 
@@ -57,7 +56,7 @@ class Vectors(UserList):
         return other.data if isinstance(other, UserList) else other
 
     def _is_valid_operand(self, other):
-        return isinstance(other, (list, np.ndarray, self.__class__,
+        return isinstance(other, (tuple, list, np.ndarray, self.__class__,
                                   self.__item_class__))
 
     def _is_compatible_shape(self, other):
@@ -65,8 +64,12 @@ class Vectors(UserList):
         return np.asarray(self.data).shape[-1] == len(other) if \
             other.ndim == 1 else np.asarray(self.data).shape == other.shape
 
-    def _check_operands(self, other):
-        if not self._is_compatible_shape(other):
+    def _validate_operand(self, other):
+        valid = self._is_valid_operand(other)
+        compatible = self._is_compatible_shape(other)
+        if not valid:
+            raise TypeError('Invalid operand type {!r}.'.format(type(other)))
+        if not compatible:
             self_shape = np.asarray(self.data).shape
             other_shape = np.asarray(self.__cast(other)).shape
             raise ValueError(operand_shape_error_msg.format(self_shape,
@@ -91,7 +94,7 @@ class Vectors(UserList):
         if not ((self._is_valid_operand(other) and
                  self._is_compatible_shape(other)) or np.isscalar(other)):
             return NotImplemented
-        return self.__add__(other)
+        return self.__add__(self.__item_class__(other))
 
     def __iadd__(self, other):
         if not ((self._is_valid_operand(other) and
@@ -120,7 +123,7 @@ class Vectors(UserList):
         if not ((self._is_valid_operand(other) and
                  self._is_compatible_shape(other)) or np.isscalar(other)):
             return NotImplemented
-        return self.__sub__(other)
+        return self.__add__(-self.__item_class__(other))
 
     def __isub__(self, other):
         if not ((self._is_valid_operand(other) and
@@ -190,6 +193,11 @@ class Vectors(UserList):
     #                 self.append(atom)
     #     return self
 
+    def __neg__(self):
+        vecs = self.__class__([-vec for vec in self])
+        vecs.rezero()
+        return vecs
+
     @property
     def x(self):
         """Return :math:`x` coordinates of `Vector` objects as array."""
@@ -197,7 +205,7 @@ class Vectors(UserList):
 
     @x.setter
     def x(self, values):
-        self._check_operands(values)
+        self._validate_operand(values)
         [setattr(vec, 'x', val) for vec, val in zip(self, values)]
 
     @property
@@ -207,7 +215,7 @@ class Vectors(UserList):
 
     @y.setter
     def y(self, values):
-        self._check_operands(values)
+        self._validate_operand(values)
         [setattr(vec, 'y', val) for vec, val in zip(self, values)]
 
     @property
@@ -217,13 +225,63 @@ class Vectors(UserList):
 
     @z.setter
     def z(self, values):
-        self._check_operands(values)
+        self._validate_operand(values)
         [setattr(vec, 'z', val) for vec, val in zip(self, values)]
+
+    def angle(self, other):
+        """Angles between each :class:`Vector` with `other`."""
+        self._validate_operand(other)
+        if isinstance(other, self.__item_class__):
+            return np.asarray([vec.angle(other) for vec in self])
+        else:
+            return np.asarray([vec.angle(other_vec) for vec, other_vec
+                               in zip(self, self.__cast(other))])
+
+    def cross(self, other):
+        """Cross product of :class:`Vector`\ s with `other`."""
+        self._validate_operand(other)
+        if isinstance(other, self.__item_class__):
+            return self.__class__([vec.cross(other) for vec in self])
+        else:
+            return self.__class__([vec.cross(other_vec) for vec, other_vec
+                                   in zip(self, self.__cast(other))])
+
+    def dot(self, other, out=None):
+        """Dot product of :class:`Vector`\ s with `other`."""
+        self._validate_operand(other)
+        if isinstance(other, self.__item_class__):
+            return np.asarray([vec.dot(other) for vec in self])
+        else:
+            return np.asarray([vec.dot(other_vec) for vec, other_vec
+                               in zip(self, self.__cast(other))])
+
+    def projection(self, other):
+        """Vector projection of each :class:`Vector` onto `other`."""
+        self._validate_operand(other)
+        if isinstance(other, self.__item_class__):
+            return self.__class__([vec.projection(other) for vec in self])
+        else:
+            return self.__class__([vec.projection(other_vec) for vec, other_vec
+                                   in zip(self, self.__cast(other))])
+
+    def rejection(self, v):
+        """Vector rejection onto `other`."""
+        u = self
+        return u - self.projection(v)
+
+    def normalize(self):
+        """Normalize each :class:`Vector`."""
+        [vec.normalize() for vec in self]
 
     @property
     def norms(self):
         """Return `Vector` :attr:`Vector.norm`\ s as array."""
         return np.asarray([v.norm for v in self])
+
+    @property
+    def lengths(self):
+        """Alias for :attr:`~Vectors.norms`."""
+        return self.norms
 
     @property
     def magnitudes(self):
@@ -301,6 +359,12 @@ class Vectors(UserList):
         [vector.rotate(fix_anchor_point=fix_anchor_points,
                        transform_matrix=transform_matrix) for vector in self]
 
+    def scale(self):
+        return NotImplemented
+
+    def tolist(self):
+        return np.asarray([vec.tolist() for vec in self]).tolist()
+
     def translate(self, t, fix_anchor_points=False, **kwargs):
         """Translate `Vector`\ s by :class:`Vector` `t`.
 
@@ -315,3 +379,5 @@ class Vectors(UserList):
 
     def todict(self):
         return dict(vectors=[vec.tolist() for vec in self])
+
+from ._vector import Vector
