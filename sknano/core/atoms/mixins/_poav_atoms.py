@@ -11,15 +11,17 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from collections import OrderedDict
 import functools
 import operator
 import warnings
 
+from collections import OrderedDict
+
 import numpy as np
 np.seterr(all='warn')
 
-from sknano.core.math import vector as vec, Vectors
+from sknano.core import timethis
+from sknano.core.math import Vectors, vector as vec
 
 __all__ = ['POAV', 'POAV1', 'POAV2', 'POAVR',
            'POAVAtomMixin', 'POAVAtomsMixin']
@@ -240,9 +242,8 @@ class POAV:
 
     @property
     def R1(self):
-        """:class:`~sknano.core.atoms.Bond` 1 \
-            :class:`~sknano.core.math.Vector` \
-            :attr:`~sknano.core.math.Vector.length`.
+        """:class:`~sknano.core.atoms.Bond` 1 :class:`~sknano.core.math.Vector`
+        :attr:`~sknano.core.math.Vector.length`.
         """
         return self.bond1.length
 
@@ -499,7 +500,7 @@ class POAVAtomMixin:
 
     @property
     def POAV1(self):
-        """:class:`~sknano.utils.analysis.POAV1` instance."""
+        """:class:`~sknano.core.atoms.mixins.POAV1` instance."""
         try:
             return self._POAV1
         except AttributeError:
@@ -507,14 +508,14 @@ class POAVAtomMixin:
 
     @POAV1.setter
     def POAV1(self, value):
-        """Set :class:`~sknano.utils.analysis.POAV1` instance."""
+        """Set :class:`~sknano.core.atoms.mixins.POAV1` instance."""
         if not isinstance(value, POAV1):
             raise TypeError('Expected a `POAV1` instance.')
         self._POAV1 = value
 
     @property
     def POAV2(self):
-        """:class:`~sknano.utils.analysis.POAV2` instance."""
+        """:class:`~sknano.core.atoms.mixins.POAV2` instance."""
         try:
             return self._POAV2
         except AttributeError:
@@ -522,14 +523,14 @@ class POAVAtomMixin:
 
     @POAV2.setter
     def POAV2(self, value):
-        """Set :class:`~sknano.utils.analysis.POAV2` instance."""
+        """Set :class:`~sknano.core.atoms.mixins.POAV2` instance."""
         if not isinstance(value, POAV2):
             raise TypeError('Expected a `POAV2` instance.')
         self._POAV2 = value
 
     @property
     def POAVR(self):
-        """:class:`~sknano.utils.analysis.POAVR` instance."""
+        """:class:`~sknano.core.atoms.mixins.POAVR` instance."""
         try:
             return self._POAVR
         except AttributeError:
@@ -537,7 +538,7 @@ class POAVAtomMixin:
 
     @POAVR.setter
     def POAVR(self, value):
-        """Set :class:`~sknano.utils.analysis.POAVR` instance."""
+        """Set :class:`~sknano.core.atoms.mixins.POAVR` instance."""
         if not isinstance(value, POAVR):
             raise TypeError('Expected a `POAVR` instance.')
         self._POAVR = value
@@ -546,14 +547,12 @@ class POAVAtomMixin:
 class POAVAtomsMixin:
     """Mixin class for POAV analysis."""
 
-    def analyze_POAVs(self):
-        """Alias for :meth:`~POAVAtomsMixin.compute_POAVs`."""
-        self.compute_POAVs()
-
-    # @timethis
-    def compute_POAVs(self):
+    @timethis
+    def analyze_POAVs(self, cutoff=None):
         """Compute `POAV1`, `POAV2`, `POAVR`."""
-        super().update_attrs()
+        # super().update_attrs()
+        if not self.neighbors_analyzed:
+            self.update_neighbors(cutoffs=cutoff)
 
         POAV_classes = {'POAV1': POAV1, 'POAV2': POAV2, 'POAVR': POAVR}
 
@@ -604,6 +603,10 @@ class POAVAtomsMixin:
                     POAV.misalignment_angles = misalignment_angles
                     POAV.sigma_pi_angles = sigma_pi_angles
 
+    def compute_POAVs(self, **kwargs):
+        """Alias for :meth:`~POAVAtomsMixin.analyze_POAVs`."""
+        self.analyze_POAVs(**kwargs)
+
     @property
     def POAV1(self):
         """List of :class:`~sknano.core.atoms.mixins.POAVAtom` :class:`POAV1` \
@@ -633,10 +636,11 @@ class POAVAtomsMixin:
 
         Returns
         -------
-        :class:`~python:list`
+        :class:`~python:tuple`
 
         """
         attr_values = []
+        atom_ids = []
         attr_list = attr.split('.')
         for atom in self:
             POAV = getattr(atom, POAV_class)
@@ -645,10 +649,11 @@ class POAVAtomsMixin:
                 for attr in attr_list:
                     val = getattr(val, attr)
                 attr_values.append(val)
+                atom_ids.append(atom.id)
 
         if len(attr_list) == 1 and attr_list[0] in POAV_vectors:
             attr_values = Vectors(attr_values)
-        return attr_values
+        return attr_values, atom_ids
 
         # return [getattr(getattr(atom, POAV_class), attr) for atom in self
         #         if getattr(atom, POAV_class) is not None]
