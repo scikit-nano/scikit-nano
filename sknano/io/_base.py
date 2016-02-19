@@ -14,7 +14,8 @@ __docformat__ = 'restructuredtext en'
 from abc import ABCMeta, abstractmethod
 
 from sknano.core import get_fpath
-from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
+from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms, \
+    MDAtom, MDAtoms
 from sknano.core.structures import StructureData
 # from sknano.utils.analysis import StructureAnalyzer
 from sknano.version import version
@@ -24,7 +25,7 @@ default_comment_line = \
 default_structure_format = 'xyz'
 supported_structure_formats = ('xyz', 'data', 'dump')
 
-__all__ = ['Atom', 'Atoms',
+__all__ = ['Atom', 'Atoms', 'MDAtom', 'MDAtoms',
            'StructureIO',
            'StructureReader',
            'StructureWriter',

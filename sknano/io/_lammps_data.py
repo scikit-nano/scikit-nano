@@ -20,8 +20,8 @@ from monty.io import zopen
 from sknano.core import get_fpath
 # from sknano.core.crystallography import Crystal3DLattice
 from sknano.core.geometric_regions import generate_bounding_box, Cuboid
-from ._base import Atom, StructureIO, StructureIOError, StructureConverter, \
-    default_comment_line
+from ._base import MDAtom as Atom, StructureIO, StructureIOError, \
+    StructureConverter, default_comment_line
 
 __all__ = ['DATAReader', 'DATAWriter', 'DATAData', 'DATAFormatSpec',
            'DATAIOError', 'DATA2XYZConverter', 'LAMMPSDATAReader',
