@@ -142,6 +142,17 @@ class NeighborAtomsMixin(KDTreeAtomsMixin):
     """Mixin `Atoms` class for neighbor analysis."""
 
     @property
+    def neighbors_analyzed(self):
+        """Return `True` if neighbors have been analyzed."""
+        return self._neighbors_analyzed
+
+    @neighbors_analyzed.setter
+    def neighbors_analyzed(self, value):
+        if not isinstance(value, bool):
+            raise ValueError('Expected a boolean value.')
+        self._neighbors_analyzed = self.kwargs['neighbors_analyzed'] = value
+
+    @property
     def neighbors(self):
         """Return array of neighbor atoms."""
         return np.asarray([atom.neighbors for atom in self])
@@ -211,6 +222,9 @@ class NeighborAtomsMixin(KDTreeAtomsMixin):
         if not any([np.allclose(self.NNrc, cutoff) for cutoff in cutoffs]):
             cutoffs.append(self.NNrc)
 
+        if not self._neighbors_analyzed:
+            self.neighbors_analyzed = True
+
         for n, cutoff in enumerate(sorted(cutoffs), start=1):
             try:
                 NNd, NNi = self.query_atom_tree(k=self.kNN, rc=cutoff)
@@ -233,7 +247,7 @@ class NeighborAtomsMixin(KDTreeAtomsMixin):
     def update_neighbor_lists(self):
         """Update neighbor lists"""
         self._update_nn_lists()
-        self._update_nn_seed_list()
+        self._update_nn_seed()
         self._update_nn_vectors()
         self._update_nn_adjacency_matrix()
 
@@ -259,11 +273,11 @@ class NeighborAtomsMixin(KDTreeAtomsMixin):
         return self._nn_adjacency_list
 
     @property
-    def nn_seed_list(self):
+    def nn_seed(self):
         """Return nearest-neighbor seed list"""
-        if self._nn_seed_list is None:
-            self._update_nn_seed_list()
-        return self._nn_seed_list
+        if self._nn_seed is None:
+            self._update_nn_seed()
+        return self._nn_seed
 
     @property
     def nn_vectors(self):
@@ -288,23 +302,23 @@ class NeighborAtomsMixin(KDTreeAtomsMixin):
         self.idx = np.asarray(idx, dtype=int)
         self.nn_idx = np.asarray(nn_idx, dtype=int)
 
-    def _update_nn_seed_list(self):
+    def _update_nn_seed(self):
         n = self.Natoms
         nnn = self.NNN
         idx = self.idx
-        nn_seed_list = (n + 1) * [0]
+        nn_seed = (n + 1) * [0]
         for k in range(n):
-            nn_seed_list[k] = -1
-        nn_seed_list[n] = nnn
-        nn_seed_list[idx[0]] = 0
+            nn_seed[k] = -1
+        nn_seed[n] = nnn
+        nn_seed[idx[0]] = 0
         for k in range(1, nnn):
             if idx[k] != idx[k - 1]:
-                nn_seed_list[idx[k]] = k
-        self._nn_seed_list = nn_seed_list
+                nn_seed[idx[k]] = k
+        self._nn_seed = np.asarray(nn_seed, dtype=int)
 
     def _update_nn_adjacency_matrix(self):
         Natoms = self.Natoms
-        nn_seed = self.nn_seed_list
+        nn_seed = self.nn_seed
         nn_idx = self.nn_idx
         nn_adjacency_matrix = np.zeros((Natoms, Natoms), dtype=int)
         # self._update_nn_lists()
@@ -337,7 +351,7 @@ class NeighborAtomsMixin(KDTreeAtomsMixin):
     def _update_nn_adjacency_map(self):
         Natoms = self.Natoms
         nn_idx = self.nn_idx
-        nn_seed = self.nn_seed_list
+        nn_seed = self.nn_seed
         nn_adjacency_map = OrderedDict()
         for i in range(Natoms):
             nn_adjacency_map[i] = \
@@ -347,7 +361,7 @@ class NeighborAtomsMixin(KDTreeAtomsMixin):
     def _update_nn_adjacency_list(self):
         Natoms = self.Natoms
         nn_idx = self.nn_idx
-        nn_seed = self.nn_seed_list
+        nn_seed = self.nn_seed
         nn_adjacency_list = []
         for i in range(Natoms):
             nn_adjacency_list.append(
