@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==========================================================================
-Periodic Table of Elements (:mod:`sknano.core.refdata._periodic_kdtree`)
+Periodic KD-Tree (:mod:`sknano.core.analysis._periodic_kdtree`)
 ==========================================================================
 
-.. currentmodule:: sknano.core.refdata._periodic_kdtree
+.. currentmodule:: sknano.core.analysis._periodic_kdtree
 
 .. versionadded:: 0.3.22
 
@@ -13,7 +13,7 @@ conditions
 
 Original source code written by Patrick Varilly, 6 Jul 2012.
 
-Modified and included with scikit-nano v0.3.22.
+Modified and included with scikit-nano v0.4.0.
 
 """
 from __future__ import absolute_import, division, print_function, \
