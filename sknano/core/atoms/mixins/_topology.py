@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Class representation of atom bonds (:mod:`sknano.core.atoms._bonds`)
+Topology Mixin (:mod:`sknano.core.atoms.mixins._topology`)
 ===============================================================================
 
-.. currentmodule:: sknano.core.atoms._bonds
+.. currentmodule:: sknano.core.atoms.mixins._topology
 
 """
 from __future__ import absolute_import, division, print_function
@@ -22,8 +22,6 @@ import numpy as np
 
 # from sknano.core import flatten
 from sknano.core.math import angle, dot
-
-from ._bonds import Bond, Bonds
 
 __all__ = ['AngleMixin', 'BondMixin', 'DihedralMixin', 'ImproperMixin',
            'AtomTopologyMixin', 'AtomsTopologyMixin',
@@ -66,6 +64,7 @@ class BondMixin:
     @property
     def bonds(self):
         """Return atom `Bonds` instance."""
+        from ._bonds import Bond, Bonds
         try:
             return Bonds([Bond(self, nn) for nn in self.NN])
         except (AttributeError, TypeError):
@@ -73,6 +72,7 @@ class BondMixin:
 
 
 class DihedralMixin:
+    """Mixin class for dihedral angle calculations."""
 
     def get_dihedral(self, *atoms):
         pass
@@ -92,6 +92,7 @@ class AtomsTopologyMixin:
 
     @property
     def bonds(self):
+        from ._bonds import Bonds
         return Bonds([bond for atom in self for bond in atom.bonds])
 
     @property
