@@ -17,6 +17,8 @@ Mixin `Atom`/`Atoms` classes
 
    AtomAdapterMixin
    AtomsAdapterMixin
+   AtomTopologyMixin
+   AtomsTopologyMixin
    KDTreeAtomsMixin
    NeighborAtomMixin
    NeighborAtomsMixin
@@ -41,5 +43,6 @@ from ._neighbor_atoms import *
 from ._poav_atoms import *
 from ._periodic_atoms import *
 from ._ring_atoms import *
+from ._topology import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
