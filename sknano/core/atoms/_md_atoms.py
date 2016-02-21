@@ -19,13 +19,14 @@ import sknano.core.atoms
 
 from ._energy_atoms import EnergyAtom, EnergyAtoms
 from ._force_atoms import ForceAtom, ForceAtoms
+from ._velocity_atoms import VelocityAtom, VelocityAtoms
 from ._structure_atoms import StructureAtom, StructureAtoms
 from ._bonds import Bond, Bonds
 
 __all__ = ['MDAtom', 'MDAtoms']
 
 
-class MDAtom(StructureAtom, ForceAtom, EnergyAtom):
+class MDAtom(StructureAtom, VelocityAtom, ForceAtom, EnergyAtom):
     """An `Atom` class for molecular dynamics trajectory analysis.
 
     """
@@ -84,7 +85,7 @@ class MDAtom(StructureAtom, ForceAtom, EnergyAtom):
         return super_dict
 
 
-class MDAtoms(StructureAtoms, ForceAtoms, EnergyAtoms):
+class MDAtoms(StructureAtoms, VelocityAtoms, ForceAtoms, EnergyAtoms):
     """An `Atoms` sub-class for molecular dynamics trajectory analysis.
 
     Sub-class of :class:`~sknano.core.atoms.StructureAtoms` class,
