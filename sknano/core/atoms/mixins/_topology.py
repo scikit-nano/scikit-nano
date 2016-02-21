@@ -64,7 +64,7 @@ class BondMixin:
     @property
     def bonds(self):
         """Return atom `Bonds` instance."""
-        from ._bonds import Bond, Bonds
+        from .._bonds import Bond, Bonds
         try:
             return Bonds([Bond(self, nn) for nn in self.NN])
         except (AttributeError, TypeError):
@@ -92,7 +92,7 @@ class AtomsTopologyMixin:
 
     @property
     def bonds(self):
-        from ._bonds import Bonds
+        from .._bonds import Bonds
         return Bonds([bond for atom in self for bond in atom.bonds])
 
     @property
