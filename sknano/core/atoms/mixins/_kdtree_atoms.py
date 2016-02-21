@@ -11,64 +11,28 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-import numbers
-import warnings
-warnings.filterwarnings('ignore', "Mean of empty slice.")
-warnings.filterwarnings('ignore',
-                        'invalid value encountered in double_scalars')
+from abc import ABCMeta, abstractmethod
+
+# import warnings
+# warnings.filterwarnings('ignore', "Mean of empty slice.")
+# warnings.filterwarnings('ignore',
+#                         'invalid value encountered in double_scalars')
 
 import numpy as np
 
-try:
-    from scipy.spatial import KDTree
-    # from scipy.spatial import cKDTree as KDTree
-except ImportError:
-    raise ImportError('Install scipy version >= 0.13.0 to allow '
-                      'nearest-neighbor queries between atoms.')
-
 from sknano.core import dedupe, flatten
-from sknano.core.analysis import PeriodicKDTree
 
 __all__ = ['KDTreeAtomsMixin']
 
 
-class KDTreeAtomsMixin:
+class KDTreeAtomsMixin(metaclass=ABCMeta):
     """Mixin Atoms class for KDTree analysis."""
 
     @property
-    def kNN(self):
-        """Max number of nearest-neighbors to return from kd-tree search."""
-        return self._kNN
-
-    @kNN.setter
-    def kNN(self, value):
-        if not isinstance(value, numbers.Number):
-            raise TypeError('Expected an integer >= 0')
-        self._kNN = self.kwargs['kNN'] = int(value)
-
-    @property
-    def NNrc(self):
-        """Nearest neighbor radius cutoff."""
-        return self._NNrc
-
-    @NNrc.setter
-    def NNrc(self, value):
-        if not (isinstance(value, numbers.Number) and value >= 0):
-            raise TypeError('Expected a real number greater >= 0')
-        self._NNrc = self.kwargs['NNrc'] = value
-
-    @property
+    @abstractmethod
     def atom_tree(self):
-        """:class:`~scipy:scipy.spatial.KDTree` of :attr:`~XAtoms.coords.`"""
-        try:
-            if np.any(self.pbc):
-                boxsize = np.asarray(self.lattice.lengths)
-                return PeriodicKDTree(np.asarray(self.coords), boxsize=boxsize,
-                                      lattice=self.lattice)
-            return KDTree(np.asarray(self.coords))
-        except ValueError as e:
-            print(e)
-            return None
+        """:class:`~scipy:scipy.spatial.KDTree` of atom coordinates."""
+        raise NotImplementedError
 
     def query_atom_tree(self, k=16, eps=0, p=2, rc=np.inf):
         """Query atom tree for nearest neighbors distances and indices.
@@ -211,22 +175,3 @@ class KDTreeAtomsMixin:
         atom_tree = self.atom_tree
         if atom_tree is not None:
             return atom_tree.count_neighbors(other, r, p=p)
-
-    def count_neighbors_in_self(self, r, p=2.0):
-        """Count number of neighbor pairs for each atom in self.
-
-        Parameters
-        ----------
-        r : float or one-dimensional array of floats
-        p : float, 1<=p<=infinity, optional
-
-        Returns
-        -------
-        result : 1-D array of ints
-
-        """
-        r = np.asarray(r)
-        ids = self.ids
-        return np.asarray([KDTree([atom.r]).count_neighbors(
-                           self.filtered(ids != atom.id).atom_tree,
-                           r, p=p) for atom in self])
