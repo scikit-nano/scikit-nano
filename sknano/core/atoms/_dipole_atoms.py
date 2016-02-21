@@ -16,7 +16,7 @@ import numbers
 
 import numpy as np
 
-from sknano.core.math import Vector
+from sknano.core.math import Vector, Vectors
 from ._atoms import Atom, Atoms
 
 __all__ = ['DipoleAtom', 'DipoleAtoms']
@@ -225,9 +225,32 @@ class DipoleAtoms(Atoms):
         super().sort(key=key, reverse=reverse)
 
     @property
+    def p(self):
+        """:class:`Vectors` of :attr:`DipoleAtom.p` :class:`Vector`\ s."""
+        return Vectors([atom.p for atom in self])
+
+    @property
     def dipole_moments(self):
-        """Return array of `DipoleAtom` dipole moments."""
-        return np.asarray([atom.p for atom in self])
+        """An alias for :attr:`DipoleAtoms.p"""
+        return self.p
+
+    @property
+    def px(self):
+        """:class:`~numpy:numpy.ndarray` of :attr:`DipoleAtom.px` \
+            components."""
+        return self.p.x
+
+    @property
+    def py(self):
+        """:class:`~numpy:numpy.ndarray` of :attr:`DipoleAtom.py` \
+            components."""
+        return self.p.y
+
+    @property
+    def pz(self):
+        """:class:`~numpy:numpy.ndarray` of :attr:`DipoleAtom.pz` \
+            components."""
+        return self.p.z
 
     @property
     def P(self):

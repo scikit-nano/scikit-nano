@@ -14,9 +14,10 @@ __docformat__ = 'restructuredtext en'
 # from operator import attrgetter
 import copy
 import numbers
+
 import numpy as np
 
-from sknano.core.math import Vector
+from sknano.core.math import Vector, Vectors
 
 from ._atoms import Atom, Atoms
 from .mixins import PBCAtomsMixin
@@ -54,11 +55,6 @@ class LatticeAtom(Atom):
             return super().__eq__(other)
         return self.rs == other.rs and super().__eq__(other)
 
-    # def __lt__(self, other):
-    #     """Test if `self` is *less than* `other`."""
-    #     return (self.rs < other.rs and super().__le__(other)) or \
-    #         (self.rs <= other.rs and super().__lt__(other))
-
     def __le__(self, other):
         if not self._is_valid_operand(other):
             return NotImplemented
@@ -67,6 +63,11 @@ class LatticeAtom(Atom):
         if self.rs > other.rs or not super().__le__(other):
             return False
         return True
+
+    # def __lt__(self, other):
+    #     """Test if `self` is *less than* `other`."""
+    #     return (self.rs < other.rs and super().__le__(other)) or \
+    #         (self.rs <= other.rs and super().__lt__(other))
 
     def __lt__(self, other):
         if not self._is_valid_operand(other):
@@ -104,12 +105,12 @@ class LatticeAtom(Atom):
 
     @property
     def xs(self):
-        """:math:`x`-coordinate in units of **Angstroms**.
+        """Scaled :math:`x`-coordinate.
 
         Returns
         -------
         float
-            :math:`x`-coordinate in units of **Angstroms**.
+            Scaled :math:`x`-coordinate.
 
         """
         try:
@@ -119,12 +120,12 @@ class LatticeAtom(Atom):
 
     @xs.setter
     def xs(self, value):
-        """Set `Atom` :math:`x`-coordinate in units of **Angstroms**.
+        """Set `Atom` :math:`x`-coordinate.
 
         Parameters
         ----------
         value : float
-            :math:`x`-coordinate in units of **Angstroms**.
+            :math:`x`-coordinate..
 
         """
         if not isinstance(value, numbers.Number):
@@ -139,12 +140,12 @@ class LatticeAtom(Atom):
 
     @property
     def ys(self):
-        """:math:`y`-coordinate in units of **Angstroms**.
+        """Scaled :math:`y`-coordinate.
 
         Returns
         -------
         float
-            :math:`y`-coordinate in units of **Angstroms**.
+            Scaled :math:`y`-coordinate.
 
         """
         try:
@@ -154,12 +155,12 @@ class LatticeAtom(Atom):
 
     @ys.setter
     def ys(self, value):
-        """Set `Atom` :math:`y`-coordinate in units of **Angstroms**.
+        """Set `Atom` :math:`y`-coordinate.
 
         Parameters
         ----------
         value : float
-            :math:`y`-coordinate in units of **Angstroms**.
+            :math:`y`-coordinate.
 
         """
         if not isinstance(value, numbers.Number):
@@ -173,12 +174,12 @@ class LatticeAtom(Atom):
 
     @property
     def zs(self):
-        """:math:`z`-coordinate in units of **Angstroms**.
+        """Scaled :math:`z`-coordinate.
 
         Returns
         -------
         float
-            :math:`z`-coordinate in units of **Angstroms**.
+            Scaled :math:`z`-coordinate.
 
         """
         try:
@@ -188,12 +189,12 @@ class LatticeAtom(Atom):
 
     @zs.setter
     def zs(self, value):
-        """Set `Atom` :math:`z`-coordinate in units of **Angstroms**.
+        """Set `Atom` :math:`z`-coordinate.
 
         Parameters
         ----------
         value : float
-            :math:`z`-coordinate in units of **Angstroms**.
+            Scaled :math:`z`-coordinate
 
         """
         if not isinstance(value, numbers.Number):
@@ -207,12 +208,12 @@ class LatticeAtom(Atom):
 
     @property
     def rs(self):
-        """:math:`x, y, z` components of `Atom` position vector.
+        """Scaled :math:`x, y, z` components of `Atom` position vector.
 
         Returns
         -------
         ndarray
-            3-element ndarray of [:math:`x, y, z`] coordinates of `Atom`.
+            3-element ndarray of [:math:`x_s, y_s, z_s`] coordinates of `Atom`.
 
         """
         try:
@@ -222,7 +223,7 @@ class LatticeAtom(Atom):
 
     @rs.setter
     def rs(self, value):
-        """Set :math:`x, y, z` components of `Atom` position vector.
+        """Set scaled :math:`x, y, z` components of `Atom` position vector.
 
         Parameters
         ----------
@@ -275,7 +276,7 @@ class LatticeAtom(Atom):
         super().rotate(**kwargs)
 
     def translate(self, t, fix_anchor_point=True):
-        """Translate `Atom` position vector by :class:`Vector` `t`.
+        """Translate :class:`Atom` position vector by :class:`Vector` `t`.
 
         Parameters
         ----------
@@ -317,27 +318,27 @@ class LatticeAtoms(PBCAtomsMixin, Atoms):
 
     @property
     def rs(self):
-        """:class:`~numpy:numpy.ndarray` of :attr:`Atom.r` position \
-            `Vector`\ s"""
-        return np.asarray([atom.rs for atom in self])
+        """:class:`Vectors` of :attr:`LatticeAtom.rs` :class:`Vector`\ s"""
+        return Vectors([atom.rs for atom in self])
 
     @property
     def xs(self):
-        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`x` coordinates."""
-        return self.rs[:, 0]
+        """:class:`~numpy:numpy.ndarray` of :attr:`LatticeAtom.xs` values"""
+        return self.rs.x
 
     @property
     def ys(self):
-        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`y` coordinates."""
-        return self.rs[:, 1]
+        """:class:`~numpy:numpy.ndarray` of :attr:`LatticeAtom.ys` values"""
+        return self.rs.y
 
     @property
     def zs(self):
-        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`z` coordinates."""
-        return self.rs[:, 2]
+        """:class:`~numpy:numpy.ndarray` of :attr:`LatticeAtom.zs` values"""
+        return self.rs.z
 
     @property
     def lattice(self):
+        """Return the :attr:`LatticeAtom.lattice` of the first atom in self."""
         try:
             return self[0].lattice
         except IndexError:
@@ -349,6 +350,7 @@ class LatticeAtoms(PBCAtomsMixin, Atoms):
 
     @property
     def cell_matrix(self):
+        """Return the :attr:`Crystal3DLattice.cell_matrix`."""
         try:
             return self.lattice.cell_matrix
         except AttributeError:
@@ -356,4 +358,13 @@ class LatticeAtoms(PBCAtomsMixin, Atoms):
 
     @property
     def cell(self):
+        """Alias for :attr:`LatticeAtoms.cell_matrix`."""
         return self.cell_matrix
+
+    def wrap_coords(self, pbc=None):
+        try:
+            [setattr(atom, 'r', self.lattice.wrap_cartesian_coordinate(
+                     atom.r, pbc=pbc if pbc is not None else self.pbc))
+             for atom in self]
+        except AttributeError:
+            pass

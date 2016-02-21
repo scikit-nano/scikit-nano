@@ -232,29 +232,30 @@ class VelocityAtoms(Atoms):
         super().sort(key=key, reverse=reverse)
 
     @property
-    def velocities(self):
-        """:class:`~numpy:numpy.ndarray` of `VelocityAtom` velocities."""
+    def v(self):
+        """Returns a :class:`Vectors` object of :attr:`VelocityAtom.v` \
+            :class:`Vector`\ s"""
         return Vectors([atom.v for atom in self])
 
     @property
-    def v(self):
-        """Alias for :attr:`~VelocityAtoms.velocities`."""
-        return self.velocities
+    def velocities(self):
+        """Alias for :attr:`~VelocityAtoms.v`."""
+        return self.v
 
     @property
     def vx(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`v_x` \
             components."""
-        return np.asarray(self.v)[:, 0]
+        return self.v.x
 
     @property
     def vy(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`v_y` \
             components."""
-        return np.asarray(self.v)[:, 1]
+        return self.v.y
 
     @property
     def vz(self):
         """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`v_z` \
             components."""
-        return np.asarray(self.v)[:, 2]
+        return self.v.z
