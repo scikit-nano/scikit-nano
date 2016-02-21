@@ -20,8 +20,6 @@ Mixin `Atom`/`Atoms` classes
    AtomTopologyMixin
    AtomsTopologyMixin
    KDTreeAtomsMixin
-   NeighborAtomMixin
-   NeighborAtomsMixin
    PBCAtomsMixin
    POAVAtomMixin
    POAVAtomsMixin
@@ -39,7 +37,6 @@ __docformat__ = 'restructuredtext en'
 
 from ._adapters import *
 from ._kdtree_atoms import *
-from ._neighbor_atoms import *
 from ._poav_atoms import *
 from ._periodic_atoms import *
 from ._ring_atoms import *
