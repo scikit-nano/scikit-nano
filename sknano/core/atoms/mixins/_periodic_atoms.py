@@ -18,11 +18,12 @@ __all__ = ['PBCAtomsMixin']
 
 class PBCAtomsMixin:
     """:class:`~sknano.core.atoms.mixins.Atoms` class for PBC."""
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, xperiodic=False, yperiodic=False,
+                 zperiodic=False, **kwargs):
         super().__init__(*args, **kwargs)
-        self._xperiodic = False
-        self._yperiodic = False
-        self._zperiodic = False
+        self.xperiodic = xperiodic
+        self.yperiodic = yperiodic
+        self.zperiodic = zperiodic
 
     @property
     def xperiodic(self):
@@ -30,7 +31,7 @@ class PBCAtomsMixin:
 
     @xperiodic.setter
     def xperiodic(self, value):
-        self._xperiodic = bool(value)
+        self._xperiodic = self.kwargs['xperiodic'] = bool(value)
 
     @property
     def yperiodic(self):
@@ -38,7 +39,7 @@ class PBCAtomsMixin:
 
     @yperiodic.setter
     def yperiodic(self, value):
-        self._yperiodic = bool(value)
+        self._yperiodic = self.kwargs['yperiodic'] = bool(value)
 
     @property
     def zperiodic(self):
@@ -46,7 +47,7 @@ class PBCAtomsMixin:
 
     @zperiodic.setter
     def zperiodic(self, value):
-        self._zperiodic = bool(value)
+        self._zperiodic = self.kwargs['zperiodic'] = bool(value)
 
     @property
     def pbc(self):
@@ -59,20 +60,14 @@ class PBCAtomsMixin:
             raise TypeError('Expected an array_like object')
         self.xperiodic, self.yperiodic, self.zperiodic = value
 
-    def set_pbc(self, xperiodic=True, yperiodic=True, zperiodic=True):
-        self.xperiodic = xperiodic
-        self.yperiodic = yperiodic
-        self.zperiodic = zperiodic
+    def set_pbc(self, dims):
+        if 'x' in dims:
+            self.xperiodic = True
+        for dim in 'xyz':
+            if dim in dims:
+                setattr(self, dim + 'periodic', True)
 
     def unset_pbc(self):
         self.xperiodic = False
         self.yperiodic = False
         self.zperiodic = False
-
-    def wrap_coords(self, pbc=None):
-        try:
-            [setattr(atom, 'r', self.lattice.wrap_cartesian_coordinate(
-                     atom.r, pbc=pbc if pbc is not None else self.pbc))
-             for atom in self]
-        except AttributeError:
-            pass
