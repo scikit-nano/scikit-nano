@@ -93,6 +93,8 @@ Helper functions for atom objects
 .. autosummary::
    :toctree: generated/
 
+   get_angle
+   get_dihedral
    vdw_radius_from_basis
 
 """
@@ -120,6 +122,7 @@ from ._structure_atoms import *
 from ._neighbor_atoms import *
 from ._vdW_atoms import *
 from ._selections import *
-from ._topology import *
+
+from .mixins import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
