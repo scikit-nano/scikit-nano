@@ -69,8 +69,8 @@ class POAV:
 
     def __str__(self):
         fmtstr = '{}\n=====\n'.format(self.__class__.__name__)
-        for k, v in list(self.todict(rad2deg=True).items()):
-            fmtstr += '{}: {}\n'.format(k, v)
+        for k, v in self.todict(rad2deg=True).items():
+            fmtstr += '{}: {:.4f}\n'.format(k, v)
         return fmtstr
 
     def __repr__(self):
@@ -335,11 +335,13 @@ class POAV:
 
     def todict(self, rad2deg=False):
         """Return dictionary of `POAV` class attributes."""
+        bond_angles = self.bond_angles
         sigma_pi_angles = self.sigma_pi_angles
         pyramidalization_angles = self.pyramidalization_angles
         misalignment_angles = self.misalignment_angles
 
         if rad2deg:
+            bond_angles = np.degrees(bond_angles)
             sigma_pi_angles = np.degrees(sigma_pi_angles)
             pyramidalization_angles = np.degrees(pyramidalization_angles)
             misalignment_angles = np.degrees(misalignment_angles)
@@ -348,9 +350,9 @@ class POAV:
             [('bond1', self.bond1.length),
              ('bond2', self.bond2.length),
              ('bond3', self.bond3.length),
-             ('sigma_bond_angle12', self.sigma_bond_angle12),
-             ('sigma_bond_angle23', self.sigma_bond_angle23),
-             ('sigma_bond_angle31', self.sigma_bond_angle31),
+             ('sigma_bond_angle12', bond_angles[0]),
+             ('sigma_bond_angle23', bond_angles[1]),
+             ('sigma_bond_angle31', bond_angles[2]),
              ('sigma_pi_angle1', sigma_pi_angles[0]),
              ('sigma_pi_angle2', sigma_pi_angles[1]),
              ('sigma_pi_angle3', sigma_pi_angles[2]),
