@@ -42,90 +42,127 @@ __all__ = ['DiamondGenerator', 'DiamondStructureGenerator',
 
 
 class AlphaQuartzGenerator(BulkGeneratorBase, AlphaQuartz):
-    """:class:`AlphaQuartz` generator class.
+    """:class:`~sknano.core.structures.AlphaQuartz` generator class.
 
     Parameters
     ----------
     a, c : :class:`~python:float`
     scaling_matrix : {None, :class:`~python:float`, :class:`~python:list`}
+
+    Examples
+    --------
+    >>> from sknano.generators import AlphaQuartzGenerator
+    >>> alpha_quartz = AlphaQuartzGenerator(scaling_matrix=5)
+    >>> alpha_quartz.save()
+
+    .. image:: /images/alpha_quartz_5x5x5-1.png
+
     """
-    def save(self, fname='alpha_quartz', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+    pass
 
 
 class DiamondGenerator(BulkGeneratorBase, DiamondStructure):
-    """:class:`DiamondStructure` generator class.
+    """:class:`~sknano.core.structures.DiamondStructure` generator class.
 
     Parameters
     ----------
     a : class:`~python:float`
 
+    Examples
+    --------
+    >>> from sknano.generators import DiamondGenerator
+    >>> diamond = DiamondGenerator(scaling_matrix=5)
+    >>> diamond.save()
+
+    .. image:: /images/diamond_5x5x5-1.png
+
     """
-    def save(self, fname='diamond', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+    pass
 
 DiamondStructureGenerator = DiamondGenerator
 
 
 class CaesiumChlorideGenerator(BulkGeneratorBase, CaesiumChlorideStructure):
-    """:class:`CaesiumChlorideStructure` generator class."""
-    def save(self, fname='caesium_chloride', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+    """:class:`~sknano.core.structures.CaesiumChlorideStructure` generator \
+        class.
+
+    Examples
+    --------
+    >>> from sknano.generators import CaesiumChlorideGenerator
+    >>> caesium_chloride = CaesiumChlorideGenerator(scaling_matrix=10)
+    >>> caesium_chloride.save()
+
+    .. image:: /images/caesium_chloride_10x10x10-1.png
+
+    """
+    pass
 
 CaesiumChlorideStructureGenerator = CsClGenerator = CaesiumChlorideGenerator
 
 
 class RocksaltGenerator(BulkGeneratorBase, RocksaltStructure):
     """:class:`RocksaltStructure` generator class."""
-    def save(self, fname='rock_salt', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+    pass
 
 RocksaltStructureGenerator = NaClGenerator = RocksaltGenerator
 
 
 class ZincblendeGenerator(BulkGeneratorBase, ZincblendeStructure):
-    """:class:`ZincblendeStructure` generator class."""
-    def save(self, fname='zincblende', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+    """:class:`~sknano.core.structures.ZincblendeStructure` generator class.
+
+    Examples
+    --------
+    >>> from sknano.generators import ZincblendeGenerator
+    >>> zincblende = ZincblendeGenerator(scaling_matrix=5)
+    >>> zincblende.save()
+
+    .. image:: /images/zincblende_5x5x5-1.png
+
+    """
+    pass
 
 ZincblendeStructureGenerator = ZincblendeGenerator
 
 
 class BCCGenerator(BulkGeneratorBase, BCCStructure):
-    """:class:`BCCStructure` generator class."""
-    def save(self, fname='bcc_structure', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+    """:class:`~sknano.core.structures.BCCStructure` generator class."""
+    pass
 
 BCCStructureGenerator = BCCGenerator
 
 
 class FCCGenerator(BulkGeneratorBase, FCCStructure):
-    """:class:`FCCStructure` generator class."""
-    def save(self, fname='fcc_structure', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+    """:class:`~sknano.core.structures.FCCStructure` generator class."""
+    pass
 
 FCCStructureGenerator = FCCGenerator
 
 
 class MoS2Generator(BulkGeneratorBase, MoS2):
-    """:class:`MoS2` generator class."""
-    def save(self, fname='MoS2', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+    """:class:`~sknano.core.structures.MoS2` generator class.
+
+    Examples
+    --------
+    >>> from sknano.generators import MoS2Generator
+    >>> mos2 = MoS2Generator(scaling_matrix=5)
+    >>> mos2.save()
+
+    .. image:: /images/MoS2_5x5x5-1.png
+
+    """
+    pass
 
 
 class IronGenerator(BulkGeneratorBase, Iron):
     """:class:`Iron` generator class."""
-    def save(self, fname='iron', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+    pass
 
 
 class GoldGenerator(BulkGeneratorBase, Gold):
     """:class:`Gold` generator class."""
-    def save(self, fname='gold', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+    pass
 
 
 class CopperGenerator(BulkGeneratorBase, Copper):
     """:class:`Copper` generator class."""
-    def save(self, fname='copper', **kwargs):
-        super().save(fname=fname, scaling_matrix=self.scaling_matrix, **kwargs)
+    pass

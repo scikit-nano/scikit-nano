@@ -16,7 +16,9 @@ from abc import ABCMeta, abstractmethod
 import copy
 import os
 
-from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
+import numpy as np
+
+from sknano.core.atoms import MDAtom as Atom, MDAtoms as Atoms
 from sknano.io import default_structure_format, supported_structure_formats
 
 __all__ = ['Atom', 'Atoms', 'GeneratorBase', 'BaseGenerator', 'GeneratorMixin',
@@ -238,8 +240,11 @@ BaseGenerator = GeneratorBase
 
 
 class GeneratorMixin:
-    "Mixin class providing concrete :meth:`~GeneratorBase.generate` method."
+    """Mixin class with concrete implementation of \
+        :meth:`~GeneratorBase.generate` method."""
     def generate(self):
+        """Concrete implementation of :meth:`~GeneratorBase.generate` \
+            method."""
         self.structure.clear()
         for atom in self.crystal_cell:
             self.atoms.append(Atom(**atom.todict()))
@@ -249,11 +254,33 @@ class GeneratorMixin:
 class BulkGeneratorBase(GeneratorMixin, GeneratorBase):
     """Base class for the *bulk structure generator* classes."""
     def save(self, fname=None, scaling_matrix=None, **kwargs):
-        if fname is not None:
-            if scaling_matrix is not None:
-                fname = '_'.join((fname,
-                                  'x'.join(map(str, scaling_matrix))))
+        """Save structure data."""
+        if fname is None:
+            fname = self.__class__.__name__[:-len('Generator')]
+        if scaling_matrix is None:
+            scaling_matrix = self.scaling_matrix.A
+        elif isinstance(scaling_matrix, np.matrix):
+            scaling_matrix = scaling_matrix.A
 
+        if fname is not None and scaling_matrix is not None:
+            ext = None
+            if fname.endswith(supported_structure_formats):
+                fname, ext = os.path.splitext(fname)
+
+            if isinstance(scaling_matrix, np.ndarray):
+                if scaling_matrix.ndim == 2:
+                    if scaling_matrix.shape == (1, 3):
+                        scaling_matrix = scaling_matrix.flatten()
+                    elif scaling_matrix.shape == (3, 3) and \
+                            np.all(scaling_matrix -
+                                   np.diag(np.diag(scaling_matrix)) == 0):
+                        scaling_matrix = scaling_matrix.diagonal()
+                    else:
+                        scaling_matrix = scaling_matrix.flatten()
+
+            fname = '_'.join((fname, 'x'.join(map(str, scaling_matrix))))
+            if ext is not None:
+                fname = fname + ext
         super().save(fname=fname, **kwargs)
 
 BaseBulkGenerator = BulkGeneratorBase
