@@ -175,7 +175,8 @@ class GeneratorBase(metaclass=ABCMeta):
             self.rotate(**rotation_parameters)
 
         getattr(self, 'write_' + structure_format)(
-            fname=fname, outpath=outpath, structure=self, **kwargs)
+            fname=fname, outpath=outpath, structure=self, atoms=atoms,
+            **kwargs)
 
         # StructureWriter.write(fname=fname, outpath=outpath,
         #                       structure_format=structure_format,
@@ -257,6 +258,8 @@ class BulkGeneratorBase(GeneratorMixin, GeneratorBase):
         """Save structure data."""
         if fname is None:
             fname = self.__class__.__name__[:-len('Generator')]
+            if fname.endswith('CC'):
+                fname = '_'.join((fname, '-'.join(set(self.basis.symbols))))
         if scaling_matrix is None:
             scaling_matrix = self.scaling_matrix.A
         elif isinstance(scaling_matrix, np.matrix):
