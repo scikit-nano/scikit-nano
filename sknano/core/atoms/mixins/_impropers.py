@@ -1,0 +1,159 @@
+# -*- coding: utf-8 -*-
+"""
+===============================================================================
+Class representations of improper angles (:mod:`sknano.core.atoms.mixins._impropers`)
+===============================================================================
+
+.. currentmodule:: sknano.core.atoms.mixins._impropers
+
+"""
+from __future__ import absolute_import, division, print_function
+from __future__ import unicode_literals
+__docformat__ = 'restructuredtext en'
+
+# import numpy as np
+
+# from sknano.core.math import vector as vec
+# from ._bonds import Bond
+from ._topology_base import AtomTopology, AtomsTopology
+from ._dihedrals import compute_dihedral
+
+
+__all__ = ['compute_improper', 'Improper', 'Impropers']
+
+
+def compute_improper(*atoms, check_operands=True, degrees=False):
+    """Compute improper angle.
+
+    Parameters
+    ----------
+    *atoms : {:class:`~python:list`, :class:`~sknano.core.atoms.Atoms`}
+        :class:`~python:list` of :class:`~sknano.core.atoms.Atom`\ s
+        or an :class:`~sknano.core.atoms.Atoms` object.
+    check_operands : :class:`~python:bool`, optional
+    degrees : :class:`~python:bool`, optional
+
+    Returns
+    -------
+    :class:`~python:float`
+
+    Raises
+    ------
+    :class:`~python:TypeError`
+        if `atoms` is not a list of :class:`~sknano.core.atoms.Atom` objects
+        or an :class:`~sknano.core.atoms.Atoms` object.
+    :class:`~python:ValueError`
+        if len(atoms) != 4.
+
+    """
+    return compute_dihedral(*atoms, check_operands=check_operands,
+                            degrees=degrees)
+
+
+class Improper(AtomTopology):
+    """Class representation of improper angle between 4 `Atom` objects.
+
+    Parameters
+    ----------
+    *atoms : {:class:`~python:list`, :class:`~sknano.core.atoms.Atoms`}
+        :class:`~python:list` of :class:`~sknano.core.atoms.Atom`\ s
+        or an :class:`~sknano.core.atoms.Atoms` object.
+    check_operands : :class:`~python:bool`, optional
+    parent : Parent :class:`~sknano.core.atoms.Molecule`, if any.
+    id : :class:`~python:int`
+
+    Raises
+    ------
+    :class:`~python:TypeError`
+        if `atoms` is not a list of :class:`~sknano.core.atoms.Atom` objects
+        or an :class:`~sknano.core.atoms.Atoms` object.
+    :class:`~python:ValueError`
+        if len(atoms) != 4.
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.check_operands and len(self.atoms) != 4:
+                raise ValueError('Expected 4 atoms')
+
+        self.fmtstr = "{atom1!r}, {atom2!r}, {atom3!r}, {atom4!r} " + \
+            super().fmtstr
+
+    def __str__(self):
+        """Return nice string representation of `Improper`."""
+        return "Improper({!r}->{!r}->{!r}->{!r})".format(self.atom1.id,
+                                                         self.atom2.id,
+                                                         self.atom3.id,
+                                                         self.atom4.id)
+
+    @property
+    def atom1(self):
+        """:class:`~sknano.core.atoms.Atom` 1 in `Improper`."""
+        return self.atoms[0]
+
+    @property
+    def atom2(self):
+        """:class:`~sknano.core.atoms.Atom` 2 in `Improper`."""
+        return self.atoms[1]
+
+    @property
+    def atom3(self):
+        """:class:`~sknano.core.atoms.Atom` 3 in `Improper`."""
+        return self.atoms[2]
+
+    @property
+    def atom4(self):
+        """:class:`~sknano.core.atoms.Atom` 4 in `Improper`."""
+        return self.atoms[3]
+
+    @property
+    def angle(self):
+        """An alias for :attr:`AtomTopology.measure`."""
+        return self.measure
+
+    def compute_measure(self):
+        """Compute the bond angle, which is the measure of an :class:`Angle`.
+
+        Returns
+        -------
+        :class:`~python:float`
+
+        """
+        return compute_improper(*self.atoms)
+
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        super_dict = super().todict()
+        super_dict.update(dict(atom1=self.atom1, atom2=self.atom2,
+                               atom3=self.atom3, atom4=self.atom4))
+        return super_dict
+
+
+class Impropers(AtomsTopology):
+    """Base class for collection of atom `Improper`\ s.
+
+    Parameters
+    ----------
+    topolist : {None, sequence, `Impropers`}, optional
+        if not `None`, then a list of `Improper` objects
+    parent : Parent :class:`~sknano.core.atoms.Molecule`, if any.
+
+    """
+    @property
+    def __item_class__(self):
+        return Improper
+
+    @property
+    def Nimpropers(self):
+        """Number of `Improper`\ s in `Impropers`."""
+        return len(self)
+
+    @property
+    def angles(self):
+        """:class:`~numpy:numpy.ndarray` of :attr:`~Improper.angles`\ s."""
+        return self.measures
+
+    @property
+    def mean_angle(self):
+        """Mean improper angle."""
+        return self.mean_measure

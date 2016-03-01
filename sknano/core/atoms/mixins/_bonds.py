@@ -1,127 +1,136 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Class representation of atom bonds (:mod:`sknano.core.atoms._bonds`)
+Class representations of atom bonds (:mod:`sknano.core.atoms.mixins._bonds`)
 ===============================================================================
 
-.. currentmodule:: sknano.core.atoms._bonds
+.. currentmodule:: sknano.core.atoms.mixins._bonds
 
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from operator import attrgetter
-
 import numpy as np
 
-from sknano.core import BaseClass, UserList, cyclic_pairs, dedupe, flatten, \
-    pairwise
-from sknano.core.crystallography import pbc_diff
-from sknano.core.math import Vector, vector as vec
+from sknano.core.math import Vector
+from ._topology_base import AtomTopology, AtomsTopology, \
+    check_operands as check_operands_
 
-import sknano.core.atoms
-
-__all__ = ['Bond', 'Bonds']
+__all__ = ['compute_bond', 'Bond', 'Bonds']
 
 
-class Bond(BaseClass):
-    """Abstract representation of bond between 2 `Atom` objects.
+def compute_bond(*atoms, check_operands=True, degrees=False):
+    """Compute bond angles.
 
     Parameters
     ----------
-    atom1, atom2 : `~sknano.core.atoms.Atom` instances
+    *atoms : {:class:`~python:list`, :class:`~sknano.core.atoms.Atoms`}
+        :class:`~python:list` of :class:`~sknano.core.atoms.Atom`\ s
+        or an :class:`~sknano.core.atoms.Atoms` object.
+    check_operands : :class:`~python:bool`, optional
+    degrees : :class:`~python:bool`, optional
+
+    Returns
+    -------
+    :class:`~python:float`
+
+    Raises
+    ------
+    :class:`~python:TypeError`
+        if `atoms` is not a list of :class:`~sknano.core.atoms.Atom` objects
+        or an :class:`~sknano.core.atoms.Atoms` object.
+    :class:`~python:ValueError`
+        if len(atoms) != 2.
 
     """
-    def __init__(self, atom1, atom2):
-        super().__init__()
-        self.atoms = sknano.core.atoms.StructureAtoms()
-        self.atoms.extend([atom1, atom2])
-        self.fmtstr = "{atom1!r}, {atom2!r}"
+    if check_operands:
+        atoms = check_operands_(*atoms, size=2)
+    atom1, atom2 = atoms
+    bvec = Bond(atom1, atom2).vector
+    return bvec.length
+
+
+class Bond(AtomTopology):
+    """Class representation of bond between 2 `Atom` objects.
+
+    Parameters
+    ----------
+    origin, end : :class:`~sknano.core.atoms.Atom` instances
+    parent : Parent :class:`~sknano.core.atoms.Molecule`, if any.
+    id : :class:`~python:int`
+    order : {1, 2, 3, 5}
+
+    Attributes
+    ----------
+    visited : :class:`~python:bool`
+
+    """
+
+    def __init__(self, *args, order=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.check_operands and len(self.atoms) != 2:
+            raise ValueError('Expected 2 atoms')
+
+        self.order = order
+        self.visited = False
+        self.fmtstr = "{origin!r}, {end!r}, order={order!r}, " + super().fmtstr
 
     def __str__(self):
         """Return nice string representation of `Bond`."""
-        return "Bond({!r}->{!r})".format(self.atom1.id, self.atom2.id)
+        return "Bond({!r}->{!r})".format(self.origin.id, self.end.id)
 
-    def _is_valid_operand(self, other):
-        return isinstance(other, self.__class__)
-
-    def __eq__(self, other):
-        if not self._is_valid_operand(other):
-            return NotImplemented
-        return self.atoms == other.atoms and super().__eq__(other)
-
-    def __le__(self, other):
-        if not self._is_valid_operand(other):
-            return NotImplemented
-        if not super().__le__(other) or self.atoms > other.atoms:
-            return False
-        return True
-
-    def __lt__(self, other):
-        if not self._is_valid_operand(other):
-            return NotImplemented
-        return (self.atoms < other.atoms and self.__le__(other))
-
-    def __ge__(self, other):
-        if not self._is_valid_operand(other):
-            return NotImplemented
-        if not super().__ge__(other) or self.atoms < other.atoms:
-            return False
-        return True
-
-    def __gt__(self, other):
-        if not self._is_valid_operand(other):
-            return NotImplemented
-        return self.atoms > other.atoms and self.__ge__(other)
-
-    def __dir__(self):
-        return ['atoms', 'atom1', 'atom2', 'vector', 'unit_vector', 'length']
+    # def __dir__(self):
+    #     attrs = super().__dir__()
+    #     attrs.extend(['vector', 'unit_vector'])
+    #     return attrs
+    #     return ['origin', 'end', 'parent', 'vector', 'unit_vector', 'length']
+    #     return ['atoms', 'atom1', 'atom2', 'vector', 'unit_vector', 'length']
 
     @property
-    def atoms(self):
-        """:class:`~sknano.core.atoms.Atoms` in `Bond`."""
-        return self._atoms
-
-    @atoms.setter
-    def atoms(self, value):
-        self._atoms = value
-
-    @property
-    def atom1(self):
+    def origin(self):
         """:class:`~sknano.core.atoms.Atom` 1 in `Bond`."""
         return self.atoms[0]
 
     @property
-    def atom2(self):
+    def end(self):
         """:class:`~sknano.core.atoms.Atom` 2 in `Bond`."""
         return self.atoms[1]
 
     @property
-    def ids(self):
-        return tuple(self.atoms.ids)
+    def atom1(self):
+        """An alias for :attr:`~Bond.origin`."""
+        return self.origin
 
     @property
-    def centroid(self):
-        """:attr:`~sknano.core.atoms.XYZAtoms.centroid` of :class:`Bond` \
-            :attr:`~Bond.atoms`."""
-        return self.atoms.centroid
+    def atom2(self):
+        """An alias for :attr:`~Bond.end`."""
+        return self.end
 
     @property
     def vector(self):
-        """`Bond` :class:`~sknano.core.math.Vector`.
+        """:class:`Bond` :class:`~sknano.core.math.Vector`.
 
-        `Bond` :class:`~sknano.core.math.Vector` points from
-        :attr:`Bond.atom1` to :attr:`Bond.atom2`.
+        :class:`Bond` :class:`~sknano.core.math.Vector` points from
+        :attr:`Bond.origin` to :attr:`Bond.end`.
+
+        .. note::
+           Accounts for periodic boundary conditions if a
+           :class:`~sknano.core.crystallography.Crystal3DLattice` is assigned
+           to the :attr:`~Bond.atoms`.
 
         """
         try:
-            lattice = self.atom1.lattice
-            dr = lattice.fractional_to_cartesian(pbc_diff(self.atom2.rs,
-                                                          self.atom1.rs))
+            # lattice = self.origin.lattice
+            if (self.parent is not None and any(self.parent.pbc)) or \
+                    self.parent is None:
+                lattice = self.atoms.lattice
+                dr = lattice.fractional_to_cartesian(
+                    lattice.fractional_diff(self.end.rs, self.origin.rs))
         except AttributeError:
-            dr = self.atom2.r - self.atom1.r
-        return Vector(dr, p0=self.atom1.r.p)
+            dr = self.end.r - self.origin.r
+        return Vector(dr, p0=self.origin.r.p)
 
     @property
     def unit_vector(self):
@@ -130,41 +139,61 @@ class Bond(BaseClass):
 
     @property
     def length(self):
+        """An alias for :attr:`AtomsTopology.measure`."""
+        return self.measure
+
+    def compute_measure(self):
         """`Bond` :attr:`~sknano.core.math.Vector.length`."""
         return self.vector.length
 
-    def rotate(self, **kwargs):
-        """Rotate the bond by rotating the :attr:`~Bond.atoms`."""
-        [atom.rotate(fix_anchor_point=True, **kwargs) for atom in self.atoms]
+    def partner(self, atom):
+        """Return :class:`~sknano.core.atoms.Atom` bonded to `atom`."""
+        if atom not in self.atoms:
+            return None
+        if atom is self.origin:
+            return self.end
+        else:
+            return self.origin
+
+    # def ring_groups(self):
+    #     return self.rings
 
     def todict(self):
-        return dict(atom1=self.atom1, atom2=self.atom2)
+        """Return :class:`~python:dict` of constructor parameters."""
+        super_dict = super().todict()
+        super_dict.update(dict(origin=self.origin, end=self.end,
+                               order=self.order))
+        return super_dict
 
 
-class Bonds(UserList):
+class Bonds(AtomsTopology):
     """Base class for collection of atom `Bond`\ s.
 
     Parameters
     ----------
-    bonds : {None, sequence, `Bonds`}, optional
+    topolist : {None, sequence, `Bonds`}, optional
         if not `None`, then a list of `Bond` objects
+    parent : Parent :class:`~sknano.core.atoms.Molecule`, if any.
 
     """
-    def __init__(self, bonds=None):
-        super().__init__(initlist=bonds)
-        self.fmtstr = "{bonds!r}"
-
     @property
     def __item_class__(self):
         return Bond
-
-    def sort(self, key=attrgetter('length'), reverse=False):
-        super().sort(key=key, reverse=reverse)
 
     @property
     def Nbonds(self):
         """Number of `Bond`\ s in `Bonds`."""
         return len(self)
+
+    @property
+    def lengths(self):
+        """:class:`~numpy:numpy.ndarray` of :attr:`~Bond.length`\ s."""
+        return self.measures
+
+    @property
+    def mean_length(self):
+        """Mean bond length."""
+        return self.mean_measure
 
     @property
     def vectors(self):
@@ -175,76 +204,3 @@ class Bonds(UserList):
     def unit_vectors(self):
         """:class:`~numpy:numpy.ndarray` of :attr:`~Bond.unit_vector`\ s."""
         return np.asarray([bond.unit_vector for bond in self])
-
-    @property
-    def lengths(self):
-        """:class:`~numpy:numpy.ndarray` of :attr:`~Bond.length`\ s."""
-        return np.asarray([bond.length for bond in self])
-
-    @property
-    def mean_length(self):
-        """Mean bond length."""
-        if np.all(self.lengths == np.inf):
-            return np.inf
-        if np.any(self.lengths == np.inf):
-            return np.ma.mean(np.ma.array(self.lengths,
-                                          mask=self.lengths == np.inf))
-        return np.mean(self.lengths)
-
-    @property
-    def bond_angle_pairs(self):
-        """`cyclic_pairs` of `Bond`\ s."""
-        return list(cyclic_pairs(self.data)) if self.Nbonds > 2 \
-            else (list(pairwise(self.data)) if self.Nbonds > 1 else None)
-
-    @property
-    def angles(self):
-        """:class:`~numpy:numpy.ndarray` of `Bond` pair angles."""
-        if self.Nbonds > 2:
-            try:
-                return np.asarray([vec.angle(b1.vector, b2.vector) for
-                                   (b1, b2) in cyclic_pairs(self)])
-            except TypeError:
-                return None
-        elif self.Nbonds == 2:
-            return vec.angle(self[0].vector, self[-1].vector)
-        else:
-            return None
-
-    @property
-    def mean_angle(self):
-        """Mean bond angle."""
-        try:
-            return np.mean(self.angles)
-        except TypeError:
-            return None
-
-    @property
-    def atoms(self):
-        """`Atoms` :class:`python:set` in `Bonds`."""
-        atoms = []
-        [atoms.extend(bond.atoms) for bond in self]
-        atoms = list(dedupe(list(flatten([bond.atoms for bond in self])),
-                            key=attrgetter('id')))
-        return sknano.core.atoms.StructureAtoms(atoms)
-
-    @property
-    def ids(self):
-        """Return array of :attr:`~Bond.ids`."""
-        # return np.asarray([bond.ids for bond in self])
-        return [bond.ids for bond in self]
-
-    @property
-    def unique_set(self):
-        """Return new Bonds object containing the set of unique bonds."""
-        seen = set()
-        unique_bonds = []
-        for bond in self:
-            if bond.ids not in seen and tuple(reversed(bond.ids)) not in seen:
-                unique_bonds.append(bond)
-                seen.add(bond.ids)
-                seen.add(tuple(reversed(bond.ids)))
-        return self.__class__(bonds=unique_bonds)
-
-    def todict(self):
-        return dict(bonds=self.data)

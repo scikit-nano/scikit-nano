@@ -30,16 +30,37 @@ Mixin `Atom`/`Atoms` classes
    RingAtomMixin
    RingAtomsMixin
 
+Atomic network topology classes
+-------------------------------
+.. autosummary::
+   :toctree: generated/
+
+   AtomTopologyBase
+   AtomsTopologyBase
+   Angle
+   Angles
+   Bond
+   Bonds
+   Dihedral
+   Dihedrals
+   Improper
+   Impropers
+
 """
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._adapters import *
+from ._angles import *
+from ._bonds import *
+from ._dihedrals import *
+from ._impropers import *
 from ._kdtree_atoms import *
 from ._poav_atoms import *
 from ._periodic_atoms import *
 from ._ring_atoms import *
 from ._topology import *
+from ._topology_base import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
