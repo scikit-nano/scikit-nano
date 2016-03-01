@@ -14,7 +14,7 @@ def configuration(parent_package='', top_path=None):
     config.add_subpackage('testing')
     config.add_subpackage('utils')
     config.add_data_dir('data')
-    #config.make_config_py()
+    config.make_config_py()
     return config
 
 if __name__ == '__main__':
