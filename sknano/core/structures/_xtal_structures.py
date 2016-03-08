@@ -11,9 +11,12 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 __docformat__ = 'restructuredtext en'
 
+import numpy as np
+
 from sknano.core.atoms import BasisAtom, BasisAtoms
-from sknano.core.refdata import lattice_parameters as lattparams
 from sknano.core.crystallography import Crystal2DLattice, Crystal3DLattice
+from sknano.core.math import Vector
+from sknano.core.refdata import lattice_parameters
 from ._base import CrystalStructureBase
 from ._extras import pymatgen_structure  # , supercell_lattice_points
 
@@ -22,10 +25,13 @@ __all__ = ['Crystal2DStructure', 'CrystalStructure', 'Crystal3DStructure',
            'DiamondStructure',
            'RocksaltStructure', 'RockSaltStructure', 'NaClStructure',
            'SphaleriteStructure', 'ZincblendeStructure', 'ZincBlendeStructure',
-           'BCCStructure', 'FCCStructure', 'Iron', 'Copper', 'Gold',
+           'CubicStructure', 'BCCStructure', 'FCCStructure',
+           'Iron', 'Copper', 'Gold',
            'CubicClosePackedStructure', 'CCPStructure',
            'HexagonalClosePackedStructure', 'HCPStructure',
-           'HexagonalStructure', 'AlphaQuartz', 'MoS2']
+           'HexagonalStructure', 'AlphaQuartz', 'BetaQuartz', 'MoS2']
+
+cubic_lattice_parameters = lattice_parameters['cubic']
 
 
 class Crystal2DStructure(CrystalStructureBase):
@@ -156,7 +162,7 @@ class Crystal3DStructure(CrystalStructureBase):
 
     @classmethod
     def from_spacegroup(cls, sg, lattice=None, basis=None, coords=None,
-                        **kwargs):
+                        structure=None, **kwargs):
         """Return a `Crystal3DStructure` from a spacegroup number/symbol.
 
         Parameters
@@ -172,14 +178,45 @@ class Crystal3DStructure(CrystalStructureBase):
 
         Notes
         -----
-        Under the hood this method generates a
-        :class:`~pymatgen:pymatgen.core.Structure`
+        Under the hood, this method generates a :class:`Crystal3DStructure`
+        from a :class:`~pymatgen:pymatgen.core.Structure`.
 
         See Also
         --------
         pymatgen_structure
 
         """
+        if structure is not None and coords is not None:
+            basis = structure.basis.copy()
+            lattice = basis.lattice
+            basis_elements = list(set(basis.elements))
+            if len(basis_elements) != len(coords):
+                raise ValueError('You must specify coordinates of structure '
+                                 'basis')
+
+            xtal_basis = BasisAtoms()
+            xtal_structure = cls.from_spacegroup(sg, lattice=lattice,
+                                                 basis=basis_elements,
+                                                 coords=coords)
+            basis.center_centroid()
+            for tvec in xtal_structure.basis.r:
+                basis_copy = basis.copy()
+                basis_copy.rotate(axis=Vector(np.random.rand(3)).unit_vector,
+                                  angle=2*np.pi*np.random.rand(1))
+                basis_copy.translate(tvec)
+                xtal_basis.extend(basis_copy)
+
+            # for atom in basis:
+            #     for tvec in xtal_structure.basis.r:
+            #         xs, ys, zs = \
+            #             lattice.cartesian_to_fractional(atom.r + tvec)
+            #         xtal_basis.append(BasisAtom(atom.element,
+            #                                     lattice=lattice,
+            #                                     xs=xs, ys=ys, zs=zs))
+
+            xtal_structure.basis = xtal_basis
+            return xtal_structure
+
         if not isinstance(basis, list):
             basis = [basis]
         if len(basis) != len(coords):
@@ -198,81 +235,6 @@ class Crystal3DStructure(CrystalStructureBase):
 CrystalStructure = Crystal3DStructure
 
 
-class MoS2(Crystal3DStructure):
-    """Molybdenum disulphide structure class."""
-    def __init__(self, a=lattparams['molybdenum_disulphide']['a'],
-                 c=lattparams['molybdenum_disulphide']['c'],
-                 basis=['Mo', 'S'], **kwargs):
-
-        molybdenum_disulphide = \
-            pymatgen_structure(194,
-                               Crystal3DLattice.hexagonal(a, c).cell_matrix,
-                               basis, [[1/3, 2/3, 1/4], [1/3, 2/3, 0.621]],
-                               classmethod='from_spacegroup')
-        molybdenum_disulphide = \
-            Crystal3DStructure.from_pymatgen_structure(molybdenum_disulphide)
-
-        super().__init__(structure=molybdenum_disulphide, **kwargs)
-
-
-class CaesiumChlorideStructure(Crystal3DStructure):
-    """Abstract representation of caesium chloride structure."""
-    def __init__(self, a=lattparams['caesium_chloride'], basis=['Cs', 'Cl'],
-                 **kwargs):
-        caesium_chloride = \
-            pymatgen_structure(221, Crystal3DLattice.cubic(a).cell_matrix,
-                               basis, [[0, 0, 0], [0.5, 0.5, 0.5]],
-                               classmethod='from_spacegroup')
-        caesium_chloride = \
-            Crystal3DStructure.from_pymatgen_structure(caesium_chloride)
-
-        super().__init__(structure=caesium_chloride, **kwargs)
-
-CsClStructure = CaesiumChlorideStructure
-
-
-class DiamondStructure(Crystal3DStructure):
-    """Abstract representation of diamond structure."""
-    def __init__(self, a=lattparams['diamond'], basis=['C'], **kwargs):
-        diamond = \
-            pymatgen_structure(227, Crystal3DLattice.cubic(a).cell_matrix,
-                               basis, [[0, 0, 0]],
-                               classmethod='from_spacegroup')
-        diamond = \
-            Crystal3DStructure.from_pymatgen_structure(diamond)
-        super().__init__(structure=diamond, **kwargs)
-
-
-class RocksaltStructure(Crystal3DStructure):
-    """Abstract representation of caesium chloride structure."""
-    def __init__(self, a=lattparams['rock_salt'], basis=['Na', 'Cl'],
-                 **kwargs):
-        rock_salt = \
-            pymatgen_structure(225, Crystal3DLattice.cubic(a).cell_matrix,
-                               basis, [[0, 0, 0], [0.5, 0.5, 0.5]],
-                               classmethod='from_spacegroup')
-        rock_salt = \
-            Crystal3DStructure.from_pymatgen_structure(rock_salt)
-        super().__init__(structure=rock_salt, **kwargs)
-
-NaClStructure = RockSaltStructure = RocksaltStructure
-
-
-class ZincblendeStructure(Crystal3DStructure):
-    """Abstract representation of caesium chloride structure."""
-    def __init__(self, a=lattparams['zincblende'], basis=['Zn', 'Fe'],
-                 **kwargs):
-        zincblende = \
-            pymatgen_structure(216, Crystal3DLattice.cubic(a).cell_matrix,
-                               basis, [[0, 0, 0], [0.25, 0.25, 0.25]],
-                               classmethod='from_spacegroup')
-        zincblende = \
-            Crystal3DStructure.from_pymatgen_structure(zincblende)
-        super().__init__(structure=zincblende, **kwargs)
-
-SphaleriteStructure = ZincBlendeStructure = ZincblendeStructure
-
-
 class CubicStructure(Crystal3DStructure):
     """Base class for a cubic `Crystal3DStructure`.
 
@@ -287,81 +249,159 @@ class CubicStructure(Crystal3DStructure):
     structure : :class:`Crystal3DStructure`, optional
 
     """
-    def __init__(self, *args, a=None, centering=None, lattice=None,
-                 basis=None, coords=None, scaling_matrix=None, structure=None,
+    def __init__(self, *args, centering=None, lattice=None, basis=None,
+                 coords=None, scaling_matrix=None, structure=None,
                  **kwargs):
 
         if len(args) == 1 and basis is None:
             basis = args[0]
 
-        self.centering = centering
-
         if lattice is None and structure is None:
-            lattice = \
-                Crystal3DLattice.cubic(
-                    CubicStructure.get_lattice_parameter(
-                        a=a, basis=basis, centering=centering))
+            lattice = CubicStructure.get_lattice(basis=basis,
+                                                 centering=centering,
+                                                 **kwargs)
         super().__init__(lattice=lattice, basis=basis, coords=coords,
                          scaling_matrix=scaling_matrix, structure=structure,
                          **kwargs)
 
     @classmethod
-    def get_lattice_parameter(cls, a=None, basis=None, centering=None):
-        if a is not None:
-            return a
+    def get_lattice(cls, name=None, centering=None, basis=None, **kwargs):
+        """Return cubic lattice."""
+        if centering is None or not isinstance(centering, str):
+            raise TypeError('Expected str for `centering` parameter')
+        elif centering not in cubic_lattice_parameters:
+            raise ValueError('Unrecognized `centering` value')
 
-        if basis is None or centering is None:
-            raise ValueError('\nBoth the `basis` and `centering` kwargs '
-                             'are required')
-        elif isinstance(basis, (tuple, list)):
-            if len(basis) != 1:
-                raise ValueError('Expected a single element basis')
-            else:
-                basis = basis[0]
+        a = kwargs.pop('a',
+                       cubic_lattice_parameters[centering].get(name, None))
+        if a is None:
+            if basis is None:
+                raise ValueError('`basis` cannot be None')
+            elif isinstance(basis, (tuple, list)):
+                if len(basis) != 1:
+                    raise ValueError('Expected a single element basis')
+                else:
+                    basis = basis[0]
 
-        if not isinstance(basis, str):
-            raise ValueError('Expected `str` object for basis')
+            if not isinstance(basis, str):
+                raise ValueError('Expected `str` object for basis')
 
-        if basis not in lattparams['cubic'][centering]:
-            raise ValueError('Specify lattice constant `a` for '
-                             'given basis {}'.format(basis))
+            if basis not in cubic_lattice_parameters[centering]:
+                raise ValueError('No lattice parameters for given basis '
+                                 '{}'.format(basis))
 
-        return lattparams['cubic'][centering][basis]
+            a = cubic_lattice_parameters[centering][basis]
+        lattice = Crystal3DLattice.cubic(a)
+        return lattice
 
     @classmethod
     def from_spacegroup(cls, *args, lattice=None, basis=None, coords=None,
-                        a=None, centering=None, **kwargs):
+                        structure=None, centering=None, **kwargs):
+        """Return :class:`CubicStructure` from spacegroup."""
         if len(args) == 2 and basis is None:
             sg, basis = args
 
         if len(args) == 1:
             sg = args[0]
 
-        if lattice is None:
-            lattice = \
-                Crystal3DLattice.cubic(
-                    CubicStructure.get_lattice_parameter(a=a, basis=basis,
-                                                         centering=centering))
+        if lattice is None and structure is None:
+            lattice = CubicStructure.get_lattice(basis=basis,
+                                                 centering=centering,
+                                                 **kwargs)
         if coords is None:
             coords = [[0, 0, 0]]
         return super().from_spacegroup(sg, lattice=lattice, basis=basis,
-                                       coords=coords)
+                                       coords=coords, structure=structure)
+
+
+class CaesiumChlorideStructure(CubicStructure):
+    """Abstract representation of caesium chloride structure."""
+    def __init__(self, lattice=None, basis=['Cs', 'Cl'], **kwargs):
+
+        if lattice is None:
+            lattice = self.get_lattice(name='caesium_chloride',
+                                       centering='cP', **kwargs)
+
+        caesium_chloride = \
+            pymatgen_structure(221, lattice.cell_matrix, basis,
+                               [[0, 0, 0], [0.5, 0.5, 0.5]],
+                               classmethod='from_spacegroup')
+        caesium_chloride = \
+            Crystal3DStructure.from_pymatgen_structure(caesium_chloride)
+
+        super().__init__(structure=caesium_chloride, **kwargs)
+
+CsClStructure = CaesiumChlorideStructure
+
+
+class DiamondStructure(CubicStructure):
+    """Abstract representation of diamond structure."""
+    def __init__(self, lattice=None, basis=['C'], **kwargs):
+
+        if lattice is None:
+            lattice = self.get_lattice(name='diamond', centering='FCC',
+                                       **kwargs)
+
+        diamond = \
+            pymatgen_structure(227, lattice.cell_matrix, basis, [[0, 0, 0]],
+                               classmethod='from_spacegroup')
+        diamond = \
+            Crystal3DStructure.from_pymatgen_structure(diamond)
+        super().__init__(structure=diamond, **kwargs)
+
+
+class RocksaltStructure(CubicStructure):
+    """Abstract representation of caesium chloride structure."""
+    def __init__(self, lattice=None, basis=['Na', 'Cl'], **kwargs):
+        if lattice is None:
+            lattice = self.get_lattice(name='rocksalt', centering='FCC',
+                                       **kwargs)
+
+        rock_salt = \
+            pymatgen_structure(225, lattice.cell_matrix, basis,
+                               [[0, 0, 0], [0.5, 0.5, 0.5]],
+                               classmethod='from_spacegroup')
+        rock_salt = \
+            Crystal3DStructure.from_pymatgen_structure(rock_salt)
+        super().__init__(structure=rock_salt, **kwargs)
+
+NaClStructure = RockSaltStructure = RocksaltStructure
+
+
+class ZincblendeStructure(CubicStructure):
+    """Abstract representation of caesium chloride structure."""
+    def __init__(self, lattice=None, basis=['Zn', 'S'], **kwargs):
+        if lattice is None:
+            lattice = self.get_lattice(name='zincblende', centering='FCC',
+                                       **kwargs)
+
+        zincblende = \
+            pymatgen_structure(216, lattice.cell_matrix, basis,
+                               [[0, 0, 0], [0.25, 0.25, 0.25]],
+                               classmethod='from_spacegroup')
+        zincblende = \
+            Crystal3DStructure.from_pymatgen_structure(zincblende)
+        super().__init__(structure=zincblende, **kwargs)
+
+SphaleriteStructure = ZincBlendeStructure = ZincblendeStructure
 
 
 class BCCStructure(CubicStructure):
     """BCC structure class."""
     def __init__(self, *args, **kwargs):
-        kwargs['centering'] = 'BCC'
-        structure = CubicStructure.from_spacegroup(229, *args, **kwargs)
-        super().__init__(*args, structure=structure, **kwargs)
+        kwargs['centering'] = 'bcc'
+        kwargs['structure'] = \
+            CubicStructure.from_spacegroup(229, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class FCCStructure(CubicStructure):
     """FCC structure class."""
     def __init__(self, *args, **kwargs):
-        kwargs['centering'] = 'FCC'
-        structure = CubicStructure.from_spacegroup(225, *args, **kwargs)
-        super().__init__(*args, structure=structure, **kwargs)
+        kwargs['centering'] = 'fcc'
+        kwargs['structure'] = \
+            CubicStructure.from_spacegroup(225, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class Iron(BCCStructure):
@@ -400,19 +440,103 @@ CCPStructure = CubicClosePackedStructure
 
 
 class HexagonalStructure(Crystal3DStructure):
+    """Base :class:`Crystal3DStructure` for a hexagonal crystal system.
+
+    Parameters
+    ----------
+    centering : :class:`~python:str`
+    lattice : :class:`Crystal3DLattice`, optional
+    a, c : :class:`~python:float`, optional
+    basis : :class:`~python:list`, optional
+    coords : :class:`~python:list`, optional
+    scaling_matrix : :class:`~python:int` or :class:`~python:list`, optional
+    structure : :class:`Crystal3DStructure`, optional
+
+    """
+    def __init__(self, *args, lattice=None, basis=None, coords=None,
+                 scaling_matrix=None, structure=None, **kwargs):
+
+        if len(args) == 1 and basis is None:
+            basis = args[0]
+
+        if lattice is None and structure is None:
+            lattice = self.get_lattice(basis=basis, **kwargs)
+
+        super().__init__(lattice=lattice, basis=basis, coords=coords,
+                         scaling_matrix=scaling_matrix, structure=structure,
+                         **kwargs)
+
     @classmethod
-    def from_spacegroup(cls, sg, a, c, basis, coords):
+    def get_lattice(cls, name=None, basis=None, **kwargs):
+        """Return hexagonal :class:`Crystal3DLattice`."""
+        a, c = [kwargs.pop(k, default) for k, default in
+                zip(('a', 'c'),
+                    lattice_parameters['hexagonal'].get(name, (None, None)))]
+
+        if a is None or c is None:
+            if basis is None:
+                raise ValueError('`basis` cannot be None.')
+            elif isinstance(basis, (tuple, list)):
+                if len(basis) != 1:
+                    raise ValueError('Expected a single element basis')
+                else:
+                    basis = basis[0]
+
+            if not isinstance(basis, str):
+                raise ValueError('Expected `str` object for basis')
+
+            if basis not in lattice_parameters['hexagonal']:
+                raise ValueError('No lattice constants for '
+                                 'given basis {}'.format(basis))
+
+            a, c = lattice_parameters['hexagonal'][basis]
+
         lattice = Crystal3DLattice.hexagonal(a, c)
+        return lattice
+
+    @classmethod
+    def from_spacegroup(cls, *args, lattice=None, basis=None, coords=None,
+                        structure=None, **kwargs):
+        """Return :class:`HexagonalStructure` from space group."""
+        if len(args) == 2 and basis is None:
+            sg, basis = args
+
+        if len(args) == 1:
+            sg = args[0]
+
+        if lattice is None and structure is None:
+            lattice = HexagonalStructure.get_lattice(basis=basis, **kwargs)
+
+        if coords is None:
+            coords = [[0, 0, 0]]
         return super().from_spacegroup(sg, lattice=lattice, basis=basis,
-                                       coords=coords)
+                                       coords=coords, structure=structure)
+
+
+class MoS2(HexagonalStructure):
+    """Molybdenum disulphide structure class."""
+    def __init__(self, lattice=None, **kwargs):
+
+        if lattice is None:
+            lattice = self.get_lattice(name='MoS2', **kwargs)
+        basis = ['Mo', 'S']
+        molybdenum_disulphide = \
+            pymatgen_structure(194, lattice.cell_matrix, basis,
+                               [[1/3, 2/3, 1/4], [1/3, 2/3, 0.621]],
+                               classmethod='from_spacegroup')
+        molybdenum_disulphide = \
+            Crystal3DStructure.from_pymatgen_structure(molybdenum_disulphide)
+
+        super().__init__(structure=molybdenum_disulphide, **kwargs)
 
 
 class AlphaQuartz(HexagonalStructure):
     """Alpha quartz structure class."""
-    def __init__(self, a=lattparams['alpha_quartz']['a'],
-                 c=lattparams['alpha_quartz']['c'], **kwargs):
-        lattice = Crystal3DLattice.hexagonal(a, c)
-        basis = BasisAtoms(3 * ["Si"] + 6 * ["O"])
+    def __init__(self, lattice=None, **kwargs):
+        if lattice is None:
+            lattice = self.get_lattice(name='alpha_quartz', **kwargs)
+        # basis = BasisAtoms(3 * ["Si"] + 6 * ["O"])
+        basis = 3 * ['Si'] + 6 * ['O']
         coords = [[0.4697, 0.0000, 0.0000],
                   [0.0000, 0.4697, 0.6667],
                   [0.5305, 0.5303, 0.3333],
@@ -422,15 +546,45 @@ class AlphaQuartz(HexagonalStructure):
                   [0.5867, 0.8539, 0.2145],
                   [0.8539, 0.5867, 0.4521],
                   [0.1461, 0.7328, 0.8812]]
-        alpha_quartz = pymatgen_structure(lattice.cell_matrix,
-                                          basis.symbols, coords)
+        alpha_quartz = pymatgen_structure(lattice.cell_matrix, basis, coords)
         alpha_quartz = \
             Crystal3DStructure.from_pymatgen_structure(alpha_quartz)
 
         # alpha_quartz = \
-        #     HexagonalStructure.from_spacegroup(154, a, c, ["Si", "O"],
+        #     HexagonalStructure.from_spacegroup(154, lattice, ["Si", "O"],
         #                                        [[0.4697, 0.0000, 0.0000],
-        #                                         [0.4135, 0.2669, 0.1191]],
-        #                                        scaling_matrix=scaling_matrix)
+        #                                         [0.4135, 0.2669, 0.1191]])
 
         super().__init__(structure=alpha_quartz, **kwargs)
+
+
+class BetaQuartz(HexagonalStructure):
+    def __init__(self, lattice=None, **kwargs):
+        if lattice is None:
+            lattice = self.get_lattice(name='beta_quartz', **kwargs)
+
+        basis = ["Si", "O"]
+        # basis = 3 * ['Si'] + 6 * ['O']
+
+        # basis = BasisAtoms(3 * ["Si"] + 6 * ["O"])
+        # coords = [[0.4697, 0.0000, 0.0000],
+        #           [0.0000, 0.4697, 0.6667],
+        #           [0.5305, 0.5303, 0.3333],
+        #           [0.4133, 0.2672, 0.1188],
+        #           [0.2672, 0.4133, 0.5479],
+        #           [0.7328, 0.1461, 0.7855],
+        #           [0.5867, 0.8539, 0.2145],
+        #           [0.8539, 0.5867, 0.4521],
+        #           [0.1461, 0.7328, 0.8812]]
+        # beta_quartz = pymatgen_structure(lattice.cell_matrix,
+        #                                  basis.symbols, coords)
+        # alpha_quartz = \
+        #     Crystal3DStructure.from_pymatgen_structure(alpha_quartz)
+
+        beta_quartz = pymatgen_structure(180, lattice.cell_matrix, basis,
+                                         [[0.5000, 0.0000, 0.0000],
+                                          [0.4147, 0.2078, 0.1667]],
+                                         classmethod='from_spacegroup')
+        beta_quartz = Crystal3DStructure.from_pymatgen_structure(beta_quartz)
+
+        super().__init__(structure=beta_quartz, **kwargs)
