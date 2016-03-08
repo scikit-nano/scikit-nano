@@ -19,7 +19,6 @@ import numpy as np
 
 from sknano.core import BaseClass
 from sknano.core.atoms import BasisAtom, BasisAtoms
-# from sknano.core.molecules import BasisMolecule, BasisMolecules
 from ._extras import supercell_lattice_points
 
 __all__ = ['CrystalCell', 'UnitCell', 'SuperCell']
@@ -48,14 +47,15 @@ class UnitCell(BaseClass):
             basis = BasisAtoms()
         else:
             basis = BasisAtoms(basis)
-            basis.lattice = lattice
-            if lattice is not None and coords is not None:
-                for atom, pos in zip(basis, coords):
-                    atom.lattice = lattice
-                    if not cartesian:
-                        atom.rs = pos
-                    else:
-                        atom.rs = lattice.cartesian_to_fractional(pos)
+            if lattice is not None:
+                basis.lattice = lattice
+                if coords is not None and len(basis) == len(coords):
+                    for atom, pos in zip(basis, coords):
+                        atom.lattice = lattice
+                        if not cartesian:
+                            atom.rs = pos
+                        else:
+                            atom.rs = lattice.cartesian_to_fractional(pos)
 
         self.lattice = lattice
         self.basis = basis
@@ -119,7 +119,7 @@ class UnitCell(BaseClass):
         self.basis.translate(t, fix_anchor_points=fix_anchor_points)
 
     def todict(self):
-        """Return `dict` of `UnitCell` parameters."""
+        """Return `dict` of :class:`UnitCell` parameters."""
         return dict(lattice=self.lattice, basis=self.basis.symbols.tolist(),
                     coords=self.basis.rs.tolist(),
                     wrap_coords=self.wrap_coords)
@@ -147,14 +147,15 @@ class CrystalCell(BaseClass):
 
         if unit_cell is None and basis is not None:
             basis = BasisAtoms(basis)
-            basis.lattice = lattice
-            if lattice is not None and coords is not None:
-                for atom, pos in zip(basis, coords):
-                    atom.lattice = lattice
-                    if not cartesian:
-                        atom.rs = pos
-                    else:
-                        atom.rs = lattice.cartesian_to_fractional(pos)
+            if lattice is not None:
+                basis.lattice = lattice
+                if coords is not None and len(basis) == len(coords):
+                    for atom, pos in zip(basis, coords):
+                        atom.lattice = lattice
+                        if not cartesian:
+                            atom.rs = pos
+                        else:
+                            atom.rs = lattice.cartesian_to_fractional(pos)
 
         # if basis is None:
         #     basis = BasisAtoms()
@@ -344,6 +345,7 @@ class CrystalCell(BaseClass):
             [self.basis.__setitem__(i, element) for i in index]
 
     def todict(self):
+        """:class:`~python:dict` of :class:`CrystalCell` parameters."""
         try:
             return dict(lattice=self.lattice,
                         basis=self.basis.symbols.tolist(),
