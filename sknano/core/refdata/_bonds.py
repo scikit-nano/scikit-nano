@@ -12,7 +12,7 @@ from __future__ import unicode_literals
 
 import os
 
-# from sknano.core.atoms import Bond
+# from sknano.core.atoms.mixins import Bond
 from sknano.core import dumpobj, loadobj
 
 aCC = C_C = CCbond = 1.42  # angstroms
