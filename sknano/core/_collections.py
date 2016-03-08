@@ -11,12 +11,12 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from abc import abstractmethod
+
 try:
     from collections.abc import Mapping, MutableSequence, Set
 except ImportError:
     from collections import Mapping, MutableSequence, Set
-
-from abc import abstractmethod
 
 from ._meta import BaseClass
 
@@ -35,7 +35,7 @@ class ListBasedSet(Set):
 
     Parameters
     ----------
-    iterable
+    iterable : :class:`~python:collections.Iterable`
 
     """
     def __init__(self, iterable):
@@ -83,6 +83,7 @@ class UserList(MutableSequence, BaseClass):
                 self.data = list(initlist)
         self.kwargs = kwargs
         super().__init__(*args, **kwargs)
+        self.fmtstr = "{initlist!r}"
 
     @property
     @abstractmethod
@@ -123,12 +124,12 @@ class UserList(MutableSequence, BaseClass):
         return len(self.data)
 
     def __getitem__(self, i):
-        data = self.data[i]
-        if isinstance(i, slice) and isinstance(data, list):
-            data = self.__class__(data, **self.kwargs)
-        elif not isinstance(data, self.__item_class__):
-            data = self.__item_class__(data)
-        return data
+        item = self.data[i]
+        if isinstance(i, slice) and isinstance(item, list):
+            item = self.__class__(item, **self.kwargs)
+        elif not isinstance(item, self.__item_class__):
+            item = self.__item_class__(item)
+        return item
 
     def __setitem__(self, i, item):
         if not isinstance(item, (self.__class__, self.__item_class__)):
@@ -214,6 +215,10 @@ class UserList(MutableSequence, BaseClass):
             self.data.extend(other.data)
         else:
             self.data.extend(other)
+
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        return dict(initlist=self.data)
 
 
 class frozendict(Mapping):
