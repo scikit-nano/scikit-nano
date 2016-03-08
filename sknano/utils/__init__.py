@@ -13,7 +13,7 @@ Sub-packages
 -------------
 
 * analysis (:mod:`sknano.utils.analysis`)
-* symmetry_groups (:mod:`sknano.utils.symmetry_groups`)
+* symmetry (:mod:`sknano.utils.symmetry`)
 
 """
 from __future__ import absolute_import, division, print_function
