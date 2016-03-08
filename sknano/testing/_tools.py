@@ -10,37 +10,70 @@ Test fixtures (:mod:`sknano.testing._tools`)
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
-from pkg_resources import resource_filename
-
-from sknano.io import DATAReader, DUMPReader, PDBReader, XYZReader
-
-from ._funcs import generate_atoms
-
-__all__ = ['AtomsTestFixture', 'GeneratorTestFixture', 'IOTestFixture']
-
-
 import os
 import unittest
+
+from pkg_resources import resource_filename
+
+from sknano.io import DATAReader, DUMPReader, PDBReader, XYZReader, \
+    DATAData, DUMPData, PDBData, XYZData
+# from sknano.core.geometric_regions import Parallel
+
+from ._funcs import generate_atoms, generate_structure
+
+__all__ = ['AtomsTestFixture', 'GeneratorTestFixture', 'IOTestFixture']
 
 
 class AtomsTestFixture(unittest.TestCase):
     """Mixin unittest.TestCase class defining setUp method to generate list
     of atoms."""
 
-    def setUp(self):
-        self.swnt = \
-            generate_atoms(generator_class='SWNTGenerator', n=5, m=0, nz=5)
-        self.swnt.update_attrs()
+    @property
+    def atoms(self):
+        return self.swnt.atoms
 
-        self.periodic_table = generate_atoms(elements='periodic_table')
-        self.periodic_table.assign_unique_ids()
-        self.periodic_table.assign_unique_types()
+    @property
+    def structure(self):
+        return self.swnt
 
-        self.buckyball = \
-            generate_atoms(generator_class='FullereneGenerator', N=60)
-        self.buckyball.update_attrs()
+    @property
+    def buckyball(self):
+        buckyball = generate_structure(generator_class='FullereneGenerator',
+                                       N=60)
+        buckyball.update_attrs()
+        return buckyball
 
-        self.atoms = self.swnt
+    @property
+    def graphene(self):
+        graphene = generate_structure(generator_class='GrapheneGenerator',
+                                      armchair_edge_length=10,
+                                      zigzag_edge_length=10)
+        graphene.update_attrs()
+        return graphene
+
+    @property
+    def periodic_table(self):
+        periodic_table = generate_atoms(elements='periodic_table')
+        periodic_table.assign_unique_ids()
+        periodic_table.assign_unique_types()
+        return periodic_table
+
+    @property
+    def dumpdata1(self):
+        dumpfile = \
+            resource_filename('sknano',
+                              'data/lammpstrj/' +
+                              'irradiated_graphene.system.dump.02000')
+
+        return DUMPReader(dumpfile, attrmap={'c_peratom_pe': 'pe',
+                                             'c_peratom_ke': 'ke'})
+
+    @property
+    def swnt(self):
+        swnt = generate_structure(generator_class='SWNTGenerator',
+                                  n=5, m=0, nz=5)
+        swnt.update_attrs()
+        return swnt
 
 
 class GeneratorTestFixture(unittest.TestCase):
@@ -63,6 +96,22 @@ class IOTestFixture(unittest.TestCase):
     """Mixin :class:`~python:unittest.TestCase` defining lazy properties
     to generate IO test data."""
 
+    def setUp(self):
+        self.tmpdata = []
+
+    def tearDown(self):
+        for f in self.tmpdata:
+            try:
+                os.remove(f)
+            except IOError:
+                continue
+
+    @property
+    def data_reader(self):
+        datafile = \
+            resource_filename('sknano', 'data/nanotubes/1010_1cell.data')
+        return DATAReader(datafile)
+
     @property
     def dump_reader(self):
         dumpfile = \
@@ -70,12 +119,6 @@ class IOTestFixture(unittest.TestCase):
 
         return DUMPReader(dumpfile, attrmap={'c_peratom_pe': 'pe',
                                              'c_peratom_ke': 'ke'})
-
-    @property
-    def data_reader(self):
-        datafile = \
-            resource_filename('sknano', 'data/nanotubes/1010_1cell.data')
-        return DATAReader(datafile)
 
     @property
     def pdb_reader(self):
@@ -86,3 +129,27 @@ class IOTestFixture(unittest.TestCase):
     def xyz_reader(self):
         xyzfile = resource_filename('sknano', 'data/nanotubes/1010_1cell.xyz')
         return XYZReader(xyzfile)
+
+    @property
+    def datadata(self):
+        datafile = \
+            resource_filename('sknano', 'data/nanotubes/1010_1cell.data')
+        return DATAData(datafile)
+
+    @property
+    def dumpdata(self):
+        dumpfile = \
+            resource_filename('sknano', 'data/lammpstrj/0500_29cells.dump')
+
+        return DUMPData(dumpfile, attrmap={'c_peratom_pe': 'pe',
+                                           'c_peratom_ke': 'ke'})
+
+    @property
+    def pdbdata(self):
+        pdbfile = resource_filename('sknano', 'data/nanotubes/1010_1cell.pdb')
+        return PDBData(pdbfile)
+
+    @property
+    def xyzdata(self):
+        xyzfile = resource_filename('sknano', 'data/nanotubes/1010_1cell.xyz')
+        return XYZData(xyzfile)
