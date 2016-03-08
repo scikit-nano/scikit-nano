@@ -38,9 +38,9 @@ class GrapheneVacancyGenerator(VacancyGenerator):
     Parameters
     ----------
     length : float, optional
-        Length of graphene sheet in **nanometers**
+        Length of graphene sheet in **Angstroms**
     width : float, optional
-        Width of graphene sheet in **nanometers**
+        Width of graphene sheet in **Angstroms**
     edge : {'AC', 'armchair', 'ZZ', 'zigzag'}, optional
         **A**\ rm\ **C**\ hair or **Z**\ ig\ **Z**\ ag edge along
         the `length` of the sheet.

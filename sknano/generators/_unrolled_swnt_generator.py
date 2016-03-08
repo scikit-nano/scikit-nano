@@ -63,8 +63,13 @@ class UnrolledSWNTGenerator(GeneratorBase, UnrolledSWNT):
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
     Lx, Ly, Lz : float, optional
-        Length of bundle in :math:`x, y, z` dimensions in **nanometers**.
+        Length of bundle in :math:`x, y, z` dimensions in **Angstroms**.
         Overrides the :math:`n_x, n_y, n_z` cell values.
+
+        .. versionchanged:: 0.4.0
+
+           Changed units from nanometers to **Angstroms**
+
     fix_Lz : bool, optional
         Generate the nanotube with length as close to the specified
         :math:`L_z` as possible. If `True`, then
@@ -97,10 +102,12 @@ class UnrolledSWNTGenerator(GeneratorBase, UnrolledSWNT):
     Now let's generate an unrolled :math:`\\mathbf{C}_{\\mathrm{h}} = (10, 5)`
     SWCNT unit cell.
 
-    >>> flatswcnt = UnrolledSWNTGenerator(10, 5)
-    >>> flatswcnt.save()
+    >>> unrolled_swnt = UnrolledSWNTGenerator(10, 5)
+    >>> unrolled_swnt.save()
 
     The rendered structure looks like:
+
+    .. image:: /images/unrolled_1005_1cellx1cell-2.png
 
     """
     def generate(self):

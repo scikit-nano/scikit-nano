@@ -17,29 +17,29 @@ from ._graphene_generator import GrapheneGenerator
 __all__ = ['BilayerGrapheneGenerator']
 
 
-class BilayerGrapheneGenerator(BilayerGraphene, GrapheneGenerator):
+class BilayerGrapheneGenerator(GrapheneGenerator, BilayerGraphene):
     """Bilayer graphene structure generator class.
 
     Parameters
     ----------
     armchair_edge_length : float, optional
-        Length of armchair edge in **nanometers**
+        Length of armchair edge in **Angstroms**
 
         .. versionadded:: 0.3.10
 
     zigzag_edge_length : float, optional
-        Length of zigzag edge in **nanometers**
+        Length of zigzag edge in **Angstroms**
 
         .. versionadded:: 0.3.10
 
     length : float, optional
-        Length of armchair edge in **nanometers**
+        Length of armchair edge in **Angstroms**
 
         .. deprecated:: 0.3.10
            Use `armchair_edge_length` instead
 
     width : float, optional
-        Width of graphene sheet in **nanometers**
+        Width of graphene sheet in **Angstroms**
 
         .. deprecated:: 0.3.10
            Use `zigzag_edge_length` instead
@@ -88,45 +88,49 @@ class BilayerGrapheneGenerator(BilayerGraphene, GrapheneGenerator):
 
     >>> from sknano.generators import BilayerGrapheneGenerator
 
-    Generate **10 nm** wide by **1 nm** long `AB` stacked
+    Generate **100 Å** wide by **10 Å** long `AB` stacked
     bilayer-graphene:
 
-    >>> blg = BilayerGrapheneGenerator(armchair_edge_length=10,
-    ...                                zigzag_edge_length=1)
+    >>> bilayer_graphene = BilayerGrapheneGenerator(armchair_edge_length=100,
+    ...                                             zigzag_edge_length=10)
 
     Save structure data in `xyz` format:
 
-    >>> blg.save()
+    >>> bilayer_graphene.save()
 
-    The rendered structure looks like (after rotating 90 degrees so that
+    Here's the rendered structure (after rotating 90 degrees so that
     it better fits the page):
 
-    .. image:: /images/10nmx1nm_bilayer.png
+    .. image:: /images/100.0Åx10.0Å_2layer_graphene-1.png
 
-    Now generate bilayer-graphene with top layer rotated by 45 degrees.
+    The next command generates bilayer-graphene with its second layer
+    rotated 45 degrees.
 
-    >>> rotated_bilayer = BilayerGrapheneGenerator(armchair_edge_length=10,
-    ...                                            zigzag_edge_length=10,
-    ...                                            layer_rotation_angle=45,
-    ...                                            degrees=True)
+    >>> rotated_bilayer = \
+    ...     BilayerGrapheneGenerator(armchair_edge_length=50,
+    ...                              zigzag_edge_length=50,
+    ...                              layer_rotation_angles=[0, 45],
+    ...                              degrees=True)
     >>> rotated_bilayer.save(fname='rotated_bilayer.xyz')
 
+    A rendering of `rotated_bilayer`:
+
+    .. image:: /images/rotated_bilayer-1.png
+
+    The next example is identical to the one above, except the atomic
+    basis is Boron and Nitrogen.
+
+    >>> rotated_BN_bilayer = \
+    ...     BilayerGrapheneGenerator(armchair_edge_length=50,
+    ...                              zigzag_edge_length=50,
+    ...                              basis=['B', 'N'],
+    ...                              layer_rotation_angles=[0, 45],
+    ...                              degrees=True)
+    >>> rotated_BN_bilayer.save(fname='rotated_bilayer_B-N_basis.xyz')
+
     The rendered structure looks like:
 
-    .. image:: /images/rotated_bilayer.png
-
-    Now generate BN bilayer-graphene with top layer rotated 45 degrees.
-
-    >>> rotated_BN_bilayer = BilayerGrapheneGenerator(armchair_edge_length=10,
-    ...                                               zigzag_edge_length=10,
-    ...                                               basis=['B', 'N'],
-    ...                                               layer_rotation_angle=45,
-    ...                                               degrees=True)
-    >>> rotated_BN_bilayer.save(fname='BN_bilayer_rotated_45deg.xyz')
-
-    The rendered structure looks like:
-
-    .. image:: /images/BN_bilayer_rotated_45deg.png
+    .. image:: /images/rotated_bilayer_B-N_basis-1.png
 
     """
     pass

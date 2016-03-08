@@ -54,6 +54,7 @@ class MWNTGenerator(NanotubeGeneratorBase, MWNTGeneratorMixin,
        MWNT bundles.
 
     .. versionadded:: 0.2.8
+
     Parameters
     ----------
     Ch_list : :class:`python:list`, optional
@@ -112,9 +113,9 @@ class MWNTGenerator(NanotubeGeneratorBase, MWNTGeneratorMixin,
     --------
 
     >>> from sknano.generators import MWNTGenerator
-    >>> MWNTGenerator(Nwalls=5, min_wall_diameter=10, Lz=5).save()
+    >>> MWNTGenerator(Nwalls=5, min_wall_diameter=10, Lz=50).save()
 
-    The above command generated a 5 wall,  10 **nanometer** long `MWNT`.
+    The above command generated a 5 wall,  50 **Angstrom** long `MWNT`.
     The only constraints on the `MWNT` wall chiralities were the diameter
     constraints imposed by the `min_wall_diameter` parameter,
     which set the minimum wall diameter to 10 Angstroms,
@@ -131,7 +132,7 @@ class MWNTGenerator(NanotubeGeneratorBase, MWNTGeneratorMixin,
 
     In the next example, we generate a `MWNT` bundle.
 
-    >>> mwntbundle = MWNTGenerator(Nwalls=5, min_wall_diameter=5, Lz=5,
+    >>> mwntbundle = MWNTGenerator(Nwalls=5, min_wall_diameter=5, Lz=50,
     ...                            bundle_geometry='hexagon')
     >>> mwntbundle.save()
 

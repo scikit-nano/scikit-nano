@@ -64,13 +64,17 @@ class SWNTGenerator(NanotubeGeneratorBase, GeneratorMixin,
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
     Lz : float, optional
-        Length of nanotube in units of **nanometers**.
+        Length of nanotube in units of **Angstroms**.
         Overrides the `nz` value.
 
         .. versionadded:: 0.2.5
 
+        .. versionchanged:: 0.4.0
+
+           Changed units from nanometers to **Angstroms**
+
     tube_length : float, optional
-        Length of nanotube in units of **nanometers**.
+        Length of nanotube in units of **Angstroms**.
         Overrides the `nz` value.
 
         .. deprecated:: 0.2.5
@@ -196,7 +200,7 @@ class SWNTGenerator(NanotubeGeneratorBase, GeneratorMixin,
         """Finalize structure data by clipping region bounds if \
                 :attr:`~SWNT.fix_Lz` is `True`."""
         if self.L0 is not None and self.fix_Lz:
-            Lz_cutoff = 10 * self.L0 + 1
+            Lz_cutoff = self.L0 + self.bond
             region_bounds = Cuboid(pmin=Point([-np.inf, -np.inf, 0]),
                                    pmax=Point([np.inf, np.inf, Lz_cutoff]))
             self.atoms.clip_bounds(region_bounds)

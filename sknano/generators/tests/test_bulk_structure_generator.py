@@ -12,11 +12,12 @@ import numpy as np
 
 from sknano.core.structures import AlphaQuartz, DiamondStructure, \
     CaesiumChlorideStructure, RocksaltStructure, ZincblendeStructure, \
-    Gold, Copper, MoS2
-from sknano.generators import BCCStructureGenerator, FCCStructureGenerator, \
+    Gold, Copper, MoS2, Fullerene
+from sknano.generators import BCCGenerator, FCCGenerator, \
     AlphaQuartzGenerator, DiamondStructureGenerator, IronGenerator, \
     GoldGenerator, CopperGenerator, CaesiumChlorideStructureGenerator, \
-    RocksaltStructureGenerator, ZincblendeStructureGenerator, MoS2Generator
+    RocksaltStructureGenerator, ZincblendeStructureGenerator, MoS2Generator, \
+    FullereneGenerator
 # from sknano.io import XYZReader, DATAReader
 from sknano.testing import GeneratorTestFixture
 
@@ -102,10 +103,19 @@ class Tests(GeneratorTestFixture):
                      MoS2().basis.Natoms * 2 ** 3)
 
     def test13(self):
-        assert_equal(GoldGenerator().atoms, FCCStructureGenerator('Au').atoms)
+        assert_equal(GoldGenerator().atoms, FCCGenerator('Au').atoms)
 
     def test14(self):
-        assert_equal(IronGenerator().atoms, BCCStructureGenerator('Fe').atoms)
+        assert_equal(IronGenerator().atoms, BCCGenerator('Fe').atoms)
+
+    def test15(self):
+        structure = FCCGenerator(structure=Fullerene(60), coords=[[0, 0, 0]])
+        # print(structure)
+        # print(structure.lattice)
+        # print(structure.crystal_cell.centroid)
+        # print(structure.lattice.fractional_)
+        # for atom in structure.basis:
+        #     print(atom.r)
 
 
 if __name__ == '__main__':

@@ -12,8 +12,8 @@ from sknano.testing import GeneratorTestFixture
 class Tests(GeneratorTestFixture):
 
     def test1(self):
-        generator = BilayerGrapheneGenerator(armchair_edge_length=1,
-                                             zigzag_edge_length=1,
+        generator = BilayerGrapheneGenerator(armchair_edge_length=10,
+                                             zigzag_edge_length=10,
                                              layer_rotation_increment=45)
         generator.save()
         self.tmpdata.append(generator.fname)

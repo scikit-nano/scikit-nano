@@ -61,7 +61,7 @@ class NanotubeStoneWalesDefectGenerator(StoneWalesDefectGenerator):
     bundle_geometry : {None, 'triangle', 'hexagon', 'square', 'rectangle',
                        'rhombus', 'rhomboid'}, optional
     Lx, Ly, Lz : float, optional
-        length of bundle in :math:`x, y, z` dimensions in **nanometers**.
+        length of bundle in :math:`x, y, z` dimensions in **Angstroms**.
         Overrides the :math:`n_x, n_y, n_z` cell values.
     verbose : bool, optional
         Verbose output
@@ -89,7 +89,7 @@ class NanotubeStoneWalesDefectGenerator(StoneWalesDefectGenerator):
     ...     n=10, m=5, Lz=10, fix_Lz=True, bundle_geometry='hexagon')
 
     Notice that I used the `Lz` keyword argument to specify the
-    **length** of the nanotube bundle in **nanometers**, and I also
+    **length** of the nanotube bundle in **Angstroms**, and I also
     set `fix_Lz=True`. If you don't set `fix_Lz=True`, then the
     length of the nanotube will get truncated such that it's an integer
     multiple of the unit cell length, which, depending on the chirality, may
@@ -220,7 +220,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     bundle_geometry : {None, 'triangle', 'hexagon', 'square', 'rectangle',
                        'rhombus', 'rhomboid'}, optional
     Lx, Ly, Lz : float, optional
-        length of bundle in :math:`x, y, z` dimensions in **nanometers**.
+        length of bundle in :math:`x, y, z` dimensions in **Angstroms**.
         Overrides the :math:`n_x, n_y, n_z` cell values.
     verbose : bool, optional
         Verbose output
@@ -250,7 +250,7 @@ class NanotubeVacancyGenerator(VacancyGenerator):
     ...                                 bundle_geometry='hexagon')
 
     Notice that I used the `Lz` keyword argument to specify the
-    **length** of the nanotube bundle in **nanometers**, and I also
+    **length** of the nanotube bundle in **Angstroms**, and I also
     set `fix_Lz=True`. If you don't set `fix_Lz=True`, then the
     length of the nanotube will get truncated such that it's an integer
     multiple of the unit cell length, which,

@@ -124,7 +124,7 @@ class PrimitiveCellGrapheneGenerator(GrapheneGeneratorBase,
     Parameters
     ----------
     edge_length : float
-        Length of graphene edges in **nanometers**
+        Length of graphene edges in **Angstroms**
     basis : {:class:`python:list`}, optional
         List of :class:`python:str`\ s of element symbols or atomic number
         of the two atom basis (default: ['C', 'C'])
@@ -151,10 +151,19 @@ class PrimitiveCellGrapheneGenerator(GrapheneGeneratorBase,
     verbose : bool, optional
         verbose output
 
+    Examples
+    --------
+
+    >>> from sknano.generators import PrimitiveCellGrapheneGenerator
+    >>> graphene = PrimitiveCellGrapheneGenerator(edge_length=10)
+    >>> graphene.save()
+
+    .. image:: /images/10.0Å_1layer_graphene-1.png
+
     """
     @classmethod
     def generate_fname(cls, edge_length=None, **kwargs):
-        dimensions = '{:.1f}nm'.format(edge_length)
+        dimensions = '{:.1f}Å'.format(edge_length)
         fname = '_'.join((dimensions, super().generate_fname(**kwargs)))
         return fname
 
@@ -183,9 +192,9 @@ class ConventionalCellGrapheneGenerator(GrapheneGeneratorBase,
     Parameters
     ----------
     armchair_edge_length : float, optional
-        Length of armchair edge in **nanometers**
+        Length of armchair edge in **Angstroms**
     zigzag_edge_length : float, optional
-        Length of zigzag edge in **nanometers**
+        Length of zigzag edge in **Angstroms**
     basis : {:class:`python:list`}, optional
         List of :class:`python:str`\ s of element symbols or atomic number
         of the two atom basis (default: ['C', 'C'])
@@ -216,8 +225,8 @@ class ConventionalCellGrapheneGenerator(GrapheneGeneratorBase,
     @classmethod
     def generate_fname(cls, armchair_edge_length=None,
                        zigzag_edge_length=None, **kwargs):
-        dimensions = '{:.1f}nmx{:.1f}nm'.format(armchair_edge_length,
-                                                zigzag_edge_length)
+        dimensions = '{:.1f}Åx{:.1f}Å'.format(armchair_edge_length,
+                                              zigzag_edge_length)
         fname = '_'.join((dimensions, super().generate_fname(**kwargs)))
         return fname
 
@@ -255,23 +264,23 @@ class GrapheneGenerator(ConventionalCellGrapheneGenerator):
     Parameters
     ----------
     armchair_edge_length : float, optional
-        Length of armchair edge in **nanometers**
+        Length of armchair edge in **Angstroms**
 
         .. versionadded:: 0.3.10
 
     zigzag_edge_length : float, optional
-        Length of zigzag edge in **nanometers**
+        Length of zigzag edge in **Angstroms**
 
         .. versionadded:: 0.3.10
 
     length : float, optional
-        Length of armchair edge in **nanometers**
+        Length of armchair edge in **Angstroms**
 
         .. deprecated:: 0.3.10
            Use `armchair_edge_length` instead
 
     width : float, optional
-        Width of graphene sheet in **nanometers**
+        Width of graphene sheet in **Angstroms**
 
         .. deprecated:: 0.3.10
            Use `zigzag_edge_length` instead
@@ -326,39 +335,41 @@ class GrapheneGenerator(ConventionalCellGrapheneGenerator):
 
     >>> from sknano.generators import GrapheneGenerator
 
-    Now generate a **20 nm AC x 1 nm ZZ** graphene nano-ribbon.
+    Now generate a **100 Å AC x 10 Å ZZ** graphene nano-ribbon.
 
-    >>> ACG = GrapheneGenerator(armchair_edge_length=20, zigzag_edge_length=1)
+    >>> armchair_nanoribbon = GrapheneGenerator(armchair_edge_length=100,
+    ...                                         zigzag_edge_length=10)
 
-    Save structure data in `xyz` format:
+    Save structure data in default `xyz` format:
 
-    >>> ACG.save()
+    >>> armchair_nanoribbon.save()
 
     The rendered structure look like:
 
-    .. image:: /images/20nmx1nm_AC_edge.png
+    .. image:: /images/100.0Åx10.0Å_1layer_graphene.png
 
-    Now let's generate a **20 nm ZZ x 1 nm AC** graphene nano-ribbon.
+    Now let's generate a **10 Å ZZ x 100 Å AC** graphene nano-ribbon.
 
-    >>> ZZG = GrapheneGenerator(armchair_edge_length=20, zigzag_edge_length=1)
-    >>> ZZG.save()
-
-    The rendered structure looks like:
-
-    .. image:: /images/20nmx1nm_ZZ_edge.png
-
-    Now generate **25 nm AC x 5 nm ZZ**, 5 layer, `AB`-stacked graphene.
-
-    >>> ACG_5layers = GrapheneGenerator(armchair_edge_length=25,
-    ...                                 zigzag_edge_length=5,
-    ...                                 nlayers=5)
-    >>> ACG_5layers.save()
+    >>> zigzag_nanoribbon = GrapheneGenerator(armchair_edge_length=10,
+    ...                                       zigzag_edge_length=100)
+    >>> zigzag_nanoribbon.save()
 
     The rendered structure looks like:
 
-    .. image:: /images/25nmx5nm_5layer_AC_graphene.png
+    .. image:: /images/10.0Åx100.0Å_1layer_graphene.png
 
-    Now generate single layer, **10 nm x 10 nm** sheet of BN Graphene.
+    Now generate **100 Å AC x 25 Å ZZ**, 5 layer, `AB`-stacked graphene.
+
+    >>> five_layer_graphene = GrapheneGenerator(armchair_edge_length=100,
+    ...                                         zigzag_edge_length=25,
+    ...                                         nlayers=5)
+    >>> five_layer_graphene.save()
+
+    The rendered structure looks like:
+
+    .. image:: /images/100.0Åx25.0Å_5layer_graphene-1.png
+
+    Now generate single layer, **10 Å x 10 Å** sheet of BN Graphene.
 
     >>> BN_graphene = GrapheneGenerator(armchair_edge_length=10,
     ...                                 zigzag_edge_length=10,
@@ -367,25 +378,21 @@ class GrapheneGenerator(ConventionalCellGrapheneGenerator):
 
     The rendered structure looks like:
 
-    .. image:: /images/10nmx10nm_single_layer_BN_graphene.png
-
-    Now, just because we can, generate a **5 nm x 5 nm** sheet of
-    Uranium-Einsteinium Graphene.
-
-    >>> UEs_graphene = GrapheneGenerator(armchair_edge_length=5,
-    ...                                  zigzag_edge_length=5,
-    ...                                  basis=['U', 'Es'])
-    >>> UEs_graphene.save()
-
-    The rendered structure looks like:
-
-    .. image:: /images/5nmx5nm_single_layer_UEs_graphene.png
+    .. image:: /images/10.0Åx10.0Å_1layer_graphene_B-N_basis-1.png
 
     """
     @classmethod
     def from_primitive_cell(cls, **kwargs):
+        """`classmethod <https://docs.python.org/3/library/functions.html#classmethod>`_
+        to call :class:`PrimitiveCellGrapheneGenerator`.
+
+        """
         return PrimitiveCellGrapheneGenerator(**kwargs)
 
     @classmethod
     def from_conventional_cell(cls, **kwargs):
+        """`classmethod <https://docs.python.org/3/library/functions.html#classmethod>`_
+        to call :class:`ConventionalCellGrapheneGenerator`.
+
+        """
         return ConventionalCellGrapheneGenerator(**kwargs)

@@ -101,7 +101,17 @@ CaesiumChlorideStructureGenerator = CsClGenerator = CaesiumChlorideGenerator
 
 
 class RocksaltGenerator(BulkGeneratorBase, RocksaltStructure):
-    """:class:`RocksaltStructure` generator class."""
+    """:class:`~sknano.core.structures.RocksaltStructure` generator class.
+
+    Examples
+    --------
+    >>> from sknano.generators import RocksaltGenerator
+    >>> nacl = RocksaltGenerator(scaling_matrix=5)
+    >>> nacl.save()
+
+    .. image:: /images/rock_salt_5x5x5-1.png
+
+    """
     pass
 
 RocksaltStructureGenerator = NaClGenerator = RocksaltGenerator
@@ -125,14 +135,34 @@ ZincblendeStructureGenerator = ZincblendeGenerator
 
 
 class BCCGenerator(BulkGeneratorBase, BCCStructure):
-    """:class:`~sknano.core.structures.BCCStructure` generator class."""
+    """:class:`~sknano.core.structures.BCCStructure` generator class.
+
+    Examples
+    --------
+    >>> from sknano.generators import BCCGenerator
+    >>> iron = BCCGenerator(basis='Fe', scaling_matrix=5)
+    >>> iron.save()
+
+    .. image:: /images/BCC_Fe_10x10x10-1.png
+
+    """
     pass
 
 BCCStructureGenerator = BCCGenerator
 
 
 class FCCGenerator(BulkGeneratorBase, FCCStructure):
-    """:class:`~sknano.core.structures.FCCStructure` generator class."""
+    """:class:`~sknano.core.structures.FCCStructure` generator class.
+
+    Examples
+    --------
+    >>> from sknano.generators import FCCGenerator
+    >>> gold = FCCGenerator(basis='Au', scaling_matrix=10)
+    >>> gold.save()
+
+    .. image:: /images/FCC_Au_5x5x5-1.png
+
+    """
     pass
 
 FCCStructureGenerator = FCCGenerator
@@ -154,15 +184,15 @@ class MoS2Generator(BulkGeneratorBase, MoS2):
 
 
 class IronGenerator(BulkGeneratorBase, Iron):
-    """:class:`Iron` generator class."""
+    """:class:`~sknano.core.structures.Iron` generator class."""
     pass
 
 
 class GoldGenerator(BulkGeneratorBase, Gold):
-    """:class:`Gold` generator class."""
+    """:class:`~sknano.core.structures.Gold` generator class."""
     pass
 
 
 class CopperGenerator(BulkGeneratorBase, Copper):
-    """:class:`Copper` generator class."""
+    """:class:`~sknano.core.structures.Copper` generator class."""
     pass

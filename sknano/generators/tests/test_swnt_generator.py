@@ -26,7 +26,7 @@ class Tests(GeneratorTestFixture):
         self.tmpdata.append(swnt.fname)
 
     def test2(self):
-        swnt = SWNTGenerator(n=5, m=5, Lz=1.0, fix_Lz=True)
+        swnt = SWNTGenerator(n=5, m=5, Lz=10.0, fix_Lz=True)
         swnt.save()
         self.tmpdata.append(swnt.fname)
         swnt.save(structure_format='data')
@@ -105,7 +105,7 @@ class Tests(GeneratorTestFixture):
                      structure.crystal_cell.basis.Natoms)
 
     def test11(self):
-        swnt = SWNTGenerator((5, 0), Lz=1, fix_Lz=True, verbose=False).atoms
+        swnt = SWNTGenerator((5, 0), Lz=10, fix_Lz=True, verbose=False).atoms
         assert_true(swnt.bounding_box.zmax < 11 and
                     swnt.bounding_box.zmax > 10)
 

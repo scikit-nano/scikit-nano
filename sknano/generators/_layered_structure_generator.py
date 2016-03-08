@@ -30,6 +30,7 @@ class LayeredStructureGenerator(GeneratorBase, BaseStructure, BaseClass):
 
     Parameters
     ----------
+    cfgfile : :class:`~python:str`
 
     """
 

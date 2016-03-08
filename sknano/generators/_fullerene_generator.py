@@ -36,8 +36,10 @@ class FullereneGenerator(GeneratorMixin, GeneratorBase, Fullerene):
     First, load the :class:`~sknano.generators.FullereneGenerator` class.
 
     >>> from sknano.generators import FullereneGenerator
-    >>> fg = FullereneGenerator(60)
-    >>> fg.save(fname='C60.data')
+    >>> buckyball = FullereneGenerator(60)
+    >>> buckyball.save()
+
+    .. image:: /images/buckyball-1.png
 
     """
 
