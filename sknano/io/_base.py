@@ -13,9 +13,8 @@ __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
 
-from sknano.core import get_fpath
-from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms, \
-    MDAtom, MDAtoms
+from sknano.core import BaseClass, get_fpath
+from sknano.core.atoms import MDAtom as Atom, MDAtoms as Atoms
 from sknano.core.structures import StructureData
 # from sknano.utils.analysis import StructureAnalyzer
 from sknano.version import version
@@ -25,7 +24,7 @@ default_comment_line = \
 default_structure_format = 'xyz'
 supported_structure_formats = ('xyz', 'data', 'dump')
 
-__all__ = ['Atom', 'Atoms', 'MDAtom', 'MDAtoms',
+__all__ = ['Atom', 'Atoms',
            'StructureIO',
            'StructureReader',
            'StructureWriter',
@@ -37,7 +36,7 @@ __all__ = ['Atom', 'Atoms', 'MDAtom', 'MDAtoms',
            'supported_structure_formats']
 
 
-class StructureIO(StructureData):
+class StructureIO(StructureData, BaseClass):
     """Base class for structure data file input and output.
 
     Parameters
@@ -47,11 +46,13 @@ class StructureIO(StructureData):
     """
     def __init__(self, fpath=None, fname=None, **kwargs):
         super().__init__()
+        self._atoms = Atoms()
         self.comment_line = default_comment_line
         if fpath is None and fname is not None:
             fpath = fname
         self.fpath = fpath
         self.kwargs = kwargs
+        self.fmtstr = "fpath={fpath!r}"
 
     @property
     def comment_line(self):
@@ -83,6 +84,10 @@ class StructureIO(StructureData):
             if not attr.startswith('_'):
                 setattr(cp, attr, deepcopy(getattr(self, attr), memo))
         return cp
+
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        return dict(fpath=self.fpath)
 
 
 class StructureReader:
@@ -146,7 +151,7 @@ class StructureWriter:
             XYZWriter.write(fname=fname, **kwargs)
 
 
-class StructureConverter(metaclass=ABCMeta):
+class StructureConverter(BaseClass, metaclass=ABCMeta):
     """Abstract base class for converting structure data.
 
     Parameters
@@ -160,6 +165,7 @@ class StructureConverter(metaclass=ABCMeta):
         self.infile = infile
         self.outfile = outfile
         self.kwargs = kwargs
+        self.fmtstr = "infile={infile!r}, outfile={outfile!r}"
 
     @abstractmethod
     def convert(self):
@@ -167,16 +173,14 @@ class StructureConverter(metaclass=ABCMeta):
         raise NotImplementedError('Subclasses of `StructureConverter` need '
                                   'to implement the `convert` method.')
 
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        return dict(infile=self.infile, outfile=self.outfile)
 
-class StructureFormatSpec:
-    """Base class for defining a format specification.
 
-    Parameters
-    ----------
-
-    """
-    def __init__(self, **kwargs):
-        pass
+class StructureFormatSpec(BaseClass):
+    """Base class for defining a format specification."""
+    pass
 
 
 class StructureIOError(Exception):
