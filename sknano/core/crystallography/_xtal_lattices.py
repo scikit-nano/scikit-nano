@@ -18,6 +18,7 @@ import numpy as np
 
 from sknano.core import BaseClass
 from sknano.core.math import Vector, Point, zhat, rotation_matrix
+from ._extras import pbc_diff
 
 __all__ = ['LatticeBase', 'ReciprocalLatticeBase',
            'DirectLatticeMixin', 'ReciprocalLatticeMixin',
@@ -107,6 +108,16 @@ class LatticeBase(BaseClass):
     def metric_tensor(self):
         """Metric tensor."""
         return self.cell_matrix * self.cell_matrix.T
+
+    def fractional_diff(self, fcoords1, fcoords2):
+        """Compute difference between fractional coordinates.
+
+        See Also
+        --------
+        core.crystallography.pbc_diff
+
+        """
+        return pbc_diff(fcoords1, fcoords2)
 
     def fractional_to_cartesian(self, fcoords):
         """Convert fractional coordinate to cartesian coordinate.
@@ -375,7 +386,6 @@ class Direct3DLatticeMixin:
     @property
     def cos_gamma(self):
         """:math:`\\cos\\gamma`"""
-        print('calling Direct3DLatticeMixin.cos_gamma')
         return np.around(
             (self.cos_alpha_star * self.cos_beta_star - self.cos_gamma_star) /
             (self.sin_alpha_star * self.sin_beta_star), decimals=10)
