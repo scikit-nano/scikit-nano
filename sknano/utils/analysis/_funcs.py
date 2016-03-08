@@ -10,9 +10,50 @@ Structure analysis functions (:mod:`sknano.utils.analysis._funcs`)
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
+from collections import deque
+
 import numpy as np
 
-__all__ = ['find_target_atom']
+__all__ = ['find_defect_chains', 'find_target_atom']
+
+from sknano.core.atoms import Atoms
+
+
+def find_defect_chains(atoms, defect_condition, max_length=None,
+                       exclude=None, include_root=True, **kwargs):
+    """Analyze atoms for chains of defects."""
+    if not isinstance(atoms, Atoms):
+        raise TypeError('Expected an `Atoms` object')
+
+    if max_length is None:
+        max_length = len(atoms)
+    if exclude is None:
+        exclude = []
+
+    chains = []
+    seen = []
+    for atom in atoms:
+        chain = []
+        queue = deque([natom for natom in atom.neighbors])
+        while queue and len(chain) <= max_length:
+            natom = queue.popleft()
+            if defect_condition(natom) and \
+                    all([natom not in atoms_ for atoms_ in
+                         (atoms, chain, chains, seen, exclude)]):
+                chain.append(natom)
+                queue.extend([nnatom for nnatom in natom.neighbors if
+                              all([nnatom not in atoms_ for atoms_ in
+                                   (atoms, chain, chains, seen, exclude)])])
+            seen.append(natom)
+        if len(chain) > 0:
+            if include_root:
+                chain.insert(0, atom)
+            defect_atoms = \
+                atoms.__class__(chain, update_item_class=False,
+                                **atoms.kwargs)
+            chains.append(defect_atoms)
+
+    return chains
 
 
 def find_target_atom(atoms, target_coords=None, search_radius=1.0,

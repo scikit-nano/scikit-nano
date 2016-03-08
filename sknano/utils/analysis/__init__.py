@@ -21,6 +21,7 @@ Helper functions
 .. autosummary::
    :toctree: generated/
 
+   find_defect_chains
    find_target_atom
 
 """
