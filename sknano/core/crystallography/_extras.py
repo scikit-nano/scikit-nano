@@ -25,16 +25,15 @@ def pbc_diff(fcoords1, fcoords2):
 
     Parameters
     ----------
-        fcoords1: First set of fractional coordinates. e.g., [0.5, 0.6,
-            0.7] or [[1.1, 1.2, 4.3], [0.5, 0.6, 0.7]]. It can be a single
-            coord or any array of coords.
-        fcoords2: Second set of fractional coordinates.
+    fcoords1, fcoords2 : array_like
+        Fractional coordinates. Either a single coord or any array of coords.
 
     Returns
     -------
-    :class:`~numpy:numpy.ndarray`
-        :class:`~numpy:numpy.ndarray` of fractional coordinates.
-        Each coordinate must have the property that abs(a) <= 0.5.
+    fdiff : :class:`~numpy:numpy.ndarray`
+        Array of difference in fractional coordinates
+        `fcoords1 - fcoords2`, accounting for periodic boundary conditions.
+        Each coordinate must have the property that abs(fc) <= 0.5.
 
     Examples
     --------
@@ -55,7 +54,7 @@ def supercell_lattice_points(supercell_matrix):
         supercell lattice.
 
     Modified implementation of \
-    :func:`pymatgen:pymatgen.util.coord_utils.lattice_points_in_supercell`
+        :func:`pymatgen:pymatgen.util.coord_utils.lattice_points_in_supercell`
 
     Parameters
     ----------
@@ -63,7 +62,7 @@ def supercell_lattice_points(supercell_matrix):
 
     Returns
     -------
-    :class:`~numpy:numpy.ndarray`
+    frac_points : :class:`~numpy:numpy.ndarray`
         numpy array of the fractional coordinates of lattice points
     """
     diagonals = np.array(
@@ -84,7 +83,7 @@ def supercell_lattice_points(supercell_matrix):
     frac_points = \
         np.asarray(np.dot(all_points, np.linalg.inv(supercell_matrix)))
 
-    frac_points = frac_points[np.all(frac_points < 1 - 1e-10, axis=1)
-                              & np.all(frac_points >= -1e-10, axis=1)]
+    frac_points = frac_points[np.all(frac_points < 1 - 1e-10, axis=1) &
+                              np.all(frac_points >= -1e-10, axis=1)]
     assert len(frac_points) == round(abs(np.linalg.det(supercell_matrix)))
     return frac_points
