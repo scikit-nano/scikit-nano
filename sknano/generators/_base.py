@@ -136,13 +136,13 @@ class GeneratorBase(metaclass=ABCMeta):
                 center_com = kwargs['center_center_of_mass']
                 del kwargs['center_center_of_mass']
 
+        if region_bounds is not None:
+            atoms.clip_bounds(region_bounds)
+
         if center_centroid:
             atoms.center_centroid()
         elif center_com:
             atoms.center_com()
-
-        if region_bounds is not None:
-            atoms.clip_bounds(region_bounds)
 
         if filter_condition is not None:
             atoms.filter(filter_condition)
