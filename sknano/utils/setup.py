@@ -8,7 +8,7 @@ def configuration(parent_package='', top_path=None):
     config = Configuration('utils', parent_package, top_path)
     config.add_subpackage('analysis')
     #config.add_subpackage('md_tools')
-    config.add_subpackage('symmetry_groups')
+    config.add_subpackage('symmetry')
     return config
 
 if __name__ == '__main__':
