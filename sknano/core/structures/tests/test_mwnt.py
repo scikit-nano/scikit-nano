@@ -27,7 +27,7 @@ def test2():
 
 
 def test3():
-    mwnt = MWNT(Ch=[(5, 5), (10, 10), (15, 15), (20, 20)], Lz=1.0)
+    mwnt = MWNT(Ch=[(5, 5), (10, 10), (15, 15), (20, 20)], Lz=10.0)
     # print(mwnt)
     # print(mwnt.chiral_types)
     # print(mwnt.chiral_set)
@@ -38,7 +38,7 @@ def test3():
 
 def test4():
     mwnt = MWNT(Ch=[(5, 0), (5, 5), (10, 5), (10, 0), (10, 10)],
-                Lz=0.5)
+                Lz=5.0)
     # print(mwnt)
     # print(mwnt.chiral_types)
     # print(mwnt.chiral_set)
@@ -61,7 +61,7 @@ def test6():
 
 def test7():
     Ch_list = [(5, 0), (10, 0)]
-    mwnt = MWNT(Ch_list=Ch_list, Lz=1.0)
+    mwnt = MWNT(Ch_list=Ch_list, Lz=10.0)
     print('\nmwnt.Natoms')
     print(mwnt.Natoms)
     # print('\nmwnt.Natoms_list')

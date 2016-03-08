@@ -29,6 +29,7 @@ class MWNTMixin:
     """Mixin class for MWNTs."""
     @property
     def Ch_list(self):
+        """List of chiralities."""
         return self._Ch_list
 
     @Ch_list.setter
@@ -96,6 +97,7 @@ class MWNTMixin:
 
     @property
     def min_wall_diameter(self):
+        """Minimum wall diameter."""
         return self._min_wall_diameter
 
     @min_wall_diameter.setter
@@ -105,6 +107,7 @@ class MWNTMixin:
 
     @property
     def max_wall_diameter(self):
+        """Maximum wall diameter."""
         return self._max_wall_diameter
 
     @max_wall_diameter.setter
@@ -114,6 +117,7 @@ class MWNTMixin:
 
     @property
     def max_walls(self):
+        """Maximum number of walls."""
         return self._max_walls
 
     @max_walls.setter
@@ -122,6 +126,7 @@ class MWNTMixin:
 
     @property
     def wall_spacing(self):
+        """Wall-to-wall spacing."""
         return self._wall_spacing
 
     @wall_spacing.setter
@@ -160,7 +165,7 @@ class MWNTMixin:
 
     @property
     def Lz_list(self):
-        """MWNT length :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**."""
+        """MWNT length :math:`L_z = L_{\\mathrm{tube}}` in **Angstroms**."""
         return [swnt.Lz for swnt in self.walls]
 
     @property
@@ -226,6 +231,7 @@ class MWNTMixin:
     def generate_Ch_list(self, Nwalls=None, max_walls=None,
                          min_wall_diameter=None, max_wall_diameter=None,
                          chiral_types=None, wall_spacing=None):
+        """Generate list of chiralities."""
         if Nwalls is not None:
             max_walls = Nwalls
 
@@ -276,6 +282,7 @@ class MWNTMixin:
     def update_Ch_list(self, Nwalls=None, min_wall_diameter=None,
                        max_wall_diameter=None, wall_spacing=None,
                        chiral_types=None):
+        """Update :attr:`MWNTMixin.Ch_list`."""
         if Nwalls is None:
             Nwalls = self.Nwalls
         if min_wall_diameter is None:
@@ -302,7 +309,7 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
     Nwalls : int, optional
         Number of `SWNT` walls in `MWNT`.
     Lz : float, optional
-        `MWNT` length in **nanometers**.
+        `MWNT` length in **Angstroms**.
     min_wall_diameter : float, optional
         Minimum `MWNT` wall diameter, in units of **Angstroms**.
     max_wall_diameter : float, optional
@@ -364,7 +371,7 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
         self._wall_spacing = wall_spacing
 
         if Lz is None:
-            Lz = 1.0
+            Lz = 10.0
         self.Lz = Lz
 
         self.generate_unit_cell()
@@ -406,7 +413,12 @@ class MWNT(NanotubeBase, MWNTBase):
     Nwalls : int, optional
         Number of `SWNT` walls in `MWNT`.
     Lz : float, optional
-        `MWNT` length in **nanometers**.
+        `MWNT` length in **Angstroms**.
+
+        .. versionchanged:: 0.4.0
+
+           Changed units from nanometers to **Angstroms**
+
     min_wall_diameter : float, optional
         Minimum `MWNT` wall diameter, in units of **Angstroms**.
     max_wall_diameter : float, optional

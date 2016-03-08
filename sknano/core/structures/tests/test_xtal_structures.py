@@ -4,14 +4,14 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
 import nose
-from nose.tools import assert_equal, assert_true, assert_raises
+from nose.tools import assert_equal, assert_true, assert_raises, assert_false
 import numpy as np
 
 from sknano.core.crystallography import Crystal2DLattice
 from sknano.core.structures import Crystal2DStructure, \
-    AlphaQuartz, DiamondStructure, HexagonalStructure, \
+    AlphaQuartz, BetaQuartz, DiamondStructure, HexagonalStructure, \
     BCCStructure, FCCStructure, Gold, Copper, CaesiumChlorideStructure, \
-    RocksaltStructure, ZincblendeStructure, MoS2
+    RocksaltStructure, ZincblendeStructure, MoS2, Fullerene
 from sknano.core.atoms import BasisAtoms
 from sknano.testing import generate_atoms, generate_structure
 
@@ -114,6 +114,49 @@ def test14():
         generate_structure(generator_class='SWNTGenerator', n=5, m=0, nz=2)
     print(structure)
     print(structure.crystal_cell)
+
+
+def test15():
+    buckyball = Fullerene(60)
+    fcc_buckyball = FCCStructure(structure=buckyball,
+                                 coords=[[0, 0, 0]])
+    assert_equal(buckyball.Natoms * 4, fcc_buckyball.Natoms)
+    # print(fcc_buckyball)
+    # print(fcc_buckyball.Natoms)
+    # buckyball.center_centroid()
+    # print(buckyball.centroid)
+    # basis = buckyball.basis
+    # coords = basis.coords
+    # print(coords)
+    # basis.center_centroid()
+    # print(basis.centroid)
+
+    # fcc_structure = FCCStructure(basis='C', lattice=buckyball.lattice)
+    # print(fcc_structure.basis)
+    # print(fcc_structure.basis.coords)
+    # new_basis = BasisAtoms()
+
+    # for i, tvec in enumerate(fcc_structure.basis[:].coords):
+    #     # print(tvec)
+    #     basis = buckyball.basis.copy()
+    #     # print(basis)
+    #     basis.translate(tvec)
+    #     # print(basis.centroid)
+    #     # fcc_structure.basis[i] = basis
+    #     # print(fcc_structure.basis[i].Natoms)
+    #     new_basis.extend(basis)
+    # # print(fcc_structure.basis.Natoms)
+    # # print(fcc_structure.basis[0])
+    # # print(fcc_structure.basis)
+    # # assert_false(fcc_structure.basis[0] == fcc_structure.basis[1])
+    # print(new_basis.Natoms)
+
+
+# def test16():
+#     structure = BetaQuartz()
+#     print(structure)
+#     assert_true(isinstance(structure.basis, BasisAtoms))
+#     assert_equal(structure.basis.Natoms, 9)
 
 
 if __name__ == '__main__':

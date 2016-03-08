@@ -47,10 +47,12 @@ Crystal structure classes
    NaClStructure
    SphaleriteStructure
    ZincblendeStructure
+   CubicStructure
    BCCStructure
    FCCStructure
-   HexagonalClosePackedStructure
    CubicClosePackedStructure
+   HexagonalClosePackedStructure
+   HexagonalStructure
    AlphaQuartz
    MoS2
 

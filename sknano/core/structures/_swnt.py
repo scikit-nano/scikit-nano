@@ -794,7 +794,7 @@ def compute_unit_cell_mass(*Ch, element1=None, element2=None, **kwargs):
 def compute_linear_mass_density(*Ch, bond=None, element1=None, element2=None,
                                 **kwargs):
     """Compute nanotube linear mass density (mass per unit length) in \
-    **grams/nm**.
+    **grams/Å**.
 
     Parameters
     ----------
@@ -814,7 +814,7 @@ def compute_linear_mass_density(*Ch, bond=None, element1=None, element2=None,
     Returns
     -------
     float
-        Linear mass density in units of **g/nm**.
+        Linear mass density in units of **g/Å**.
 
     """
     n, m, _ = get_chiral_indices(*Ch)
@@ -825,23 +825,47 @@ def compute_linear_mass_density(*Ch, bond=None, element1=None, element2=None,
 
     try:
         linear_mass_density = mass / T
-        # there are 1.6605e-24 grams / Da and 10 angstroms / nm
-        linear_mass_density *= 10 * grams_per_Da
+        # there are 1.6605e-24 grams / Da
+        linear_mass_density *= grams_per_Da
         return linear_mass_density
     except ZeroDivisionError:
         return 0
 
 
 def compute_Lx(*Ch, nx=1, bond=None, gutter=r_CC_vdw):
-    return nx * (compute_dt(*Ch, bond=bond) + 2 * gutter) / 10
+    """Compute the axis-aligned length along the `x`-axis in **Angstroms**.
+
+    Calculated as:
+
+    .. math::
+
+       L_x = n_x * (d_t + 2 r_{\\mathrm{vdW}})
+
+    """
+    return nx * (compute_dt(*Ch, bond=bond) + 2 * gutter)
 
 
 def compute_Ly(*Ch, ny=1, bond=None, gutter=r_CC_vdw):
-    return ny * (compute_dt(*Ch, bond=bond) + 2 * gutter) / 10
+    """Compute the axis-aligned length along the `y`-axis in **Angstroms**.
+
+    Calculated as:
+
+    .. math::
+
+       L_y = n_y * (d_t + 2 r_{\\mathrm{vdW}})
+
+    """
+    return ny * (compute_dt(*Ch, bond=bond) + 2 * gutter)
 
 
 def compute_Lz(*Ch, nz=1, bond=None, **kwargs):
-    """Compute :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**.
+    """Compute the axis-aligned length along the `z`-axis in **Angstroms**.
+
+    :math:`L_z = L_{\\mathrm{tube}}` in **Angstroms**.
+
+    .. versionchanged:: 0.4.0
+
+       Changed units from nanometers to **Angstroms**
 
     .. math::
 
@@ -865,7 +889,7 @@ def compute_Lz(*Ch, nz=1, bond=None, **kwargs):
     Returns
     -------
     float
-        :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**
+        :math:`L_z = L_{\\mathrm{tube}}` in **Angstroms**
 
     """
     n, m, _ = get_chiral_indices(*Ch)
@@ -874,7 +898,7 @@ def compute_Lz(*Ch, nz=1, bond=None, **kwargs):
         raise TypeError('Expected a real, positive number')
 
     T = compute_T(n, m, bond=bond, **kwargs)
-    return nz * T / 10
+    return nz * T
 
 
 def compute_symmetry_chiral_angle(*Ch, degrees=True):
@@ -1204,11 +1228,13 @@ class SWNTMixin:
 
     @property
     def Lz(self):
-        """SWNT length :math:`L_z = L_{\\mathrm{tube}}` in **nanometers**."""
-        return self.nz * self.T / 10
+        """SWNT length :math:`L_z = L_{\\mathrm{tube}}` in **Angstroms**."""
+        return self.nz * self.T
 
     @property
     def fix_Lz(self):
+        """:class:`~python:bool` indicating whether :attr:`SWNTMixin.Lz` is \
+            fixed or calculated."""
         return self._fix_Lz
 
     @fix_Lz.setter
@@ -1270,7 +1296,7 @@ class SWNTMixin:
 
     @property
     def linear_mass_density(self):
-        """Linear mass density of nanotube in g/nm."""
+        """Linear mass density of nanotube in g/Å."""
         return compute_linear_mass_density(self.n, self.m, bond=self.bond,
                                            element1=self.element1,
                                            element2=self.element2)
@@ -1338,7 +1364,7 @@ class SWNTBase(SWNTMixin, NanoStructureBase):
 
         self.fix_Lz = fix_Lz
         if Lz is not None:
-            self.nz = 10 * float(Lz) / self.T
+            self.nz = float(Lz) / self.T
         elif nz is not None:
             self.nz = nz
         else:
@@ -1489,13 +1515,17 @@ class SWNT(NanotubeBase, SWNTBase):
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
     Lz : float, optional
-        Length of nanotube in units of **nanometers**.
+        Length of nanotube in units of **Angstroms**.
         Overrides the `nz` value.
 
         .. versionadded:: 0.2.5
 
+        .. versionchanged:: 0.4.0
+
+           Changed units from nanometers to **Angstroms**
+
     tube_length : float, optional
-        Length of nanotube in units of **nanometers**.
+        Length of nanotube in units of **Angstroms**.
         Overrides the `nz` value.
 
         .. deprecated:: 0.2.5

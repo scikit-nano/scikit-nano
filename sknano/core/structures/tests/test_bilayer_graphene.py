@@ -12,7 +12,7 @@ from sknano.core.structures import BilayerGraphene
 
 
 def test1():
-    blg = BilayerGraphene(armchair_edge_length=5, zigzag_edge_length=5,
+    blg = BilayerGraphene(armchair_edge_length=10, zigzag_edge_length=10,
                           layer_rotation_increment=45, degrees=True)
     assert_equal(blg.nlayers, 2)
     assert_equal(blg.layer_rotation_angles[-1], np.pi/4)

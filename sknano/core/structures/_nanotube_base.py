@@ -86,6 +86,7 @@ class NanotubeBundleMixin:
     """Mixin class for nanotube bundles."""
     @property
     def bundle_density(self):
+        """Compute the nanotube bundle density."""
         return compute_bundle_density(self.n, self.m, r_vdw=self.vdw_radius,
                                       bond=self.bond, basis=self.basis)
 
@@ -123,11 +124,29 @@ class NanotubeBundleMixin:
 
     @property
     def Lx(self):
-        return self.nx * (self.dt + 2 * self.vdw_radius) / 10
+        """Axis-aligned length along the `x`-axis in **Angstroms**.
+
+        Calculated as:
+
+        .. math::
+
+           L_x = n_x * (d_t + 2 r_{\\mathrm{vdW}})
+
+        """
+        return self.nx * (self.dt + 2 * self.vdw_radius)
 
     @property
     def Ly(self):
-        return self.ny * (self.dt + 2 * self.vdw_radius) / 10
+        """Axis-aligned length along the `y`-axis in **Angstroms**.
+
+        Calculated as:
+
+        .. math::
+
+           L_y = n_y * (d_t + 2 r_{\\mathrm{vdW}})
+
+        """
+        return self.ny * (self.dt + 2 * self.vdw_radius)
 
     @property
     def bundle_geometry(self):
@@ -214,6 +233,7 @@ class NanotubeBundleMixin:
             return super().Natoms_per_tube
 
     def init_bundle_parameters(self):
+        """Initialize bundle attributes."""
         self.bundle_list = []
         self.generate_bundle_coords()
         fmtstr = super().fmtstr
@@ -265,7 +285,7 @@ class NanotubeBundleMixin:
                 ntubes_per_row = nrows - row
 
         elif self.bundle_geometry == 'rectangle':
-            Lx = 10 * self.Lx
+            Lx = self.Lx
             for nx in range(self.nx):
                 for ny in range(self.ny):
                     dr = nx * self.r1 + ny * self.r2
@@ -305,6 +325,7 @@ class NanotubeBase(NanotubeBundleMixin):
             self.init_bundle_parameters()
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         attrdict = super().todict()
         if self.is_bundle:
             attrdict.update(dict(nx=self.nx, ny=self.ny,

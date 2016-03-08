@@ -33,11 +33,13 @@ class UnrolledSWNTMixin:
 
     @property
     def Lx(self):
-        return self.nx * self.Ch / 10
+        """Axis-aligned length along the `x`-axis in **Angstroms**."""
+        return self.nx * self.Ch
 
     @property
     def Ly(self):
-        return self.nlayers * self.layer_spacing / 10
+        """Axis-aligned length along the `y`-axis in **Angstroms**."""
+        return self.nlayers * self.layer_spacing
 
     @property
     def nx(self):
@@ -69,6 +71,8 @@ class UnrolledSWNTMixin:
 
     @property
     def fix_Lx(self):
+        """:class:`~python:bool` indicating whether \
+            :attr:`UnrolledSWNTMixin.Lx` is fixed or calculated."""
         return self._fix_Lx
 
     @fix_Lx.setter
@@ -114,7 +118,7 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
     nlayers : int, optional
         Number of layers (default: 1)
     layer_spacing : float, optional
-        Distance between layers in **Angstroms** (default: 3.35).
+        Distance between layers in **Angstroms** (default: 3.4).
     stacking_order : {'AA', 'AB'}, optional
         Stacking order of layers.
     layer_rotation_angles : list, optional
@@ -129,14 +133,24 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
         below it.
     Lx : float, optional
         Length of the unrolled swnt sheet along the chiral vector
-        in units of **nanometers**. Overrides the `nx` value.
+        in units of **Angstroms**. Overrides the `nx` value.
+
+        .. versionchanged:: 0.4.0
+
+           Changed units from nanometers to **Angstroms**
+
     fix_Lx : bool, optional
         Generate the unrolled swnt sheet with the length along the
         chiral vector as close to the specified :math:`L_x` as possible.
         If `True`, then non integer :math:`n_x` cells are permitted.
     Lz : float, optional
         Length of the unrolled swnt sheet along the translation vector
-        in units of **nanometers**. Overrides the `nz` value.
+        in units of **Angstroms**. Overrides the `nz` value.
+
+        .. versionchanged:: 0.4.0
+
+           Changed units from nanometers to **Angstroms**
+
     fix_Lz : bool, optional
         Generate the unrolled swnt sheet with the length along the
         translation vector as close to the specified :math:`L_z` as possible.
@@ -149,9 +163,12 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
     --------
 
     >>> from sknano.core.structures import UnrolledSWNT
+    >>> unrolled_swnt = UnrolledSWNT(10, 5)
+    >>> unrolled_swnt
+    UnrolledSWNT((10, 5), nx=1, nz=1, bond=1.42, basis=['C', 'C'], nlayers=1,
+    layer_spacing=3.4, stacking_order='AB')
 
     """
-
     def __init__(self, *Ch, nx=1, nz=1, basis=['C', 'C'], bond=aCC,
                  gutter=None, nlayers=1, layer_spacing=2 * r_CC_vdw,
                  layer_rotation_angles=None,
@@ -174,7 +191,7 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
 
         self.fix_Lx = fix_Lx
         if Lx is not None:
-            self.nx = 10 * float(Lx) / self.Ch
+            self.nx = float(Lx) / self.Ch
         elif nx is not None:
             self.nx = nx
         else:
@@ -182,7 +199,7 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
 
         self.fix_Lz = fix_Lz
         if Lz is not None:
-            self.nz = 10 * float(Lz) / self.T
+            self.nz = float(Lz) / self.T
         elif nz is not None:
             self.nz = nz
         else:

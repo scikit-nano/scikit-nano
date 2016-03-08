@@ -150,6 +150,7 @@ class Fullerene(CrystalStructureBase):
 
     @property
     def data(self):
+        """Return :class:`~python:dict` of :class:`Fullerene` data."""
         try:
             return self._data[self.name]
         except KeyError:
@@ -157,6 +158,7 @@ class Fullerene(CrystalStructureBase):
 
     @property
     def datafile(self):
+        """Return :class:`Fullerene` `xyz` structure data file."""
         try:
             return self.data[self.PG][self.Niso]
         except TypeError:
@@ -183,6 +185,7 @@ class Fullerene(CrystalStructureBase):
         except TypeError:
             self._Niso = None
 
+    @property
     def Natoms(self):
         """Alias for :attr:`~Fullerene.N`."""
         return self.N
@@ -223,13 +226,16 @@ class Fullerene(CrystalStructureBase):
 
     @property
     def name(self):
+        """Return string representation if :attr:`~Fullerene.N` is not `None` \
+            else `None`."""
         if self.N is not None:
-            return ''.join(('C', str(self.N)))
+            return str(self)
         else:
             return None
 
     @property
     def Nisomers(self):
+        """Return number of :attr:`~Fullerene.N` isomers."""
         try:
             return len(self.data['files'])
         except TypeError:
@@ -237,14 +243,17 @@ class Fullerene(CrystalStructureBase):
 
     @property
     def point_groups(self):
+        """List of point groups."""
         try:
             return self.data['point_groups']
         except TypeError:
             return None
 
     def generate_unit_cell(self):
+        """Generate :class:`Fullerene` :class:`UnitCell`."""
         from sknano.io import XYZReader
         atoms = XYZReader(self.datafile).atoms
+        atoms.center_centroid()
         bounding_box = atoms.bounding_box
         a = np.sqrt(2) * (max(bounding_box.abc) + 3.4)
         lattice = Crystal3DLattice.cubic(a)
@@ -257,12 +266,11 @@ class Fullerene(CrystalStructureBase):
         self.unit_cell = UnitCell(lattice=lattice, basis=basis)
 
     def todict(self):
-        """Return :class:`~python:dict` of `Fullerene` attributes."""
+        """Return :class:`~python:dict` of :class:`Fullerene` parameters."""
         return dict(N=self.N, PG=self.PG, Niso=self.Niso)
 
 
 class Fullerenes:
-
     data = load_fullerene_data()
     fullerenes = tuple(data.keys())
     N = tuple(int(fullerene[1:]) for fullerene in fullerenes)

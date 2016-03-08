@@ -47,7 +47,7 @@ class BaseStructureMixin:
 
     @property
     def atoms(self):
-        """Structure :class:`~sknano.core.atoms.StructureAtoms`."""
+        """Structure :class:`~sknano.core.atoms.Atoms`."""
         return self._atoms
 
     @property

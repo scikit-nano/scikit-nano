@@ -80,10 +80,11 @@ class GrapheneMixin:
     """Mixin class for graphene structure classes."""
     @property
     def n1(self):
+        """Number of unit cells along :attr:`Crystal3DLattice.a1`."""
         try:
             return self._n1
         except AttributeError:
-            return int(np.ceil(10 * self.l1 / self.unit_cell.a1.length))
+            return int(np.ceil(self.l1 / self.unit_cell.a1.length))
 
     @n1.setter
     def n1(self, value):
@@ -91,10 +92,11 @@ class GrapheneMixin:
 
     @property
     def n2(self):
+        """Number of unit cells along :attr:`Crystal3DLattice.a2`."""
         try:
             return self._n2
         except AttributeError:
-            return int(np.ceil(10 * self.l2 / self.unit_cell.a2.length))
+            return int(np.ceil(self.l2 / self.unit_cell.a2.length))
 
     @n2.setter
     def n2(self, value):
@@ -102,10 +104,14 @@ class GrapheneMixin:
 
     @property
     def r1(self):
+        """Vector :attr:`GrapheneMixin.n1` :math:`\\times` \
+            :attr:`Crystal3DLattice.a1`."""
         return self.n1 * self.unit_cell.a1
 
     @property
     def r2(self):
+        """Vector :attr:`GrapheneMixin.n2` :math:`\\times` \
+            :attr:`Crystal3DLattice.a2`."""
         return self.n2 * self.unit_cell.a2
 
     @property
@@ -157,7 +163,7 @@ class GrapheneBase(GrapheneMixin, NanoStructureBase):
     nlayers : int, optional
         Number of graphene layers (default: 1)
     layer_spacing : float, optional
-        Distance between layers in **Angstroms** (default: 3.35).
+        Distance between layers in **Angstroms** (default: 3.4).
     stacking_order : {'AA', 'AB'}, optional
         Stacking order of graphene layers.
     layer_rotation_angles : list, optional
@@ -182,6 +188,10 @@ class GrapheneBase(GrapheneMixin, NanoStructureBase):
         if 'deg2rad' in kwargs:
             degrees = kwargs['deg2rad']
             del kwargs['deg2rad']
+
+        if 'layer_rotation_angle' in kwargs and layer_rotation_angles is None:
+                layer_rotation_angles = kwargs['layer_rotation_angle']
+                del kwargs['layer_rotation_angle']
 
         super().__init__(basis=basis, bond=bond, **kwargs)
 
@@ -231,6 +241,7 @@ class GrapheneBase(GrapheneMixin, NanoStructureBase):
         return strrep
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         return dict(bond=self.bond, basis=self.basis,
                     nlayers=self.nlayers, layer_spacing=self.layer_spacing,
                     layer_rotation_angles=self.layer_rotation_angles,
@@ -245,7 +256,12 @@ class PrimitiveCellGraphene(GrapheneBase):
     Parameters
     ----------
     edge_length : float, optional
-        length of graphene edges
+        length of graphene edges in **Angstroms**.
+
+        .. versionchanged:: 0.4.0
+
+           Changed units from nanometers to **Angstroms**
+
     basis : {:class:`python:list`}, optional
         List of :class:`python:str`\ s of element symbols or atomic number
         of the two atom basis (default: ['C', 'C'])
@@ -255,7 +271,7 @@ class PrimitiveCellGraphene(GrapheneBase):
     nlayers : int, optional
         Number of graphene layers (default: 1)
     layer_spacing : float, optional
-        Distance between layers in **Angstroms** (default: 3.35).
+        Distance between layers in **Angstroms** (default: 3.4).
     stacking_order : {'AA', 'AB'}, optional
         Stacking order of graphene layers.
     layer_rotation_angles : list, optional
@@ -286,6 +302,7 @@ class PrimitiveCellGraphene(GrapheneBase):
         self.fmtstr = 'edge_length={edge_length!r}, ' + self.fmtstr
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         attr_dict = super().todict()
         attr_dict.update(dict(edge_length=self.edge_length))
         return attr_dict
@@ -301,9 +318,19 @@ class ConventionalCellGraphene(GrapheneBase):
     Parameters
     ----------
     armchair_edge_length : float, optional
-        Length of armchair edge in **nanometers**
+        Length of armchair edge in **Angstroms**
+
+        .. versionchanged:: 0.4.0
+
+           Changed units from nanometers to **Angstroms**
+
     zigzag_edge_length : float, optional
-        Length of zigzag edge in **nanometers**
+        Length of zigzag edge in **Angstroms**
+
+        .. versionchanged:: 0.4.0
+
+           Changed units from nanometers to **Angstroms**
+
     basis : {:class:`python:list`}, optional
         List of :class:`python:str`\ s of element symbols or atomic number
         of the two atom basis (default: ['C', 'C'])
@@ -313,7 +340,7 @@ class ConventionalCellGraphene(GrapheneBase):
     nlayers : int, optional
         Number of graphene layers (default: 1)
     layer_spacing : float, optional
-        Distance between layers in **Angstroms** (default: 3.35).
+        Distance between layers in **Angstroms** (default: 3.4).
     stacking_order : {'AA', 'AB'}, optional
         Stacking order of graphene layers.
     layer_rotation_angles : list, optional
@@ -330,7 +357,6 @@ class ConventionalCellGraphene(GrapheneBase):
         verbose output
 
     """
-
     def __init__(self, armchair_edge_length=None, zigzag_edge_length=None,
                  n1=None, n2=None, **kwargs):
 
@@ -355,6 +381,7 @@ class ConventionalCellGraphene(GrapheneBase):
             'zigzag_edge_length={zigzag_edge_length!r}, ' + self.fmtstr
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         attr_dict = super().todict()
         attr_dict.update(dict(armchair_edge_length=self.armchair_edge_length,
                          zigzag_edge_length=self.zigzag_edge_length))
@@ -370,7 +397,6 @@ class GrapheneNanoribbon(ConventionalCellGraphene):
 
     """
     def __init__(self, **kwargs):
-
         super().__init__(nlayers=1, **kwargs)
 
 
@@ -387,23 +413,31 @@ class Graphene(ConventionalCellGraphene):
     Parameters
     ----------
     armchair_edge_length : float, optional
-        Length of armchair edge in **nanometers**
+        Length of armchair edge in **Angstroms**
 
         .. versionadded:: 0.3.10
+
+        .. versionchanged:: 0.4.0
+
+           Changed units from nanometers to **Angstroms**
 
     zigzag_edge_length : float, optional
-        Length of zigzag edge in **nanometers**
+        Length of zigzag edge in **Angstroms**
 
         .. versionadded:: 0.3.10
 
+        .. versionchanged:: 0.4.0
+
+           Changed units from nanometers to **Angstroms**
+
     length : float, optional
-        Length of armchair edge in **nanometers**
+        Length of armchair edge in **Angstroms**
 
         .. deprecated:: 0.3.10
            Use `armchair_edge_length` instead
 
     width : float, optional
-        Width of graphene sheet in **nanometers**
+        Width of graphene sheet in **Angstroms**
 
         .. deprecated:: 0.3.10
            Use `zigzag_edge_length` instead
@@ -434,7 +468,7 @@ class Graphene(ConventionalCellGraphene):
     nlayers : int, optional
         Number of graphene layers (default: 1)
     layer_spacing : float, optional
-        Distance between layers in **Angstroms** (default: 3.35).
+        Distance between layers in **Angstroms** (default: 3.4).
     stacking_order : {'AA', 'AB'}, optional
         Stacking order of graphene layers.
     layer_rotation_angles : list, optional

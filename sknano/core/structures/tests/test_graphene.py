@@ -13,9 +13,9 @@ from sknano.core.structures import Graphene, PrimitiveCellGraphene, \
 
 
 def test1():
-    s = Graphene(armchair_edge_length=5, zigzag_edge_length=5)
-    assert_equal(s.zigzag_edge_length, 5)
-    assert_equal(s.armchair_edge_length, 5)
+    s = Graphene(armchair_edge_length=10, zigzag_edge_length=10)
+    assert_equal(s.zigzag_edge_length, 10)
+    assert_equal(s.armchair_edge_length, 10)
     assert_true(isinstance(s, ConventionalCellGraphene))
     assert_true(isinstance(s.unit_cell, GrapheneConventionalCell))
     assert_equal(s.unit_cell.basis.Natoms, 4)
@@ -23,8 +23,8 @@ def test1():
 
 
 def test2():
-    s = PrimitiveCellGraphene(edge_length=5)
-    assert_equal(s.edge_length, 5)
+    s = PrimitiveCellGraphene(edge_length=10)
+    assert_equal(s.edge_length, 10)
     assert_true(isinstance(s, PrimitiveCellGraphene))
     assert_true(isinstance(s.unit_cell, GraphenePrimitiveCell))
     assert_true(np.allclose(np.degrees(s.r1.angle(s.r2)), 60.0))
@@ -33,9 +33,10 @@ def test2():
 
 
 def test3():
-    s = ConventionalCellGraphene(armchair_edge_length=5, zigzag_edge_length=5)
-    assert_equal(s.zigzag_edge_length, 5)
-    assert_equal(s.armchair_edge_length, 5)
+    s = ConventionalCellGraphene(armchair_edge_length=10,
+                                 zigzag_edge_length=10)
+    assert_equal(s.zigzag_edge_length, 10)
+    assert_equal(s.armchair_edge_length, 10)
     assert_true(isinstance(s, ConventionalCellGraphene))
     assert_true(isinstance(s.unit_cell, GrapheneConventionalCell))
     print(s.unit_cell)
@@ -44,17 +45,17 @@ def test3():
 
 
 def test4():
-    s = Graphene.from_conventional_cell(armchair_edge_length=5,
-                                        zigzag_edge_length=5)
-    assert_equal(s.zigzag_edge_length, 5)
-    assert_equal(s.armchair_edge_length, 5)
+    s = Graphene.from_conventional_cell(armchair_edge_length=10,
+                                        zigzag_edge_length=10)
+    assert_equal(s.zigzag_edge_length, 10)
+    assert_equal(s.armchair_edge_length, 10)
     assert_true(isinstance(s.unit_cell, GrapheneConventionalCell))
     print(s.unit_cell)
     assert_true(isinstance(s, ConventionalCellGraphene))
 
 
 def test5():
-    s = Graphene.from_primitive_cell(edge_length=5)
+    s = Graphene.from_primitive_cell(edge_length=10)
     assert_true(isinstance(s, PrimitiveCellGraphene))
     assert_true(isinstance(s.unit_cell, GraphenePrimitiveCell))
 
