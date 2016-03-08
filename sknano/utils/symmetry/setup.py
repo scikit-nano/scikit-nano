@@ -5,8 +5,8 @@ from __future__ import unicode_literals
 
 def configuration(parent_package='utils', top_path=None):
     from numpy.distutils.misc_util import Configuration
-    config = Configuration('symmetry_groups', parent_package, top_path)
-    #config.add_data_dir('tests')
+    config = Configuration('symmetry', parent_package, top_path)
+    config.add_data_dir('tests')
     return config
 
 if __name__ == '__main__':
