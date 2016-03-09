@@ -469,6 +469,7 @@ class Cuboid(Geometric3DRegion):
 
     @property
     def abc(self):
+        """:class:`~python:tuple` of side lengths"""
         return self.a, self.b, self.c
 
     @property
