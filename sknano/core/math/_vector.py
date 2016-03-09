@@ -751,19 +751,25 @@ class Vector(np.ndarray):
             self.p += t
 
 
-def angle(u, v):
+def angle(u, v, degrees=False):
     """Compute the angle between two Cartesian `Vector`\ s.
 
     Parameters
     ----------
-    u, v : `Vector`
+    u, v : array_like
+    degrees : :class:`~python:bool`, optional
+
 
     Returns
     -------
     :class:`~numpy:numpy.number`
 
     """
-    return np.arccos(dot(u, v) / (u.norm * v.norm))
+    u, v = map(Vector, (u, v))
+    angle = np.arccos(dot(u, v) / (u.norm * v.norm))
+    if degrees:
+        angle = np.degrees(angle)
+    return angle
 
 
 def cross(u, v, p0=None):
@@ -771,7 +777,7 @@ def cross(u, v, p0=None):
 
     Parameters
     ----------
-    u, v : `Vector`
+    u, v : array_like
     p0 : `Point`, optional
 
     Returns
@@ -779,6 +785,7 @@ def cross(u, v, p0=None):
     :class:`~numpy:numpy.number` or :class:`Vector`
 
     """
+    u, v = map(Vector, (u, v))
     val = np.cross(np.asarray(u), np.asarray(v))
     if p0 is None:
         p0 = u.p0
@@ -793,7 +800,7 @@ def dot(u, v):
 
     Parameters
     ----------
-    u, v : `Vector`
+    u, v : array_like
 
     Returns
     -------
@@ -808,7 +815,7 @@ def scalar_triple_product(u, v, w):
 
     Parameters
     ----------
-    u, v, w : `Vector`
+    u, v, w : array_like
 
     Returns
     -------
@@ -823,7 +830,7 @@ def vector_triple_product(u, v, w):
 
     Parameters
     ----------
-    u, v, w : `Vector`
+    u, v, w : array_like
 
     Returns
     -------
@@ -839,13 +846,14 @@ def scalar_projection(a, b):
 
     Parameters
     ----------
-    a, b : `Vector`
+    a, b : array_like
 
     Returns
     -------
     :class:`~numpy:numpy.number`
 
     """
+    a, b = map(Vector, (a, b))
     return dot(a, b) / b.norm
 
 
@@ -855,13 +863,14 @@ def vector_projection(a, b):
 
     Parameters
     ----------
-    a, b : `Vector`
+    a, b : array_like
 
     Returns
     -------
     :class:`Vector`
 
     """
+    a, b = map(Vector, (a, b))
     return dot(a, b) / dot(b, b) * b
 
 projection = vector_projection
@@ -873,13 +882,14 @@ def vector_rejection(a, b):
 
     Parameters
     ----------
-    a, b : `Vector`
+    a, b : array_like
 
     Returns
     -------
     :class:`Vector`
 
     """
+    a, b = map(Vector, (a, b))
     a1 = vector_projection(a, b)
     return a - a1
 
