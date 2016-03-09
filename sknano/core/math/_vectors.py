@@ -199,6 +199,30 @@ class Vectors(UserList):
         return vecs
 
     @property
+    def A(self):
+        """Return array of vectors."""
+        return self.asarray()
+
+    @property
+    def T(self):
+        """Return transpose of :class:`Vectors` as an \
+            :class:`~numpy:numpy.ndarray`."""
+        return self.asarray().T
+
+    @property
+    def M(self):
+        """Return :class:`Vectors` as a :class:`~numpy:numpy.matrix`."""
+        return self.asmatrix()
+
+    def asarray(self):
+        """Return :class:`Vectors` as an :class:`~numpy:numpy.ndarray`."""
+        return np.asarray([vec.tolist() for vec in self])
+
+    def asmatrix(self):
+        """Return :class:`Vectors` as a :class:`~numpy:numpy.matrix`."""
+        return np.asmatrix([vec.tolist() for vec in self])
+
+    @property
     def x(self):
         """Return :math:`x` coordinates of `Vector` objects as array."""
         return np.asarray([vec.x for vec in self])
@@ -363,6 +387,7 @@ class Vectors(UserList):
         return NotImplemented
 
     def tolist(self):
+        """Return `Vectors` as :class:`~python:list`"""
         return np.asarray([vec.tolist() for vec in self]).tolist()
 
     def translate(self, t, fix_anchor_points=False, **kwargs):
@@ -378,6 +403,7 @@ class Vectors(UserList):
          for vector in self]
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         return dict(vectors=[vec.tolist() for vec in self])
 
 from ._vector import Vector

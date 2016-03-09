@@ -129,6 +129,30 @@ class Points(UserList):
         return self
 
     @property
+    def A(self):
+        """Return array of vectors."""
+        return self.asarray()
+
+    @property
+    def T(self):
+        """Return transpose of :class:`Points` as an \
+            :class:`~numpy:numpy.ndarray`."""
+        return self.asarray().T
+
+    @property
+    def M(self):
+        """Return :class:`Points` as a :class:`~numpy:numpy.matrix`."""
+        return self.asmatrix()
+
+    def asarray(self):
+        """Return :class:`Points` as an :class:`~numpy:numpy.ndarray`."""
+        return np.asarray([point.tolist() for point in self])
+
+    def asmatrix(self):
+        """Return :class:`Points` as a :class:`~numpy:numpy.matrix`."""
+        return np.asmatrix([point.tolist() for point in self])
+
+    @property
     def x(self):
         """Return :math:`x` coordinates of `Point` objects as array."""
         return np.asarray([point.x for point in self])
@@ -234,4 +258,5 @@ class Points(UserList):
         [point.translate(t) for point in self]
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         return dict(points=[p.tolist() for p in self])
