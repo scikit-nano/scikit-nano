@@ -45,7 +45,8 @@ class StructureIO(StructureData, BaseClass):
 
     """
     def __init__(self, fpath=None, fname=None, **kwargs):
-        super().__init__()
+        super().__init__(**kwargs)
+
         self._atoms = Atoms()
         self.comment_line = default_comment_line
         if fpath is None and fname is not None:
