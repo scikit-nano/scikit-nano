@@ -10,8 +10,9 @@ from nose.tools import assert_equal
 
 # import numpy as np
 
-from sknano.core.atoms import generate_vmd_selection_string
 from sknano.core import flatten
+from sknano.core.atoms import generate_vmd_selection_string
+from sknano.core.geometric_regions import Cylinder
 from sknano.io import DUMPReader
 from sknano.utils.analysis import find_defect_chains, find_target_atom
 from sknano.testing import generate_atoms
@@ -38,13 +39,16 @@ def test_find_defect_chains():
                           'data/lammpstrj/' +
                           'irradiated_graphene.system.dump.02000')
 
-    dump = DUMPReader(dumpfile, attrmap={'c_peratom_pe': 'pe',
-                                         'c_peratom_ke': 'ke'})
+    dump = DUMPReader(dumpfile, dumpattrmap={'c_atom_pe': 'pe',
+                                             'c_atom_ke': 'ke'},
+                      elementmap={1: 'C', 2: 'Ar'})
     atoms = dump.trajectory[-1].atoms
     max_mol_id = 3
     atoms = atoms.filtered((atoms.types == 1) & (atoms.mol_ids <= max_mol_id))
     # print(atoms.ids)
     assert_equal(atoms.Natoms, 1008 * max_mol_id)
+    cylinder = Cylinder(p1=[0, -25, 0], p2=[0, 25, 0], r=15)
+    atoms = atoms.within_region(cylinder)
     atoms.verbose = True
     rings, ring_cntr, Rn_cntr = \
         atoms.analyze_network(cutoff=2.0, max_ring_size=20,
