@@ -15,7 +15,7 @@ __docformat__ = 'restructuredtext en'
 import numpy as np
 
 __all__ = ['components', 'dimensions', 'xyz', 'xyz_axes',
-           'dedupe', 'rezero', 'rezero_array']
+           'dedupe', 'rezero', 'rezero_array', 'minmax']
 
 components = dimensions = xyz = xyz_axes = ('x', 'y', 'z')
 
@@ -51,6 +51,11 @@ def dedupe(items, key=None):
         if val not in seen:
             yield item
             seen.add(val)
+
+
+def minmax(a):
+    """Return :class:`~python:tuple` of (min, max) values in `a`."""
+    return np.min(a), np.max(a)
 
 
 def rezero(a, epsilon=5.0*np.finfo(float).eps):
