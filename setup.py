@@ -72,6 +72,7 @@ Operating System :: Unix
 Operating System :: MacOS
 Programming Language :: Python
 Programming Language :: Python :: 3.4
+Programming Language :: Python :: 3.5
 Topic :: Scientific/Engineering
 Topic :: Scientific/Engineering :: Chemistry
 Topic :: Scientific/Engineering :: Physics
@@ -82,8 +83,8 @@ Topic :: Software Development :: Libraries :: Python Modules
 """
 
 MAJOR = 0
-MINOR = 3
-MICRO = 22
+MINOR = 4
+MICRO = 0
 ISRELEASED = False
 VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
 
