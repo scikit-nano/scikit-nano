@@ -11,11 +11,13 @@ from sknano.testing import IOTestFixture
 
 class XYZTestFixture(IOTestFixture):
 
-    def setUp(self):
-        atoms = self.atoms = self.xyz_reader.atoms
+    @property
+    def atoms(self):
+        atoms = self.xyz_reader.atoms
         atoms.assign_unique_ids()
         atoms.assign_unique_types()
         atoms.update_attrs()
+        return atoms
 
 
 class Tests(XYZTestFixture):
@@ -24,6 +26,10 @@ class Tests(XYZTestFixture):
         atoms = self.atoms
         assert_equal(atoms.Natoms, 40)
         assert_equal(list(set(atoms.atom_ids)), list(range(1, 41)))
+
+    def test2(self):
+        xyz_reader = self.xyz_reader
+        print(xyz_reader)
 
     # def test2(self):
     #     # data = XYZData()

@@ -12,6 +12,8 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
+import copy
+import os
 
 from sknano.core import BaseClass, get_fpath
 from sknano.core.atoms import MDAtom as Atom, MDAtoms as Atoms
@@ -31,12 +33,220 @@ __all__ = ['Atom', 'Atoms',
            'StructureConverter',
            'StructureIOError',
            'StructureFormatSpec',
+           'StructureReaderMixin',
+           'StructureWriterMixin',
+           'StructureIOMixin',
            'default_comment_line',
            'default_structure_format',
            'supported_structure_formats']
 
 
-class StructureIO(StructureData, BaseClass):
+class StructureReaderMixin:
+    """Mixin class for reading structure data."""
+    def read(self, *args, fname=None, structure_format=None, **kwargs):
+        if fname is None:
+            if len(args) == 0:
+                raise ValueError('`fname` is required')
+            else:
+                fname = list(args).pop()
+
+        if fname.endswith(supported_structure_formats) and \
+                structure_format is None:
+            for ext in supported_structure_formats:
+                if fname.endswith(ext):
+                    structure_format = ext
+                    break
+
+        if not fname.endswith(structure_format):
+            fname += '.' + structure_format
+
+        if structure_format is None:
+            raise ValueError(('Unknown structure format: ' +
+                              '{}'.format(structure_format)))
+
+        getattr(self, 'read_' + structure_format)(fname=fname, **kwargs)
+
+    def read_data(self, *args, **kwargs):
+        """Read LAMMPS Data file.
+
+        Returns
+        -------
+        :class:`~sknano.io.DATAReader`
+
+        """
+        from sknano.io import DATAReader
+        return DATAReader(*args, **kwargs)
+
+    def read_dump(self, *args, **kwargs):
+        """Read LAMMPS Dump file.
+
+        Returns
+        -------
+        :class:`~sknano.io.DUMPReader`
+
+        """
+        from sknano.io import DUMPReader
+        return DUMPReader(*args, **kwargs)
+
+    def read_xyz(self, *args, **kwargs):
+        """Read XYZ file.
+
+        Returns
+        -------
+        :class:`~sknano.io.XYZReader`
+
+        """
+        from sknano.io import XYZReader
+        return XYZReader.read(*args, **kwargs)
+
+
+class StructureWriterMixin:
+    """Mixin class for saving structure data."""
+    def _update_atoms(self, deepcopy=True, center_centroid=True,
+                      center_com=False, region_bounds=None,
+                      filter_condition=None, rotation_parameters=None,
+                      **kwargs):
+        atoms_copy = self._atoms[:]
+        if deepcopy:
+            atoms_copy = copy.deepcopy(atoms_copy)
+
+        self._atoms_copy = atoms_copy
+        atoms = self._atoms
+
+        if any([kw in kwargs for kw
+                in ('center_CM', 'center_center_of_mass')]):
+            if 'center_CM' in kwargs:
+                center_com = kwargs['center_CM']
+                del kwargs['center_CM']
+            else:
+                center_com = kwargs['center_center_of_mass']
+                del kwargs['center_center_of_mass']
+
+        if region_bounds is not None:
+            atoms.clip_bounds(region_bounds)
+
+        if center_centroid:
+            atoms.center_centroid()
+        elif center_com:
+            atoms.center_com()
+
+        if filter_condition is not None:
+            atoms.filter(filter_condition)
+            # atoms = atoms.filtered(filter_condition)
+
+        rotation_kwargs = ['rotation_angle', 'angle', 'rot_axis', 'axis',
+                           'anchor_point', 'deg2rad', 'degrees', 'rot_point',
+                           'from_vector', 'to_vector', 'transform_matrix']
+
+        if rotation_parameters is None and \
+                any([kw in kwargs for kw in rotation_kwargs]):
+            rotation_parameters = {kw: kwargs[kw] for kw in rotation_kwargs
+                                   if kw in kwargs}
+            if 'rotation_angle' in rotation_parameters:
+                rotation_parameters['angle'] = \
+                    rotation_parameters['rotation_angle']
+                del rotation_parameters['rotation_angle']
+            if 'rot_axis' in rotation_parameters:
+                rotation_parameters['axis'] = rotation_parameters['rot_axis']
+                del rotation_parameters['rot_axis']
+            if 'deg2rad' in rotation_parameters:
+                rotation_parameters['degrees'] = rotation_parameters['deg2rad']
+                del rotation_parameters['deg2rad']
+
+            kwargs = {k: v for k, v in kwargs.items()
+                      if k not in rotation_kwargs}
+
+        if rotation_parameters is not None and \
+                isinstance(rotation_parameters, dict):
+            atoms.rotate(**rotation_parameters)
+
+        atoms.rezero()
+        self._atoms = atoms
+
+    def _update_fpath(self, fname=None, outpath=None, structure_format=None,
+                      **kwargs):
+        if fname.endswith(supported_structure_formats) and \
+                structure_format is None:
+            for ext in supported_structure_formats:
+                if fname.endswith(ext):
+                    structure_format = ext
+                    break
+        elif structure_format is None or \
+            structure_format not in supported_structure_formats or \
+            (not fname.endswith(supported_structure_formats) and
+             structure_format not in supported_structure_formats):
+            structure_format = default_structure_format
+
+        self.structure_format = structure_format
+
+        if not fname.endswith(structure_format):
+            fname += '.' + structure_format
+        self.fname = fname
+
+        if outpath is not None:
+            fpath = os.path.join(outpath, fname)
+        else:
+            fpath = os.path.join(os.getcwd(), fname)
+        self.fpath = fpath
+
+    def write(self, *args, **kwargs):
+        """Save structure data.
+
+        Parameters
+        ----------
+        fname : {None, str}, optional
+            file name string
+        outpath : str, optional
+            Output path for structure data file.
+        structure_format : {None, str}, optional
+            chemical file format of saved structure data. Must be one of:
+
+                - `xyz`
+                - `data`
+
+            If `None`, then guess based on `fname` file extension or
+            default to `xyz` format.
+        center_centroid : bool, optional
+            Center centroid on origin.
+        center_com : bool, optional
+            Center center-of-mass on origin.
+        region_bounds : :class:`GeometricRegion`, optional
+            An instance of a
+            :class:`~sknano.core.geometric_regions.GeometricRegion` having
+            a method
+            :meth:`~sknano.core.geometric_regions.GeometricRegion.contains`
+            to filter the atoms not contained within the
+            `GeometricRegion`.
+        filter_condition : array_like, optional
+
+        """
+        self._update_fpath(**kwargs)
+        # self._update_atoms(**kwargs)
+        structure_format = self.structure_format
+        getattr(self, 'write_' + structure_format)(structure=self, **kwargs)
+
+    def write_data(self, **kwargs):
+        """Write LAMMPS DATA file."""
+        from sknano.io import DATAWriter
+        DATAWriter.write(**kwargs)
+
+    def write_dump(self, **kwargs):
+        """Write LAMMPS dump file."""
+        from sknano.io import DUMPWriter
+        DUMPWriter.write(**kwargs)
+
+    def write_xyz(self, **kwargs):
+        """Write XYZ file."""
+        from sknano.io import XYZWriter
+        XYZWriter.write(**kwargs)
+
+
+class StructureIOMixin(StructureReaderMixin, StructureWriterMixin):
+    """Mixin class providing I/O methods for structure data."""
+    pass
+
+
+class StructureIO(StructureIOMixin, StructureData, BaseClass):
     """Base class for structure data file input and output.
 
     Parameters

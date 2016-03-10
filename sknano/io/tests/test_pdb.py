@@ -13,11 +13,14 @@ from sknano.testing import IOTestFixture
 
 
 class PDBTestFixture(IOTestFixture):
-    def setUp(self):
-        atoms = self.atoms = self.pdb_reader.atoms
+
+    @property
+    def atoms(self):
+        atoms = self.pdb_reader.atoms
         atoms.assign_unique_ids()
         atoms.assign_unique_types()
         atoms.update_attrs()
+        return atoms
 
     @property
     def pdbfile1(self):
@@ -36,7 +39,9 @@ class Tests(PDBTestFixture):
         assert_equal(list(set(atoms.atom_ids)), list(range(1, 41)))
 
     def test2(self):
-        atoms = PDBReader(self.pdbfile1).atoms
+        pdbreader = PDBReader(self.pdbfile1)
+        print(pdbreader)
+        atoms = pdbreader.atoms
         # print('atoms.Natoms: {}'.format(atoms.Natoms))
         assert_equal(2795, atoms.Natoms)
 

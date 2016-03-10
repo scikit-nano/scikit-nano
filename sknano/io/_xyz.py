@@ -15,8 +15,9 @@ import os
 
 from monty.io import zopen
 from sknano.core import get_fpath
+from sknano.core.atoms import StructureAtom as Atom
 
-from ._base import Atom, StructureIO, StructureIOError, StructureConverter, \
+from ._base import StructureIO, StructureIOError, StructureConverter, \
     StructureFormatSpec, default_comment_line
 
 __all__ = ['XYZReader', 'XYZWriter', 'XYZData', 'XYZFormatSpec', 'XYZIOError',
@@ -40,7 +41,7 @@ class XYZReader(StructureIO):
 
     def read(self):
         """Read `xyz` file."""
-        self.structure_data.clear()
+        self.structure.clear()
         with zopen(self.fpath) as f:
             Natoms = int(f.readline().strip())
             self.comment_line = f.readline().strip()
@@ -67,7 +68,7 @@ class XYZWriter:
 
     @classmethod
     def write(cls, fname=None, outpath=None, fpath=None, structure=None,
-              atoms=None, comment_line=None, **kwargs):
+              atoms=None, **kwargs):
         """Write structure data to file.
 
         Parameters
@@ -80,9 +81,6 @@ class XYZWriter:
             Full path (directory path + file name) to output data file.
         atoms : :class:`~sknano.core.atoms.Atoms`
             An :class:`~sknano.core.atoms.Atoms` instance.
-        comment_line : str, optional
-            A string written to the first line of `xyz` file. If `None`,
-            then it is set to the full path of the output `xyz` file.
 
         """
         if structure is None and atoms is None:
@@ -94,17 +92,9 @@ class XYZWriter:
         if fpath is None:
             fpath = get_fpath(fname=fname, ext='xyz', outpath=outpath,
                               overwrite=True, add_fnum=False)
-        if comment_line is None:
-            comment_line = default_comment_line
 
-        atoms.rezero_coords()
-
-        with zopen(fpath, 'wt') as f:
-            f.write('{:d}\n'.format(atoms.Natoms))
-            f.write('{}\n'.format(comment_line))
-            for atom in atoms:
-                f.write('{:>3s}{:15.8f}{:15.8f}{:15.8f}\n'.format(
-                    atom.symbol, atom.x, atom.y, atom.z))
+        xyz = XYZData()
+        xyz.write(xyzfile=fpath, atoms=atoms, **kwargs)
 
 
 class XYZData(XYZReader):
@@ -118,35 +108,59 @@ class XYZData(XYZReader):
     def __init__(self, fpath=None, **kwargs):
         super().__init__(fpath, **kwargs)
 
-    def write(self, xyzfile=None, **kwargs):
+    def write(self, xyzfile=None, atoms=None, comment_line=None, **kwargs):
         """Write xyz file.
 
         Parameters
         ----------
         xyzfile : {None, str}, optional
+        comment_line : str, optional
+            A string written to the first line of `xyz` file. If `None`,
+            then it is set to the full path of the output `xyz` file.
 
         """
         try:
             kwargs.update(self.kwargs)
-            if (xyzfile is None or xyzfile == '') and \
-                    (self.fpath is None or self.fpath == ''):
-                error_msg = '`xyzfile` must be a string at least 1 ' + \
-                    'character long.'
-                if xyzfile is None:
-                    raise TypeError(error_msg)
-                else:
-                    raise ValueError(error_msg)
-            else:
-                xyzfile = self.fpath
 
-            XYZWriter.write(fname=xyzfile, atoms=self.atoms,
-                            comment_line=self.comment_line, **kwargs)
+            if not xyzfile:
+                if self.fpath is None:
+                    error_msg = 'Invalid `xyzfile` {}'.format(xyzfile)
+                    raise ValueError(error_msg)
+                else:
+                    xyzfile = self.fpath
+
+            if comment_line is None:
+                comment_line = default_comment_line
+
+            if atoms is not None:
+                self._atoms = atoms
+
+            super()._update_atoms(**kwargs)
+
+            try:
+                with zopen(xyzfile, 'wt') as fh:
+                    self._write_header(fh, comment_line)
+                    self._write_atoms(fh)
+            except OSError as e:
+                print(e)
+
+            self._atoms = self._atoms_copy
 
         except (TypeError, ValueError) as e:
             print(e)
 
+    def _write_header(self, fh, comment_line):
+        fh.write('{:d}\n'.format(self.atoms.Natoms))
+        fh.write('{}\n'.format(comment_line))
+
+    def _write_atoms(self, fh):
+        for atom in self.atoms:
+            fh.write('{:>3s}{:15.8f}{:15.8f}{:15.8f}\n'.format(
+                atom.symbol, atom.x, atom.y, atom.z))
+
 
 class XYZIOError(StructureIOError):
+    """Exception class for `XYZData` IO errors."""
     pass
 
 

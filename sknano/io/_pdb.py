@@ -17,8 +17,9 @@ from monty.io import zopen
 from pyparsing import ParseException
 
 from sknano.core import get_fpath
+from sknano.core.atoms import Atom
 from .tokenizers import PDBTokenizer
-from ._base import Atom, StructureIO, StructureIOError, StructureFormatSpec, \
+from ._base import StructureIO, StructureIOError, StructureFormatSpec, \
     default_comment_line
 
 __all__ = ['PDBData', 'PDBReader', 'PDBWriter', 'PDBFormatSpec']
@@ -72,8 +73,8 @@ class PDBWriter:
     """Class for writing pdb chemical file format."""
 
     @classmethod
-    def write(cls, fname=None, outpath=None, fpath=None, atoms=None,
-              comment_line=None):
+    def write(cls, fname=None, outpath=None, fpath=None, structure=None,
+              atoms=None, **kwargs):
         """Write structure data to file.
 
         Parameters
@@ -86,16 +87,20 @@ class PDBWriter:
             Full path (directory path + file name) to output data file.
         atoms : :py:class:`~sknano.io.atoms.Atoms`
             An :py:class:`~sknano.io.atoms.Atoms` instance.
-        comment_line : str, optional
 
         """
+        if structure is None and atoms is None:
+            raise ValueError('Expected either `structure` or `atoms` object.')
+
+        if structure is not None and atoms is None:
+            atoms = structure.atoms
+
         if fpath is None:
             fpath = get_fpath(fname=fname, ext='pdb', outpath=outpath,
                               overwrite=True, add_fnum=False)
-        if comment_line is None:
-            comment_line = default_comment_line
 
-        atoms.rezero_coords()
+        pdb = PDBData()
+        pdb.write(pdbfile=fpath, atoms=atoms, **kwargs)
 
         with zopen(fpath, 'wt') as f:
             for atom in atoms:
@@ -112,12 +117,41 @@ class PDBData(PDBReader):
     """
     def __init__(self, fpath=None):
         try:
-            super(PDBData, self).__init__(fpath=fpath)
+            # super(PDBData, self).__init__(fpath=fpath)
+            super().__init__(fpath=fpath)
         except StructureIOError:
             pass
 
-    def write(self, pdbfile=None):
-        pass
+    def write(self, pdbfile=None, atoms=None, comment_line=None, **kwargs):
+        try:
+            kwargs.update(self.kwargs)
+
+            if not pdbfile:
+                if self.fpath is None:
+                    error_msg = 'Invalid `pdbfile` {}'.format(pdbfile)
+                    raise ValueError(error_msg)
+                else:
+                    pdbfile = self.fpath
+
+            if comment_line is None:
+                comment_line = default_comment_line
+
+            if atoms is not None:
+                self._atoms = atoms
+
+            super()._update_atoms(**kwargs)
+
+            try:
+                with zopen(pdbfile, 'wt') as fh:
+                    self._write_header(fh, comment_line)
+                    self._write_atoms(fh)
+            except OSError as e:
+                print(e)
+
+            self._atoms = self._atoms_copy
+
+        except (TypeError, ValueError) as e:
+            print(e)
 
 
 class PDBFormatSpec(StructureFormatSpec):

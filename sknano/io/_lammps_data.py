@@ -17,11 +17,12 @@ import os
 import numpy as np
 
 from monty.io import zopen
-from sknano.core import get_fpath
+from sknano.core import get_fpath, minmax
+from sknano.core.atoms import Atoms, MDAtoms, MDAtom as Atom
 # from sknano.core.crystallography import Crystal3DLattice
 from sknano.core.geometric_regions import generate_bounding_box, Cuboid
-from ._base import MDAtom as Atom, StructureIO, StructureIOError, \
-    StructureConverter, default_comment_line
+from ._base import StructureIO, StructureIOError, \
+    StructureConverter, StructureFormatSpec, default_comment_line
 
 __all__ = ['DATAReader', 'DATAWriter', 'DATAData', 'DATAFormatSpec',
            'DATAIOError', 'DATA2XYZConverter', 'LAMMPSDATAReader',
@@ -32,7 +33,21 @@ __all__ = ['DATAReader', 'DATAWriter', 'DATAData', 'DATAFormatSpec',
 
 class Domain:
     """Dummy class for periodic boundary conditions."""
-    pass
+    triclinic = False
+
+    def update(self, from_lattice=None):
+        if from_lattice is not None:
+            lattice = from_lattice
+            if not np.allclose(np.radians(lattice.angles),
+                               np.pi / 2 * np.ones(3)):
+                self.triclinic = True
+                a, b, c = lattice.lengths
+                cos_alpha, cos_beta, cos_gamma = \
+                    np.cos(np.radians(lattice.angles))
+                self.xy = xy = b * cos_gamma
+                self.xz = xz = c * cos_beta
+                self.yz = \
+                    (b * c * cos_alpha - xy * xz) / np.sqrt(b ** 2 - xy ** 2)
 
 
 class DATAReader(StructureIO):
@@ -43,26 +58,41 @@ class DATAReader(StructureIO):
     fpath : str
         `LAMMPS data` file path
     atom_style : {'full', 'atomic'}, optional
+    bond_style : {None, 'class2', 'fene', 'fene/expand', 'harmonic', 'morse', \
+                  'nonlinear', 'quartic'}
+    angle_style
+    dihedral_style
+    improper_style
+    pair_style
+
+    Attributes
+    ----------
+    bounding_box : :class:`Cuboid`
+    domain : :class:`Domain`
 
     """
     def __init__(self, fpath, atom_style='full', bond_style=None,
                  angle_style=None, dihedral_style=None, improper_style=None,
-                 pair_style=None, **kwargs):
+                 pair_style=None, formatspec=None, **kwargs):
         super().__init__(fpath=fpath, **kwargs)
 
         self.header_data = OrderedDict()
         self.section_data = OrderedDict()
+        self.bounding_box = Cuboid()
         self.domain = Domain()
-        self.kwargs = OrderedDict()
 
-        styles = dict(atom_style=atom_style, bond_style=bond_style,
-                      angle_style=angle_style, dihedral_style=dihedral_style,
-                      improper_style=improper_style, pair_style=pair_style)
+        if formatspec is None or not isinstance(formatspec, DATAFormatSpec):
+            formatspec = DATAFormatSpec(atom_style=atom_style,
+                                        bond_style=bond_style,
+                                        angle_style=angle_style,
+                                        dihedral_style=dihedral_style,
+                                        improper_style=improper_style,
+                                        pair_style=pair_style)
 
-        formatspec = DATAFormatSpec(**styles)
-        self.atom_style = atom_style
+        self.formatspec = formatspec
         self.section_attrs = formatspec.section_attrs
         self.section_attrs_specs = formatspec.section_attrs_specs
+        self.fmtstr = "{fpath!r}, " + formatspec.fmtstr
 
         if self.fpath is not None:
             self.read()
@@ -91,9 +121,20 @@ class DATAReader(StructureIO):
         """
         return self.section_data
 
+    # @property
+    # def bounding_box(self):
+    #     """Bounding box."""
+    #     return self._bounding_box
+
+    # @bounding_box.setter
+    # def bounding_box(self, value):
+    #     if not isinstance(value, Cuboid):
+    #         raise TypeError('Expected `Cuboid` instance.')
+    #     self._bounding_box = self.kwargs['bounding_box'] = value
+
     def read(self):
         """Read data file."""
-        self.structure_data.clear()
+        self.structure.clear()
         try:
             with zopen(self.fpath) as f:
                 self.comment_line = f.readline().strip()
@@ -166,21 +207,21 @@ class DATAReader(StructureIO):
             atoms_section_attrs = self.section_attrs['Atoms']
         except KeyError:
             atoms_section = []
-            atoms_section_attrs = {}
+            atoms_section_attrs = []
 
         try:
             masses_section = self.section_data['Masses']
             masses_section_attrs = self.section_attrs['Masses']
         except KeyError:
             masses_section = []
-            masses_section_attrs = {}
+            masses_section_attrs = []
 
         try:
             velocities_section = self.section_data['Velocities']
             velocities_section_attrs = self.section_attrs['Velocities']
         except KeyError:
             velocities_section = []
-            velocities_section_attrs = {}
+            velocities_section_attrs = []
 
         for line in atoms_section:
             atom_kwargs = {}
@@ -232,14 +273,13 @@ class DATAReader(StructureIO):
                         self.atoms.add_type(Atom(type=atomtype))
 
     def _parse_bounding_box(self):
-        self.bounding_box = Cuboid()
+        bounding_box = self.bounding_box
         for dim in ('x', 'y', 'z'):
             bounds = \
                 self.header_data[' '.join([dim + lim for lim in ('lo', 'hi')])]
-            [setattr(self.bounding_box, dim + lim, value) for
+            [setattr(bounding_box, dim + lim, value) for
              lim, value in zip(('min', 'max'), bounds)]
-
-        self.kwargs['bounding_box'] = self.bounding_box
+        self.bounding_box = bounding_box
 
     def _parse_domain(self):
         tilt_factors = 'xy xz yz'
@@ -247,8 +287,55 @@ class DATAReader(StructureIO):
             self.domain.triclinic = True
             [setattr(self.domain, tilt_factor, value) for tilt_factor, value
              in zip(tilt_factors.split(), self.headers[tilt_factors])]
-        else:
-            self.domain.triclinic = False
+
+    def _update_headers(self, from_atoms=None, from_bonds=None,
+                        from_angles=None, from_dihedrals=None,
+                        from_impropers=None):
+        headers = OrderedDict()
+        if from_atoms is not None:
+            atoms = from_atoms
+            headers['atoms'] = atoms.Natoms
+            headers['atom types'] = atoms.Ntypes
+
+        if from_bonds is not None:
+            bonds = from_bonds
+            headers['bonds'] = bonds.Nbonds
+            headers['bond types'] = bonds.Ntypes
+
+        if from_angles is not None:
+            angles = from_angles
+            headers['angles'] = angles.Nangles
+            headers['angle types'] = angles.Ntypes
+
+        if from_dihedrals is not None:
+            dihedrals = from_dihedrals
+            headers['dihedrals'] = dihedrals.Ndihedrals
+            headers['dihedral types'] = dihedrals.Ntypes
+
+        if from_impropers is not None:
+            impropers = from_impropers
+            headers['impropers'] = impropers.Nimpropers
+            headers['improper types'] = impropers.Ntypes
+
+        # TODO: adding bounding_box limits to headers
+        self.header_data = headers
+
+    def _update_sections(self, from_atoms=None):
+        sections = OrderedDict()
+        if from_atoms is not None:
+            atoms = from_atoms
+            typemap = OrderedDict(sorted(atoms.typemap.items()))
+            sections['Masses'] = [[type, attrmap['mass']] for type, attrmap in
+                                  typemap.items()]
+            atoms_section_attrs = self.section_attrs['Atoms']
+            sections['Atoms'] = \
+                [[getattr(atom, attr) for attr in atoms_section_attrs]
+                 for atom in atoms]
+            velocities_section_attrs = self.section_attrs['Velocities']
+            sections['Velocities'] = \
+                [[getattr(atom, attr) for attr in velocities_section_attrs]
+                 for atom in atoms]
+        self.section_data = sections
 
     def get(self, section, colnum=None, colname=None, colindex=None):
         """Return section with `section`.
@@ -296,6 +383,13 @@ class DATAReader(StructureIO):
         finally:
             return section_data
 
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        super_dict = super().todict()
+        super_dict.update(self.formatspec.todict())
+        return super_dict
+
+
 LAMMPSDATAReader = DATAReader
 
 
@@ -304,11 +398,10 @@ class DATAWriter:
 
     @classmethod
     def write(cls, fname=None, outpath=None, fpath=None, structure=None,
-              atoms=None, atom_style='full', bounding_box=None,
-              comment_line=None, assert_unique_ids=False,
-              enforce_consecutive_ids=True, pad_box=False,
-              xpad=10., ypad=10., zpad=10., pad_tol=0.01,
-              verbose=False, **kwargs):
+              atoms=None, bounding_box=None, pad_box=False, pad_tol=0.01,
+              xpad=10., ypad=10., zpad=10., atom_style='full', bond_style=None,
+              angle_style=None, dihedral_style=None, improper_style=None,
+              pair_style=None, verbose=False, **kwargs):
         """Write structure data to file.
 
         Parameters
@@ -323,18 +416,6 @@ class DATAWriter:
             An :class:`~sknano.core.atoms.Atoms` instance.
         bounding_box : dict, optional
             If `None`, determined automatically from the `atoms` coordinates.
-        comment_line : str, optional
-            A string written to the first line of `data` file. If `None`,
-            then it is set to the full path of the output `data` file.
-        assert_unique_ids : bool, optional
-            Check that each :class:`~sknano.core.atoms.Atom` in `atoms`
-            has a unique :attr:`~sknano.core.atoms.Atom.id`.
-            If the check fails, then assign a unique
-            :attr:`~sknano.core.atoms.Atom.id`.
-            to each :class:`~sknano.core.atoms.Atom`.
-            If `assert_unique_ids` is True, but the id's are not unique,
-            LAMMPS will not be able to read the data file.
-        enforce_consecutive_ids : bool, optional
         pad_box : bool, optional
         xpad, ypad, zpad : float, optional
         pad_tol : float, optional
@@ -349,34 +430,31 @@ class DATAWriter:
             atoms = structure.atoms
 
         if fpath is None:
+            if 'datafile' in kwargs and fname is None:
+                fname = kwargs.pop('datafile')
             fpath = get_fpath(fname=fname, ext='data', outpath=outpath,
                               overwrite=True, add_fnum=False)
-        if comment_line is None:
-            comment_line = default_comment_line
 
-        atoms.rezero()
-        atoms.assign_unique_types()
-        typemap = atoms.typemap
+        if not isinstance(atoms, MDAtoms):
+            atoms = MDAtoms(atoms)
 
-        Natoms = atoms.Natoms
-        Natoms_width = \
-            8 if len(str(Natoms)) <= 12 else len(str(Natoms)) + 4
-        Ntypes = atoms.Ntypes
-        Ntypes_width = Natoms_width
+        formatspec = DATAFormatSpec(atom_style=atom_style,
+                                    bond_style=bond_style,
+                                    angle_style=angle_style,
+                                    dihedral_style=dihedral_style,
+                                    improper_style=improper_style,
+                                    pair_style=pair_style)
 
-        id_width = len(str(Natoms)) + 1
-        type_width = len(str(Ntypes)) + 1
-
-        if (enforce_consecutive_ids and
-            atoms.ids.max() != atoms.Natoms) or \
-                (not assert_unique_ids and
-                 len(set(atoms.ids)) != atoms.Natoms):
-            atoms.assign_unique_ids()
+        data = DATAData(formatspec=formatspec)
 
         if bounding_box is None:
             if structure is not None and structure.lattice is not None:
                 bounding_box = \
                     generate_bounding_box(from_lattice=structure.lattice,
+                                          center=atoms.centroid)
+            elif atoms.lattice is not None:
+                bounding_box = \
+                    generate_bounding_box(from_lattice=atoms.lattice,
                                           center=atoms.centroid)
             else:
                 bounding_box = \
@@ -398,64 +476,15 @@ class DATAWriter:
                     setattr(bounding_box, dmax,
                             getattr(bounding_box, dmax) + pad)
 
-        if verbose:
-            print('bounding_box: {}'.format(bounding_box))
+        if structure is not None and structure.lattice is not None:
+            data.domain.update(from_lattice=structure.lattice)
+        elif atoms.lattice is not None:
+            data.domain.update(from_lattice=atoms.lattice)
 
-        lohi_width = 0
-        for dim in ('x', 'y', 'z'):
-            lohi_width = \
-                max(lohi_width, len('{:.6f} {:.6f}'.format(
-                    getattr(bounding_box, dim + 'min'),
-                    getattr(bounding_box, dim + 'max'))) + 4)
-
-        with zopen(fpath, 'wt') as f:
-            f.write('# {}\n\n'.format(comment_line.lstrip('#').strip()))
-
-            f.write('{}atoms\n'.format(
-                '{:d}'.format(Natoms).ljust(Natoms_width)))
-            f.write('{}atom types\n\n'.format(
-                '{:d}'.format(Ntypes).ljust(Ntypes_width)))
-
-            for dim in ('x', 'y', 'z'):
-                f.write('{}{dim}lo {dim}hi\n'.format(
-                    '{:.6f} {:.6f}'.format(
-                        getattr(bounding_box, dim + 'min'),
-                        getattr(bounding_box, dim + 'max')).ljust(lohi_width),
-                    dim=dim))
-
-            f.write('\nMasses\n\n')
-            for atomtype, properties in list(typemap.items()):
-                f.write('{}{:.4f}\n'.format(
-                    '{:d}'.format(atomtype).ljust(Natoms_width),
-                    properties['mass']))
-
-            f.write('\nAtoms\n\n')
-            for atom in atoms:
-                line = ''
-                line += "{:>{}}".format(atom.id, id_width)
-                line += "{:>{}}".format(atom.mol, 3)
-                line += "{:>{}}".format(atom.type, type_width)
-                line += "{:>{}}".format('{:.1f}'.format(atom.q), 4)
-                line += "{:>{}}".format('{:f}'.format(atom.x), 14)
-                line += "{:>{}}".format('{:f}'.format(atom.y), 14)
-                line += "{:>{}}".format('{:f}'.format(atom.z), 14)
-                line += "{:>{}}".format('{:d}'.format(atom.ix), 3)
-                line += "{:>{}}".format('{:d}'.format(atom.iy), 3)
-                line += "{:>{}}".format('{:d}'.format(atom.iz), 3)
-                line += '\n'
-
-                f.write(line)
-
-            f.write('\nVelocities\n\n')
-            for atom in atoms:
-                line = ''
-                line += "{:>{}}".format(atom.id, id_width)
-                line += "{:>{}}".format('{:f}'.format(atom.vx), 14)
-                line += "{:>{}}".format('{:f}'.format(atom.vy), 14)
-                line += "{:>{}}".format('{:f}'.format(atom.vz), 14)
-                line += '\n'
-
-                f.write(line)
+        data.bounding_box = bounding_box
+        data._update_headers(from_atoms=atoms)
+        data._update_sections(from_atoms=atoms)
+        data.write(datafile=fpath, atoms=atoms, **kwargs)
 
 LAMMPSDATAWriter = DATAWriter
 
@@ -543,97 +572,116 @@ class DATAData(DATAReader):
     def viz(self, isnap):
         pass
 
-    def write(self, datafile=None, **kwargs):
+    def write(self, datafile=None, atoms=None, comment_line=None, **kwargs):
         """Write data file.
 
         Parameters
         ----------
-        datafile : {None, str}, optional
+        datafile : :class:`~python:str`, optional
+        atoms : :class:`~sknano.core.atoms.Atoms`, optional
+        comment_line : :class:`~python:str`, optional
+            A string written to the first line of `data` file. If `None`,
+            then it is the current version string of scikit-nano.
 
         """
         try:
             kwargs.update(self.kwargs)
 
-            if (datafile is None or datafile == '') and \
-                    (self.fpath is None or self.fpath == ''):
-                error_msg = \
-                    '`datafile` must be a string at least 1 character long.'
-                if datafile is None:
-                    raise TypeError(error_msg)
-                else:
+            if not datafile:
+                if self.fpath is None:
+                    error_msg = 'Invalid `datafile` {}'.format(datafile)
                     raise ValueError(error_msg)
-            elif datafile is None or datafile == '':
-                datafile = self.fpath
+                else:
+                    datafile = self.fpath
+            elif self.fpath is None:
+                self.fpath = datafile
 
-            # DATAWriter.write(fname=datafile, atoms=self.atoms,
-            #                  comment_line=self.comment_line, **kwargs)
+            if comment_line is None:
+                comment_line = default_comment_line
 
-            self.atoms.rezero()
-            self.atoms.assign_unique_types()
-            self.atoms.assign_unique_ids()
+            if atoms is not None and isinstance(atoms, Atoms):
+                if not isinstance(atoms, MDAtoms):
+                    atoms = MDAtoms(atoms)
+                self._atoms = atoms
 
+            super()._update_atoms(**kwargs)
+            atoms = self._atoms
+            atoms.assign_unique_ids()
+            atoms.assign_unique_types()
             self._update_attr_fmtstr_widths()
 
             try:
                 with zopen(datafile, 'wt') as fp:
-                    self._write_header(fp)
+                    self._write_header(fp, comment_line)
                     self._write_bounding_box(fp)
                     [getattr(self, '_write_' + section.lower())(fp)
                      for section in self.sections.keys()]
             except OSError as e:
                 print(e)
 
+            self._atoms = self._atoms_copy
+
         except (TypeError, ValueError) as e:
             print(e)
 
     def _update_attr_fmtstr_widths(self):
-        attr_fmtstr_width['id'] = len(str(self.atoms.Natoms)) + 1
-        attr_fmtstr_width['type'] = len(str(self.atoms.Ntypes)) + 1
-        attr_fmtstr_width['mol'] = len(str(np.max(self.atoms.mols))) + 1
+        atoms = self.atoms
+        attr_fmtstr_width['id'] = len(str(atoms.Natoms)) + 1
+        attr_fmtstr_width['type'] = len(str(atoms.Ntypes)) + 1
+        attr_fmtstr_width['mol'] = len(str(np.max(atoms.mols))) + 1
         attr_fmtstr_width['q'] = \
-            len('{:f}'.format(np.max(self.atoms.charges))) + 2
+            len('{:f}'.format(np.max(np.abs(minmax(atoms.charges))))) + 2
         attr_fmtstr_width['mass'] = \
-            len('{:f}'.format(np.max(self.atoms.masses))) + 4
-        attr_fmtstr_width['x'] = len('{:f}'.format(np.max(self.atoms.x))) + 2
-        attr_fmtstr_width['y'] = len('{:f}'.format(np.max(self.atoms.y))) + 2
-        attr_fmtstr_width['z'] = len('{:f}'.format(np.max(self.atoms.z))) + 2
-        attr_fmtstr_width['ix'] = len(str(np.max(self.atoms.ix))) + 2
-        attr_fmtstr_width['iy'] = len(str(np.max(self.atoms.iy))) + 2
-        attr_fmtstr_width['iz'] = len(str(np.max(self.atoms.iz))) + 2
-        attr_fmtstr_width['vx'] = len('{:f}'.format(np.max(self.atoms.vx))) + 2
-        attr_fmtstr_width['vy'] = len('{:f}'.format(np.max(self.atoms.vy))) + 2
-        attr_fmtstr_width['vz'] = len('{:f}'.format(np.max(self.atoms.vz))) + 2
+            len('{:f}'.format(np.max(atoms.masses))) + 4
+        attr_fmtstr_width['x'] = \
+            len('{:f}'.format(np.max(np.abs(minmax(atoms.x))))) + 2
+        attr_fmtstr_width['y'] = \
+            len('{:f}'.format(np.max(np.abs(minmax(atoms.y))))) + 2
+        attr_fmtstr_width['z'] = \
+            len('{:f}'.format(np.max(np.abs(minmax(atoms.z))))) + 2
+        attr_fmtstr_width['ix'] = \
+            len(str(np.max(np.abs(minmax(atoms.ix))))) + 2
+        attr_fmtstr_width['iy'] = \
+            len(str(np.max(np.abs(minmax(atoms.iy))))) + 2
+        attr_fmtstr_width['iz'] = \
+            len(str(np.max(np.abs(minmax(atoms.iz))))) + 2
+        attr_fmtstr_width['vx'] = \
+            len('{:f}'.format(np.max(np.abs(minmax(atoms.vx))))) + 2
+        attr_fmtstr_width['vy'] = \
+            len('{:f}'.format(np.max(np.abs(minmax(atoms.vy))))) + 2
+        attr_fmtstr_width['vz'] = \
+            len('{:f}'.format(np.max(np.abs(minmax(atoms.vz))))) + 2
 
         # attr_fmtstr_width['lx'] = \
-        #     len('{:f}'.format(np.max(self.atoms.lx))) + 2
+        #     len('{:f}'.format(np.max(atoms.lx))) + 2
         # attr_fmtstr_width['ly'] = \
-        #     len('{:f}'.format(np.max(self.atoms.ly))) + 2
+        #     len('{:f}'.format(np.max(atoms.ly))) + 2
         # attr_fmtstr_width['lz'] = \
-        #     len('{:f}'.format(np.max(self.atoms.lz))) + 2
+        #     len('{:f}'.format(np.max(atoms.lz))) + 2
         # attr_fmtstr_width['wx'] = \
-        #     len('{:f}'.format(np.max(self.atoms.wx))) + 2
+        #     len('{:f}'.format(np.max(atoms.wx))) + 2
         # attr_fmtstr_width['wy'] = \
-        #     len('{:f}'.format(np.max(self.atoms.wy))) + 2
+        #     len('{:f}'.format(np.max(atoms.wy))) + 2
         # attr_fmtstr_width['wz'] = \
-        #     len('{:f}'.format(np.max(self.atoms.wz))) + 2
+        #     len('{:f}'.format(np.max(atoms.wz))) + 2
 
         # attr_fmtstr_width['ervel'] = \
-        #     len('{:f}'.format(np.max(self.atoms.ervel))) + 2
+        #     len('{:f}'.format(np.max(atoms.ervel))) + 2
         # attr_fmtstr_width['shapex'] = \
-        #     len('{:f}'.format(np.max(self.atoms.shapex))) + 2
+        #     len('{:f}'.format(np.max(atoms.shapex))) + 2
         # attr_fmtstr_width['shapey'] = \
-        #     len('{:f}'.format(np.max(self.atoms.shapey))) + 2
+        #     len('{:f}'.format(np.max(atoms.shapey))) + 2
         # attr_fmtstr_width['shapez'] = \
-        #     len('{:f}'.format(np.max(self.atoms.shapez))) + 2
+        #     len('{:f}'.format(np.max(atoms.shapez))) + 2
 
         # attr_fmtstr_width['quatw'] = \
-        #     len('{:f}'.format(np.max(self.atoms.quatw))) + 2
+        #     len('{:f}'.format(np.max(atoms.quatw))) + 2
         # attr_fmtstr_width['quati'] = \
-        #     len('{:f}'.format(np.max(self.atoms.quati))) + 2
+        #     len('{:f}'.format(np.max(atoms.quati))) + 2
         # attr_fmtstr_width['quatj'] = \
-        #     len('{:f}'.format(np.max(self.atoms.quatj))) + 2
+        #     len('{:f}'.format(np.max(atoms.quatj))) + 2
         # attr_fmtstr_width['quatk'] = \
-        #     len('{:f}'.format(np.max(self.atoms.quatk))) + 2
+        #     len('{:f}'.format(np.max(atoms.quatk))) + 2
 
         attr_fmtstr_width['atom1'] = attr_fmtstr_width['atom2'] = \
             attr_fmtstr_width['atom3'] = attr_fmtstr_width['atom4'] = \
@@ -643,8 +691,8 @@ class DATAData(DATAReader):
             for attr, specs in attr_specs.items():
                 specs['width'] = attr_fmtstr_width[attr]
 
-    def _write_header(self, fp):
-        fp.write('# {}\n\n'.format(default_comment_line))
+    def _write_header(self, fp, comment_line):
+        fp.write('# {}\n\n'.format(comment_line.lstrip('#').strip()))
         for header, value in self.headers.items():
             if header in list(header_specs.keys())[-4:]:
                 continue
@@ -657,24 +705,26 @@ class DATAData(DATAReader):
         fp.write('\n')
 
     def _write_bounding_box(self, fp):
+        bounding_box = self.bounding_box
+        domain = self.domain
         lohi_width = 0
         lohi_fmtstr = '{:.10f} {:.10f}'
         for dim in ('x', 'y', 'z'):
             lohi_width = \
                 max(lohi_width, len(lohi_fmtstr.format(
-                    getattr(self.bounding_box, dim + 'min'),
-                    getattr(self.bounding_box, dim + 'max'))) + 4)
+                    getattr(bounding_box, dim + 'min'),
+                    getattr(bounding_box, dim + 'max'))) + 4)
 
         for dim in ('x', 'y', 'z'):
             fp.write('{}{dim}lo {dim}hi\n'.format(
                 lohi_fmtstr.format(
-                    getattr(self.bounding_box, dim + 'min'),
-                    getattr(self.bounding_box, dim + 'max')).ljust(lohi_width),
+                    getattr(bounding_box, dim + 'min'),
+                    getattr(bounding_box, dim + 'max')).ljust(lohi_width),
                 dim=dim))
 
-        if self.domain.triclinic:
+        if domain.triclinic:
             fp.write('{xy:.10f} {xz:.10f} {yz:.10f} xy xz yz\n'.format(
-                     xy=self.domain.xy, xz=self.domain.xz, yz=self.domain.yz))
+                     xy=domain.xy, xz=domain.xz, yz=domain.yz))
 
     def _write_masses(self, fp):
         type_width = self.section_attrs_specs['Masses']['type']['width']
@@ -684,20 +734,23 @@ class DATAData(DATAReader):
                      '{:d}'.format(type).ljust(type_width), mass))
 
     def _write_atoms(self, fp):
-        fp.write('\nAtoms # {}\n\n'.format(self.atom_style))
+        section_attrs_specs_items = self.section_attrs_specs['Atoms'].items()
+        fp.write('\nAtoms # {}\n\n'.format(self.formatspec.atom_style))
         for atom in self.atoms:
             line = ''
-            for attr, specs in self.section_attrs_specs['Atoms'].items():
+            for attr, specs in section_attrs_specs_items:
                 line += "{:>{}}".format(specs['fmtstr'].format(
                                         getattr(atom, attr)), specs['width'])
             line += '\n'
             fp.write(line)
 
     def _write_velocities(self, fp):
+        section_attrs_specs_items = \
+            self.section_attrs_specs['Velocities'].items()
         fp.write('\nVelocities\n\n')
         for atom in self.atoms:
             line = ''
-            for attr, specs in self.section_attrs_specs['Velocities'].items():
+            for attr, specs in section_attrs_specs_items:
                 line += "{:>{}}".format(specs['fmtstr'].format(
                                         getattr(atom, attr)), specs['width'])
             line += '\n'
@@ -782,21 +835,26 @@ LAMMPSDATA2XYZConverter = DATA2XYZConverter
 
 
 class DATAIOError(StructureIOError):
+    """Exception class for :class:`DATAData` IO Errors."""
     pass
 
 LAMMPSDATAIOError = DATAIOError
 
 
-class DATAFormatSpec:
+class DATAFormatSpec(StructureFormatSpec):
     """`StructureFormatSpec` class the `LAMMPS data` format spec.
 
     Parameters
     ----------
-    atom_style : {'full'}, optional
+    atom_style : str
         LAMMPS atom style.
+    bond_style : str
+    angle_style : str
+    dihedral_style : str
+    improper_style : str
+    pair_style : str
 
     """
-
     def __init__(self, atom_style='full', bond_style=None, angle_style=None,
                  dihedral_style=None, improper_style=None, pair_style=None,
                  **kwargs):
@@ -809,7 +867,7 @@ class DATAFormatSpec:
         self.pair_style = pair_style
 
         self.section_attrs = OrderedDict()
-        self.section_attrs['Masses'] = ['type', 'mass']
+        self.section_attrs['Masses'] = masses_section_attrs
         self.section_attrs['Atoms'] = atoms_section_attrs[atom_style]
         self.section_attrs['Velocities'] = velocities_section_attrs[atom_style]
         self.section_attrs['Bonds'] = bonds_section_attrs
@@ -826,19 +884,19 @@ class DATAFormatSpec:
             dihedral_coeffs_section_attrs[dihedral_style]
         self.section_attrs['Improper Coeffs'] = \
             improper_coeffs_section_attrs[improper_style]
-        self.section_attrs['BondBond Coeffs'] = ['M', 'r1', 'r2']
-        self.section_attrs['BondAngle Coeffs'] = ['N1', 'N2', 'r1', 'r2']
-        self.section_attrs['MiddleBondTorsion Coeffs'] = \
-            ['A1', 'A2', 'A3', 'r2']
-        self.section_attrs['EndBondTorsion Coeffs'] = \
-            ['B1', 'B2', 'B3', 'C1', 'C2', 'C3', 'r1', 'r3']
-        self.section_attrs['AngleTorsion Coeffs'] = \
-            ['D1', 'D2', 'D3', 'E1', 'E2', 'E3', 'theta1', 'theta2']
-        self.section_attrs['AngleAngleTorsion Coeffs'] = \
-            ['M', 'theta1', 'theta2']
-        self.section_attrs['BondBond13 Coeffs'] = ['N', 'r1', 'r3']
-        self.section_attrs['AngleAngle Coeffs'] = \
-            ['M1', 'M2', 'M3', 'theta1', 'theta2', 'theta3']
+        # self.section_attrs['BondBond Coeffs'] = ['M', 'r1', 'r2']
+        # self.section_attrs['BondAngle Coeffs'] = ['N1', 'N2', 'r1', 'r2']
+        # self.section_attrs['MiddleBondTorsion Coeffs'] = \
+        #     ['A1', 'A2', 'A3', 'r2']
+        # self.section_attrs['EndBondTorsion Coeffs'] = \
+        #     ['B1', 'B2', 'B3', 'C1', 'C2', 'C3', 'r1', 'r3']
+        # self.section_attrs['AngleTorsion Coeffs'] = \
+        #     ['D1', 'D2', 'D3', 'E1', 'E2', 'E3', 'theta1', 'theta2']
+        # self.section_attrs['AngleAngleTorsion Coeffs'] = \
+        #     ['M', 'theta1', 'theta2']
+        # self.section_attrs['BondBond13 Coeffs'] = ['N', 'r1', 'r3']
+        # self.section_attrs['AngleAngle Coeffs'] = \
+        #     ['M1', 'M2', 'M3', 'theta1', 'theta2', 'theta3']
 
         self.section_attrs_specs = OrderedDict()
         for section, attrs in list(self.section_attrs.items()):
@@ -854,20 +912,100 @@ class DATAFormatSpec:
                      'width': attr_fmtstr_width[attr] if attr in
                      attr_fmtstr_width else 14}
 
+        self.fmtstr = "atom_style={atom_style!r}, " + \
+            "bond_style={bond_style!r}, " + \
+            "angle_style={angle_style!r}, " + \
+            "dihedral_style={dihedral_style!r}, " + \
+            "improper_style={improper_style!r}, " + \
+            "pair_style={pair_style!r}"
+
     @property
     def atom_style(self):
+        """LAMMPS data atom_style."""
         return self._atom_style
 
     @atom_style.setter
     def atom_style(self, value):
         if value not in atom_styles:
-            raise ValueError("Allowed `atom_style`'s:\n{}".format(
-                list(atom_styles)))
+            error_msg = "Unknown `atom_style`: {}\n".format(value) + \
+                "Expected one of: {}".format(atom_styles)
+            raise ValueError(error_msg)
         self._atom_style = value
 
-    @atom_style.deleter
-    def atom_style(self):
-        del self._atom_style
+    @property
+    def angle_style(self):
+        """LAMMPS data `angle_style`."""
+        return self._angle_style
+
+    @angle_style.setter
+    def angle_style(self, value):
+        if value not in angle_styles:
+            error_msg = "Unknown `angle_style`: {}\n".format(value) + \
+                "Expected one of: {}".format(angle_styles)
+            raise ValueError(error_msg)
+        self._angle_style = value
+
+    @property
+    def bond_style(self):
+        """LAMMPS data bond_style."""
+        return self._bond_style
+
+    @bond_style.setter
+    def bond_style(self, value):
+        if value not in bond_styles:
+            error_msg = "Unknown `bond_style`: {}\n".format(value) + \
+                "Expected one of: {}".format(bond_styles)
+            raise ValueError(error_msg)
+        self._bond_style = value
+
+    @property
+    def dihedral_style(self):
+        """LAMMPS data `dihedral_style`."""
+        return self._dihedral_style
+
+    @dihedral_style.setter
+    def dihedral_style(self, value):
+        if value not in dihedral_styles:
+            error_msg = "Unknown `dihedral_style`: {}\n".format(value) + \
+                "Expected one of: {}".format(dihedral_styles)
+            raise ValueError(error_msg)
+        self._dihedral_style = value
+
+    @property
+    def improper_style(self):
+        """LAMMPS data `improper_style`."""
+        return self._improper_style
+
+    @improper_style.setter
+    def improper_style(self, value):
+        if value not in improper_styles:
+            error_msg = "Unknown `improper_style`: {}\n".format(value) + \
+                "Expected one of: {}".format(improper_styles)
+            raise ValueError(error_msg)
+        self._improper_style = value
+
+    @property
+    def pair_style(self):
+        """LAMMPS data `pair_style`."""
+        return self._pair_style
+
+    @pair_style.setter
+    def pair_style(self, value):
+        if value not in pair_styles:
+            error_msg = "Unknown `pair_style`: {}\n".format(value) + \
+                "Expected one of: {}".format(pair_styles)
+            raise ValueError(error_msg)
+        self._pair_style = value
+
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        return dict(atom_style=self.atom_style,
+                    angle_style=self.angle_style,
+                    bond_style=self.bond_style,
+                    dihedral_style=self.dihedral_style,
+                    improper_style=self.improper_style,
+                    pair_style=self.pair_style)
+
 
 LAMMPSDATAFormatSpec = DATAFormatSpec
 
@@ -926,19 +1064,16 @@ attr_dtypes = {'id': int, 'type': int, 'mol': int, 'q': float, 'mass': float,
                'ervel': float,
                'shapex': float, 'shapey': float, 'shapez': float,
                'quatw': float, 'quati': float, 'quatj': float, 'quatk': float,
-               'atom1': int, 'atom2': int, 'atom3': int, 'atom4': int,
-               'bond_id': int, 'bond_type': int,
-               'angle_id': int, 'angle_type': int,
-               'dihedral_id': int, 'dihedral_type': int,
-               'improper_id': int, 'improper_type': int}
+               'atom1': int, 'atom2': int, 'atom3': int, 'atom4': int}
 
 attr_fmtstr = {key: '{:d}' if dtype == int else '{:f}'
                for key, dtype in attr_dtypes.items()}
 attr_fmtstr_width = {key: 5 if dtype == int else 16
                      for key, dtype in attr_dtypes.items()}
 
-atoms_section_attrs = OrderedDict()
+masses_section_attrs = ['type', 'mass']
 
+atoms_section_attrs = OrderedDict()
 atoms_section_attrs['angle'] = ['id', 'mol', 'type', 'x', 'y', 'z']
 atoms_section_attrs['atomic'] = ['id', 'type', 'x', 'y', 'z']
 atoms_section_attrs['body'] = ['id', 'type', 'bodyflag', 'mass', 'x', 'y', 'z']
@@ -981,12 +1116,10 @@ velocities_section_attrs['ellipsoid'].extend(['lx', 'ly', 'lz'])
 velocities_section_attrs['sphere'].extend(['wx', 'wy', 'wz'])
 # velocities_section_attrs['hybrid'].append('...')
 
-bonds_section_attrs = ['bond_id', 'bond_type', 'atom1', 'atom2']
-angles_section_attrs = ['angle_id', 'angle_type', 'atom1', 'atom2', 'atom3']
-dihedrals_section_attrs = ['dihedral_id', 'dihedral_type',
-                           'atom1', 'atom2', 'atom3', 'atom4']
-impropers_section_attrs = ['improper_id', 'improper_type',
-                           'atom1', 'atom2', 'atom3', 'atom4']
+bonds_section_attrs = ['id', 'type', 'atom1', 'atom2']
+angles_section_attrs = ['id', 'type', 'atom1', 'atom2', 'atom3']
+dihedrals_section_attrs = ['id', 'type', 'atom1', 'atom2', 'atom3', 'atom4']
+impropers_section_attrs = ['id', 'type', 'atom1', 'atom2', 'atom3', 'atom4']
 ellipsoids_section_attrs = ['id', 'shapex', 'shapey', 'shapez',
                             'quatw', 'quati', 'quatj', 'quatk']
 
@@ -1000,18 +1133,18 @@ angle_styles = list(angle_coeffs_section_attrs.keys())
 
 bond_coeffs_section_attrs = OrderedDict()
 bond_coeffs_section_attrs[None] = []
-bond_coeffs_section_attrs['class2'] = ['bond_type', 'R0', 'K2', 'K3', 'K4']
+bond_coeffs_section_attrs['class2'] = ['type', 'R0', 'K2', 'K3', 'K4']
 bond_coeffs_section_attrs['fene'] = \
-    ['bond_type', 'K', 'R0', 'epsilon', 'sigma']
+    ['type', 'K', 'R0', 'epsilon', 'sigma']
 bond_coeffs_section_attrs['fene/expand'] = \
-    ['bond_type', 'K', 'R0', 'epsilon', 'sigma', 'delta']
-bond_coeffs_section_attrs['harmonic'] = ['bond_type', 'K', 'r0']
-bond_coeffs_section_attrs['morse'] = ['bond_type', 'D', 'alpha', 'r0']
+    ['type', 'K', 'R0', 'epsilon', 'sigma', 'delta']
+bond_coeffs_section_attrs['harmonic'] = ['type', 'K', 'r0']
+bond_coeffs_section_attrs['morse'] = ['type', 'D', 'alpha', 'r0']
 bond_coeffs_section_attrs['nonlinear'] = \
-    ['bond_type', 'epsilon', 'r0', 'lambda']
+    ['type', 'epsilon', 'r0', 'lambda']
 bond_coeffs_section_attrs['quartic'] = \
-    ['bond_type', 'K', 'B1', 'B2', 'Rc', 'U0']
-bond_coeffs_section_attrs['table'] = ['bond_type', 'filename', 'keyword']
+    ['type', 'K', 'B1', 'B2', 'Rc', 'U0']
+bond_coeffs_section_attrs['table'] = ['type', 'filename', 'keyword']
 bond_styles = list(bond_coeffs_section_attrs.keys())
 bond_style_args = OrderedDict()
 bond_style_args['table'] = ['style', 'N']
@@ -1019,7 +1152,7 @@ bond_style_args['table'] = ['style', 'N']
 dihedral_coeffs_section_attrs = OrderedDict()
 dihedral_coeffs_section_attrs[None] = []
 dihedral_coeffs_section_attrs['charmm'] = \
-    ['dihedral_type', 'K', 'n', 'd', 'weight']
+    ['type', 'K', 'n', 'd', 'weight']
 dihedral_coeffs_section_attrs['class2'] = []
 dihedral_coeffs_section_attrs['harmonic'] = []
 dihedral_coeffs_section_attrs['helix'] = []

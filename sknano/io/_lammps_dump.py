@@ -12,15 +12,17 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from glob import glob
+from operator import attrgetter
 # import re
 import sys
-from operator import attrgetter
+import warnings
 
 import numpy as np
 
 from monty.io import zopen
 from sknano.core import get_fpath, flatten
-from sknano.core.atoms import Trajectory, Snapshot, MDAtom as Atom
+from sknano.core.atoms import Trajectory, Snapshot, Atoms, MDAtoms, \
+    MDAtom as Atom
 # from sknano.core.crystallography import Crystal3DLattice
 from sknano.core.geometric_regions import Cuboid
 
@@ -73,9 +75,11 @@ class DUMPReader(StructureIO):
     ----------
     *args : :class:`~python:list`
         :class:`~python:list` of one or more LAMMPS dump files.
-    attrmap : class:`~python:dict`
+    dumpattrmap : class:`~python:dict`
         Python :class:`~python:dict` mapping custom dump attributes
         to :class:`~sknano.core.atoms.Atom` attributes.
+    elementmap : :class:`~python:dict`
+        :class:`~python:dict` mapping atom type to atom element
     autoread : :class:`~python:bool`, optional
         Automatically read dump files. Default is `True`
 
@@ -102,6 +106,11 @@ class DUMPReader(StructureIO):
 
         .. versionadded:: 0.3.22
 
+    Attributes
+    ----------
+    trajectory
+    dumpattrs
+    atomattrs
 
     Examples
     --------
@@ -113,42 +122,67 @@ class DUMPReader(StructureIO):
     attribute.
 
     For example, consider a dump file containing per-atom dump attributes
-    *id*, *mol*, *type*, *x*, *y*, *z*, *vx*, *vy*, *vz*, *c_atom_ke*,
-    *c_atom_pe*, and *c_atom_CN*, where *c_atom_ke*, *c_atom_pe*, and
-    *c_atom_CN* are the LAMMPS *compute-IDs* from custom compute commands
-    in a LAMMPS input script, which calculate per-atom values for
-    kinetic energy, potential energy, and coordination number, respectively.
-    To map these compute-IDs to corresponding
-    :class:`~sknano.core.atoms.Atom` attributes
-    :attr:`~sknano.core.atom.EnergyAtom.ke`,
-    :attr:`~sknano.core.atom.EnergyAtom.pe`,
-    and :attr:`~sknano.core.atom.CNAtom.CN`), respectively, one
+    *id*, *mol*, *type*, *x*, *y*, *z*, *vx*, *vy*, *vz*, *c_atom_ke*, and
+    *c_atom_pe*, where *c_atom_ke* and *c_atom_pe* are the LAMMPS
+    *compute-IDs* from custom compute commands defined in a LAMMPS input
+    script, which calculate per-atom values for kinetic energy and
+    potential energy, respectively. To map these compute-IDs and their
+    per-atom values to their respective :class:`~sknano.core.atoms.Atom`
+    attributes :attr:`~sknano.core.atom.EnergyAtom.ke` and
+    :attr:`~sknano.core.atom.EnergyAtom.pe`, one
     would use the following :class:`~python:dict` mapping::
 
+    >>> dumpattrmap = {'c_atom_pe': 'pe', 'c_atom_ke': 'ke'}
+
     >>> from sknano.io import DUMPReader
-    >>> compute_attrmap = {'c_atom_pe': 'pe', 'c_atom_ke': 'ke',
-    ...                    'c_atom_CN': 'CN'}
-    >>> dumps = DUMPReader('dump.*', attrmap=compute_attrmap)
+    >>> dumps = DUMPReader('dump.*', dumpattrmap=dumpattrmap)
     >>> print(repr(dumps.dumpattrs2str()))
     'id mol type x y z vx vy vz c_atom_ke c_atom_pe c_atom_CN'
     >>> print(repr(dumps.atomattrs2str()))
-    'id mol type x y z vx vy vz ke pe CN'
+    'id mol type x y z vx vy vz ke pe'
+
+    Futhermore, atom attributes such as mass or element symbol are not
+    typically included in a LAMMPS dump. The LAMMPS attribute usually
+    associated with a specic atom element/mass is the `type` attribute.
+    The `elementmap` parameter takes a :class:`~python:dict` mapping
+    of the LAMMPS dump `type` value to an element symbol::
+
+    >>> dumps = DUMPReader('dump.*', dumpattrmap=dumpattrmap,
+    ...                    elementmap={1: 'C'})
+    >>> atoms = dumps[0].atoms
+    >>> print(atoms[0])
 
     """
-    def __init__(self, *args, autoread=True, attrmap=None,
-                 reference_timestep=None, reference_index=None, **kwargs):
+    def __init__(self, *args, autoread=True, dumpattrmap=None,
+                 elementmap=None, reference_timestep=None,
+                 reference_index=None, **kwargs):
+
+        if 'attrmap' in kwargs:
+            msg = ("The {!s} keyword argument `attrmap` was deprecated in "
+                   "in version 0.4.0.\nUse `dumpattrmap` instead."
+                   .format(self.__class__.__name__))
+            warnings.warn(msg, DeprecationWarning, stacklevel=2)
+            dumpattrmap = kwargs.pop('attrmap')
+
         super().__init__(**kwargs)
 
-        self.attrmap = attrmap
+        self.dumpattrmap = dumpattrmap
+        self.elementmap = elementmap
         self.trajectory = Trajectory()
         self.dumpattrs = {}
-        self.dumpfiles = list(flatten([[glob(f) for f in arg.split()]
-                                       for arg in args]))
+        self.dumpfiles = tuple(flatten([[glob(f) for f in arg.split()]
+                                        for arg in args]))
         self._reference_timestep = reference_timestep
         self._reference_index = reference_index
 
         if len(self.dumpfiles) == 0:
             raise ValueError('No dump file specified.')
+
+        self.fmtstr = "{dumpfiles!r}, autoread=True, " + \
+            "dumpattrmap={dumpattrmap!r}, " + \
+            "elementmap={elementmap!r}, " + \
+            "reference_timestep={reference_timestep!r}, " + \
+            "reference_index={reference_index!r}"
 
         if autoread:
             self.read()
@@ -167,6 +201,7 @@ class DUMPReader(StructureIO):
 
     @property
     def reference_index(self):
+        """Reference snapshot index."""
         return self._reference_index
 
     @reference_index.setter
@@ -206,6 +241,7 @@ class DUMPReader(StructureIO):
 
     @property
     def reference_timestep(self):
+        """Reference snapshot timestep."""
         return self._reference_timestep
 
     @reference_timestep.setter
@@ -250,6 +286,7 @@ class DUMPReader(StructureIO):
                 print('dump is already unscaled')
 
     def read_snapshot(self, f):
+        """Read snapshot from file."""
         try:
             snapshot = Snapshot(self.trajectory)
             f.readline()
@@ -320,9 +357,9 @@ class DUMPReader(StructureIO):
                 self.attr_dtypes = [attr_dtypes[attr] if attr in attr_dtypes
                                     else float for attr in self.atomattrs]
 
-                if self.attrmap is not None:
-                    self.remap_atomattr_names(self.attrmap)
-                    self.attrmap = None
+                if self.dumpattrmap is not None:
+                    self.remap_atomattr_names(self.dumpattrmap)
+                    self.dumpattrmap = None
 
                 self.unknown_attrs = \
                     {attr: self.atomattrs.index(attr) for
@@ -334,6 +371,7 @@ class DUMPReader(StructureIO):
 
             snapshot.atomattrs = self.atomattrs
             snapshot.attr_dtypes = self.attr_dtypes
+            snapshot.elementmap = self.elementmap
 
             atoms = \
                 np.zeros((snapshot.Natoms, len(self.atomattrs)), dtype=float)
@@ -349,17 +387,17 @@ class DUMPReader(StructureIO):
         except IndexError:
             return None
 
-    def remap_atomattr_names(self, attrmap):
+    def remap_atomattr_names(self, dumpattrmap):
         """Rename attributes in the :attr:`DUMPReader.atomattrs` list.
 
         Parameters
         ----------
-        attrmap : :class:`~python:dict`
+        dumpattrmap : :class:`~python:dict`
             :class:`~python:dict` mapping atom attribute name to new
             attribute name.
 
         """
-        for k, v in attrmap.items():
+        for k, v in dumpattrmap.items():
             try:
                 self.atomattrs[self.atomattrs.index(k)] = v
             except ValueError:
@@ -454,6 +492,13 @@ class DUMPReader(StructureIO):
         """Return a space-separated string of the dumped atom attributes."""
         return ' '.join(sorted(self.dumpattrs, key=self.dumpattrs.__getitem__))
 
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        return dict(dumpfiles=self.dumpfiles, dumpattrmap=self.dumpattrmap,
+                    elementmap=self.elementmap,
+                    reference_timestep=self.reference_timestep,
+                    reference_index=self.reference_index)
+
 
 class DUMPWriter:
     """Class for writing LAMMPS dump chemical file format."""
@@ -505,10 +550,10 @@ class DUMPData(DUMPReader):
     *args : one or more dump files
 
     """
-    def __init__(self, *args):
-        super().__init__(*args)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    def write(self, dumpfile=None):
+    def write(self, dumpfile=None, snapshot=None, atoms=None, dumpattrs=None):
         """Write dump file.
 
         Parameters
@@ -516,24 +561,104 @@ class DUMPData(DUMPReader):
         dumpfile : {None, str}, optional
 
         """
-        try:
-            if (dumpfile is None or dumpfile == '') and \
-                    (self.fpath is None or self.fpath == ''):
-                error_msg = '`dumpfile` must be a string at least 1 ' + \
-                    'character long.'
-                if dumpfile is None:
-                    raise TypeError(error_msg)
-                else:
-                    raise ValueError(error_msg)
-            else:
-                dumpfile = self.fpath
-            DUMPWriter.write(fname=dumpfile, atoms=self.atoms,
-                             comment_line=self.comment_line)
-        except (TypeError, ValueError) as e:
-            print(e)
+        if self.trajectory.Nsnaps > 0:
+            try:
+                if not dumpfile:
+                    if self.fpath is None:
+                        error_msg = 'Invalid `dumpfile` {}'.format(dumpfile)
+                        raise ValueError(error_msg)
+                    else:
+                        dumpfile = self.fpath
+                # DUMPWriter.write(fname=dumpfile, atoms=self.atoms,
+                #                  comment_line=self.comment_line)
+
+                # self._update_attr_fmtstr_widths()
+
+                if atoms is not None and isinstance(atoms, Atoms):
+                    if not isinstance(atoms, MDAtoms):
+                        atoms = MDAtoms(atoms)
+
+                    if snapshot is None:
+                        self.trajectory.atom_selection.update(atoms)
+                    else:
+                        self.trajectory.atom_selection.update(
+                            atoms, ts=snapshot.timestep)
+
+                with zopen(dumpfile, 'wt') as fh:
+                    if snapshot is not None:
+                        ss = self.trajectory.get_snapshot(snapshot.timestep)
+                        self._write_header(fh, ss)
+                        self._write_bounding_box(fh, ss)
+                        self._write_atoms(fh, ss)
+                    else:
+                        for ss in self.trajectory:
+                            if not ss.selected:
+                                continue
+                            self._write_header(fh, ss)
+                            self._write_bounding_box(fh, ss)
+                            self._write_atoms(fh, ss)
+
+            except (OSError, TypeError, ValueError) as e:
+                print(e)
+
+    def _update_attr_fmtstr_widths(self):
+        attr_fmtstr_width = self.attr_fmtstr_width = {}
+        # for attr in self.atomattrs:
+        #     attr_fmtstr_width[attr] = len(str(self))
+
+        # attr_fmtstr_width['id'] = len(str(self.atoms.Natoms)) + 1
+        # attr_fmtstr_width['type'] = len(str(self.atoms.Ntypes)) + 1
+        # attr_fmtstr_width['mol'] = len(str(np.max(self.atoms.mols))) + 1
+        # attr_fmtstr_width['q'] = \
+        #     len('{:f}'.format(np.max(self.atoms.charges))) + 2
+        # attr_fmtstr_width['mass'] = \
+        #     len('{:f}'.format(np.max(self.atoms.masses))) + 4
+        # attr_fmtstr_width['x'] = len('{:f}'.format(np.max(self.atoms.x))) + 2
+        # attr_fmtstr_width['y'] = len('{:f}'.format(np.max(self.atoms.y))) + 2
+        # attr_fmtstr_width['z'] = len('{:f}'.format(np.max(self.atoms.z))) + 2
+        # attr_fmtstr_width['ix'] = len(str(np.max(self.atoms.ix))) + 2
+        # attr_fmtstr_width['iy'] = len(str(np.max(self.atoms.iy))) + 2
+        # attr_fmtstr_width['iz'] = len(str(np.max(self.atoms.iz))) + 2
+        # attr_fmtstr_width['vx'] = len('{:f}'.format(np.max(self.atoms.vx))) + 2
+        # attr_fmtstr_width['vy'] = len('{:f}'.format(np.max(self.atoms.vy))) + 2
+        # attr_fmtstr_width['vz'] = len('{:f}'.format(np.max(self.atoms.vz))) + 2
+
+    def _write_header(self, fh, ss):
+            """Write snapshot header info."""
+            fh.write('ITEM: TIMESTEP\n')
+            fh.write('{}\n'.format(ss.timestep))
+            fh.write('ITEM: NUMBER OF ATOMS\n')
+            fh.write('{}\n'.format(ss.nselected))
+
+    def _write_bounding_box(self, fh, ss):
+            """Write snapshot bounding box info."""
+            box_bounds = 'ITEM: BOX BOUNDS'
+            if ss.boxstr:
+                box_bounds = ' '.join((box_bounds, '{}'.format(ss.boxstr)))
+            fh.write('{}\n'.format(box_bounds))
+            for dim, tilt_factor in zip(('x', 'y', 'z'), ('xy', 'xz', 'yz')):
+                box_bounds = ' '.join(('{}'.format(getattr(ss, dim + 'lo')),
+                                       '{}'.format(getattr(ss, dim + 'hi'))))
+                if ss.triclinic:
+                    box_bounds = \
+                        ' '.join((box_bounds,
+                                  '{}'.format(getattr(ss, tilt_factor))))
+                fh.write('{}\n'.format(box_bounds))
+
+    def _write_atoms(self, fh, ss):
+        """Write snapshot atoms."""
+        fh.write('ITEM: ATOMS {}\n'.format(self.atomattrs2str()))
+        aselection = ss.get_atoms(asarray=True)[ss.atom_selection]
+        attr_dtypes = ss.attr_dtypes
+        for atom in aselection:
+            line = ' '.join(('{}'.format(dtype(attr)) for dtype, attr in
+                            zip(attr_dtypes, atom)))
+            line += '\n'
+            fh.write(line)
 
 
 class DUMPIOError(StructureIOError):
+    """Exception class for :class:`DUMPData` I/O errors."""
     pass
 
 
