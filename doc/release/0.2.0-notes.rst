@@ -10,8 +10,7 @@ Introducing **scikit-nano**!
 
 scikit-nano 0.2.0 is the first public release. This python package
 is the culmination of code from a side project teaching myself about
-the physical properties of nanotubes and the underlying mathematics
-and group theory.
+the physical properties of nanotubes.
 
 Contributors to this release
 =============================
