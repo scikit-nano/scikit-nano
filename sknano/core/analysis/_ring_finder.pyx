@@ -32,8 +32,18 @@ cdef void search_paths(int32_t root, int32_t node, int32_t node_si,
 
     Parameters
     ----------
-    root, node : :class:`~python:int`
-    d : array_like
+    root, node : int32_t
+    node_si : int32_t
+    visited : int32_t array
+    Natoms : int32_t
+    nn_idx : int32_t array
+    nn_seed : int32_t array
+    nn_amat : int32_t array
+    nn_vecs : float64_t array
+    max_ring_size : int32_t
+    eps : float64_t
+    ring_counts : vector
+    nodes_list : vector of vectors
 
     """
     cdef:
@@ -135,6 +145,20 @@ cpdef tuple find_rings(int32_t Natoms, int32_t NNN, int32_t[::1] nn_idx,
                        int32_t[::1] nn_seed, int32_t[:,::1] nn_amat,
                        float64_t[:,::1] nn_vecs, int32_t max_ring_size,
                        float64_t eps):
+    """Find rings.
+
+    Parameters
+    ----------
+    Natoms : :class:`~python:int`
+    NNN : :class:`~python:int`
+    nn_idx : :class:`~numpy:numpy.ndarray`
+    nn_seed : :class:`~numpy:numpy.ndarray`
+    nn_amat : :class:`~numpy:numpy.ndarray`
+    nn_vecs : :class:`~numpy:numpy.ndarray`
+    max_ring_size : :class:`~python:int`, optional
+    eps : :class:`~python:float`, optional
+
+    """
 
     cdef:
         int32_t i, si, ni, nsi, nni

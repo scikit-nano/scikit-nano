@@ -83,9 +83,8 @@ class PeriodicKDTree(KDTree):
     distance between a query point and a data point to half the smallest
     box dimension.
     """
-
     def __init__(self, data, boxsize=None, lattice=None, center=None,
-                 leafsize=10):
+                 leafsize=10, verbose=False):
         """Construct a kd-tree.
 
         Parameters
@@ -97,21 +96,28 @@ class PeriodicKDTree(KDTree):
             Size of the periodic box along each spatial dimension.  A
             negative or zero size for dimension k means that space is not
             periodic along k.
-        leafsize : positive int
+        leafsize : positive :class:`~python:int`, optional
             The number of points at which the algorithm switches over to
             brute-force.
+        verbose : :class:`~python:bool`, optional
 
         """
-
         # Map all points to canonical periodic image
         data = np.asarray(data)
         boxsize = self.boxsize = np.asarray(boxsize)
         wrapped_data = data - \
             np.where(boxsize > 0.0, (np.floor(data / boxsize) * boxsize), 0.0)
 
+        self.verbose = verbose
+
         # Calculate maximum distance_upper_bound
         self.max_distance_upper_bound = \
             np.amin(np.where(boxsize > 0, 0.5 * boxsize, np.inf))
+
+        if verbose:
+            print('wrapped_data:\n{}'.format(wrapped_data))
+            print('max_distance_upper_bound: {}'.format(
+                  self.max_distance_upper_bound))
 
         # Set up underlying kd-tree
         super().__init__(wrapped_data, leafsize)
@@ -190,7 +196,6 @@ class PeriodicCKDTree(cKDTree):
     distance between a query point and a data point to half the smallest
     box dimension.
     """
-
     def __init__(self, data, boxsize=None, leafsize=10):
         """Construct a kd-tree.
 
@@ -214,7 +219,6 @@ class PeriodicCKDTree(cKDTree):
             brute-force.
 
         """
-
         # Map all points to canonical periodic image
         boxsize = self.boxsize = np.asarray(boxsize)
         data = np.asarray(data)

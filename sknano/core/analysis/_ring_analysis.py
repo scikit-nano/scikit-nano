@@ -29,7 +29,7 @@ __all__ = ['find_rings', 'py_find_rings']
 # @timethis
 def find_rings(Natoms, NNN, nn_idx, nn_seed, nn_amat, nn_vecs,
                max_ring_size=None, eps=0.0001, pyversion=False):
-    """Analyze the network connectivity.
+    """Find rings.
 
     Parameters
     ----------
@@ -65,7 +65,7 @@ def find_rings(Natoms, NNN, nn_idx, nn_seed, nn_amat, nn_vecs,
 # @timethis
 def py_find_rings(Natoms, NNN, nn_idx, nn_seed, nn_amat, nn_vecs,
                   max_ring_size=None, eps=0.0001):
-    """Analyze the network connectivity.
+    """Find rings.
 
     Parameters
     ----------

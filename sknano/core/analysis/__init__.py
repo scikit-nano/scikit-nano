@@ -15,8 +15,14 @@ Periodic KD-Tree class
    :toctree: generated/
 
    PeriodicKDTree
-   find_rings
 
+Network connectivity analysis
+-----------------------------
+.. autosummary::
+   :toctree: generated/
+
+   find_rings
+   py_find_rings
 
 """
 from __future__ import absolute_import, division, print_function
@@ -26,5 +32,6 @@ __docformat__ = 'restructuredtext en'
 
 from ._periodic_kdtree import *
 from ._ring_analysis import *
+# from ._ring_finder import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
