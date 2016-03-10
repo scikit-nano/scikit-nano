@@ -53,8 +53,8 @@ This module allows for easy structure generation from the command line.
 Examples
 --------
 
-The following command generates a graphene sheet with a 10 nm long
-armchair edge and 1 nm long zigzag edge and saves the data in the
+The following command generates a graphene sheet with a 10 Å long
+armchair edge and 1 Å long zigzag edge and saves the data in the
 LAMMPS data format.::
 
     > nanogen --structure-format data graphene 10 1
@@ -143,19 +143,19 @@ def nanogen_parser():
     primitive_cell_graphene_parser = \
         graphene_subparsers.add_parser('from_primitive_cell')
     primitive_cell_graphene_parser.add_argument(
-        '--edge-length', type=float, default=5,
-        help='graphene edge length in **nanometers**')
+        '--edge-length', type=float, default=10,
+        help='graphene edge length in **Angstroms**')
     primitive_cell_graphene_parser.set_defaults(
         generator_class='PrimitiveCellGrapheneGenerator')
 
     conventional_cell_graphene_parser = \
         graphene_subparsers.add_parser('from_conventional_cell')
     conventional_cell_graphene_parser.add_argument(
-        '--armchair-edge-length', type=float, default=5,
-        help='length of graphene armchair edge in **nanometers**')
+        '--armchair-edge-length', type=float, default=10,
+        help='length of graphene armchair edge in **Angstroms**')
     conventional_cell_graphene_parser.add_argument(
-        '--zigzag-edge-length', type=float, default=5,
-        help='length of graphene zigzag edge in **nanometers**')
+        '--zigzag-edge-length', type=float, default=10,
+        help='length of graphene zigzag edge in **Angstroms**')
     conventional_cell_graphene_parser.set_defaults(
         generator_class='ConventionalCellGrapheneGenerator')
 
@@ -182,7 +182,7 @@ def nanogen_parser():
                                           '(default: %(default)s)')
     swnt_parent_parser_group.add_argument('--Lz', type=float, default=None,
                                           help='Length of nanotube along `z` '
-                                          'axis in **nanometers**. '
+                                          'axis in **Angstroms**. '
                                           '(default: %(default)s)')
     swnt_parent_parser.add_argument(
         '--fix-Lz', action='store_true', help='Generate the nanotube with '
@@ -202,7 +202,7 @@ def nanogen_parser():
         '(default: %(default)s)')
     unrolled_swnt_parser_group.add_argument(
         '--Lx', type=float, default=None,
-        help='Length of unrolled nanotube along `x` axis in **nanometers**. '
+        help='Length of unrolled nanotube along `x` axis in **Angstroms**. '
         '(default: %(default)s)')
     unrolled_swnt_parser.add_argument(
         '--fix-Lx', action='store_true', help='Generate the nanotube with '
@@ -224,7 +224,7 @@ def nanogen_parser():
                                     '(default: %(default)s)')
     mwnt_parent_parser.add_argument('--Lz', type=float, default=None,
                                     help='Length of nanotube along `z` axis '
-                                    'in **nanometers**. '
+                                    'in **Angstroms**. '
                                     '(default: %(default)s)')
     mwnt_parent_parser.add_argument('--min-wall-diameter', type=float,
                                     default=None,
