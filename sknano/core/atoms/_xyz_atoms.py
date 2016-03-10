@@ -12,15 +12,17 @@ from __future__ import unicode_literals
 
 __docformat__ = 'restructuredtext en'
 
-from collections import OrderedDict
-from operator import attrgetter
 import numbers
+
+from collections import OrderedDict
+from math import fsum
+from operator import attrgetter
 
 import numpy as np
 
 from sknano.core import rezero_array, xyz
+from sknano.core.geometric_regions import Cuboid, Sphere
 from sknano.core.math import Vector, Vectors
-from sknano.core.geometric_regions import Cuboid, Sphere  # , Rectangle
 
 from ._atoms import Atom, Atoms
 
@@ -28,7 +30,7 @@ __all__ = ['XYZAtom', 'XYZAtoms']
 
 
 class XYZAtom(Atom):
-    """An `Atom` class with x, y, z attributes.
+    """An `Atom` sub-class with x, y, z attributes.
 
     Parameters
     ----------
@@ -169,8 +171,8 @@ class XYZAtom(Atom):
 
         Returns
         -------
-        ndarray
-            3-element ndarray of [:math:`x, y, z`] coordinates of `Atom`.
+        :class:`Vector`
+            3D :class:`Vector` of [:math:`x, y, z`] coordinates of `Atom`.
 
         """
         return self._r
@@ -307,6 +309,7 @@ class XYZAtom(Atom):
         # self.r += t
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()
         super_dict.update(dict(x=self.x, y=self.y, z=self.z))
         return super_dict
@@ -392,17 +395,21 @@ class XYZAtoms(Atoms):
 
         Returns
         -------
-        :class:`~sknano.core.geometric_regions.Cuboid`"""
+        :class:`~sknano.core.geometric_regions.Cuboid`
+
+        """
         return Cuboid(pmin=[self.x.min(), self.y.min(), self.z.min()],
                       pmax=[self.x.max(), self.y.max(), self.z.max()])
 
     @property
     def bounding_sphere(self):
-        """Axis-aligned bounding box of `Atoms`.
+        """Bounding :class:`Sphere` of `Atoms`.
 
         Returns
         -------
-        :class:`~sknano.core.geometric_regions.Cuboid`"""
+        :class:`~sknano.core.geometric_regions.Sphere`
+
+        """
         return Sphere(center=self.centroid,
                       r=np.max((self.r - self.centroid).norms))
 
@@ -423,50 +430,49 @@ class XYZAtoms(Atoms):
 
     @property
     def r(self):
-        """:class:`~numpy:numpy.ndarray` of :attr:`Atom.r` position \
-            `Vector`\ s"""
+        """:class:`Vectors` of :attr:`Atom.r` position `Vector`\ s"""
         return Vectors([atom.r for atom in self])
 
     @property
     def dr(self):
-        """:class:`~numpy:numpy.ndarray` of :attr:`Atom.dr` displacement \
-            `Vector`\ s"""
+        """:class:`Vectors` of :attr:`Atom.dr` displacement `Vector`\ s"""
         return Vectors([atom.dr for atom in self])
 
     @property
     def x(self):
-        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`x` coordinates."""
+        """:class:`~numpy:numpy.ndarray` of :attr:`XYZAtom.x` coordinates."""
         # return np.asarray(self.r)[:, 0]
         return self.r.x
 
     @property
     def y(self):
-        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`y` coordinates."""
+        """:class:`~numpy:numpy.ndarray` of :attr:`XYZAtom.y` coordinates."""
         # return np.asarray(self.r)[:, 1]
         return self.r.y
 
     @property
     def z(self):
-        """:class:`~numpy:numpy.ndarray` of `Atom`\ s :math:`z` coordinates."""
+        """:class:`~numpy:numpy.ndarray` of :attr:`XYZAtom.z` coordinates."""
         # return np.asarray(self.r)[:, 2]
         return self.r.z
 
     @property
     def inertia_tensor(self):
-        """Inertia tensor."""
+        """Return inertia tensor about the origin."""
         masses = self.masses
         r = self.r - self.center_of_mass
         x, y, z = r.x, r.y, r.z
 
-        Ixx = (masses * (y**2 + z**2)).sum()
-        Iyy = (masses * (x**2 + z**2)).sum()
-        Izz = (masses * (x**2 + y**2)).sum()
-        Ixy = Iyx = (-masses * x * y).sum()
-        Ixz = Izx = (-masses * x * z).sum()
-        Iyz = Izy = (-masses * y * z).sum()
-        return rezero_array(np.array([[Ixx, Ixy, Ixz],
-                                      [Iyx, Iyy, Iyz],
-                                      [Izx, Izy, Izz]]), epsilon=1e-12)
+        Ixx = fsum(masses * (y**2 + z**2))
+        Iyy = fsum(masses * (x**2 + z**2))
+        Izz = fsum(masses * (x**2 + y**2))
+        Ixy = Iyx = fsum(-masses * x * y)
+        Ixz = Izx = fsum(-masses * x * z)
+        Iyz = Izy = fsum(-masses * y * z)
+        I = np.array([[Ixx, Ixy, Ixz],
+                      [Iyx, Iyy, Iyz],
+                      [Izx, Izy, Izz]])
+        return rezero_array(I, epsilon=1e-10)
 
     @property
     def moment_of_inertia(self):
@@ -475,13 +481,66 @@ class XYZAtoms(Atoms):
 
     @property
     def principal_axes(self):
-        """Return principal axes."""
+        """Return principal axes of rotation computed from the inertia tensor.
+
+        Since the :attr:`~XYZAtoms.inertia_tensor` forms a :math:`3\\times3`
+        real symmetric matrix :math:`[I]`, then there is a matrix
+        :math:`[P]=[\\mathbf{p}_1\\,\\mathbf{p}_2\\,\\mathbf{p}_3]`
+        that orthogonally diagonalizes :math:`[I]` such that
+        :math:`[\\Lambda]=[P]^T [I] [P]` is a diagonal matrix:
+
+        .. math::
+
+           [\\Lambda] =  \\begin{bmatrix}
+           \\lambda_1 & 0 & 0\\\\
+           0 & \\lambda_2 & 0\\\\
+           0 & 0 & \\lambda_3
+           \\end{bmatrix}
+
+        where :math:`\\lambda_1,\\lambda_2,\\lambda_3` are the eigenvalues
+        of :math:`[I]` corresponding to the eigenvectors
+        :math:`\\mathbf{p}_1, \\mathbf{p}_2, \\mathbf{p}_3`, which form the
+        column vectors of matrix :math:`[P]` and are the principal axes
+        of the moment of inertia. In other words, the matrix :math:`[P]`
+        is a rotation matrix which transforms the coordinates
+        :math:`\\mathbf{r}`
+        of the atoms such that the moment of inertia i
+
+        Returns
+        -------
+        p : :class:`~sknano.core.math.Vectors`
+            :class:`~sknano.core.math.Vectors` object where `p[0]`, `p[1]`,
+            and `p[2]` are the 3 principal axes corresponding to the
+            eigenvectors that form the successive columns of :math:`P`.
+
+        """
         w, v = np.linalg.eig(self.inertia_tensor)
-        print(w)
-        print(v)
-        v = rezero_array(v, epsilon=1e-12)
-        I1, I2, I3 = list(map(Vector, [v[i] for i in range(3)]))
-        return Vectors([I1, I2, I3])
+        v = rezero_array(v[:, np.argsort(w)[::-1]], epsilon=1e-10)
+        # v = rezero_array(v, epsilon=1e-10)
+        p = Vectors(list(map(Vector, [v[:, i] for i in range(3)])))
+        return p
+
+    @property
+    def principal_moments_of_inertia(self):
+        """Return principal moments of inertia."""
+        w = np.linalg.eigvals(self.inertia_tensor)
+        return w[np.argsort(w)[::-1]]
+
+    @property
+    def radius_of_gyration(self):
+        """Return radius of gyration.
+
+        .. math::
+
+           R_g = \\sqrt{\\frac{1}{M}\\sum_{i=1}^{N}
+           m_i(\\mathbf{r}_i-\\mathbf{R})^2}
+
+        """
+        r = self.r
+        masses = self.masses
+        R = self.center_of_mass
+        M = self.M
+        return np.sqrt(np.sum(masses * (r - R).dot(r - R)) / M)
 
     @property
     def volume(self):
@@ -494,6 +553,24 @@ class XYZAtoms(Atoms):
     @volume.setter
     def volume(self, value):
         self._volume = float(value)
+
+    def align_principal_axis(self, index, vector):
+        """Align :attr:`~XYZAtoms.principal_axes`[`index`] along `vector`.
+
+        Parameters
+        ----------
+        index : :class:`~python:int`
+        vector : {:class:`~python:list`, :class:`~numpy:numpy.ndarray`}
+
+        Examples
+        --------
+        >>> from sknano.generators import SWNTGenerator
+        >>> swnt = SWNTGenerator(10, 5)
+        >>>
+
+        """
+        self.rotate(from_vector=self.principal_axes[index],
+                    to_vector=Vector(vector))
 
     def center_center_of_mass(self, axis=None):
         """Center atoms on center-of-mass coordinates."""
@@ -565,3 +642,18 @@ class XYZAtoms(Atoms):
 
         """
         [atom.rezero_xyz(epsilon=epsilon) for atom in self]
+
+    def within_region(self, region):
+        """Returns new `Atoms` object containing atoms within `region`.
+
+        Similar to :meth:`XYZAtom.clip_bounds`, but returns a new
+        `Atoms` object.
+
+        Parameters
+        ----------
+        region : :class:`~sknano.core.geometric_regions.GeometricRegion`
+
+        """
+        return \
+            self.__class__([atom for atom in self if region.contains(atom.r)],
+                           update_item_class=False, **self.kwargs)

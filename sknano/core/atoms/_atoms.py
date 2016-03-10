@@ -15,6 +15,7 @@ from collections.abc import Iterable
 from operator import attrgetter
 import numbers
 import re
+import warnings
 
 import numpy as np
 
@@ -38,7 +39,8 @@ class Atom(BaseClass):
     """
     _fields = ['element', 'Z', 'mass']
 
-    def __init__(self, *args, element=None, mass=None, Z=None, **kwargs):
+    def __init__(self, *args, element=None, mass=None, Z=None, parent=None,
+                 **kwargs):
         args = list(args)
 
         if 'm' in kwargs and mass is None:
@@ -59,6 +61,7 @@ class Atom(BaseClass):
         super().__init__(*args, **kwargs)
         self.mass = mass
         self.element = element
+        self.parent = parent
         self.fmtstr = "{element!r}, Z={Z!r}, mass={mass!r}"
 
     def _is_valid_operand(self, other):
@@ -69,8 +72,8 @@ class Atom(BaseClass):
         if not self._is_valid_operand(other):
             return NotImplemented
         return (self is other or
-                (np.allclose([self.Z, self.mass], [other.Z, other.mass])
-                 and self.element == other.element))
+                (np.allclose([self.Z, self.mass], [other.Z, other.mass]) and
+                 self.element == other.element))
 
     def __le__(self, other):
         if not self._is_valid_operand(other):
@@ -118,7 +121,7 @@ class Atom(BaseClass):
         return True
 
     def __dir__(self):
-        return ['element', 'Z', 'mass']
+        return ['element', 'Z', 'mass', 'parent']
 
     @property
     def Z(self):
@@ -236,6 +239,7 @@ class Atom(BaseClass):
 
     @property
     def m(self):
+        """An alias for :attr:`~Atom.mass`."""
         return self.mass
 
     @m.setter
@@ -251,9 +255,18 @@ class Atom(BaseClass):
     def translate(self, *args, **kwargs):
         assert not hasattr(super(), 'translate')
 
+    def reset_attrs(self, **kwargs):
+        """Reset atom attributes."""
+        assert not hasattr(super(), 'reset_attrs')
+
+    def update_attrs(self, **kwargs):
+        """Update atom attributes."""
+        assert not hasattr(super(), 'update_attrs')
+
     def todict(self):
-        """Return `dict` of `Atom` constructor parameters."""
-        return dict(element=self.element, mass=self.mass, Z=self.Z)
+        """Return :class:`~python:dict` of `Atom` constructor parameters."""
+        return dict(element=self.element, mass=self.mass, Z=self.Z,
+                    parent=self.parent)
 
 
 class Atoms(UserList):
@@ -271,8 +284,11 @@ class Atoms(UserList):
         if atoms is not None and \
                 (isinstance(atoms, str) or isinstance(atoms, Atom)):
             atoms = [atoms]
-        if update_item_class and not isinstance(atoms, type(self)) and \
-                isinstance(atoms, list):
+        # if update_item_class and not isinstance(atoms, type(self)) and \
+        #         isinstance(atoms, list):
+        if update_item_class and isinstance(atoms, Iterable) and \
+                len(atoms) > 0 and not \
+                isinstance(atoms[0], self.__atom_class__):
             atoms = atoms[:]
             for i, atom in enumerate(atoms):
                 try:
@@ -294,7 +310,6 @@ class Atoms(UserList):
                 except AttributeError:
                     atoms[i] = self.__atom_class__(atom)
         super().__init__(initlist=atoms, **kwargs)
-        self.fmtstr = "{atoms!r}"
 
     @property
     def __atom_class__(self):
@@ -353,11 +368,12 @@ class Atoms(UserList):
 
     def __cast_item(self, item):
         if not isinstance(item, self.__item_class__):
-            if isinstance(item, dict):
+            try:
+                itemdict = item.todict()
                 item = self.__item_class__(
-                    **{k: item[k] for k in set(item) &
+                    **{k: itemdict[k] for k in set(dir(item)) &
                        set(dir(self.__item_class__()))})
-            elif isinstance(item, (str, int, float)):
+            except AttributeError:
                 item = self.__item_class__(item)
         return item
 
@@ -417,15 +433,15 @@ class Atoms(UserList):
     def __sub__(self, other):
         if not self._is_valid_operand(other):
             return NotImplemented
-        return self._from_iterable([atom for atom in self
-                                    if atom not in self.__cast(other)],
+        return self._from_iterable((atom for atom in self
+                                    if atom not in self.__cast(other)),
                                    **self.kwargs)
 
     def __rsub__(self, other):
         if not self._is_valid_operand(other):
             return NotImplemented
-        return self._from_iterable(atom for atom in self.__cast(other)
-                                   if atom not in self,
+        return self._from_iterable((atom for atom in self.__cast(other)
+                                    if atom not in self),
                                    **self.kwargs)
 
     def __isub__(self, other):
@@ -437,8 +453,8 @@ class Atoms(UserList):
     def __and__(self, other):
         if not self._is_valid_operand(other):
             return NotImplemented
-        return self._from_iterable([atom for atom in self.__cast(other)
-                                    if atom in self], **self.kwargs)
+        return self._from_iterable((atom for atom in self.__cast(other)
+                                    if atom in self), **self.kwargs)
 
     __rand__ = __and__
 
@@ -598,41 +614,62 @@ class Atoms(UserList):
             return self.__class__(atoms=np.asarray(self)[condition],
                                   **self.kwargs)
 
-    def select(self, selstr, verbose=False):
+    def select(self, selstr=None, selstrlist=None, verbose=False):
         """Return `Atom` or `Atoms` from selection command.
 
         Parameters
         ----------
-        selstr : :class:`~python:str`
+        selstr : :class:`~python:str`, optional
+            optional if `selstrlist` is not `None`
+        selstrlist : {`None`, :class:`~python:list`}, optional
+            :class:`~python:list` of selection strings.
 
         Returns
         -------
-        :class:`Atom` or :class:`Atoms`
+        :class:`~python:list` of `Atom` or `Atoms` objects
+            if `selstrlist` is not `None`
+        :class:`Atom` or :class:`Atoms` if `selstr` is not `None`
 
         """
         from ._selections import SelectionParser, SelectionException
-        try:
-            return SelectionParser(self, verbose=verbose).parse(selstr)
-        except SelectionException as e:
-            print(e)
-            return None
+        if selstrlist is not None:
+            selections = []
+            for selstr in selstrlist:
+                try:
+                    selections.append(self.select(selstr, verbose=verbose))
+                except SelectionException as e:
+                    print(e)
+            return selections
+        elif selstr is not None:
+            try:
+                return SelectionParser(self, verbose=verbose).parse(selstr)
+            except SelectionException as e:
+                print(e)
+                return None
+        else:
+            return self.__class__()
 
-    def get_atoms(self, asarray=False):
-        """Return list of `Atoms`.
+    def get_atoms(self, asarray=False, aslist=True):
+        """Return `Atoms` either as list (default) or numpy array or self.
 
         Parameters
         ----------
-        asarray : bool, optional
+        asarray, aslist : :class:`~python:bool`, optional
+            Default values: `asarray=False`, `aslist=True`
 
         Returns
         -------
-        sequence or ndarray
+        :class:`~numpy:numpy.ndarray` if `asarray` is `True`
+        :class:`~python:list` if `asarray` is `False` and `aslist` is `True`
+        :class:`Atoms` object if `asarray` and `aslist` are `False`
 
         """
         if asarray:
             return np.asarray(self.data)
-        else:
+        elif aslist:
             return self.data
+        else:
+            return self
 
     def getatomattr(self, attr):
         """Get :class:`~numpy:numpy.ndarray` of atom attributes `attr`.
@@ -670,13 +707,14 @@ class Atoms(UserList):
 
         Examples
         --------
-        Suppose you have an `XAtoms` instance named ``atoms`` that has
-        `XAtom` instances of two atom types `1` and `2` and we want to set
-        all `XAtom`\ s with `type=1` to Nitrogen and all `XAtom`\ s with
-        `type=2` to Argon. In other words, we want to map the
-        `XAtom.type` attribute to the `XAtom.element` attribute.
-
-        We'd call this method like so::
+        Suppose you have an `Atoms` instance named ``atoms`` that contains
+        `Atom` instances of two atom types `1` and `2` and we want to set
+        all `Atom`\ s with `type=1` to Nitrogen and all `Atom`\ s with
+        `type=2` to Argon. In other words, we want to use the
+        :attr:`~sknano.core.atoms.TypeAtom.type` attribute to set the
+        :attr:`~Atom.element` attribute, which we do by passing a
+        :class:`~python:dict` mapping each `type` to the respective element
+        symbol. For example::
 
         >>> atoms.mapatomattr('type', 'element', {1: 'N', 2: 'Ar'})
 
@@ -718,7 +756,7 @@ class Atoms(UserList):
             kwargs['transform_matrix'] = rotation_matrix(**kwargs)
         [atom.rotate(**kwargs) for atom in self]
 
-    def translate(self, t, fix_anchor_points=True):
+    def translate(self, t, fix_anchor_points=True, cartesian=True):
         """Translate `Atom` vectors by :class:`Vector` `t`.
 
         Parameters
@@ -727,8 +765,18 @@ class Atoms(UserList):
         fix_anchor_points : bool, optional
 
         """
-        [atom.translate(t, fix_anchor_point=fix_anchor_points)
-         for atom in self]
+        [atom.translate(t, fix_anchor_point=fix_anchor_points,
+                        cartesian=cartesian) for atom in self]
 
-    def todict(self):
-        return dict(atoms=self.data)
+    def reset_attrs(self, **kwargs):
+        """Call corresponding `reset_attrs` method on each atom"""
+        # [atom.reset_attrs(**kwargs) for atom in self]
+        assert not hasattr(super(), 'reset_attrs')
+
+    def update_attrs(self, **kwargs):
+        """Call `update_attrs` method on each atom."""
+        # [atom.update_attrs() for atom in self]
+        # if len(kwargs) != 0:
+        #     warnings.warn('`Atoms.update_attrs` received unused kwargs: \n'
+        #                   '{}'.format(kwargs))
+        assert not hasattr(super(), 'update_attrs')

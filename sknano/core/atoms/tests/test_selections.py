@@ -17,21 +17,25 @@ from sknano.generators import SWNTGenerator
 # from sknano.io import DATAReader
 # from sknano.core.structures import compute_Natoms
 # from sknano.core.atoms import SelectionParser
+from sknano.core.geometric_regions import Cylinder
 from sknano.testing import AtomsTestFixture
 
 
 class SelectionTestFixture(AtomsTestFixture):
-    def setUp(self):
-        super().setUp()
-        self.atoms.center_centroid()
-        self.BNatoms = SWNTGenerator((10, 5), basis=['B', 'N']).atoms
-        self.BNatoms.assign_unique_types()
-        self.BNatoms.assign_unique_ids()
-        self.BNatoms.center_centroid()
 
-    # def tearDown(self):
-    #     super().tearDown()
-    #     print('type(selection): {}'.format(type(self.selection)))
+    @AtomsTestFixture.atoms.getter
+    def atoms(self):
+        atoms = super().atoms
+        atoms.center_centroid()
+        return atoms
+
+    @property
+    def BNatoms(self):
+        BNatoms = SWNTGenerator((10, 5), basis=['B', 'N']).atoms
+        BNatoms.assign_unique_types()
+        BNatoms.assign_unique_ids()
+        BNatoms.center_centroid()
+        return BNatoms
 
 
 class Tests(SelectionTestFixture):
@@ -152,6 +156,19 @@ class Tests(SelectionTestFixture):
         print(parallelepiped.Natoms)
         sphere = atoms.select("within Sphere(r=6)", verbose=True)
         print(sphere.Natoms)
+
+    def test16(self):
+        atoms = self.dumpdata1.trajectory[-1].atoms
+        atoms = atoms.select("within Cylinder(p1=[0,-15,0], p2=[0,25,0], r=15)")
+        print(atoms.bounding_box)
+        atoms = atoms.select("molid 1 2 3 4 5")
+        mol_ids = list(set(atoms.mol_ids))
+        print(mol_ids)
+        assert_true(np.allclose(mol_ids, [1, 2, 3, 4, 5]))
+        # selection_list = []
+        # for i in range(1, 9):
+        #     selection_list.append(atoms.select('mol_id {}'.format(i)))
+
 
 if __name__ == '__main__':
     nose.runmodule()

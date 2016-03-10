@@ -48,12 +48,39 @@ class AtomSelection:
                     continue
                 for i in range(snapshot.Natoms):
                     snapshot.atom_selection[i] = True
-                snapshot.nselected = snapshot.Natoms
+                # snapshot.nselected = snapshot.Natoms
         else:
             snapshot = self.traj.get_snapshot(ts)
             for i in range(snapshot.Natoms):
                 snapshot.atom_selection[i] = True
-            snapshot.nselected = snapshot.Natoms
+            # snapshot.nselected = snapshot.Natoms
+
+    def update(self, atoms, ts=None):
+        atom_ids = atoms.ids
+        if ts is None:
+            for ss in self.traj:
+                if not ss.selected:
+                    continue
+                aselection = ss.atom_selection
+                id_idx = ss.atomattrs.index('id')
+                # for i, atom in enumerate(ss.atoms):
+                #     if atom in atoms:
+                for i, atom in enumerate(ss.get_atoms(asarray=True)):
+                    if int(atom[id_idx]) in atom_ids:
+                        aselection[i] = True
+                    else:
+                        aselection[i] = False
+        else:
+            ss = self.traj.get_snapshot(ts)
+            aselection = ss.atom_selection
+            id_idx = ss.atomattrs.index('id')
+            # for i, atom in enumerate(ss.atoms):
+            #     if atom in atoms:
+            for i, atom in enumerate(ss.get_atoms(asarray=True)):
+                if int(atom[id_idx]) in atom_ids:
+                    aselection[i] = True
+                else:
+                    aselection[i] = False
 
 
 class TimeSelection:
@@ -70,7 +97,7 @@ class TimeSelection:
     def all(self, ts=None):
         """Select all trajectory snapshots/timesteps."""
         [setattr(snapshot, 'selected', True) for snapshot in self.traj]
-        self.traj.nselected = self.traj.Nsnaps
+        # self.traj.nselected = self.traj.Nsnaps
         self.traj.atom_selection.all()
         self.print_fraction_selected()
 
@@ -79,7 +106,7 @@ class TimeSelection:
         [setattr(snapshot, 'selected', False) for snapshot in self.traj]
         try:
             self.traj.get_snapshot(ts).selected = True
-            self.traj.nselected = 1
+            # self.traj.nselected = 1
         except AttributeError:
             pass
         self.traj.atom_selection.all()
@@ -88,21 +115,21 @@ class TimeSelection:
     def none(self):
         """Deselect all timesteps."""
         [setattr(snapshot, 'selected', False) for snapshot in self.traj]
-        self.traj.nselected = 0
+        # self.traj.nselected = 0
         self.print_fraction_selected()
 
     def skip(self, n):
         """Select every `n`\ th timestep from currently selected timesteps."""
         count = n - 1
-        for snapshot in self.traj:
-            if not snapshot.selected:
+        for ss in self.traj:
+            if not ss.selected:
                 continue
             count += 1
             if count == n:
                 count = 0
                 continue
-            snapshot.selected = False
-            self.traj.nselected -= 1
+            ss.selected = False
+            # self.traj.nselected -= 1
         self.traj.atom_selection.all()
         self.print_fraction_selected()
 
@@ -119,6 +146,7 @@ class Snapshot(BaseClass):
     trajectory
     atomattrs
     attr_dtypes
+    elementmap
     timestep
     fmtstr
 
@@ -134,34 +162,49 @@ class Snapshot(BaseClass):
         self.trajectory = trajectory
 
         self.atomattrs = None
+        self.elementmap = None
         self.attr_dtypes = None
         self.timestep = None
 
         self._atoms = None
+        self._atoms_array = None
 
         self.fmtstr = "trajectory={trajectory!r}"
 
     @property
     def atoms(self):
         """Snapshot atoms."""
-        atoms = Atoms()
-        for atom in self._atoms:
-            try:
-                reference_atom = \
-                    self.trajectory.reference_atoms.get_atom(
-                        int(atom[self.atomattrs.index('id')]))
-            except AttributeError:
-                reference_atom = None
+        if self._atoms is None:
+            atoms = self._atoms = Atoms()
+            atomattrs = self.atomattrs
+            elementmap = self.elementmap
+            attr_dtypes = self.attr_dtypes
+            id_idx = atomattrs.index('id')
+            aselection = self._atoms_array[self.atom_selection]
+            # selected = self.atom_selection
+            traj = self.trajectory
+            for atom in aselection:
+                try:
+                    reference_atom = \
+                        traj.reference_atoms.get_atom(int(atom[id_idx]))
+                except AttributeError:
+                    reference_atom = None
 
-            attrs = [dtype(value) for dtype, value in
-                     zip(self.attr_dtypes, atom)]
-            atoms.append(Atom(reference_atom=reference_atom,
-                              **dict(list(zip(self.atomattrs, attrs)))))
-        return atoms
+                attrs = \
+                    [dtype(value) for dtype, value in zip(attr_dtypes, atom)]
+
+                atoms.append(Atom(reference_atom=reference_atom,
+                                  **dict(list(zip(atomattrs, attrs)))))
+            if elementmap is not None:
+                atoms.mapatomattr(from_attr='type', to_attr='element',
+                                  attrmap=elementmap)
+            return atoms
+        else:
+            return self._atoms.filtered(self.atom_selection)
 
     @atoms.setter
     def atoms(self, value):
-        self._atoms = value
+        self._atoms_array = value
 
     @property
     def atom_selection(self):
@@ -204,20 +247,22 @@ class Snapshot(BaseClass):
     @property
     def nselected(self):
         """Number of selected atoms in this snapshot."""
-        return self._nselected
+        # return self._nselected
+        aselection = self.atom_selection
+        return len(aselection[aselection])
 
-    @nselected.setter
-    def nselected(self, value):
-        self._nselected = int(value)
+    # @nselected.setter
+    # def nselected(self, value):
+    #     self._nselected = int(value)
 
     @property
     def nselect(self):
         """Alias for :attr:`Snapshot.nselected`."""
         return self.nselected
 
-    @nselect.setter
-    def nselect(self, value):
-        self.nselected = value
+    # @nselect.setter
+    # def nselect(self, value):
+    #     self.nselected = value
 
     def get_atoms(self, asarray=False):
         """Get atoms.
@@ -235,10 +280,19 @@ class Snapshot(BaseClass):
 
         """
         if asarray:
-            return self._atoms
+            return self._atoms_array
         return self.atoms
 
+    # def update_atom_selection(self, atoms):
+    #     ss_atoms = self.atoms
+    #     selection = np.zeros(ss_atoms.Natoms, dtype=bool)
+    #     for i, atom in enumerate(ss_atoms):
+    #         if atom in atoms:
+    #             selection[i] = True
+    #     self.atom_selection = selection
+
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         return dict(trajectory=self.trajectory)
 
 
@@ -250,7 +304,7 @@ class Trajectory(UserList):
         self.fmtstr = "snapshots={snapshots!r}"
         self.time_selection = TimeSelection(self)
         self.atom_selection = AtomSelection(self)
-        self.nselected = 0
+        # self.nselected = 0
         self.reference_atoms = None
         self._reference_snapshot = None
 
@@ -276,6 +330,7 @@ class Trajectory(UserList):
 
     @property
     def time_selection(self):
+        """:class:`TimeSelection` class."""
         return self._time_selection
 
     @time_selection.setter
@@ -305,20 +360,25 @@ class Trajectory(UserList):
     @property
     def nselected(self):
         """Number of selected snapshots."""
-        return self._nselected
+        # return self._nselected
+        n = 0
+        for ss in self:
+            if ss.selected:
+                n += 1
+        return n
 
-    @nselected.setter
-    def nselected(self, value):
-        self._nselected = int(value)
+    # @nselected.setter
+    # def nselected(self, value):
+    #     self._nselected = int(value)
 
     @property
     def nselect(self):
         """Alias for :attr:`~Trajectory.nselected`."""
         return self.nselected
 
-    @nselect.setter
-    def nselect(self, value):
-        self.nselected = value
+    # @nselect.setter
+    # def nselect(self, value):
+    #     self.nselected = value
 
     @property
     def snapshots(self):
@@ -377,5 +437,10 @@ class Trajectory(UserList):
                 v[i] = snapshot.timestep
         return v.tolist()
 
+    # def update_selection(self, *snapshots, *atoms):
+    #     timesteps = self.timesteps
+    #     for snapshot in snapshots:
+
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         return dict(snapshots=self.data)

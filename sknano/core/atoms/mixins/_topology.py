@@ -11,7 +11,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from collections import Iterable
+from collections import Iterable, namedtuple
 # from operator import attrgetter
 
 # import numpy as np
@@ -23,10 +23,12 @@ from ._bonds import Bond, Bonds, compute_bond
 from ._dihedrals import Dihedral, Dihedrals, compute_dihedral
 from ._impropers import Improper, Impropers, compute_improper
 
-__all__ = ['AtomTopologyMixin', 'AtomsTopologyMixin']
+__all__ = ['AtomTopologyMixin', 'AtomsTopologyMixin', 'TopologyStats']
 
 operand_error_msg = 'Expected an `iterable` object containing {}'
 ids_operand_error_msg = operand_error_msg.format('`ints`')
+TopologyStats = namedtuple('TopologyStats',
+                           ('angles', 'bonds', 'dihedrals', 'impropers'))
 
 
 class AtomTopologyMixin:
@@ -40,6 +42,12 @@ class AtomTopologyMixin:
             self._update_angles()
             return self._angles
 
+    @angles.setter
+    def angles(self, value):
+        if not isinstance(value, Angles):
+            raise TypeError('Expected an `Angles` object')
+        self._angles = value
+
     @property
     def bonds(self):
         """Atom :class:`~sknano.core.atoms.mixins.Bonds`"""
@@ -48,6 +56,12 @@ class AtomTopologyMixin:
         except AttributeError:
             self._update_bonds()
             return self._bonds
+
+    @bonds.setter
+    def bonds(self, value):
+        if not isinstance(value, Bonds):
+            raise TypeError('Expected a `Bonds` object.')
+        self._bonds = value
 
     @property
     def dihedrals(self):
@@ -58,6 +72,12 @@ class AtomTopologyMixin:
             self._update_dihedrals()
             return self._dihedrals
 
+    @dihedrals.setter
+    def dihedrals(self, value):
+        if not isinstance(value, Dihedrals):
+            raise TypeError('Expected a `Dihedrals` object')
+        self._dihedrals = value
+
     @property
     def impropers(self):
         """Atom :class:`~sknano.core.atoms.mixins.Dihedrals`"""
@@ -66,6 +86,12 @@ class AtomTopologyMixin:
         except AttributeError:
             self._update_impropers()
             return self._impropers
+
+    @impropers.setter
+    def impropers(self, value):
+        if not isinstance(value, Impropers):
+            raise TypeError('Expected an `Impropers` object')
+        self._impropers = value
 
     def _update_angles(self):
         try:
@@ -82,7 +108,8 @@ class AtomTopologyMixin:
 
     def _update_bonds(self):
         try:
-            bonds = Bonds([Bond(self, nn) for nn in self.NN]).unique
+            bonds = Bonds([Bond(self, nn) for nn in self.NN])
+            bonds = bonds.unique
         except (AttributeError, TypeError):
             bonds = Bonds()
         self._bonds = bonds
@@ -119,40 +146,87 @@ class AtomTopologyMixin:
 class AtomsTopologyMixin:
     """Mixin :class:`~sknano.core.atoms.Atoms` topology class."""
     @property
+    def angles_in_degrees(self):
+        """:class:`~python:bool` setting for returning angles in degrees."""
+        try:
+            return self._angles_in_degrees
+        except AttributeError:
+            self._angles_in_degrees = False
+            return False
+
+    @angles_in_degrees.setter
+    def angles_in_degrees(self, value):
+        if not isinstance(value, bool):
+            raise ValueError('Expected a boolean value.')
+        self._angles_in_degrees = value
+        self._update_topology()
+
+    @property
+    def all_angles(self):
+        """:class:`~sknano.core.atoms.mixins.Angles`."""
+        try:
+            return self._all_angles
+        except AttributeError:
+            self._update_angles()
+            return self._all_angles
+
+    @property
+    def all_bonds(self):
+        """:class:`~sknano.core.atoms.mixins.Bonds`."""
+        try:
+            return self._all_bonds
+        except AttributeError:
+            self._update_bonds()
+            return self._all_bonds
+
+    @property
+    def all_dihedrals(self):
+        """:class:`~sknano.core.atoms.mixins.Dihedrals`."""
+        try:
+            return self._all_dihedrals
+        except AttributeError:
+            self._update_dihedrals()
+            return self._all_dihedrals
+
+    @property
+    def all_impropers(self):
+        """:class:`~sknano.core.atoms.mixins.Impropers`."""
+        try:
+            return self._all_impropers
+        except AttributeError:
+            self._update_impropers()
+            return self._all_impropers
+
+    @property
     def angles(self):
         """:class:`~sknano.core.atoms.mixins.Angles`."""
-        return Angles([angle for atom in self for angle in atom.angles
-                       if len(atom.angles) > 0], parent=self)
+        return self.all_angles.unique
 
     @property
     def bonds(self):
         """:class:`~sknano.core.atoms.mixins.Bonds`."""
-        return Bonds([bond for atom in self for bond in atom.bonds
-                      if len(atom.bonds) > 0], parent=self)
+        return self.all_bonds.unique
 
     @property
     def dihedrals(self):
         """:class:`~sknano.core.atoms.mixins.Dihedrals`."""
-        return Dihedrals([dihedral for atom in self for dihedral in
-                          atom.dihedrals if len(atom.dihedrals) > 0],
-                         parent=self)
+        return self.all_dihedrals.unique
 
     @property
     def impropers(self):
         """:class:`~sknano.core.atoms.mixins.Impropers`."""
-        return Impropers([improper for atom in self for improper in
-                          atom.impropers if len(atom.impropers) > 0],
-                         parent=self)
+        return self.all_impropers.unique
 
     @property
     def topology_stats(self):
         """:class:`~python:dict` of topology statistics."""
-        stats = {}
-        stats['Angles'] = self.angles.statistics
-        stats['Bonds'] = self.bonds.statistics
-        stats['Dihedrals'] = self.dihedrals.statistics
-        stats['Impropers'] = self.impropers.statistics
-        return stats
+        topostats = {}
+        topostats['angles'] = self.angles.statistics
+        topostats['bonds'] = self.bonds.statistics
+        topostats['dihedrals'] = self.dihedrals.statistics
+        # topostats['impropers'] = self.impropers.statistics
+        topostats['impropers'] = None
+        return TopologyStats(**topostats)
 
     def get_angle(self, *triplet, check_operands=True, degrees=False):
         """Compute bond angles.
@@ -310,10 +384,10 @@ class AtomsTopologyMixin:
             elif neighbors_only:
                 bonds = [bond[-1] for bond in bonds]
             elif ids_only:
-                bonds = bonds.ids
+                bonds = bonds.atom_ids
 
         elif ids_only:
-            bonds = bonds.ids
+            bonds = bonds.atom_ids
 
         if isinstance(bonds, Bonds):
             bonds = bonds.data
@@ -347,3 +421,37 @@ class AtomsTopologyMixin:
             [atom._update_angles() for atom in self]
             [atom._update_dihedrals() for atom in self]
             [atom._update_impropers() for atom in self]
+
+    def _update_topology(self):
+        self._update_angles()
+        self._update_bonds()
+        self._update_dihedrals()
+        self._update_impropers()
+
+    def _update_angles(self):
+        self._all_angles = \
+            Angles([angle for atom in self for angle in atom.angles
+                    if len(atom.angles) > 0], parent=self)
+        if self.angles_in_degrees:
+            self._all_angles.degrees = True
+
+    def _update_bonds(self):
+        self._all_bonds = \
+            Bonds([bond for atom in self for bond in atom.bonds
+                   if len(atom.bonds) > 0], parent=self)
+
+    def _update_dihedrals(self):
+        self._all_dihedrals = \
+            Dihedrals([dihedral for atom in self for dihedral in
+                       atom.dihedrals if len(atom.dihedrals) > 0],
+                      parent=self)
+        if self.angles_in_degrees:
+            self._all_dihedrals.degrees = True
+
+    def _update_impropers(self):
+        self._all_impropers = \
+            Impropers([improper for atom in self for improper in
+                       atom.impropers if len(atom.impropers) > 0],
+                      parent=self)
+        if self.angles_in_degrees:
+            self._all_impropers.degrees = True

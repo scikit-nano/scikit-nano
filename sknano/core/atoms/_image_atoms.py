@@ -28,7 +28,7 @@ class ImageAtom(Atom):
 
     Parameters
     ----------
-    ix, iy, iz : int, optional
+    ix, iy, iz : :class:`~python:int`, optional
         :math:`x, y, z` `ImageAtom` image count
 
     """

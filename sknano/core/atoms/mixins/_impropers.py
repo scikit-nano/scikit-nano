@@ -11,15 +11,19 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from collections import namedtuple
 # import numpy as np
 
 # from sknano.core.math import vector as vec
 # from ._bonds import Bond
-from ._topology_base import AtomTopology, AtomsTopology
+from ._topology_base import AngularTopology, AngularTopologyCollection, \
+    TopologyStats
 from ._dihedrals import compute_dihedral
 
 
-__all__ = ['compute_improper', 'Improper', 'Impropers']
+__all__ = ['compute_improper', 'Improper', 'Impropers', 'ImproperStats']
+
+ImproperStats = namedtuple('ImproperStats', TopologyStats._fields)
 
 
 def compute_improper(*atoms, check_operands=True, degrees=False):
@@ -50,7 +54,7 @@ def compute_improper(*atoms, check_operands=True, degrees=False):
                             degrees=degrees)
 
 
-class Improper(AtomTopology):
+class Improper(AngularTopology):
     """Class representation of improper angle between 4 `Atom` objects.
 
     Parameters
@@ -58,9 +62,11 @@ class Improper(AtomTopology):
     *atoms : {:class:`~python:list`, :class:`~sknano.core.atoms.Atoms`}
         :class:`~python:list` of :class:`~sknano.core.atoms.Atom`\ s
         or an :class:`~sknano.core.atoms.Atoms` object.
-    check_operands : :class:`~python:bool`, optional
+    size : :class:`~python:int`
     parent : Parent :class:`~sknano.core.atoms.Molecule`, if any.
     id : :class:`~python:int`
+    check_operands : :class:`~python:bool`, optional
+    degrees : :class:`~python:bool`, optional
 
     Raises
     ------
@@ -71,11 +77,7 @@ class Improper(AtomTopology):
         if len(atoms) != 4.
     """
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if self.check_operands and len(self.atoms) != 4:
-                raise ValueError('Expected 4 atoms')
-
+        super().__init__(*args, size=4, **kwargs)
         self.fmtstr = "{atom1!r}, {atom2!r}, {atom3!r}, {atom4!r} " + \
             super().fmtstr
 
@@ -107,8 +109,8 @@ class Improper(AtomTopology):
         return self.atoms[3]
 
     @property
-    def angle(self):
-        """An alias for :attr:`AtomTopology.measure`."""
+    def improper(self):
+        """An alias for :attr:`Topology.measure`."""
         return self.measure
 
     def compute_measure(self):
@@ -119,7 +121,7 @@ class Improper(AtomTopology):
         :class:`~python:float`
 
         """
-        return compute_improper(*self.atoms)
+        return compute_improper(*self.atoms, degrees=self.degrees)
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
@@ -129,7 +131,7 @@ class Improper(AtomTopology):
         return super_dict
 
 
-class Impropers(AtomsTopology):
+class Impropers(AngularTopologyCollection):
     """Base class for collection of atom `Improper`\ s.
 
     Parameters
@@ -137,6 +139,7 @@ class Impropers(AtomsTopology):
     topolist : {None, sequence, `Impropers`}, optional
         if not `None`, then a list of `Improper` objects
     parent : Parent :class:`~sknano.core.atoms.Molecule`, if any.
+    degrees : :class:`~python:bool`, optional
 
     """
     @property
@@ -149,11 +152,16 @@ class Impropers(AtomsTopology):
         return len(self)
 
     @property
-    def angles(self):
+    def impropers(self):
         """:class:`~numpy:numpy.ndarray` of :attr:`~Improper.angles`\ s."""
         return self.measures
 
     @property
-    def mean_angle(self):
+    def mean_improper(self):
         """Mean improper angle."""
         return self.mean_measure
+
+    @property
+    def statistics(self):
+        """Improper stats."""
+        return ImproperStats(**super().statistics._asdict())

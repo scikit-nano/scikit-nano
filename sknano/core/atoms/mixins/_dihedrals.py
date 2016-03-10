@@ -11,15 +11,19 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from collections import namedtuple
+
 import numpy as np
 
 from sknano.core.math import vector as vec
 from ._bonds import Bond
-from ._topology_base import AtomTopology, AtomsTopology, \
-    check_operands as check_operands_
+from ._topology_base import AngularTopology, AngularTopologyCollection, \
+    TopologyStats, check_operands as check_operands_
 
 
-__all__ = ['compute_dihedral', 'Dihedral', 'Dihedrals']
+__all__ = ['compute_dihedral', 'Dihedral', 'Dihedrals', 'DihedralStats']
+
+DihedralStats = namedtuple('DihedralStats', TopologyStats._fields)
 
 
 def compute_dihedral(*atoms, check_operands=True, degrees=False):
@@ -63,7 +67,7 @@ def compute_dihedral(*atoms, check_operands=True, degrees=False):
     return angle
 
 
-class Dihedral(AtomTopology):
+class Dihedral(AngularTopology):
     """Class representation of dihedral angle between 4 `Atom` objects.
 
     Parameters
@@ -71,9 +75,11 @@ class Dihedral(AtomTopology):
     *atoms : {:class:`~python:list`, :class:`~sknano.core.atoms.Atoms`}
         :class:`~python:list` of :class:`~sknano.core.atoms.Atom`\ s
         or an :class:`~sknano.core.atoms.Atoms` object.
-    check_operands : :class:`~python:bool`, optional
+    size : :class:`~python:int`
     parent : Parent :class:`~sknano.core.atoms.Molecule`, if any.
     id : :class:`~python:int`
+    check_operands : :class:`~python:bool`, optional
+    degrees : :class:`~python:bool`, optional
 
     Raises
     ------
@@ -84,11 +90,7 @@ class Dihedral(AtomTopology):
         if len(atoms) != 4.
     """
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if self.check_operands and len(self.atoms) != 4:
-                raise ValueError('Expected 4 atoms')
-
+        super().__init__(*args, size=4, **kwargs)
         self.fmtstr = "{atom1!r}, {atom2!r}, {atom3!r}, {atom4!r} " + \
             super().fmtstr
 
@@ -120,9 +122,9 @@ class Dihedral(AtomTopology):
         return self.atoms[3]
 
     @property
-    def angle(self):
-        """An alias for :attr:`AtomTopology.measure`."""
-        return self.measure
+    def dihedral(self):
+        """An alias for :attr:`Topology.measure`."""
+        return self.dihedral
 
     def compute_measure(self):
         """Compute the bond angle, which is the measure of an :class:`Angle`.
@@ -132,7 +134,7 @@ class Dihedral(AtomTopology):
         :class:`~python:float`
 
         """
-        return compute_dihedral(*self.atoms)
+        return compute_dihedral(*self.atoms, degrees=self.degrees)
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
@@ -142,7 +144,7 @@ class Dihedral(AtomTopology):
         return super_dict
 
 
-class Dihedrals(AtomsTopology):
+class Dihedrals(AngularTopologyCollection):
     """Base class for collection of atom `Dihedral`\ s.
 
     Parameters
@@ -150,6 +152,7 @@ class Dihedrals(AtomsTopology):
     topolist : {None, sequence, `Dihedrals`}, optional
         if not `None`, then a list of `Dihedral` objects
     parent : Parent :class:`~sknano.core.atoms.Molecule`, if any.
+    degrees : :class:`~python:bool`, optional
 
     """
     @property
@@ -162,11 +165,16 @@ class Dihedrals(AtomsTopology):
         return len(self)
 
     @property
-    def angles(self):
-        """:class:`~numpy:numpy.ndarray` of :attr:`~Dihedral.angles`\ s."""
+    def dihedrals(self):
+        """:class:`~numpy:numpy.ndarray` of :attr:`~Dihedral.dihedral`\ s."""
         return self.measures
 
     @property
-    def mean_angle(self):
+    def mean_dihedral(self):
         """Mean dihedral angle."""
         return self.mean_measure
+
+    @property
+    def statistics(self):
+        """Dihedral stats."""
+        return DihedralStats(**super().statistics._asdict())

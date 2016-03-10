@@ -97,6 +97,8 @@ class CNAtom(Atom):
         self._CN = int(value)
 
     def todict(self):
+        """Return :class:`~python:dict` of :class:`CNAtom` constructor \
+            parameters."""
         super_dict = super().todict()
         super_dict.update(dict(CN=self.CN))
         return super_dict

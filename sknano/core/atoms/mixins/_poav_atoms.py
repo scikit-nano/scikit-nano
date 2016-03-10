@@ -20,20 +20,20 @@ from collections import OrderedDict
 import numpy as np
 np.seterr(all='warn')
 
-from sknano.core import timethis
+from sknano.core import BaseClass, timethis
 from sknano.core.math import Vectors, vector as vec
 
 __all__ = ['POAV', 'POAV1', 'POAV2', 'POAVR',
            'POAVAtomMixin', 'POAVAtomsMixin']
 
 
-class POAV:
+class POAV(BaseClass):
     """Base class for POAV analysis.
 
     Parameters
     ----------
-    sigma_bonds : :class:`~sknano.core.atoms.Bonds`
-        :class:`~sknano.core.atoms.Bonds` instance.
+    atom : :class:`~sknano.core.atoms.Atom`
+        :class:`~sknano.core.atoms.Atom` instance.
 
     Attributes
     ----------
@@ -42,22 +42,26 @@ class POAV:
     cosa31
 
     """
-    def __init__(self, sigma_bonds):
-        self.bonds = sigma_bonds
+    def __init__(self, atom):
+        super().__init__()
+        self.atom = atom
+        self.angles = atom.angles
+        self.bonds = atom.bonds
+
         self.bond1 = self.bonds[0].vector
         self.bond2 = self.bonds[1].vector
         self.bond3 = self.bonds[2].vector
 
-        self.bond_angles = self.bonds.angles
-        self.bond_angle_pairs = self.bonds.bond_angle_pairs
+        self.bond_angles = self.angles.angles
+        self.angle_bond_pairs = self.angles.bond_pairs
 
-        self.sigma_bond_angle12 = self.bond_angles[0]
-        self.sigma_bond_angle23 = self.bond_angles[1]
-        self.sigma_bond_angle31 = self.bond_angles[2]
+        self.sigma_bond_angle12 = self.angles[0].angle
+        self.sigma_bond_angle23 = self.angles[1].angle
+        self.sigma_bond_angle31 = self.angles[2].angle
 
-        self.cosa12 = np.cos(self.bond_angles[0])
-        self.cosa23 = np.cos(self.bond_angles[1])
-        self.cosa31 = np.cos(self.bond_angles[2])
+        self.cosa12 = np.cos(self.angles[0].angle)
+        self.cosa23 = np.cos(self.angles[1].angle)
+        self.cosa31 = np.cos(self.angles[2].angle)
 
         self._v1 = self.bond1
         self._v2 = self.bond2
@@ -66,23 +70,20 @@ class POAV:
         self._pyramidalization_angles = None
         self._sigma_pi_angles = None
         self._misalignment_angles = None
+        self.fmtstr = "{atom!r}"
 
     def __str__(self):
         fmtstr = '{}\n=====\n'.format(self.__class__.__name__)
-        for k, v in self.todict(rad2deg=True).items():
+        for k, v in self.POAVdict(rad2deg=True).items():
             fmtstr += '{}: {:.4f}\n'.format(k, v)
         return fmtstr
-
-    def __repr__(self):
-        return '{}({bonds!r})'.format(self.__class__.__name__,
-                                      **dict(bonds=self.bonds))
 
     @property
     def v1(self):
         """:class:`~sknano.core.math.Vector` :math:`\\mathbf{v}_1` \
             directed along the :math:`\\sigma`-orbital to the \
             nearest-neighbor :class:`~sknano.core.atoms.Atom` \
-            in :class:`~sknano.core.atoms.Bond` 1."""
+            in :class:`~sknano.core.atoms.mixins.Bond` 1."""
         return self._v1
 
     @property
@@ -90,7 +91,7 @@ class POAV:
         """:class:`~sknano.core.math.Vector` :math:`\\mathbf{v}_2` \
             directed along the :math:`\\sigma`-orbital to the \
             nearest-neighbor :class:`~sknano.core.atoms.Atom` \
-            in :class:`~sknano.core.atoms.Bond` 2."""
+            in :class:`~sknano.core.atoms.mixins.Bond` 2."""
         return self._v2
 
     @property
@@ -98,7 +99,7 @@ class POAV:
         """:class:`~sknano.core.math.Vector` :math:`\\mathbf{v}_3` \
             directed along the :math:`\\sigma`-orbital to the \
             nearest-neighbor :class:`~sknano.core.atoms.Atom` \
-            in :class:`~sknano.core.atoms.Bond` 3."""
+            in :class:`~sknano.core.atoms.mixins.Bond` 3."""
         return self._v3
 
     @property
@@ -242,14 +243,15 @@ class POAV:
 
     @property
     def R1(self):
-        """:class:`~sknano.core.atoms.Bond` 1 :class:`~sknano.core.math.Vector`
-        :attr:`~sknano.core.math.Vector.length`.
+        """:class:`~sknano.core.atoms.mixins.Bond` 1 \
+            :class:`~sknano.core.math.Vector` \
+            :attr:`~sknano.core.math.Vector.length`.
         """
         return self.bond1.length
 
     @property
     def R2(self):
-        """:class:`~sknano.core.atoms.Bond` 2 \
+        """:class:`~sknano.core.atoms.mixins.Bond` 2 \
             :class:`~sknano.core.math.Vector` \
             :attr:`~sknano.core.math.Vector.length`.
         """
@@ -257,7 +259,7 @@ class POAV:
 
     @property
     def R3(self):
-        """:class:`~sknano.core.atoms.Bond` 3 \
+        """:class:`~sknano.core.atoms.mixins.Bond` 3 \
             :class:`~sknano.core.math.Vector` \
             :attr:`~sknano.core.math.Vector.length`.
         """
@@ -333,7 +335,7 @@ class POAV:
             raise TypeError('Expected a list')
         self._misalignment_angles = value
 
-    def todict(self, rad2deg=False):
+    def POAVdict(self, rad2deg=False):
         """Return dictionary of `POAV` class attributes."""
         bond_angles = self.bond_angles
         sigma_pi_angles = self.sigma_pi_angles
@@ -365,6 +367,10 @@ class POAV:
              ('T', self.T), ('H', self.H), ('A', self.A)])
         return od
 
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        return dict(atom=self.atom)
+
 
 class POAV1(POAV):
     """:class:`POAV` sub-class for POAV1 analysis."""
@@ -389,9 +395,9 @@ class POAV1(POAV):
             (:math:`sp^n`) for :math:`sp^3` normalized hybridization."""
         return 3 * self.m + 2
 
-    def todict(self, rad2deg=False):
+    def POAVdict(self, rad2deg=False):
         """Return dictionary of `POAV1` class attributes."""
-        super_dict = super().todict(rad2deg=rad2deg)
+        super_dict = super().POAVdict(rad2deg=rad2deg)
         super_dict.update([('m', self.m), ('n', self.n)])
         return super_dict
 
@@ -401,13 +407,18 @@ class POAV2(POAV):
 
     def __init__(self, *args):
         super().__init__(*args)
-
         vi = []
-        for bond, pair in zip(self.bonds, self.bond_angle_pairs):
+        for bond, pair in zip(self.bonds, self.angle_bond_pairs):
+            # print('bond: {}'.format(bond))
+            # print('pair: {}'.format(pair))
+            # print(np.in1d(self.bonds, pair, invert=True))
             cosa = \
                 np.cos(self.bond_angles[
                     np.in1d(self.bonds, pair, invert=True)])[0]
+            # print('cosa: {}'.format(cosa))
             vi.append(cosa * bond.vector.unit_vector)
+        # import sys
+        # sys.exit(1)
 
         self._v1 = vi[0]
         self._v2 = vi[1]
@@ -425,8 +436,7 @@ class POAV2(POAV):
 
         """
         return -functools.reduce(operator.mul,
-                                 np.cos(self.bonds.angles), 1) * \
-            super().T
+                                 np.cos(self.bond_angles), 1) * super().T
 
     @property
     def n1(self):
@@ -455,9 +465,9 @@ class POAV2(POAV):
         s3 = 1 / (1 + self.n3)
         return 1 / sum([s1, s2, s3]) - 1
 
-    def todict(self, rad2deg=False):
+    def POAVdict(self, rad2deg=False):
         """Return dictionary of `POAV2` class attributes."""
-        super_dict = super().todict(rad2deg=rad2deg)
+        super_dict = super().POAVdict(rad2deg=rad2deg)
         super_dict.update(
             [('m', self.m), ('n1', self.n1), ('n2', self.n2), ('n3', self.n3)])
         return super_dict
@@ -545,16 +555,49 @@ class POAVAtomMixin:
             raise TypeError('Expected a `POAVR` instance.')
         self._POAVR = value
 
+    # def reset_attrs(self, poavs=False, **kwargs):
+    #     """Reset :class:`POAVAtomMixin` attributes."""
+    #     if poavs:
+    #         [setattr(self, POAV, None) for POAV in
+    #          ('_POAV1', '_POAV2', '_POAVR')]
+    #     super().reset_attrs(**kwargs)
+
 
 class POAVAtomsMixin:
-    """Mixin class for POAV analysis."""
+    """Mixin class for POAV analysis.
+
+    Attributes
+    ----------
+    poavs : :class:`~python:collections.OrderedDict`
+
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.poavs = OrderedDict()
+
+    @property
+    def POAV1(self):
+        """List of :class:`~sknano.core.atoms.mixins.POAVAtom` :class:`POAV1` \
+            :attr:`~sknano.core.atoms.mixins.POAVAtom.POAV1` attribute."""
+        return [atom.POAV1 for atom in self if atom.POAV1 is not None]
+
+    @property
+    def POAV2(self):
+        """List of :class:`~sknano.core.atoms.mixins.POAVAtom` :class:`POAV2` \
+            :attr:`~sknano.core.atoms.mixins.POAVAtom.POAV2` attribute."""
+        return [atom.POAV2 for atom in self if atom.POAV2 is not None]
+
+    @property
+    def POAVR(self):
+        """List of :class:`~sknano.core.atoms.mixins.POAVAtom` :class:`POAVR` \
+            :attr:`~sknano.core.atoms.mixins.POAVAtom.POAVR` attribute."""
+        return [atom.POAVR for atom in self if atom.POAVR is not None]
 
     @timethis
-    def analyze_POAVs(self, cutoff=None):
+    def analyze_POAVs(self, **kwargs):
         """Compute `POAV1`, `POAV2`, `POAVR`."""
-        # super().update_attrs()
         if not self.neighbors_analyzed:
-            self.update_neighbors(cutoffs=cutoff)
+            self.update_neighbors(**kwargs)
 
         POAV_classes = {'POAV1': POAV1, 'POAV2': POAV2, 'POAVR': POAVR}
 
@@ -562,7 +605,7 @@ class POAVAtomsMixin:
             # the central atom must have 3 bonds for POAV analysis.
             if atom.bonds.Nbonds == 3:
                 for POAV_name, POAV_class in list(POAV_classes.items()):
-                    setattr(atom, POAV_name, POAV_class(atom.bonds))
+                    setattr(atom, POAV_name, POAV_class(atom))
 
         for atom in self:
             # the central atom must have 3 bonds for POAV analysis.
@@ -609,24 +652,6 @@ class POAVAtomsMixin:
         """Alias for :meth:`~POAVAtomsMixin.analyze_POAVs`."""
         self.analyze_POAVs(**kwargs)
 
-    @property
-    def POAV1(self):
-        """List of :class:`~sknano.core.atoms.mixins.POAVAtom` :class:`POAV1` \
-            :attr:`~sknano.core.atoms.mixins.POAVAtom.POAV1` attribute."""
-        return [atom.POAV1 for atom in self if atom.POAV1 is not None]
-
-    @property
-    def POAV2(self):
-        """List of :class:`~sknano.core.atoms.mixins.POAVAtom` :class:`POAV2` \
-            :attr:`~sknano.core.atoms.mixins.POAVAtom.POAV2` attribute."""
-        return [atom.POAV2 for atom in self if atom.POAV2 is not None]
-
-    @property
-    def POAVR(self):
-        """List of :class:`~sknano.core.atoms.mixins.POAVAtom` :class:`POAVR` \
-            :attr:`~sknano.core.atoms.mixins.POAVAtom.POAVR` attribute."""
-        return [atom.POAVR for atom in self if atom.POAVR is not None]
-
     def get_POAV_attr(self, POAV_class, attr):
         """Return list of :class:`~sknano.core.atoms.mixins.POAVAtom` :class:`POAV1` \
             :class:`POAV2` or :class:`POAVR` attribute.
@@ -659,6 +684,25 @@ class POAVAtomsMixin:
 
         # return [getattr(getattr(atom, POAV_class), attr) for atom in self
         #         if getattr(atom, POAV_class) is not None]
+
+    def reset_attrs(self, poavs=False, **kwargs):
+        """Reset the :class:`POAVAtomsMixin` class attributes, then call \
+            parent class `reset_attrs` method."""
+        if poavs:
+            self.reset_poav_atoms_attrs()
+        super().reset_attrs(**kwargs)
+
+    def reset_poav_atoms_attrs(self):
+        """Reset the :class:`POAVAtomsMixin` class attributes."""
+        self.poavs = OrderedDict()
+        [setattr(self, POAV, None) for POAV in ('_POAV1', '_POAV2', '_POAVR')]
+
+    def update_attrs(self, poavs=False, **kwargs):
+        """Update :class:`POAVAtomsMixin` class attributes."""
+        super().update_attrs(**kwargs)
+        if poavs:
+            self.analyze_POAVs(**kwargs)
+
 
 POAV_vectors = ('v1', 'v2', 'v3', 'vpi', 'V1', 'V2', 'V3', 'Vpi',
                 'reciprocal_v1', 'reciprocal_v2', 'reciprocal_v3')

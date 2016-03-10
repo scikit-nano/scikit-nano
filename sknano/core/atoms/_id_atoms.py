@@ -23,7 +23,7 @@ __all__ = ['IDAtom', 'IDAtoms']
 
 
 class IDAtom(Atom):
-    """An `Atom` class with id attributes.
+    """An `Atom` sub-class with id attributes.
 
     Parameters
     ----------
@@ -143,6 +143,15 @@ class IDAtom(Atom):
         self._mol = int(value)
 
     @property
+    def molid(self):
+        """An alias for :attr:`~IDAtom.mol`."""
+        return self.mol
+
+    @molid.setter
+    def molid(self, value):
+        self.mol = value
+
+    @property
     def atomID(self):
         """Alias for :attr:`~IDAtom.id`."""
         return self.id
@@ -170,6 +179,7 @@ class IDAtom(Atom):
         self.mol = value
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()
         super_dict.update(dict(id=self.id, mol=self.mol))
         return super_dict
@@ -251,11 +261,15 @@ class IDAtoms(Atoms):
         invert : bool, optional
 
         """
-        mask = np.in1d(self.ids, atom_ids, invert=invert).nonzero()
-        self.data = np.asarray(self)[mask].tolist()
+        # mask = np.in1d(self.ids, atom_ids, invert=invert).nonzero()
+        # self.data = np.asarray(self)[mask].tolist()
+        self.data = [self.get_atom(id) for id in atom_ids]
 
     def filtered_ids(self, atom_ids, invert=False):
-        """Return new `Atoms` filtered by :attr:`IDAtoms.ids` in `atom_ids`.
+        """Return new `Atoms` object filtered by `atom_ids`.
+
+        Returns a new `Atoms` object containing the `Atom` objects whose
+        `Atom.id` is in `atom_ids` list.
 
         .. versionadded:: 0.3.11
 
@@ -270,8 +284,10 @@ class IDAtoms(Atoms):
             An instance of `Atoms` (sub)class.
 
         """
-        mask = np.in1d(self.ids, atom_ids, invert=invert).nonzero()
-        return self.__class__(atoms=np.asarray(self)[mask].tolist(),
+        # mask = np.in1d(self.ids, atom_ids, invert=invert).nonzero()
+        # return self.__class__(atoms=np.asarray(self)[mask].tolist(),
+        #                       **self.kwargs)
+        return self.__class__(atoms=[self.get_atom(id) for id in atom_ids],
                               **self.kwargs)
 
     def get_atom(self, id):
@@ -293,3 +309,27 @@ class IDAtoms(Atoms):
         except TypeError:
             print('No atom with id = {}'.format(id))
             return None
+
+    def get_atoms(self, ids=None, **kwargs):
+        """Overrides parent class :meth:`Atoms.get_atoms`.
+
+        Calls :meth:`~IDAtoms.filtered_ids` if `ids` is not None.
+
+        Parameters
+        ----------
+        ids : {:class:`~python:list` of :class:`~python:int`\ s or \
+            :class:`~python:None`}
+        **kwargs : :class:`~python:dict`
+
+        Returns
+        -------
+        :class:`~numpy:numpy.ndarray` if `asarray` is `True`
+        :class:`~python:list` if `asarray` is `False` and `aslist` is `True`
+        :class:`Atoms` object if `asarray` and `aslist` are `False`
+
+        """
+        if ids is None:
+            return super().get_atoms(**kwargs)
+        else:
+            kwargs['aslist'] = kwargs.pop('aslist', False)
+            return self.filtered_ids(ids).get_atoms(**kwargs)

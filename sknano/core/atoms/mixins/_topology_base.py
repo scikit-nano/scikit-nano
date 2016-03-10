@@ -13,24 +13,32 @@ __docformat__ = 'restructuredtext en'
 
 import numbers
 from abc import ABCMeta, abstractmethod
-from collections import Iterable
+from collections import Iterable, namedtuple
 from functools import total_ordering
 from operator import attrgetter
 
 import numpy as np
 # np.set_printoptions(edgeitems=20)
-np.set_printoptions(threshold=10000)
+# np.set_printoptions(threshold=10000)
+# import scipy as sp
+from scipy import stats
+# import pandas as pd
 
 from sknano.core import BaseClass, UserList, rezero_array
 from sknano.core.atoms import Atom, Atoms
 # from sknano.core.math import vector as vec
 
-__all__ = ['AtomTopology', 'AtomsTopology', 'check_operands']
+__all__ = ['Topology', 'TopologyCollection', 'TopologyStats', 'check_operands',
+           'AngularTopology', 'AngularTopologyCollection']
 
 
 operand_error_msg = 'Expected an `iterable` object containing {}'
 atoms_operand_error_msg = operand_error_msg.format('`Atom` objects')
 ids_operand_error_msg = operand_error_msg.format('`ints`')
+TopologyStats = namedtuple('TopologyStats', ('nobs', 'min', 'max', 'minmax',
+                                             'mean', 'median', 'mode',
+                                             'variance', 'std',
+                                             'skewness', 'kurtosis'))
 
 
 def check_operands(*atoms, size=None):
@@ -75,7 +83,7 @@ def check_operands(*atoms, size=None):
 
 
 @total_ordering
-class AtomTopology(BaseClass, metaclass=ABCMeta):
+class Topology(BaseClass, metaclass=ABCMeta):
     """Base :class:`~sknano.core.atoms.Atom` topology class.
 
     Parameters
@@ -83,17 +91,22 @@ class AtomTopology(BaseClass, metaclass=ABCMeta):
     *atoms : {:class:`~python:list`, :class:`~sknano.core.atoms.Atoms`}
         :class:`~python:list` of :class:`~sknano.core.atoms.Atom`\ s
         or an :class:`~sknano.core.atoms.Atoms` object.
-    check_operands : :class:`~python:bool`, optional
+    size : :class:`~python:int`
     parent : Parent :class:`~sknano.core.atoms.Molecule`, if any.
     id : :class:`~python:int`
+    type : :class:`~python:int`
+    check_operands : :class:`~python:bool`, optional
 
     Raises
     ------
     :class:`~python:TypeError`
         if `atoms` is not a list of :class:`~sknano.core.atoms.Atom` objects
         or an :class:`~sknano.core.atoms.Atoms` object.
+    :class:`~python:ValueError`
+        if len(atoms) != `size`.
     """
-    def __init__(self, *atoms, check_operands=True, parent=None, id=0):
+    def __init__(self, *atoms, size, id=0, type=0, parent=None,
+                 check_operands=True):
         if check_operands:
             if not isinstance(atoms, Iterable):
                 raise TypeError(atoms_operand_error_msg)
@@ -102,6 +115,8 @@ class AtomTopology(BaseClass, metaclass=ABCMeta):
             if not isinstance(atoms, (Iterable, Atoms)) or not \
                     all([isinstance(atom, Atom) for atom in atoms]):
                 raise TypeError(atoms_operand_error_msg)
+            if len(atoms) != size:
+                raise ValueError('Expected {} atoms'.format(size))
 
         super().__init__()
         from .. import StructureAtoms
@@ -110,9 +125,10 @@ class AtomTopology(BaseClass, metaclass=ABCMeta):
         self.atoms.extend(list(atoms))
 
         self.check_operands = check_operands
-        self.parent = parent
         self.id = id
-        self.fmtstr = "parent={parent!r}, id={id!r}"
+        self.type = type
+        self.parent = parent
+        self.fmtstr = "id={id!r}, type={type!r}, parent={parent!r}"
 
     def _is_valid_operand(self, other):
         return isinstance(other, (numbers.Number, self.__class__))
@@ -132,14 +148,14 @@ class AtomTopology(BaseClass, metaclass=ABCMeta):
         return self.atoms < other.atoms
 
     def __dir__(self):
-        return ['atoms', 'measure', 'parent', 'id']
+        return ['atoms', 'measure', 'id', 'type', 'parent']
 
     # def __iter__(self):
     #     return iter(self.atoms)
 
     @property
     def atoms(self):
-        """:class:`~sknano.core.atoms.Atoms` in `AtomsTopology`."""
+        """:class:`~sknano.core.atoms.Atoms` in `TopologyCollection`."""
         return self._atoms
 
     @atoms.setter
@@ -149,29 +165,40 @@ class AtomTopology(BaseClass, metaclass=ABCMeta):
         self._atoms = value
 
     @property
-    def ids(self):
-        """:attr:`AtomTopology.atoms` \
-            :attr:`~sknano.core.atoms.IDAtoms.ids`."""
+    def atom_ids(self):
+        """:attr:`Topology.atoms` :attr:`~sknano.core.atoms.IDAtoms.ids`."""
         return tuple(self.atoms.ids)
 
     @property
     def centroid(self):
         """:attr:`~sknano.core.atoms.XYZAtoms.centroid` of \
-            :attr:`AtomTopology.atoms`."""
+            :attr:`Topology.atoms`."""
         return self.atoms.centroid
 
     @property
     def measure(self):
         """Measure of topology."""
-        return self.compute_measure()
+        try:
+            return self._measure
+        except AttributeError:
+            self._update_measure()
+            return self._measure
+
+    @property
+    def strain(self):
+        """Strain in measure."""
+        try:
+            return self._strain
+        except AttributeError:
+            return 0.0
 
     @abstractmethod
     def compute_measure(self):
-        """Compute topological measure from :attr:`AtomTopology.atoms`."""
+        """Compute topological measure from :attr:`Topology.atoms`."""
         raise NotImplementedError
 
     def compute_strain(self, m0):
-        """Compute topological strain in :attr:`AtomTopology.measure`.
+        """Compute topological strain in :attr:`Topology.measure`.
 
         Parameters
         ----------
@@ -183,25 +210,29 @@ class AtomTopology(BaseClass, metaclass=ABCMeta):
 
         """
         m = self.measure
-        return (m0 - m) / m
+        self._strain = (m0 - m) / m
+        return self._strain
 
     def rotate(self, **kwargs):
-        """Rotate the `AtomTopology` by rotating the \
-            :attr:`~AtomTopology.atoms`."""
+        """Rotate the `Topology` by rotating the \
+            :attr:`~Topology.atoms`."""
         [atom.rotate(fix_anchor_point=True, **kwargs) for atom in self.atoms]
+
+    def _update_measure(self):
+        self._measure = self.compute_measure()
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
-        return dict(parent=self.parent, id=self.id)
+        return dict(id=self.id, type=self.type, parent=self.parent)
 
 
-class AtomsTopology(UserList):
+class TopologyCollection(UserList):
     """Base :class:`~sknano.core.atoms.Atoms` topology class.
 
     Parameters
     ----------
-    topolist : {None, sequence, `AtomTopology`}, optional
-        if not `None`, then a list of `AtomTopology` objects
+    topolist : {None, sequence, `Topology`}, optional
+        if not `None`, then a list of `Topology` objects
     parent : Parent :class:`~sknano.core.atoms.Molecule`, if any.
 
     """
@@ -212,10 +243,15 @@ class AtomsTopology(UserList):
 
     @property
     def __item_class__(self):
-        return AtomTopology
+        return Topology
 
     def sort(self, key=attrgetter('measure'), reverse=False):
         super().sort(key=key, reverse=reverse)
+
+    @property
+    def Ntypes(self):
+        """Number of unique :attr:`Topology.type`\ s."""
+        return len(set(self.types))
 
     @property
     def parent(self):
@@ -228,7 +264,7 @@ class AtomsTopology(UserList):
 
     # @property
     # def atoms(self):
-    #     """`Atoms` :class:`python:set` in `AtomsTopology`."""
+    #     """`Atoms` :class:`python:set` in `TopologyCollection`."""
     #     atoms = []
     #     [atoms.extend(topology.atoms) for topology in self]
     #     atoms = \
@@ -239,9 +275,21 @@ class AtomsTopology(UserList):
     @property
     def measures(self):
         """:class:`~numpy:numpy.ndarray` of \
-            :attr:`~AtomTopology.measure`\ s."""
-        return rezero_array(
-            np.asarray([topology.measure for topology in self]))
+            :attr:`~Topology.measure`\ s."""
+        try:
+            return self._measures
+        except AttributeError:
+            self._update_measures()
+            return self._measures
+
+    @property
+    def strains(self):
+        """:class:`~numpy:numpy.ndarray` of \
+            :attr:`~Topology.strain`\ s."""
+        try:
+            return self._strains
+        except AttributeError:
+            return np.zeros(len(self), dtype=float)
 
     @property
     def mean_measure(self):
@@ -255,46 +303,62 @@ class AtomsTopology(UserList):
 
     @property
     def mean(self):
-        """An alias for :attr:`AtomsTopology.mean_measure`."""
+        """An alias for :attr:`TopologyCollection.mean_measure`."""
         return self.mean_measure
 
     @property
+    def atom_ids(self):
+        """:class:`~python:list` of :attr:`~Topology.atom_ids`."""
+        # return np.asarray([topology.atom_ids for topology in self])
+        return [topology.atom_ids for topology in self]
+
+    @property
     def ids(self):
-        """Return array of :attr:`~AtomTopology.ids`."""
-        # return np.asarray([topology.ids for topology in self])
-        return [topology.ids for topology in self]
+        """:class:`~python:list` of :attr:`~Topology.id`\ s."""
+        # return np.asarray([topology.id for topology in self])
+        return [topology.id for topology in self]
+
+    @property
+    def types(self):
+        """:class:`~python:list` of :attr:`~Topology.type`\ s."""
+        # return np.asarray([topology.type for topology in self])
+        return [topology.type for topology in self]
 
     @property
     def unique(self):
-        """Return new `AtomsTopology` object containing the set of unique \
-            `AtomTopology`\ s."""
+        """Return new `TopologyCollection` object containing the set of \
+            unique `Topology`\ s."""
         seen = set()
         unique = []
         for topology in self:
-            if topology.ids not in seen and \
-                    tuple(reversed(topology.ids)) not in seen:
+            atom_ids = tuple(topology.atom_ids)
+            ratom_ids = tuple(reversed(atom_ids))
+            if atom_ids not in seen and ratom_ids not in seen:
                 unique.append(topology)
-                seen.add(topology.ids)
-                seen.add(tuple(reversed(topology.ids)))
-        return self.__class__(topolist=unique)
+                seen.add(atom_ids)
+                seen.add(ratom_ids)
+        return self.__class__(topolist=unique, **self.kwargs)
 
     @property
     def statistics(self):
-        """:class:`~python:dict` of :class:`AtomsTopology.measures` \
+        """:class:`TopologyStats` of :attr:`TopologyCollection.measures` \
             statistics."""
-        stats = {}
-        measures = self.unique.measures
-        stats['min'] = np.min(measures)
-        stats['max'] = np.max(measures)
-        stats['mean'] = np.mean(measures)
-        return stats
+        # measures = self.unique.measures
+        measures = self.measures
+        topostats = stats.describe(measures)._asdict()
+        topostats['min'] = np.min(measures)
+        topostats['max'] = np.max(measures)
+        topostats['median'] = np.median(measures)
+        topostats['mode'] = stats.mode(measures).mode[0]
+        topostats['std'] = np.std(measures)
+        return TopologyStats(**topostats)
 
-    def compute_strain(self, m0):
+    def compute_strains(self, reference):
         """Return :class:`~numpy:numpy.ndarray` of topology measure strains.
 
         Parameters
         ----------
-        m0 : :class:`~python:float`
+        reference : :class:`~python:float` or array_like
             Reference/starting measure.
 
         Returns
@@ -302,10 +366,116 @@ class AtomsTopology(UserList):
         :class:`~numpy:numpy.ndarray`
 
         """
-        return np.asarray([topology.compute_strain(m0) for topology in self])
+        if not (np.isscalar(reference) or
+                isinstance(reference, (list, np.ndarray))):
+            raise TypeError('Expected a `float` or `array_like` object.')
+        if np.isscalar(reference):
+            self._strains = \
+                np.asarray([topology.compute_strain(reference) for
+                            topology in self])
+        else:
+            if len(reference) != len(self):
+                raise ValueError('`reference` must be same length as '
+                                 'topology list')
+            self._strains = \
+                np.asarray([topology.compute_strain(ref) for topology, ref in
+                            zip(self, reference)])
+        return self._strains
+
+    def _update_measures(self):
+        [topology._update_measure() for topology in self]
+        self._measures = \
+            rezero_array(np.asarray([topology.measure for topology in self]))
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()
         super_dict.update(dict(parent=self.parent))
+        return super_dict
+
+
+class AngularTopology(Topology):
+    """`Topology` sub-class for topology with angular measure.
+
+    Parameters
+    ----------
+    *atoms : {:class:`~python:list`, :class:`~sknano.core.atoms.Atoms`}
+        :class:`~python:list` of :class:`~sknano.core.atoms.Atom`\ s
+        or an :class:`~sknano.core.atoms.Atoms` object.
+    check_operands : :class:`~python:bool`, optional
+    parent : Parent :class:`~sknano.core.atoms.Molecule`, if any.
+    id : :class:`~python:int`
+    degrees : :class:`~python:bool`, optional
+
+    Raises
+    ------
+    :class:`~python:TypeError`
+        if `atoms` is not a list of :class:`~sknano.core.atoms.Atom` objects
+        or an :class:`~sknano.core.atoms.Atoms` object.
+    """
+    def __init__(self, *args, degrees=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.degrees = degrees
+        self.fmtstr = super().fmtstr + ", degrees={degrees!r}"
+
+    @property
+    def angle(self):
+        """An alias for :attr:`Topology.measure`."""
+        return self.measure
+
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        super_dict = super().todict()
+        super_dict.update(dict(degrees=self.degrees))
+        return super_dict
+
+
+class AngularTopologyCollection(TopologyCollection):
+    """`TopologyCollection` sub-class for collection of angular topologies.
+
+    Parameters
+    ----------
+    topolist : {None, sequence, `AngularTopology`}, optional
+        if not `None`, then a list of `AngularTopology` objects
+    parent : Parent :class:`~sknano.core.atoms.Molecule`, if any.
+    degrees : :class:`~python:bool`, optional
+
+    """
+    def __init__(self, *args, degrees=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.degrees = degrees
+        self.fmtstr = super().fmtstr + ", degrees={degrees!r}"
+
+    @property
+    def __item_class__(self):
+        return AngularTopology
+
+    @property
+    def degrees(self):
+        """:class:`~python:bool` setting for returning angles in degrees."""
+        return self._degrees
+
+    @degrees.setter
+    def degrees(self, value):
+        if not isinstance(value, bool):
+            raise ValueError('Expected a boolean value.')
+        self._degrees = self.kwargs['degrees'] = value
+        [setattr(topoobj, 'degrees', value) for topoobj in self]
+        super()._update_measures()
+
+    @property
+    def angles(self):
+        """:class:`~numpy:numpy.ndarray` of \
+            :attr:`~AngularTopology.angle`\ s."""
+        return self.measures
+
+    @property
+    def mean_angle(self):
+        """Mean angle."""
+        return self.mean_measure
+
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        super_dict = super().todict()
+        super_dict.update(dict(degrees=self.degrees))
         return super_dict

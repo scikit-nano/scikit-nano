@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 from pkg_resources import resource_filename
 import unittest
+import warnings
 
 import nose
 from nose.tools import assert_equal, assert_true
@@ -24,10 +25,14 @@ def test1():
 class TrajectoryTestFixture(unittest.TestCase):
 
     def setUp(self):
-        self.dump = \
-            DUMPReader(resource_filename('sknano',
-                                         'data/lammpstrj/0500_29cells.dump'),
-                       attrmap={'c_peratom_pe': 'pe', 'c_peratom_ke': 'ke'})
+        dump = resource_filename('sknano', 'data/lammpstrj/0500_29cells.dump')
+        with warnings.catch_warnings():
+            warnings.simplefilter('always')
+            self.dump = \
+                DUMPReader(dump,
+                           dumpattrmap={'c_peratom_pe': 'pe',
+                                        'c_peratom_ke': 'ke'},
+                           elementmap={1: 'C'})
 
 
 class Tests(TrajectoryTestFixture):
@@ -66,7 +71,7 @@ class Tests(TrajectoryTestFixture):
             atoms = ss.atoms
             # atoms = atoms.filtered((atoms.z <= 20) & (atoms.z >= -20))
             atoms = atoms.select("(z <= 20) and (z >= -20)")
-            atoms.update_attrs()
+            atoms.update_neighbors()
             # atoms = atoms.filtered((atoms.z <= 15) & (atoms.z >= -15))
             atoms = atoms.select("(z <= 15) and (z >= -15)")
             # assert_equal(atoms, selection)

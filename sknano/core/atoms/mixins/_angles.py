@@ -11,12 +11,16 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from collections import namedtuple
+
 from sknano.core.math import vector as vec
 from ._bonds import Bond, Bonds
-from ._topology_base import AtomTopology, AtomsTopology, \
-    check_operands as check_operands_
+from ._topology_base import AngularTopology, AngularTopologyCollection, \
+    TopologyStats, check_operands as check_operands_
 
-__all__ = ['compute_angle', 'Angle', 'Angles']
+__all__ = ['compute_angle', 'Angle', 'Angles', 'AngleStats']
+
+AngleStats = namedtuple('AngleStats', TopologyStats._fields)
 
 
 def compute_angle(*atoms, check_operands=True, degrees=False):
@@ -52,7 +56,7 @@ def compute_angle(*atoms, check_operands=True, degrees=False):
     return vec.angle(b21, b23, degrees=degrees)
 
 
-class Angle(AtomTopology):
+class Angle(AngularTopology):
     """Class representation of bond angle between 3 `Atom` objects.
 
     Parameters
@@ -60,9 +64,11 @@ class Angle(AtomTopology):
     *atoms : {:class:`~python:list`, :class:`~sknano.core.atoms.Atoms`}
         :class:`~python:list` of :class:`~sknano.core.atoms.Atom`\ s
         or an :class:`~sknano.core.atoms.Atoms` object.
-    check_operands : :class:`~python:bool`, optional
+    size : :class:`~python:int`
     parent : Parent :class:`~sknano.core.atoms.Molecule`, if any.
     id : :class:`~python:int`
+    check_operands : :class:`~python:bool`, optional
+    degrees : :class:`~python:bool`, optional
 
     Raises
     ------
@@ -73,10 +79,7 @@ class Angle(AtomTopology):
         if len(atoms) != 3.
     """
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if self.check_operands and len(self.atoms) != 3:
-                raise ValueError('Expected 3 atoms')
+        super().__init__(*args, size=3, **kwargs)
 
         self.fmtstr = "{lneighbor!r}, {center!r}, {rneighbor!r}, " + \
             super().fmtstr
@@ -129,34 +132,6 @@ class Angle(AtomTopology):
             :attr:`~Angle.rneighbor`."""
         return Bond(self.center, self.rneighbor)
 
-    @property
-    def angle(self):
-        """An alias for :attr:`AtomTopology.measure`."""
-        return self.measure
-
-    # @property
-    # def vector(self):
-    #     """:class:`Angle` :class:`~sknano.core.math.Vector`.
-
-    #     :class:`Angle` :class:`~sknano.core.math.Vector` points from
-    #     :attr:`Angle.origin` to :attr:`Angle.end`.
-
-    #     .. note::
-    #        Accounts for periodic boundary conditions if a
-    #        :class:`~sknano.core.crystallography.Crystal3DLattice` is assigned
-    #        to the :attr:`~Angle.atoms`.
-
-    #     """
-    #     try:
-    #         # lattice = self.origin.lattice
-    #         if any(self.pbc):
-    #             lattice = self.atoms.lattice
-    #             dr = lattice.fractional_to_cartesian(
-    #                 lattice.fractional_diff(self.end.rs, self.origin.rs))
-    #     except AttributeError:
-    #         dr = self.end.r - self.origin.r
-    #     return Vector(dr, p0=self.origin.r.p)
-
     def compute_measure(self):
         """Compute the bond angle, which is the measure of an :class:`Angle`.
 
@@ -165,11 +140,12 @@ class Angle(AtomTopology):
         :class:`~python:float`
 
         """
-        return compute_angle(*self.atoms)
+        return compute_angle(*self.atoms, degrees=self.degrees)
 
     @property
     def bond_pairs(self):
-        """`cyclic_pairs` of `Bond`\ s."""
+        """:class:`~python:tuple` of `Angle` \
+            :attr:`Angle.lbond`, :attr:`Angle.rbond`."""
         return (self.lbond, self.rbond)
 
     def todict(self):
@@ -180,14 +156,15 @@ class Angle(AtomTopology):
         return super_dict
 
 
-class Angles(AtomsTopology):
-    """`AtomsTopology` sub-class for collection of atom `Angle`\ s.
+class Angles(AngularTopologyCollection):
+    """`TopologyCollection` sub-class for collection of atom `Angle`\ s.
 
     Parameters
     ----------
     topolist : {None, sequence, `Angles`}, optional
         if not `None`, then a list of `Angle` objects
     parent : Parent :class:`~sknano.core.atoms.Molecule`, if any.
+    degrees : :class:`~python:bool`, optional
 
     """
     @property
@@ -200,16 +177,11 @@ class Angles(AtomsTopology):
         return len(self)
 
     @property
-    def angles(self):
-        """:class:`~numpy:numpy.ndarray` of :attr:`~Angle.angle`\ s."""
-        return self.measures
-
-    @property
-    def mean_angle(self):
-        """Mean bond angle."""
-        return self.mean_measure
-
-    @property
     def bond_pairs(self):
         """:class:`~python:list` of :attr:`Angle.bond_pairs`"""
         return [Bonds(list(angle.bond_pairs)) for angle in self]
+
+    @property
+    def statistics(self):
+        """Angle stats."""
+        return AngleStats(**super().statistics._asdict())

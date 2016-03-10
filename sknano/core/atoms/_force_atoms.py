@@ -23,7 +23,7 @@ __all__ = ['ForceAtom', 'ForceAtoms']
 
 
 class ForceAtom(Atom):
-    """An `Atom` class with force attributes.
+    """An `Atom` sub-class with force attributes.
 
     Parameters
     ----------
@@ -211,6 +211,7 @@ class ForceAtom(Atom):
         super().rotate(**kwargs)
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()
         super_dict.update(dict(fx=self.fx, fy=self.fy, fz=self.fz))
         return super_dict

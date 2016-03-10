@@ -15,14 +15,14 @@ import nose
 from nose.tools import assert_equal, assert_true, assert_false, \
     assert_is_instance
 
-from sknano.core import flatten
+from sknano.core import flatten, rezero_array
 from sknano.core.atoms import Atom, Atoms, BasisAtom, BasisAtoms, \
     StructureAtom, StructureAtoms
 from sknano.core.crystallography import Crystal2DLattice, Crystal3DLattice
-from sknano.core.math import Vectors
+from sknano.core.math import Vector, Vectors, rotation_matrix
 from sknano.core.refdata import element_symbols
 from sknano.io import DATAReader
-from sknano.testing import AtomsTestFixture
+from sknano.testing import AtomsTestFixture, generate_structure
 
 
 class Tests(AtomsTestFixture):
@@ -146,9 +146,9 @@ class Tests(AtomsTestFixture):
 
     def test15(self):
         atom = StructureAtom(element='C')
-        assert_equal(atom.CN, 0)
-        atom.CN = 3
-        assert_equal(atom.CN, 3)
+        assert_equal(atom.q, 0)
+        atom.q = 1
+        assert_equal(atom.q, 1)
 
     def test16(self):
         atoms1 = StructureAtoms()
@@ -177,9 +177,9 @@ class Tests(AtomsTestFixture):
 
     def test19(self):
         atoms = self.atoms
-        atoms.kNN = 6
-        atoms.NNrc = 9.0
-        atoms.update_attrs()
+        atoms.kNN = 9
+        atoms.NNrc = 4.0
+        atoms.update_neighbors()
         atoms = atoms.filtered((atoms.z >= -5) & (atoms.z <= 5))
         for atom in atoms:
             assert_equal(atom.CN, atoms.kNN)
@@ -197,29 +197,36 @@ class Tests(AtomsTestFixture):
 
     def test21(self):
         atoms = self.atoms
-        assert_is_instance(atoms, StructureAtoms)
-        atoms.kNN = 10
-        atoms.NNrc = 5
+        # assert_is_instance(atoms, StructureAtoms)
+        atoms.set_pbc('z')
+        atoms.kNN = 30
+        atoms.NNrc = 1.5
         atoms.update_neighbors(cutoffs=[1.5, 2.0, 3.0])
+        assert_true(all([atom.first_neighbors.Natoms == 3 for atom in atoms]))
+        assert_true(all([atom.second_neighbors.Natoms == 0 for atom in atoms]))
+        assert_true(all([atom.third_neighbors.Natoms == 9 for atom in atoms]))
+        # assert_true(all([atom.get_nth_nearest_neighbors(4).Natoms == 6
+        #                 for atom in atoms]))
+
         # print(atoms.neighbors.tolist())
         # print(atoms.neighbor_distances.tolist())
         # print('first_neighbors:\n{}'.format(atoms.first_neighbors))
         # print('second_neighbors:\n{}'.format(atoms.second_neighbors))
-        print('len(first_neighbors): {}'.format(
-              [len(atom.first_neighbors) for atom in atoms]))
-        print('len(second_neighbors): {}'.format(
-              [len(atom.second_neighbors) for atom in atoms]))
-        print('len(third_neighbors): {}'.format(
-              [len(atom.third_neighbors) for atom in atoms]))
-        print('len(4th_neighbors): {}'.format(
-              [len(atom.get_nth_nearest_neighbors(4)) for atom in atoms]))
+        # print('len(first_neighbors): {}'.format(
+        #       [len(atom.first_neighbors) for atom in atoms]))
+        # print('len(second_neighbors): {}'.format(
+        #       [len(atom.second_neighbors) for atom in atoms]))
+        # print('len(third_neighbors): {}'.format(
+        #       [len(atom.third_neighbors) for atom in atoms]))
+        # print('len(4th_neighbors): {}'.format(
+        #       [len(atom.get_nth_nearest_neighbors(4)) for atom in atoms]))
 
     def test22(self):
         atoms = self.atoms
         atoms.kNN = 3
         atoms.NNrc = 2.0
-        atoms.set_pbc()
-        atoms.update_attrs()
+        atoms.set_pbc('xyz')
+        atoms.update_neighbors()
         for atom in atoms:
             assert_true(np.all(atom.bonds.lengths < 1.5))
             # print('atom: {}, bond.lengths: {}'.format(
@@ -240,7 +247,7 @@ class Tests(AtomsTestFixture):
         assert_true(np.allclose(atoms.coords, atoms.atom_tree.data))
         atoms.kNN = 3
         atoms.NNrc = 2.0
-        atoms.update_attrs()
+        atoms.update_neighbors()
         assert_equal(len(atoms.nearest_neighbors), atoms.Natoms)
         assert_equal(len(atoms.coordination_numbers), atoms.Natoms)
 
@@ -255,15 +262,18 @@ class Tests(AtomsTestFixture):
         atoms = self.atoms
         atoms.kNN = 3
         atoms.NNrc = 2.0
-        atoms.update_attrs()
+        atoms.update_neighbors()
         assert_true(np.allclose(atoms.coordination_numbers,
-                                atoms.count_neighbors(2.0)))
+                                atoms.count_neighbors_in_self(2.0)))
+        # print(np.sum(atoms.count_neighbors_in_self(2.0)))
+        # print(atoms.count_neighbors(atoms.atom_tree, 2.0))
+        # print(atoms.query_pairs(2.0))
 
     def test29(self):
         atoms = self.atoms
         atoms.kNN = 3
         atoms.NNrc = 2.0
-        atoms.update_attrs()
+        atoms.update_neighbors()
         # print(atoms.bonds.lengths)
         # print(atoms.neighbor_distances)
         bond_lengths = [bond.length for atom in atoms for bond in atom.bonds]
@@ -277,7 +287,7 @@ class Tests(AtomsTestFixture):
     def test31(self):
         atoms = self.atoms
         [assert_equal(atoms.get_atom(i),
-                      atoms.get_atom_from_vmd_atom_id(i - 1))
+                      atoms.get_atom_from_vmd_index(i - 1))
          for i in atoms.ids]
 
     def test32(self):
@@ -288,10 +298,9 @@ class Tests(AtomsTestFixture):
 
     def test33(self):
         atoms = self.atoms
-        atoms.compute_POAVs()
-        bonds = list(flatten([atom.bonds for atom in atoms]))
-        assert_equal(len(bonds), atoms.coordination_numbers.sum())
-        # assert_equal(bonds.Nbonds, atoms.coordination_numbers.sum())
+        bonds = atoms.all_bonds
+        atoms.analyze_POAVs()
+        assert_equal(bonds.Nbonds, atoms.coordination_numbers.sum())
         for atom in atoms:
             if atom.bonds.Nbonds > 1:
                 for j, bond in enumerate(atom.bonds):
@@ -302,13 +311,13 @@ class Tests(AtomsTestFixture):
     def test34(self):
         fname = resource_filename('sknano', 'data/nanotubes/0500_5cells.data')
         data_atoms = DATAReader(fname).atoms
-        data_atoms.compute_POAVs()
+        data_atoms.analyze_POAVs()
         atoms = self.atoms
         assert_equal(atoms.Natoms, data_atoms.Natoms)
 
     def test35(self):
         atoms = self.atoms
-        atoms.compute_POAVs()
+        atoms.analyze_POAVs()
         atoms.filter(atoms.coordination_numbers == 3)
         atom = atoms[10]
         assert_equal(atom.bonds.Nbonds, 3)
@@ -333,8 +342,8 @@ class Tests(AtomsTestFixture):
     def test36(self):
         atoms = self.atoms
         # atoms.NNrc = 2.0
-        atoms.set_pbc()
-        atoms.compute_POAVs()
+        atoms.set_pbc('xyz')
+        atoms.analyze_POAVs()
 
         for atom in atoms:
             # print('atom{}: {}'.format(atom.id, atom))
@@ -365,8 +374,18 @@ class Tests(AtomsTestFixture):
                                                    equal_nan=True)))
 
     def test37(self):
-        atoms = self.atoms
-        atoms.sort(key=attrgetter('CN'))
+        atoms = self.graphene.atoms
+        atoms.set_pbc('xy')
+        atoms.kNN = 30
+        atoms.NNrc = 1.5
+        atoms.update_neighbors(cutoffs=[1.5, 2.0, 2.5, 3.0, 4.0, 4.4])
+        assert_true(all([atom.first_neighbors.Natoms == 3 for atom in atoms]))
+        assert_true(all([atom.second_neighbors.Natoms == 0 for atom in atoms]))
+        assert_true(all([atom.third_neighbors.Natoms == 6 for atom in atoms]))
+        assert_true(all([atom.get_nth_nearest_neighbors(4).Natoms == 3
+                        for atom in atoms]))
+        assert_true(all([atom.get_nth_nearest_neighbors(5).Natoms == 6
+                        for atom in atoms]))
 
     def test38(self):
         atoms = self.atoms
@@ -376,77 +395,84 @@ class Tests(AtomsTestFixture):
 
     def test39(self):
         atoms = self.atoms
-        ring_cntr, Rn_cntr = \
-            atoms.analyze_network(cutoff=1.5, maxlength=20,
-                                  retcodes=('ring_counter', 'Rn_counter'))
-        assert_equal(ring_cntr[6], 40)
-        assert_equal(ring_cntr[10], 9)
-        assert_equal(Rn_cntr[0], 10)
-        assert_equal(Rn_cntr[2], 10)
-        assert_equal(Rn_cntr[3], 10)
-        assert_equal(Rn_cntr[4], 70)
+        atoms.set_pbc('xyz')
+        atoms.update_neighbors()
+        atoms.update_neighbor_lists()
+        assert_equal(set(atoms.coordination_numbers), {3})
+        # print(list(zip(atoms.idx, atoms.nn_idx)))
+        # assert_equal(list(zip(atoms.idx, atoms.nn_idx)), atoms.bonds.indices)
 
     def test40(self):
         atoms = self.atoms
-        atoms.set_pbc()
-        atoms.update_attrs()
-        # print(atoms.nn_adjacency_matrix)
-        # print(atoms.nn_adjacency_map)
-        # print(atoms.nn_adjacency_list)
-        ring_cntr, Rn_cntr = \
-            atoms.analyze_network(cutoff=1.5, maxlength=20,
-                                  retcodes=('ring_counter', 'Rn_counter'))
-        # print(rings)
-        assert_equal(ring_cntr[6], 50)
-        assert_equal(ring_cntr[10], 10)
-        assert_true(len(list(ring_cntr)) == 2)
-        assert_true(set(Rn_cntr), {4})
+        atoms.kNN = 3
+        atoms.NNrc = 2.0
+        atoms.update_neighbors()
+        for atom in atoms:
+            assert_true(np.all(atom.bonds.lengths < 1.5))
 
     def test41(self):
-        atoms = self.buckyball
-        bonds = atoms.bonds
-        ring_cntr, Rn_cntr = \
-            atoms.analyze_network(cutoff=1.5, maxlength=20,
-                                  retcodes=('ring_counter', 'Rn_counter'))
-        bonds = atoms.bonds
-        assert_equal(ring_cntr[6], 20)
-        assert_equal(ring_cntr[5], 12)
-        assert_equal(ring_cntr[18], 10)
-        assert_equal(Rn_cntr[6], 60)
-        F = ring_cntr[6] + ring_cntr[5]
-        E = bonds.unique_set.Nbonds
-        V = atoms.Natoms
-        assert_true(V - E + F == 2)
+        atoms = self.atoms
+        atoms.analyze_POAVs()
+        Vpi_vectors, Vpi_vectors_atom_ids = atoms.get_POAV_attr('POAVR', 'Vpi')
+        assert_is_instance(Vpi_vectors, Vectors)
+        assert_is_instance(Vpi_vectors[0], Vector)
+        Vpi_y_components, Vpi_y_components_atom_ids = \
+            atoms.get_POAV_attr('POAVR', 'Vpi.y')
+        assert_is_instance(Vpi_y_components[0], float)
+        assert_equal(len(Vpi_vectors), len(Vpi_y_components))
 
     def test42(self):
         atoms = self.atoms
-        atoms.set_pbc()
-        atoms.update_attrs()
-        atoms.update_neighbor_lists()
-        assert_equal(set(atoms.coordination_numbers), {3})
-        assert_equal(list(zip(atoms.idx, atoms.nn_idx)), atoms.bonds.indices)
-
-    # def test43(self):
-    #     atoms = self.atoms
-    #     atoms.set_pbc()
-    #     atoms.update_attrs()
-    #     G = atoms.graph
-    #     print('Graph: {}'.format(list(G.edges())))
-    #     print('bfs_edges: {}'.format(list(nx.bfs_edges(G, 0))))
-    #     print('len(bfs_edges): {}'.format(len(list(nx.bfs_edges(G, 0)))))
-    #     print('bfs_tree: {}'.format(list(nx.bfs_tree(G, 0))))
-    #     # print('nx.clustering: {}'.format(nx.clustering(G)))
-    #     # print(atoms.nn_adjacency_matrix)
-    #     print('bfs_predecessors: {}'.format(dict(nx.bfs_predecessors(G, 0))))
-    #     print('bfs_successors: {}'.format(dict(nx.bfs_successors(G, 0))))
+        assert_equal(atoms.get_vmd_selection_string('index'),
+                     ' '.join(('index', ' '.join(map(str, atoms.indices)))))
 
     def test43(self):
+        atoms = self.dumpdata1.trajectory[-1].atoms
+        layer4 = atoms.filtered(atoms.mol_ids == 4)
+        assert_equal(layer4.Natoms, (atoms.Natoms - 2) // 10)
+
+    def test44(self):
+        atoms = self.graphene.atoms
+        print(atoms.Natoms)
+        print(atoms.neighbor_cutoffs)
+        atoms.set_pbc('xy')
+        assert_is_instance(atoms, StructureAtoms)
+        atoms.kNN = 12
+        # atoms.NNrc = 5
+        # atoms.update_neighbors(cutoffs=[1.5, 2.0, 3.0])
+        atoms.update_neighbors(cutoffs=[2.0, 3.0])
+        atom30 = atoms.get_atom(30)
+        assert_equal(atom30.first_neighbors.Natoms, 3)
+        print(atom30.first_neighbors.pbc)
+        # assert_true(all(atom30.first_neighbors.pbc))
+        # print(atom30.neighbor_map)
+        print(atom30.second_neighbors.Natoms)
+        print(atom30.neighbor_map['2nd'].Natoms)
+
+    def test45(self):
         atoms = self.atoms
-        atoms.kNN = 3
-        atoms.NNrc = 2.0
-        atoms.update_attrs()
-        for atom in atoms:
-            assert_true(np.all(atom.bonds.lengths < 1.5))
+        atoms.center_com()
+        atoms.rotate(axis='x', angle=np.pi/4)
+        R = rotation_matrix(axis='x', angle=-np.pi/4)
+        print(R)
+        # print(atoms.bounding_box)
+        i = atoms.inertia_tensor
+        print('inertia_tensor:\n{}'.format(i))
+        p = atoms.principal_axes
+        print('principal_axes:\n{}'.format(p))
+        print('principal_axes.T:\n{}'.format(p.T))
+        atoms.rotate(transform_matrix=p.A)
+        print(atoms.inertia_tensor)
+        # print(p[0])
+        # print(p.x)
+        w = atoms.principal_moments_of_inertia
+        print('principal_moments_of_inertia:\n{}'.format(w))
+        W = np.diag(w)
+        print('principal_moments_matrix:\n{}'.format(W))
+        I = rezero_array(np.asmatrix(p.A) * np.asmatrix(i) * np.asmatrix(p.T),
+                         epsilon=1e-10)
+        print('rotated inertia_tensor:\n{}'.format(I))
+
 
 if __name__ == '__main__':
     nose.runmodule()

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Base molecule classes (:mod:`sknano.core.molecules._molecules`)
+Base molecule classes (:mod:`sknano.core.atoms._molecules`)
 ==============================================================================
 
 .. currentmodule:: sknano.core.molecules._molecules
@@ -218,4 +218,5 @@ class Molecules(UserList):
          for molecule in self]
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         return dict(molecules=self.data)

@@ -17,17 +17,21 @@ import numpy as np
 
 import sknano.core.atoms
 
+from .mixins import Bond, Bonds
 from ._energy_atoms import EnergyAtom, EnergyAtoms
 from ._force_atoms import ForceAtom, ForceAtoms
 from ._velocity_atoms import VelocityAtom, VelocityAtoms
 from ._structure_atoms import StructureAtom, StructureAtoms
-from ._bonds import Bond, Bonds
 
 __all__ = ['MDAtom', 'MDAtoms']
 
 
-class MDAtom(StructureAtom, VelocityAtom, ForceAtom, EnergyAtom):
-    """An `Atom` class for molecular dynamics trajectory analysis.
+class MDAtom(EnergyAtom, ForceAtom, VelocityAtom, StructureAtom):
+    """An `Atom` sub-class for molecular dynamics trajectory analysis.
+
+    Parameters
+    ----------
+    reference_atom : :class:`Atom` sub-class
 
     """
     def __init__(self, *args, reference_atom=None, **kwargs):
@@ -41,6 +45,7 @@ class MDAtom(StructureAtom, VelocityAtom, ForceAtom, EnergyAtom):
 
     @property
     def reference_atom(self):
+        """Reference atom."""
         return self._reference_atom
 
     @reference_atom.setter
@@ -54,6 +59,7 @@ class MDAtom(StructureAtom, VelocityAtom, ForceAtom, EnergyAtom):
 
     @property
     def reference_atom_neighbors(self):
+        """:attr:`~MDAtom.reference_atom` neighbor atoms."""
         atoms = []
         neighbors = self.neighbors
         try:
@@ -79,13 +85,14 @@ class MDAtom(StructureAtom, VelocityAtom, ForceAtom, EnergyAtom):
             return Bonds()
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()
         super_dict.update(dict(reference_atom=self.reference_atom,
                                neighbors=self.neighbors))
         return super_dict
 
 
-class MDAtoms(StructureAtoms, VelocityAtoms, ForceAtoms, EnergyAtoms):
+class MDAtoms(EnergyAtoms, ForceAtoms, VelocityAtoms, StructureAtoms):
     """An `Atoms` sub-class for molecular dynamics trajectory analysis.
 
     Sub-class of :class:`~sknano.core.atoms.StructureAtoms` class,

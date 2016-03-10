@@ -11,13 +11,17 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from collections import namedtuple
+
 import numpy as np
 
 from sknano.core.math import Vector
-from ._topology_base import AtomTopology, AtomsTopology, \
+from ._topology_base import Topology, TopologyCollection, TopologyStats, \
     check_operands as check_operands_
 
-__all__ = ['compute_bond', 'Bond', 'Bonds']
+__all__ = ['compute_bond', 'Bond', 'Bonds', 'BondStats']
+
+BondStats = namedtuple('BondStats', TopologyStats._fields)
 
 
 def compute_bond(*atoms, check_operands=True, degrees=False):
@@ -51,7 +55,7 @@ def compute_bond(*atoms, check_operands=True, degrees=False):
     return bvec.length
 
 
-class Bond(AtomTopology):
+class Bond(Topology):
     """Class representation of bond between 2 `Atom` objects.
 
     Parameters
@@ -68,10 +72,7 @@ class Bond(AtomTopology):
     """
 
     def __init__(self, *args, order=None, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if self.check_operands and len(self.atoms) != 2:
-            raise ValueError('Expected 2 atoms')
+        super().__init__(*args, size=2, **kwargs)
 
         self.order = order
         self.visited = False
@@ -138,8 +139,13 @@ class Bond(AtomTopology):
         return self.vector.unit_vector
 
     @property
+    def bond(self):
+        """An alias for :attr:`TopologyCollection.measure`."""
+        return self.measure
+
+    @property
     def length(self):
-        """An alias for :attr:`AtomsTopology.measure`."""
+        """An alias for :attr:`TopologyCollection.measure`."""
         return self.measure
 
     def compute_measure(self):
@@ -166,7 +172,7 @@ class Bond(AtomTopology):
         return super_dict
 
 
-class Bonds(AtomsTopology):
+class Bonds(TopologyCollection):
     """Base class for collection of atom `Bond`\ s.
 
     Parameters
@@ -186,14 +192,24 @@ class Bonds(AtomsTopology):
         return len(self)
 
     @property
-    def lengths(self):
-        """:class:`~numpy:numpy.ndarray` of :attr:`~Bond.length`\ s."""
+    def bonds(self):
+        """:class:`~numpy:numpy.ndarray` of :attr:`~Bond.bond`\ s."""
         return self.measures
 
     @property
-    def mean_length(self):
+    def lengths(self):
+        """An alias for :attr:`Bonds.bonds`."""
+        return self.measures
+
+    @property
+    def mean_bond(self):
         """Mean bond length."""
         return self.mean_measure
+
+    @property
+    def mean_length(self):
+        """An alias for :attr:`Bonds.mean_bond`."""
+        return self.mean_bond
 
     @property
     def vectors(self):
@@ -204,3 +220,8 @@ class Bonds(AtomsTopology):
     def unit_vectors(self):
         """:class:`~numpy:numpy.ndarray` of :attr:`~Bond.unit_vector`\ s."""
         return np.asarray([bond.unit_vector for bond in self])
+
+    @property
+    def statistics(self):
+        """Bond stats."""
+        return BondStats(**super().statistics._asdict())

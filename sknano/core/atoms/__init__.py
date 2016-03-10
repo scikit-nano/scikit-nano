@@ -71,14 +71,6 @@ Composite `Atom`/`Atoms` classes
    StructureAtom
    StructureAtoms
 
-`Bond`/`Bonds` classes
-----------------------
-.. autosummary::
-   :toctree: generated/
-
-   Bond
-   Bonds
-
 Classes for molecular dynamics simulations
 ------------------------------------------
 .. autosummary::
@@ -93,8 +85,8 @@ Helper functions for atom objects
 .. autosummary::
    :toctree: generated/
 
-   get_angle
-   get_dihedral
+   compute_angle
+   compute_dihedral
    vdw_radius_from_basis
 
 """
@@ -115,7 +107,6 @@ from ._type_atoms import *
 from ._lattice_atoms import *
 from ._dipole_atoms import *
 from ._basis_atoms import *
-from ._bonds import *
 from ._md_atoms import *
 from ._trajectory import *
 from ._structure_atoms import *

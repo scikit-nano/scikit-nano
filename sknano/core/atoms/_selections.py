@@ -19,16 +19,17 @@ import numpy as np
 
 # from abc import abstractmethod
 
-from pyparsing import Forward, Word, Suppress, Optional, CaselessKeyword, \
-    Keyword, OneOrMore, ParseException, delimitedList, infixNotation, \
-    alphas, oneOf, opAssoc
+from pyparsing import CaselessKeyword, Forward, Keyword, OneOrMore, Optional, \
+    ParseException, Suppress, Word, alphas, delimitedList, infixNotation, \
+    oneOf, opAssoc
 
-from sknano.core import BaseClass, binary_operator, integer, \
-    number, kwargs_expr
+from sknano.core import BaseClass, binary_operator, integer, kwargs_expr, \
+    number
 # from sknano.core.geometric_regions import Sphere
 # from ._md_atoms import MDAtom as Atom, MDAtoms as Atoms
 
-__all__ = ['SelectionException', 'SelectionParser']
+__all__ = ['SelectionException', 'SelectionParser',
+           'generate_vmd_selection_string']
 
 
 def make_selection(cls):
@@ -60,6 +61,7 @@ class Selection(BaseClass):
 
 
 class SelectionException(ParseException):
+    """Custom :class:`Exception` class for :class:`Selection`\ s."""
     pass
 
 
@@ -124,6 +126,15 @@ class IDSelection(Selection):
 
     def apply(self, atoms, as_mask=False):
         mask = np.in1d(atoms.ids, self.selection.asList()).nonzero()[0]
+        if as_mask:
+            return mask
+        return super().apply(atoms, mask)
+
+
+class MolIDSelection(Selection):
+
+    def apply(self, atoms, as_mask=False):
+        mask = np.in1d(atoms.mol_ids, self.selection.asList()).nonzero()[0]
         if as_mask:
             return mask
         return super().apply(atoms, mask)
@@ -196,6 +207,7 @@ class SelectionParser(BaseClass):
     TYPE = CaselessKeyword('type')
     INDEX = CaselessKeyword('index')
     ID = CaselessKeyword('id')
+    MOLID = CaselessKeyword('molid') | CaselessKeyword('mol')
     WITHIN = CaselessKeyword('within')
     EXWITHIN = CaselessKeyword('exwithin')
     SERIAL = CaselessKeyword('serial')
@@ -250,6 +262,10 @@ class SelectionParser(BaseClass):
         (Suppress(ID) + delimitedList(OneOrMore(integer), delim=' ')
          ).setParseAction(IDSelection)
 
+    molid_selection_expression = \
+        (Suppress(MOLID) + delimitedList(OneOrMore(integer), delim=' ')
+         ).setParseAction(MolIDSelection)
+
     type_selection_expression = \
         (Suppress(TYPE) + delimitedList(OneOrMore(integer), delim=' ')
          ).setParseAction(TypeSelection)
@@ -267,8 +283,9 @@ class SelectionParser(BaseClass):
     expr_term << \
         (all_selection_expression | none_selection_expression |
          attr_selection_expression | id_selection_expression |
-         type_selection_expression | within_selection_expression |
-         exwithin_selection_expression | grouped_expr)
+         molid_selection_expression | type_selection_expression |
+         within_selection_expression | exwithin_selection_expression |
+         grouped_expr)
 
     selection_expression = expr.copy()
 
@@ -282,6 +299,7 @@ class SelectionParser(BaseClass):
         #     self.parse(selstr)
 
     def parse(self, selstr=None, **kwargs):
+        """Parse `selstr`."""
         if selstr is None and self.selstr is not None:
             selstr = self.selstr
 
@@ -298,3 +316,8 @@ class SelectionParser(BaseClass):
 
     def todict(self):
         return dict(atoms=self.atoms, selstr=self.selstr)
+
+
+def generate_vmd_selection_string(keyword, iterable):
+    """Generate a VMD `keyword` selection string from iterable."""
+    return ' '.join((keyword, ' '.join(map(str, iterable))))

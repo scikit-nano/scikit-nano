@@ -14,7 +14,7 @@ __docformat__ = 'restructuredtext en'
 from operator import attrgetter
 import numbers
 
-import numpy as np
+# import numpy as np
 
 from sknano.core.math import Vector, Vectors
 from ._atoms import Atom, Atoms
@@ -23,7 +23,7 @@ __all__ = ['DipoleAtom', 'DipoleAtoms']
 
 
 class DipoleAtom(Atom):
-    """An `Atom` class with electric dipole moment attributes.
+    """An `Atom` sub-class with electric dipole moment attributes.
 
     Parameters
     ----------
@@ -200,6 +200,7 @@ class DipoleAtom(Atom):
         super().rotate(**kwargs)
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()
         super_dict.update(dict(px=self.px, py=self.py, pz=self.pz))
         return super_dict

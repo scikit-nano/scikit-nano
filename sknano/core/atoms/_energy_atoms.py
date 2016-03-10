@@ -160,16 +160,31 @@ class EnergyAtoms(Atoms):
         super().sort(key=key, reverse=reverse)
 
     @property
-    def kinetic_energies(self):
+    def ke(self):
         """:class:`~numpy:numpy.ndarray` of `EnergyAtom.ke`."""
         return np.asarray([atom.ke for atom in self])
 
     @property
-    def potential_energies(self):
+    def pe(self):
         """:class:`~numpy:numpy.ndarray` of `EnergyAtom.pe`."""
         return np.asarray([atom.pe for atom in self])
 
     @property
-    def total_energies(self):
+    def etotal(self):
         """:class:`~numpy:numpy.ndarray` of `EnergyAtom.etotal`."""
         return np.asarray([atom.etotal for atom in self])
+
+    @property
+    def kinetic_energies(self):
+        """An alias for :attr:`EnergyAtoms.ke`."""
+        return self.ke
+
+    @property
+    def potential_energies(self):
+        """An alias for :attr:`EnergyAtoms.pe`."""
+        return self.pe
+
+    @property
+    def total_energies(self):
+        """An alias for :attr:`EnergyAtoms.etotal`."""
+        return self.etotal

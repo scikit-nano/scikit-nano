@@ -23,7 +23,7 @@ __all__ = ['VelocityAtom', 'VelocityAtoms']
 
 
 class VelocityAtom(Atom):
-    """An `Atom` class with velocity component attributes.
+    """An `Atom` sub-class with velocity component attributes.
 
     Parameters
     ----------
@@ -207,6 +207,7 @@ class VelocityAtom(Atom):
         super().rotate(**kwargs)
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()
         super_dict.update(dict(vx=self.vx, vy=self.vy, vz=self.vz))
         return super_dict

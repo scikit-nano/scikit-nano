@@ -30,17 +30,17 @@ from .mixins import AtomAdapterMixin, AtomsAdapterMixin, \
 __all__ = ['StructureAtom', 'StructureAtoms']
 
 
-class StructureAtom(AtomAdapterMixin, POAVAtomMixin, RingAtomMixin,
-                    AtomTopologyMixin, NeighborAtom, ImageAtom, LatticeAtom,
+class StructureAtom(AtomAdapterMixin, AtomTopologyMixin, POAVAtomMixin,
+                    RingAtomMixin, NeighborAtom, ImageAtom, LatticeAtom,
                     XYZAtom, ChargedAtom, TypeAtom, IDAtom):
-    """An `Atom` class for structure analysis."""
+    """An :class:`Atom` class for structure analysis."""
     pass
 
 
-class StructureAtoms(AtomsAdapterMixin, POAVAtomsMixin, RingAtomsMixin,
-                     AtomsTopologyMixin, NeighborAtoms, ImageAtoms,
-                     LatticeAtoms, XYZAtoms, ChargedAtoms, TypeAtoms, IDAtoms):
-    """An `Atoms` sub-class for structure analysis."""
+class StructureAtoms(AtomsAdapterMixin, AtomsTopologyMixin, POAVAtomsMixin,
+                     RingAtomsMixin, NeighborAtoms, ImageAtoms, LatticeAtoms,
+                     XYZAtoms, ChargedAtoms, TypeAtoms, IDAtoms):
+    """An :class:`Atoms` sub-class for structure analysis."""
 
     @property
     def __atom_class__(self):

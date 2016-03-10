@@ -18,12 +18,12 @@ __all__ = ['BasisAtom', 'BasisAtoms']
 
 
 class BasisAtom(LatticeAtom, XYZAtom):
-    """An abstract object representation of a crystal structure basis atom.
+    """An `Atom` sub-class for a crystal structure basis atom.
 
     Parameters
     ----------
     lattice : :class:`~sknano.core.crystallography.Crystal3DLattice`
-    xs, ys, zs : float
+    xs, ys, zs : :class:`~python:float`
     """
     pass
 

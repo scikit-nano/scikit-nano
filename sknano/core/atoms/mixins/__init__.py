@@ -35,8 +35,8 @@ Atomic network topology classes
 .. autosummary::
    :toctree: generated/
 
-   AtomTopologyBase
-   AtomsTopologyBase
+   Topology
+   TopologyCollection
    Angle
    Angles
    Bond
@@ -60,7 +60,7 @@ from ._kdtree_atoms import *
 from ._poav_atoms import *
 from ._periodic_atoms import *
 from ._ring_atoms import *
-from ._topology import *
 from ._topology_base import *
+from ._topology import AtomTopologyMixin, AtomsTopologyMixin
 
 __all__ = [s for s in dir() if not s.startswith('_')]

@@ -26,12 +26,13 @@ __all__ = ['LatticeAtom', 'LatticeAtoms']
 
 
 class LatticeAtom(Atom):
-    """Class representation of a crystal structure lattice atom.
+    """An `Atom` sub-class with crystal lattice attributes.
 
     Parameters
     ----------
     lattice : :class:`~sknano.core.crystallography.Crystal3DLattice`
-    xs, ys, zs : float
+    xs, ys, zs : :class:`~python:float`
+
     """
 
     def __init__(self, *args, lattice=None, xs=None, ys=None, zs=None,
@@ -275,13 +276,14 @@ class LatticeAtom(Atom):
             pass
         super().rotate(**kwargs)
 
-    def translate(self, t, fix_anchor_point=True):
+    def translate(self, t, fix_anchor_point=True, cartesian=True):
         """Translate :class:`Atom` position vector by :class:`Vector` `t`.
 
         Parameters
         ----------
         t : :class:`Vector`
-        fix_anchor_point : bool, optional
+        fix_anchor_point : :class:`~python:bool`, optional
+        cartesian : :class:`~python:bool`, optional
 
         """
         if not fix_anchor_point:
@@ -289,9 +291,13 @@ class LatticeAtom(Atom):
                 self.lattice.translate(t)
             except AttributeError:
                 pass
+
+        if not cartesian:
+            t = self.lattice.fractional_to_cartesian(t)
         super().translate(t, fix_anchor_point=fix_anchor_point)
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()
         super_dict.update(dict(lattice=self.lattice, xs=self.xs, ys=self.ys,
                                zs=self.zs))
