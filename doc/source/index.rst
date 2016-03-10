@@ -25,6 +25,9 @@ scikit-nano |version| docs
    contribute.rst
    credits.rst
 
+.. toctree::
+   :maxdepth: 1
+
    release.rst
 
 
