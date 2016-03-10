@@ -157,7 +157,7 @@ def deprecated(since, message='', name='', alternative='', pending=False,
         specifier `%(func)s` may be used for the name of the function,
         and `%(alternative)s` may be used in the deprecation message
         to insert the name of an alternative to the deprecated
-        function.  `%(obj_type)` may be used to insert a friendly name
+        function.  `%(obj_type)s` may be used to insert a friendly name
         for the type of object being deprecated.
 
     name : str, optional
@@ -183,11 +183,11 @@ def deprecated(since, message='', name='', alternative='', pending=False,
     Examples
     --------
 
-        Basic example::
+    Basic example::
 
-            @deprecated('1.4.0')
-            def the_function_to_deprecate():
-                pass
+        @deprecated('1.4.0')
+        def the_function_to_deprecate():
+            pass
 
     """
     def decorated(func, message=message, name=name, alternative=alternative,
@@ -248,7 +248,7 @@ def get_object_signature(obj):
 
 
 def memoize(f, cache={}):
-    """memoization function to cache dict mapping"""
+    """Memoization function to cache dict mapping"""
     @wraps(f)
     def g(*args, **kwargs):
         key = (f, tuple(args), frozenset(list(kwargs.items())))
