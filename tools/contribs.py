@@ -15,24 +15,28 @@ tag = sys.argv[1]
 if not sys.version_info[:2] == (2, 6):
 
     def call(cmd):
-        return subprocess.check_output(shlex.split(cmd), universal_newlines=True).split('\n')
+        return subprocess.check_output(shlex.split(cmd),
+                                       universal_newlines=True).split('\n')
 
-    tag_date = call("git show --format='%%ci' %s" % tag)[0]
-    print("Release %s was on %s\n" % (tag, tag_date))
+    tag_date = call("git log --pretty='format:%ci' {}".format(tag))[0]
+    # print('tag_date: {}'.format(tag_date))
 
-    merges = call("git log --since='%s' --merges --format='>>>%%B' --reverse" % tag_date)
+    print("Release {} was on {}\n".format(tag, tag_date))
+
+    merges = \
+        call("git log --since='{}' --merges --format='>>>%%B' --reverse".format(tag_date))
     merges = [m for m in merges if m.strip()]
     merges = '\n'.join(merges).split('>>>')
     merges = [m.split('\n')[:2] for m in merges]
     merges = [m for m in merges if len(m) == 2 and m[1].strip()]
 
-    num_commits = call("git rev-list %s..HEAD --count" % tag)[0]
-    print("A total of %s changes have been committed.\n" % num_commits)
+    num_commits = call("git rev-list {}..HEAD --count".format(tag))[0]
+    print("A total of {} changes have been committed.\n".format(num_commits))
 
-    print("It contained the following %d merges:\n" % len(merges))
+    print("It contained the following {:d} merges:\n".format(len(merges)))
     for (merge, message) in merges:
         if merge.startswith('Merge pull request #'):
-            PR = ' (%s)' % merge.split()[3]
+            PR = ' ({})'.format(merge.split())[3]
         else:
             PR = ''
 
@@ -40,7 +44,7 @@ if not sys.version_info[:2] == (2, 6):
 
     print("\nMade by the following committers [alphabetical by last name]:\n")
 
-    authors = call("git log --since='%s' --format=%%aN" % tag_date)
+    authors = call("git log --since='{}' --format=%aN".format(tag_date))
     authors = [a.strip() for a in authors if a.strip()]
 
     def key(author):
