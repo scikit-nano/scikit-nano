@@ -4,4 +4,4 @@
    :hidden:
 
    utils.analysis.rst
-   utils.symmetry_groups.rst
+   utils.symmetry.rst
