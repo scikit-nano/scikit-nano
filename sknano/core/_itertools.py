@@ -196,7 +196,7 @@ def dotproduct(vec1, vec2):
 
 
 def flatten(items, ignore_types=(str, bytes)):
-    """Yields single sequence of values with no nesting [PythonCookbook]_.
+    """Yields single sequence of values with no nesting :ref:`[PythonCookbook]`
 
     Parameters
     ----------

@@ -311,7 +311,7 @@ class NeighborAtoms(KDTreeAtomsMixin, Atoms):
 
     @property
     def coordination_numbers(self):
-        """:class:`~numpy:numpy.ndarray` of :attr:`CNAtom.CN`\ s."""
+        """:class:`~numpy:numpy.ndarray` of :attr:`NeighborAtom.CN`\ s."""
         return np.asarray([atom.CN for atom in self])
 
     @property
@@ -322,19 +322,19 @@ class NeighborAtoms(KDTreeAtomsMixin, Atoms):
         -------
         :class:`~python:collections.Counter`
             :class:`~python:collections.Counter` of
-            :attr:`~CNAtoms.coordination_numbers`.
+            :attr:`~NeighborAtoms.coordination_numbers`.
 
         """
         return Counter(self.coordination_numbers)
 
     @property
     def coordination_counts(self):
-        """Alias for :attr:`~CNAtoms.coordination_number_counts`."""
+        """Alias for :attr:`~NeighborAtoms.coordination_number_counts`."""
         return self.coordination_number_counts
 
     @property
     def CN_counts(self):
-        """Alias for :attr:`~CNAtoms.coordination_number_counts`."""
+        """Alias for :attr:`~NeighborAtoms.coordination_number_counts`."""
         return self.coordination_number_counts
 
     @property

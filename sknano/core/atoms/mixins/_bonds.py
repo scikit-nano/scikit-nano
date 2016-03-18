@@ -119,7 +119,7 @@ class Bond(Topology):
         .. note::
            Accounts for periodic boundary conditions if a
            :class:`~sknano.core.crystallography.Crystal3DLattice` is assigned
-           to the :attr:`~Bond.atoms`.
+           to the :attr:`~Topology.atoms`.
 
         """
         try:

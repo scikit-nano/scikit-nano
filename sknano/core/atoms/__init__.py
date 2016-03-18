@@ -86,7 +86,9 @@ Helper functions for atom objects
    :toctree: generated/
 
    compute_angle
+   compute_bond
    compute_dihedral
+   compute_improper
    vdw_radius_from_basis
 
 """

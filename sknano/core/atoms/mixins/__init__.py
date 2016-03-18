@@ -37,6 +37,8 @@ Atomic network topology classes
 
    Topology
    TopologyCollection
+   AngularTopology
+   AngularTopologyCollection
    Angle
    Angles
    Bond

@@ -17,7 +17,6 @@ See the specific class doc pages below for detailed documentation on its use.
 
 Base/Mixin Classes
 ------------------
-
 .. autosummary::
    :toctree: generated/
 
@@ -40,14 +39,14 @@ Crystal structure classes
 
    Crystal2DStructure
    Crystal3DStructure
+   CubicStructure
    CaesiumChlorideStructure
    CsClStructure
    DiamondStructure
    RocksaltStructure
    NaClStructure
-   SphaleriteStructure
    ZincblendeStructure
-   CubicStructure
+   SphaleriteStructure
    BCCStructure
    FCCStructure
    CubicClosePackedStructure
@@ -74,7 +73,6 @@ Nanostructure Classes
 
 Composite structure classes
 ----------------------------
-
 .. autosummary::
    :toctree: generated/
 

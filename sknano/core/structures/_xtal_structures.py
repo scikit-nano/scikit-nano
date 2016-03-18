@@ -351,7 +351,7 @@ class DiamondStructure(CubicStructure):
 
 
 class RocksaltStructure(CubicStructure):
-    """Abstract representation of caesium chloride structure."""
+    """Abstract representation of rock salt structure."""
     def __init__(self, lattice=None, basis=['Na', 'Cl'], **kwargs):
         if lattice is None:
             lattice = self.get_lattice(name='rocksalt', centering='FCC',
@@ -369,7 +369,7 @@ NaClStructure = RockSaltStructure = RocksaltStructure
 
 
 class ZincblendeStructure(CubicStructure):
-    """Abstract representation of caesium chloride structure."""
+    """Abstract representation of zinc blende structure."""
     def __init__(self, lattice=None, basis=['Zn', 'S'], **kwargs):
         if lattice is None:
             lattice = self.get_lattice(name='zincblende', centering='FCC',
@@ -559,6 +559,7 @@ class AlphaQuartz(HexagonalStructure):
 
 
 class BetaQuartz(HexagonalStructure):
+    """Beta quartz structure class."""
     def __init__(self, lattice=None, **kwargs):
         if lattice is None:
             lattice = self.get_lattice(name='beta_quartz', **kwargs)
