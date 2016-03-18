@@ -23,12 +23,12 @@ from ._bonds import Bond, Bonds, compute_bond
 from ._dihedrals import Dihedral, Dihedrals, compute_dihedral
 from ._impropers import Improper, Impropers, compute_improper
 
-__all__ = ['AtomTopologyMixin', 'AtomsTopologyMixin', 'TopologyStats']
+__all__ = ['AtomTopologyMixin', 'AtomsTopologyMixin', 'AtomsTopologyStats']
 
 operand_error_msg = 'Expected an `iterable` object containing {}'
 ids_operand_error_msg = operand_error_msg.format('`ints`')
-TopologyStats = namedtuple('TopologyStats',
-                           ('angles', 'bonds', 'dihedrals', 'impropers'))
+AtomsTopologyStats = namedtuple('AtomsTopologyStats',
+                                ('angles', 'bonds', 'dihedrals', 'impropers'))
 
 
 class AtomTopologyMixin:
@@ -226,7 +226,7 @@ class AtomsTopologyMixin:
         topostats['dihedrals'] = self.dihedrals.statistics
         # topostats['impropers'] = self.impropers.statistics
         topostats['impropers'] = None
-        return TopologyStats(**topostats)
+        return AtomsTopologyStats(**topostats)
 
     def get_angle(self, *triplet, check_operands=True, degrees=False):
         """Compute bond angles.
