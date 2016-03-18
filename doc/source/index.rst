@@ -5,9 +5,27 @@ scikit-nano |version| docs
 :Release: |release|
 :Date: |today|
 
-.. include:: ../../README.rst
-   :start-line: 10
-   :end-line: 12
+:tocdepth: 2
+
+.. |logo_svg| image:: _static/scikit-nano_banner.svg
+
+.. |logo_png| image:: _static/scikit-nano_banner_96.png
+
+.. raw:: html
+
+   <img src="_images/scikit-nano_banner.svg" onerror="this.src='_images/scikit-nano_banner_96.png'; this.onerror=null;" width="485"/>
+
+.. only:: latex
+
+    .. image:: _static/scikit-nano_logo.pdf
+
+Welcome to the scikit-nano documentation! scikit-nano is a Python package
+intended for nanoscience.
+
+.. _user-docs:
+
+User Documentation
+==================
 
 .. toctree::
    :maxdepth: 1
@@ -23,7 +41,6 @@ scikit-nano |version| docs
    :maxdepth: 1
 
    contribute.rst
-   credits.rst
 
 .. toctree::
    :maxdepth: 1
@@ -33,9 +50,8 @@ scikit-nano |version| docs
 
 .. _reference:
 
-=========
-Reference
-=========
+API Reference
+=============
 
 .. toctree::
    :maxdepth: 1
@@ -48,6 +64,8 @@ Reference
    testing.rst
    utils.rst
 
+Indices and Tables
+==================
 
 * :ref:`genindex`
 * :ref:`modindex`

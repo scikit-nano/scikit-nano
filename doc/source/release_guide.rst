@@ -6,7 +6,32 @@ How to make a new release of `scikit-nano`
 
 A guide for developers for making a new release.
 
-* Edit :file:`setup.py` and change `ISRELEASED` to `True`.
+For purposes of this example, we'll assume we're working
+on the development branch `dev`, with current version number
+`0.X.Y.dev`. After merging our shiny new `feature` branch code
+into `dev` and checking that all unit tests are
+passing, we're ready to create a new stable release
+with version number `0.X.Y`. This is my current workflow:
+
+1. Update release notes.
+
+  * Review and cleanup :file:`doc/release/dev-notes.rst`
+  * Update the list of contributors by running
+    :mod:`tools/contributors.py <tag-of-previous-release>`.
+  * Rename :file:`doc/release/dev-notes.rst` to
+    :file:`doc/release/X.X.X-notes.rst`, where
+    `X.X.X` is the new release version.
+  * Copy :file:`doc/release/X.X.X-template.rst` to
+    :file:`doc/release/dev-notes.rst` for the next release.
+  * Edit :file:`setup.py` and change `ISRELEASED` to `True`.
+  * Save and commit these changes with a commit message to
+    the effect of 'updating setup for release of version 0.X.Y'.
+
+2. Merge changes into master branch.
+
+  *
+
+*
 
 .. _release-testing:
 

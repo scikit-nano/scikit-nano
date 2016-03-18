@@ -6,13 +6,11 @@ scikit-nano 0.2.0 Release Notes
 
 **Release date:** (December 11, 2013)
 
-Introducing **scikit-nano**!
+Introducing **scikit-nano**, a Python toolkit for nanoscience.
 
-scikit-nano 0.2.0 is the first public release. This python package
-is the culmination of code from a side project teaching myself about
-the physical properties of nanotubes.
+scikit-nano 0.2.0 is the first public release.
 
 Contributors to this release
-=============================
+============================
 
 - Andrew Merrill

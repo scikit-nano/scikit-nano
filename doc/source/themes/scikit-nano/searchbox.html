@@ -1,13 +1,7 @@
-{%- if theme_edit_link -%}
-{% block edit_link %}
-{%- if sourcename %}
-<div class="this-page-menu">
-{%- if 'generated/' in sourcename %}
-  <a href="/scikit-nano/docs/{{ sourcename.replace('generated/', '').replace('.txt', '') |e }}">{{_('Edit page')}}</a>
-{%- else %}
-  <a href="/scikit-nano/docs/scikit-nano-docs/{{ sourcename.replace('.txt', '.rst') |e }}">{{_('Edit page')}}</a>
+{%- if pagename != "search" %}
+<form action="{{ pathto('search') }}" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
 {%- endif %}
-</div>
-{%- endif %}
-{% endblock %}
-{%- endif -%}

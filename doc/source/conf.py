@@ -48,7 +48,7 @@ extensions = ['sphinx.ext.autodoc',
               'IPython.sphinxext.ipython_console_highlighting',
               'IPython.sphinxext.ipython_directive',
               'numpydoc',
-              'sphinxarg.ext']
+              'sphinxarg.ext', 'edit_on_github']
 
 # Show todo items
 todo_include_todos = True
@@ -86,7 +86,7 @@ copyright = '2016, Andrew Merrill'
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
 import sknano
-version = re.sub(r'\.dev-.*$', r'.dev', sknano.__version__)
+version = re.sub(r'\.dev0[-+].*$', r'.dev', sknano.__version__)
 release = sknano.__version__
 
 print("scikit-nano (VERSION {})".format(version))
@@ -148,14 +148,14 @@ html_theme = 'scikit-nano'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-# html_theme_options = {}
-html_theme_options = {
-    "edit_link": False,
-    "sidebar": "left",
-    "scikit_nano_logo": False,
-    "rootlinks":
-    [("https://github.com/scikit-nano/scikit-nano", "scikit-nano"),
-     ("https://scikit-nano.org/doc", "Docs")]}
+html_theme_options = {}
+# html_theme_options = {
+#     "edit_link": False,
+#     "sidebar": "left",
+#     "scikit_nano_logo": False,
+#     "rootlinks":
+#     [("https://github.com/scikit-nano/scikit-nano", "scikit-nano"),
+#      ("https://scikit-nano.org/doc", "Docs")]}
 
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = ['themes']
@@ -181,7 +181,14 @@ html_favicon = '_static/favicon.ico'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 
-html_sidebars = {'index': 'indexsidebar.html'}
+html_sidebars = {
+    '**': ['localtoc.html'],
+    'search': [],
+    'genindex': [],
+    'py-modindex': [],
+}
+
+# html_sidebars = {'index': 'indexsidebar.html'}
 
 html_static_path = ['_static']
 
@@ -425,6 +432,24 @@ if not use_matplotlib_plot_directive:
 # -----------------------------------------------------------------------------
 # Source code links
 # -----------------------------------------------------------------------------
+
+# -- Options for the edit_on_github extension ----------------------------------------
+
+# Don't import the module as "version" or it will override the
+# "version" configuration parameter
+from sknano import version as versionmod
+edit_on_github_project = "scikit-nano/scikit-nano"
+if versionmod.release:
+    edit_on_github_branch = "v{0}.{1}.x".format(
+        versionmod.major, versionmod.minor)
+else:
+    edit_on_github_branch = "master"
+edit_on_github_source_root = ""
+edit_on_github_doc_root = "doc"
+
+edit_on_github_skip_regex = '_.*|api/.*'
+
+github_issues_url = 'https://github.com/scikit-nano/scikit-nano/issues/'
 
 import inspect
 from os.path import relpath, dirname
