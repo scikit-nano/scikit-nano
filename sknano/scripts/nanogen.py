@@ -252,6 +252,18 @@ def nanogen_parser():
                                       help='van der Waals '
                                       'radius of nanotube atoms '
                                       '(default: %(default)s)')
+    bundle_parent_parser.add_argument('--bundle-packing',
+                                      choices=('hcp', 'ccp'),
+                                      default=None,
+                                      help='Packing arrangement of nanotube '
+                                      'bundles. (default: %(default)s)')
+    bundle_parent_parser.add_argument('--bundle-geometry',
+                                      choices=('hexagon', 'square',
+                                               'rectangle', 'triangle'),
+                                      default=None,
+                                      help='Force a specific geometry on the '
+                                      'nanotube bundle boundaries '
+                                      '(default: %(default)s)')
 
     swnt_parser = \
         subparsers.add_parser('swnt', parents=[nanostructure_parent_parser,
