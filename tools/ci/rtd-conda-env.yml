@@ -1,0 +1,13 @@
+name: scikit-nano
+
+channels:
+  - r
+  - defaults
+
+dependencies:
+  - numpy
+  - scipy
+  - cython
+  - ipython
+  - matplotlib
+  - pandas

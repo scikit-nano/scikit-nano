@@ -1,0 +1,10 @@
+requirements_file: tools/ci/rtd-pip-requirements.txt
+
+conda:
+  file: tools/ci/rtd-conda-env.yml
+
+python:
+  setup_py_install: true
+
+formats:
+  - pdf
