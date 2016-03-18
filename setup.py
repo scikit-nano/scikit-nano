@@ -93,7 +93,10 @@ if STABLEVERSION is None:
     if ISRELEASED:
         STABLEVERSION = VERSION
     else:
-        STABLEVERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO - 1)
+        if VERSION == '0.4.0':
+            STABLEVERSION = '0.3.21'
+        else:
+            STABLEVERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO - 1)
 
 
 # Return the GIT version as a string
