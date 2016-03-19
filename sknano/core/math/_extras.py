@@ -65,17 +65,23 @@ operator_map.update(math_symbol_operator_mappings)
 
 
 def abs_cap(val, max_abs_val=1):
-    """
-    Returns the value with its absolute value capped at max_abs_val.
+    """Returns the value with its absolute value capped at max_abs_val.
+
+    Modified implementation of
+    :func:`pymatgen:pymatgen.util.num_utils.abs_cap`.
+
     Particularly useful in passing values to trignometric functions where
     numerical errors may result in an argument > 1 being passed in.
 
-    Args:
-        val (float): Input value.
-        max_abs_val (float): The maximum absolute value for val. Defaults to 1.
+    Parameters
+    ----------
+    val : :class:`~python:float`
+    max_abs_val : :class:`~python:float`
+        The maximum absolute value for val. Default=1.
 
-    Returns:
-        val if abs(val) < 1 else sign of val * max_abs_val.
+    Returns
+    -------
+    val if abs(val) < `max_abs_val` else sign of val * max_abs_val.
     """
     return max(min(val, max_abs_val), -max_abs_val)
 
