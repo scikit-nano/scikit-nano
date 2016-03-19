@@ -16,7 +16,7 @@ import operator
 
 import numpy as np
 
-__all__ = ['math_functions', 'function_map',
+__all__ = ['abs_cap', 'math_functions', 'function_map',
            'comparison_symbol_operator_mappings',
            'math_symbol_operator_mappings',
            'symbol_operator_mappings', 'operator_map',
@@ -64,7 +64,39 @@ math_symbol_operator_mappings = \
 operator_map.update(math_symbol_operator_mappings)
 
 
+def abs_cap(val, max_abs_val=1):
+    """
+    Returns the value with its absolute value capped at max_abs_val.
+    Particularly useful in passing values to trignometric functions where
+    numerical errors may result in an argument > 1 being passed in.
+
+    Args:
+        val (float): Input value.
+        max_abs_val (float): The maximum absolute value for val. Defaults to 1.
+
+    Returns:
+        val if abs(val) < 1 else sign of val * max_abs_val.
+    """
+    return max(min(val, max_abs_val), -max_abs_val)
+
+
 def convert_condition_str(obj, condition):
+    """Evaluates a boolean condtion of an object attribute.
+
+    Parameters
+    ----------
+    obj : :class:`~python:object`
+    condtion : :class:`~python:str`
+
+    Returns
+    -------
+    :class:`~python:bool`
+
+    Raises
+    ------
+    :class:`~python:ValueError`
+
+    """
     try:
         attr, comparison, value = condition.split()
     except ValueError:
