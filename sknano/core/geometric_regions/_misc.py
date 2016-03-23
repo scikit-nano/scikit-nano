@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Helper functions (:mod:`sknano.core.geometric_regions._funcs`)
+Helper functions (:mod:`sknano.core.geometric_regions._misc`)
 ===============================================================================
 
-.. currentmodule:: sknano.core.geometric_regions._funcs
+.. currentmodule:: sknano.core.geometric_regions._misc
 
 """
 from __future__ import absolute_import, division, print_function
@@ -12,7 +12,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 
-__all__ = ['generate_bounding_box']
+__all__ = ['generate_bounding_box', 'Domain']
 
 from sknano.core.math import Point, Vector
 from ._3D_regions import Cuboid, Parallelepiped
@@ -36,7 +36,6 @@ def generate_bounding_box(from_region=None, from_lattice=None,
     bounding_box : :class:`~sknano.core.geometric_regions.Cuboid`
 
     """
-
     if all([obj is None for obj in (from_region, from_lattice, from_array)]):
         return None
 
@@ -96,3 +95,23 @@ def generate_bounding_box(from_region=None, from_lattice=None,
             setattr(bounding_box, dim + 'max', array[:, i].max())
 
     return bounding_box
+
+
+class Domain:
+    """Dummy class container for simulation domain metadata."""
+    triclinic = False
+
+    def update(self, from_lattice=None):
+        """Update simulation domain attributes from lattice."""
+        if from_lattice is not None:
+            lattice = from_lattice
+            if not np.allclose(np.radians(lattice.angles),
+                               np.pi / 2 * np.ones(3)):
+                self.triclinic = True
+                a, b, c = lattice.lengths
+                cos_alpha, cos_beta, cos_gamma = \
+                    np.cos(np.radians(lattice.angles))
+                self.xy = xy = b * cos_gamma
+                self.xz = xz = c * cos_beta
+                self.yz = \
+                    (b * c * cos_alpha - xy * xz) / np.sqrt(b ** 2 - xy ** 2)

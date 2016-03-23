@@ -47,6 +47,11 @@ Base/mixin classes for all geometric regions
 
 Other
 -----
+.. autosummary::
+   :toctree: generated/
+
+   Domain
+   generate_bounding_box
 
 .. autodata:: geometric_2D_regions
    :annotation: = list of :class:`Geometric2DRegion`\ s classes.
@@ -61,8 +66,8 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._base import *
-from ._funcs import *
 from ._2D_regions import *
 from ._3D_regions import *
+from ._misc import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
