@@ -66,6 +66,7 @@ class GeneratorBase(StructureWriterMixin, metaclass=ABCMeta):
         self.assign_unique_types()
 
     def save(self, *args, **kwargs):
+        """An alias for :meth:`~sknano.io.StructureWriterMixin.write`."""
         super().write(*args, **kwargs)
 
 BaseGenerator = GeneratorBase

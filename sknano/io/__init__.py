@@ -17,33 +17,60 @@ Base I/O classes to inherit from when creating new I/O classes
    StructureIO
    StructureReader
    StructureWriter
+   StructureIOMixin
+   StructureReaderMixin
+   StructureWriterMixin
+   StructureConverter
    StructureFormatSpec
    StructureIOError
-   StructureConverter
 
 I/O classes for the `LAMMPS data` structure data format
 --------------------------------------------------------
 .. autosummary::
    :toctree: generated/
 
+   DATAIO
+   DATAData
    DATAReader
    DATAWriter
-   DATAData
    DATAFormatSpec
    DATAIOError
-   DATA2XYZConverter
+
+I/O classes for the `LAMMPS dump` structure data format
+--------------------------------------------------------
+.. autosummary::
+   :toctree: generated/
+
+   DUMPIO
+   DUMPData
+   DUMPReader
+   DUMPWriter
+   DUMPFormatSpec
+   DUMPIOError
+
+I/O classes for the `pdb` structure data format
+-------------------------------------------------
+.. autosummary::
+   :toctree: generated/
+
+   PDBIO
+   PDBData
+   PDBReader
+   PDBWriter
+   PDBFormatSpec
+   PDBIOError
 
 I/O classes for the `xyz` structure data format
 -------------------------------------------------
 .. autosummary::
    :toctree: generated/
 
+   XYZIO
+   XYZData
    XYZReader
    XYZWriter
-   XYZData
    XYZFormatSpec
    XYZIOError
-   XYZ2DATAConverter
 
 Sub-packages
 -------------
