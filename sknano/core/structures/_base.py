@@ -21,7 +21,8 @@ from sknano.core.crystallography import CrystalCell, UnitCell, SuperCell
 from sknano.core.refdata import aCC, element_data
 
 
-__all__ = ['BaseStructureMixin', 'BaseStructure', 'StructureData',
+__all__ = ['BaseStructureMixin', 'BaseStructure',
+           'StructureBaseMixin', 'StructureBase', 'StructureData',
            'CrystalStructureBase', 'NanoStructureBase']
 
 r_CC_vdw = element_data['C']['VanDerWaalsRadius']
@@ -32,7 +33,6 @@ _list_methods = ('append', 'extend', 'insert', 'remove', 'pop', 'clear',
 
 class BaseStructureMixin:
     """Mixin class for crystal structures."""
-
     def __getattr__(self, name):
         try:
             if name not in _list_methods and not name.startswith('_') \
@@ -163,6 +163,8 @@ class BaseStructureMixin:
     #             setattr(cp, attr, deepcopy(getattr(self, attr), memo))
     #     return cp
 
+StructureBaseMixin = BaseStructureMixin
+
 
 class BaseStructure(BaseStructureMixin):
     """Base structure class for structure data."""
@@ -171,7 +173,7 @@ class BaseStructure(BaseStructureMixin):
         self._atoms = StructureAtoms()
         self._crystal_cell = CrystalCell()
 
-StructureData = BaseStructure
+StructureBase = StructureData = BaseStructure
 
 
 @total_ordering
@@ -211,6 +213,7 @@ class CrystalStructureBase(BaseStructure, BaseClass):
             return self.crystal_cell < other.crystal_cell
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         attrdict = self.unit_cell.todict()
         attrdict.update(dict(scaling_matrix=self.scaling_matrix.tolist()))
         return attrdict
@@ -280,7 +283,7 @@ class NanoStructureBase(BaseStructure, BaseClass):
 
     @property
     def vdw_radius(self):
-        """van der Waals radius"""
+        """Van der Waals radius"""
         if self._vdw_radius is not None:
             return self._vdw_radius
         else:
@@ -292,12 +295,12 @@ class NanoStructureBase(BaseStructure, BaseClass):
 
     @property
     def vdw_distance(self):
-        """van der Waals distance."""
+        """Van der Waals distance."""
         return 2 * self.vdw_radius
 
     @property
     def element1(self):
-        "Basis element 1"
+        """Basis element 1"""
         return self.basis[0]
 
     @element1.setter
@@ -310,7 +313,7 @@ class NanoStructureBase(BaseStructure, BaseClass):
 
     @property
     def element2(self):
-        "Basis element 2"
+        """Basis element 2"""
         return self.basis[1]
 
     @element2.setter
