@@ -21,7 +21,7 @@ def configuration(parent_package='core', top_path=None):
     include_dirs.append(np.get_include())
 
     extra_compile_args = []
-    extra_compile_args.append('-std=c++11')
+    #extra_compile_args.append('-std=c++11')
 
     config.add_extension('_ring_finder',
                          sources=['_ring_finder.cxx'],
