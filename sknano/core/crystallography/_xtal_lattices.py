@@ -17,6 +17,7 @@ from functools import total_ordering
 import numpy as np
 
 from sknano.core import BaseClass
+from sknano.core.geometric_regions import Parallelepiped
 from sknano.core.math import Vector, Point, zhat, rotation_matrix
 from ._extras import pbc_diff
 
@@ -108,6 +109,18 @@ class LatticeBase(BaseClass):
     def metric_tensor(self):
         """Metric tensor."""
         return self.cell_matrix * self.cell_matrix.T
+
+    @property
+    def region(self):
+        """Region enclosed by lattice vectors."""
+        return Parallelepiped(u=Vector(self.ortho_matrix[:, 0].A.flatten()),
+                              v=Vector(self.ortho_matrix[:, 1].A.flatten()),
+                              w=Vector(self.ortho_matrix[:, 2].A.flatten()))
+
+    @property
+    def centroid(self):
+        """Region centroid."""
+        return self.region.centroid
 
     def fractional_diff(self, fcoords1, fcoords2):
         """Compute difference between fractional coordinates.
