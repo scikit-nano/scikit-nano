@@ -12,14 +12,13 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from collections import namedtuple
-# import numpy as np
+import numpy as np
 
 # from sknano.core.math import vector as vec
-# from ._bonds import Bond
+from sknano.core.math import abs_cap
+from ._bonds import Bond
 from ._topology_base import AngularTopology, AngularTopologyCollection, \
-    TopologyStats
-from ._dihedrals import compute_dihedral
-
+    TopologyStats, check_operands as check_operands_
 
 __all__ = ['compute_improper', 'Improper', 'Impropers', 'ImproperStats']
 
@@ -50,8 +49,23 @@ def compute_improper(*atoms, check_operands=True, degrees=False):
         if len(atoms) != 4.
 
     """
-    return compute_dihedral(*atoms, check_operands=check_operands,
-                            degrees=degrees)
+    if check_operands:
+        atoms = check_operands_(*atoms, size=4)
+
+    atom1, atom2, atom3, atom4 = atoms
+    b21 = Bond(atom2, atom1).vector
+    b23 = Bond(atom2, atom3).vector
+    b34 = Bond(atom3, atom4).vector
+
+    m = b21.cross(b23)
+    n = b23.cross(b34)
+    cosa = -m.dot(n) / (m.norm * n.norm)
+    cosa = abs_cap(cosa, 1)
+    angle = np.arccos(cosa)
+    if degrees:
+        angle = np.degrees(angle)
+
+    return angle
 
 
 class Improper(AngularTopology):
