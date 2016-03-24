@@ -27,6 +27,9 @@ doc/*.dump
 doc/*.json
 doc/*.pdb
 doc/*.xyz
+doc/*.data.*
+doc/*.dump.*
+doc/*.xyz.*
 
 # setup.py dist directory
 dist
@@ -86,16 +89,25 @@ tclIndex
 /*.json
 /*.pdb
 /*.xyz
+/*.data.*
+/*.dump.*
+/*.xyz.*
 sknano/*.data
 sknano/*.dump
 sknano/*.json
 sknano/*.pdb
 sknano/*.xyz
+sknano/*.data.*
+sknano/*.dump.*
+sknano/*.xyz.*
 **/tests/*.data
 **/tests/*.dump
 **/tests/*.json
 **/tests/*.pdb
 **/tests/*.xyz
+**/tests/*.data.*
+**/tests/*.dump.*
+**/tests/*.xyz.*
 
 # Temporary environment/workspace/project/backup files #
 ########################################################
