@@ -275,7 +275,7 @@ def setup_package():
         if scipy_version < (0, 14):
             raise RuntimeError
     except (AttributeError, ImportError, RuntimeError):
-        install_requires += ['scipy>=0.16.1']
+        install_requires += ['scipy>=0.17.0']
 
     # # Add six module to install_requires (used in numpydoc git submodule)
     # install_requires += ['six>=1.9']
@@ -283,7 +283,8 @@ def setup_package():
     # # Add future module to install requires
     # install_requires += ['future>=0.14.3']
     install_requires += \
-        ['pyparsing>=2.0.5', 'monty>=0.8.0', 'pymatgen>=3.3.4']
+        ['pyparsing>=2.1.1', 'monty>=0.8.0', 'pymatgen>=3.3.6',
+         'tabulate>=0.7.5', 'tables>=3.2.2', 'pandas>=0.18.0']
 
     metadata = dict(
         name=DISTNAME,
@@ -303,7 +304,7 @@ def setup_package():
         setup_requires=build_requires,
         install_requires=install_requires,
         extras_require={
-            'plotting': ['matplotlib>=1.4.3', 'palettable>=2.1.1']
+            'plotting': ['matplotlib>=1.5.1', 'palettable>=2.1.1']
         },
         entry_points={
             'console_scripts': [
