@@ -28,10 +28,10 @@ import numpy as np
 from numpy.compat import formatargspec, getargspec
 
 __all__ = ['attach_wrapper', 'logged', 'check_type', 'deprecated',
-           'get_object_signature', 'memoize',
+           'deprecate_kwarg', 'get_object_signature', 'memoize',
            'method_func', 'optional_debug', 'removed_package_warning',
-           'timethis', 'typeassert', 'typed_property', 'with_doc',
-           'make_sig', 'ClassSignature', 'Cached', 'NoInstances',
+           'lazy_property', 'timethis', 'typeassert', 'typed_property',
+           'with_doc', 'make_sig', 'ClassSignature', 'Cached', 'NoInstances',
            'Singleton', 'BaseClass']
 
 
@@ -233,6 +233,139 @@ def deprecated(since, message='', name='', alternative='', pending=False,
         return deprecated_func
 
     return decorated
+
+
+def deprecate_kwarg(old_arg_name, new_arg_name, mapping=None, stacklevel=2):
+    """Decorator to deprecate a keyword argument of a function.
+
+    Modified implementation of
+    :func:`pandas:pandas.util.decorators.deprecate_kwargs`.
+
+    Parameters
+    ----------
+    old_arg_name : str
+        Name of argument in function to deprecate
+    new_arg_name : str
+        Name of prefered argument in function
+    mapping : dict or callable
+        If mapping is present, use it to translate old arguments to
+        new arguments. A callable must do its own value checking;
+        values not found in a dict will be forwarded unchanged.
+
+    Examples
+    --------
+    The following deprecates 'cols', using 'columns' instead
+
+    >>> @deprecate_kwarg(old_arg_name='cols', new_arg_name='columns')
+    ... def f(columns=''):
+    ...     print(columns)
+    ...
+    >>> f(columns='should work ok')
+    should work ok
+    >>> f(cols='should raise warning')
+    FutureWarning: cols is deprecated, use columns instead
+      warnings.warn(msg, FutureWarning)
+    should raise warning
+    >>> f(cols='should error', columns="can\'t pass do both")
+    TypeError: Can only specify 'cols' or 'columns', not both
+    >>> @deprecate_kwarg('old', 'new', {'yes': True, 'no': False})
+    ... def f(new=False):
+    ...     print('yes!' if new else 'no!')
+    ...
+    >>> f(old='yes')
+    FutureWarning: old='yes' is deprecated, use new=True instead
+      warnings.warn(msg, FutureWarning)
+    yes!
+
+    """
+    if mapping is not None and not hasattr(mapping, 'get') and \
+            not callable(mapping):
+        raise TypeError("mapping from old to new argument values "
+                        "must be dict or callable!")
+
+    def _deprecate_kwarg(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            old_arg_value = kwargs.pop(old_arg_name, None)
+            if old_arg_value is not None:
+                if mapping is not None:
+                    if hasattr(mapping, 'get'):
+                        new_arg_value = mapping.get(old_arg_value,
+                                                    old_arg_value)
+                    else:
+                        new_arg_value = mapping(old_arg_value)
+                    msg = "the %s=%r keyword is deprecated, " \
+                          "use %s=%r instead" % \
+                          (old_arg_name, old_arg_value,
+                           new_arg_name, new_arg_value)
+                else:
+                    new_arg_value = old_arg_value
+                    msg = "the '%s' keyword is deprecated, " \
+                          "use '%s' instead" % (old_arg_name, new_arg_name)
+
+                warnings.warn(msg, FutureWarning, stacklevel=stacklevel)
+                if kwargs.get(new_arg_name, None) is not None:
+                    msg = ("Can only specify '%s' or '%s', not both" %
+                           (old_arg_name, new_arg_name))
+                    raise TypeError(msg)
+                else:
+                    kwargs[new_arg_name] = new_arg_value
+            return func(*args, **kwargs)
+        return wrapper
+    return _deprecate_kwarg
+
+
+class lazy_property:
+    """
+    lazy property descriptor
+
+    Used as a decorator to create lazy attributes. Lazy attributes
+    are evaluated on first use.
+    """
+
+    def __init__(self, func):
+        self.__func = func
+        wraps(self.__func)(self)
+
+    def __get__(self, instance, cls):
+        if instance is None:
+            return self
+
+        if not hasattr(instance, '__dict__'):
+            raise AttributeError("'%s' object has no attribute '__dict__'"
+                                 % (cls.__name__,))
+
+        name = self.__name__
+        if name.startswith('__') and not name.endswith('__'):
+            name = '_%s%s' % (cls.__name__, name)
+
+        value = self.__func(instance)
+        instance.__dict__[name] = value
+        return value
+
+    @classmethod
+    def invalidate(cls, instance, name):
+        """Invalidate a lazy attribute.
+
+        This obviously violates the lazy contract. A subclass of lazy
+        may however have a contract where invalidation is appropriate.
+        """
+        instance_class = instance.__class__
+
+        if not hasattr(instance, '__dict__'):
+            raise AttributeError("'%s' object has no attribute '__dict__'"
+                                 % (instance_class.__name__,))
+
+        if name.startswith('__') and not name.endswith('__'):
+            name = '_%s%s' % (instance_class.__name__, name)
+
+        if not isinstance(getattr(instance_class, name), cls):
+            raise AttributeError("'%s.%s' is not a %s attribute"
+                                 % (instance_class.__name__, name,
+                                    cls.__name__))
+
+        if name in instance.__dict__:
+            del instance.__dict__[name]
 
 
 def get_object_signature(obj):
@@ -486,7 +619,7 @@ class method_func:
         self.reversed = reversed
 
     def getdoc(self):
-        "Return the doc of the function (from the doc of the method)."
+        """Return the doc of the function (from the doc of the method)."""
         meth = getattr(self._classobj, self.__name__, None) or \
             getattr(np, self.__name__, None)
         sig = self.__name__ + get_object_signature(meth)
