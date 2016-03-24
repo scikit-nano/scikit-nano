@@ -54,9 +54,12 @@ class Tests(AtomsTestFixture):
 
     def test4(self):
         atoms = self.atoms
-        print(atoms.topology_stats)
-        atoms.angles_in_degrees = True
-        print(atoms.topology_stats)
+        all_impropers = atoms.all_impropers
+        impropers = atoms.impropers
+        assert_equal(all_impropers.Nimpropers,
+                     len(set(all_impropers.atom_ids)))
+        print('\aall_impropers.Nimpropers: {}'.format(all_impropers.Nimpropers))
+        print('impropers.Nimpropers: {}'.format(impropers.Nimpropers))
 
     def test5(self):
         atoms = self.atoms
@@ -125,6 +128,11 @@ class Tests(AtomsTestFixture):
             #     assert_true(isinstance(angles, np.ndarray))
             #     assert_true(len(bond_angle_pairs) == 3)
 
+    def test8(self):
+        atoms = self.atoms
+        print(atoms.topology_stats)
+        atoms.angles_in_degrees = True
+        print(atoms.topology_stats)
 
 if __name__ == '__main__':
     nose.runmodule()
