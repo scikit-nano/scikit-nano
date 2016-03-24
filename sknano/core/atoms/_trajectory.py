@@ -18,6 +18,7 @@ from operator import attrgetter
 import numpy as np
 
 from sknano.core import BaseClass, UserList
+from sknano.core.geometric_regions import Domain
 from ._md_atoms import MDAtom as Atom, MDAtoms as Atoms
 
 __all__ = ['Snapshot', 'Trajectory']
@@ -141,18 +142,19 @@ class TimeSelection:
 class Snapshot(BaseClass):
     """Container class for :class:`Trajectory` data at single timestep
 
-    Attributes
-    ----------
-    trajectory
-    atomattrs
-    attr_dtypes
-    elementmap
-    timestep
-    fmtstr
-
     Parameters
     ----------
     trajectory : :class:`Trajectory`, optional
+
+    Attributes
+    ----------
+    trajectory : :class:`Trajectory`
+    atomattrs : :class:`~python:list`
+    attr_dtypes : :class:`~python:dict`
+    elementmap : :class:`~python:dict`
+    timestep : :class:`~python:int`
+    fmtstr : :class:`~python:str`
+    domain : :class:`Domain`
 
     """
     def __init__(self, trajectory=None):
@@ -165,6 +167,7 @@ class Snapshot(BaseClass):
         self.elementmap = None
         self.attr_dtypes = None
         self.timestep = None
+        self.domain = Domain()
 
         self._atoms = None
         self._atoms_array = None
@@ -204,7 +207,8 @@ class Snapshot(BaseClass):
 
     @atoms.setter
     def atoms(self, value):
-        self._atoms_array = value
+        if isinstance(value, np.ndarray):
+            self._atoms_array = value
 
     @property
     def atom_selection(self):
@@ -297,8 +301,13 @@ class Snapshot(BaseClass):
 
 
 class Trajectory(UserList):
-    """Base class for trajectory analysis."""
+    """Base class for trajectory analysis.
 
+    Parameters
+    ----------
+    snapshots : :class:`~python:list`, optional
+
+    """
     def __init__(self, snapshots=None):
         super().__init__(initlist=snapshots)
         self.fmtstr = "snapshots={snapshots!r}"
