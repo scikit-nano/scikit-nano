@@ -22,9 +22,11 @@ doc/build
 # sphinx autodoc generated directory
 doc/source/generated
 # misc sphinx generated output
-doc/*.xyz
 doc/*.data
+doc/*.dump
+doc/*.json
 doc/*.pdb
+doc/*.xyz
 
 # setup.py dist directory
 dist
@@ -79,15 +81,21 @@ tclIndex
 
 # test output files #
 #####################
-/*.xyz
 /*.data
+/*.dump
+/*.json
 /*.pdb
-sknano/*.xyz
+/*.xyz
 sknano/*.data
+sknano/*.dump
+sknano/*.json
 sknano/*.pdb
-**/tests/*.xyz
+sknano/*.xyz
 **/tests/*.data
+**/tests/*.dump
+**/tests/*.json
 **/tests/*.pdb
+**/tests/*.xyz
 
 # Temporary environment/workspace/project/backup files #
 ########################################################
@@ -104,3 +112,4 @@ sknano/*.pdb
 # misc stuff #
 ##############
 sknano/__config__.py
+*.bak
