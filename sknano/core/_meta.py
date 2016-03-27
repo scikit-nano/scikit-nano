@@ -19,6 +19,9 @@ from functools import wraps, partial
 from textwrap import dedent
 import inspect
 import logging
+import os
+import re
+import sys
 import time
 import warnings
 import weakref
@@ -33,6 +36,16 @@ __all__ = ['attach_wrapper', 'logged', 'check_type', 'deprecated',
            'lazy_property', 'timethis', 'typeassert', 'typed_property',
            'with_doc', 'make_sig', 'ClassSignature', 'Cached', 'NoInstances',
            'Singleton', 'BaseClass']
+
+
+def custom_showwarning(message, category, filename, lineno, file=None,
+                       line=None):
+    filename = os.path.split(filename)[-1]
+    warning = warnings.formatwarning(message, category, filename, lineno,
+                                     line=line)
+    if file is None:
+        file = sys.stderr
+    file.write(warning)
 
 
 def attach_wrapper(obj, func=None):
@@ -110,37 +123,32 @@ def check_type(obj, allowed_types=()):
                         '(Allowed type(s): {})'.format(allowed_types))
 
 
-def _generate_deprecation_message(since, message='', name='',
-                                  alternative='', pending=False,
+def _generate_deprecation_message(since=None, message=None, name=None,
+                                  alternative=None, pending=False,
                                   obj_type='attribute'):
 
-    if not message:
-        altmessage = ''
+    if message is None:
+        message = 'The {func!s} {obj_type!s} '
 
         if pending:
-            message = (
-                'The %(func)s %(obj_type)s will be deprecated in a '
-                'future version.')
+            message += 'will be deprecated in a future version.'
         else:
-            message = (
-                'The %(func)s %(obj_type)s was deprecated in version '
-                '%(since)s.')
-        if alternative:
-            altmessage = ' Use %s instead.' % alternative
+            if since is not None:
+                message += 'was deprecated in version {since!s}.'
+            else:
+                message += 'is deprecated.'
 
-        message = ((message % {
-            'func': name,
-            'name': name,
-            'alternative': alternative,
-            'obj_type': obj_type,
-            'since': since}) +
-            altmessage)
+        if alternative is not None:
+            message += ' Use {alternative!s} instead.'
+
+        message = message.format(**dict(func=name, obj_type=obj_type,
+                                        since=since, alternative=alternative))
 
     return message
 
 
-def deprecated(since, message='', name='', alternative='', pending=False,
-               obj_type='function'):
+def deprecated(since=None, message=None, name=None, alternative=None,
+               pending=False, obj_type='function'):
     """Decorator to mark a function as deprecated.
 
     Modified implementation of matplotlib's
@@ -148,9 +156,8 @@ def deprecated(since, message='', name='', alternative='', pending=False,
 
     Parameters
     ------------
-    since : str
-        The release at which this API became deprecated.  This is
-        required.
+    since : str, optional
+        The release at which this API became deprecated.
 
     message : str, optional
         Override the default deprecation message.  The format
@@ -182,16 +189,19 @@ def deprecated(since, message='', name='', alternative='', pending=False,
 
     Examples
     --------
-
     Basic example::
 
-        @deprecated('1.4.0')
-        def the_function_to_deprecate():
-            pass
+    >>> from sknano.core import deprecated
+    >>> @deprecated()
+    ... def f():
+    ...     pass
+    ...
+    >>> f()
+    DeprecationWarning: The f function is deprecated.
 
     """
-    def decorated(func, message=message, name=name, alternative=alternative,
-                  pending=pending):
+    def decorated(func, since=since, message=message, name=name,
+                  alternative=alternative, pending=pending):
 
         if isinstance(func, classmethod):
             func = func.__func__
@@ -199,21 +209,22 @@ def deprecated(since, message='', name='', alternative='', pending=False,
         else:
             is_classmethod = False
 
-        if not name:
+        if name is None:
             name = func.__name__
 
         message = _generate_deprecation_message(
             since, message, name, alternative, pending, obj_type)
 
         @wraps(func)
-        def deprecated_func(*args, **kwargs):
-            warnings.warn(message,
-                          DeprecationWarning,
-                          stacklevel=2)
-
+        def wrapper(*args, **kwargs):
+            warning_category = DeprecationWarning
+            if pending:
+                warning_category = PendingDeprecationWarning
+            warnings.showwarning = custom_showwarning
+            warnings.warn(message, warning_category, stacklevel=2)
             return func(*args, **kwargs)
 
-        old_doc = deprecated_func.__doc__
+        old_doc = wrapper.__doc__
         if not old_doc:
             old_doc = ''
         old_doc = dedent(old_doc).strip('\n')
@@ -226,16 +237,17 @@ def deprecated(since, message='', name='', alternative='', pending=False,
             # docutils when the original docstring was blank.
             new_doc += r'\ '
 
-        deprecated_func.__doc__ = new_doc
+        wrapper.__doc__ = new_doc
 
         if is_classmethod:
-            deprecated_func = classmethod(deprecated_func)
-        return deprecated_func
+            wrapper = classmethod(wrapper)
+        return wrapper
 
     return decorated
 
 
-def deprecate_kwarg(old_arg_name, new_arg_name, mapping=None, stacklevel=2):
+def deprecate_kwarg(kwarg, since=None, message=None, alternative=None,
+                    mapping=None, pending=False, obj_type='keyword argument'):
     """Decorator to deprecate a keyword argument of a function.
 
     Modified implementation of
@@ -243,20 +255,32 @@ def deprecate_kwarg(old_arg_name, new_arg_name, mapping=None, stacklevel=2):
 
     Parameters
     ----------
-    old_arg_name : str
+    kwarg : str
         Name of argument in function to deprecate
-    new_arg_name : str
+    since : str, optional
+        The release at which this API became deprecated.
+    message : str, optional
+        Override the default deprecation message.  The format
+        specifier `%(func)s` may be used for the name of the function,
+        and `%(alternative)s` may be used in the deprecation message
+        to insert the name of an alternative to the deprecated
+        function.  `%(obj_type)s` may be used to insert a friendly name
+        for the type of object being deprecated.
+    alternative : str
         Name of prefered argument in function
     mapping : dict or callable
         If mapping is present, use it to translate old arguments to
         new arguments. A callable must do its own value checking;
         values not found in a dict will be forwarded unchanged.
+    pending : bool, optional
+        If True, uses a PendingDeprecationWarning instead of a
+        DeprecationWarning.
 
     Examples
     --------
     The following deprecates 'cols', using 'columns' instead
 
-    >>> @deprecate_kwarg(old_arg_name='cols', new_arg_name='columns')
+    >>> @deprecate_kwarg(kwarg='cols', alternative='columns')
     ... def f(columns=''):
     ...     print(columns)
     ...
@@ -283,36 +307,75 @@ def deprecate_kwarg(old_arg_name, new_arg_name, mapping=None, stacklevel=2):
         raise TypeError("mapping from old to new argument values "
                         "must be dict or callable!")
 
-    def _deprecate_kwarg(func):
+    def decorated(func, kwarg=kwarg, since=since, message=message,
+                  alternative=alternative, pending=pending, mapping=mapping):
+
+        if isinstance(func, classmethod):
+            func = func.__func__
+            is_classmethod = True
+        else:
+            is_classmethod = False
+
+        message = _generate_deprecation_message(
+            since, message, kwarg, alternative, pending, obj_type)
+
         @wraps(func)
         def wrapper(*args, **kwargs):
-            old_arg_value = kwargs.pop(old_arg_name, None)
-            if old_arg_value is not None:
+            old_value = kwargs.pop(kwarg, None)
+            if old_value is not None:
                 if mapping is not None:
                     if hasattr(mapping, 'get'):
-                        new_arg_value = mapping.get(old_arg_value,
-                                                    old_arg_value)
+                        new_value = mapping.get(old_value, old_value)
                     else:
-                        new_arg_value = mapping(old_arg_value)
-                    msg = "the %s=%r keyword is deprecated, " \
-                          "use %s=%r instead" % \
-                          (old_arg_name, old_arg_value,
-                           new_arg_name, new_arg_value)
+                        new_value = mapping(old_value)
+                    kwarg_repl = '{!s}={!r}'.format(kwarg, old_value)
+                    if alternative is not None:
+                        alt_repl = '{!s}={!r}'.format(alternative, new_value)
                 else:
-                    new_arg_value = old_arg_value
-                    msg = "the '%s' keyword is deprecated, " \
-                          "use '%s' instead" % (old_arg_name, new_arg_name)
+                    new_value = old_value
+                    kwarg_repl = '{!r}'.format(kwarg)
+                    if alternative is not None:
+                        alt_repl = '{!r}'.format(alternative)
 
-                warnings.warn(msg, FutureWarning, stacklevel=stacklevel)
-                if kwargs.get(new_arg_name, None) is not None:
+                msg = re.sub(kwarg, kwarg_repl, message)
+
+                if alternative is not None:
+                    msg = re.sub(alternative, alt_repl, msg)
+
+                warning_category = DeprecationWarning
+                if pending:
+                    warning_category = PendingDeprecationWarning
+
+                warnings.showwarning = custom_showwarning
+                warnings.warn(msg, warning_category, stacklevel=2)
+                if kwargs.get(alternative, None) is not None:
                     msg = ("Can only specify '%s' or '%s', not both" %
-                           (old_arg_name, new_arg_name))
+                           (kwarg, alternative))
                     raise TypeError(msg)
                 else:
-                    kwargs[new_arg_name] = new_arg_value
+                    if alternative is not None:
+                        kwargs[alternative] = new_value
             return func(*args, **kwargs)
+
+        # old_doc = wrapper.__doc__
+        # if not old_doc:
+        #     old_doc = ''
+        # old_doc = dedent(old_doc).strip('\n')
+        # message = message.strip()
+        # new_doc = (('\n.. deprecated:: %(since)s'
+        #             '\n    %(message)s\n\n' %
+        #             {'since': since, 'message': message}) + old_doc)
+        # if not old_doc:
+        #     # This is to prevent a spurious 'unexected unindent' warning from
+        #     # docutils when the original docstring was blank.
+        #     new_doc += r'\ '
+
+        # wrapper.__doc__ = new_doc
+
+        if is_classmethod:
+            wrapper = classmethod(wrapper)
         return wrapper
-    return _deprecate_kwarg
+    return decorated
 
 
 class lazy_property:
@@ -322,7 +385,6 @@ class lazy_property:
     Used as a decorator to create lazy attributes. Lazy attributes
     are evaluated on first use.
     """
-
     def __init__(self, func):
         self.__func = func
         wraps(self.__func)(self)
