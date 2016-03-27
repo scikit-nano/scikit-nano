@@ -30,12 +30,13 @@ import random
 from itertools import chain, combinations, count, cycle, filterfalse, \
     groupby, islice, repeat, starmap, tee, zip_longest
 
-__all__ = ['cyclic_pairs', 'take', 'tabulate', 'consume', 'nth', 'quantify',
-           'padnone', 'ncycles', 'dotproduct', 'flatten', 'repeatfunc',
-           'pairwise', 'grouper', 'roundrobin', 'partition', 'powerset',
-           'unique_elements', 'unique_everseen', 'unique_justseen',
-           'iter_except', 'first_true', 'random_product', 'random_permutation',
-           'random_combination', 'random_combination_with_replacement']
+__all__ = ['cyclic_pairs', 'take', 'tabulate', 'tail', 'consume', 'nth',
+           'all_equal', 'quantify', 'padnone', 'ncycles', 'dotproduct',
+           'flatten', 'repeatfunc', 'pairwise', 'grouper', 'roundrobin',
+           'partition', 'powerset', 'unique_elements', 'unique_everseen',
+           'unique_justseen', 'iter_except', 'first_true', 'random_product',
+           'random_permutation', 'random_combination',
+           'random_combination_with_replacement']
 
 
 def cyclic_pairs(iterable):
@@ -74,7 +75,7 @@ def take(n, iterable):
     >>> t = tabulate(lambda i: i)
     >>> take(5, t)
     [0, 1, 2, 3, 4]
-    >>> take(5, 5)
+    >>> take(5, t)
     [5, 6, 7, 8, 9]
 
     """
@@ -115,12 +116,28 @@ def tabulate(function, start=0):
     return map(function, count(start))
 
 
+def tail(n, iterable):
+    """Return an iterator over the last `n` items.
+
+    Parameters
+    ----------
+    n : :class:`~python:int`
+    iterable : :class:`~python:collections.Iterable`
+
+    Returns
+    -------
+    :class:`~python:collections.Iterator`.
+
+    """
+    return iter(collections.deque(iterable, maxlen=n))
+
+
 def consume(iterator, n=None):
     """Advance the iterator n-steps ahead. If n is `None`, consume entirely.
 
     Parameters
     ----------
-    iterator : :class:`~python.collections.Iterator`
+    iterator : :class:`~python:collections.Iterator`
     n : {:class:`~python:None`, :class:`~python:int`}, optional
 
     """
@@ -151,6 +168,22 @@ def nth(iterable, n, default=None):
 
     """
     return next(islice(iterable, n, None), default)
+
+
+def all_equal(iterable):
+    """Returns True if all the elements are equal to each other.
+
+    Parameters
+    ----------
+    iterable : :class:`~python:collections.Iterable`
+
+    Returns
+    -------
+    :class:`~python:bool`
+
+    """
+    g = groupby(iterable)
+    return next(g, True) and not next(g, False)
 
 
 def quantify(iterable, pred=bool):
