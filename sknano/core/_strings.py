@@ -15,8 +15,6 @@ from textwrap import shorten
 
 from tabulate import tabulate
 
-from sknano.core.math import function_map, operator_map
-
 from pyparsing import Group, Forward, Optional, Regex, Suppress, Keyword, \
     Literal, Word, ZeroOrMore, alphas, alphanums, delimitedList, \
     oneOf, replaceWith, quotedString, removeQuotes
@@ -220,12 +218,14 @@ def asset(s, l, t):
 def map_function(s, l, t):
     """:mod:`~pyparsing:pyparsing` parse action to convert function string to \
         function in :func:`sknano.core.math.function_map`."""
+    from sknano.core.math import function_map
     return function_map[t[0]]
 
 
 def map_operator(s, l, t):
     """:mod:`~pyparsing:pyparsing` parse action to convert operator string to \
         operator in :func:`sknano.core.math.operator_map`."""
+    from sknano.core.math import operator_map
     return operator_map[t[0]]
 
 
