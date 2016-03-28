@@ -19,6 +19,9 @@ Mixin `Atom`/`Atoms` classes
    AtomsAdapterMixin
    AtomTopologyMixin
    AtomsTopologyMixin
+   AtomTransformationsMixin
+   AtomsTransformationsMixin
+   BoundingRegionsMixin
    KDTreeAtomsMixin
    PBCAtomsMixin
    POAVAtomMixin
@@ -64,5 +67,8 @@ from ._periodic_atoms import *
 from ._ring_atoms import *
 from ._topology_base import *
 from ._topology import AtomTopologyMixin, AtomsTopologyMixin
+from ._bounding_regions import BoundingRegionsMixin
+from ._transformations import AtomTransformationsMixin, \
+    AtomsTransformationsMixin
 
 __all__ = [s for s in dir() if not s.startswith('_')]
