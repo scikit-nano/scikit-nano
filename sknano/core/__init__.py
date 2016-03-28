@@ -29,19 +29,21 @@ Data structures & algorithms
 
    dedupe
    rezero_array
+   minmax
 
 
 Iterator functions
 ------------------
-
 .. autosummary::
    :toctree: generated/
 
    cyclic_pairs
    take
    tabulate
+   tail
    consume
    nth
+   all_equal
    quantify
    padnone
    ncycles
@@ -66,13 +68,15 @@ Iterator functions
 
 Meta functions/classes
 -----------------------
-
 .. autosummary::
    :toctree: generated/
 
    check_type
    deprecated
+   deprecate_kwarg
    get_object_signature
+   lazy_property
+   logged
    memoize
    optional_debug
    timethis
@@ -90,7 +94,6 @@ Meta functions/classes
 
 I/O functions
 --------------
-
 .. autosummary::
    :toctree: generated/
 
@@ -102,14 +105,23 @@ I/O functions
    loadobj
    dumpobj
 
-String functions
------------------
-
+String functions/classes
+-------------------------
 .. autosummary::
    :toctree: generated/
 
+   asbool
+   asdict
+   aslist
+   asset
+   astuple
+   asint
+   asfloat
+   map_function
+   map_operator
    ordinal_form
    pluralize
+   TabulateMixin
 
 Custom container datatypes
 ---------------------------

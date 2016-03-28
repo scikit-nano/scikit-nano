@@ -11,13 +11,17 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from textwrap import shorten
+
+from tabulate import tabulate
+
 from sknano.core.math import function_map, operator_map
 
 from pyparsing import Group, Forward, Optional, Regex, Suppress, Keyword, \
     Literal, Word, ZeroOrMore, alphas, alphanums, delimitedList, \
     oneOf, replaceWith, quotedString, removeQuotes
 
-__all__ = ['pluralize', 'plural_word_check', 'ordinal_form',
+__all__ = ['TabulateMixin', 'pluralize', 'plural_word_check', 'ordinal_form',
            'map_operator', 'map_function', 'asint', 'asfloat', 'asbool',
            'astuple', 'aslist', 'asdict', 'asset', 'integer', 'real',
            'number', 'boolean', 'string', 'none', 'LPAR', 'RPAR',
@@ -26,6 +30,35 @@ __all__ = ['pluralize', 'plural_word_check', 'ordinal_form',
            'unhashable_item', 'expr_item', 'tuple_expr', 'list_expr',
            'dict_expr', 'set_expr', 'kwarg', 'kwargs_expr', 'signature_args',
            'signature_kwargs', 'call_signature']
+
+
+class TabulateMixin:
+    """Mixin class for pretty tabulated output strings."""
+
+    def __str__(self):
+        return self._table_title_str()
+
+    def _tabulate(self, values=None, headers=(), tablefmt='fancy_grid'):
+        if values is None:
+            return self._tabulate(*self._tabular_data())
+        return tabulate(values, headers=headers, tablefmt=tablefmt)
+
+    def _tabular_data(self):
+        """Return :class:`~python:tuple` of tabular data for \
+            pretty tabulated output."""
+        header = self.__class__.__name__
+        fmt = self._tabular_data_format_string
+        return [fmt(self)], (header,)
+
+    def _table_title_str(self):
+        return '{}'.format(shorten(repr(self), width=78))
+
+    def _tabular_data_format_string(self, value, begin=None, end=None):
+        strrep = '{!r}'.format(value)
+        try:
+            return strrep[begin:end]
+        except IndexError:
+            return strrep
 
 
 def pluralize(word, count):
@@ -139,12 +172,14 @@ def cast_type(parameters):
 
 
 def asint(s, l, t):
-    """parse action to convert token to :class:`~python:int`."""
+    """:mod:`~pyparsing:pyparsing` parse action to convert token to \
+        :class:`~python:int`."""
     return int(t[0])
 
 
 def asfloat(s, l, t):
-    """parse action to convert token to :class:`~python:float`."""
+    """:mod:`~pyparsing:pyparsing` parse action to convert token to \
+        :class:`~python:float`."""
     try:
         val = int(t[0])
     except ValueError:
@@ -153,37 +188,44 @@ def asfloat(s, l, t):
 
 
 def asbool(s, l, t):
-    """parse action to convert token to :class:`~python:bool`."""
+    """:mod:`~pyparsing:pyparsing` parse action to convert token to \
+        :class:`~python:bool`."""
     return t[0] == 'True'
 
 
 def astuple(s, l, t):
-    """parse action to convert token to :class:`~python:tuple`."""
+    """:mod:`~pyparsing:pyparsing` parse action to convert token to \
+        :class:`~python:tuple`."""
     return tuple(t.asList())
 
 
 def aslist(s, l, t):
-    """parse action to convert token to :class:`~python:list`."""
+    """:mod:`~pyparsing:pyparsing` parse action to convert token to \
+        :class:`~python:list`."""
     return [t.asList()]
 
 
 def asdict(s, l, t):
-    """parse action to convert token to :class:`~python:dict`."""
+    """:mod:`~pyparsing:pyparsing` parse action to convert token to \
+        :class:`~python:dict`."""
     return dict(t.asList())
 
 
 def asset(s, l, t):
-    """parse action to convert token to :class:`~python:set`."""
+    """:mod:`~pyparsing:pyparsing` parse action to convert token to \
+        :class:`~python:set`."""
     return set(t.asList())
 
 
 def map_function(s, l, t):
-    """parse action to convert function string to function."""
+    """:mod:`~pyparsing:pyparsing` parse action to convert function string to \
+        function in :func:`sknano.core.math.function_map`."""
     return function_map[t[0]]
 
 
 def map_operator(s, l, t):
-    """parse action to convert operator string to function."""
+    """:mod:`~pyparsing:pyparsing` parse action to convert operator string to \
+        operator in :func:`sknano.core.math.operator_map`."""
     return operator_map[t[0]]
 
 
