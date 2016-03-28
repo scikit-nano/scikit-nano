@@ -34,7 +34,9 @@ class TabulateMixin:
     """Mixin class for pretty tabulated output strings."""
 
     def __str__(self):
-        return self._table_title_str()
+        title = self._table_title_str()
+        table = self._tabulate()
+        return '\n'.join((title, table))
 
     def _tabulate(self, values=None, headers=(), tablefmt='fancy_grid'):
         if values is None:
@@ -44,12 +46,18 @@ class TabulateMixin:
     def _tabular_data(self):
         """Return :class:`~python:tuple` of tabular data for \
             pretty tabulated output."""
+        print('in TabulateMixin._tabular_data()')
         header = self.__class__.__name__
         fmt = self._tabular_data_format_string
         return [fmt(self)], (header,)
 
-    def _table_title_str(self):
-        return '{}'.format(shorten(repr(self), width=78))
+    def _table_title_str(self, prepend='', obj=None, append='', sep=''):
+        if obj is None:
+            title = repr(self)
+        elif obj is not None and not isinstance(obj, str):
+            title = repr(obj)
+        title = '{}'.format(shorten(title, width=78))
+        return sep.join((prepend, title, append))
 
     def _tabular_data_format_string(self, value, begin=None, end=None):
         strrep = '{!r}'.format(value)
