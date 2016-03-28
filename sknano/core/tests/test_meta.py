@@ -6,9 +6,10 @@ import nose
 from nose.tools import assert_false, assert_true, assert_equal, assert_raises
 
 import logging
+import warnings
 
 from sknano.core import timethis, typeassert, typed_property, \
-    ClassSignature, Singleton, Cached, logged
+    ClassSignature, Singleton, Cached, logged, deprecated, deprecate_kwarg
 from sknano.core.math import Vector
 
 
@@ -127,6 +128,69 @@ def test7():
 
     add.set_level(logging.WARNING)
     print(add(2, 3))
+
+
+def test8():
+
+    with warnings.catch_warnings():
+        warnings.simplefilter('always')
+
+        @deprecated()
+        def f():
+            pass
+        f()
+
+        @deprecated(since='0.4.0')
+        def f():
+            pass
+        f()
+
+        @deprecated(since='0.4.0', alternative='g')
+        def f():
+            pass
+        f()
+
+        @deprecated(alternative='h', pending=True)
+        def f():
+            pass
+        f()
+
+
+def test9():
+
+    with warnings.catch_warnings():
+        warnings.simplefilter('always')
+
+        @deprecate_kwarg(kwarg='XYZ')
+        def f(abc=False):
+            print('yes!' if abc else 'no!')
+        f(XYZ=False)
+        f(abc=True)
+        # print(w[-1].message)
+
+        @deprecate_kwarg(kwarg='XYZ', alternative='abc')
+        def f(abc=''):
+            print(abc)
+        f(XYZ='should_raise_warning')
+        f(abc='should work ok')
+
+        @deprecate_kwarg(kwarg='XYZ', since='0.4.0')
+        def f(abc=''):
+            print(abc)
+        f(XYZ='should_raise_warning')
+        f(abc='should work ok')
+
+        @deprecate_kwarg(kwarg='XYZ', since='0.4.0', alternative='abc')
+        def f(abc=''):
+            print(abc)
+        f(XYZ='should_raise_warning')
+        f(abc='should work ok')
+
+        @deprecate_kwarg(kwarg='XYZ', alternative='abc', pending=True)
+        def f(abc=''):
+            print(abc)
+        f(XYZ='should_raise_warning')
+        f(abc='should work ok')
 
 
 if __name__ == '__main__':
