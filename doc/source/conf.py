@@ -355,6 +355,9 @@ intersphinx_mapping = {
     'scipy': ('http://docs.scipy.org/doc/scipy/reference', None),
     'pymatgen': ('http://pymatgen.org', None),
     'matplotlib': ('http://matplotlib.org', None),
+    'pandas': ('http://pandas.pydata.org/pandas-docs/stable', None),
+    'monty': ('http://pythonhosted.org/monty', None),
+    'pyparsing': ('http://pythonhosted.org/pyparsing', None),
 }
 
 # -----------------------------------------------------------------------------
