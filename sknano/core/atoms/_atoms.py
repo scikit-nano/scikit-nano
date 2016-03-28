@@ -15,12 +15,12 @@ from collections.abc import Iterable
 from operator import attrgetter
 import numbers
 import re
-import warnings
+# import warnings
 
 import numpy as np
 
-from sknano.core import BaseClass, UserList, dedupe
-from sknano.core.math import convert_condition_str, rotation_matrix
+from sknano.core import BaseClass, UserList, TabulateMixin, dedupe
+from sknano.core.math import convert_condition_str
 from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols, element_names
 
@@ -246,14 +246,32 @@ class Atom(BaseClass):
     def m(self, value):
         self.mass = value
 
+    def getattr(self, attr, default=None, recursive=False):
+        """Get atom attribute named `attr`.
+
+        Parameters
+        ----------
+        attr : str
+            Name of attribute
+        default : :class:`~python:object`, optional
+        recursive : :class:`~python:bool`, optional
+
+        Returns
+        -------
+        val : :class:`~python:object`
+
+        """
+        if recursive:
+            attr_list = attr.split('.')
+            obj = self
+            for attr in attr_list:
+                obj = getattr(obj, attr, default)
+            return obj
+        else:
+            return getattr(self, attr, default)
+
     def rezero(self, *args, **kwargs):
         assert not hasattr(super(), 'rezero')
-
-    def rotate(self, **kwargs):
-        assert not hasattr(super(), 'rotate')
-
-    def translate(self, *args, **kwargs):
-        assert not hasattr(super(), 'translate')
 
     def reset_attrs(self, **kwargs):
         """Reset atom attributes."""
@@ -269,7 +287,7 @@ class Atom(BaseClass):
                     parent=self.parent)
 
 
-class Atoms(UserList):
+class Atoms(TabulateMixin, UserList):
     """Base class for collection of `Atom` objects.
 
     Parameters
@@ -318,6 +336,11 @@ class Atoms(UserList):
     @property
     def __item_class__(self):
         return self.__atom_class__
+
+    def __str__(self):
+        title = self._table_title_str()
+        table = self._tabulate([['Natoms', self.Natoms]])
+        return '\n'.join((title, table))
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -671,24 +694,33 @@ class Atoms(UserList):
         else:
             return self
 
-    def getatomattr(self, attr):
+    def getattr(self, attr, default=None, recursive=False):
         """Get :class:`~numpy:numpy.ndarray` of atom attributes `attr`.
 
         Parameters
         ----------
         attr : str
-            Name of attribute to pass to `getattr` from each `XAtom` in
-            `XAtoms`.
+            Name of attribute to pass to `getattr` from each `Atom` in
+            `Atoms`.
+        default : :class:`~python:object`, optional
+        recursive : :class:`~python:bool`, optional
 
         Returns
         -------
         :class:`~numpy:numpy.ndarray`
 
         """
-        try:
-            return np.asarray([getattr(atom, attr) for atom in self])
-        except AttributeError:
-            return None
+        if recursive:
+            attr_values = []
+            attr_list = attr.split('.')
+            for atom in self:
+                obj = atom
+                for attr in attr_list:
+                    obj = getattr(obj, attr, default)
+                attr_values.append(obj)
+            return np.asarray(attr_values)
+        else:
+            return np.asarray([getattr(atom, attr, default) for atom in self])
 
     def mapatomattr(self, from_attr=None, to_attr=None, attrmap=None):
         """Set/update atom attribute from another atom attribute with dict.
@@ -737,36 +769,6 @@ class Atoms(UserList):
 
         """
         [atom.rezero(epsilon=epsilon) for atom in self]
-
-    def rotate(self, **kwargs):
-        """Rotate `Atom` vectors.
-
-        Parameters
-        ----------
-        angle : float
-        axis : :class:`~sknano.core.math.Vector`, optional
-        anchor_point : :class:`~sknano.core.math.Point`, optional
-        rot_point : :class:`~sknano.core.math.Point`, optional
-        from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
-        degrees : bool, optional
-        transform_matrix : :class:`~numpy:numpy.ndarray`
-
-        """
-        if kwargs.get('transform_matrix', None) is None:
-            kwargs['transform_matrix'] = rotation_matrix(**kwargs)
-        [atom.rotate(**kwargs) for atom in self]
-
-    def translate(self, t, fix_anchor_points=True, cartesian=True):
-        """Translate `Atom` vectors by :class:`Vector` `t`.
-
-        Parameters
-        ----------
-        t : :class:`Vector`
-        fix_anchor_points : bool, optional
-
-        """
-        [atom.translate(t, fix_anchor_point=fix_anchor_points,
-                        cartesian=cartesian) for atom in self]
 
     def reset_attrs(self, **kwargs):
         """Call corresponding `reset_attrs` method on each atom"""
