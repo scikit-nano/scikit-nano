@@ -256,46 +256,6 @@ class LatticeAtom(Atom):
         except AttributeError:
             pass
 
-    def rotate(self, **kwargs):
-        """Rotate `Atom` position vector.
-
-        Parameters
-        ----------
-        angle : float
-        axis : :class:`~sknano.core.math.Vector`, optional
-        anchor_point : :class:`~sknano.core.math.Point`, optional
-        rot_point : :class:`~sknano.core.math.Point`, optional
-        from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
-        degrees : bool, optional
-        transform_matrix : :class:`~numpy:numpy.ndarray`
-
-        """
-        try:
-            self.lattice.rotate(**kwargs)
-        except AttributeError:
-            pass
-        super().rotate(**kwargs)
-
-    def translate(self, t, fix_anchor_point=True, cartesian=True):
-        """Translate :class:`Atom` position vector by :class:`Vector` `t`.
-
-        Parameters
-        ----------
-        t : :class:`Vector`
-        fix_anchor_point : :class:`~python:bool`, optional
-        cartesian : :class:`~python:bool`, optional
-
-        """
-        if not fix_anchor_point:
-            try:
-                self.lattice.translate(t)
-            except AttributeError:
-                pass
-
-        if not cartesian:
-            t = self.lattice.fractional_to_cartesian(t)
-        super().translate(t, fix_anchor_point=fix_anchor_point)
-
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()

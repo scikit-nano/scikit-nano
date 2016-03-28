@@ -24,22 +24,26 @@ from ._lattice_atoms import LatticeAtom, LatticeAtoms
 from ._xyz_atoms import XYZAtom, XYZAtoms
 # from ._velocity_atoms import VelocityAtom, VelocityAtoms
 from .mixins import AtomAdapterMixin, AtomsAdapterMixin, \
-    AtomTopologyMixin, AtomsTopologyMixin, POAVAtomMixin, POAVAtomsMixin, \
-    RingAtomMixin, RingAtomsMixin
+    AtomTopologyMixin, AtomsTopologyMixin, AtomTransformationsMixin, \
+    AtomsTransformationsMixin, BoundingRegionsMixin, \
+    POAVAtomMixin, POAVAtomsMixin, RingAtomMixin, RingAtomsMixin
+
 
 __all__ = ['StructureAtom', 'StructureAtoms']
 
 
-class StructureAtom(AtomAdapterMixin, AtomTopologyMixin, POAVAtomMixin,
-                    RingAtomMixin, NeighborAtom, ImageAtom, LatticeAtom,
-                    XYZAtom, ChargedAtom, TypeAtom, IDAtom):
+class StructureAtom(AtomAdapterMixin, AtomTopologyMixin,
+                    AtomTransformationsMixin, POAVAtomMixin, RingAtomMixin,
+                    NeighborAtom, ImageAtom, LatticeAtom, XYZAtom,
+                    ChargedAtom, TypeAtom, IDAtom):
     """An :class:`Atom` class for structure analysis."""
     pass
 
 
-class StructureAtoms(AtomsAdapterMixin, AtomsTopologyMixin, POAVAtomsMixin,
-                     RingAtomsMixin, NeighborAtoms, ImageAtoms, LatticeAtoms,
-                     XYZAtoms, ChargedAtoms, TypeAtoms, IDAtoms):
+class StructureAtoms(AtomsAdapterMixin, AtomsTopologyMixin,
+                     AtomsTransformationsMixin, BoundingRegionsMixin,
+                     POAVAtomsMixin, RingAtomsMixin, NeighborAtoms, ImageAtoms,
+                     LatticeAtoms, XYZAtoms, ChargedAtoms, TypeAtoms, IDAtoms):
     """An :class:`Atoms` sub-class for structure analysis."""
 
     @property

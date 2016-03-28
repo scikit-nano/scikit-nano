@@ -21,7 +21,6 @@ from operator import attrgetter
 import numpy as np
 
 from sknano.core import rezero_array, xyz
-from sknano.core.geometric_regions import Cuboid, Sphere
 from sknano.core.math import Vector, Vectors
 
 from ._atoms import Atom, Atoms
@@ -275,39 +274,6 @@ class XYZAtom(Atom):
         """
         self.r.rezero(epsilon=epsilon)
 
-    def rotate(self, **kwargs):
-        """Rotate `Atom` position vector.
-
-        Parameters
-        ----------
-        angle : float
-        axis : :class:`~sknano.core.math.Vector`, optional
-        anchor_point : :class:`~sknano.core.math.Point`, optional
-        rot_point : :class:`~sknano.core.math.Point`, optional
-        from_vector, to_vector : :class:`~sknano.core.math.Vector`, optional
-        degrees : bool, optional
-        transform_matrix : :class:`~numpy:numpy.ndarray`
-
-        """
-        self.r.rotate(**kwargs)
-        self.r0.rotate(**kwargs)
-        super().rotate(**kwargs)
-
-    def translate(self, t, fix_anchor_point=True):
-        """Translate `Atom` position vector by :class:`Vector` `t`.
-
-        Parameters
-        ----------
-        t : :class:`Vector`
-        fix_anchor_point : bool, optional
-
-        """
-        # TODO compare timing benchmarks for translation of position vector.
-        self.r.translate(t, fix_anchor_point=fix_anchor_point)
-        self.r0.translate(t, fix_anchor_point=fix_anchor_point)
-        super().translate(t, fix_anchor_point=fix_anchor_point)
-        # self.r += t
-
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()
@@ -333,6 +299,13 @@ class XYZAtoms(Atoms):
 
     def sort(self, key=attrgetter('r'), reverse=False):
         super().sort(key=key, reverse=reverse)
+
+    def __str__(self):
+        strrep = super().__str__()
+        items = ['centroid', 'center_of_mass']
+        values = [self.centroid, self.center_of_mass]
+        table1 = self._tabulate(list(zip(items, values)))
+        return '\n'.join((strrep, table1, str(self.bounding_box)))
 
     @property
     def center_of_mass(self):
@@ -388,35 +361,6 @@ class XYZAtoms(Atoms):
         C = Vector(np.mean(self.coords, axis=0))
         C.rezero()
         return C
-
-    @property
-    def bounding_box(self):
-        """Axis-aligned bounding box of `Atoms`.
-
-        Returns
-        -------
-        :class:`~sknano.core.geometric_regions.Cuboid`
-
-        """
-        return Cuboid(pmin=[self.x.min(), self.y.min(), self.z.min()],
-                      pmax=[self.x.max(), self.y.max(), self.z.max()])
-
-    @property
-    def bounding_sphere(self):
-        """Bounding :class:`Sphere` of `Atoms`.
-
-        Returns
-        -------
-        :class:`~sknano.core.geometric_regions.Sphere`
-
-        """
-        return Sphere(center=self.centroid,
-                      r=np.max((self.r - self.centroid).norms))
-
-    @property
-    def bounds(self):
-        """Alias for :attr:`~XYZAtoms.bounding_box`."""
-        return self.bounding_box
 
     @property
     def coords(self):
@@ -542,18 +486,6 @@ class XYZAtoms(Atoms):
         M = self.M
         return np.sqrt(np.sum(masses * (r - R).dot(r - R)) / M)
 
-    @property
-    def volume(self):
-        """Volume of region containing atoms."""
-        try:
-            return self._volume
-        except AttributeError:
-            return self.bounds.volume
-
-    @volume.setter
-    def volume(self, value):
-        self._volume = float(value)
-
     def align_principal_axis(self, index, vector):
         """Align :attr:`~XYZAtoms.principal_axes`[`index`] along `vector`.
 
@@ -642,18 +574,3 @@ class XYZAtoms(Atoms):
 
         """
         [atom.rezero_xyz(epsilon=epsilon) for atom in self]
-
-    def within_region(self, region):
-        """Returns new `Atoms` object containing atoms within `region`.
-
-        Similar to :meth:`XYZAtom.clip_bounds`, but returns a new
-        `Atoms` object.
-
-        Parameters
-        ----------
-        region : :class:`~sknano.core.geometric_regions.GeometricRegion`
-
-        """
-        return \
-            self.__class__([atom for atom in self if region.contains(atom.r)],
-                           update_item_class=False, **self.kwargs)
