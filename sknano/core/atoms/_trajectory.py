@@ -64,8 +64,6 @@ class AtomSelection:
                     continue
                 aselection = ss.atom_selection
                 id_idx = ss.atomattrs.index('id')
-                # for i, atom in enumerate(ss.atoms):
-                #     if atom in atoms:
                 for i, atom in enumerate(ss.get_atoms(asarray=True)):
                     if int(atom[id_idx]) in atom_ids:
                         aselection[i] = True
@@ -75,8 +73,6 @@ class AtomSelection:
             ss = self.traj.get_snapshot(ts)
             aselection = ss.atom_selection
             id_idx = ss.atomattrs.index('id')
-            # for i, atom in enumerate(ss.atoms):
-            #     if atom in atoms:
             for i, atom in enumerate(ss.get_atoms(asarray=True)):
                 if int(atom[id_idx]) in atom_ids:
                     aselection[i] = True
@@ -98,7 +94,6 @@ class TimeSelection:
     def all(self, ts=None):
         """Select all trajectory snapshots/timesteps."""
         [setattr(snapshot, 'selected', True) for snapshot in self.traj]
-        # self.traj.nselected = self.traj.Nsnaps
         self.traj.atom_selection.all()
         self.print_fraction_selected()
 
@@ -107,7 +102,6 @@ class TimeSelection:
         [setattr(snapshot, 'selected', False) for snapshot in self.traj]
         try:
             self.traj.get_snapshot(ts).selected = True
-            # self.traj.nselected = 1
         except AttributeError:
             pass
         self.traj.atom_selection.all()
@@ -116,7 +110,6 @@ class TimeSelection:
     def none(self):
         """Deselect all timesteps."""
         [setattr(snapshot, 'selected', False) for snapshot in self.traj]
-        # self.traj.nselected = 0
         self.print_fraction_selected()
 
     def skip(self, n):
@@ -130,7 +123,6 @@ class TimeSelection:
                 count = 0
                 continue
             ss.selected = False
-            # self.traj.nselected -= 1
         self.traj.atom_selection.all()
         self.print_fraction_selected()
 
@@ -148,13 +140,9 @@ class Snapshot(BaseClass):
 
     Attributes
     ----------
-    trajectory : :class:`Trajectory`
-    atomattrs : :class:`~python:list`
-    attr_dtypes : :class:`~python:dict`
-    elementmap : :class:`~python:dict`
     timestep : :class:`~python:int`
-    fmtstr : :class:`~python:str`
     domain : :class:`Domain`
+    fmtstr : :class:`~python:str`
 
     """
     def __init__(self, trajectory=None):
@@ -162,46 +150,41 @@ class Snapshot(BaseClass):
         super().__init__()
 
         self.trajectory = trajectory
-
-        self.atomattrs = None
-        self.elementmap = None
-        self.attr_dtypes = None
         self.timestep = None
         self.domain = Domain()
-
         self._atoms = None
         self._atoms_array = None
+        self._formatter = None
 
         self.fmtstr = "trajectory={trajectory!r}"
+
+    def __getattr__(self, name):
+        try:
+            return getattr(self.trajectory, name)
+        except AttributeError:
+            try:
+                return getattr(self.formatter, name)
+            except AttributeError:
+                return super().__getattr__(name)
+
+    @property
+    def formatter(self):
+        """An instance of :class:`~sknano.io.DUMPFormatter`."""
+        return self._formatter
+
+    @formatter.setter
+    def formatter(self, value):
+        self._formatter = value
+        self.atomattrs = value.atomattrs
+        self.atomattrmap = value.atomattrmap
+        self.attr_dtypes = value.attr_dtypes
 
     @property
     def atoms(self):
         """Snapshot atoms."""
         if self._atoms is None:
-            atoms = self._atoms = Atoms()
-            atomattrs = self.atomattrs
-            elementmap = self.elementmap
-            attr_dtypes = self.attr_dtypes
-            id_idx = atomattrs.index('id')
-            aselection = self._atoms_array[self.atom_selection]
-            # selected = self.atom_selection
-            traj = self.trajectory
-            for atom in aselection:
-                try:
-                    reference_atom = \
-                        traj.reference_atoms.get_atom(int(atom[id_idx]))
-                except AttributeError:
-                    reference_atom = None
-
-                attrs = \
-                    [dtype(value) for dtype, value in zip(attr_dtypes, atom)]
-
-                atoms.append(Atom(reference_atom=reference_atom,
-                                  **dict(list(zip(atomattrs, attrs)))))
-            if elementmap is not None:
-                atoms.mapatomattr(from_attr='type', to_attr='element',
-                                  attrmap=elementmap)
-            return atoms
+            self._update_atoms()
+            return self.atoms
         else:
             return self._atoms.filtered(self.atom_selection)
 
@@ -251,22 +234,13 @@ class Snapshot(BaseClass):
     @property
     def nselected(self):
         """Number of selected atoms in this snapshot."""
-        # return self._nselected
         aselection = self.atom_selection
         return len(aselection[aselection])
-
-    # @nselected.setter
-    # def nselected(self, value):
-    #     self._nselected = int(value)
 
     @property
     def nselect(self):
         """Alias for :attr:`Snapshot.nselected`."""
         return self.nselected
-
-    # @nselect.setter
-    # def nselect(self, value):
-    #     self.nselected = value
 
     def get_atoms(self, asarray=False):
         """Get atoms.
@@ -287,13 +261,30 @@ class Snapshot(BaseClass):
             return self._atoms_array
         return self.atoms
 
-    # def update_atom_selection(self, atoms):
-    #     ss_atoms = self.atoms
-    #     selection = np.zeros(ss_atoms.Natoms, dtype=bool)
-    #     for i, atom in enumerate(ss_atoms):
-    #         if atom in atoms:
-    #             selection[i] = True
-    #     self.atom_selection = selection
+    def _update_atoms(self):
+        atoms = Atoms()
+        traj = self.trajectory
+        atomattrs = self.atomattrs
+        atomattrmap = self.atomattrmap
+        attr_dtypes = self.attr_dtypes
+        id_idx = atomattrs.index('id')
+        for atom in self._atoms_array:
+            try:
+                reference_atom = \
+                    traj.reference_atoms.get_atom(int(atom[id_idx]))
+            except AttributeError:
+                reference_atom = None
+
+            attrs = {attr: attr_dtypes[idx](atom[idx]) for idx, attr in
+                     enumerate(atomattrs)}
+
+            atoms.append(Atom(reference_atom=reference_atom, **attrs))
+
+        if atomattrmap is not None:
+            for (from_attr, to_attr), attrmap in atomattrmap.items():
+                atoms.mapatomattr(from_attr=from_attr, to_attr=to_attr,
+                                  attrmap=attrmap)
+        self._atoms = atoms
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
@@ -313,7 +304,6 @@ class Trajectory(UserList):
         self.fmtstr = "snapshots={snapshots!r}"
         self.time_selection = TimeSelection(self)
         self.atom_selection = AtomSelection(self)
-        # self.nselected = 0
         self.reference_atoms = None
         self._reference_snapshot = None
 
@@ -369,25 +359,16 @@ class Trajectory(UserList):
     @property
     def nselected(self):
         """Number of selected snapshots."""
-        # return self._nselected
         n = 0
         for ss in self:
             if ss.selected:
                 n += 1
         return n
 
-    # @nselected.setter
-    # def nselected(self, value):
-    #     self._nselected = int(value)
-
     @property
     def nselect(self):
         """Alias for :attr:`~Trajectory.nselected`."""
         return self.nselected
-
-    # @nselect.setter
-    # def nselect(self, value):
-    #     self.nselected = value
 
     @property
     def snapshots(self):
@@ -445,10 +426,6 @@ class Trajectory(UserList):
             if snapshot.selected:
                 v[i] = snapshot.timestep
         return v.tolist()
-
-    # def update_selection(self, *snapshots, *atoms):
-    #     timesteps = self.timesteps
-    #     for snapshot in snapshots:
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
