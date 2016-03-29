@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Nanotube bundle base class (:mod:`sknano.core.structures._nanotube_bundle`)
+Nanotube bundle classes (:mod:`sknano.core.structures._nanotube_bundle`)
 ==============================================================================
 
 .. currentmodule:: sknano.core.structures._nanotube_bundle
@@ -19,10 +19,11 @@ import numpy as np
 from sknano.core.atoms import Atom, vdw_radius_from_basis
 from sknano.core.refdata import aCC, grams_per_Da
 from sknano.core.math import Vector
+from ._base import NanoStructureBase
 from ._extras import get_chiral_indices
 
 __all__ = ['compute_bundle_density', 'NanotubeBundleMixin',
-           'NanotubeBase']
+           'NanotubeBundleBase']
 
 
 def compute_bundle_density(*Ch, r_vdw=None, bond=None,
@@ -304,20 +305,20 @@ class NanotubeBundleMixin:
                     self.bundle_coords.append(dr)
 
 
-class NanotubeBase(NanotubeBundleMixin):
+class NanotubeBundleBase(NanotubeBundleMixin, NanoStructureBase):
     """Nanotube bundle structure base class."""
 
     _bundle_geometries = ['square', 'rectangle', 'hexagon']
 
-    def __init__(self, *args, basis=['C', 'C'], bond=aCC, nx=1, ny=1,
-                 bundle_packing=None, bundle_geometry=None, **kwargs):
-
-        super().__init__(*args, basis=basis, bond=bond, **kwargs)
+    def __init__(self, *args, nx=1, ny=1, bundle_packing=None,
+                 bundle_geometry=None, **kwargs):
 
         self.nx = nx
         self.ny = ny
         self.bundle_geometry = bundle_geometry
         self.bundle_packing = bundle_packing
+
+        super().__init__(*args, **kwargs)
 
         self.is_bundle = False
         if nx != 1 or ny != 1 or bundle_geometry is not None:
