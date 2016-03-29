@@ -20,38 +20,21 @@ from monty.io import zopen
 from sknano.core import get_fpath, minmax
 from sknano.core.atoms import Atoms, MDAtoms, MDAtom as Atom
 # from sknano.core.crystallography import Crystal3DLattice
-from sknano.core.geometric_regions import generate_bounding_box, Cuboid
-from ._base import StructureIO, StructureIOError, \
-    StructureConverter, StructureFormatSpec, default_comment_line
+from sknano.core.geometric_regions import Domain
+from ._base import StructureData, StructureDataError, StructureDataFormatter, \
+    StructureDataConverter, default_comment_line
 
-__all__ = ['DATAReader', 'DATAWriter', 'DATAData', 'DATAFormatSpec',
-           'DATAIOError', 'DATA2XYZConverter', 'LAMMPSDATAReader',
-           'LAMMPSDATAWriter', 'LAMMPSDATA', 'LAMMPSDATAFormatSpec',
-           'LAMMPSDATAIOError', 'LAMMPSDATA2XYZConverter',
-           'atom_styles', 'lammps_atom_styles']
-
-
-class Domain:
-    """Dummy class for periodic boundary conditions."""
-    triclinic = False
-
-    def update(self, from_lattice=None):
-        if from_lattice is not None:
-            lattice = from_lattice
-            if not np.allclose(np.radians(lattice.angles),
-                               np.pi / 2 * np.ones(3)):
-                self.triclinic = True
-                a, b, c = lattice.lengths
-                cos_alpha, cos_beta, cos_gamma = \
-                    np.cos(np.radians(lattice.angles))
-                self.xy = xy = b * cos_gamma
-                self.xz = xz = c * cos_beta
-                self.yz = \
-                    (b * c * cos_alpha - xy * xz) / np.sqrt(b ** 2 - xy ** 2)
+__all__ = ['DATA', 'DATAData', 'DATAReader', 'DATAWriter', 'DATAFormatter',
+           'DATAError', 'DATAIO', 'DATAIOReader', 'DATAIOWriter',
+           'DATAIOError', 'DATAIOFormatter', 'DATAFormatSpec',
+           'DATAConverter', 'DATA2XYZConverter', 'LAMMPSDATA',
+           'LAMMPSDATAReader', 'LAMMPSDATAWriter', 'LAMMPSDATAFormatter',
+           'LAMMPSDATAFormatSpec', 'LAMMPSDATAIOError',
+           'LAMMPSDATA2XYZConverter', 'atom_styles', 'lammps_atom_styles']
 
 
-class DATAReader(StructureIO):
-    """`StructureIO` class for reading `LAMMPS data` file format.
+class DATAReader(StructureData):
+    """`StructureData` class for reading `LAMMPS data` file format.
 
     Parameters
     ----------
@@ -67,35 +50,40 @@ class DATAReader(StructureIO):
 
     Attributes
     ----------
-    bounding_box : :class:`Cuboid`
     domain : :class:`Domain`
 
     """
     def __init__(self, fpath, atom_style='full', bond_style=None,
                  angle_style=None, dihedral_style=None, improper_style=None,
-                 pair_style=None, formatspec=None, **kwargs):
+                 pair_style=None, formatter=None, **kwargs):
         super().__init__(fpath=fpath, **kwargs)
 
         self.header_data = OrderedDict()
         self.section_data = OrderedDict()
-        self.bounding_box = Cuboid()
         self.domain = Domain()
 
-        if formatspec is None or not isinstance(formatspec, DATAFormatSpec):
-            formatspec = DATAFormatSpec(atom_style=atom_style,
-                                        bond_style=bond_style,
-                                        angle_style=angle_style,
-                                        dihedral_style=dihedral_style,
-                                        improper_style=improper_style,
-                                        pair_style=pair_style)
+        if formatter is None or not isinstance(formatter, DATAFormatter):
+            formatter = DATAFormatter(atom_style=atom_style,
+                                      bond_style=bond_style,
+                                      angle_style=angle_style,
+                                      dihedral_style=dihedral_style,
+                                      improper_style=improper_style,
+                                      pair_style=pair_style)
 
-        self.formatspec = formatspec
-        self.section_attrs = formatspec.section_attrs
-        self.section_attrs_specs = formatspec.section_attrs_specs
-        self.fmtstr = "{fpath!r}, " + formatspec.fmtstr
+        self.formatter = formatter
+        self.section_attrs = formatter.section_attrs
+        self.section_attrs_specs = formatter.section_attrs_specs
+        self.fmtstr = "{fpath!r}, " + formatter.fmtstr
 
         if self.fpath is not None:
             self.read()
+
+    def __str__(self):
+        strrep = super().__str__()
+        formatter = self.formatter
+        if formatter is not None:
+            strrep = '\n'.join((strrep, str(formatter)))
+        return strrep
 
     @property
     def headers(self):
@@ -120,17 +108,6 @@ class DATAReader(StructureIO):
 
         """
         return self.section_data
-
-    # @property
-    # def bounding_box(self):
-    #     """Bounding box."""
-    #     return self._bounding_box
-
-    # @bounding_box.setter
-    # def bounding_box(self, value):
-    #     if not isinstance(value, Cuboid):
-    #         raise TypeError('Expected `Cuboid` instance.')
-    #     self._bounding_box = self.kwargs['bounding_box'] = value
 
     def read(self):
         """Read data file."""
@@ -186,7 +163,6 @@ class DATAReader(StructureIO):
                     line = f.readline().strip()
                     if len(line) == 0:
                         break
-            self._parse_bounding_box()
             self._parse_domain()
             self._parse_atoms()
             self._parse_atom_types()
@@ -272,20 +248,20 @@ class DATAReader(StructureIO):
                     except KeyError:
                         self.atoms.add_type(Atom(type=atomtype))
 
-    def _parse_bounding_box(self):
-        bounding_box = self.bounding_box
+    def _parse_domain(self):
+        domain = self.domain
+        bounding_box = domain.bounding_box
         for dim in ('x', 'y', 'z'):
             bounds = \
                 self.header_data[' '.join([dim + lim for lim in ('lo', 'hi')])]
             [setattr(bounding_box, dim + lim, value) for
              lim, value in zip(('min', 'max'), bounds)]
-        self.bounding_box = bounding_box
+        domain.bounding_box = bounding_box
 
-    def _parse_domain(self):
         tilt_factors = 'xy xz yz'
         if tilt_factors in self.headers:
-            self.domain.triclinic = True
-            [setattr(self.domain, tilt_factor, value) for tilt_factor, value
+            domain.triclinic = True
+            [setattr(domain, tilt_factor, value) for tilt_factor, value
              in zip(tilt_factors.split(), self.headers[tilt_factors])]
 
     def _update_headers(self, from_atoms=None, from_bonds=None,
@@ -385,12 +361,11 @@ class DATAReader(StructureIO):
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
-        super_dict = super().todict()
-        super_dict.update(self.formatspec.todict())
-        return super_dict
+        attr_dict = super().todict()
+        attr_dict.update(self.formatter.todict())
+        return attr_dict
 
-
-LAMMPSDATAReader = DATAReader
+LAMMPSDATAReader = DATAIOReader = DATAReader
 
 
 class DATAWriter:
@@ -398,28 +373,27 @@ class DATAWriter:
 
     @classmethod
     def write(cls, fname=None, outpath=None, fpath=None, structure=None,
-              atoms=None, bounding_box=None, pad_box=False, pad_tol=0.01,
-              xpad=10., ypad=10., zpad=10., atom_style='full', bond_style=None,
-              angle_style=None, dihedral_style=None, improper_style=None,
-              pair_style=None, verbose=False, **kwargs):
+              atoms=None, bounding_box=None, allow_triclinic_box=False,
+              atom_style='full', bond_style=None, angle_style=None,
+              dihedral_style=None, improper_style=None, pair_style=None,
+              **kwargs):
         """Write structure data to file.
 
         Parameters
         ----------
-        fname : str, optional
+        fname : :class:`~python:str`, optional
             Output file name.
-        outpath : str, optional
+        outpath : :class:`~python:str`, optional
             Output file path.
-        fpath : str, optional
+        fpath : :class:`~python:str`, optional
             Full path (directory path + file name) to output data file.
-        atoms : :class:`~sknano.core.atoms.Atoms`
+        structure : :class:`~sknano.core.structures.BaseStructure`, optional
+        atoms : :class:`~sknano.core.atoms.Atoms`, optional
             An :class:`~sknano.core.atoms.Atoms` instance.
-        bounding_box : dict, optional
+        bounding_box : :class:`~python:dict`, optional
             If `None`, determined automatically from the `atoms` coordinates.
-        pad_box : bool, optional
-        xpad, ypad, zpad : float, optional
-        pad_tol : float, optional
-        verbose : bool, optional
+        allow_triclinic_box : :class:`~python:bool`, optional
+        verbose : :class:`~python:bool`, optional
             verbose output
 
         """
@@ -438,59 +412,44 @@ class DATAWriter:
         if not isinstance(atoms, MDAtoms):
             atoms = MDAtoms(atoms)
 
-        formatspec = DATAFormatSpec(atom_style=atom_style,
-                                    bond_style=bond_style,
-                                    angle_style=angle_style,
-                                    dihedral_style=dihedral_style,
-                                    improper_style=improper_style,
-                                    pair_style=pair_style)
+        formatter = DATAFormatter(atom_style=atom_style,
+                                  bond_style=bond_style,
+                                  angle_style=angle_style,
+                                  dihedral_style=dihedral_style,
+                                  improper_style=improper_style,
+                                  pair_style=pair_style)
 
-        data = DATAData(formatspec=formatspec)
-
-        if bounding_box is None:
+        data = DATAData(formatter=formatter)
+        domain = data.domain
+        if bounding_box is not None:
+            domain.update(from_region=bounding_box,
+                          allow_triclinic_box=allow_triclinic_box,
+                          **kwargs)
+        else:
+            lattice = None
             if structure is not None and structure.lattice is not None:
-                bounding_box = \
-                    generate_bounding_box(from_lattice=structure.lattice,
-                                          center=atoms.centroid)
+                lattice = structure.lattice
             elif atoms.lattice is not None:
-                bounding_box = \
-                    generate_bounding_box(from_lattice=atoms.lattice,
-                                          center=atoms.centroid)
+                lattice = atoms.lattice
+
+            if lattice is not None:
+                domain.update(from_lattice=lattice,
+                              allow_triclinic_box=allow_triclinic_box,
+                              **kwargs)
             else:
-                bounding_box = \
-                    generate_bounding_box(from_array=atoms.coords)
+                domain.update(from_array=atoms.coords,
+                              allow_triclinic_box=allow_triclinic_box,
+                              **kwargs)
 
-        if pad_box:
-            boxpad = {'x': xpad, 'y': ypad, 'z': zpad}
-            # for dim, pad in boxpad.items():
-            for i, dim in enumerate(('x', 'y', 'z')):
-                pad = boxpad[dim]
-                dmin = dim + 'min'
-                dmax = dim + 'max'
-                if abs(getattr(bounding_box, dmin) -
-                       atoms.coords[:, i].min()) < pad - pad_tol:
-                    setattr(bounding_box, dmin,
-                            getattr(bounding_box, dmin) - pad)
-                if abs(getattr(bounding_box, dmax) -
-                       atoms.coords[:, i].max()) < pad - pad_tol:
-                    setattr(bounding_box, dmax,
-                            getattr(bounding_box, dmax) + pad)
-
-        if structure is not None and structure.lattice is not None:
-            data.domain.update(from_lattice=structure.lattice)
-        elif atoms.lattice is not None:
-            data.domain.update(from_lattice=atoms.lattice)
-
-        data.bounding_box = bounding_box
         data._update_headers(from_atoms=atoms)
         data._update_sections(from_atoms=atoms)
         data.write(datafile=fpath, atoms=atoms, **kwargs)
 
-LAMMPSDATAWriter = DATAWriter
+LAMMPSDATAWriter = DATAIOWriter = DATAWriter
 
 
 class DATAData(DATAReader):
-    """Class for reading and writing `StructureIO` in `LAMMPS data` format.
+    """Class for reading and writing `StructureData` in `LAMMPS data` format.
 
     Parameters
     ----------
@@ -559,7 +518,7 @@ class DATAData(DATAReader):
                 elif colindex is not None:
                     colidx = int(colindex)
             except (KeyError, TypeError, ValueError) as e:
-                raise DATAIOError(e)
+                raise StructureDataError(e)
         attr_name = self.section_attrs[section][colidx]
         attr_dtype = self.section_attrs_specs[section][attr_name]['dtype']
         new_data = np.asarray(new_data, dtype=attr_dtype)
@@ -611,10 +570,10 @@ class DATAData(DATAReader):
             self._update_attr_fmtstr_widths()
 
             try:
-                with zopen(datafile, 'wt') as fp:
-                    self._write_header(fp, comment_line)
-                    self._write_bounding_box(fp)
-                    [getattr(self, '_write_' + section.lower())(fp)
+                with zopen(datafile, 'wt') as stream:
+                    self._write_header(stream, comment_line)
+                    self._write_domain(stream)
+                    [getattr(self, '_write_' + section.lower())(stream)
                      for section in self.sections.keys()]
             except OSError as e:
                 print(e)
@@ -691,8 +650,8 @@ class DATAData(DATAReader):
             for attr, specs in attr_specs.items():
                 specs['width'] = attr_fmtstr_width[attr]
 
-    def _write_header(self, fp, comment_line):
-        fp.write('# {}\n\n'.format(comment_line.lstrip('#').strip()))
+    def _write_header(self, stream, comment_line):
+        stream.write('# {}\n\n'.format(comment_line.lstrip('#').strip()))
         for header, value in self.headers.items():
             if header in list(header_specs.keys())[-4:]:
                 continue
@@ -701,12 +660,12 @@ class DATAData(DATAReader):
             except TypeError:
                 s = ' '.join(map(str, list((value, header))))
             finally:
-                fp.write('{}\n'.format(s))
-        fp.write('\n')
+                stream.write('{}\n'.format(s))
+        stream.write('\n')
 
-    def _write_bounding_box(self, fp):
-        bounding_box = self.bounding_box
+    def _write_domain(self, stream):
         domain = self.domain
+        bounding_box = domain.bounding_box
         lohi_width = 0
         lohi_fmtstr = '{:.10f} {:.10f}'
         for dim in ('x', 'y', 'z'):
@@ -716,71 +675,85 @@ class DATAData(DATAReader):
                     getattr(bounding_box, dim + 'max'))) + 4)
 
         for dim in ('x', 'y', 'z'):
-            fp.write('{}{dim}lo {dim}hi\n'.format(
+            stream.write('{}{dim}lo {dim}hi\n'.format(
                 lohi_fmtstr.format(
                     getattr(bounding_box, dim + 'min'),
                     getattr(bounding_box, dim + 'max')).ljust(lohi_width),
                 dim=dim))
 
         if domain.triclinic:
-            fp.write('{xy:.10f} {xz:.10f} {yz:.10f} xy xz yz\n'.format(
-                     xy=domain.xy, xz=domain.xz, yz=domain.yz))
+            stream.write('{xy:.10f} {xz:.10f} {yz:.10f} xy xz yz\n'.format(
+                         xy=domain.xy, xz=domain.xz, yz=domain.yz))
 
-    def _write_masses(self, fp):
+    def _write_masses(self, stream):
         type_width = self.section_attrs_specs['Masses']['type']['width']
-        fp.write('\nMasses\n\n')
+        stream.write('\nMasses\n\n')
         for type, mass in self.sections['Masses']:
-            fp.write('{}{:.4f}\n'.format(
-                     '{:d}'.format(type).ljust(type_width), mass))
+            stream.write('{}{:.4f}\n'.format(
+                         '{:d}'.format(type).ljust(type_width), mass))
 
-    def _write_atoms(self, fp):
+    def _write_atoms(self, stream):
         section_attrs_specs_items = self.section_attrs_specs['Atoms'].items()
-        fp.write('\nAtoms # {}\n\n'.format(self.formatspec.atom_style))
+        stream.write('\nAtoms # {}\n\n'.format(self.formatter.atom_style))
         for atom in self.atoms:
             line = ''
             for attr, specs in section_attrs_specs_items:
                 line += "{:>{}}".format(specs['fmtstr'].format(
                                         getattr(atom, attr)), specs['width'])
             line += '\n'
-            fp.write(line)
+            stream.write(line)
 
-    def _write_velocities(self, fp):
+    def _write_velocities(self, stream):
         section_attrs_specs_items = \
             self.section_attrs_specs['Velocities'].items()
-        fp.write('\nVelocities\n\n')
+        stream.write('\nVelocities\n\n')
         for atom in self.atoms:
             line = ''
             for attr, specs in section_attrs_specs_items:
                 line += "{:>{}}".format(specs['fmtstr'].format(
                                         getattr(atom, attr)), specs['width'])
             line += '\n'
-            fp.write(line)
+            stream.write(line)
 
-    def _write_force_fields(self, fp):
+    def _write_force_fields(self, stream):
         pass
 
-    def _write_bonds(self, fp):
+    def _write_bonds(self, stream):
         pass
 
-    def _write_angles(self, fp):
+    def _write_angles(self, stream):
         pass
 
-    def _write_dihedrals(self, fp):
+    def _write_dihedrals(self, stream):
         pass
 
-    def _write_impropers(self, fp):
+    def _write_impropers(self, stream):
         pass
 
     @classmethod
-    def format_spec(cls, atom_style='full', **kwargs):
-        return DATAFormatSpec(atom_style=atom_style, **kwargs)
+    def formatter(cls, atom_style='full', **kwargs):
+        """Return :class:`DATAFormatter` object."""
+        return DATAFormatter(atom_style=atom_style, **kwargs)
 
-LAMMPSDATA = DATAData
+DATA = LAMMPSDATA = DATAIO = DATAData
 
 
-class DATA2XYZConverter(StructureConverter):
+class DATAConverter(StructureDataConverter):
+    """:class:`StructureDataConverter` class for converting `LAMMPS data`.
+
+    Parameters
+    ----------
+    datafile : str
+
     """
-    `StructureConverter` class for converting `LAMMPS data` to `xyz` format.
+    @property
+    def datafile(self):
+        """`LAMMPS data` file."""
+        return self.infile
+
+
+class DATA2XYZConverter(DATAConverter):
+    """:class:`DATAConverter` class for converting to `xyz` format.
 
     .. versionadded:: 0.2.9
 
@@ -790,16 +763,8 @@ class DATA2XYZConverter(StructureConverter):
 
     """
     def __init__(self, datafile, **kwargs):
-        self._datafile = datafile
-        self._xyzfile = os.path.splitext(self._datafile)[0] + '.xyz'
-
-        super().__init__(infile=self._datafile, outfile=self._xyzfile,
-                         **kwargs)
-
-    @property
-    def datafile(self):
-        """`LAMMPS data` file."""
-        return self.infile
+        xyzfile = os.path.splitext(datafile)[0] + '.xyz'
+        super().__init__(infile=datafile, outfile=xyzfile, **kwargs)
 
     @property
     def xyzfile(self):
@@ -834,15 +799,15 @@ class DATA2XYZConverter(StructureConverter):
 LAMMPSDATA2XYZConverter = DATA2XYZConverter
 
 
-class DATAIOError(StructureIOError):
+class DATAError(StructureDataError):
     """Exception class for :class:`DATAData` IO Errors."""
     pass
 
-LAMMPSDATAIOError = DATAIOError
+LAMMPSDATAIOError = DATAIOError = DATAError
 
 
-class DATAFormatSpec(StructureFormatSpec):
-    """`StructureFormatSpec` class the `LAMMPS data` format spec.
+class DATAFormatter(StructureDataFormatter):
+    """`StructureDataFormatter` class the `LAMMPS data` format spec.
 
     Parameters
     ----------
@@ -918,6 +883,16 @@ class DATAFormatSpec(StructureFormatSpec):
             "dihedral_style={dihedral_style!r}, " + \
             "improper_style={improper_style!r}, " + \
             "pair_style={pair_style!r}"
+
+    def __str__(self):
+        strrep = super().__str__()
+        items = ['atom_style', 'bond_style', 'dihedral_style',
+                 'improper_style', 'pair_style']
+        values = [self.atom_style, self.bond_style, self.dihedral_style,
+                  self.improper_style, self.pair_style]
+        table = list(zip(items, values))
+        strrep = '\n'.join((strrep, table))
+        return strrep
 
     @property
     def atom_style(self):
@@ -999,15 +974,17 @@ class DATAFormatSpec(StructureFormatSpec):
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
-        return dict(atom_style=self.atom_style,
-                    angle_style=self.angle_style,
-                    bond_style=self.bond_style,
-                    dihedral_style=self.dihedral_style,
-                    improper_style=self.improper_style,
-                    pair_style=self.pair_style)
+        attr_dict = super().todict()
+        attr_dict.update(dict(atom_style=self.atom_style,
+                              angle_style=self.angle_style,
+                              bond_style=self.bond_style,
+                              dihedral_style=self.dihedral_style,
+                              improper_style=self.improper_style,
+                              pair_style=self.pair_style))
+        return attr_dict
 
-
-LAMMPSDATAFormatSpec = DATAFormatSpec
+DATAFormatSpec = LAMMPSDATAFormatSpec = LAMMPSDATAFormatter = \
+    DATAIOFormatter = DATAFormatter
 
 header_specs = OrderedDict()
 [header_specs.update({key: {'dtype': int, 'items': 1} for key in
