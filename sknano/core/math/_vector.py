@@ -172,9 +172,6 @@ class Vector(np.ndarray):
         res = np.ndarray.__array_wrap__(self, obj, context)
         return self.__class__(res.__array__(), p0=self.p0)
 
-    def __str__(self):
-        return repr(self)
-
     def __repr__(self):
         try:
             if np.allclose(self.p0, np.zeros_like(self.p0)):
@@ -566,6 +563,11 @@ class Vector(np.ndarray):
             self.p.translate(t)
 
     @property
+    def norm(self):
+        """Return the vector norm."""
+        return np.sqrt((self.__array__() ** 2).sum())
+
+    @property
     def length(self):
         """Alias for :attr:`Vector.norm`."""
         return self.norm
@@ -579,11 +581,6 @@ class Vector(np.ndarray):
     def mag(self):
         """Alias for :attr:`Vector.norm`."""
         return self.norm
-
-    @property
-    def norm(self):
-        """Return the vector norm."""
-        return np.sqrt((self.__array__() ** 2).sum())
 
     @property
     def unit_vector(self):

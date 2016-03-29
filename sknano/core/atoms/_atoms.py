@@ -338,9 +338,13 @@ class Atoms(TabulateMixin, UserList):
         return self.__atom_class__
 
     def __str__(self):
-        title = self._table_title_str()
-        table = self._tabulate([['Natoms', self.Natoms]])
-        return '\n'.join((title, table))
+        strrep = self._table_title_str()
+        if self.data:
+            items = ['Natoms', 'centroid', 'center_of_mass']
+            values = [self.Natoms, self.centroid, self.center_of_mass]
+            table = self._tabulate(list(zip(items, values)))
+            strrep = '\n'.join((strrep, table))
+        return strrep
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):

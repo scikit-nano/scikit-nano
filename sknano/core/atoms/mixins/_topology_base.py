@@ -24,7 +24,7 @@ import numpy as np
 from scipy import stats
 # import pandas as pd
 
-from sknano.core import BaseClass, UserList, rezero_array
+from sknano.core import BaseClass, UserList, TabulateMixin, rezero_array
 from sknano.core.atoms import Atom, Atoms
 # from sknano.core.math import vector as vec
 
@@ -83,7 +83,7 @@ def check_operands(*atoms, size=None):
 
 
 @total_ordering
-class Topology(BaseClass, metaclass=ABCMeta):
+class Topology(BaseClass, TabulateMixin, metaclass=ABCMeta):
     """Base :class:`~sknano.core.atoms.Atom` topology class.
 
     Parameters
@@ -226,7 +226,7 @@ class Topology(BaseClass, metaclass=ABCMeta):
         return dict(id=self.id, type=self.type, parent=self.parent)
 
 
-class TopologyCollection(UserList):
+class TopologyCollection(TabulateMixin, UserList):
     """Base :class:`~sknano.core.atoms.Atoms` topology class.
 
     Parameters

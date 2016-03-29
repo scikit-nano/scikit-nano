@@ -92,9 +92,6 @@ class Point(np.ndarray):
             return None
         self.nd = len(pt)
 
-    def __str__(self):
-        return repr(self)
-
     def __repr__(self):
         return "Point({!r})".format(self.tolist())
 

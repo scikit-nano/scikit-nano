@@ -17,7 +17,7 @@ import numbers
 
 import numpy as np
 
-from sknano.core import BaseClass
+from sknano.core import BaseClass, TabulateMixin
 from sknano.core.atoms import BasisAtom, BasisAtoms
 from ._extras import supercell_lattice_points
 
@@ -25,7 +25,7 @@ __all__ = ['CrystalCell', 'UnitCell', 'SuperCell']
 
 
 @total_ordering
-class UnitCell(BaseClass):
+class UnitCell(BaseClass, TabulateMixin):
     """Base class for abstract representations of crystallographic unit cells.
 
     Parameters
@@ -62,6 +62,16 @@ class UnitCell(BaseClass):
         self.wrap_coords = wrap_coords
         self.fmtstr = "{lattice!r}, {basis!r}, {coords!r}, " + \
             "cartesian=False, wrap_coords={wrap_coords!r}"
+
+    def __str__(self):
+        strrep = self._table_title_str()
+        lattice = self.lattice
+        basis = self.basis
+        if lattice is not None:
+            strrep = '\n'.join((strrep, str(lattice)))
+        if basis.data:
+            strrep = '\n'.join((strrep, str(basis)))
+        return strrep
 
     def __dir__(self):
         return ['lattice', 'basis']
@@ -126,7 +136,7 @@ class UnitCell(BaseClass):
 
 
 @total_ordering
-class CrystalCell(BaseClass):
+class CrystalCell(BaseClass, TabulateMixin):
     """Class representation of crystal structure cell.
 
     Parameters
@@ -177,6 +187,19 @@ class CrystalCell(BaseClass):
 
     def __dir__(self):
         return ['lattice', 'basis', 'unit_cell', 'scaling_matrix']
+
+    def __str__(self):
+        strrep = self._table_title_str()
+        lattice = self.lattice
+        unit_cell = self.unit_cell
+        if lattice is not None:
+            strrep = '\n'.join((strrep, str(lattice)))
+        if unit_cell is not None:
+            strrep = '\n'.join((strrep, str(unit_cell)))
+        basis = self.basis
+        if isinstance(basis, BasisAtoms) and basis.data:
+            strrep = '\n'.join((strrep, str(basis)))
+        return strrep
 
     def __eq__(self, other):
         if all([attr is not None for attr in

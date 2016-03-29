@@ -15,7 +15,7 @@ from operator import attrgetter
 
 import numpy as np
 
-from sknano.core import UserList
+from sknano.core import UserList, TabulateMixin
 from ._transforms import transformation_matrix
 # from sknano.core.geometric_regions import Cuboid  # , Rectangle
 from ._point import Point
@@ -26,7 +26,7 @@ operand_shape_error_msg = \
     "operands could not be broadcast together with shapes {}, {}"
 
 
-class Points(UserList):
+class Points(TabulateMixin, UserList):
     """Container class for collection of `Point` objects.
 
     Parameters
@@ -36,13 +36,19 @@ class Points(UserList):
         existing `Points` instance object.
 
     """
-
     def __init__(self, points=None):
         super().__init__(initlist=points)
         self.fmtstr = "{points!r}"
 
-    def __repr__(self):
-        return str(np.asarray([pt.tolist() for pt in self]))
+    def _tabular_data(self):
+        begin = len('Point(')
+        fmt = super()._tabular_data_format_string
+        values = list(zip(['P{}'.format(i+1) for i in range(len(self))],
+                          [fmt(pt, begin, end=-1) for pt in self]))
+        return values,
+
+    def _table_title_str(self):
+        return 'Points'
 
     @property
     def __item_class__(self):
@@ -146,11 +152,11 @@ class Points(UserList):
 
     def asarray(self):
         """Return :class:`Points` as an :class:`~numpy:numpy.ndarray`."""
-        return np.asarray([point.tolist() for point in self])
+        return np.asarray(self.tolist())
 
     def asmatrix(self):
         """Return :class:`Points` as a :class:`~numpy:numpy.matrix`."""
-        return np.asmatrix([point.tolist() for point in self])
+        return np.asmatrix(self.tolist())
 
     @property
     def x(self):
@@ -257,6 +263,11 @@ class Points(UserList):
         """
         [point.translate(t) for point in self]
 
+    def tolist(self):
+        """Return `Points` as :class:`~python:list`"""
+        # return np.asarray([pt.tolist() for pt in self]).tolist()
+        return [pt.tolist() for pt in self]
+
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
-        return dict(points=[p.tolist() for p in self])
+        return dict(points=self.tolist())

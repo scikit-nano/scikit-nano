@@ -300,13 +300,6 @@ class XYZAtoms(Atoms):
     def sort(self, key=attrgetter('r'), reverse=False):
         super().sort(key=key, reverse=reverse)
 
-    def __str__(self):
-        strrep = super().__str__()
-        items = ['centroid', 'center_of_mass']
-        values = [self.centroid, self.center_of_mass]
-        table1 = self._tabulate(list(zip(items, values)))
-        return '\n'.join((strrep, table1, str(self.bounding_box)))
-
     @property
     def center_of_mass(self):
         """Center-of-Mass coordinates of `Atoms`.

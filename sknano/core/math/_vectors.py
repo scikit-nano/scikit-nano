@@ -15,7 +15,7 @@ from operator import attrgetter
 
 import numpy as np
 
-from sknano.core import UserList
+from sknano.core import UserList, TabulateMixin
 from ._transforms import transformation_matrix
 # from sknano.core.geometric_regions import Cuboid  # , Rectangle
 
@@ -25,7 +25,7 @@ operand_shape_error_msg = \
     "operands could not be broadcast together with shapes {}, {}"
 
 
-class Vectors(UserList):
+class Vectors(UserList, TabulateMixin):
     """Container class for collection of `Vector` objects.
 
     Parameters
@@ -37,13 +37,19 @@ class Vectors(UserList):
     """
 
     def __init__(self, vectors=None):
-        # if vectors is not None:
-        #     vectors = np.asarray(vectors).tolist()
         super().__init__(initlist=vectors)
         self.fmtstr = "{vectors!r}"
 
-    def __repr__(self):
-        return str(np.asarray([vec.tolist() for vec in self]))
+    def _tabular_data(self):
+        """Return values for pretty tabulated output."""
+        begin = len('Vector(')
+        fmt = super()._tabular_data_format_string
+        values = list(zip(['V{}'.format(i+1) for i in range(len(self))],
+                          [fmt(vec, begin, end=-1) for vec in self]))
+        return values,
+
+    def _table_title_str(self):
+        return 'Vectors'
 
     @property
     def __item_class__(self):
@@ -216,11 +222,11 @@ class Vectors(UserList):
 
     def asarray(self):
         """Return :class:`Vectors` as an :class:`~numpy:numpy.ndarray`."""
-        return np.asarray([vec.tolist() for vec in self])
+        return np.asarray(self.tolist())
 
     def asmatrix(self):
         """Return :class:`Vectors` as a :class:`~numpy:numpy.matrix`."""
-        return np.asmatrix([vec.tolist() for vec in self])
+        return np.asmatrix(self.tolist())
 
     @property
     def x(self):
@@ -386,10 +392,6 @@ class Vectors(UserList):
     def scale(self):
         return NotImplemented
 
-    def tolist(self):
-        """Return `Vectors` as :class:`~python:list`"""
-        return np.asarray([vec.tolist() for vec in self]).tolist()
-
     def translate(self, t, fix_anchor_points=False, **kwargs):
         """Translate `Vector`\ s by :class:`Vector` `t`.
 
@@ -402,8 +404,13 @@ class Vectors(UserList):
         [vector.translate(t, fix_anchor_point=fix_anchor_points)
          for vector in self]
 
+    def tolist(self):
+        """Return `Vectors` as :class:`~python:list`"""
+        # return np.asarray([vec.tolist() for vec in self]).tolist()
+        return [vec.tolist() for vec in self]
+
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
-        return dict(vectors=[vec.tolist() for vec in self])
+        return dict(vectors=self.tolist())
 
 from ._vector import Vector

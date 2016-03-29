@@ -15,14 +15,14 @@ from functools import total_ordering
 
 import numpy as np
 
-from sknano.core import BaseClass
+from sknano.core import BaseClass, TabulateMixin
 from sknano.core.atoms import StructureAtoms, vdw_radius_from_basis
 from sknano.core.crystallography import CrystalCell, UnitCell, SuperCell
 from sknano.core.refdata import aCC, element_data
 
 
 __all__ = ['BaseStructureMixin', 'BaseStructure',
-           'StructureBaseMixin', 'StructureBase', 'StructureData',
+           'StructureBaseMixin', 'StructureBase',
            'CrystalStructureBase', 'NanoStructureBase']
 
 r_CC_vdw = element_data['C']['VanDerWaalsRadius']
@@ -173,11 +173,11 @@ class BaseStructure(BaseStructureMixin):
         self._atoms = StructureAtoms()
         self._crystal_cell = CrystalCell()
 
-StructureBase = StructureData = BaseStructure
+StructureBase = BaseStructure
 
 
 @total_ordering
-class CrystalStructureBase(BaseStructure, BaseClass):
+class CrystalStructureBase(TabulateMixin, BaseStructure, BaseClass):
     """Base class for abstract representions of crystal structures.
 
     Parameters
@@ -212,6 +212,11 @@ class CrystalStructureBase(BaseStructure, BaseClass):
         if isinstance(other, CrystalStructureBase):
             return self.crystal_cell < other.crystal_cell
 
+    def __str__(self):
+        strrep = self._table_title_str()
+        strrep = '\n'.join((strrep, str(self.atoms), str(self.crystal_cell)))
+        return strrep
+
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
         attrdict = self.unit_cell.todict()
@@ -219,7 +224,7 @@ class CrystalStructureBase(BaseStructure, BaseClass):
         return attrdict
 
 
-class NanoStructureBase(BaseStructure, BaseClass):
+class NanoStructureBase(TabulateMixin, BaseStructure, BaseClass):
     """Base class for creating abstract representations of nanostructure.
 
     Parameters
@@ -262,6 +267,11 @@ class NanoStructureBase(BaseStructure, BaseClass):
         self.bond = bond
         self.basis = basis
         self.vdw_radius = vdw_radius
+
+    def __str__(self):
+        strrep = self._table_title_str()
+        strrep = '\n'.join((strrep, str(self.atoms), str(self.crystal_cell)))
+        return strrep
 
     @property
     def basis(self):

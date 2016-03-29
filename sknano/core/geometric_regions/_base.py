@@ -13,8 +13,11 @@ from __future__ import absolute_import, division, print_function, \
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
-from functools import total_ordering
-from sknano.core import BaseClass
+from functools import reduce, total_ordering
+
+import numpy as np
+
+from sknano.core import BaseClass, TabulateMixin
 from sknano.core.math import Points, Vectors, transformation_matrix
 
 # import numpy as np
@@ -80,7 +83,7 @@ class GeometricTransformsMixin:
 
 
 @total_ordering
-class GeometricRegion(BaseClass, metaclass=ABCMeta):
+class GeometricRegion(BaseClass, TabulateMixin, metaclass=ABCMeta):
     """Abstract base class for all geometric regions.
 
     Attributes
@@ -93,11 +96,27 @@ class GeometricRegion(BaseClass, metaclass=ABCMeta):
         defining the :class:`GeometricRegion`
 
     """
-
     def __init__(self):
         super().__init__()
         self.points = Points()
         self.vectors = Vectors()
+
+    def __eq__(self, other):
+        return isinstance(other, type(self)) and \
+            self.points == other.points and self.vectors == other.vectors
+
+    def __lt__(self, other):
+        return isinstance(other, type(self)) and self.measure < other.measure
+
+    def __str__(self):
+        strrep = self._table_title_str()
+        points = self.points
+        vectors = self.vectors
+        if points:
+            strrep = '\n'.join((strrep, str(points)))
+        if vectors:
+            strrep = '\n'.join((strrep, str(vectors)))
+        return strrep
 
     @property
     @abstractmethod
@@ -116,17 +135,24 @@ class GeometricRegion(BaseClass, metaclass=ABCMeta):
         """Measure of geometric region."""
         raise NotImplementedError
 
-    def __eq__(self, other):
-        return isinstance(other, type(self)) and \
-            self.points == other.points and self.vectors == other.vectors
-
-    def __lt__(self, other):
-        return isinstance(other, type(self)) and self.measure < other.measure
-
     @abstractmethod
     def contains(self, point):
         """Test region membership of `point` in :class:`GeometricRegion`."""
         raise NotImplementedError
+
+    @property
+    def pmin(self):
+        """:class:`Point` at minimum extent in :math:`(x,y,z)` dimensions."""
+        points = [pt for pt in self.points]
+        points.extend([vec.p for vec in self.vectors])
+        return reduce(lambda x1, x2: np.minimum(x1, x2), points)
+
+    @property
+    def pmax(self):
+        """:class:`Point` at maximum extent in :math:`(x,y,z)` dimensions."""
+        points = [pt for pt in self.points]
+        points.extend([vec.p for vec in self.vectors])
+        return reduce(lambda x1, x2: np.maximum(x1, x2), points)
 
     def center_centroid(self):
         """Center :attr:`~GeometricRegion.centroid` on origin."""

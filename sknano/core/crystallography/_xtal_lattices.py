@@ -16,7 +16,9 @@ from functools import total_ordering
 
 import numpy as np
 
-from sknano.core import BaseClass
+# from tabulate import tabulate
+
+from sknano.core import BaseClass, TabulateMixin
 from sknano.core.geometric_regions import Parallelepiped
 from sknano.core.math import Vector, Point, zhat, rotation_matrix
 from ._extras import pbc_diff
@@ -34,7 +36,7 @@ __all__ = ['LatticeBase', 'ReciprocalLatticeBase',
 
 
 @total_ordering
-class LatticeBase(BaseClass):
+class LatticeBase(BaseClass, TabulateMixin):
     """Base class for crystallographic lattice objects.
 
     Parameters
@@ -111,11 +113,17 @@ class LatticeBase(BaseClass):
         return self.cell_matrix * self.cell_matrix.T
 
     @property
+    def bounding_box(self):
+        """:attr:`~LatticeBase.region` :attr:`~Parallelepiped.bounding_box`."""
+        return self.region.bounding_box
+
+    @property
     def region(self):
-        """Region enclosed by lattice vectors."""
-        return Parallelepiped(u=Vector(self.ortho_matrix[:, 0].A.flatten()),
-                              v=Vector(self.ortho_matrix[:, 1].A.flatten()),
-                              w=Vector(self.ortho_matrix[:, 2].A.flatten()))
+        """:class:`Parallelepiped` defined by lattice vectors."""
+        cell_matrix = self.cell_matrix
+        o = self.offset
+        u, v, w = map(Vector, [cell_matrix[ri].A.flatten() for ri in range(3)])
+        return Parallelepiped(o, u, v, w)
 
     @property
     def centroid(self):
@@ -886,6 +894,23 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin):
         attrs = super().__dir__()
         attrs.extend(['a', 'b', 'c', 'alpha', 'beta', 'gamma'])
         return attrs
+
+    def __str__(self):
+        title = self._table_title_str()
+        lattice_params = \
+            self._tabulate(list(zip(('a', 'b', 'c', 'α', 'β', 'γ'),
+                                    self.lengths_and_angles)))
+
+        cosines = np.around(np.cos(np.radians(self.angles)), decimals=2)
+        cosines = self._tabulate(list(zip(('cos(α)', 'cos(β)', 'cos(γ)'),
+                                          cosines)))
+        offset = self._tabulate([['origin', self.offset]])
+        lattice_vectors = \
+            self._tabulate(list(zip(('a1', 'a2', 'a3'),
+                                    self.lattice_vectors)))
+        strrep = '\n'.join((title, lattice_params, cosines, offset,
+                            lattice_vectors, str(self.region)))
+        return strrep
 
     def todict(self):
         """Return `dict` of `Crystal3DLattice` parameters."""
