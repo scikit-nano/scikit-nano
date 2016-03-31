@@ -28,13 +28,13 @@ class Tests(GeneratorTestFixture):
         quartz = AlphaQuartzGenerator()
         quartz.save()
         self.tmpdata.append(quartz.fname)
-        assert_equal(quartz.atoms.Natoms, AlphaQuartz().basis.Natoms)
+        assert_equal(quartz.Natoms, AlphaQuartz().Natoms)
 
     def test2(self):
         quartz = AlphaQuartzGenerator(scaling_matrix=[2, 2, 2])
         quartz.save()
         self.tmpdata.append(quartz.fname)
-        assert_equal(quartz.atoms.Natoms, AlphaQuartz().basis.Natoms * 2 ** 3)
+        assert_equal(quartz.Natoms, AlphaQuartz().basis.Natoms * 2 ** 3)
 
     def test3(self):
         gold = GoldGenerator()

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Bulk structure generator (:mod:`sknano.generators._bulk_structure_generator`)
+Bulk structure generator (:mod:`sknano.generators._xtal_structure_generator`)
 ===============================================================================
 
-.. currentmodule:: sknano.generators._bulk_structure_generator
+.. currentmodule:: sknano.generators._xtal_structure_generator
 
 .. todo::
 
@@ -21,14 +21,12 @@ from __future__ import absolute_import, division, print_function, \
 
 __docformat__ = 'restructuredtext en'
 
-# import numpy as np
-
 # from sknano.core import pluralize
 # from sknano.core.math import Point, Vector
 from sknano.core.structures import AlphaQuartz, DiamondStructure, \
     Iron, Gold, Copper, BCCStructure, FCCStructure, CaesiumChlorideStructure, \
     RocksaltStructure, ZincblendeStructure, MoS2
-from ._base import BulkGeneratorBase
+from ._base import CrystalStructureGenerator
 
 __all__ = ['DiamondGenerator', 'DiamondStructureGenerator',
            'BCCGenerator', 'BCCStructureGenerator',
@@ -41,7 +39,7 @@ __all__ = ['DiamondGenerator', 'DiamondStructureGenerator',
            'GoldGenerator', 'CopperGenerator', 'MoS2Generator']
 
 
-class AlphaQuartzGenerator(BulkGeneratorBase, AlphaQuartz):
+class AlphaQuartzGenerator(CrystalStructureGenerator, AlphaQuartz):
     """:class:`~sknano.core.structures.AlphaQuartz` generator class.
 
     Parameters
@@ -61,7 +59,7 @@ class AlphaQuartzGenerator(BulkGeneratorBase, AlphaQuartz):
     pass
 
 
-class DiamondGenerator(BulkGeneratorBase, DiamondStructure):
+class DiamondGenerator(CrystalStructureGenerator, DiamondStructure):
     """:class:`~sknano.core.structures.DiamondStructure` generator class.
 
     Parameters
@@ -82,7 +80,8 @@ class DiamondGenerator(BulkGeneratorBase, DiamondStructure):
 DiamondStructureGenerator = DiamondGenerator
 
 
-class CaesiumChlorideGenerator(BulkGeneratorBase, CaesiumChlorideStructure):
+class CaesiumChlorideGenerator(CrystalStructureGenerator,
+                               CaesiumChlorideStructure):
     """:class:`~sknano.core.structures.CaesiumChlorideStructure` generator \
         class.
 
@@ -100,7 +99,7 @@ class CaesiumChlorideGenerator(BulkGeneratorBase, CaesiumChlorideStructure):
 CaesiumChlorideStructureGenerator = CsClGenerator = CaesiumChlorideGenerator
 
 
-class RocksaltGenerator(BulkGeneratorBase, RocksaltStructure):
+class RocksaltGenerator(CrystalStructureGenerator, RocksaltStructure):
     """:class:`~sknano.core.structures.RocksaltStructure` generator class.
 
     Examples
@@ -117,7 +116,7 @@ class RocksaltGenerator(BulkGeneratorBase, RocksaltStructure):
 RocksaltStructureGenerator = NaClGenerator = RocksaltGenerator
 
 
-class ZincblendeGenerator(BulkGeneratorBase, ZincblendeStructure):
+class ZincblendeGenerator(CrystalStructureGenerator, ZincblendeStructure):
     """:class:`~sknano.core.structures.ZincblendeStructure` generator class.
 
     Examples
@@ -134,7 +133,7 @@ class ZincblendeGenerator(BulkGeneratorBase, ZincblendeStructure):
 ZincblendeStructureGenerator = ZincblendeGenerator
 
 
-class BCCGenerator(BulkGeneratorBase, BCCStructure):
+class BCCGenerator(CrystalStructureGenerator, BCCStructure):
     """:class:`~sknano.core.structures.BCCStructure` generator class.
 
     Examples
@@ -151,7 +150,7 @@ class BCCGenerator(BulkGeneratorBase, BCCStructure):
 BCCStructureGenerator = BCCGenerator
 
 
-class FCCGenerator(BulkGeneratorBase, FCCStructure):
+class FCCGenerator(CrystalStructureGenerator, FCCStructure):
     """:class:`~sknano.core.structures.FCCStructure` generator class.
 
     Examples
@@ -168,7 +167,7 @@ class FCCGenerator(BulkGeneratorBase, FCCStructure):
 FCCStructureGenerator = FCCGenerator
 
 
-class MoS2Generator(BulkGeneratorBase, MoS2):
+class MoS2Generator(CrystalStructureGenerator, MoS2):
     """:class:`~sknano.core.structures.MoS2` generator class.
 
     Examples
@@ -183,16 +182,16 @@ class MoS2Generator(BulkGeneratorBase, MoS2):
     pass
 
 
-class IronGenerator(BulkGeneratorBase, Iron):
+class IronGenerator(CrystalStructureGenerator, Iron):
     """:class:`~sknano.core.structures.Iron` generator class."""
     pass
 
 
-class GoldGenerator(BulkGeneratorBase, Gold):
+class GoldGenerator(CrystalStructureGenerator, Gold):
     """:class:`~sknano.core.structures.Gold` generator class."""
     pass
 
 
-class CopperGenerator(BulkGeneratorBase, Copper):
+class CopperGenerator(CrystalStructureGenerator, Copper):
     """:class:`~sknano.core.structures.Copper` generator class."""
     pass
