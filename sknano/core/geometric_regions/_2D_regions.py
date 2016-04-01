@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-=======================================================================
+============================================================================
 2D geometric regions (:mod:`sknano.core.geometric_regions._2D_regions`)
-=======================================================================
+============================================================================
 
 .. currentmodule:: sknano.core.geometric_regions._2D_regions
 
@@ -12,11 +12,12 @@ from __future__ import absolute_import, division, print_function, \
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
+# from functools import reduce
 
 import numpy as np
 
 from sknano.core.math import Point, Vector
-from ._base import GeometricRegion, GeometricTransformsMixin
+from ._base import GeometricRegion, GeometricTransformsMixin, ndim_errmsg
 
 __all__ = ['Geometric2DRegion', 'Parallelogram', 'Rectangle', 'Square',
            'Ellipse', 'Circle', 'Triangle', 'geometric_2D_regions']
@@ -25,6 +26,11 @@ __all__ = ['Geometric2DRegion', 'Parallelogram', 'Rectangle', 'Square',
 class Geometric2DRegion(GeometricRegion, GeometricTransformsMixin,
                         metaclass=ABCMeta):
     """Abstract base class for representing 2D geometric regions."""
+
+    @property
+    def ndim(self):
+        """Return the dimensions."""
+        return 2
 
     @property
     @abstractmethod
@@ -37,6 +43,11 @@ class Geometric2DRegion(GeometricRegion, GeometricTransformsMixin,
         """Alias for :attr:`~Geometric2DRegion.area`, which is the measure \
             of a 2D geometric region."""
         return self.area
+
+    @property
+    def bounding_box(self):
+        """Bounding :class:`Cuboid`."""
+        return Rectangle(pmin=self.pmin.tolist(), pmax=self.pmax.tolist())
 
 
 class Parallelogram(Geometric2DRegion):
@@ -71,21 +82,17 @@ class Parallelogram(Geometric2DRegion):
 
         super().__init__()
 
-        self._o = Point(nd=2)
-        self._u = Vector(nd=2)
-        self._v = Vector(nd=2)
-
         if o is None:
             o = [0, 0]
-        self.o = o
+        self._o = Point(o)
 
         if u is None:
             u = [1, 0]
-        self.u = u
+        self._u = Vector(u, p0=self.o)
 
         if v is None:
             v = [1, 1]
-        self.v = v
+        self._v = Vector(v, p0=self.o)
 
         self.points.append(self.o)
         self.vectors.extend([self.u, self.v])
@@ -106,8 +113,8 @@ class Parallelogram(Geometric2DRegion):
     def o(self, value):
         if not isinstance(value, (tuple, list, np.ndarray)) or len(value) != 2:
             raise TypeError('Expected a 2-element array_like object')
-        self.vectors.translate(Vector(p0=self.o, p=Point(value)))
-        self._o[:] = Point(value)
+        # self._o[:] = Point(value)
+        self.translate(Vector(p0=self.o, p=Point(value)))
 
     @property
     def u(self):
@@ -269,33 +276,48 @@ class Rectangle(Geometric2DRegion):
             pmax = [xmax, ymax]
         self._pmax = Point(pmax)
 
+        self.points.extend([self._pmin, self._pmax])
         assert np.all(np.less_equal(self.pmin, self.pmax))
-        self.points.extend([self.pmin, self.pmax])
         self.fmtstr = "pmin={pmin!r}, pmax={pmax!r}"
+
+    def _update_points(self):
+        pmin = self.pmin.copy()
+        pmax = self.pmax.copy()
+        self._pmin = np.minimum(pmin, pmax)
+        self._pmax = np.maximum(pmin, pmax)
+        assert np.all(np.less_equal(self._pmin, self._pmax))
+        self.points.clear()
+        self.points.extend([self.pmin, self.pmax])
 
     @property
     def pmin(self):
         """2D :class:`Point` at \
             (:attr:`~Rectangle.xmin`, :attr:`~Rectangle.ymin`)."""
-        return self._pmin
+        # return self._pmin
+        return super().pmin
 
     @pmin.setter
     def pmin(self, value):
-        if not isinstance(value, (tuple, list, np.ndarray)) or len(value) != 2:
-            raise TypeError('Expected a 2-element array_like object')
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != self.ndim:
+            raise TypeError(ndim_errmsg.format(self.ndim))
         self._pmin[:] = Point(value)
+        self._update_points()
 
     @property
     def pmax(self):
         """2D :class:`Point` at \
             (:attr:`~Rectangle.xmax`, :attr:`~Rectangle.ymax`)."""
-        return self._pmax
+        # return self._pmax
+        return super().pmax
 
     @pmax.setter
     def pmax(self, value):
-        if not isinstance(value, (tuple, list, np.ndarray)) or len(value) != 2:
-            raise TypeError('Expected a 2-element array_like object')
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != self.ndim:
+            raise TypeError(ndim_errmsg.format(self.ndim))
         self._pmax[:] = Point(value)
+        self._update_points()
 
     @property
     def xmin(self):
@@ -304,7 +326,8 @@ class Rectangle(Geometric2DRegion):
 
     @xmin.setter
     def xmin(self, value):
-        self.pmin.x = float(value)
+        self._pmin.x = float(value)
+        self._update_points()
 
     @property
     def xmax(self):
@@ -313,7 +336,8 @@ class Rectangle(Geometric2DRegion):
 
     @xmax.setter
     def xmax(self, value):
-        self.pmax.x = float(value)
+        self._pmax.x = float(value)
+        self._update_points()
 
     @property
     def ymin(self):
@@ -322,7 +346,8 @@ class Rectangle(Geometric2DRegion):
 
     @ymin.setter
     def ymin(self, value):
-        self.pmin.y = float(value)
+        self._pmin.y = float(value)
+        self._update_points()
 
     @property
     def ymax(self):
@@ -331,24 +356,38 @@ class Rectangle(Geometric2DRegion):
 
     @ymax.setter
     def ymax(self, value):
-        self.pmax.y = float(value)
+        self._pmax.y = float(value)
+        self._update_points()
 
     @property
-    def a(self):
+    def lengths(self):
+        """:class:`~python:tuple` of side lengths"""
+        return self.lx, self.ly
+
+    @property
+    def lx(self):
         """Distance between :math:`x_{\\mathrm{max}}-x_{\\mathrm{min}}`."""
         return self.xmax - self.xmin
 
     @property
-    def b(self):
+    def ly(self):
         """Distance between :math:`y_{\\mathrm{max}}-y_{\\mathrm{min}}`."""
         return self.ymax - self.ymin
 
     @property
+    def a(self):
+        """Alias for :attr:`Rectangle.lx`."""
+        return self.lx
+
+    @property
+    def b(self):
+        """Alias for :attr:`Rectangle.ly`."""
+        return self.ly
+
+    @property
     def area(self):
-        """:class:`Rectangle` area, :math:`A=ab`"""
-        a = self.a
-        b = self.b
-        return a * b
+        """:class:`Rectangle` area, :math:`A=\\ell_x\\ell_y`"""
+        return self.lx * self.ly
 
     @property
     def centroid(self):
@@ -412,13 +451,6 @@ class Rectangle(Geometric2DRegion):
 
         return (px >= xmin) and (px <= xmax) and (py >= ymin) and (py <= ymax)
 
-    def _update_pminmax(self):
-        pmin = self.pmin.copy()
-        pmax = self.pmax.copy()
-        self._pmin[:] = np.minimum(pmin, pmax)
-        self._pmax[:] = np.maximum(pmin, pmax)
-        assert np.all(np.less_equal(self.pmin, self.pmax))
-
     def todict(self):
         """Returns a :class:`~python:dict` of the :class:`Rectangle` \
             constructor parameters."""
@@ -455,12 +487,9 @@ class Square(Geometric2DRegion):
 
         super().__init__()
 
-        self._center = Point(nd=2)
-
         if center is None:
             center = [0, 0]
-        self.center = center
-
+        self._center = Point(center)
         self.a = a
 
         self.points.append(self.center)
@@ -566,20 +595,18 @@ class Triangle(Geometric2DRegion):
     def __init__(self, p1=None, p2=None, p3=None):
         super().__init__()
 
-        self._p1 = Point(nd=2)
-        self._p2 = Point(nd=2)
-        self._p3 = Point(nd=2)
-
         if p1 is None:
             p1 = [0, 0]
+        self._p1 = Point(p1)
+
         if p2 is None:
             p2 = [0, 1]
+        self._p2 = Point(p2)
+
         if p3 is None:
             p3 = [1, 0]
+        self._p3 = Point(p3)
 
-        self.p1 = p1
-        self.p2 = p2
-        self.p3 = p3
         self.points.extend([self.p1, self.p2, self.p3])
         self.fmtstr = "p1={p1!r}, p2={p2!r}, p3={p3!r}"
 
@@ -750,11 +777,9 @@ class Ellipse(Geometric2DRegion):
     def __init__(self, center=None, rx=1, ry=1):
         super().__init__()
 
-        self._center = Point(nd=2)
-
         if center is None:
             center = [0, 0]
-        self.center = center
+        self._center = Point(center)
         self.rx = rx
         self.ry = ry
 
@@ -865,11 +890,9 @@ class Circle(Geometric2DRegion):
 
         super().__init__()
 
-        self._center = Point(nd=2)
-
         if center is None:
             center = [0, 0]
-        self.center = center
+        self._center = Point(center)
         self.r = r
 
         self.points.append(self.center)

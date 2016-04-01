@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-=======================================================================
+============================================================================
 3D geometric regions (:mod:`sknano.core.geometric_regions._3D_regions`)
-=======================================================================
+============================================================================
 
 .. currentmodule:: sknano.core.geometric_regions._3D_regions
 
@@ -12,12 +12,11 @@ from __future__ import absolute_import, division, print_function, \
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
-from functools import reduce
 import numbers
 import numpy as np
 
 from sknano.core.math import Point, Vector, vector as vec
-from ._base import GeometricRegion, GeometricTransformsMixin
+from ._base import GeometricRegion, GeometricTransformsMixin, ndim_errmsg
 
 __all__ = ['Geometric3DRegion', 'Parallelepiped', 'Cuboid', 'Cube',
            'Ellipsoid', 'Sphere', 'Cylinder', 'Cone', 'geometric_3D_regions']
@@ -26,6 +25,11 @@ __all__ = ['Geometric3DRegion', 'Parallelepiped', 'Cuboid', 'Cube',
 class Geometric3DRegion(GeometricRegion, GeometricTransformsMixin,
                         metaclass=ABCMeta):
     """Abstract base class for representing 3D geometric regions."""
+
+    @property
+    def ndim(self):
+        """Return the dimensions."""
+        return 3
 
     @property
     @abstractmethod
@@ -78,29 +82,23 @@ class Parallelepiped(Geometric3DRegion):
 
     """
     def __init__(self, o=None, u=None, v=None, w=None):
-
-        self._o = Point()
-        self._u = Vector()
-        self._v = Vector()
-        self._w = Vector()
-
         super().__init__()
 
         if o is None:
             o = [0, 0, 0]
-        self.o = o
+        self._o = Point(o)
 
         if u is None:
             u = [1, 0, 0]
-        self.u = u
+        self._u = Vector(u, p0=self.o)
 
         if v is None:
             v = [1, 1, 0]
-        self.v = v
+        self._v = Vector(v, p0=self.o)
 
         if w is None:
             w = [0, 1, 1]
-        self.w = w
+        self._w = Vector(w, p0=self.o)
 
         self.points.append(self.o)
         self.vectors.extend([self.u, self.v, self.w])
@@ -122,8 +120,8 @@ class Parallelepiped(Geometric3DRegion):
     def o(self, value):
         if not isinstance(value, (tuple, list, np.ndarray)) or len(value) != 3:
             raise TypeError('Expected a 3-element array_like object')
-        self.vectors.translate(Vector(p0=self.o, p=Point(value)))
-        self._o[:] = Point(value)
+        self.translate(Vector(p0=self._o, p=Point(value)))
+        # self._o[:] = Point(value)
 
     @property
     def u(self):
@@ -165,6 +163,31 @@ class Parallelepiped(Geometric3DRegion):
         self._w.p0 = self.o
 
     @property
+    def lengths(self):
+        """:class:`~python:tuple` of side lengths"""
+        return self.a, self.b, self.c
+
+    @property
+    def abc(self):
+        """Alias for :attr:`Parallelepiped.lengths`."""
+        return self.lengths
+
+    @property
+    def a(self):
+        """Alias for :attr:`Parallelepiped.u.length`."""
+        return self.u.length
+
+    @property
+    def b(self):
+        """Alias for :attr:`Parallelepiped.v.length`."""
+        return self.v.length
+
+    @property
+    def c(self):
+        """Alias for :attr:`Parallelepiped.w.length`."""
+        return self.w.length
+
+    @property
     def centroid(self):
         """Parallelepiped centroid, :math:`(c_x, c_y, c_z)`.
 
@@ -201,22 +224,6 @@ class Parallelepiped(Geometric3DRegion):
         cz = oz + (uz + vz + wz) / 2
 
         return Point([cx, cy, cz])
-
-    @property
-    def pmin(self):
-        """3D :class:`Point` at \
-            (:attr:`~Cuboid.xmin`, :attr:`~Cuboid.ymin`, :attr:`~Cuboid.zmin`)
-        """
-        return reduce(lambda x1, x2: np.minimum(x1, x2),
-                      [self.o, self.u.p, self.v.p, self.w.p])
-
-    @property
-    def pmax(self):
-        """3D :class:`Point` at \
-            (:attr:`~Cuboid.xmax`, :attr:`~Cuboid.ymax`, :attr:`~Cuboid.zmax`)
-        """
-        return reduce(lambda x1, x2: np.maximum(x1, x2),
-                      [self.o, self.u.p, self.v.p, self.w.p])
 
     @property
     def volume(self):
@@ -367,39 +374,46 @@ class Cuboid(Geometric3DRegion):
             pmax = [xmax, ymax, zmax]
         self._pmax = Point(pmax)
 
-        # assert self.pmin <= self.pmax
         assert np.all(np.less_equal(self.pmin, self.pmax))
+        self.points.extend([self._pmin, self._pmax])
+        # assert self.pmin <= self.pmax
 
-        self.points.extend([self.pmin, self.pmax])
         self.fmtstr = "pmin={pmin!r}, pmax={pmax!r}"
+
+    def _update_points(self):
+        pmin = self.pmin.copy()
+        pmax = self.pmax.copy()
+        self._pmin = np.minimum(pmin, pmax)
+        self._pmax = np.maximum(pmin, pmax)
+        assert np.all(np.less_equal(self._pmin, self._pmax))
+        self.points.clear()
+        self.points.extend([self.pmin, self.pmax])
 
     @property
     def pmin(self):
-        """3D :class:`Point` at \
-            (:attr:`~Cuboid.xmin`, :attr:`~Cuboid.ymin`, :attr:`~Cuboid.zmin`)
-        """
-        return self._pmin
+        """:class:`Point` at minimum extent."""
+        return super().pmin
 
     @pmin.setter
     def pmin(self, value):
-        if not isinstance(value, (tuple, list, np.ndarray)) or len(value) != 3:
-            raise TypeError('Expected a 3-element array_like object')
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != self.ndim:
+            raise TypeError(ndim_errmsg.format(self.ndim))
         self._pmin[:] = Point(value)
-        self._update_pminmax()
+        self._update_points()
 
     @property
     def pmax(self):
-        """3D :class:`Point` at \
-            (:attr:`~Cuboid.xmax`, :attr:`~Cuboid.ymax`, :attr:`~Cuboid.zmax`)
-        """
-        return self._pmax
+        """:class:`Point` at maximum extent."""
+        return super().pmax
 
     @pmax.setter
     def pmax(self, value):
-        if not isinstance(value, (tuple, list, np.ndarray)) or len(value) != 3:
-            raise TypeError('Expected a 3-element array_like object')
+        if not isinstance(value, (tuple, list, np.ndarray)) or \
+                len(value) != self.ndim:
+            raise TypeError(ndim_errmsg.format(self.ndim))
         self._pmax[:] = Point(value)
-        self._update_pminmax()
+        self._update_points()
 
     @property
     def xmin(self):
@@ -410,29 +424,8 @@ class Cuboid(Geometric3DRegion):
     def xmin(self, value):
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self.pmin.x = float(value)
-
-    @property
-    def ymin(self):
-        """:math:`y_{\\mathrm{min}}` coordinate."""
-        return self.pmin.y
-
-    @ymin.setter
-    def ymin(self, value):
-        if not isinstance(value, numbers.Number):
-            raise TypeError('Expected a number')
-        self.pmin.y = float(value)
-
-    @property
-    def zmin(self):
-        """:math:`z_{\\mathrm{min}}` coordinate."""
-        return self.pmin.z
-
-    @zmin.setter
-    def zmin(self, value):
-        if not isinstance(value, numbers.Number):
-            raise TypeError('Expected a number')
-        self.pmin.z = float(value)
+        self._pmin.x = float(value)
+        self._update_points()
 
     @property
     def xmax(self):
@@ -443,7 +436,20 @@ class Cuboid(Geometric3DRegion):
     def xmax(self, value):
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self.pmax.x = float(value)
+        self._pmax.x = float(value)
+        self._update_points()
+
+    @property
+    def ymin(self):
+        """:math:`y_{\\mathrm{min}}` coordinate."""
+        return self.pmin.y
+
+    @ymin.setter
+    def ymin(self, value):
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._pmin.y = float(value)
+        self._update_points()
 
     @property
     def ymax(self):
@@ -454,7 +460,20 @@ class Cuboid(Geometric3DRegion):
     def ymax(self, value):
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self.pmax.y = float(value)
+        self._pmax.y = float(value)
+        self._update_points()
+
+    @property
+    def zmin(self):
+        """:math:`z_{\\mathrm{min}}` coordinate."""
+        return self.pmin.z
+
+    @zmin.setter
+    def zmin(self, value):
+        if not isinstance(value, numbers.Number):
+            raise TypeError('Expected a number')
+        self._pmin.z = float(value)
+        self._update_points()
 
     @property
     def zmax(self):
@@ -465,32 +484,53 @@ class Cuboid(Geometric3DRegion):
     def zmax(self, value):
         if not isinstance(value, numbers.Number):
             raise TypeError('Expected a number')
-        self.pmax.z = float(value)
+        self._pmax.z = float(value)
+        self._update_points()
 
     @property
-    def abc(self):
+    def lengths(self):
         """:class:`~python:tuple` of side lengths"""
-        return self.a, self.b, self.c
+        return self.lx, self.ly, self.lz
 
     @property
-    def a(self):
+    def lx(self):
         """Distance between :math:`x_{\\mathrm{max}}-x_{\\mathrm{min}}`."""
         return self.xmax - self.xmin
 
     @property
-    def b(self):
+    def ly(self):
         """Distance between :math:`y_{\\mathrm{max}}-y_{\\mathrm{min}}`."""
         return self.ymax - self.ymin
 
     @property
-    def c(self):
+    def lz(self):
         """Distance between :math:`z_{\\mathrm{max}}-z_{\\mathrm{min}}`."""
         return self.zmax - self.zmin
 
     @property
+    def abc(self):
+        """Alias for :attr:`Cuboid.lengths`."""
+        return self.lengths
+
+    @property
+    def a(self):
+        """Alias for :attr:`Cuboid.lx`."""
+        return self.lx
+
+    @property
+    def b(self):
+        """Alias for :attr:`Cuboid.ly`."""
+        return self.ly
+
+    @property
+    def c(self):
+        """Alias for :attr:`Cuboid.lz`."""
+        return self.lz
+
+    @property
     def volume(self):
-        """:class:`Cuboid` volume, :math:`V=abc`."""
-        return self.a * self.b * self.c
+        """:class:`Cuboid` volume, :math:`V=\\ell_x\\ell_y\\ell_z`."""
+        return self.lx * self.ly * self.lz
 
     @property
     def centroid(self):
@@ -557,13 +597,6 @@ class Cuboid(Geometric3DRegion):
             (py >= self.ymin) and (py <= self.ymax) and \
             (pz >= self.zmin) and (pz <= self.zmax)
 
-    def _update_pminmax(self):
-        pmin = self.pmin.copy()
-        pmax = self.pmax.copy()
-        self._pmin[:] = np.minimum(pmin, pmax)
-        self._pmax[:] = np.maximum(pmin, pmax)
-        assert np.all(np.less_equal(self.pmin, self.pmax))
-
     def todict(self):
         """Returns a :class:`~python:dict` of the :class:`Cuboid` \
             constructor parameters."""
@@ -595,12 +628,9 @@ class Cube(Geometric3DRegion):
     """
     def __init__(self, center=None, a=1):
         super().__init__()
-
-        self._center = Point()
-
         if center is None:
             center = [0, 0, 0]
-        self.center = center
+        self._center = Point(center)
         self.a = a
         self.points.append(self.center)
 
@@ -718,11 +748,9 @@ class Ellipsoid(Geometric3DRegion):
     def __init__(self, center=None, rx=1, ry=1, rz=1):
         super().__init__()
 
-        self._center = Point()
-
         if center is None:
             center = [0, 0, 0]
-        self.center = center
+        self._center = Point(center)
 
         self.rx = rx
         self.ry = ry
@@ -841,14 +869,10 @@ class Sphere(Geometric3DRegion):
     def __init__(self, center=None, r=1):
         super().__init__()
 
-        self._center = Point()
-
         if center is None:
             center = [0, 0, 0]
-        self.center = center
-
+        self._center = Point(center)
         self.r = r
-
         self.points.append(self.center)
 
         self.fmtstr = "center={center!r}, r={r:.3f}"
@@ -956,18 +980,17 @@ class Cylinder(Geometric3DRegion):
     def __init__(self, p1=None, p2=None, r=1):
         super().__init__()
 
-        self._p1 = Point()
-        self._p2 = Point()
-
         if p1 is None:
             p1 = [0, 0, -1]
+        self._p1 = Point(p1)
+
         if p2 is None:
             p2 = [0, 0, 1]
+        self._p2 = Point(p2)
 
-        self.p1 = p1
-        self.p2 = p2
-        self.points.extend([self.p1, self.p2])
         self.r = r
+
+        self.points.extend([self.p1, self.p2])
         self.fmtstr = "p1={p1!r}, p2={p2!r}, r={r:.3f}"
 
     @property
@@ -1136,18 +1159,17 @@ class Cone(Geometric3DRegion):
     def __init__(self, p1=None, p2=None, r=1):
         super().__init__()
 
-        self._p1 = Point()
-        self._p2 = Point()
-
         if p1 is None:
             p1 = [0, 0, 0]
+        self._p1 = Point(p1)
+
         if p2 is None:
             p2 = [0, 0, 2]
+        self._p2 = Point(p2)
 
-        self.p1 = p1
-        self.p2 = p2
-        self.points.extend([self.p1, self.p2])
         self.r = r
+
+        self.points.extend([self.p1, self.p2])
         self.fmtstr = "p1={p1!r}, p2={p2!r}, r={r:.3f}"
 
     @property

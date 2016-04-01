@@ -18,20 +18,20 @@ from functools import reduce, total_ordering
 import numpy as np
 
 from sknano.core import BaseClass, TabulateMixin
-from sknano.core.math import Points, Vectors, transformation_matrix
+from sknano.core.math import Point, Points, Vectors, transformation_matrix
 
 # import numpy as np
 
 __all__ = ['GeometricRegion', 'GeometricTransformsMixin']
+
+ndim_errmsg = 'Expected a {}-element array_like object'
 
 
 class GeometricTransformsMixin:
     """Mixin class providing methods for applying linear algebra \
         transforms to geometric regions."""
 
-    def rotate(self, angle=None, axis=None, anchor_point=None,
-               rot_point=None, from_vector=None, to_vector=None,
-               degrees=False, transform_matrix=None, verbose=False, **kwargs):
+    def rotate(self, **kwargs):
         """Rotate `GeometricRegion` :attr:`~GeometricRegion.points` and \
             :attr:`~GeometricRegion.vectors`.
 
@@ -45,23 +45,21 @@ class GeometricTransformsMixin:
         degrees : bool, optional
         transform_matrix : :class:`~numpy:numpy.ndarray`
 
-
         See Also
         --------
         sknano.core.math.rotate
 
         """
-        if transform_matrix is None:
-            transform_matrix = \
-                transformation_matrix(angle=angle, axis=axis,
-                                      anchor_point=anchor_point,
-                                      rot_point=rot_point,
-                                      from_vector=from_vector,
-                                      to_vector=to_vector, degrees=degrees,
-                                      verbose=verbose, **kwargs)
+        # if kwargs.get('axis', None) is None:
+        #     kwargs['axis'] = 'z'
+        if kwargs.get('anchor_point', None) is None:
+            kwargs['anchor_point'] = self.centroid
 
-        self.points.rotate(transform_matrix=transform_matrix)
-        self.vectors.rotate(transform_matrix=transform_matrix)
+        if kwargs.get('transform_matrix', None) is None:
+            kwargs['transform_matrix'] = transformation_matrix(**kwargs)
+
+        self.points.rotate(**kwargs)
+        self.vectors.rotate(**kwargs)
 
     def translate(self, t, fix_anchor_points=False):
         """Translate `GeometricRegion` :attr:`~GeometricRegion.points` and \
@@ -110,18 +108,27 @@ class GeometricRegion(BaseClass, TabulateMixin, metaclass=ABCMeta):
 
     def __str__(self):
         strrep = self._table_title_str()
+        objstr = self._obj_mro_str()
         points = self.points
         vectors = self.vectors
         if points:
-            strrep = '\n'.join((strrep, str(points)))
+            title = '.'.join((objstr, points.__class__.__qualname__))
+            strrep = '\n'.join((strrep, title, str(points)))
         if vectors:
-            strrep = '\n'.join((strrep, str(vectors)))
+            title = '.'.join((objstr, vectors.__class__.__qualname__))
+            strrep = '\n'.join((strrep, title, str(vectors)))
         return strrep
 
     @property
     @abstractmethod
     def centroid(self):
         """Centroid of geometric region."""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def ndim(self):
+        """Dimensions of of geometric region."""
         raise NotImplementedError
 
     @property
@@ -142,17 +149,29 @@ class GeometricRegion(BaseClass, TabulateMixin, metaclass=ABCMeta):
 
     @property
     def pmin(self):
-        """:class:`Point` at minimum extent in :math:`(x,y,z)` dimensions."""
-        points = [pt for pt in self.points]
-        points.extend([vec.p for vec in self.vectors])
-        return reduce(lambda x1, x2: np.minimum(x1, x2), points)
+        """:class:`Point` at minimum extent."""
+        # self._update_minmax_points()
+        try:
+            return self._pmin
+        except AttributeError:
+            return Point(reduce(lambda x1, x2: np.minimum(x1, x2),
+                                self.get_points()))
 
     @property
     def pmax(self):
-        """:class:`Point` at maximum extent in :math:`(x,y,z)` dimensions."""
-        points = [pt for pt in self.points]
-        points.extend([vec.p for vec in self.vectors])
-        return reduce(lambda x1, x2: np.maximum(x1, x2), points)
+        """:class:`Point` at maximum extent."""
+        try:
+            return self._pmax
+        except AttributeError:
+            return Point(reduce(lambda x1, x2: np.maximum(x1, x2),
+                                self.get_points()))
+
+    def get_points(self):
+        """Return list of points from :attr:`GeometricRegion.points` and \
+            :attr:`GeometricRegion.vectors`"""
+        points = [np.asarray(pt) for pt in self.points]
+        points.extend([np.asarray(vec.p) for vec in self.vectors])
+        return points
 
     def center_centroid(self):
         """Center :attr:`~GeometricRegion.centroid` on origin."""

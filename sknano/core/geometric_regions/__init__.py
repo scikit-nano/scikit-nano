@@ -11,6 +11,7 @@ Contents
 
 Base/mixin classes for all geometric regions
 -----------------------------------------------------------
+
 .. autosummary::
    :toctree: generated/
 
@@ -21,6 +22,7 @@ Base/mixin classes for all geometric regions
 
 2D Regions
 ----------
+
 .. autosummary::
    :toctree: generated/
 
@@ -46,11 +48,10 @@ Base/mixin classes for all geometric regions
    Cone
 
 Other
------
+-------
 .. autosummary::
    :toctree: generated/
 
-   Domain
    generate_bounding_box
 
 .. autodata:: geometric_2D_regions
