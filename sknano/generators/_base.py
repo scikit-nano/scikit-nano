@@ -12,18 +12,17 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
-
-# import copy
 import os
 
 import numpy as np
-
-# from sknano.core.atoms import MDAtom as Atom, MDAtoms as Atoms
+# import copy
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
+from sknano.core.structures import StructureBase
 from sknano.io import StructureWriterMixin, supported_structure_formats
 
-__all__ = ['Atom', 'Atoms', 'GeneratorBase', 'BaseGenerator', 'GeneratorMixin',
-           'BulkGeneratorBase', 'BaseBulkGenerator',
+
+__all__ = ['Atom', 'Atoms', 'GeneratorBase', 'GeneratorMixin',
+           'CrystalStructureGenerator', 'NanoStructureGenerator',
            'STRUCTURE_GENERATORS']
 
 
@@ -45,47 +44,80 @@ STRUCTURE_GENERATORS = ('FullereneGenerator',
                         'MoS2Generator')
 
 
-class GeneratorBase(StructureWriterMixin, metaclass=ABCMeta):
+class GeneratorBase(StructureWriterMixin, StructureBase, metaclass=ABCMeta):
     """Base structure generator class."""
-    def __init__(self, *args, autogen=True, **kwargs):
-
+    def __init__(self, *args, autogen=True, finalize=True, **kwargs):
         super().__init__(*args, **kwargs)
 
         if autogen:
-            self.generate()
+            self.generate(finalize=finalize)
+
+    # def __getattr__(self, name):
+    #     print('getting attribute: {}'.format(name))
+    #     if name != 'atoms' and len(self.atoms) > 0:
+    #         attr = getattr(self.atoms, name, None)
+    #         if attr:
+    #             return attr
+    #     super().__getattr__(name)
+
+    @property
+    def Natoms(self):
+        """N atoms."""
+        try:
+            Natoms = self._atoms.Natoms
+            if Natoms:
+                return Natoms
+            raise AttributeError
+        except AttributeError:
+            return super().Natoms
+
+    @property
+    def mass(self):
+        """Total mass of atoms."""
+        try:
+            mass = self._atoms.mass
+            if mass:
+                return mass
+            raise AttributeError
+        except AttributeError:
+            return super().mass
 
     @abstractmethod
-    def generate(self):
+    def generate(self, finalize=True):
         """Generate structure data."""
         return NotImplementedError
 
     def finalize(self):
         """Finalize structure data by assigning unique ids and types to \
             structure atoms."""
-        self.assign_unique_ids()
-        self.assign_unique_types()
+        atoms = self._atoms
+
+        atoms.assign_unique_ids()
+        atoms.assign_unique_types()
+        self.structure.translate(self.lattice_shift)
+        # atoms.lattice = self.crystal_cell.lattice
 
     def save(self, *args, **kwargs):
         """An alias for :meth:`~sknano.io.StructureWriterMixin.write`."""
         super().write(*args, **kwargs)
 
-BaseGenerator = GeneratorBase
-
 
 class GeneratorMixin:
     """Mixin class with concrete implementation of \
         :meth:`~GeneratorBase.generate` method."""
-    def generate(self):
+    def generate(self, finalize=True):
         """Concrete implementation of :meth:`~GeneratorBase.generate` \
             method."""
         self.structure.clear()
         for atom in self.crystal_cell:
             self.atoms.append(Atom(**atom.todict()))
-        self.finalize()
+        if finalize:
+            self.finalize()
 
 
-class BulkGeneratorBase(GeneratorMixin, GeneratorBase):
-    """Base class for the *bulk structure generator* classes."""
+class CrystalStructureGenerator(GeneratorMixin, GeneratorBase):
+    """`GeneratorBase` sub-class for \
+        :class:`~sknano.core.structures.CrystalStructureBase`\ s"""
     def save(self, fname=None, scaling_matrix=None, **kwargs):
         """Save structure data."""
         if fname is None:
@@ -118,4 +150,8 @@ class BulkGeneratorBase(GeneratorMixin, GeneratorBase):
                 fname = fname + ext
         super().save(fname=fname, **kwargs)
 
-BaseBulkGenerator = BulkGeneratorBase
+
+class NanoStructureGenerator(GeneratorBase):
+    """`GeneratorBase` sub-class for \
+        :class:`~sknano.core.structures.NanoStructureBase` class."""
+    pass

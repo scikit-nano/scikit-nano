@@ -22,19 +22,18 @@ __docformat__ = 'restructuredtext en'
 
 import copy
 
-import numpy as np
+# import numpy as np
 
 from sknano.core import pluralize
 from sknano.core.crystallography import SuperCell
 from sknano.core.math import Vector
 from sknano.core.structures import UnrolledSWNT
-# from sknano.core.geometric_regions import Cuboid
-from ._base import Atom, Atoms, GeneratorBase
+from ._base import Atom, Atoms, NanoStructureGenerator
 
 __all__ = ['UnrolledSWNTGenerator']
 
 
-class UnrolledSWNTGenerator(GeneratorBase, UnrolledSWNT):
+class UnrolledSWNTGenerator(NanoStructureGenerator, UnrolledSWNT):
     """Class for generating unrolled nanotube structures.
 
     .. versionadded:: 0.2.23
@@ -110,19 +109,22 @@ class UnrolledSWNTGenerator(GeneratorBase, UnrolledSWNT):
     .. image:: /images/unrolled_1005_1cellx1cell-2.png
 
     """
-    def generate(self):
+    def generate(self, finalize=True):
         """Generate structure data."""
-
-        self.structure_data.clear()
+        self.structure.clear()
         layer0 = Atoms()
-        scaling_matrix = [int(np.ceil(self.nx)), 1, int(np.ceil(self.nz))]
+        scaling_matrix = self.scaling_matrix
+        supercell = SuperCell(self.unit_cell, scaling_matrix)
 
-        for atom in SuperCell(self.unit_cell, scaling_matrix):
+        for atom in supercell:
             layer0.append(Atom(**atom.todict()))
-
         layer0.center_centroid()
 
-        self.layers = []
+        lattice_shift = Vector(p0=supercell.basis.centroid,
+                               p=layer0.centroid)
+        lattice_shift.z = self.nlayers * lattice_shift.z
+        self.lattice_shift = Vector(lattice_shift)
+
         for nlayer in range(self.nlayers):
             layer = copy.deepcopy(layer0)
             layer.translate(Vector([0, nlayer * self.layer_spacing, 0]))
@@ -133,23 +135,19 @@ class UnrolledSWNTGenerator(GeneratorBase, UnrolledSWNT):
             self.atoms.extend(layer)
             self.layers.append(layer)
 
+        if finalize:
+            self.finalize()
+
     @classmethod
     def generate_fname(cls, n=None, m=None, nx=None, nz=None,
                        fix_Lx=False, fix_Lz=False, **kwargs):
-        chirality = '{}{}'.format('{}'.format(n).zfill(2),
-                                  '{}'.format(m).zfill(2))
-
+        fname = '{}{}'.format('{}'.format(n).zfill(2), '{}'.format(m).zfill(2))
         nx_fmtstr = '{:.2f}' if fix_Lx else '{:.0f}'
         nx = ''.join((nx_fmtstr.format(nx), pluralize('cell', nx)))
-
         nz_fmtstr = '{:.2f}' if fix_Lz else '{:.0f}'
         nz = ''.join((nz_fmtstr.format(nz), pluralize('cell', nz)))
-
         cells = 'x'.join((nx, nz))
-        fname_wordlist = (chirality, cells)
-
-        fname = 'unrolled_' + '_'.join(fname_wordlist)
-        return fname
+        return '_'.join(('unrolled', fname, cells))
 
     def save(self, fname=None, outpath=None, structure_format=None,
              center_centroid=True, **kwargs):

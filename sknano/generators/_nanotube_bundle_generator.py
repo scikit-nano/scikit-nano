@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-===============================================================================
-Nanotube generator base (:mod:`sknano.generators._base_nanotube_generator`)
-===============================================================================
+========================================================================================
+Nanotube bundle generator classes (:mod:`sknano.generators._nanotube_bundle_generator`)
+========================================================================================
 
-.. currentmodule:: sknano.generators._base_nanotube_generator
+.. currentmodule:: sknano.generators._nanotube_bundle_generator
 
 """
 from __future__ import absolute_import, division, print_function
@@ -16,12 +16,13 @@ import copy
 # import numpy as np
 
 # from sknano.core.crystallography import SuperCell
-from ._base import GeneratorBase
+# from sknano.core.math import Vector
+from ._base import NanoStructureGenerator
 
 __all__ = ['NanotubeBundleGeneratorBase']
 
 
-class NanotubeBundleGeneratorBase(GeneratorBase):
+class NanotubeBundleGeneratorBase(NanoStructureGenerator):
     """Base class for generating nanotubes."""
     def __init__(self, *args, from_scaling_matrix=False, **kwargs):
         self.from_scaling_matrix = from_scaling_matrix
@@ -48,7 +49,10 @@ class NanotubeBundleGeneratorBase(GeneratorBase):
         """Generate bundle atoms by replicating structure atoms to \
             bundle coordinates."""
         atomsobj0 = copy.deepcopy(self.atoms)
-        atomsobj0.center_centroid()
+        # atomsobj0.center_centroid()
+
+        # self.lattice_shift = Vector(p0=self.crystal_cell.basis.centroid,
+        #                             p=atomsobj0.centroid)
 
         self.structure.clear()
         for mol_id, dr in enumerate(self.bundle_coords, start=1):

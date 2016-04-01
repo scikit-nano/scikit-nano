@@ -19,7 +19,7 @@ from sknano.core.math import Vector
 from sknano.core.crystallography import SuperCell
 from sknano.core.structures import PrimitiveCellGraphene, \
     ConventionalCellGraphene
-from ._base import Atom, Atoms, GeneratorBase
+from ._base import Atom, Atoms, NanoStructureGenerator
 
 __all__ = ['GrapheneGenerator',
            'GrapheneGeneratorBase',
@@ -31,7 +31,7 @@ __all__ = ['GrapheneGenerator',
            'RectangularCellGrapheneGenerator']
 
 
-class GrapheneGeneratorBase(GeneratorBase):
+class GrapheneGeneratorBase(NanoStructureGenerator):
     """`N`-layer graphene generator class.
 
     Parameters
@@ -63,15 +63,20 @@ class GrapheneGeneratorBase(GeneratorBase):
         verbose output
 
     """
-    def generate(self):
+    def generate(self, finalize=True):
         """Generate the full structure coordinates."""
-
         self.structure.clear()
         layer0 = Atoms()
-        for atom in SuperCell(self.unit_cell, [self.n1, self.n2, 1]):
-            layer0.append(Atom(**atom.todict()))
+        supercell = SuperCell(self.unit_cell, [self.n1, self.n2, 1])
 
+        for atom in supercell:
+            layer0.append(Atom(**atom.todict()))
         layer0.center_centroid()
+
+        lattice_shift = Vector(p0=supercell.basis.centroid,
+                               p=layer0.centroid)
+        lattice_shift.z = self.nlayers * lattice_shift.z
+        self.lattice_shift = Vector(lattice_shift)
         # self.Natoms_per_layer = layer0.Natoms
 
         self.layers = []
@@ -84,10 +89,13 @@ class GrapheneGeneratorBase(GeneratorBase):
             layer.rotate(angle=self.layer_rotation_angles[nlayer], axis='z')
             self.atoms.extend(layer)
             self.layers.append(layer)
-        self.finalize()
+
+        if finalize:
+            self.finalize()
 
     @classmethod
     def generate_fname(cls, nlayers=None, basis=None, **kwargs):
+        """Generate a filename string."""
         nlayer = '{}layer'.format(nlayers)
         fname_wordlist = [nlayer, 'graphene']
         basis = '-'.join(basis)
@@ -163,6 +171,7 @@ class PrimitiveCellGrapheneGenerator(GrapheneGeneratorBase,
     """
     @classmethod
     def generate_fname(cls, edge_length=None, **kwargs):
+        """Generate a filename string."""
         dimensions = '{:.1f}Å'.format(edge_length)
         fname = '_'.join((dimensions, super().generate_fname(**kwargs)))
         return fname
@@ -225,6 +234,7 @@ class ConventionalCellGrapheneGenerator(GrapheneGeneratorBase,
     @classmethod
     def generate_fname(cls, armchair_edge_length=None,
                        zigzag_edge_length=None, **kwargs):
+        """Generate a filename string."""
         dimensions = '{:.1f}Åx{:.1f}Å'.format(armchair_edge_length,
                                               zigzag_edge_length)
         fname = '_'.join((dimensions, super().generate_fname(**kwargs)))

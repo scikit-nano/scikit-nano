@@ -9,30 +9,28 @@ Structure generators (:mod:`sknano.generators`)
 Contents
 ========
 
-Nanostructure generators
-------------------------
+Base/mixin generator classes
+-----------------------------
 
 .. autosummary::
    :toctree: generated/
 
    GeneratorBase
-   NanotubeGeneratorBase
-   FullereneGenerator
-   GrapheneGenerator
-   PrimitiveCellGrapheneGenerator
-   ConventionalCellGrapheneGenerator
-   BilayerGrapheneGenerator
-   MWNTGenerator
-   SWNTGenerator
-   UnrolledSWNTGenerator
+   GeneratorMixin
+   CrystalStructureGenerator
+   NanoStructureGenerator
+   GrapheneGeneratorBase
+   NanotubeBundleGeneratorBase
+   SWNTGeneratorBase
+   MWNTGeneratorBase
 
-Bulk structure generators
---------------------------
+
+Crystal structure generators
+-----------------------------
 
 .. autosummary::
    :toctree: generated/
 
-   BulkGeneratorBase
    AlphaQuartzGenerator
    DiamondGenerator
    CaesiumChlorideGenerator
@@ -41,6 +39,22 @@ Bulk structure generators
    BCCGenerator
    FCCGenerator
    MoS2Generator
+
+
+NanoStructure generator classes
+--------------------------------
+
+.. autosummary::
+   :toctree: generated/
+
+   FullereneGenerator
+   GrapheneGenerator
+   PrimitiveCellGrapheneGenerator
+   ConventionalCellGrapheneGenerator
+   BilayerGrapheneGenerator
+   MWNTGenerator
+   SWNTGenerator
+   UnrolledSWNTGenerator
 
 Compound structure generators
 ------------------------------
@@ -62,12 +76,12 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._base import *
-from ._bulk_structure_generator import *
+from ._xtal_structure_generator import *
 from ._mixins import *
 from ._fullerene_generator import *
 from ._graphene_generator import *
 from ._bilayer_graphene_generator import *
-from ._nanotube_generator_base import *
+from ._nanotube_bundle_generator import *
 from ._swnt_generator import *
 from ._mwnt_generator import *
 from ._unrolled_swnt_generator import *

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-Fullerene generators (:mod:`sknano.generators._fullerene_generators`)
+Fullerene generator class (:mod:`sknano.generators._fullerene_generator`)
 ===============================================================================
 
-.. currentmodule:: sknano.generators._fullerene_generators
+.. currentmodule:: sknano.generators._fullerene_generator
 
 """
 from __future__ import absolute_import, division, print_function
@@ -17,12 +17,12 @@ import os
 
 from sknano.core.structures import Fullerene
 # from sknano.core.geometric_regions import Cuboid
-from ._base import GeneratorBase, GeneratorMixin
+from ._base import NanoStructureGenerator, GeneratorMixin
 
 __all__ = ['FullereneGenerator']
 
 
-class FullereneGenerator(GeneratorMixin, GeneratorBase, Fullerene):
+class FullereneGenerator(GeneratorMixin, NanoStructureGenerator, Fullerene):
     """Fullerene structure generator class.
 
     Parameters

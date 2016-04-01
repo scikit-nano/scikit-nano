@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-===============================================================================
-Bulk structure generator (:mod:`sknano.generators._xtal_structure_generator`)
-===============================================================================
+=================================================================================
+Crystal structure generators (:mod:`sknano.generators._xtal_structure_generator`)
+=================================================================================
 
 .. currentmodule:: sknano.generators._xtal_structure_generator
 

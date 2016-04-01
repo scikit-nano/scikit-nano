@@ -13,22 +13,22 @@ __docformat__ = 'restructuredtext en'
 
 # import copy
 
-# import numpy as np
+import numpy as np
 
 from sknano.core import pluralize
-# from sknano.core.math import Vector
+from sknano.core.math import Point
 from sknano.core.structures import MWNT
-# from sknano.core.geometric_regions import Cuboid
-from ._base import GeneratorBase
-from ._nanotube_generator_base import NanotubeGeneratorBase
+from sknano.core.geometric_regions import Cuboid
+from ._base import NanoStructureGenerator
+from ._nanotube_bundle_generator import NanotubeBundleGeneratorBase
 from ._swnt_generator import SWNTGenerator
 
-__all__ = ['MWNTGeneratorMixin', 'MWNTGenerator']
+__all__ = ['MWNTGeneratorBase', 'MWNTGenerator']
 
 
-class MWNTGeneratorMixin:
+class MWNTGeneratorBase(NanoStructureGenerator):
     """`MWNTGenerator` mixin."""
-    def generate(self, **kwargs):
+    def generate(self, finalize=True):
         """Generate structure data.
 
         .. todo::
@@ -39,13 +39,13 @@ class MWNTGeneratorMixin:
         """
         self.structure.clear()
         for swnt in self.walls:
-            self.atoms.extend(
-                SWNTGenerator(fix_Lz=True, **swnt.todict()).atoms)
-        self.finalize()
+            self.atoms.extend(SWNTGenerator(finalize=False,
+                                            **swnt.todict()).atoms)
+        if finalize:
+            self.finalize()
 
 
-class MWNTGenerator(NanotubeGeneratorBase, MWNTGeneratorMixin,
-                    GeneratorBase, MWNT):
+class MWNTGenerator(NanotubeBundleGeneratorBase, MWNTGeneratorBase, MWNT):
     """Class for generating multi-walled nanotubes (MWNT).
 
     .. versionchanged:: 0.3.22
@@ -139,30 +139,51 @@ class MWNTGenerator(NanotubeGeneratorBase, MWNTGeneratorMixin,
     .. image:: /images/5wall_mwnt_(1,6)@(11,7)@(18,9)@(31,2)@(41,0)_hcp_7tube_hexagon-perspective_view-01.png
 
     """
+    def finalize(self):
+        """Finalize structure data by clipping region bounds if \
+                :attr:`~MWNT.fix_Lz` is `True`."""
+        # print('finalizing structure data')
+        # print('Natoms: {}'.format(self.atoms.Natoms))
+        if self.fix_Lz:
+            Lz_cutoff = self.Lz + self.bond
+            # print('clipping_bounds')
+            # print(self.atoms.coordinates_bounding_box)
+            # print('Lz_cutoff: {}'.format(Lz_cutoff))
+            region_bounds = Cuboid(pmin=Point([-np.inf, -np.inf, 0]),
+                                   pmax=Point([np.inf, np.inf, Lz_cutoff]))
+            self.atoms.clip_bounds(region_bounds)
+        # print('Natoms: {}'.format(self.atoms.Natoms))
+        super().finalize()
+
     @classmethod
-    def generate_fname(cls, Ch_list=None, Nwalls=None, Ntubes=None,
-                       nx=None, ny=None, bundle_geometry=None,
+    def generate_fname(cls, Ch_list=None, Nwalls=None, Ntubes=None, Lz=None,
+                       nx=None, ny=None, nz=None, bundle_geometry=None,
                        bundle_packing=None, **kwargs):
-        Nwalls = '{}wall_mwnt'.format(Nwalls)
-        chiralities = '@'.join([str(Ch).replace(' ', '') for Ch in Ch_list])
+        """Generate a filename string."""
+        # Nwalls = '{}wall_mwnt'.format(Nwalls)
+        fname = '@'.join([str(Ch).replace(' ', '') for Ch in Ch_list])
         if nx == ny == 1 and bundle_geometry is None:
-            fname = '_'.join((Nwalls, chiralities))
             return fname
+            # fname = '_'.join((Nwalls, chiralities))
+            # return fname
 
         packing = '{}cp'.format(bundle_packing[0])
         Ntubes = '{}tube'.format(Ntubes)
 
-        fname_wordlist = None
-        if bundle_geometry is None:
-            nx = ''.join(('{}'.format(nx), pluralize('cell', nx)))
-            ny = ''.join(('{}'.format(ny), pluralize('cell', ny)))
-            cells = 'x'.join((nx, ny))
-            fname_wordlist = (Nwalls, chiralities, packing, cells)
-        else:
-            fname_wordlist = \
-                (Nwalls, chiralities, packing, Ntubes, bundle_geometry)
+        nx = ''.join(('{}'.format(nx), pluralize('cell', nx)))
+        ny = ''.join(('{}'.format(ny), pluralize('cell', ny)))
+        cells = 'x'.join((nx, ny))
 
-        fname = '_'.join(fname_wordlist)
+        if nz is not None:
+            nz = ''.join(('{}'.format(nz), pluralize('cell', nz)))
+            cells = 'x'.join((cells, nz))
+        else:
+            cells = 'x'.join((cells, '{:.1f}Å'.format(Lz)))
+
+        fname = '_'.join((fname, cells, packing))
+
+        if bundle_geometry is not None:
+            fname = '_'.join((fname, Ntubes, bundle_geometry))
         return fname
 
     def save(self, fname=None, outpath=None, structure_format=None,
@@ -175,9 +196,9 @@ class MWNTGenerator(NanotubeGeneratorBase, MWNTGeneratorMixin,
         """
         if fname is None:
             fname = self.generate_fname(Ch_list=self.Ch_list,
-                                        Nwalls=self.Nwalls,
-                                        Ntubes=self.Ntubes,
-                                        nx=self.nx, ny=self.ny,
+                                        Nwalls=self.Nwalls, Ntubes=self.Ntubes,
+                                        Lz=self.Lz,
+                                        nx=self.nx, ny=self.ny, nz=self.nz,
                                         bundle_geometry=self.bundle_geometry,
                                         bundle_packing=self.bundle_packing)
 

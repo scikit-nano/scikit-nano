@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-===============================================================================
+===================================================================================
 Layered structure generator (:mod:`sknano.generators._layered_structure_generator`)
-===============================================================================
+===================================================================================
 
 .. currentmodule:: sknano.generators._layered_structure_generator
 
@@ -19,13 +19,13 @@ import importlib
 
 from sknano.core import BaseClass, call_signature
 from sknano.core.atoms import StructureAtoms
-from sknano.core.structures import BaseStructure
+from sknano.core.structures import StructureBase
 from ._base import GeneratorBase
 
 import configparser
 
 
-class LayeredStructureGenerator(GeneratorBase, BaseStructure, BaseClass):
+class LayeredStructureGenerator(GeneratorBase, StructureBase, BaseClass):
     """Class for generating structures.
 
     Parameters
@@ -92,7 +92,9 @@ class LayeredStructureGenerator(GeneratorBase, BaseStructure, BaseClass):
         structures = self.structures
         [structure.center_centroid() for structure in structures]
         for layer, structure in enumerate(structures[1:], start=1):
-            dy = -structure.bounds.ymin + structures[layer-1].bounds.ymax - \
+            # lattice_region = structure.lattice_region
+            dy = -structure.bounding_box.ymin + \
+                structures[layer-1].bounding_box.ymax - \
                 float(self.config.get('overlap', 0.0))
             structure.translate([0, dy, 0])
 
