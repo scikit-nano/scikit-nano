@@ -172,6 +172,12 @@ class Vector(np.ndarray):
         res = np.ndarray.__array_wrap__(self, obj, context)
         return self.__class__(res.__array__(), p0=self.p0)
 
+    def __str__(self):
+        strrep = repr(self)
+        begin = len('Vector(')
+        end = -1
+        return strrep[begin:end]
+
     def __repr__(self):
         try:
             if np.allclose(self.p0, np.zeros_like(self.p0)):

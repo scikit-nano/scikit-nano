@@ -33,6 +33,8 @@ Linear algebra transforms
    scaling_matrix
    transformation_matrix
    axis_angle_from_rotation_matrix
+   rotation_matrix_from_augmented_matrix
+   translation_from_augmented_matrix
 
 Number theory
 ---------------

@@ -15,7 +15,7 @@ from operator import attrgetter
 
 import numpy as np
 
-from sknano.core import UserList, TabulateMixin
+from sknano.core import UserList, TabulateMixin, minmax
 from ._transforms import transformation_matrix
 # from sknano.core.geometric_regions import Cuboid  # , Rectangle
 from ._point import Point
@@ -46,9 +46,6 @@ class Points(TabulateMixin, UserList):
         values = list(zip(['P{}'.format(i+1) for i in range(len(self))],
                           [fmt(pt, begin, end=-1) for pt in self]))
         return values,
-
-    def _table_title_str(self):
-        return 'Points'
 
     @property
     def __item_class__(self):
@@ -187,6 +184,17 @@ class Points(TabulateMixin, UserList):
     def z(self, values):
         self._check_operands(values)
         [setattr(point, 'z', value) for point, value in zip(self, values)]
+
+    @property
+    def minmax(self):
+        """Minimum/maximum x, y, z components.
+
+        Returns
+        -------
+        :class:`~python:tuple`
+
+        """
+        return tuple(zip(minmax(self.x), minmax(self.y), minmax(self.z)))
 
     def filter(self, condition, invert=False):
         """Filter `Points` by `condition`.

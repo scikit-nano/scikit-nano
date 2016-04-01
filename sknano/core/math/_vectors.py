@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Vectors class (:mod:`sknano.core.math._vectors`)
+Class for collection of `Vector`\ s (:mod:`sknano.core.math._vectors`)
 ==============================================================================
 
 .. currentmodule:: sknano.core.math._vectors
@@ -15,7 +15,7 @@ from operator import attrgetter
 
 import numpy as np
 
-from sknano.core import UserList, TabulateMixin
+from sknano.core import UserList, TabulateMixin, minmax
 from ._transforms import transformation_matrix
 # from sknano.core.geometric_regions import Cuboid  # , Rectangle
 
@@ -47,9 +47,6 @@ class Vectors(UserList, TabulateMixin):
         values = list(zip(['V{}'.format(i+1) for i in range(len(self))],
                           [fmt(vec, begin, end=-1) for vec in self]))
         return values,
-
-    def _table_title_str(self):
-        return 'Vectors'
 
     @property
     def __item_class__(self):
@@ -257,6 +254,17 @@ class Vectors(UserList, TabulateMixin):
     def z(self, values):
         self._validate_operand(values)
         [setattr(vec, 'z', val) for vec, val in zip(self, values)]
+
+    @property
+    def minmax(self):
+        """Minimum/maximum x, y, z components.
+
+        Returns
+        -------
+        :class:`~python:tuple`
+
+        """
+        return tuple(zip(minmax(self.x), minmax(self.y), minmax(self.z)))
 
     def angle(self, other):
         """Angles between each :class:`Vector` with `other`."""

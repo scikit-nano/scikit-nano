@@ -18,7 +18,8 @@ import numpy as np
 
 __all__ = ['rotate', 'Rx', 'Ry', 'Rz', 'rotation_matrix',
            'reflection_matrix', 'scaling_matrix', 'translation_matrix',
-           'translation_from_matrix',
+           'translation_from_augmented_matrix', 'translation_from_matrix',
+           'rotation_matrix_from_augmented_matrix',
            'transformation_matrix', 'axis_angle_from_rotation_matrix']
 
 I = np.identity(4)
@@ -377,9 +378,17 @@ def translation_matrix(v):
     return np.asmatrix(M)
 
 
-def translation_from_matrix(M):
+def rotation_matrix_from_augmented_matrix(M):
+    """Return the linear transformation component from an augmented matrix."""
+    return M[:-1, :-1]
+
+
+def translation_from_augmented_matrix(M):
+    """Return the translation vector from an affine matrix."""
     from . import Vector
     return Vector(np.asarray(M)[:-1, -1])
+
+translation_from_matrix = translation_from_augmented_matrix
 
 
 def transformation_matrix(angle=None, axis=None, anchor_point=None,
