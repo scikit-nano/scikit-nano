@@ -22,3 +22,4 @@ tabulate>=0.7.5
 wheel>=0.29.0
 numpydoc>=0.6.0
 sphinx-argparse>=0.1.15
+sphinxcontrib-epydoc>=0.6
