@@ -15,14 +15,18 @@ import unittest
 
 from pkg_resources import resource_filename
 
+from sknano.core.geometric_regions import Parallelogram, Rectangle, Square, \
+    Ellipse, Circle, Triangle, Parallelepiped, Cuboid, Cube, Ellipsoid, \
+    Sphere, Cylinder, Cone
+
 from sknano.io import DATAReader, DUMPReader, PDBReader, XYZReader, \
     DATAData, DUMPData, PDBData, XYZData
-# from sknano.core.geometric_regions import Parallel
 
 from ._funcs import generate_atoms, generate_structure
 
 __all__ = ['AtomsTestFixture', 'TempfileTestFixture', 'GeneratorTestFixture',
-           'IOTestFixture']
+           'IOTestFixture', 'DUMPTestFixture', 'GeometricRegionsTestFixture',
+           'Geometric2DRegionsTestFixture', 'Geometric3DRegionsTestFixture']
 
 
 class AtomsTestFixture(unittest.TestCase):
@@ -60,6 +64,15 @@ class AtomsTestFixture(unittest.TestCase):
         return graphene
 
     @property
+    def bilayer_graphene(self):
+        """:class:`~sknano.generators.GrapheneGenerator` structure."""
+        blg = generate_structure(generator_class='BilayerGrapheneGenerator',
+                                 armchair_edge_length=10,
+                                 zigzag_edge_length=10)
+        blg.update_attrs()
+        return blg
+
+    @property
     def periodic_table(self):
         """:class:`~sknano.core.atoms.StructureAtoms`"""
         periodic_table = generate_atoms(elements='periodic_table')
@@ -77,7 +90,7 @@ class AtomsTestFixture(unittest.TestCase):
 
         return DUMPReader(dumpfile,
                           dumpattrmap={'c_atom_pe': 'pe', 'c_atom_ke': 'ke'},
-                          elementmap={1: 'C', 2: 'Ar'})
+                          atomattrmap={('type', 'element'): {1: 'C', 2: 'Ar'}})
 
     @property
     def swnt(self):
@@ -93,6 +106,10 @@ class TempfileTestFixture(unittest.TestCase):
 
     Defines setUp/tearDown methods to keep track of and delete temporary files
     created by unit tests.
+
+    Attributes
+    ----------
+    tmpdata : :class:`~python:list`
 
     """
     def setUp(self):
@@ -137,7 +154,7 @@ class IOTestFixture(TempfileTestFixture):
         return DUMPReader(dumpfile,
                           dumpattrmap={'c_peratom_pe': 'pe',
                                        'c_peratom_ke': 'ke'},
-                          elementmap={1: 'C'})
+                          atomattrmap={('type', 'element'): {1: 'C'}})
 
     @property
     def pdb_reader(self):
@@ -165,8 +182,9 @@ class IOTestFixture(TempfileTestFixture):
             resource_filename('sknano', 'data/lammpstrj/0500_29cells.dump')
 
         return DUMPData(dumpfile, dumpattrmap={'c_peratom_pe': 'pe',
-                                               'c_peratom_ke': 'ke'},
-                        elementmap={1: 'C'})
+                                               'c_peratom_ke': 'ke',
+                                               'v_speed': 'v.magnitude'},
+                        atomattrmap={('type', 'element'): {1: 'C'}})
 
     @property
     def pdbdata(self):
@@ -179,3 +197,109 @@ class IOTestFixture(TempfileTestFixture):
         """:class:`~sknano.io.XYZData` instance."""
         xyzfile = resource_filename('sknano', 'data/nanotubes/1010_1cell.xyz')
         return XYZData(xyzfile)
+
+
+class DUMPTestFixture(IOTestFixture):
+    """Mixin :class:`~python:unittest.TestCase` class for \
+        :class:`~sknano.io.DUMPIO` unit tests.
+    """
+    def print_dumpattrs(self, dump):
+        """Print dump attributes."""
+        print('DUMP:\n{}'.format(dump))
+
+
+class GeometricRegionsTestFixture(unittest.TestCase):
+    """Mixin :class:`~python:unittest.TestCase` class for \
+        :mod:`sknano.core.geometric_regions` unit tests.
+    """
+
+    def setUp(self):
+        """Initialize list of regions."""
+        self.regions = []
+        print()
+
+    def print_regions(self):
+        """Pretty print regions."""
+        for r in self.regions:
+            print('{}\n'.format(r))
+
+    def tearDown(self):
+        """Pretty print regions."""
+        self.print_regions()
+        print()
+
+
+class Geometric2DRegionsTestFixture(GeometricRegionsTestFixture):
+    """Mixin :class:`~python:unittest.TestCase` class for \
+        :class:`sknano.core.geometric_regions.Geometric2DRegions` unit tests.
+    """
+    @property
+    def parallelogram(self):
+        """Return :class:`~sknano.core.geometric_regions.Parallelogram`"""
+        return Parallelogram()
+
+    @property
+    def rectangle(self):
+        """Return :class:`~sknano.core.geometric_regions.Rectangle`"""
+        return Rectangle()
+
+    @property
+    def square(self):
+        """Return :class:`~sknano.core.geometric_regions.Square`"""
+        return Square()
+
+    @property
+    def ellipse(self):
+        """Return :class:`~sknano.core.geometric_regions.Ellipse`"""
+        return Ellipse()
+
+    @property
+    def circle(self):
+        """Return :class:`~sknano.core.geometric_regions.Circle`"""
+        return Circle()
+
+    @property
+    def triangle(self):
+        """Return :class:`~sknano.core.geometric_regions.Triangle`"""
+        return Triangle()
+
+
+class Geometric3DRegionsTestFixture(GeometricRegionsTestFixture):
+    """Mixin :class:`~python:unittest.TestCase` class for \
+        :class:`sknano.core.geometric_regions.Geometric3DRegions` unit tests.
+    """
+
+    @property
+    def parallelepiped(self):
+        """Return :class:`~sknano.core.geometric_regions.Parallelepiped`"""
+        return Parallelepiped()
+
+    @property
+    def cuboid(self):
+        """Return :class:`~sknano.core.geometric_regions.Cuboid`"""
+        return Cuboid()
+
+    @property
+    def cube(self):
+        """Return :class:`~sknano.core.geometric_regions.Cube`"""
+        return Cube()
+
+    @property
+    def ellipsoid(self):
+        """Return :class:`~sknano.core.geometric_regions.Ellipsoid`"""
+        return Ellipsoid()
+
+    @property
+    def sphere(self):
+        """Return :class:`~sknano.core.geometric_regions.Sphere`"""
+        return Sphere()
+
+    @property
+    def cylinder(self):
+        """Return :class:`~sknano.core.geometric_regions.Cylinder`"""
+        return Cylinder()
+
+    @property
+    def cone(self):
+        """Return :class:`~sknano.core.geometric_regions.Cone`"""
+        return Cone()

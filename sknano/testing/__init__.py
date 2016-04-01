@@ -11,6 +11,7 @@ Contents
 
 Helper funcs to generate test data
 ---------------------------------------
+
 .. autosummary::
    :toctree: generated/
 
@@ -19,6 +20,7 @@ Helper funcs to generate test data
 
 Tools for timing processes
 ---------------------------
+
 .. autosummary::
    :toctree: generated/
 
@@ -33,6 +35,9 @@ Test fixtures
    GeneratorTestFixture
    IOTestFixture
    TempfileTestFixture
+   DUMPTestFixture
+   Geometric2DRegionsTestFixture
+   Geometric3DRegionsTestFixture
 
 """
 from __future__ import absolute_import, division, print_function, \
