@@ -25,9 +25,9 @@ class StructureAnalyzer:
         structure data file
 
     """
-    def __init__(self, structure_data, **kwargs):
-        self.structure_data = structure_data
-        self.structure_data.atoms.update_attrs()
+    def __init__(self, structure, **kwargs):
+        self.structure = structure
+        self.structure.atoms.update_attrs()
 
     def analyze_POAV(self):
-        self.structure_data.atoms.compute_POAVs()
+        self.structure.atoms.compute_POAVs()
