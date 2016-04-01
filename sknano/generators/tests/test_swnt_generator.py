@@ -106,8 +106,7 @@ class Tests(GeneratorTestFixture):
 
     def test11(self):
         swnt = SWNTGenerator((5, 0), Lz=10, fix_Lz=True, verbose=False).atoms
-        assert_true(swnt.bounding_box.zmax < 11 and
-                    swnt.bounding_box.zmax > 10)
+        assert_true(swnt.z.max() < 11 and swnt.z.max() > 10)
 
     def test12(self):
         swnt = SWNT((5, 0), nz=5)

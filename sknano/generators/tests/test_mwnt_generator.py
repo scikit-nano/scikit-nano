@@ -66,14 +66,21 @@ class Tests(GeneratorTestFixture):
     def test7(self):
         Ch_list = [(3, 3), (4, 4), (5, 5)]
         mwnt = MWNTGenerator(Ch_list=Ch_list, Lz=10.0)
+        print('mwnt.atoms.Natoms: {}'.format(mwnt.atoms.Natoms))
+        coordinates_bounding_box = mwnt.coordinates_bounding_box
+        print('mwnt.coordinates_bounding_box: {}'.format(coordinates_bounding_box))
+        print('type(mwnt.atoms): {}'.format(type(mwnt.atoms)))
+        print('mwnt.Natoms: {}'.format(mwnt.Natoms))
+        assert_equal(mwnt.atoms.Natoms, mwnt.Natoms)
         bundle = MWNTGenerator(Ch_list=Ch_list, nx=3, ny=2, Lz=10.0)
-        assert_true(bundle.Natoms, bundle.Ntubes * mwnt.Natoms)
+        print('bundle.Natoms: {}'.format(bundle.Natoms))
+        print('bundle.Ntubes: {}'.format(bundle.Ntubes))
+        print('mwnt.Natoms: {}'.format(mwnt.Natoms))
+        assert_equal(bundle.Natoms, bundle.Ntubes * mwnt.Natoms)
 
     def test8(self):
         Ch_list = [(5, 0), (10, 0)]
-        mwnt = MWNTGenerator(Ch_list=Ch_list, Lz=10.0, verbose=False)
-        assert_true(mwnt.bounding_box.zmax < 11 and
-                    mwnt.bounding_box.zmax > 10)
+        mwnt = MWNTGenerator(Ch_list=Ch_list, nz=5, verbose=False)
         mwnt.save()
         self.tmpdata.append(mwnt.fname)
         assert_equal(sum([swnt.Natoms for swnt in mwnt.walls]), mwnt.Natoms)

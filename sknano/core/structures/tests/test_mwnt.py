@@ -72,6 +72,10 @@ def test7():
     print('\nmwnt.crystal_cell.Natoms')
     print(mwnt.crystal_cell.Natoms)
 
+# def test8():
+#     Ch_list = [(3, 3), (4, 4), (5, 5)]
+#     mwnt = MWNT(Ch_list=Ch_list, Lz=10.0)
+
 
 if __name__ == '__main__':
     nose.runmodule()

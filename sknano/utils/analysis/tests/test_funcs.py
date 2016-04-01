@@ -41,7 +41,7 @@ def test_find_defect_chains():
 
     dump = DUMPReader(dumpfile, dumpattrmap={'c_atom_pe': 'pe',
                                              'c_atom_ke': 'ke'},
-                      elementmap={1: 'C', 2: 'Ar'})
+                      atomattrmap={('type', 'element'): {1: 'C', 2: 'Ar'}})
     atoms = dump.trajectory[-1].atoms
     max_mol_id = 3
     atoms = atoms.filtered((atoms.types == 1) & (atoms.mol_ids <= max_mol_id))

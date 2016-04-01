@@ -59,16 +59,26 @@ def test3():
 def test4():
     a = np.sqrt(3) * aCC
     latt = Crystal2DLattice(a=a, b=a, gamma=60)
+    print(latt)
     a1 = latt.a1
     a2 = latt.a2
-
+    print('a1: {}'.format(a1))
+    print('a2: {}'.format(a2))
     rotated_a1 = a1.copy()
     rotated_a2 = a2.copy()
     xfrm = transformation_matrix(angle=-np.pi / 6)
+    print('xtrm: {}'.format(xfrm))
     rotated_a1.rotate(transform_matrix=xfrm)
     rotated_a2.rotate(transform_matrix=xfrm)
+    print('rotated_a1: {}'.format(rotated_a1))
+    print('rotated_a2: {}'.format(rotated_a2))
+    print('latt.a1: {}'.format(latt.a1))
+    print('latt.a2: {}'.format(latt.a2))
 
+    print('rotating lattice..')
     latt.rotate(angle=-np.pi / 6)
+    print('latt.a1: {}'.format(latt.a1))
+    print('latt.a2: {}'.format(latt.a2))
 
     assert_equal(latt.a1, rotated_a1)
     assert_equal(latt.a2, rotated_a2)

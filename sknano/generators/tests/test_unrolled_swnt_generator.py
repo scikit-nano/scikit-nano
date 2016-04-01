@@ -32,6 +32,12 @@ class Tests(GeneratorTestFixture):
         unrolled_swnt.save(structure_format='data')
         self.tmpdata.append(unrolled_swnt.fname)
 
+    def test3(self):
+        unrolled_swnt = UnrolledSWNTGenerator(n=10, m=5, nlayers=2)
+        unrolled_swnt.save()
+        self.tmpdata.append(unrolled_swnt.fname)
+        unrolled_swnt.save(structure_format='data')
+        self.tmpdata.append(unrolled_swnt.fname)
 
 if __name__ == '__main__':
     nose.runmodule()

@@ -99,6 +99,8 @@ def test5():
     swnt = SWNT((10, 5), basis=['B', 'N'])
     assert_equal(swnt.element1, 'B')
     assert_equal(swnt.element2, 'N')
+    basis_symbols = swnt.unit_cell.basis.symbols.tolist()
+    print('swnt.unit_cell.basis.symbols.tolist():\n{}'.format(basis_symbols))
     assert_equal(swnt.unit_cell.basis.symbols.tolist(),
                  swnt.N * ['B', 'N'])
     assert_equal(swnt.unit_cell.basis.symbols.tolist()[:2], ['B', 'N'])

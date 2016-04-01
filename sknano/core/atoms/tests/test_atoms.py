@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 from pkg_resources import resource_filename
 
 # from collections import Counter
-from operator import attrgetter
+# from operator import attrgetter
 
 # import networkx as nx
 import numpy as np
@@ -15,14 +15,15 @@ import nose
 from nose.tools import assert_equal, assert_true, assert_false, \
     assert_is_instance
 
-from sknano.core import flatten, rezero_array
+from sknano.core import rezero_array
 from sknano.core.atoms import Atom, Atoms, BasisAtom, BasisAtoms, \
     StructureAtom, StructureAtoms
 from sknano.core.crystallography import Crystal2DLattice, Crystal3DLattice
+from sknano.core.geometric_regions import generate_bounding_box
 from sknano.core.math import Vector, Vectors, rotation_matrix
 from sknano.core.refdata import element_symbols
 from sknano.io import DATAReader
-from sknano.testing import AtomsTestFixture, generate_structure
+from sknano.testing import AtomsTestFixture
 
 
 class Tests(AtomsTestFixture):
@@ -282,7 +283,14 @@ class Tests(AtomsTestFixture):
 
     def test30(self):
         atoms = self.atoms
-        assert_true(np.allclose(atoms.volume, atoms.bounds.volume))
+        lattice = atoms.lattice
+        # print(lattice)
+        print('lattice.bounding_box: {}'.format(lattice.bounding_box))
+        bounding_box = generate_bounding_box(from_lattice=atoms.lattice)
+        print(bounding_box)
+        assert_equal(bounding_box, lattice.bounding_box)
+        assert_true(np.allclose(atoms.bounding_box.volume,
+                                bounding_box.volume))
 
     def test31(self):
         atoms = self.atoms
@@ -378,7 +386,7 @@ class Tests(AtomsTestFixture):
         atoms.set_pbc('xy')
         atoms.kNN = 30
         atoms.NNrc = 1.5
-        atoms.update_neighbors(cutoffs=[1.5, 2.0, 2.5, 3.0, 4.0, 4.4])
+        atoms.update_neighbors(cutoffs=[1.5, 2.0, 2.5, 3.0, 4.0, 4.5])
         assert_true(all([atom.first_neighbors.Natoms == 3 for atom in atoms]))
         assert_true(all([atom.second_neighbors.Natoms == 0 for atom in atoms]))
         assert_true(all([atom.third_neighbors.Natoms == 6 for atom in atoms]))
@@ -472,6 +480,18 @@ class Tests(AtomsTestFixture):
         I = rezero_array(np.asmatrix(p.A) * np.asmatrix(i) * np.asmatrix(p.T),
                          epsilon=1e-10)
         print('rotated inertia_tensor:\n{}'.format(I))
+
+    def test46(self):
+        atoms = self.atoms
+        bounding_region = atoms.bounding_region
+        lattice_region = atoms.lattice_region
+        assert_equal(bounding_region, lattice_region)
+        bounding_box = atoms.bounding_box
+        assert_equal(bounding_box, lattice_region.bounding_box)
+        coordinates_bbox = atoms.coordinates_bounding_box
+        rminmax = atoms.r.minmax
+        print(rminmax)
+        assert_equal(coordinates_bbox, coordinates_bbox.bounding_box)
 
 
 if __name__ == '__main__':

@@ -32,15 +32,15 @@ class TrajectoryTestFixture(unittest.TestCase):
                 DUMPReader(dump,
                            dumpattrmap={'c_peratom_pe': 'pe',
                                         'c_peratom_ke': 'ke'},
-                           elementmap={1: 'C'})
+                           atomattrmap={('type', 'element'): {1: 'C'}})
 
 
 class Tests(TrajectoryTestFixture):
 
     def test1(self):
         traj = self.dump.trajectory
-        assert_true('{!s}'.format(traj).startswith('Trajectory(snapshots='))
-        assert_true('{!s}'.format(traj[0]).startswith('Snapshot(trajectory='))
+        assert_true('{!r}'.format(traj).startswith('Trajectory(snapshots='))
+        assert_true('{!r}'.format(traj[0]).startswith('Snapshot(trajectory='))
 
     def test2(self):
         traj = self.dump.trajectory

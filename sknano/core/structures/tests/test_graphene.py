@@ -35,8 +35,8 @@ def test2():
 def test3():
     s = ConventionalCellGraphene(armchair_edge_length=10,
                                  zigzag_edge_length=10)
-    assert_equal(s.zigzag_edge_length, 10)
-    assert_equal(s.armchair_edge_length, 10)
+    assert_equal(s.l1, 10)
+    assert_equal(s.l2, 10)
     assert_true(isinstance(s, ConventionalCellGraphene))
     assert_true(isinstance(s.unit_cell, GrapheneConventionalCell))
     print(s.unit_cell)

@@ -3,9 +3,11 @@
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
 import nose
 from nose.tools import assert_equal
-# from sknano.io import XYZData, XYZReader, XYZWriter, XYZ2DATAConverter
+from sknano.io import XYZData, XYZReader, XYZWriter, XYZ2DATAConverter
 from sknano.testing import IOTestFixture
 
 
@@ -24,8 +26,18 @@ class Tests(XYZTestFixture):
 
     def test1(self):
         atoms = self.atoms
+        atoms.sort(key=attrgetter('id'))
         assert_equal(atoms.Natoms, 40)
         assert_equal(list(set(atoms.atom_ids)), list(range(1, 41)))
+        testfile = 'test1.xyz'
+        self.tmpdata.append(testfile)
+        XYZWriter.write(testfile, atoms=atoms)
+        test_atoms = XYZData(testfile).atoms
+        test_atoms.assign_unique_ids()
+        test_atoms.assign_unique_types()
+        test_atoms.update_attrs()
+        test_atoms.sort(key=attrgetter('id'))
+        assert_equal(atoms, test_atoms)
 
     def test2(self):
         xyz_reader = self.xyz_reader
