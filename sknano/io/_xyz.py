@@ -17,15 +17,17 @@ from monty.io import zopen
 from sknano.core import get_fpath
 from sknano.core.atoms import StructureAtom as Atom
 
-from ._base import StructureIO, StructureIOError, StructureConverter, \
-    StructureFormatSpec, default_comment_line
+from ._base import StructureData, StructureDataError, StructureDataConverter, \
+    StructureDataFormatter, default_comment_line
 
-__all__ = ['XYZReader', 'XYZWriter', 'XYZData', 'XYZFormatSpec', 'XYZIOError',
+__all__ = ['XYZ', 'XYZData', 'XYZReader', 'XYZWriter', 'XYZFormatter',
+           'XYZConverter', 'XYZError', 'XYZIO', 'XYZIOReader', 'XYZIOWriter',
+           'XYZIOFormatter', 'XYZIOConverter', 'XYZIOError', 'XYZFormatSpec',
            'XYZ2DATAConverter']
 
 
-class XYZReader(StructureIO):
-    """`StructureIO` class for reading `xyz` chemical file format.
+class XYZReader(StructureData):
+    """`StructureData` class for reading `xyz` chemical file format.
 
     Parameters
     ----------
@@ -33,8 +35,10 @@ class XYZReader(StructureIO):
         `xyz` structure file path.
 
     """
-    def __init__(self, fpath, **kwargs):
-        super().__init__(fpath=fpath, **kwargs)
+    def __init__(self, fpath, formatter=None, **kwargs):
+        if formatter is None or not isinstance(formatter, XYZFormatter):
+            formatter = XYZFormatter()
+        super().__init__(fpath=fpath, formatter=formatter, **kwargs)
 
         if self.fpath is not None:
             self.read()
@@ -42,10 +46,10 @@ class XYZReader(StructureIO):
     def read(self):
         """Read `xyz` file."""
         self.structure.clear()
-        with zopen(self.fpath) as f:
-            Natoms = int(f.readline().strip())
-            self.comment_line = f.readline().strip()
-            lines = f.readlines()
+        with zopen(self.fpath) as stream:
+            Natoms = int(stream.readline().strip())
+            self.comment_line = stream.readline().strip()
+            lines = stream.readlines()
             for line in lines:
                 s = line.strip().split()
                 if len(s) != 0:
@@ -57,10 +61,12 @@ class XYZReader(StructureIO):
                 error_msg = '`xyz` data contained {} atoms '.format(
                     self.atoms.Natoms) + 'but should contain ' + \
                     '{}'.format(Natoms)
-                raise XYZIOError(error_msg)
+                raise StructureDataError(error_msg)
 
         if len(set(self.atoms.elements)) > 1:
             self.assign_unique_types()
+
+XYZIOReader = XYZReader
 
 
 class XYZWriter:
@@ -95,6 +101,8 @@ class XYZWriter:
 
         xyz = XYZData()
         xyz.write(xyzfile=fpath, atoms=atoms, **kwargs)
+
+XYZIOWriter = XYZWriter
 
 
 class XYZData(XYZReader):
@@ -138,9 +146,9 @@ class XYZData(XYZReader):
             super()._update_atoms(**kwargs)
 
             try:
-                with zopen(xyzfile, 'wt') as fh:
-                    self._write_header(fh, comment_line)
-                    self._write_atoms(fh)
+                with zopen(xyzfile, 'wt') as stream:
+                    self._write_header(stream, comment_line)
+                    self._write_atoms(stream)
             except OSError as e:
                 print(e)
 
@@ -149,49 +157,52 @@ class XYZData(XYZReader):
         except (TypeError, ValueError) as e:
             print(e)
 
-    def _write_header(self, fh, comment_line):
-        fh.write('{:d}\n'.format(self.atoms.Natoms))
-        fh.write('{}\n'.format(comment_line))
+    def _write_header(self, stream, comment_line):
+        stream.write('{:d}\n'.format(self.atoms.Natoms))
+        stream.write('{}\n'.format(comment_line))
 
-    def _write_atoms(self, fh):
+    def _write_atoms(self, stream):
+        sformat = self.formatter.format
         for atom in self.atoms:
-            fh.write('{:>3s}{:15.8f}{:15.8f}{:15.8f}\n'.format(
-                atom.symbol, atom.x, atom.y, atom.z))
+            stream.write(sformat(atom))
+
+XYZ = XYZIO = XYZData
 
 
-class XYZIOError(StructureIOError):
-    """Exception class for `XYZData` IO errors."""
-    pass
+class XYZFormatter(StructureDataFormatter):
+    """`StructureDataFormatter` class defining properties for `xyz` format."""
+    def __init__(self, format_string=None):
+        if format_string is None:
+            format_string = '{:>3s}{:15.8f}{:15.8f}{:15.8f}\n'
+        self.format_string = format_string
+        self.fmtstr = "format_string={format_string!r}"
+
+    def __str__(self):
+        strrep = super().__str__()
+        items = ['format_string']
+        values = [self.format_string]
+        table = self._tabulate(list(zip(items, values)))
+        strrep = '\n'.join((strrep, table))
+        return strrep
+
+    def format(self, atom):
+        """Return :class:`~python:str` of atom attributes formatted for an \
+            output stream."""
+        return self.format_string.format(atom.symbol, atom.x, atom.y, atom.z)
+
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        attr_dict = super().todict()
+        attr_dict.update(dict(format_string=self.format_string))
+        return attr_dict
+
+XYZFormatSpec = XYZIOFormatter = XYZFormatter
 
 
-class XYZ2DATAConverter(StructureConverter):
-    """
-    `StructureConverter` class for converting `xyz` to `LAMMPS data` format.
-
-    Parameters
-    ----------
-    xyzfile : str
-    boxbounds : {None, dict}, optional
-        dict specifying `min` and `max` box bounds in
-        :math:`x,y,z` dimensions. If None, then determine bounds based
-        atom coordinates.
-    pad_box : bool, optional
-        If True, after determining minimum simulation box bounds,
-        expand :math:`\\pm x,\\pm y,\\pm z` dimensions of simulation box by
-        `xpad`, `ypad`, `zpad` distance.
-    xpad : float, optional
-    ypad : float, optional
-    zpad : float, optional
-
-    """
-    def __init__(self, xyzfile, **kwargs):
-
-        self._xyzfile = xyzfile
-        self._datafile = os.path.splitext(self._xyzfile)[0] + '.data'
-
-        super().__init__(infile=self._xyzfile, outfile=self._datafile,
-                         **kwargs)
-
+class XYZConverter(StructureDataConverter):
+    """:class:`StructureDataConverter` class for converting `xyz` data."""
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self._new_atoms = []
         self._add_new_atoms = False
 
@@ -202,11 +213,6 @@ class XYZ2DATAConverter(StructureConverter):
     def xyzfile(self):
         """`xyz` file name."""
         return self.infile
-
-    @property
-    def datafile(self):
-        """`LAMMPS data` file name."""
-        return self.outfile
 
     def add_atom(self, atom=None):
         """Add new `Atom` to `Atoms`.
@@ -231,6 +237,37 @@ class XYZ2DATAConverter(StructureConverter):
         self._new_types.append(atom)
         if not self._add_new_types:
             self._add_new_types = True
+
+XYZIOConverter = XYZConverter
+
+
+class XYZ2DATAConverter(XYZConverter):
+    """:class:`XYZConverter` for converting to `LAMMPS data` format.
+
+    Parameters
+    ----------
+    xyzfile : str
+    boxbounds : {None, dict}, optional
+        dict specifying `min` and `max` box bounds in
+        :math:`x,y,z` dimensions. If None, then determine bounds based
+        atom coordinates.
+    pad_box : bool, optional
+        If True, after determining minimum simulation box bounds,
+        expand :math:`\\pm x,\\pm y,\\pm z` dimensions of simulation box by
+        `xpad`, `ypad`, `zpad` distance.
+    xpad : float, optional
+    ypad : float, optional
+    zpad : float, optional
+
+    """
+    def __init__(self, xyzfile, **kwargs):
+        datafile = os.path.splitext(xyzfile)[0] + '.data'
+        super().__init__(infile=xyzfile, outfile=datafile, **kwargs)
+
+    @property
+    def datafile(self):
+        """`LAMMPS data` file name."""
+        return self.outfile
 
     def convert(self, return_reader=False, **kwargs):
         """Convert `xyz` to `LAMMPS data` chemical file format.
@@ -264,6 +301,8 @@ class XYZ2DATAConverter(StructureConverter):
             return DATAReader(self.outfile, **kwargs)
 
 
-class XYZFormatSpec(StructureFormatSpec):
-    """`StructureFormatSpec` class defining properties for `xyz` format."""
+class XYZError(StructureDataError):
+    """Exception class for `XYZData` IO errors."""
     pass
+
+XYZIOError = XYZDataError = XYZError

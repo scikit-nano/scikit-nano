@@ -29,41 +29,6 @@ __all__ = ['DUMP', 'DUMPData', 'DUMPReader', 'DUMPWriter', 'DUMPError',
            'DUMPFormatter', 'DUMPIO', 'DUMPIOReader', 'DUMPIOWriter',
            'DUMPIOError', 'DUMPIOFormatter']
 
-attr_dtypes = {'id': int, 'type': int, 'mol': int, 'q': float, 'mass': float,
-               'x': float, 'y': float, 'z': float,
-               'ix': int, 'iy': int, 'iz': int,
-               'vx': float, 'vy': float, 'vz': float,
-               'fx': float, 'fy': float, 'fz': float,
-               'lx': float, 'ly': float, 'lz': float,
-               'wx': float, 'wy': float, 'wz': float,
-               'shapex': float, 'shapey': float, 'shapez': float,
-               'quatw': float, 'quati': float, 'quatj': float, 'quatk': float,
-               'atom1': int, 'atom2': int, 'atom3': int, 'atom4': int}
-
-
-# class LAMMPSBOX(Crystal3DLattice):
-#     """LAMMPS 3D simulation box.
-
-#     Parameters
-#     ----------
-#     lx, ly, lz : float
-#     xy, xz, yz : float
-
-#     """
-
-#     def __init__(self, lx=None, ly=None, lz=None,
-#                  xy=None, xz=None, yz=None, cell_matrix=None,
-#                  orientation_matrix=None, offset=None):
-
-#         a = lx
-#         b = np.sqrt(ly ** 2 + xy ** 2)
-#         c = np.sqrt(lz ** 2 + xz ** 2 + yz ** 2)
-#         alpha = np.degrees(np.arccos((xy * xz + ly * yz) / (b * c)))
-#         beta = np.degrees(np.arccos(xz / c))
-#         gamma = np.degrees(np.arccos(xy / b))
-#         super().__init__(a=a, b=b, c=c, alpha=alpha, beta=beta, gamma=gamma,
-#                          offset=offset)
-
 
 class DUMPReader(StructureData):
     """Class for reading `LAMMPS dump` file format.
@@ -218,13 +183,6 @@ class DUMPReader(StructureData):
 
     def __iter__(self):
         return iter(self.trajectory)
-
-    def __str__(self):
-        strrep = super().__str__()
-        formatter = self.formatter
-        if formatter is not None:
-            strrep = '\n'.join((strrep, str(formatter)))
-        return strrep
 
     @property
     def reference_index(self):
@@ -669,7 +627,7 @@ class DUMPWriter:
         if invalid_kwargs:
             error_msg = \
                 ('Expected a `Trajectory` object for kwarg `trajectory`,\n'
-                 '`BaseStructure` sub-class for kwarg `structure`,\n'
+                 '`StructureBase` sub-class for kwarg `structure`,\n'
                  'or an `Atoms` object for kwarg `atoms`.')
             raise ValueError(error_msg)
 
@@ -873,14 +831,11 @@ class DUMPData(DUMPReader):
         """Write snapshot atoms."""
         atoms_array = ss.get_atoms(asarray=True)[ss.atom_selection]
         formatter = ss.formatter
-        stream.write('ITEM: ATOMS {}\n'.format(formatter.dumpattrs2str()))
         attr_dtypes = formatter.attr_dtypes
-
+        sformat = formatter.format
+        stream.write('ITEM: ATOMS {}\n'.format(formatter.dumpattrs2str()))
         for atom in atoms_array:
-            line = ' '.join(('{}'.format(dtype(attr)) for dtype, attr in
-                            zip(attr_dtypes, atom)))
-            line += '\n'
-            stream.write(line)
+            stream.write(sformat(atom, attr_dtypes))
 
 DUMP = DUMPIO = DUMPData
 
@@ -907,7 +862,8 @@ class DUMPFormatter(StructureDataFormatter):
 
     Attributes
     ----------
-    dumpattrs
+    style
+    dumpattrs2index
 
     """
     def __init__(self, style=None, dumpattrs=None, dumpattrmap=None,
@@ -958,9 +914,11 @@ class DUMPFormatter(StructureDataFormatter):
     @property
     def attr_dtypes(self):
         """List of dump atom attributes."""
-        _attr_dtypes = [attr_dtypes[attr] if attr in attr_dtypes
-                        else float for attr in self.dumpattrs]
-        return _attr_dtypes
+        try:
+            return self._attr_dtypes
+        except AttributeError:
+            self._update_attr_dtypes()
+            return self._attr_dtypes
 
     @property
     def atomattrs(self):
@@ -973,7 +931,7 @@ class DUMPFormatter(StructureDataFormatter):
 
     @property
     def dumpattrs(self):
-        """List of dump atom attributes."""
+        """List of dump attributes."""
         if self.dumpattrs2index:
             self._update_attrs()
             return self._dumpattrs
@@ -982,7 +940,7 @@ class DUMPFormatter(StructureDataFormatter):
 
     @property
     def otherattrs(self):
-        """List of dump atom attributes."""
+        """List of other dump atom attributes."""
         try:
             return self._otherattrs
         except AttributeError:
@@ -1012,6 +970,10 @@ class DUMPFormatter(StructureDataFormatter):
         self._atomattrs = atomattrs
         self._otherattrs = otherattrs
 
+    def _update_attr_dtypes(self):
+        self._attr_dtypes = [DUMPATTR_DTYPES[attr] if attr in DUMPATTR_DTYPES
+                             else float for attr in self.dumpattrs]
+
     def atomattrs2str(self):
         """Return a space-separated string of parsed atom attributes."""
         return ' '.join(self.atomattrs)
@@ -1036,13 +998,42 @@ class DUMPFormatter(StructureDataFormatter):
             except ValueError:
                 pass
 
+    def format(self, attrs, attr_dtypes=None):
+        """Return :class:`~python:str` of dump attributes formatted for an \
+            output stream.
+
+        Parameters
+        ----------
+        attrs : :class:`~python:list`
+            List of dump attribute values.
+
+        """
+        if attr_dtypes is None:
+            attr_dtypes = self.attr_dtypes
+        line = ' '.join(('{}'.format(dtype(attr)) for attr, dtype in
+                        zip(attrs, attr_dtypes)))
+        line += '\n'
+        return line
+
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
-        super_dict = super().todict()
-        super_dict.update(dict(style=self.style,
-                               dumpattrs=self.dumpattrs,
-                               dumpattrmap=self.dumpattrmap,
-                               atomattrmap=self.atomattrmap))
-        return super_dict
+        attr_dict = super().todict()
+        attr_dict.update(dict(style=self.style,
+                              dumpattrs=self.dumpattrs,
+                              dumpattrmap=self.dumpattrmap,
+                              atomattrmap=self.atomattrmap))
+        return attr_dict
 
 DUMPIOFormatter = DUMPFormatter
+
+DUMPATTR_DTYPES = \
+    {'id': int, 'type': int, 'mol': int, 'q': float, 'mass': float,
+     'x': float, 'y': float, 'z': float,
+     'ix': int, 'iy': int, 'iz': int,
+     'vx': float, 'vy': float, 'vz': float,
+     'fx': float, 'fy': float, 'fz': float,
+     'lx': float, 'ly': float, 'lz': float,
+     'wx': float, 'wy': float, 'wz': float,
+     'shapex': float, 'shapey': float, 'shapez': float,
+     'quatw': float, 'quati': float, 'quatj': float, 'quatk': float,
+     'atom1': int, 'atom2': int, 'atom3': int, 'atom4': int}

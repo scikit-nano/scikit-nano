@@ -15,7 +15,7 @@ from collections import OrderedDict
 
 from pyparsing import Combine, Empty, Forward, Group, Keyword, Literal, \
     OneOrMore, Optional, Word, White, Suppress, Regex, ZeroOrMore, \
-    alphas, alphanums, delimitedList, oneOf, nums, matchOnlyAtCol, restOfLine
+    alphas, alphanums, oneOf, nums, matchOnlyAtCol, restOfLine
 
 from sknano.core import integer, real, asint
 from sknano.core.crystallography import Crystal3DLattice
@@ -350,9 +350,8 @@ ter_expr = Record("TER", width=6) + integer("serial") + \
     Word(alphanums, min=1, max=3)("resName") + \
     Word(alphanums, exact=1).addParseAction(matchOnlyAtCol(22))("chainID") + \
     Word(nums, min=1, max=4).setParseAction(asint)("resSeq") + \
-    Optional(Word(alphas, exact=1).addParseAction(matchOnlyAtCol(27))("iCode")
-             | nspaces(1))
-
+    Optional(Word(alphas, exact=1)
+             .addParseAction(matchOnlyAtCol(27))("iCode") | nspaces(1))
 
 conect_expr = Record("CONECT") + integer("serial") + OneOrMore(integer)
 end_expr = Record("END", width=6)
@@ -419,23 +418,33 @@ record_expr << (header_expr | title_expr | compnd_expr | source_expr |
 
 
 class PDBTokenizer:
+    """PDB Record tokenizer."""
+
+    def __init__(self):
+        self.parse_results = OrderedDict()
+        self.raw_fields = OrderedDict()
+
+    def _update_records(self, record, fields, parse_result):
+        self.raw_fields[record] = fields
+        self.parse_results[record] = parse_result
 
     def _parse_header(self, fields):
         # print('fields: {}'.format(fields))
-        # self.records['HEADER'] = header.parseString(fields)
+        result = header_expr.parseString(fields)
+        self._update_records('HEADER', fields, result)
+        return result
+
         # classification = fields[10:50]
         # dep_date = fields[50:59]
         # id_code = fields[63:66]
         # print(classification)
         # print(dep_date)
         # print(id_code)
-        pass
 
     def _parse_title(self, fields):
-        # continuation = fields[8:10]
-        # title = fields[10:]
-        # print(title)
-        pass
+        result = title_expr.parseString(fields)
+        self._update_records('TITLE', fields, result)
+        return result
 
     def _parse_compnd(self, fields):
         pass
@@ -504,13 +513,17 @@ class PDBTokenizer:
         pass
 
     def _parse_atom(self, fields):
-        return atom_expr.parseString(fields, parseAll=True)[0]
+        result = atom_expr.parseString(fields, parseAll=True)[0]
+        self._update_records('ATOM', fields, result)
+        return result
 
     def _parse_ter(self, fields):
         pass
 
     def _parse_hetatm(self, fields):
-        return hetatm_expr.parseString(fields, parseAll=True)[0]
+        result = hetatm_expr.parseString(fields, parseAll=True)[0]
+        self._update_records('HETATM', fields, result)
+        return result
 
     def _parse_conect(self, fields):
         pass

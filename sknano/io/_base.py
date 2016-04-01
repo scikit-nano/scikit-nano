@@ -15,9 +15,9 @@ from abc import ABCMeta, abstractmethod
 import copy
 import os
 
-from sknano.core import BaseClass, get_fpath
+from sknano.core import BaseClass, TabulateMixin, get_fpath
 from sknano.core.atoms import MDAtom as Atom, MDAtoms as Atoms
-from sknano.core.structures import StructureData
+from sknano.core.structures import StructureBase
 # from sknano.utils.analysis import StructureAnalyzer
 from sknano.version import version
 
@@ -27,23 +27,38 @@ default_structure_format = 'xyz'
 supported_structure_formats = ('xyz', 'data', 'dump')
 
 __all__ = ['Atom', 'Atoms',
+           'StructureData',
+           'StructureDataConverter',
+           'StructureDataFormatter',
+           'StructureDataError',
+           'StructureDataMixin',
+           'StructureDataReader',
+           'StructureDataWriter',
+           'StructureDataReaderMixin',
+           'StructureDataWriterMixin',
            'StructureIO',
+           'StructureIOConverter',
+           'StructureIOFormatter',
+           'StructureIOError',
+           'StructureIOMixin',
+           'StructureIOReader',
+           'StructureIOWriter',
+           'StructureIOReaderMixin',
+           'StructureIOWriterMixin',
            'StructureReader',
            'StructureWriter',
-           'StructureConverter',
-           'StructureIOError',
-           'StructureFormatSpec',
            'StructureReaderMixin',
            'StructureWriterMixin',
-           'StructureIOMixin',
+           'StructureFormatSpec',
            'default_comment_line',
            'default_structure_format',
            'supported_structure_formats']
 
 
-class StructureReaderMixin:
+class StructureDataReaderMixin:
     """Mixin class for reading structure data."""
     def read(self, *args, fname=None, structure_format=None, **kwargs):
+        """Read structure data."""
         if fname is None:
             if len(args) == 0:
                 raise ValueError('`fname` is required')
@@ -88,6 +103,17 @@ class StructureReaderMixin:
         from sknano.io import DUMPReader
         return DUMPReader(*args, **kwargs)
 
+    def read_pdb(self, *args, **kwargs):
+        """Read PDB file.
+
+        Returns
+        -------
+        :class:`~sknano.io.PDBReader`
+
+        """
+        from sknano.io import PDBReader
+        return PDBReader(*args, **kwargs)
+
     def read_xyz(self, *args, **kwargs):
         """Read XYZ file.
 
@@ -99,8 +125,10 @@ class StructureReaderMixin:
         from sknano.io import XYZReader
         return XYZReader.read(*args, **kwargs)
 
+StructureReaderMixin = StructureIOReaderMixin = StructureDataReaderMixin
 
-class StructureWriterMixin:
+
+class StructureDataWriterMixin:
     """Mixin class for saving structure data."""
     def _update_atoms(self, deepcopy=True, center_centroid=True,
                       center_com=False, region_bounds=None,
@@ -190,7 +218,7 @@ class StructureWriterMixin:
         self.fpath = fpath
 
     def write(self, *args, **kwargs):
-        """Save structure data.
+        """Write structure data to file.
 
         Parameters
         ----------
@@ -198,11 +226,13 @@ class StructureWriterMixin:
             file name string
         outpath : str, optional
             Output path for structure data file.
-        structure_format : {None, str}, optional
+        structure_format : {None, 'xyz', 'pdb', 'data', 'dump'}, optional
             chemical file format of saved structure data. Must be one of:
 
                 - `xyz`
+                - `pdb`
                 - `data`
+                - `dump`
 
             If `None`, then guess based on `fname` file extension or
             default to `xyz` format.
@@ -223,10 +253,11 @@ class StructureWriterMixin:
         self._update_fpath(**kwargs)
         # self._update_atoms(**kwargs)
         structure_format = self.structure_format
+        print('writing {}'.format(kwargs['fname']))
         getattr(self, 'write_' + structure_format)(structure=self, **kwargs)
 
     def write_data(self, **kwargs):
-        """Write LAMMPS DATA file."""
+        """Write LAMMPS data file."""
         from sknano.io import DATAWriter
         DATAWriter.write(**kwargs)
 
@@ -235,18 +266,27 @@ class StructureWriterMixin:
         from sknano.io import DUMPWriter
         DUMPWriter.write(**kwargs)
 
+    def write_pdb(self, **kwargs):
+        """Write pdb file."""
+        from sknano.io import PDBWriter
+        PDBWriter.write(**kwargs)
+
     def write_xyz(self, **kwargs):
-        """Write XYZ file."""
+        """Write xyz file."""
         from sknano.io import XYZWriter
         XYZWriter.write(**kwargs)
 
+StructureWriterMixin = StructureIOWriterMixin = StructureDataWriterMixin
 
-class StructureIOMixin(StructureReaderMixin, StructureWriterMixin):
+
+class StructureDataMixin(StructureDataReaderMixin, StructureDataWriterMixin):
     """Mixin class providing I/O methods for structure data."""
     pass
 
+StructureIOMixin = StructureDataMixin
 
-class StructureIO(StructureIOMixin, StructureData, BaseClass):
+
+class StructureData(StructureDataMixin, StructureBase, BaseClass):
     """Base class for structure data file input and output.
 
     Parameters
@@ -254,7 +294,7 @@ class StructureIO(StructureIOMixin, StructureData, BaseClass):
     fpath : {None, str}, optional
 
     """
-    def __init__(self, fpath=None, fname=None, **kwargs):
+    def __init__(self, fpath=None, fname=None, formatter=None, **kwargs):
         super().__init__(**kwargs)
 
         self._atoms = Atoms()
@@ -262,8 +302,27 @@ class StructureIO(StructureIOMixin, StructureData, BaseClass):
         if fpath is None and fname is not None:
             fpath = fname
         self.fpath = fpath
+        self.formatter = formatter
         self.kwargs = kwargs
-        self.fmtstr = "fpath={fpath!r}"
+        fmtstr = "fpath={fpath!r}"
+        if isinstance(formatter, StructureDataFormatter):
+            fmtstr = ', '.join((fmtstr, formatter.fmtstr))
+        self.fmtstr = fmtstr
+
+    def __str__(self):
+        # strrep = self._table_title_str()
+        strrep = self._obj_mro_str()
+        atoms = self.atoms
+        # xtal_cell = self.crystal_cell
+
+        if atoms.data:
+            title = '.'.join((strrep, atoms.__class__.__name__))
+            strrep = '\n'.join((title, str(atoms)))
+
+        # formatter = self.formatter
+        # if formatter is not None:
+        #     strrep = '\n'.join((strrep, str(formatter)))
+        return strrep
 
     @property
     def comment_line(self):
@@ -298,10 +357,12 @@ class StructureIO(StructureIOMixin, StructureData, BaseClass):
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
-        return dict(fpath=self.fpath)
+        return dict(fpath=self.fpath, formatter=self.formatter)
+
+StructureIO = StructureData
 
 
-class StructureReader:
+class StructureDataReader:
     """Structure data reader base class."""
     @classmethod
     def read(cls, fpath, structure_format=None, **kwargs):
@@ -320,15 +381,21 @@ class StructureReader:
                 structure_format == 'dump':
             from ._lammps_dump import DUMPReader
             return DUMPReader(fpath, **kwargs)
+        elif (structure_format is None and fpath.endswith('.pdb')) or \
+                structure_format == 'pdb':
+            from ._pdb import PDBReader
+            return PDBReader.read(fpath)
         elif (structure_format is None and fpath.endswith('.xyz')) or \
                 structure_format == 'xyz':
             from ._xyz import XYZReader
             return XYZReader.read(fpath)
         else:
-            raise StructureIOError("Unable to determine `structure_format`")
+            raise StructureDataError("Unable to determine `structure_format`")
+
+StructureReader = StructureIOReader = StructureDataReader
 
 
-class StructureWriter:
+class StructureDataWriter:
     """Structure data writer base class."""
     @classmethod
     def write(cls, fname=None, structure_format=None, **kwargs):
@@ -355,14 +422,20 @@ class StructureWriter:
                 structure_format == 'dump':
             from ._lammps_dump import DUMPWriter
             DUMPWriter.write(fname=fname, **kwargs)
+        elif (structure_format is None and fname.endswith('.pdb')) or \
+                structure_format == 'pdb':
+            from ._pdb import PDBWriter
+            PDBWriter.write(fname=fname, **kwargs)
         # elif (structure_format is None and fname.endswith('.xyz')) or \
         #        structure_format == 'xyz':
         else:
             from ._xyz import XYZWriter
             XYZWriter.write(fname=fname, **kwargs)
 
+StructureWriter = StructureIOWriter = StructureDataWriter
 
-class StructureConverter(BaseClass, metaclass=ABCMeta):
+
+class StructureDataConverter(BaseClass, metaclass=ABCMeta):
     """Abstract base class for converting structure data.
 
     Parameters
@@ -388,12 +461,26 @@ class StructureConverter(BaseClass, metaclass=ABCMeta):
         """Return :class:`~python:dict` of constructor parameters."""
         return dict(infile=self.infile, outfile=self.outfile)
 
+StructureConverter = StructureIOConverter = StructureDataConverter
 
-class StructureFormatSpec(BaseClass):
+
+class StructureDataFormatter(TabulateMixin, BaseClass):
     """Base class for defining a format specification."""
-    pass
+
+    def __str__(self):
+        strrep = self._table_title_str()
+        objstr = self._obj_mro_str()
+        return '\n'.join((strrep, objstr))
+
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        return dict()
+
+StructureFormatSpec = StructureIOFormatter = StructureDataFormatter
 
 
-class StructureIOError(Exception):
-    """Base class for `StructureIO` errors."""
+class StructureDataError(Exception):
+    """Base class for `StructureData` errors."""
     pass
+
+StructureIOError = StructureDataError

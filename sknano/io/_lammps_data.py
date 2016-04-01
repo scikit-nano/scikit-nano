@@ -19,8 +19,7 @@ import numpy as np
 from monty.io import zopen
 from sknano.core import get_fpath, minmax
 from sknano.core.atoms import Atoms, MDAtoms, MDAtom as Atom
-# from sknano.core.crystallography import Crystal3DLattice
-from sknano.core.geometric_regions import Domain
+from sknano.core.crystallography import Domain
 from ._base import StructureData, StructureDataError, StructureDataFormatter, \
     StructureDataConverter, default_comment_line
 
@@ -43,24 +42,19 @@ class DATAReader(StructureData):
     atom_style : {'full', 'atomic'}, optional
     bond_style : {None, 'class2', 'fene', 'fene/expand', 'harmonic', 'morse', \
                   'nonlinear', 'quartic'}
-    angle_style
-    dihedral_style
-    improper_style
-    pair_style
+    angle_style : str, optional
+    dihedral_style : str, optional
+    improper_style : str, optional
+    pair_style : str, optional
 
     Attributes
     ----------
-    domain : :class:`Domain`
+    domain : :class:`sknano.core.crystallography.Domain`
 
     """
     def __init__(self, fpath, atom_style='full', bond_style=None,
                  angle_style=None, dihedral_style=None, improper_style=None,
                  pair_style=None, formatter=None, **kwargs):
-        super().__init__(fpath=fpath, **kwargs)
-
-        self.header_data = OrderedDict()
-        self.section_data = OrderedDict()
-        self.domain = Domain()
 
         if formatter is None or not isinstance(formatter, DATAFormatter):
             formatter = DATAFormatter(atom_style=atom_style,
@@ -70,20 +64,16 @@ class DATAReader(StructureData):
                                       improper_style=improper_style,
                                       pair_style=pair_style)
 
-        self.formatter = formatter
-        self.section_attrs = formatter.section_attrs
-        self.section_attrs_specs = formatter.section_attrs_specs
-        self.fmtstr = "{fpath!r}, " + formatter.fmtstr
+        super().__init__(fpath=fpath, formatter=formatter, **kwargs)
+
+        self.header_data = OrderedDict()
+        self.section_data = OrderedDict()
+        self.domain = Domain()
+        self.section_attrs = self.formatter.section_attrs
+        self.section_attrs_specs = self.formatter.section_attrs_specs
 
         if self.fpath is not None:
             self.read()
-
-    def __str__(self):
-        strrep = super().__str__()
-        formatter = self.formatter
-        if formatter is not None:
-            strrep = '\n'.join((strrep, str(formatter)))
-        return strrep
 
     @property
     def headers(self):
@@ -387,7 +377,7 @@ class DATAWriter:
             Output file path.
         fpath : :class:`~python:str`, optional
             Full path (directory path + file name) to output data file.
-        structure : :class:`~sknano.core.structures.BaseStructure`, optional
+        structure : :class:`~sknano.core.structures.StructureBase`, optional
         atoms : :class:`~sknano.core.atoms.Atoms`, optional
             An :class:`~sknano.core.atoms.Atoms` instance.
         bounding_box : :class:`~python:dict`, optional
@@ -890,7 +880,7 @@ class DATAFormatter(StructureDataFormatter):
                  'improper_style', 'pair_style']
         values = [self.atom_style, self.bond_style, self.dihedral_style,
                   self.improper_style, self.pair_style]
-        table = list(zip(items, values))
+        table = self._tabulate(list(zip(items, values)))
         strrep = '\n'.join((strrep, table))
         return strrep
 
@@ -971,6 +961,13 @@ class DATAFormatter(StructureDataFormatter):
                 "Expected one of: {}".format(pair_styles)
             raise ValueError(error_msg)
         self._pair_style = value
+
+    def format(self):
+        """Return :class:`~python:str` of dump attributes formatted for an \
+            output stream.
+
+        """
+        raise NotImplementedError
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
