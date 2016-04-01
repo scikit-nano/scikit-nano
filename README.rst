@@ -15,23 +15,18 @@ nanostructure data.
 *scikit-nano* can generate structure data (i.e., atomic coordinates)
 for the following classes of nanostructures:
 
-    * Fullerenes
-    * Graphene
+    * Nano Structures
 
-        * *N*-layer graphene
-        * Bilayer graphene with more fine control over relative layer
-          orientation, including relative rotation and stacking arrangements.
+        * Fullerenes
+        * Graphene
+        * Nanotubes
 
-    * Nanotubes
-
-        * Single-walled nanotubes (SWNTs)
-        * SWNT *bundles*
-        * Multi-walled nanotubes (MWNTs)
-        * MWNT *bundles*
+            * Single-walled nanotubes (SWNTs) and SWNT bundles.
+            * Multi-walled nanotubes (MWNTs) and MWNT bundles
 
     * Crystal Structures
 
-    * Composite/Layered Structures
+    * Layered Structures
 
 
 The following structure data formats are supported:
