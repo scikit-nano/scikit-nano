@@ -65,12 +65,15 @@ class UnitCell(BaseClass, TabulateMixin):
 
     def __str__(self):
         strrep = self._table_title_str()
+        objstr = self._obj_mro_str()
         lattice = self.lattice
-        basis = self.basis
         if lattice is not None:
-            strrep = '\n'.join((strrep, str(lattice)))
+            title = '.'.join((objstr, lattice.__class__.__qualname__))
+            strrep = '\n'.join((strrep, title, str(lattice)))
+        basis = self.basis
         if basis.data:
-            strrep = '\n'.join((strrep, str(basis)))
+            title = '.'.join((objstr, basis.__class__.__qualname__))
+            strrep = '\n'.join((strrep, title, str(basis)))
         return strrep
 
     def __dir__(self):
@@ -119,13 +122,14 @@ class UnitCell(BaseClass, TabulateMixin):
 
     def rotate(self, **kwargs):
         """Rotate unit cell lattice vectors and basis."""
+        if kwargs.get('anchor_point', None) is None:
+            kwargs['anchor_point'] = self.lattice.offset
         self.lattice.rotate(**kwargs)
         self.basis.rotate(**kwargs)
 
     def translate(self, t, fix_anchor_points=True):
         """Translate unit cell basis."""
-        if not fix_anchor_points:
-            self.lattice.translate(t)
+        self.lattice.translate(t)
         self.basis.translate(t, fix_anchor_points=fix_anchor_points)
 
     def todict(self):
@@ -190,15 +194,19 @@ class CrystalCell(BaseClass, TabulateMixin):
 
     def __str__(self):
         strrep = self._table_title_str()
+        objstr = self._obj_mro_str()
         lattice = self.lattice
         unit_cell = self.unit_cell
         if lattice is not None:
-            strrep = '\n'.join((strrep, str(lattice)))
+            title = '.'.join((objstr, lattice.__class__.__qualname__))
+            strrep = '\n'.join((strrep, title, str(lattice)))
         if unit_cell is not None:
-            strrep = '\n'.join((strrep, str(unit_cell)))
+            title = '.'.join((objstr, unit_cell.__class__.__qualname__))
+            strrep = '\n'.join((strrep, title, str(unit_cell)))
         basis = self.basis
         if isinstance(basis, BasisAtoms) and basis.data:
-            strrep = '\n'.join((strrep, str(basis)))
+            title = '.'.join((objstr, basis.__class__.__qualname__))
+            strrep = '\n'.join((strrep, title, str(basis)))
         return strrep
 
     def __eq__(self, other):
@@ -335,6 +343,8 @@ class CrystalCell(BaseClass, TabulateMixin):
 
     def rotate(self, **kwargs):
         """Rotate crystal cell lattice, basis, and unit cell."""
+        if kwargs.get('anchor_point', None) is None:
+            kwargs['anchor_point'] = self.lattice.offset
         if self.lattice is not None:
             self.lattice.rotate(**kwargs)
         if self.basis is not None:
@@ -343,7 +353,7 @@ class CrystalCell(BaseClass, TabulateMixin):
 
     def translate(self, t, fix_anchor_points=True):
         """Translate crystal cell basis."""
-        if not fix_anchor_points and self.lattice is not None:
+        if self.lattice is not None:
             self.lattice.translate(t)
         if self.basis is not None:
             self.basis.translate(t, fix_anchor_points=fix_anchor_points)

@@ -11,17 +11,20 @@ Contents
 
 Base crystallography classes
 ------------------------------
+
 .. autosummary::
    :toctree: generated/
 
+   LatticeBase
+   ReciprocalLatticeBase
+   Domain
    CrystalCell
    UnitCell
    SuperCell
-   LatticeBase
-   ReciprocalLatticeBase
 
 2D crystal lattices
 ---------------------------
+
 .. autosummary::
    :toctree: generated/
 
@@ -32,6 +35,7 @@ Base crystallography classes
 
 3D crystal lattices
 ---------------------------
+
 .. autosummary::
    :toctree: generated/
 
@@ -42,6 +46,7 @@ Base crystallography classes
 
 Helper functions
 ----------------
+
 .. autosummary::
    :toctree: generated/
 
