@@ -15,31 +15,41 @@ including fullerenes, graphene, and nanotubes.
 
 See the specific class doc pages below for detailed documentation on its use.
 
-Base/Mixin Classes
-------------------
+Base/Mixin structure classes
+----------------------------
+
 .. autosummary::
    :toctree: generated/
 
-   BaseStructureMixin
-   BaseStructure
+   StructureBase
+   StructureMixin
    CrystalStructureBase
    NanoStructureBase
    GrapheneBase
-   NanotubeBase
    GrapheneMixin
+   SWNTBase
    SWNTMixin
+   MWNTBase
    MWNTMixin
+   NanotubeBundleBase
    NanotubeBundleMixin
+   UnrolledSWNTBase
    UnrolledSWNTMixin
+   CubicStructure
+   BCCStructure
+   FCCStructure
+   CubicClosePackedStructure
+   HexagonalClosePackedStructure
+   HexagonalStructure
 
 Crystal structure classes
 --------------------------
+
 .. autosummary::
    :toctree: generated/
 
    Crystal2DStructure
    Crystal3DStructure
-   CubicStructure
    CaesiumChlorideStructure
    CsClStructure
    DiamondStructure
@@ -47,11 +57,6 @@ Crystal structure classes
    NaClStructure
    ZincblendeStructure
    SphaleriteStructure
-   BCCStructure
-   FCCStructure
-   CubicClosePackedStructure
-   HexagonalClosePackedStructure
-   HexagonalStructure
    AlphaQuartz
    MoS2
 
@@ -68,11 +73,14 @@ Nanostructure Classes
    ConventionalCellGraphene
    RectangularGraphene
    BilayerGraphene
+   NanotubeUnitCell
    SWNT
    MWNT
+   UnrolledSWNT
 
 Composite structure classes
 ----------------------------
+
 .. autosummary::
    :toctree: generated/
 
@@ -81,6 +89,7 @@ Composite structure classes
 
 Helper functions for nanotube properties
 ------------------------------------------
+
 .. autosummary::
    :toctree: generated/
 
@@ -122,6 +131,7 @@ Nanotube compute functions:
 
 Helper functions for working with :math:`(n, m)` chirality data
 -----------------------------------------------------------------
+
 .. autosummary::
    :toctree: generated/
 
@@ -142,7 +152,7 @@ __docformat__ = 'restructuredtext en'
 from ._base import *
 from ._xtal_structures import *
 from ._compositions import *
-from ._nanotube_base import *
+from ._nanotube_bundle import *
 from ._fullerenes import *
 from ._graphene import *
 from ._bilayer_graphene import *

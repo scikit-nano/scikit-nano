@@ -20,7 +20,7 @@ from sknano.core.refdata import lattice_parameters
 from ._base import CrystalStructureBase
 from ._extras import pymatgen_structure  # , supercell_lattice_points
 
-__all__ = ['Crystal2DStructure', 'CrystalStructure', 'Crystal3DStructure',
+__all__ = ['Crystal2DStructure', 'Crystal3DStructure',
            'CaesiumChlorideStructure', 'CsClStructure',
            'DiamondStructure',
            'RocksaltStructure', 'RockSaltStructure', 'NaClStructure',
@@ -65,6 +65,7 @@ class Crystal2DStructure(CrystalStructureBase):
 
     @classmethod
     def from_pymatgen_structure(cls, structure):
+        """Classmethod to generate structure using pymatgen."""
         atoms = BasisAtoms()
         for site in structure.sites:
             atoms.append(BasisAtom(element=site.specie.symbol,
@@ -90,7 +91,7 @@ class Crystal2DStructure(CrystalStructureBase):
 
         Notes
         -----
-        Under the hood this method first s a pymatgen
+        Under the hood this method first creates a pymatgen
         :class:`~pymatgen:Structure`
 
         See Also
@@ -231,8 +232,6 @@ class Crystal3DStructure(CrystalStructureBase):
                                classmethod='from_spacegroup')
 
         return cls.from_pymatgen_structure(structure, **kwargs)
-
-CrystalStructure = Crystal3DStructure
 
 
 class CubicStructure(Crystal3DStructure):

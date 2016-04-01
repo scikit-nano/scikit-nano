@@ -18,11 +18,11 @@ import numpy as np
 from sknano.core import BaseClass, TabulateMixin
 from sknano.core.atoms import StructureAtoms, vdw_radius_from_basis
 from sknano.core.crystallography import CrystalCell, UnitCell, SuperCell
+from sknano.core.math import Vector
 from sknano.core.refdata import aCC, element_data
 
 
-__all__ = ['BaseStructureMixin', 'BaseStructure',
-           'StructureBaseMixin', 'StructureBase',
+__all__ = ['StructureMixin', 'StructureBase',
            'CrystalStructureBase', 'NanoStructureBase']
 
 r_CC_vdw = element_data['C']['VanDerWaalsRadius']
@@ -31,7 +31,7 @@ _list_methods = ('append', 'extend', 'insert', 'remove', 'pop', 'clear',
                  'index', 'count', 'sort', 'reverse', 'copy')
 
 
-class BaseStructureMixin:
+class StructureMixin:
     """Mixin class for crystal structures."""
     def __getattr__(self, name):
         try:
@@ -79,6 +79,15 @@ class BaseStructureMixin:
         self.atoms.lattice = self.crystal_cell.lattice
 
     @property
+    def lattice_shift(self):
+        """Lattice displacement vector."""
+        return self._lattice_shift
+
+    @lattice_shift.setter
+    def lattice_shift(self, value):
+        self._lattice_shift = Vector(value)
+
+    @property
     def scaling_matrix(self):
         """:attr:`CrystalCell.scaling_matrix`."""
         return self.crystal_cell.scaling_matrix
@@ -98,16 +107,11 @@ class BaseStructureMixin:
 
     @property
     def structure(self):
-        """Pointer to self."""
-        return self
-
-    @property
-    def structure_data(self):
-        """Alias for :attr:`BaseStructureMixin.structure`."""
+        """An alias to `self`."""
         return self
 
     def clear(self):
-        """Clear list of :attr:`BaseStructureMixin.atoms`."""
+        """Clear list of :attr:`StructureMixin.atoms`."""
         self.atoms.clear()
 
     def make_supercell(self, scaling_matrix, wrap_coords=False):
@@ -119,6 +123,7 @@ class BaseStructureMixin:
         """Rotate crystal cell lattice, basis, and unit cell."""
         self.crystal_cell.rotate(**kwargs)
         self.atoms.rotate(**kwargs)
+        # self.lattice = self.crystal_cell.lattice
 
     def translate(self, t, fix_anchor_points=True):
         """Translate crystal cell lattice, basis, and unit cell."""
@@ -163,21 +168,31 @@ class BaseStructureMixin:
     #             setattr(cp, attr, deepcopy(getattr(self, attr), memo))
     #     return cp
 
-StructureBaseMixin = BaseStructureMixin
 
-
-class BaseStructure(BaseStructureMixin):
+class StructureBase(TabulateMixin, StructureMixin):
     """Base structure class for structure data."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._atoms = StructureAtoms()
         self._crystal_cell = CrystalCell()
+        self._lattice_shift = Vector()
 
-StructureBase = BaseStructure
+    def __str__(self):
+        strrep = self._table_title_str()
+        objstr = self._obj_mro_str()
+        atoms = self.atoms
+        xtal_cell = self.crystal_cell
+
+        title = '.'.join((objstr, atoms.__class__.__name__))
+        strrep = '\n'.join((strrep, title, str(atoms)))
+
+        title = '.'.join((objstr, xtal_cell.__class__.__name__))
+        strrep = '\n'.join((strrep, title, str(xtal_cell)))
+        return strrep
 
 
 @total_ordering
-class CrystalStructureBase(TabulateMixin, BaseStructure, BaseClass):
+class CrystalStructureBase(StructureBase, BaseClass):
     """Base class for abstract representions of crystal structures.
 
     Parameters
@@ -189,7 +204,6 @@ class CrystalStructureBase(TabulateMixin, BaseStructure, BaseClass):
     scaling_matrix : {:class:`~python:int`, :class:`~python:list`}, optional
 
     """
-
     def __init__(self, *args, lattice=None, basis=None, coords=None,
                  cartesian=False, scaling_matrix=None, **kwargs):
 
@@ -212,11 +226,6 @@ class CrystalStructureBase(TabulateMixin, BaseStructure, BaseClass):
         if isinstance(other, CrystalStructureBase):
             return self.crystal_cell < other.crystal_cell
 
-    def __str__(self):
-        strrep = self._table_title_str()
-        strrep = '\n'.join((strrep, str(self.atoms), str(self.crystal_cell)))
-        return strrep
-
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
         attrdict = self.unit_cell.todict()
@@ -224,7 +233,7 @@ class CrystalStructureBase(TabulateMixin, BaseStructure, BaseClass):
         return attrdict
 
 
-class NanoStructureBase(TabulateMixin, BaseStructure, BaseClass):
+class NanoStructureBase(StructureBase, BaseClass):
     """Base class for creating abstract representations of nanostructure.
 
     Parameters
@@ -242,22 +251,17 @@ class NanoStructureBase(TabulateMixin, BaseStructure, BaseClass):
         if isinstance(basis, list):
             basis = basis[:]
 
-            if 'element1' in kwargs:
-                basis[0] = kwargs['element1']
-                del kwargs['element1']
+            [basis.__setitem__(i, kwargs.pop(element)) for i, element in
+             enumerate(('element1', 'element2')) if element in kwargs]
 
-            if 'element2' in kwargs:
-                basis[1] = kwargs['element2']
-                del kwargs['element2']
-
+        vdw_radius = None
         if 'vdw_spacing' in kwargs:
-            vdw_radius = kwargs['vdw_spacing'] / 2
-            del kwargs['vdw_spacing']
+            vdw_radius = kwargs.pop('vdw_spacing') / 2
         elif 'vdw_radius' in kwargs:
-            vdw_radius = kwargs['vdw_radius']
-            del kwargs['vdw_radius']
-        else:
-            vdw_radius = None
+            vdw_radius = kwargs.pop('vdw_radius')
+
+        if vdw_radius is None:
+            vdw_radius = r_CC_vdw
 
         if bond is None:
             bond = aCC
@@ -267,11 +271,8 @@ class NanoStructureBase(TabulateMixin, BaseStructure, BaseClass):
         self.bond = bond
         self.basis = basis
         self.vdw_radius = vdw_radius
-
-    def __str__(self):
-        strrep = self._table_title_str()
-        strrep = '\n'.join((strrep, str(self.atoms), str(self.crystal_cell)))
-        return strrep
+        self.fmtstr = "bond={bond!r}, basis={basis!r}, " + \
+            "vdw_radius={vdw_radius!r}"
 
     @property
     def basis(self):
@@ -333,3 +334,8 @@ class NanoStructureBase(TabulateMixin, BaseStructure, BaseClass):
             self.crystal_cell.update_basis(value, index=1, step=2)
         except AttributeError:
             pass
+
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        return dict(bond=self.bond, basis=self.basis,
+                    vdw_radius=self.vdw_radius)

@@ -18,7 +18,7 @@ import numpy as np
 
 # from sknano.core.atoms import Atom
 from sknano.core.crystallography import Crystal3DLattice, UnitCell
-from sknano.core.math import Vector
+from sknano.core.math import Vector, vector as vec
 from sknano.core.refdata import aCC  # , grams_per_Da
 from ._base import NanoStructureBase, r_CC_vdw
 
@@ -45,7 +45,8 @@ class GraphenePrimitiveCell(UnitCell):
 
     """
     def __init__(self, bond=aCC, a=np.sqrt(3) * aCC, c=2 * r_CC_vdw,
-                 gamma=60, basis=['C', 'C'], coords=[[0, 0, 0], [aCC, 0, 0]],
+                 gamma=60, basis=['C', 'C'],
+                 coords=[[0, 0, r_CC_vdw], [aCC, 0, r_CC_vdw]],
                  cartesian=True):
         lattice = Crystal3DLattice(a=a, b=a, c=c, alpha=90., beta=90.,
                                    gamma=gamma)
@@ -68,9 +69,9 @@ class GrapheneConventionalCell(UnitCell):
     """
     def __init__(self, bond=aCC, a=3 * aCC, b=np.sqrt(3) * aCC, c=2 * r_CC_vdw,
                  basis=4 * ['C'],
-                 coords=[[0, 0, 0], [aCC, 0, 0],
-                         [3 / 2 * aCC, np.sqrt(3) / 2 * aCC, 0],
-                         [5 / 2 * aCC, np.sqrt(3) / 2 * aCC, 0]],
+                 coords=[[0, 0, r_CC_vdw], [aCC, 0, r_CC_vdw],
+                         [3 / 2 * aCC, np.sqrt(3) / 2 * aCC, r_CC_vdw],
+                         [5 / 2 * aCC, np.sqrt(3) / 2 * aCC, r_CC_vdw]],
                  cartesian=True):
         lattice = Crystal3DLattice.orthorhombic(a, b, c)
         super().__init__(lattice, basis, coords, cartesian)
@@ -117,7 +118,10 @@ class GrapheneMixin:
     @property
     def area(self):
         """Total area of graphene supercell."""
-        return np.abs(self.r1[:2].cross(self.r2[:2]))
+        r1 = self.r1
+        r2 = self.r2
+        a = r1.norm * r2.norm * np.sin(vec.angle(r1, r2))
+        return a
 
     @property
     def N(self):
@@ -128,8 +132,11 @@ class GrapheneMixin:
            N = \\frac{A_{\\mathrm{sheet}}}{A_{\\mathrm{cell}}}
 
         """
-        return int(self.area /
-                   np.abs(self.unit_cell.a1[:2].cross(self.unit_cell.a2[:2])))
+        unit_cell = self.unit_cell
+        a1 = unit_cell.a1
+        a2 = unit_cell.a2
+        unit_cell_area = a1.norm * a2.norm * np.sin(vec.angle(a1, a2))
+        return int(self.area / unit_cell_area)
 
     @property
     def Natoms(self):
@@ -179,21 +186,15 @@ class GrapheneBase(GrapheneMixin, NanoStructureBase):
     verbose : bool, optional
         verbose output
     """
+    def __init__(self, nlayers=1, layer_spacing=2 * r_CC_vdw,
+                 layer_rotation_angles=None, layer_rotation_increment=None,
+                 stacking_order='AB', degrees=True, **kwargs):
 
-    def __init__(self, basis=['C', 'C'], bond=aCC, nlayers=1,
-                 layer_spacing=2 * r_CC_vdw, layer_rotation_angles=None,
-                 layer_rotation_increment=None, stacking_order='AB',
-                 degrees=True, **kwargs):
+        degrees = kwargs.pop('deg2rad', degrees)
+        layer_rotation_angles = kwargs.pop('layer_rotation_angle',
+                                           layer_rotation_angles)
 
-        if 'deg2rad' in kwargs:
-            degrees = kwargs['deg2rad']
-            del kwargs['deg2rad']
-
-        if 'layer_rotation_angle' in kwargs and layer_rotation_angles is None:
-                layer_rotation_angles = kwargs['layer_rotation_angle']
-                del kwargs['layer_rotation_angle']
-
-        super().__init__(basis=basis, bond=bond, **kwargs)
+        super().__init__(**kwargs)
 
         self.layers = []
         self.nlayers = nlayers
@@ -224,28 +225,30 @@ class GrapheneBase(GrapheneMixin, NanoStructureBase):
         if nlayers > 1 and stacking_order == 'AB':
             self.layer_shift.x = self.bond
 
-        self.fmtstr = 'bond={bond!r}, basis={basis!r}, ' + \
-            'nlayers={nlayers!r}, layer_spacing={layer_spacing!r}, ' + \
-            'layer_rotation_angles={layer_rotation_angles!r}, ' + \
-            'stacking_order={stacking_order!r}'
+        self.fmtstr = \
+            ", ".join((super().fmtstr, 'nlayers={nlayers!r}',
+                       'layer_spacing={layer_spacing!r}',
+                       'layer_rotation_angles={layer_rotation_angles!r}',
+                       'stacking_order={stacking_order!r}'))
 
     def __str__(self):
-        strrep = repr(self)
-        strrep += '\n\n'
+        strrep = super().__str__()
+        strrep += '\n'
         strrep += 'area: {:.2f} \u212b^2\n'.format(self.area)
         strrep += 'N atoms/unit cell: {:d}\n'.format(self.Natoms_per_unit_cell)
         strrep += 'N unit cells: {:d}\n'.format(self.N)
         strrep += 'N atoms/layer: {:d}\n'.format(self.Natoms_per_layer)
         strrep += 'N layers: {:d}\n'.format(self.nlayers)
-        strrep += 'N atoms: {:d}\n'.format(self.Natoms)
         return strrep
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
-        return dict(bond=self.bond, basis=self.basis,
-                    nlayers=self.nlayers, layer_spacing=self.layer_spacing,
-                    layer_rotation_angles=self.layer_rotation_angles,
-                    stacking_order=self.stacking_order)
+        attr_dict = super().todict()
+        attr_dict.update(dict(nlayers=self.nlayers,
+                              layer_spacing=self.layer_spacing,
+                              layer_rotation_angles=self.layer_rotation_angles,
+                              stacking_order=self.stacking_order))
+        return attr_dict
 
 
 class PrimitiveCellGraphene(GrapheneBase):
@@ -291,15 +294,13 @@ class PrimitiveCellGraphene(GrapheneBase):
 
     def __init__(self, edge_length=None, ncells=None, **kwargs):
 
-        self.edge_length = edge_length
-        self.l1 = self.l2 = self.edge_length
-
+        self.l1 = self.l2 = self.edge_length = edge_length
         super().__init__(**kwargs)
-
-        self.unit_cell = GraphenePrimitiveCell(bond=self.bond,
-                                               basis=self.basis)
-        self.crystal_cell.scaling_matrix = [self.n1, self.n2, self.nlayers]
-        self.fmtstr = 'edge_length={edge_length!r}, ' + self.fmtstr
+        self.unit_cell = \
+            GraphenePrimitiveCell(bond=self.bond, basis=self.basis)
+        self.scaling_matrix = [self.n1, self.n2, self.nlayers]
+        self.fmtstr = ', '.join((super().fmtstr,
+                                 'edge_length={edge_length!r}'))
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
@@ -357,34 +358,25 @@ class ConventionalCellGraphene(GrapheneBase):
         verbose output
 
     """
-    def __init__(self, armchair_edge_length=None, zigzag_edge_length=None,
-                 n1=None, n2=None, **kwargs):
+    def __init__(self, l1=None, l2=None, n1=None, n2=None, **kwargs):
 
-        if 'length' in kwargs:
-            armchair_edge_length = kwargs['length']
-            del kwargs['length']
-
-        if 'width' in kwargs:
-            zigzag_edge_length = kwargs['width']
-            del kwargs['width']
-
-        self.l1 = self.armchair_edge_length = armchair_edge_length
-        self.l2 = self.zigzag_edge_length = zigzag_edge_length
+        self.l1 = self.armchair_edge_length = \
+            kwargs.pop('armchair_edge_length', kwargs.pop('length', l1))
+        self.l2 = self.zigzag_edge_length = \
+            kwargs.pop('zigzag_edge_length', kwargs.pop('width', l2))
 
         super().__init__(**kwargs)
 
         self.unit_cell = GrapheneConventionalCell(bond=self.bond,
                                                   basis=2 * self.basis)
-        self.crystal_cell.scaling_matrix = [self.n1, self.n2, self.nlayers]
-
-        self.fmtstr = 'armchair_edge_length={armchair_edge_length!r}, ' + \
-            'zigzag_edge_length={zigzag_edge_length!r}, ' + self.fmtstr
+        self.scaling_matrix = [self.n1, self.n2, self.nlayers]
+        self.fmtstr = ', '.join((super().fmtstr, 'l1={l1!r}', 'l2={l2!r}',
+                                 'n1={n1!r}', 'n2={n2!r}'))
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
         attr_dict = super().todict()
-        attr_dict.update(dict(armchair_edge_length=self.armchair_edge_length,
-                         zigzag_edge_length=self.zigzag_edge_length))
+        attr_dict.update(dict(l1=self.l1, l2=self.l2, n1=self.n1, n2=self.n2))
         return attr_dict
 
 RectangularGraphene = RectangularCellGraphene = ConventionalCellGraphene

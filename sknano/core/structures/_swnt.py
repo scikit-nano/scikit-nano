@@ -21,19 +21,109 @@ from sknano.core.refdata import aCC, grams_per_Da
 from ._base import NanoStructureBase, r_CC_vdw
 from ._extras import attr_strfmt, attr_symbols, attr_units, \
     get_chiral_indices, get_chiral_type
-from ._nanotube_base import NanotubeBase
+from ._nanotube_bundle import NanotubeBundleBase
+
 
 __all__ = ['compute_d', 'compute_dR', 'compute_N', 'compute_t1', 'compute_t2',
            'compute_Ch', 'compute_chiral_angle', 'compute_T', 'compute_dt',
            'compute_rt', 'compute_M', 'compute_R', 'compute_R_chiral_angle',
-           'compute_symmetry_operation', 'compute_psi', 'compute_tau',
+           'compute_symmetry_operation', 'compute_unit_cell_symmetry_params',
+           'compute_psi', 'compute_tau',
            'compute_Lx', 'compute_Ly', 'compute_Lz',
            'compute_electronic_type', 'compute_Natoms',
            'compute_Natoms_per_tube', 'compute_Natoms_per_unit_cell',
            'compute_unit_cell_mass', 'compute_linear_mass_density',
            'compute_symmetry_chiral_angle', 'compute_tube_diameter',
            'compute_tube_radius', 'compute_tube_length', 'compute_tube_mass',
-           'SWNTMixin', 'NanotubeMixin', 'SWNT', 'Nanotube']
+           'NanotubeUnitCell', 'SWNTMixin', 'NanotubeMixin', 'SWNTBase',
+           'SWNT', 'Nanotube']
+
+
+class NanotubeUnitCell(UnitCell):
+    """Primitive graphene unit cell with 2 atom basis.
+
+    Parameters
+    ----------
+    bond : :class:`~python:float`, optional
+    a : :class:`~python:float`, optional
+    gamma : {60, 120}, optional
+    basis : {:class:`~python:list`, :class:`~sknano.core.atoms.BasisAtoms`}, \
+    optional
+    coords : {:class:`~python:list`}, optional
+    cartesian : {:class:`~python:bool`}, optional
+
+    """
+    def __init__(self, *args, lattice=None, **kwargs):
+        basis = kwargs.get('basis')
+        if lattice is None or not isinstance(basis, BasisAtoms):
+            lattice, basis = \
+                self._generate_unit_cell_parameters(*args, **kwargs)
+        super().__init__(lattice=lattice, basis=basis)
+
+    def _generate_unit_cell_parameters(self, *Ch, bond=aCC, basis=['C', 'C'],
+                                       gutter=r_CC_vdw, wrap_coords=False,
+                                       eps=0.01, **kwargs):
+        n, m, kwargs = get_chiral_indices(*Ch, **kwargs)
+        e1, e2 = basis
+        N = compute_N(*Ch)
+        T = compute_T(*Ch, bond=bond, length=True)
+        rt = compute_rt(*Ch, bond=bond)
+        psi, tau, dpsi, dtau = \
+            compute_unit_cell_symmetry_params(*Ch, bond=bond)
+
+        a = compute_dt(*Ch, bond=bond) + 2 * gutter
+        c = T
+        lattice = Crystal3DLattice.hexagonal(a, c)
+        basis = BasisAtoms()
+
+        verbose = kwargs.get('verbose', False)
+        debug = kwargs.get('debug', False)
+        if verbose:
+            print('dpsi: {}'.format(dpsi))
+            print('dtau: {}\n'.format(dtau))
+
+        for i in range(N):
+            for j, element in enumerate((e1, e2), start=1):
+                theta = i * psi
+                h = i * tau
+
+                if j == 2:
+                    theta += dpsi
+                    h -= dtau
+
+                x = rt * np.cos(theta)
+                y = rt * np.sin(theta)
+                z = h
+
+                while z > T - eps:
+                    z -= T
+
+                if z < 0:
+                    z += T
+
+                xs, ys, zs = \
+                    lattice.cartesian_to_fractional([x, y, z])
+
+                if wrap_coords:
+                    xs, ys, zs = \
+                        lattice.wrap_fractional_coordinate([xs, ys, zs])
+
+                if debug:
+                    print('i={}: x, y, z = ({:.6f}, {:.6f}, {:.6f})'.format(
+                        i, x, y, z))
+
+                    print('xs, ys, zs = ({:.6f}, {:.6f}, {:.6f})'.format(
+                        xs, ys, zs))
+
+                atom = BasisAtom(element, lattice=lattice, xs=xs, ys=ys, zs=zs)
+                atom.rezero()
+
+                if verbose:
+                    print('Basis Atom:\n{}'.format(atom))
+
+                basis.append(atom)
+
+        return lattice, basis
 
 
 def compute_d(*Ch):
@@ -532,6 +622,16 @@ def compute_symmetry_operation(*Ch, bond=None):
     psi = compute_psi(n, m)
     tau = compute_tau(n, m, bond=bond)
     return (psi, tau)
+
+
+def compute_unit_cell_symmetry_params(*Ch, bond=None):
+    """Tuple of `SWNT` unit cell *symmetry parameters*."""
+    psi, tau = compute_symmetry_operation(*Ch, bond=bond)
+    aCh = compute_chiral_angle(*Ch, degrees=False)
+    rt = compute_rt(*Ch, bond=bond)
+    dpsi = bond * np.cos(np.pi / 6 - aCh) / rt
+    dtau = bond * np.sin(np.pi / 6 - aCh)
+    return psi, tau, dpsi, dtau
 
 
 def compute_psi(*Ch):
@@ -1273,6 +1373,7 @@ class SWNTMixin:
         nanotube unit cell and :math:`n_z` is the number of unit cells.
 
         """
+        print('in SWNTMixin.Natoms')
         return compute_Natoms(self.n, self.m, nz=self.nz)
 
     @property
@@ -1307,11 +1408,16 @@ class SWNTMixin:
         return self.Lz
 
     @property
-    def tube_mass(self):
+    def mass(self):
         """SWNT mass in **grams**."""
         return compute_tube_mass(self.n, self.m, nz=self.nz,
                                  element1=self.element1,
                                  element2=self.element2)
+
+    @property
+    def tube_mass(self):
+        """An alias for :attr:`~SWNTMixin.mass`."""
+        return self.mass
 
     @property
     def unit_cell_mass(self):
@@ -1345,10 +1451,7 @@ class SWNTBase(SWNTMixin, NanoStructureBase):
                  wrap_coords=False, **kwargs):
 
         n, m, kwargs = get_chiral_indices(*Ch, **kwargs)
-
-        if 'tube_length' in kwargs:
-            Lz = kwargs['tube_length']
-            del kwargs['tube_length']
+        Lz = kwargs.pop('tube_length', Lz)
 
         super().__init__(**kwargs)
 
@@ -1370,14 +1473,19 @@ class SWNTBase(SWNTMixin, NanoStructureBase):
         else:
             self.nz = 1
 
-        self.generate_unit_cell()
-        self.crystal_cell.scaling_matrix = [1, 1, int(np.ceil(self.nz))]
-        fmtstr = "{Ch!r}, "
+        # self.generate_unit_cell()
+        self.unit_cell = \
+            NanotubeUnitCell((self.n, self.m), bond=self.bond,
+                             basis=self.basis, gutter=self.gutter,
+                             wrap_coords=wrap_coords)
+        self.scaling_matrix = [1, 1, int(np.ceil(self.nz))]
+        fmtstr = ", ".join(("{Ch!r}", super().fmtstr))
         if self.fix_Lz:
-            fmtstr += "Lz={Lz!r}, fix_Lz=True, "
+            fmtstr = ", ".join((fmtstr, "Lz={Lz!r}", "fix_Lz=True"))
         else:
-            fmtstr += "nz={nz!r}, "
-        self.fmtstr = fmtstr + "basis={basis!r}, bond={bond!r}"
+            fmtstr = ", ".join((fmtstr, "nz={nz!r}"))
+        self.fmtstr = ", ".join((fmtstr, "gutter={gutter!r}",
+                                 "wrap_coords={wrap_coords!r}"))
 
     def __str__(self):
         """Return nice string representation of `SWNT`."""
@@ -1407,81 +1515,17 @@ class SWNTBase(SWNTMixin, NanoStructureBase):
 
         return fmtstr
 
-    def generate_unit_cell(self):
-        """Generate the nanotube unit cell."""
-        eps = 0.01
-
-        e1 = self.element1
-        e2 = self.element2
-        N = self.N
-        T = self.T
-        rt = self.rt
-
-        psi, tau, dpsi, dtau = self.unit_cell_symmetry_params
-
-        a = compute_dt(self.n, self.m, bond=self.bond) + 2 * self.gutter
-        c = compute_T(self.n, self.m, bond=self.bond, length=True)
-        lattice = Crystal3DLattice.hexagonal(a, c)
-        basis = BasisAtoms()
-
-        if self.verbose:
-            print('dpsi: {}'.format(dpsi))
-            print('dtau: {}\n'.format(dtau))
-
-        for i in range(N):
-            for j, element in enumerate((e1, e2), start=1):
-                theta = i * psi
-                h = i * tau
-
-                if j == 2:
-                    theta += dpsi
-                    h -= dtau
-
-                x = rt * np.cos(theta)
-                y = rt * np.sin(theta)
-                z = h
-
-                while z > T - eps:
-                    z -= T
-
-                if z < 0:
-                    z += T
-
-                xs, ys, zs = \
-                    lattice.cartesian_to_fractional([x, y, z])
-
-                if self.wrap_coords:
-                    xs, ys, zs = \
-                        lattice.wrap_fractional_coordinate([xs, ys, zs])
-
-                if self.debug:
-                    print('i={}: x, y, z = ({:.6f}, {:.6f}, {:.6f})'.format(
-                        i, x, y, z))
-
-                    print('xs, ys, zs = ({:.6f}, {:.6f}, {:.6f})'.format(
-                        xs, ys, zs))
-
-                # atom = BasisAtom(element, lattice=lattice, x=x, y=y, z=z)
-                # print('i={}: x, y, z = ({:.6f}, {:.6f}, {:.6f})'.format(
-                #     i, x, y, z))
-                atom = BasisAtom(element, lattice=lattice, xs=xs, ys=ys, zs=zs)
-                atom.rezero()
-
-                if self.verbose:
-                    print('Basis Atom:\n{}'.format(atom))
-
-                basis.append(atom)
-
-        self.unit_cell = UnitCell(lattice=lattice, basis=basis)
-
     def todict(self):
         """Return :class:`~python:dict` of `SWNT` attributes."""
-        return dict(Ch=(self.n, self.m), nz=self.nz,
-                    bond=self.bond, basis=self.basis,
-                    Lz=self.Lz)
+        attr_dict = super().todict()
+        attr_dict.update(dict(Ch=(self.n, self.m),
+                              nz=self.nz, Lz=self.Lz,
+                              gutter=self.gutter,
+                              wrap_coords=self.wrap_coords))
+        return attr_dict
 
 
-class SWNT(NanotubeBase, SWNTBase):
+class SWNT(NanotubeBundleBase, SWNTBase):
     """SWNT structure class.
 
     Parameters

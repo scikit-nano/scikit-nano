@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
 ==============================================================================
-Base composition classes (:mod:`sknano.core.compositions._compositions`)
+Base composition classes (:mod:`sknano.core.structures._compositions`)
 ==============================================================================
 
-.. currentmodule:: sknano.core.compositions._compositions
+.. currentmodule:: sknano.core.structures._compositions
 
 """
 from __future__ import absolute_import, division, print_function

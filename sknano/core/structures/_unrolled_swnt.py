@@ -17,57 +17,19 @@ import numpy as np
 
 from sknano.core.atoms import BasisAtom as Atom, BasisAtoms as Atoms
 from sknano.core.crystallography import Crystal3DLattice, UnitCell
-from sknano.core.math import Vector
-from sknano.core.refdata import aCC
+# from sknano.core.math import Vector
+# from sknano.core.refdata import aCC
 
-from ._base import NanoStructureBase, r_CC_vdw
-from ._extras import get_chiral_indices
-from ._swnt import NanotubeMixin, compute_Ch, compute_T, compute_chiral_angle
+from ._base import NanoStructureBase
+from ._swnt import SWNTBase, compute_Ch, compute_T, compute_chiral_angle
+from ._graphene import GrapheneBase
 
 
-__all__ = ['UnrolledSWNTMixin', 'UnrolledSWNT']
+__all__ = ['UnrolledSWNTMixin', 'UnrolledSWNTBase', 'UnrolledSWNT']
 
 
 class UnrolledSWNTMixin:
     """Mixin class for unrolled nanotubes."""
-
-    @property
-    def Lx(self):
-        """Axis-aligned length along the `x`-axis in **Angstroms**."""
-        return self.nx * self.Ch
-
-    @property
-    def Ly(self):
-        """Axis-aligned length along the `y`-axis in **Angstroms**."""
-        return self.nlayers * self.layer_spacing
-
-    @property
-    def nx(self):
-        """Number of unit cells along the :math:`x`-axis."""
-        return self._nx
-
-    @nx.setter
-    def nx(self, value):
-        """Set :math:`n_x`"""
-        if not (isinstance(value, numbers.Number) or value > 0):
-            raise TypeError('Expected a real positive number.')
-        self._nx = int(value)
-
-    @property
-    def nlayers(self):
-        """Number of layers."""
-        return self._nlayers
-
-    @nlayers.setter
-    def nlayers(self, value):
-        """Set :attr:`nlayers`."""
-        if not (isinstance(value, numbers.Number) or value > 0):
-            raise TypeError('Expected a real positive number.')
-        self._nlayers = int(value)
-
-    @nlayers.deleter
-    def nlayers(self):
-        del self._nlayers
 
     @property
     def fix_Lx(self):
@@ -82,8 +44,82 @@ class UnrolledSWNTMixin:
         self._fix_Lx = value
         self._integral_nx = False if self.fix_Lx else True
 
+    @property
+    def Lx(self):
+        """Axis-aligned length along the `x`-axis in **Angstroms**."""
+        return self.nx * self.Ch
 
-class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
+    @property
+    def nx(self):
+        """Number of unit cells along the :math:`x`-axis."""
+        return self._nx
+
+    @nx.setter
+    def nx(self, value):
+        """Set :math:`n_x`"""
+        if not (isinstance(value, numbers.Number) or value > 0):
+            raise TypeError('Expected a real positive number.')
+        self._nx = int(value)
+
+    @property
+    def Ly(self):
+        """Axis-aligned length along the `y`-axis in **Angstroms**."""
+        return self.ny * self.layer_spacing
+
+    @property
+    def ny(self):
+        """An alias for :attr:`UnrolledSWNTMixin.nlayers`."""
+        return self._nlayers
+
+    @ny.setter
+    def ny(self, value):
+        self.nalyers = value
+
+    @property
+    def nlayers(self):
+        """Number of layers."""
+        return self._nlayers
+
+    @nlayers.setter
+    def nlayers(self, value):
+        """Set :attr:`nlayers`."""
+        if not (isinstance(value, numbers.Number) or value > 0):
+            raise TypeError('Expected a real positive number.')
+        self._nlayers = int(value)
+
+
+class UnrolledSWNTBase(UnrolledSWNTMixin, SWNTBase, GrapheneBase):
+
+    def __init__(self, *args, nx=1, Lx=None, fix_Lx=False, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.fix_Lx = fix_Lx
+        if Lx is not None:
+            self.nx = float(Lx) / self.Ch
+        elif nx is not None:
+            self.nx = nx
+        else:
+            self.nx = 1
+
+        if self.nlayers > 1 and self.stacking_order == 'AB':
+            chiral_angle = compute_chiral_angle(self.n, self.m, degrees=False)
+            self.layer_shift.x = self.bond * np.cos(np.pi/6 - chiral_angle)
+            self.layer_shift.z = -self.bond * np.sin(np.pi/6 - chiral_angle)
+
+        self.generate_unit_cell()
+        self.scaling_matrix = \
+            [int(np.ceil(self.nx)), self.ny, int(np.ceil(self.nz))]
+        self.fmtstr = ", ".join((super().fmtstr, "nx={nx!r}", "Lx={Lx!r}"))
+
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        attr_dict = super().todict()
+        attr_dict.update(dict(nx=self.nx, Lx=self.Lx))
+        return attr_dict
+
+
+class UnrolledSWNT(UnrolledSWNTBase, NanoStructureBase):
     """Unrolled SWNT structure class.
 
     Parameters
@@ -169,81 +205,6 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
     layer_spacing=3.4, stacking_order='AB')
 
     """
-    def __init__(self, *Ch, nx=1, nz=1, basis=['C', 'C'], bond=aCC,
-                 gutter=None, nlayers=1, layer_spacing=2 * r_CC_vdw,
-                 layer_rotation_angles=None,
-                 layer_rotation_increment=None, degrees=True,
-                 stacking_order='AB', Lx=None, fix_Lx=False,
-                 Lz=None, fix_Lz=False, wrap_coords=False, **kwargs):
-
-        n, m, kwargs = get_chiral_indices(*Ch, **kwargs)
-
-        super().__init__(basis=basis, bond=bond, **kwargs)
-
-        if gutter is None:
-            gutter = self.vdw_radius
-
-        self.gutter = gutter
-        self.wrap_coords = wrap_coords
-
-        self.n = n
-        self.m = m
-
-        self.fix_Lx = fix_Lx
-        if Lx is not None:
-            self.nx = float(Lx) / self.Ch
-        elif nx is not None:
-            self.nx = nx
-        else:
-            self.nx = 1
-
-        self.fix_Lz = fix_Lz
-        if Lz is not None:
-            self.nz = float(Lz) / self.T
-        elif nz is not None:
-            self.nz = nz
-        else:
-            self.nz = 1
-
-        self.nlayers = nlayers
-        self.layer_spacing = layer_spacing
-
-        if layer_rotation_increment is not None and \
-                layer_rotation_angles is None:
-            layer_rotation_angles = layer_rotation_increment * \
-                np.arange(self.nlayers)
-        elif isinstance(layer_rotation_angles, numbers.Number):
-            layer_rotation_angles = layer_rotation_angles * \
-                np.ones(self.nlayers)
-        elif layer_rotation_angles is None or \
-                isinstance(layer_rotation_angles, (tuple, list, np.ndarray)) \
-                and len(layer_rotation_angles) != self.nlayers:
-            layer_rotation_angles = np.zeros(self.nlayers)
-            degrees = False
-
-        if degrees:
-            layer_rotation_angles = \
-                np.radians(np.asarray(layer_rotation_angles)).tolist()
-
-        self.layer_rotation_angles = \
-            np.asarray(layer_rotation_angles).tolist()
-
-        self.layer_shift = Vector()
-        self.stacking_order = stacking_order
-        if nlayers > 1 and stacking_order == 'AB':
-            chiral_angle = compute_chiral_angle(self.n, self.m, degrees=False)
-            self.layer_shift.x = self.bond * np.cos(np.pi/6 - chiral_angle)
-            self.layer_shift.z = -self.bond * np.sin(np.pi/6 - chiral_angle)
-
-        self.generate_unit_cell()
-        self.crystal_cell.scaling_matrix = \
-            [int(np.ceil(self.nx)), self.nlayers, int(np.ceil(self.nz))]
-
-        self.fmtstr = "{Ch!r}, nx={nx!r}, nz={nz!r}, bond={bond!r}, " + \
-            "basis={basis!r}, nlayers={nlayers!r}, " + \
-            "layer_spacing={layer_spacing!r}, " + \
-            "stacking_order={stacking_order!r}"
-
     def generate_unit_cell(self):
         """Generate the nanotube unit cell."""
         eps = 0.01
@@ -302,10 +263,3 @@ class UnrolledSWNT(UnrolledSWNTMixin, NanotubeMixin, NanoStructureBase):
                 basis.append(atom)
 
         self.unit_cell = UnitCell(lattice=lattice, basis=basis)
-
-    def todict(self):
-        """Return :class:`~python:dict` of `SWNT` attributes."""
-        return dict(Ch=(self.n, self.m), nx=self.nx, nz=self.nz,
-                    bond=self.bond, basis=self.basis,
-                    nlayers=self.nlayers, layer_spacing=self.layer_spacing,
-                    stacking_order=self.stacking_order)

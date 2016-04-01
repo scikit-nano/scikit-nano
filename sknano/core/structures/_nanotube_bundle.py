@@ -186,9 +186,14 @@ class NanotubeBundleMixin:
         del self._bundle_packing
 
     @property
-    def bundle_mass(self):
+    def mass(self):
         """Bundle mass."""
-        return self.Ntubes * self.tube_mass
+        return self.Ntubes * super().mass
+
+    @property
+    def bundle_mass(self):
+        """An alias for :attr:`~NanotubeBundleMixin.mass`."""
+        return self.mass
 
     @property
     def Natoms(self):
@@ -312,13 +317,12 @@ class NanotubeBundleBase(NanotubeBundleMixin, NanoStructureBase):
 
     def __init__(self, *args, nx=1, ny=1, bundle_packing=None,
                  bundle_geometry=None, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.nx = nx
         self.ny = ny
         self.bundle_geometry = bundle_geometry
         self.bundle_packing = bundle_packing
-
-        super().__init__(*args, **kwargs)
 
         self.is_bundle = False
         if nx != 1 or ny != 1 or bundle_geometry is not None:
