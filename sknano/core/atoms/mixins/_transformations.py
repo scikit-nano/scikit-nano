@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-===============================================================================
+=====================================================================================
 Mixin classes for transformations (:mod:`sknano.core.atoms.mixins._transformations`)
-===============================================================================
+=====================================================================================
 
 .. currentmodule:: sknano.core.atoms.mixins._transformations
 
@@ -14,7 +14,7 @@ __docformat__ = 'restructuredtext en'
 # import numpy as np
 # import pandas as pd
 
-from sknano.core.math import rotation_matrix
+from sknano.core.math import transformation_matrix
 
 __all__ = ['AtomTransformationsMixin', 'AtomsTransformationsMixin']
 
@@ -36,6 +36,10 @@ class AtomTransformationsMixin:
         transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
+        transform_matrix = kwargs.get('transform_matrix', None)
+        if transform_matrix is None:
+            kwargs['transform_matrix'] = transformation_matrix(**kwargs)
+
         try:
             self.lattice.rotate(**kwargs)
         except AttributeError:
@@ -85,8 +89,18 @@ class AtomsTransformationsMixin:
         transform_matrix : :class:`~numpy:numpy.ndarray`
 
         """
-        if kwargs.get('transform_matrix', None) is None:
-            kwargs['transform_matrix'] = rotation_matrix(**kwargs)
+        if kwargs.get('anchor_point', None) is None:
+            try:
+                kwargs['anchor_point'] = self.lattice.offset
+            except AttributeError:
+                try:
+                    kwargs['anchor_point'] = self.bounding_region.centroid
+                except AttributeError:
+                    kwargs['anchor_point'] = self.centroid
+
+        transform_matrix = kwargs.get('transform_matrix', None)
+        if transform_matrix is None:
+            kwargs['transform_matrix'] = transformation_matrix(**kwargs)
         [atom.rotate(**kwargs) for atom in self]
 
     def translate(self, t, fix_anchor_points=True, cartesian=True):
