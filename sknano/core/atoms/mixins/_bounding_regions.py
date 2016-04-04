@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-===============================================================================
-Mixin classes for bounding regions (:mod:`sknano.core.atoms.mixins._geometric_regions`)
-===============================================================================
+========================================================================================
+Mixin classes for bounding regions (:mod:`sknano.core.atoms.mixins._bounding_regions`)
+========================================================================================
 
-.. currentmodule:: sknano.core.atoms.mixins._geometric_regions
+.. currentmodule:: sknano.core.atoms.mixins._bounding_regions
 
 """
 from __future__ import absolute_import, division, print_function
@@ -33,10 +33,45 @@ class BoundingRegionsMixin:
 
         """
         try:
-            return self.lattice.region.bounding_box
+            return self.bounding_region.bounding_box
         except AttributeError:
-            return Cuboid(pmin=[self.x.min(), self.y.min(), self.z.min()],
-                          pmax=[self.x.max(), self.y.max(), self.z.max()])
+            None
+
+    @property
+    def coordinates_bounding_box(self):
+        """Bounding box of atom coordinates.
+
+        Returns
+        -------
+
+        """
+        try:
+            pmin, pmax = self.r.minmax
+            return Cuboid(pmin=pmin, pmax=pmax)
+        except AttributeError:
+            return None
+
+    @property
+    def bounding_region(self):
+        """Bounding :class:`~sknano.core.geometric_regions.Geometric3DRegion`.
+
+        Returns
+        -------
+        :class:`~sknano.core.geometric_regions.Geometric3DRegion`
+            The :class:`~sknano.core.geometric_regions.Parallelepiped` attached
+            to the :class:`~sknano.core.crystallography.Crystal3DLattice` of
+            the :class:`~sknano.core.atoms.LatticeAtoms` class.
+
+        """
+        try:
+            return self.lattice.region
+        except AttributeError:
+            return self.coordinates_bounding_box
+
+    @property
+    def bounds(self):
+        """Alias for :attr:`~BoundingRegionsMixin.bounding_region`."""
+        return self.bounding_region
 
     @property
     def bounding_sphere(self):
@@ -51,23 +86,21 @@ class BoundingRegionsMixin:
                       r=np.max((self.r - self.centroid).norms))
 
     @property
-    def bounding_region(self):
-        """Bounding :class:`~sknano.core.geometric_regions.Geometric3DRegion`.
+    def lattice_region(self):
+        """:attr:`~sknano.core.atoms.LatticeAtoms.lattice` region.
 
         Returns
         -------
-        :class:`~sknano.core.geometric_regions.Geometric3DRegion`
+        :class:`~sknano.core.geometric_regions.Parallelepiped`
+            The :class:`~sknano.core.geometric_regions.Parallelepiped` attached
+            to the :class:`~sknano.core.crystallography.Crystal3DLattice` of
+            the :class:`~sknano.core.atoms.LatticeAtoms` class.
 
         """
         try:
             return self.lattice.region
         except AttributeError:
-            return self.bounding_box
-
-    @property
-    def bounds(self):
-        """Alias for :attr:`~BoundingRegionsMixin.bounding_box`."""
-        return self.bounding_box
+            return None
 
     @property
     def volume(self):
