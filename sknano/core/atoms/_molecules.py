@@ -4,7 +4,7 @@
 Base molecule classes (:mod:`sknano.core.atoms._molecules`)
 ==============================================================================
 
-.. currentmodule:: sknano.core.molecules._molecules
+.. currentmodule:: sknano.core.atoms._molecules
 
 """
 from __future__ import absolute_import, division, print_function

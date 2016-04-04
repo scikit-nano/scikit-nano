@@ -155,7 +155,7 @@ def deprecated(since=None, message=None, name=None, alternative=None,
     :func:`matplotlib:matplotlib.cbook.deprecated` function.
 
     Parameters
-    ------------
+    ----------
     since : str, optional
         The release at which this API became deprecated.
 
@@ -174,9 +174,9 @@ def deprecated(since=None, message=None, name=None, alternative=None,
         the new function is just assigned to the name of the
         deprecated function.  For example::
 
-            def new_function():
-                ...
-            oldFunction = new_function
+        >>> def new_function():
+        ...
+        >>> oldFunction = new_function
 
     alternative : str, optional
         An alternative function that the user may use in place of the

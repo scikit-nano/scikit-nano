@@ -17,8 +17,8 @@ from operator import attrgetter
 
 import numpy as np
 
-from sknano.core import BaseClass, UserList
-from sknano.core.geometric_regions import Domain
+from sknano.core import BaseClass, UserList, TabulateMixin
+from sknano.core.crystallography import Domain
 from ._md_atoms import MDAtom as Atom, MDAtoms as Atoms
 
 __all__ = ['Snapshot', 'Trajectory']
@@ -131,7 +131,7 @@ class TimeSelection:
             self.traj.nselected, self.traj.Nsnaps))
 
 
-class Snapshot(BaseClass):
+class Snapshot(TabulateMixin, BaseClass):
     """Container class for :class:`Trajectory` data at single timestep
 
     Parameters
@@ -141,7 +141,7 @@ class Snapshot(BaseClass):
     Attributes
     ----------
     timestep : :class:`~python:int`
-    domain : :class:`Domain`
+    domain : :class:`~sknano.core.crystallography.Domain`
     fmtstr : :class:`~python:str`
 
     """
@@ -166,6 +166,16 @@ class Snapshot(BaseClass):
                 return getattr(self.formatter, name)
             except AttributeError:
                 return super().__getattr__(name)
+
+    def __str__(self):
+        strrep = self._table_title_str()
+        objstr = self._obj_mro_str()
+        if self.trajectory is not None:
+            items = ['timestep', 'Natoms']
+            values = [getattr(self, item) for item in items]
+            table = self._tabulate(list(zip(items, values)))
+            strrep = '\n'.join((strrep, objstr, table))
+        return strrep
 
     @property
     def formatter(self):
@@ -291,7 +301,7 @@ class Snapshot(BaseClass):
         return dict(trajectory=self.trajectory)
 
 
-class Trajectory(UserList):
+class Trajectory(TabulateMixin, UserList):
     """Base class for trajectory analysis.
 
     Parameters
@@ -310,6 +320,18 @@ class Trajectory(UserList):
     @property
     def __item_class__(self):
         return Snapshot
+
+    def __str__(self):
+        strrep = self._table_title_str()
+        objstr = self._obj_mro_str()
+        if self.data:
+            items = ['Nsnaps', 'nselected', 'timesteps']
+            values = [self.Nsnaps, self.nselected, self.timesteps]
+            table = self._tabulate(list(zip(items, values)))
+            strrep = '\n'.join((strrep, objstr, table))
+            if self._reference_snapshot is not None:
+                strrep = '\n'.join((strrep, str(self._reference_snapshot)))
+        return strrep
 
     @property
     def Nsnaps(self):

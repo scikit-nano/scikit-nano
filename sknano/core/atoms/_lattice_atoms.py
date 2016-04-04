@@ -328,6 +328,7 @@ class LatticeAtoms(PBCAtomsMixin, Atoms):
         return self.cell_matrix
 
     def wrap_coords(self, pbc=None):
+        """Wrap coordinates into lattice."""
         try:
             [setattr(atom, 'r', self.lattice.wrap_cartesian_coordinate(
                      atom.r, pbc=pbc if pbc is not None else self.pbc))

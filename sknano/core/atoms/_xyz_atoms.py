@@ -342,6 +342,7 @@ class XYZAtoms(Atoms):
         coordinates.
 
         .. math::
+
            \\mathbf{C} =
            \\frac{\\sum_{i=1}^{N_{\\mathrm{atoms}}}
            \\mathbf{r}_i}{N_{\\mathrm{atoms}}}
@@ -491,7 +492,6 @@ class XYZAtoms(Atoms):
         --------
         >>> from sknano.generators import SWNTGenerator
         >>> swnt = SWNTGenerator(10, 5)
-        >>>
 
         """
         self.rotate(from_vector=self.principal_axes[index],
@@ -518,7 +518,7 @@ class XYZAtoms(Atoms):
 
         Parameters
         ----------
-        region : :class:`~sknano.core.geometric_regions.`GeometricRegion`
+        region : :class:`~sknano.core.geometric_regions.GeometricRegion`
 
         """
         centroid0 = None

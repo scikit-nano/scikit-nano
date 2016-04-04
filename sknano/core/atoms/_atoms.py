@@ -339,11 +339,12 @@ class Atoms(TabulateMixin, UserList):
 
     def __str__(self):
         strrep = self._table_title_str()
+        objstr = self._obj_mro_str()
         if self.data:
-            items = ['Natoms', 'centroid', 'center_of_mass']
+            items = ('Natoms', 'centroid', 'center_of_mass')
             values = [self.Natoms, self.centroid, self.center_of_mass]
             table = self._tabulate(list(zip(items, values)))
-            strrep = '\n'.join((strrep, table))
+            strrep = '\n'.join((strrep, objstr, table))
         return strrep
 
     def __eq__(self, other):
