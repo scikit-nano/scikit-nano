@@ -19,8 +19,9 @@ import numpy as np
 # from tabulate import tabulate
 
 from sknano.core import BaseClass, TabulateMixin
-from sknano.core.geometric_regions import Parallelepiped
-from sknano.core.math import Vector, Point, zhat, rotation_matrix
+from sknano.core.geometric_regions import Cuboid, Parallelepiped, \
+    generate_bounding_box
+from sknano.core.math import Vector, Point, zhat, transformation_matrix
 from ._extras import pbc_diff
 
 __all__ = ['LatticeBase', 'ReciprocalLatticeBase',
@@ -28,15 +29,275 @@ __all__ = ['LatticeBase', 'ReciprocalLatticeBase',
            'Direct2DLatticeMixin', 'Direct3DLatticeMixin',
            'Reciprocal2DLatticeMixin', 'Reciprocal3DLatticeMixin',
            'Crystal2DLattice', 'Reciprocal2DLattice',
-           'CrystalLattice', 'ReciprocalLattice',
-           'Crystal3DLattice', 'Reciprocal3DLattice']
+           'Crystal3DLattice', 'Reciprocal3DLattice',
+           'Domain', 'generate_lattice']
 # __all__ += ['BravaisLattice', 'Bravais3DLattice',
 #            'SimpleCubicLattice', 'BodyCenteredCubicLattice',
 #            'FaceCenteredCubicLattice']
 
 
+class Domain(TabulateMixin, BaseClass):
+    """Container class for molecular dynamics simulation box metadata.
+
+    Attributes
+    ----------
+    bounding_box : :class:`Cuboid`
+    triclinic : :class:`~python:bool`
+    xy, xz, yz : :class:`~python:float`
+
+    """
+    def __init__(self):
+        self.bounding_box = Cuboid()
+        self.triclinic = False
+        self.xy = self.xz = self.yz = 0.0
+        self.lattice = None
+
+    def __str__(self):
+        strrep = self._table_title_str()
+        attrs = ['triclinic', 'xy', 'xz', 'yz']
+        values = [getattr(self, attr) for attr in attrs]
+        table = self._tabulate(list(zip(attrs, values)))
+        strrep = '\n'.join((strrep, table))
+        lattice = self.lattice
+        if lattice is not None:
+            strrep = '\n'.join((strrep, str(lattice)))
+        return strrep
+
+    @property
+    def tilt_factors(self):
+        """Domain tilt factors `xy`, `xz`, `yz`."""
+        return self.xy, self.xz, self.yz
+
+    @property
+    def xlo(self):
+        """Alias for :attr:`Domain.bounding_box.xmin`"""
+        return self.bounding_box.xmin
+
+    @xlo.setter
+    def xlo(self, value):
+        self.bounding_box.xmin = value
+
+    @property
+    def xhi(self):
+        """Alias for :attr:`Domain.bounding_box.xmax`"""
+        return self.bounding_box.xmax
+
+    @xhi.setter
+    def xhi(self, value):
+        self.bounding_box.xmax = value
+
+    @property
+    def ylo(self):
+        """Alias for :attr:`Domain.bounding_box.ymin`"""
+        return self.bounding_box.ymin
+
+    @ylo.setter
+    def ylo(self, value):
+        self.bounding_box.ymin = value
+
+    @property
+    def yhi(self):
+        """Alias for :attr:`Domain.bounding_box.ymax`"""
+        return self.bounding_box.ymax
+
+    @yhi.setter
+    def yhi(self, value):
+        self.bounding_box.ymax = value
+
+    @property
+    def zlo(self):
+        """Alias for :attr:`Domain.bounding_box.zmin`"""
+        return self.bounding_box.zmin
+
+    @zlo.setter
+    def zlo(self, value):
+        self.bounding_box.zmin = value
+
+    @property
+    def zhi(self):
+        """Alias for :attr:`Domain.bounding_box.zmax`"""
+        return self.bounding_box.zmax
+
+    @zhi.setter
+    def zhi(self, value):
+        self.bounding_box.zmax = value
+
+    @property
+    def lengths(self):
+        """:class:`~python:tuple` of side lengths"""
+        return self.bounding_box.lengths
+
+    @property
+    def lx(self):
+        """Alias for :attr:`Domain.bounding_box.lx`."""
+        return self.bounding_box.lx
+
+    @property
+    def ly(self):
+        """Alias for :attr:`Domain.bounding_box.ly`."""
+        return self.bounding_box.ly
+
+    @property
+    def lz(self):
+        """Alias for :attr:`Domain.bounding_box.lz`."""
+        return self.bounding_box.lz
+
+    @property
+    def xlo_bound(self):
+        """Triclinic bounding box minimum extent in the x-dimension"""
+        xlo = self.xlo
+        xy = self.xy
+        xz = self.xz
+        return xlo + min((0.0, xy, xz, xy + xz))
+
+    @xlo_bound.setter
+    def xlo_bound(self, value):
+        xy = self.xy
+        xz = self.xz
+        self.xlo = value - min((0.0, xy, xz, xy + xz))
+
+    @property
+    def xhi_bound(self):
+        """Triclinic bounding box maximum extent in the x-dimension"""
+        xhi = self.xhi
+        xy = self.xy
+        xz = self.xz
+        return xhi + max((0.0, xy, xz, xy + xz))
+
+    @xhi_bound.setter
+    def xhi_bound(self, value):
+        xy = self.xy
+        xz = self.xz
+        self.xhi = value - max((0.0, xy, xz, xy + xz))
+
+    @property
+    def ylo_bound(self):
+        """Triclinic bounding box minimum extent in the y-dimension"""
+        return self.ylo + min((0.0, self.yz))
+
+    @ylo_bound.setter
+    def ylo_bound(self, value):
+        self.ylo = value - min((0.0, self.yz))
+
+    @property
+    def yhi_bound(self):
+        """Triclinic bounding box maximum extent in the y-dimension"""
+        return self.yhi + max((0.0, self.yz))
+
+    @yhi_bound.setter
+    def yhi_bound(self, value):
+        self.yhi = value - max((0.0, self.yz))
+
+    @property
+    def zlo_bound(self):
+        """Triclinic bounding box minimum extent in the z-dimension"""
+        return self.zlo
+
+    @zlo_bound.setter
+    def zlo_bound(self, value):
+        self.zlo = value
+
+    @property
+    def zhi_bound(self):
+        """Triclinic bounding box maximum extent in the z-dimension"""
+        return self.zhi
+
+    @zhi_bound.setter
+    def zhi_bound(self, value):
+        self.zhi = value
+
+    def update(self, from_lattice=None, from_region=None, from_array=None,
+               allow_triclinic_box=False, pad_box=False,
+               pad_tol=0.01, xpad=10., ypad=10., zpad=10., verbose=False,
+               **kwargs):
+        """Update simulation domain attributes from lattice."""
+        bounding_box = \
+            generate_bounding_box(from_lattice=from_lattice,
+                                  from_region=from_region,
+                                  from_array=from_array,
+                                  verbose=verbose)
+
+        if pad_box and from_array is not None:
+            coords = from_array
+            boxpad = {'x': xpad, 'y': ypad, 'z': zpad}
+            # for dim, pad in boxpad.items():
+            for i, dim in enumerate(('x', 'y', 'z')):
+                pad = boxpad[dim]
+                dmin = dim + 'min'
+                dmax = dim + 'max'
+                if abs(getattr(bounding_box, dmin) -
+                       coords[:, i].min()) < pad - pad_tol:
+                    setattr(bounding_box, dmin,
+                            getattr(bounding_box, dmin) - pad)
+                if abs(getattr(bounding_box, dmax) -
+                       coords[:, i].max()) < pad - pad_tol:
+                    setattr(bounding_box, dmax,
+                            getattr(bounding_box, dmax) + pad)
+
+        if allow_triclinic_box and from_lattice is not None:
+            self.lattice = lattice = from_lattice
+            if not np.allclose(np.radians(lattice.angles),
+                               np.pi / 2 * np.ones(3)):
+                self.triclinic = True
+                a, b, c = lattice.lengths
+                cos_alpha, cos_beta, cos_gamma = \
+                    np.cos(np.radians(lattice.angles))
+                self.xy = xy = b * cos_gamma
+                self.xz = xz = c * cos_beta
+                self.yz = \
+                    (b * c * cos_alpha - xy * xz) / np.sqrt(b ** 2 - xy ** 2)
+
+                self.xlo_bound = bounding_box.xmin
+                self.xhi_bound = bounding_box.xmax
+                self.ylo_bound = bounding_box.ymin
+                self.yhi_bound = bounding_box.ymax
+                self.zlo_bound = bounding_box.zmin
+                self.zhi_bound = bounding_box.zmax
+        else:
+            self.bounding_box = bounding_box
+
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        return dict()
+
+
+def generate_lattice(from_domain=None, from_region=None, offset=None):
+    """Return a :class:`~sknano.core.crystallography.Crystal3DLattice`.
+
+    Parameters
+    ----------
+    from_domain : :class:`~sknano.core.crystallography.Domain`
+    from_region : :class:`~sknano.core.geometric_regions.Geometric3DRegion`
+    verbose : :class:`~python:bool`
+
+    Returns
+    -------
+    lattice : :class:`~sknano.core.crystallography.Crystal3DLattice`
+
+    """
+    if all([obj is None for obj in (from_domain, from_region)]):
+        return None
+
+    if from_domain is not None:
+        domain = from_domain
+        lx, ly, lz = domain.lengths
+        xy, xz, yz = domain.tilt_factors
+
+        a = lx
+        b = np.sqrt(ly ** 2 + xy ** 2)
+        c = np.sqrt(lz ** 2 + xz ** 2 + yz ** 2)
+        alpha = np.degrees(np.arccos((xy * xz + ly * yz) / (b * c)))
+        beta = np.degrees(np.arccos(xz / c))
+        gamma = np.degrees(np.arccos(xy / b))
+
+        lattice = \
+            Crystal3DLattice(a=a, b=b, c=c, alpha=alpha, beta=beta,
+                             gamma=gamma, offset=offset)
+        return lattice
+
+
 @total_ordering
-class LatticeBase(BaseClass, TabulateMixin):
+class LatticeBase(TabulateMixin, BaseClass):
     """Base class for crystallographic lattice objects.
 
     Parameters
@@ -47,13 +308,11 @@ class LatticeBase(BaseClass, TabulateMixin):
     offset : array_like, optional
 
     """
-
     def __init__(self, nd=None, cell_matrix=None, orientation_matrix=None,
                  offset=None):
         super().__init__()
 
         self.nd = nd
-        self.offset = Point(offset, nd=3)
         if cell_matrix is not None and orientation_matrix is None:
             orientation_matrix = cell_matrix.T * self.fractional_matrix
 
@@ -62,6 +321,8 @@ class LatticeBase(BaseClass, TabulateMixin):
 
         self.orientation_matrix = np.asmatrix(orientation_matrix)
         self.lattice_type = None
+        self._offset = Point(offset, nd=3)
+        self._update_region()
 
     def __dir__(self):
         return ['nd', 'offset', 'orientation_matrix']
@@ -80,11 +341,52 @@ class LatticeBase(BaseClass, TabulateMixin):
                 return self.cell_area < other.cell_area
 
     @property
+    def offset(self):
+        """Lattice offset."""
+        return self._offset
+
+    @offset.setter
+    def offset(self, value):
+        # self.translate(Vector(p0=self._offset, p=Point(value)))
+        self._offset[:] = Point(value)
+
+    @property
+    def ortho_matrix(self):
+        """Transformation matrix to convert from fractional coordinates to \
+            cartesian coordinates.
+
+        .. math::
+
+           [M] = \\begin{pmatrix}
+           \\mathbf{a} & \\mathbf{b} & \\mathbf{c}
+           \\end{pmatrix}
+
+           =\\begin{pmatrix}
+           a & b\\cos\\gamma & c\\cos\\beta\\\\
+           0 & b\\sin\\gamma & c(\\cos\\alpha - \\cos\\beta\\cos\\gamma)/\\sin\\gamma\\\\
+           0 & 0 & c\\sin\\alpha\\sin\\beta\\sin\\gamma^*/\\sin\\gamma
+           \\end{pmatrix}
+
+        """
+        return self._ortho_matrix
+
+    @property
     def cell_matrix(self):
         """Matrix of lattice row vectors.
 
-        Same as :attr:`Crystal2DLattice.ortho_matrix`\ .T or
-        :attr:`Crystal3DLattice.ortho_matrix`\ .T.
+        Same as the matrix transpose of the matrix product
+        :attr:`LatticeBase.orientation_matrix` :math:`\\times`
+        :attr:`LatticeBase.ortho_matrix`:
+
+        .. math::
+
+           [A] = ([R][M])^T
+           \\begin{pmatrix}
+           \\mathbf{a}\\\\
+           \\mathbf{b}\\\\
+           \\mathbf{c}
+           \\end{pmatrix}
+           =([R][\\mathbf{a}\\,\\mathbf{b}\\,\\mathbf{c}])^T
 
         """
         return (self.orientation_matrix * self.ortho_matrix).T
@@ -104,7 +406,37 @@ class LatticeBase(BaseClass, TabulateMixin):
     @property
     def fractional_matrix(self):
         """Transformation matrix to convert from cartesian coordinates to \
-            fractional coordinates."""
+            fractional coordinates.
+
+        The fractional matrix :math:`[Q]` is given by the inverse
+        of the orthogonal matrix :math:`[M]`
+        (see: :attr:`~LatticeBase.ortho_matrix`),
+        i.e. :math:`[Q]=[M]^{-1}`
+
+        .. math::
+
+           [Q] = [M]^{-1} =\\begin{pmatrix}
+           1/a & -1/a\\tan\\gamma & (\\cos\\alpha\\cos\\gamma - \\cos\\beta)/
+           a\\phi\\sin\\gamma\\\\
+           0 & 1/b\\sin\\gamma & (\\cos\\beta\\cos\\gamma - \\cos\\alpha)/
+           b\\phi\\sin\\gamma\\\\
+           0 & 0 & \\sin\\gamma/c\\phi
+           \\end{pmatrix}
+
+        where:
+
+        .. math::
+
+           \\begin{align*}
+           \\phi &= \\frac{V}{abc}\\\\
+                 &=\\sqrt{1 - \\cos^2\\alpha - \\cos^2\\beta - \\cos^2\\gamma
+                           + 2\\cos\\alpha\\cos\\beta\\cos\\gamma}\\\\
+                 &=\\sin\\alpha\\sin\\beta\\sin\\gamma^*
+           \\end{align*}
+
+        where :math:`V` is the volume of the unit cell.
+
+        """
         return np.linalg.inv(self.ortho_matrix)
 
     @property
@@ -120,10 +452,20 @@ class LatticeBase(BaseClass, TabulateMixin):
     @property
     def region(self):
         """:class:`Parallelepiped` defined by lattice vectors."""
+        try:
+            return self._region
+        except AttributeError:
+            self._update_region()
+            return self._region
+
+    def _update_region(self):
         cell_matrix = self.cell_matrix
         o = self.offset
-        u, v, w = map(Vector, [cell_matrix[ri].A.flatten() for ri in range(3)])
-        return Parallelepiped(o, u, v, w)
+        u, v, w = \
+            map(Vector, [cell_matrix[ri].A.flatten() for ri in range(3)])
+        # u, v, w = \
+        #     map(Vector, [ortho_matrix[:, ri].A.flatten() for ri in range(3)])
+        self._region = Parallelepiped(o, u, v, w)
 
     @property
     def centroid(self):
@@ -250,9 +592,7 @@ class LatticeBase(BaseClass, TabulateMixin):
                                                           pbc=pbc)
                            for p in points])
 
-    def rotate(self, angle=None, axis=None, anchor_point=None,
-               rot_point=None, from_vector=None, to_vector=None, degrees=False,
-               transform_matrix=None, verbose=False, **kwargs):
+    def rotate(self, **kwargs):
         """Rotate unit cell.
 
         Parameters
@@ -270,29 +610,21 @@ class LatticeBase(BaseClass, TabulateMixin):
         core.math.rotate
 
         """
-        if self.nd == 2:
-            axis = 'z'
-        if transform_matrix is None:
-            transform_matrix = \
-                np.asmatrix(
-                    rotation_matrix(angle=angle, axis=axis,
-                                    anchor_point=anchor_point,
-                                    rot_point=rot_point,
-                                    from_vector=from_vector,
-                                    to_vector=to_vector, degrees=degrees,
-                                    verbose=verbose, **kwargs))
-            # print('transform_matrix: {}'.format(transform_matrix))
+        if self.nd == 2 and kwargs.get('axis', None) is None:
+            kwargs['axis'] = 'z'
+        if kwargs.get('anchor_point', None) is None:
+            kwargs['anchor_point'] = self.offset
 
-            # transform_matrix = \
-            #     transformation_matrix(angle=angle, axis=axis,
-            #                           anchor_point=anchor_point,
-            #                           rot_point=rot_point,
-            #                           from_vector=from_vector,
-            #                           to_vector=to_vector, degrees=degrees,
-            #                           verbose=verbose, **kwargs)
-
-        self.orientation_matrix = \
-            transform_matrix * self.orientation_matrix
+        if kwargs.get('transform_matrix', None) is None:
+            kwargs['transform_matrix'] = transformation_matrix(**kwargs)
+        transform_matrix = kwargs['transform_matrix']
+        if transform_matrix.shape == (4, 4):
+            # tvec = translation_from_matrix(transform_matrix)
+            # print('translation_part: {}'.format(tvec))
+            # self.translate(tvec)
+            transform_matrix = transform_matrix[:3, :3]
+        transform_matrix = np.asmatrix(transform_matrix)
+        self.orientation_matrix = transform_matrix * self.orientation_matrix
 
     def translate(self, t):
         """Translate lattice.
@@ -307,6 +639,7 @@ class LatticeBase(BaseClass, TabulateMixin):
 
         """
         self.offset.translate(t)
+        self.region.translate(t)
 
 
 class ReciprocalLatticeBase(LatticeBase):
@@ -347,6 +680,7 @@ class Direct2DLatticeMixin:
         """2D lattice vector :math:`\\mathbf{a}_1=\\mathbf{a}`."""
         b2 = Vector()
         b2[:2] = self.b2
+        # b2.p0 = self.offset
         return b2.cross(zhat) / self.cell_area
 
     @property
@@ -354,6 +688,8 @@ class Direct2DLatticeMixin:
         """2D lattice vector :math:`\\mathbf{a}_2=\\mathbf{b}`."""
         b1 = Vector()
         b1[:2] = self.b1
+        # z = zhat.copy()
+        # z.p0 = self.offset
         return zhat.cross(b1) / self.cell_area
 
 
@@ -376,6 +712,7 @@ class Reciprocal2DLatticeMixin:
         """
         a2 = Vector()
         a2[:2] = self.a2
+        # a2.p0 = self.offset
         return a2.cross(zhat)[:2] / self.cell_area
 
     @property
@@ -384,6 +721,8 @@ class Reciprocal2DLatticeMixin:
         """
         a1 = Vector()
         a1[:2] = self.a1
+        # z = zhat.copy()
+        # z.p0 = self.offset
         return zhat.cross(a1)[:2] / self.cell_area
 
 
@@ -514,14 +853,13 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin):
 
     """
 
-    def __init__(self, a=None, b=None, gamma=None,
-                 a1=None, a2=None, cell_matrix=None,
-                 orientation_matrix=None, offset=None):
+    def __init__(self, a=None, b=None, gamma=None, a1=None, a2=None,
+                 cell_matrix=None, orientation_matrix=None, offset=None):
 
         if cell_matrix is not None:
             cell_matrix = np.asarray(cell_matrix)
-            a1 = np.array(cell_matrix[0, :])
-            a2 = np.array(cell_matrix[1, :])
+            a1 = np.array(cell_matrix[0])
+            a2 = np.array(cell_matrix[1])
 
         if a1 is not None and a2 is not None:
             a1 = Vector(a1, nd=3)
@@ -550,6 +888,35 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin):
         attrs = super().__dir__()
         attrs.extend(['a', 'b', 'gamma'])
         return attrs
+
+    def __str__(self):
+        strrep = self._table_title_str()
+        objstr = self._obj_mro_str()
+        lattice_params = \
+            self._tabulate(list(zip(('a', 'b', 'γ'),
+                                    self.lengths_and_angles)))
+        title = '.'.join((objstr, 'lengths_and_angles'))
+        strrep = '\n'.join((strrep, title, lattice_params))
+        cosines = np.around(np.cos(np.radians(self.angles)), decimals=2)
+        cosines = self._tabulate(list(zip(('cos(γ)',), (cosines,))))
+        title = '.'.join((objstr, 'offset'))
+        offset = self._tabulate([['Lattice offset', self.offset]])
+        strrep = '\n'.join((strrep, title, offset))
+
+        lattice_vectors = \
+            self._tabulate(list(zip(('a1', 'a2'), self.lattice_vectors)))
+        title = '.'.join((objstr, 'lattice_vectors'))
+        strrep = '\n'.join((strrep, title, lattice_vectors))
+
+        region = self.region
+        title = '.'.join((objstr, region.__class__.__qualname__))
+        strrep = '\n'.join((strrep, title, str(region)))
+
+        bbox = region.bounding_box
+        title = '.'.join((title, bbox.__class__.__qualname__))
+        strrep = '\n'.join((strrep, title, str(bbox)))
+
+        return strrep
 
     def todict(self):
         """Return `dict` of `Crystal2DLattice` parameters."""
@@ -592,12 +959,16 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin):
     @property
     def a1(self):
         """Lattice vector :math:`\\mathbf{a}_1=\\mathbf{a}`."""
-        return Vector(self.cell_matrix[0, :].A.flatten())[:2]
+        # return Vector(self.ortho_matrix[:, 0].A.flatten(),
+        #               p0=self.offset)[:2]
+        return Vector(self.cell_matrix[0].A.flatten(), p0=self.offset)[:2]
 
     @property
     def a2(self):
         """Lattice vector :math:`\\mathbf{a}_2=\\mathbf{b}`."""
-        return Vector(self.cell_matrix[1, :].A.flatten())[:2]
+        # return Vector(self.ortho_matrix[:, 1].A.flatten(),
+        #               p0=self.offset)[:2]
+        return Vector(self.cell_matrix[1].A.flatten(), p0=self.offset)[:2]
 
     @property
     def cos_gamma(self):
@@ -618,12 +989,6 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin):
     def area(self):
         """Crystal cell area."""
         return np.abs(self.a1.cross(self.a2))
-
-    @property
-    def ortho_matrix(self):
-        """Transformation matrix to convert from fractional coordinates to \
-            cartesian coordinates."""
-        return self._ortho_matrix
 
     def _update_ortho_matrix(self):
         m11 = self.a
@@ -850,14 +1215,14 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin):
             errmsg = 'Expected lattice parameters ' + \
                 '`a`, `b`, `c`, `alpha`, `beta`, `gamma`\n' + \
                 'or lattice vectors `a1`, `a2`, `a3`\n' + \
-                'or a 3x3 matrix with lattice vectors for columns.'
+                'or a 3x3 matrix with rows of lattice vectors.'
             raise ValueError(errmsg)
 
         if cell_matrix is not None:
             cell_matrix = np.asarray(cell_matrix)
-            a1 = np.array(cell_matrix[0, :])
-            a2 = np.array(cell_matrix[1, :])
-            a3 = np.array(cell_matrix[2, :])
+            a1 = np.array(cell_matrix[0])
+            a2 = np.array(cell_matrix[1])
+            a3 = np.array(cell_matrix[2])
 
         if all([v is not None for v in (a1, a2, a3)]):
             a1 = Vector(a1)
@@ -896,20 +1261,34 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin):
         return attrs
 
     def __str__(self):
-        title = self._table_title_str()
+        strrep = self._table_title_str()
+        objstr = self._obj_mro_str()
         lattice_params = \
             self._tabulate(list(zip(('a', 'b', 'c', 'α', 'β', 'γ'),
                                     self.lengths_and_angles)))
-
+        title = '.'.join((objstr, 'lengths_and_angles'))
+        strrep = '\n'.join((strrep, title, lattice_params))
         cosines = np.around(np.cos(np.radians(self.angles)), decimals=2)
         cosines = self._tabulate(list(zip(('cos(α)', 'cos(β)', 'cos(γ)'),
                                           cosines)))
-        offset = self._tabulate([['origin', self.offset]])
+        title = '.'.join((objstr, 'offset'))
+        offset = self._tabulate([['Lattice offset', self.offset]])
+        strrep = '\n'.join((strrep, title, offset))
+
         lattice_vectors = \
             self._tabulate(list(zip(('a1', 'a2', 'a3'),
                                     self.lattice_vectors)))
-        strrep = '\n'.join((title, lattice_params, cosines, offset,
-                            lattice_vectors, str(self.region)))
+        title = '.'.join((objstr, 'lattice_vectors'))
+        strrep = '\n'.join((strrep, title, lattice_vectors))
+
+        region = self.region
+        title = '.'.join((objstr, region.__class__.__qualname__))
+        strrep = '\n'.join((strrep, title, str(region)))
+
+        bbox = region.bounding_box
+        title = '.'.join((title, bbox.__class__.__qualname__))
+        strrep = '\n'.join((strrep, title, str(bbox)))
+
         return strrep
 
     def todict(self):
@@ -983,17 +1362,20 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin):
     @property
     def a1(self):
         """Lattice vector :math:`\\mathbf{a}_1=\\mathbf{a}`."""
-        return Vector(self.cell_matrix[0, :].A.flatten())
+        # return Vector(self.ortho_matrix[:, 0].A.flatten(), p0=self.offset)
+        return Vector(self.cell_matrix[0].A.flatten(), p0=self.offset)
 
     @property
     def a2(self):
         """Lattice vector :math:`\\mathbf{a}_2=\\mathbf{b}`."""
-        return Vector(self.cell_matrix[1, :].A.flatten())
+        # return Vector(self.ortho_matrix[:, 1].A.flatten(), p0=self.offset)
+        return Vector(self.cell_matrix[1].A.flatten(), p0=self.offset)
 
     @property
     def a3(self):
         """Lattice vector :math:`\\mathbf{a}_3=\\mathbf{c}`."""
-        return Vector(self.cell_matrix[2, :].A.flatten())
+        # return Vector(self.ortho_matrix[:, 2].A.flatten(), p0=self.offset)
+        return Vector(self.cell_matrix[2].A.flatten(), p0=self.offset)
 
     @property
     def cos_alpha(self):
