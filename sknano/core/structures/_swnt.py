@@ -1440,7 +1440,7 @@ NanotubeMixin = SWNTMixin
 
 
 class SWNTBase(SWNTMixin, NanoStructureBase):
-    """Base SWNT structure class class."""
+    """Base SWNT structure class."""
     # add each attribute in the order I want them to appear in
     # verbose output mode
     _structure_attrs = ['n', 'm', 't1', 't2', 'd', 'dR', 'N', 'R',

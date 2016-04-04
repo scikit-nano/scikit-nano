@@ -46,7 +46,7 @@ class Crystal2DStructure(CrystalStructureBase):
     coords : {:class:`~python:list`}, optional
     cartesian : {:class:`~python:bool`}, optional
     scaling_matrix : {:class:`~python:int`, :class:`~python:list`}, optional
-    structure : `Crystal3DStructure`, optional
+    structure : `Crystal2DStructure`, optional
 
     """
     def __init__(self, lattice=None, basis=None, coords=None, cartesian=False,

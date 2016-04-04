@@ -213,10 +213,6 @@ class NeighborAtoms(KDTreeAtomsMixin, Atoms):
         Nearest neighbor radius cutoff.
     neighbor_cutoffs : :class:`~python:list`, optional
 
-    Attributes
-    ----------
-    idx, nn_idx : :class:`~python:list`
-
     """
     def __init__(self, *args, kNN=16, NNrc=2.0, neighbor_cutoffs=None,
                  neighbors_analyzed=False, **kwargs):

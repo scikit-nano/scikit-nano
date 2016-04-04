@@ -74,6 +74,7 @@ Meta functions/classes
    check_type
    deprecated
    deprecate_kwarg
+   find_mod_objs
    get_object_signature
    lazy_property
    logged

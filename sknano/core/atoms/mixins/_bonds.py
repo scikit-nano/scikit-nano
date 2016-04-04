@@ -65,17 +65,12 @@ class Bond(Topology):
     id : :class:`~python:int`
     order : {1, 2, 3, 5}
 
-    Attributes
-    ----------
-    visited : :class:`~python:bool`
-
     """
-
     def __init__(self, *args, order=None, **kwargs):
         super().__init__(*args, size=2, **kwargs)
 
-        self.order = order
-        self.visited = False
+        self._order = order
+        self._visited = False
         self.fmtstr = "{origin!r}, {end!r}, order={order!r}, " + super().fmtstr
 
     def __str__(self):
@@ -147,6 +142,15 @@ class Bond(Topology):
     def length(self):
         """An alias for :attr:`TopologyCollection.measure`."""
         return self.measure
+
+    @property
+    def order(self):
+        """Bond order."""
+        return self._order
+
+    @order.setter
+    def order(self, value):
+        self._order = value
 
     def compute_measure(self):
         """`Bond` :attr:`~sknano.core.math.Vector.length`."""

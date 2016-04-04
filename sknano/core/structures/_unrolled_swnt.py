@@ -88,7 +88,9 @@ class UnrolledSWNTMixin:
         self._nlayers = int(value)
 
 
-class UnrolledSWNTBase(UnrolledSWNTMixin, SWNTBase, GrapheneBase):
+class UnrolledSWNTBase(UnrolledSWNTMixin, SWNTBase, GrapheneBase,
+                       NanoStructureBase):
+    """Base unrolled SWNT structure class."""
 
     def __init__(self, *args, nx=1, Lx=None, fix_Lx=False, **kwargs):
 

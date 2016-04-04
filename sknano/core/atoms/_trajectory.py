@@ -138,12 +138,6 @@ class Snapshot(TabulateMixin, BaseClass):
     ----------
     trajectory : :class:`Trajectory`, optional
 
-    Attributes
-    ----------
-    timestep : :class:`~python:int`
-    domain : :class:`~sknano.core.crystallography.Domain`
-    fmtstr : :class:`~python:str`
-
     """
     def __init__(self, trajectory=None):
 

@@ -35,12 +35,6 @@ Base/Mixin structure classes
    NanotubeBundleMixin
    UnrolledSWNTBase
    UnrolledSWNTMixin
-   CubicStructure
-   BCCStructure
-   FCCStructure
-   CubicClosePackedStructure
-   HexagonalClosePackedStructure
-   HexagonalStructure
 
 Crystal structure classes
 --------------------------
@@ -50,6 +44,12 @@ Crystal structure classes
 
    Crystal2DStructure
    Crystal3DStructure
+   CubicStructure
+   BCCStructure
+   FCCStructure
+   CubicClosePackedStructure
+   HexagonalClosePackedStructure
+   HexagonalStructure
    CaesiumChlorideStructure
    CsClStructure
    DiamondStructure

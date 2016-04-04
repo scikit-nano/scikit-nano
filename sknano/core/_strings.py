@@ -194,13 +194,13 @@ def cast_type(parameters):
 
 
 def asint(s, l, t):
-    """:mod:`~pyparsing:pyparsing` parse action to convert token to \
+    """:mod:`pyparsing` parse action to convert token to \
         :class:`~python:int`."""
     return int(t[0])
 
 
 def asfloat(s, l, t):
-    """:mod:`~pyparsing:pyparsing` parse action to convert token to \
+    """:mod:`pyparsing` parse action to convert token to \
         :class:`~python:float`."""
     try:
         val = int(t[0])
@@ -210,44 +210,44 @@ def asfloat(s, l, t):
 
 
 def asbool(s, l, t):
-    """:mod:`~pyparsing:pyparsing` parse action to convert token to \
+    """:mod:`pyparsing` parse action to convert token to \
         :class:`~python:bool`."""
     return t[0] == 'True'
 
 
 def astuple(s, l, t):
-    """:mod:`~pyparsing:pyparsing` parse action to convert token to \
+    """:mod:`pyparsing` parse action to convert token to \
         :class:`~python:tuple`."""
     return tuple(t.asList())
 
 
 def aslist(s, l, t):
-    """:mod:`~pyparsing:pyparsing` parse action to convert token to \
+    """:mod:`pyparsing` parse action to convert token to \
         :class:`~python:list`."""
     return [t.asList()]
 
 
 def asdict(s, l, t):
-    """:mod:`~pyparsing:pyparsing` parse action to convert token to \
+    """:mod:`pyparsing` parse action to convert token to \
         :class:`~python:dict`."""
     return dict(t.asList())
 
 
 def asset(s, l, t):
-    """:mod:`~pyparsing:pyparsing` parse action to convert token to \
+    """:mod:`pyparsing` parse action to convert token to \
         :class:`~python:set`."""
     return set(t.asList())
 
 
 def map_function(s, l, t):
-    """:mod:`~pyparsing:pyparsing` parse action to convert function string to \
+    """:mod:`pyparsing` parse action to convert function string to \
         function in :func:`sknano.core.math.function_map`."""
     from sknano.core.math import function_map
     return function_map[t[0]]
 
 
 def map_operator(s, l, t):
-    """:mod:`~pyparsing:pyparsing` parse action to convert operator string to \
+    """:mod:`pyparsing` parse action to convert operator string to \
         operator in :func:`sknano.core.math.operator_map`."""
     from sknano.core.math import operator_map
     return operator_map[t[0]]

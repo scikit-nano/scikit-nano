@@ -30,9 +30,8 @@ __all__ = ['AtomsTestFixture', 'TempfileTestFixture', 'GeneratorTestFixture',
 
 
 class AtomsTestFixture(unittest.TestCase):
-    """Mixin :class:`~python:unittest.TestCase` class.
-
-    Defines properties which return structures or atoms objects.
+    """Mixin :class:`~python:unittest.TestCase` class for \
+        :py:mod:`sknano.core.atoms` unit tests.
 
     """
     @property
@@ -102,14 +101,11 @@ class AtomsTestFixture(unittest.TestCase):
 
 
 class TempfileTestFixture(unittest.TestCase):
-    """Mixin :class:`~python:unittest.TestCase` class temp file I/O.
+    """Mixin :class:`~python:unittest.TestCase` class for \
+        :py:mod:`sknano.io` unit tests.
 
     Defines setUp/tearDown methods to keep track of and delete temporary files
     created by unit tests.
-
-    Attributes
-    ----------
-    tmpdata : :class:`~python:list`
 
     """
     def setUp(self):
@@ -127,13 +123,13 @@ class TempfileTestFixture(unittest.TestCase):
 
 class GeneratorTestFixture(TempfileTestFixture):
     """Mixin :class:`~python:unittest.TestCase` class for \
-        :mod:`sknano.generators` tests."""
+        :py:mod:`sknano.generators` tests."""
     pass
 
 
 class IOTestFixture(TempfileTestFixture):
     """Mixin :class:`~python:unittest.TestCase` class for \
-        :mod:`sknano.io` unit tests.
+        :py:mod:`sknano.io` unit tests.
 
     Defines lazy properties to get IO test data and IO class instances.
 
@@ -201,7 +197,7 @@ class IOTestFixture(TempfileTestFixture):
 
 class DUMPTestFixture(IOTestFixture):
     """Mixin :class:`~python:unittest.TestCase` class for \
-        :class:`~sknano.io.DUMPIO` unit tests.
+        :class:`~sknano.io.DUMPData` unit tests.
     """
     def print_dumpattrs(self, dump):
         """Print dump attributes."""
@@ -210,7 +206,7 @@ class DUMPTestFixture(IOTestFixture):
 
 class GeometricRegionsTestFixture(unittest.TestCase):
     """Mixin :class:`~python:unittest.TestCase` class for \
-        :mod:`sknano.core.geometric_regions` unit tests.
+        :py:mod:`sknano.core.geometric_regions` unit tests.
     """
 
     def setUp(self):
@@ -231,7 +227,7 @@ class GeometricRegionsTestFixture(unittest.TestCase):
 
 class Geometric2DRegionsTestFixture(GeometricRegionsTestFixture):
     """Mixin :class:`~python:unittest.TestCase` class for \
-        :class:`sknano.core.geometric_regions.Geometric2DRegions` unit tests.
+        :class:`~sknano.core.geometric_regions.Geometric2DRegion` unit tests.
     """
     @property
     def parallelogram(self):
@@ -266,7 +262,7 @@ class Geometric2DRegionsTestFixture(GeometricRegionsTestFixture):
 
 class Geometric3DRegionsTestFixture(GeometricRegionsTestFixture):
     """Mixin :class:`~python:unittest.TestCase` class for \
-        :class:`sknano.core.geometric_regions.Geometric3DRegions` unit tests.
+        :class:`~sknano.core.geometric_regions.Geometric3DRegion` unit tests.
     """
 
     @property

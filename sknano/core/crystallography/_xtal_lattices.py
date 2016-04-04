@@ -37,16 +37,17 @@ __all__ = ['LatticeBase', 'ReciprocalLatticeBase',
 
 
 class Domain(TabulateMixin, BaseClass):
-    """Container class for molecular dynamics simulation box metadata.
-
-    Attributes
-    ----------
-    bounding_box : :class:`Cuboid`
-    triclinic : :class:`~python:bool`
-    xy, xz, yz : :class:`~python:float`
-
-    """
+    """Container class for molecular dynamics simulation box metadata."""
     def __init__(self):
+        """
+        Attributes
+        ----------
+        bounding_box : :class:`~sknano.core.geometric_regions.Cuboid`
+        triclinic : :class:`~python:bool`
+        xy, xz, yz : :class:`~python:float`
+        lattice : :class:`~sknano.core.crystallography.Crystal3DLattice`.
+
+        """
         self.bounding_box = Cuboid()
         self.triclinic = False
         self.xy = self.xz = self.yz = 0.0
