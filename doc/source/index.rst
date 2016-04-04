@@ -1,11 +1,11 @@
+:tocdepth: 2
+
 ==========================
 scikit-nano |version| docs
 ==========================
 
 :Release: |release|
 :Date: |today|
-
-:tocdepth: 2
 
 .. |logo_svg| image:: _static/scikit-nano_banner.svg
 
