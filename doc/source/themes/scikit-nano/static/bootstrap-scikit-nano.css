@@ -5,7 +5,7 @@
  * Licensed under the Apache License v2.0
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Heavily modified by Kyle Barbary for the AstroPy Project for use with Sphinx.
+ * Modified by Andrew Merrill for the scikit-nano Project for use with Sphinx.
  */
 
 @import url("basic.css");
@@ -23,7 +23,7 @@ body {
 /* Hyperlinks ----------------------------------------------------------------*/
 
 a {
-  color: #0564B1;
+  color: #1F6AD5;
   text-decoration: none;
   line-height: inherit;
   font-weight: inherit;
@@ -499,7 +499,7 @@ a.headerlink {
 }
 
 a.headerlink:hover {
-    background-color: #0564B1;
+    background-color: #1F6AD5;
     color: white;
     text-docoration: none;
 }
