@@ -33,6 +33,13 @@ needs_sphinx = '1.3'
 sys.path.insert(0, os.path.abspath('../sphinxext'))
 sys.path.insert(0, os.path.abspath('../sphinxext/numpydoc'))
 sys.path.insert(0, os.path.abspath('../sphinxext/edit_on_github'))
+sys.path.insert(0, os.path.abspath('../sphinxext/autodoc_enhancements'))
+sys.path.insert(0, os.path.abspath('../sphinxext/automodsumm'))
+sys.path.insert(0, os.path.abspath('../sphinxext/automodapi'))
+sys.path.insert(0, os.path.abspath('../sphinxext/tocdepthfix'))
+sys.path.insert(0, os.path.abspath('../sphinxext/changelog_links'))
+sys.path.insert(0, os.path.abspath('../sphinxext/viewcode'))
+sys.path.insert(0, os.path.abspath('../sphinxext/smart_resolver'))
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
@@ -44,12 +51,20 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.intersphinx',
               'sphinx.ext.coverage',
               'sphinx.ext.inheritance_diagram',
-              'sphinx.ext.viewcode',
               'sphinx.ext.todo',
               'IPython.sphinxext.ipython_console_highlighting',
               'IPython.sphinxext.ipython_directive',
-              'numpydoc', 'sphinxcontrib.epydoc',
-              'sphinxarg.ext', 'edit_on_github']
+              'viewcode',
+              'numpydoc',
+              'sphinxcontrib.epydoc',
+              'sphinxarg.ext',
+              'autodoc_enhancements',
+              'automodsumm',
+              'automodapi',
+              'tocdepthfix',
+              'changelog_links',
+              'smart_resolver',
+              'edit_on_github']
 
 # Show todo items
 todo_include_todos = True
@@ -109,18 +124,17 @@ today_fmt = '%B %d, %Y'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns = []
-
+exclude_patterns.append('_templates')
 # List of documents that shouldn't be included in the build.
 # unused_docs = []
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
-default_role = "autolink"
+default_role = 'obj'
 
 # List of directories, relative to source directories, that shouldn't be
 # searched for source files.
 exclude_dirs = []
-exclude_patterns.append('_templates')
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = False
@@ -144,9 +158,15 @@ show_authors = False
 
 # Class documentation should contain *both* the class docstring and
 # the __init__ docstring
-autoclass_content = "both"
+# autoclass_content = "both"
 
 numpydoc_show_class_members = False
+
+# -----------------------------------------------------------------------------
+# Autosummary
+# -----------------------------------------------------------------------------
+
+autosummary_generate = True
 
 # -- Options for graphviz -----------------------------------------------------
 # Render inheritance diagrams in SVG
@@ -387,14 +407,6 @@ phantom_import_file = 'dump.xml'
 
 # Generate plots for example sections
 numpydoc_use_plots = True
-
-# -----------------------------------------------------------------------------
-# Autosummary
-# -----------------------------------------------------------------------------
-
-if sphinx.__version__ >= "0.7":
-    import glob
-    autosummary_generate = glob.glob("*.rst")
 
 # -----------------------------------------------------------------------------
 # Coverage checker
