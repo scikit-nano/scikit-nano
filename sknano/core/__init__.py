@@ -122,6 +122,7 @@ String functions/classes
    ordinal_form
    pluralize
    TabulateMixin
+   obj_mro_str
 
 Custom container datatypes
 ---------------------------

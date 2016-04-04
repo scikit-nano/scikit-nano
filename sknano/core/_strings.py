@@ -19,9 +19,9 @@ from pyparsing import Group, Forward, Optional, Regex, Suppress, Keyword, \
     Literal, Word, ZeroOrMore, alphas, alphanums, delimitedList, \
     oneOf, replaceWith, quotedString, removeQuotes
 
-__all__ = ['TabulateMixin', 'pluralize', 'plural_word_check', 'ordinal_form',
-           'map_operator', 'map_function', 'asint', 'asfloat', 'asbool',
-           'astuple', 'aslist', 'asdict', 'asset', 'integer', 'real',
+__all__ = ['TabulateMixin', 'obj_mro_str', 'pluralize', 'plural_word_check',
+           'ordinal_form', 'map_operator', 'map_function', 'asint', 'asfloat',
+           'asbool', 'astuple', 'aslist', 'asdict', 'asset', 'integer', 'real',
            'number', 'boolean', 'string', 'none', 'LPAR', 'RPAR',
            'LBRACK', 'RBRACK', 'LBRACE', 'RBRACE', 'COLON', 'SEMICOLON',
            'SPACE', 'COMMA', 'EQUAL', 'binary_operator', 'hashable_item',
@@ -46,7 +46,6 @@ class TabulateMixin:
     def _tabular_data(self):
         """Return :class:`~python:tuple` of tabular data for \
             pretty tabulated output."""
-        print('in TabulateMixin._tabular_data()')
         header = self.__class__.__name__
         fmt = self._tabular_data_format_string
         return [fmt(self)], (header,)
@@ -65,6 +64,23 @@ class TabulateMixin:
             return strrep[begin:end]
         except IndexError:
             return strrep
+
+    def _obj_mro_str(self):
+        return obj_mro_str(self.__class__)
+
+
+def obj_mro_str(obj, include_obj_name=True, sep='.'):
+    """Helper function to return a string of `obj` base classes."""
+    obj = obj if hasattr(obj, '__name__') else obj.__class__
+    bases = obj.__mro__
+    mro_str = obj.__name__
+    for base in bases:
+        name = base.__name__
+        if name.endswith('Mixin') or \
+                name in ('BaseClass', 'UserList', 'object', 'type'):
+            break
+        mro_str = sep.join((name, mro_str))
+    return mro_str
 
 
 def pluralize(word, count):
