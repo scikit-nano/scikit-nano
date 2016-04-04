@@ -32,6 +32,7 @@ needs_sphinx = '1.3'
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../sphinxext'))
 sys.path.insert(0, os.path.abspath('../sphinxext/numpydoc'))
+sys.path.insert(0, os.path.abspath('../sphinxext/edit_on_github'))
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
@@ -47,7 +48,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.todo',
               'IPython.sphinxext.ipython_console_highlighting',
               'IPython.sphinxext.ipython_directive',
-              'numpydoc',
+              'numpydoc', 'sphinxcontrib.epydoc',
               'sphinxarg.ext', 'edit_on_github']
 
 # Show todo items
@@ -81,7 +82,8 @@ master_doc = 'index'
 
 # General substitutions.
 project = 'scikit-nano'
-copyright = '2016, Andrew Merrill'
+author = 'Andrew Merrill'
+copyright = ', '.join(('2012-2016', author))
 
 # The default replacements for |version| and |release|, also used in various
 # other places throughout the built documents.
@@ -118,6 +120,7 @@ default_role = "autolink"
 # List of directories, relative to source directories, that shouldn't be
 # searched for source files.
 exclude_dirs = []
+exclude_patterns.append('_templates')
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = False
@@ -139,6 +142,24 @@ show_authors = False
 # If true, keep warnings as "system message" paragraphs in the built documents.
 # keep_warnings = False
 
+# Class documentation should contain *both* the class docstring and
+# the __init__ docstring
+autoclass_content = "both"
+
+numpydoc_show_class_members = False
+
+# -- Options for graphviz -----------------------------------------------------
+# Render inheritance diagrams in SVG
+graphviz_output_format = "svg"
+
+graphviz_dot_args = [
+    '-Nfontsize=10',
+    '-Nfontname=Helvetica Neue, Helvetica, Arial, sans-serif',
+    '-Efontsize=10',
+    '-Efontname=Helvetica Neue, Helvetica, Arial, sans-serif',
+    '-Gfontsize=10',
+    '-Gfontname=Helvetica Neue, Helvetica, Arial, sans-serif'
+]
 # -- Options for HTML output --------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -148,7 +169,7 @@ html_theme = 'scikit-nano'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {}
+# html_theme_options = {}
 # html_theme_options = {
 #     "edit_link": False,
 #     "sidebar": "left",
@@ -162,8 +183,7 @@ html_theme_path = ['themes']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-# html_title = None
-html_title = "%s v%s Reference Guide" % (project, version)
+html_title = '{} v{}'.format(project, version)
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 # html_short_title = None
@@ -240,7 +260,7 @@ html_show_copyright = True
 html_file_suffix = '.html'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'scikit-nano-doc'
+htmlhelp_basename = project + 'doc'
 
 # -- Options for LaTeX output -------------------------------------------------
 
@@ -253,13 +273,12 @@ latex_font_size = '10pt'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class
 # [howto/manual]).
-latex_documents = [('index', 'scikit-nano-ref.tex',
-                    'scikit-nano Reference Guide',
-                    'Andrew Merrill', 'manual')]
+latex_documents = [('index', project + '.tex', project + ' Documentation',
+                    author, 'manual')]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-# latex_logo = None
+latex_logo = '_static/scikit-nano_logo'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
@@ -312,10 +331,7 @@ latex_use_modindex = False
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    ('index', 'scikit-nano', 'scikit-nano Documentation',
-     ['Andrew Merrill'], 1)
-]
+man_pages = [('index', project, project + ' Documentation', [author], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -323,15 +339,14 @@ man_pages = [
 
 # -- Options for Texinfo output -----------------------------------------------
 
+description = 'python toolkit for nanoscience'
+category = 'Science'
 
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
-texinfo_documents = [('index', 'scikit-nano',
-                      'scikit-nano Documentation',
-                      'Andrew Merrill', 'scikit-nano',
-                      'python toolkit',
-                      'Miscellaneous')]
+texinfo_documents = [('index', project, project + ' Documentation',
+                      author, project, description, category)]
 
 # Documents to append as an appendix to all manuals.
 # texinfo_appendices = []
@@ -357,7 +372,10 @@ intersphinx_mapping = {
     'matplotlib': ('http://matplotlib.org', None),
     'pandas': ('http://pandas.pydata.org/pandas-docs/stable', None),
     'monty': ('http://pythonhosted.org/monty', None),
-    'pyparsing': ('http://pythonhosted.org/pyparsing', None),
+}
+
+epydoc_mapping = {
+    'http://pythonhosted.org/pyparsing': [r'pyparsing(\.|$)'],
 }
 
 # -----------------------------------------------------------------------------
@@ -436,7 +454,7 @@ if not use_matplotlib_plot_directive:
 # Source code links
 # -----------------------------------------------------------------------------
 
-# -- Options for the edit_on_github extension ----------------------------------------
+# -- Options for the edit_on_github extension --------------------------------
 
 # Don't import the module as "version" or it will override the
 # "version" configuration parameter
