@@ -1,27 +1,65 @@
-{% extends "!autosummary/class.rst" %}
-
-{% block methods %}
-{% if methods %}
-   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
-      .. autosummary::
-         :toctree:
-      {% for item in all_methods %}
-         {%- if not item.startswith('_') or item in ['__call__'] %}
-         {{ name }}.{{ item }}
-         {%- endif -%}
-      {%- endfor %}
+{% if referencefile %}
+.. include:: {{ referencefile }}
 {% endif %}
-{% endblock %}
 
-{% block attributes %}
-{% if attributes %}
-   .. HACK -- the point here is that we don't want this to appear in the output, but the autosummary should still generate the pages.
-      .. autosummary::
-         :toctree:
-      {% for item in all_attributes %}
-         {%- if not item.startswith('_') %}
-         {{ name }}.{{ item }}
-         {%- endif -%}
-      {%- endfor %}
-{% endif %}
-{% endblock %}
+{{ objname }}
+{{ underline }}
+
+.. currentmodule:: {{ module }}
+
+.. autoclass:: {{ objname }}
+   :show-inheritance:
+
+   {% if '__init__' in methods %}
+     {% set caught_result = methods.remove('__init__') %}
+   {% endif %}
+
+   {% block attributes_summary %}
+   {% if attributes %}
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+   {% for item in attributes %}
+      ~{{ name }}.{{ item }}
+   {%- endfor %}
+
+   {% endif %}
+   {% endblock %}
+
+   {% block methods_summary %}
+   {% if methods %}
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+   {% for item in methods %}
+      ~{{ name }}.{{ item }}
+   {%- endfor %}
+
+   {% endif %}
+   {% endblock %}
+
+   {% block attributes_documentation %}
+   {% if attributes %}
+
+   .. rubric:: Attributes Documentation
+
+   {% for item in attributes %}
+   .. autoattribute:: {{ item }}
+   {%- endfor %}
+
+   {% endif %}
+   {% endblock %}
+
+   {% block methods_documentation %}
+   {% if methods %}
+
+   .. rubric:: Methods Documentation
+
+   {% for item in methods %}
+   .. automethod:: {{ item }}
+   {%- endfor %}
+
+   {% endif %}
+   {% endblock %}
