@@ -8,7 +8,8 @@ sudo: false
 cache:
   # See http://docs.travis-ci.com/user/caching/#pip-cache
   directories:
-    - $HOME/sklearn_build_latest
+    - $HOME/sknano_build
+    - $HOME/.ccache
     - $HOME/.cache/pip
     - $HOME/download
     # - $HOME/.cache/sphinx
@@ -27,9 +28,9 @@ env:
   # global:
   #   - TEST_DIR=/tmp/sknano
   matrix:
-    - DISTRIB="conda" PYTHON_VERSION="3.5" INSTALL_MKL="true"
+    - DISTRIB="conda" PYTHON_VERSION="3.5" INSTALL_MKL="false"
       NUMPY_VERSION="1.10.2" SCIPY_VERSION="0.17.0" CYTHON_VERSION="0.23.4"
-      CACHED_BUILD_DIR="$HOME/sklearn_build_latest"
+      CACHED_BUILD_DIR="$HOME/sknano_build"
 
 install: source tools/ci/install.sh
 script: bash tools/ci/travis_tests.sh
