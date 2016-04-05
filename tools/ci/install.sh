@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 set -ex
 
-PYTHON_VERSION="$(python --version)"
-echo ${PYTHON_VERSION}
-
 export CC=gcc
 export CXX=g++
 
