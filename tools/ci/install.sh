@@ -69,7 +69,7 @@ elif [[ "$DISTRIB" == "ubuntu" ]]; then
     source testvenv/bin/activate
     pip install nose nose-timer
     pip install cython
-    travis_wait pip -v install -r requirements
+    travis_wait pip -v install -r requirements.txt
 fi
 
 if [[ "$COVERAGE" == "true" ]]; then
