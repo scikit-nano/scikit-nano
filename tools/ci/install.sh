@@ -88,7 +88,7 @@ cd $CACHED_BUILD_DIR/scikit-nano
 python --version
 python -c "import numpy; print('numpy %s' % numpy.__version__)"
 python -c "import scipy; print('scipy %s' % scipy.__version__)"
-python setup.py develop
+python setup.py install
 
 # pip install --upgrade pip setuptools
 # travis_wait pip install -r requirements.txt
