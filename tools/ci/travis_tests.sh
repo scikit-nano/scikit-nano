@@ -7,6 +7,10 @@
 # License: 3-clause BSD
 
 set -e
+mkdir -p $TEST_DIR
+# We need the setup.cfg for the nose settings
+# cp setup.cfg $TEST_DIR
+cd $TEST_DIR
 
 python --version
 python -c "import numpy; print('numpy %s' % numpy.__version__)"

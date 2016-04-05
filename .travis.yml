@@ -24,8 +24,8 @@ addons:
     - libgmp-dev
     - libmpfr-dev
 env:
-  # global:
-  #   - TEST_DIR=/tmp/sknano
+  global:
+    - TEST_DIR=/tmp/sknano
   matrix:
     - DISTRIB="conda" PYTHON_VERSION="3.5" INSTALL_MKL="false"
       NUMPY_VERSION="1.10.2" SCIPY_VERSION="0.17.0" CYTHON_VERSION="0.23.4"
