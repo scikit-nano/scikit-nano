@@ -54,7 +54,7 @@ if [[ "$DISTRIB" == "conda" ]]; then
 
     # Install nose-timer via pip
     pip install nose-timer
-    travis_wait pip -v install -r requirements
+    travis_wait pip -v install -r requirements.txt
 
     # Resolve MKL usage
 
