@@ -447,6 +447,7 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
         """Return :class:`~python:dict` of `MWNT` attributes."""
         attr_dict = super().todict()
         attr_dict.update(dict(Ch_list=self.Ch_list, nz=self._nz, Lz=self._Lz,
+                              fix_Lz=self.fix_Lz,
                               min_wall_diameter=self.min_wall_diameter,
                               max_wall_diameter=self.max_wall_diameter,
                               max_walls=self.max_walls,

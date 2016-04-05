@@ -117,7 +117,7 @@ class UnrolledSWNTBase(UnrolledSWNTMixin, SWNTBase, GrapheneBase,
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
         attr_dict = super().todict()
-        attr_dict.update(dict(nx=self.nx, Lx=self.Lx))
+        attr_dict.update(dict(nx=self.nx, Lx=self.Lx, fix_Lx=self.fix_Lx))
         return attr_dict
 
 

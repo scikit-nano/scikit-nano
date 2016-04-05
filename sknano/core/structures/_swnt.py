@@ -1519,7 +1519,7 @@ class SWNTBase(SWNTMixin, NanoStructureBase):
         """Return :class:`~python:dict` of `SWNT` attributes."""
         attr_dict = super().todict()
         attr_dict.update(dict(Ch=(self.n, self.m),
-                              nz=self.nz, Lz=self.Lz,
+                              nz=self.nz, Lz=self.Lz, fix_Lz=self.fix_Lz,
                               gutter=self.gutter,
                               wrap_coords=self.wrap_coords))
         return attr_dict
