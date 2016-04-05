@@ -2,19 +2,36 @@
 #   http://lint.travis-ci.org/
 
 language: python
-sudo: false
 python:
   - "3.4"
+  - "3.5"
+sudo: false
+cache:
+  # See http://docs.travis-ci.com/user/caching/#pip-cache
+  directories:
+    - $HOME/sklearn_build_latest
+    - $HOME/.cache/pip
+    - $HOME/download
+    # - $HOME/.cache/sphinx
+    # - $HOME/.ccache
 addons:
   apt:
     packages:
-      - libatlas-base-dev
-      - libatlas-dev
-      - liblapack-dev
-      - gfortran
-      - libgmp-dev
-      - libmpfr-dev
-      - ccache
+    - ccache
+    - libatlas-base-dev
+    - libatlas-dev
+    - liblapack-dev
+    - gfortran
+    - libgmp-dev
+    - libmpfr-dev
+env:
+  # global:
+  #   - TEST_DIR=/tmp/sknano
+  matrix:
+    - DISTRIB="conda" PYTHON_VERSION="3.5" INSTALL_MKL="true"
+      NUMPY_VERSION="1.10.2" SCIPY_VERSION="0.17.0" CYTHON_VERSION="0.23.4"
+      CACHED_BUILD_DIR="$HOME/sklearn_build_latest"
+
 install: source tools/ci/install.sh
 script: bash tools/ci/travis_tests.sh
 after_success:
