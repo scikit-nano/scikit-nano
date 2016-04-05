@@ -17,6 +17,7 @@ from __future__ import absolute_import, division, print_function, \
 import os
 import re
 import sys
+import six
 
 # Check Sphinx version
 import sphinx
@@ -572,3 +573,20 @@ class Mock(object):
 MOCK_MODULES = []
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = Mock()
+
+
+# Enable nitpicky mode - which ensures that all references in the docs
+# resolve.
+
+nitpicky = True
+nitpick_ignore = []
+
+for line in open('nitpick-exceptions'):
+    if line.strip() == "" or line.startswith("#"):
+        continue
+    dtype, target = line.split(None, 1)
+    target = target.strip()
+    nitpick_ignore.append((dtype, six.u(target)))
+
+if six.PY2:
+    nitpick_ignore.extend([('py:obj', six.u('bases'))])

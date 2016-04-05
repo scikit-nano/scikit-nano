@@ -30,23 +30,23 @@ User Documentation
 .. toctree::
    :maxdepth: 1
 
-   getting_started.rst
+   install
+   getting_started
 
 .. toctree::
    :maxdepth: 2
 
-   tutorial/index.rst
+   tutorial/index
 
 .. toctree::
    :maxdepth: 1
 
-   contribute.rst
+   contribute
 
 .. toctree::
    :maxdepth: 1
 
-   release.rst
-
+   release
 
 .. _reference:
 
@@ -56,13 +56,13 @@ API Reference
 .. toctree::
    :maxdepth: 1
 
-   apps.rst
-   core.rst
-   generators.rst
-   io.rst
-   scripts.rst
-   testing.rst
-   utils.rst
+   apps/index
+   core/index
+   generators/index
+   io/index
+   scripts/index
+   testing/index
+   utils/index
 
 Indices and Tables
 ==================
