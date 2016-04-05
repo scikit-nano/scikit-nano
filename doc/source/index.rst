@@ -9,11 +9,11 @@ scikit-nano |version| docs
 
 .. |logo_svg| image:: _static/scikit-nano_banner.svg
 
-.. |logo_png| image:: _static/scikit-nano_banner_96.png
+.. |logo_png| image:: _static/scikit-nano_banner.png
 
 .. raw:: html
 
-   <img src="_images/scikit-nano_banner.svg" onerror="this.src='_images/scikit-nano_banner_96.png'; this.onerror=null;" width="485"/>
+   <img src="_images/scikit-nano_banner.svg" onerror="this.src='_images/scikit-nano_banner.png'; this.onerror=null;" width="485"/>
 
 .. only:: latex
 
