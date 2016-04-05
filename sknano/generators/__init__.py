@@ -67,6 +67,11 @@ Compound structure generators
 Other
 -----
 
+.. autosummary::
+   :toctree: generated/
+
+   GeneratorConfigParser
+
 .. autodata:: STRUCTURE_GENERATORS
    :annotation: = tuple of recognized generator classes.
 

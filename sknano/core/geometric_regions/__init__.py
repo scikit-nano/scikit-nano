@@ -10,7 +10,7 @@ Contents
 ========
 
 Base/mixin classes for all geometric regions
------------------------------------------------------------
+----------------------------------------------
 
 .. autosummary::
    :toctree: generated/

@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+==============================================================================
+Generator config parser (:mod:`sknano.generators._generator_configparser`)
+==============================================================================
+
+.. currentmodule:: sknano.generators._generator_configparser
+
+"""
+
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
