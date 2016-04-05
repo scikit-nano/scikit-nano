@@ -76,6 +76,7 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from ._base import *
+from ._generator_configparser import *
 from ._xtal_structure_generator import *
 from ._mixins import *
 from ._fullerene_generator import *
