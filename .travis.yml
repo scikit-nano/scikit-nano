@@ -8,12 +8,11 @@ sudo: false
 cache:
   # See http://docs.travis-ci.com/user/caching/#pip-cache
   directories:
-    - $HOME/sknano_build
-    - $HOME/.ccache
-    - $HOME/.cache/pip
     - $HOME/download
-    # - $HOME/.cache/sphinx
     # - $HOME/.ccache
+    - $HOME/.cache/pip
+    # - $HOME/.cache/sphinx
+    - $HOME/sknano_build
 addons:
   apt:
     packages:
