@@ -57,6 +57,7 @@ class LayeredStructureGenerator(GeneratorBase, StructureBase, BaseClass):
     def _parse_config(self):
         parser = self.parser
         parser.read(self.cfgfile)
+        generator_module = 'sknano.generators'
 
         del self.structures[:]
         for section in parser.sections():
@@ -67,15 +68,9 @@ class LayeredStructureGenerator(GeneratorBase, StructureBase, BaseClass):
                     print(self.config)
                 continue
 
-            # generator_module = parser[section]['generator_module']
-            generator_module = 'sknano.generators'
-            generator_class = parser[section]['generator_class']
             parameters = parser[section]['parameters']
-            fname = '{}({})'.format(generator_class[:-len('Generator')],
-                                    parameters)
+            fname = '{}({})'.format(section[:-len('Generator')], parameters)
             self.fnames.append(fname.replace(' ', ''))
-            # self.config.update({section: {'generator_class': generator_class,
-            #                               'parameters': parameters}})
 
             call_sig = \
                 self.call_signature.parseString(parameters, parseAll=True)[0]
@@ -85,7 +80,7 @@ class LayeredStructureGenerator(GeneratorBase, StructureBase, BaseClass):
                 args, kwargs = tuple(), call_sig[0]
 
             generator = getattr(importlib.import_module(generator_module),
-                                generator_class)(*args, **kwargs)
+                                section)(*args, **kwargs)
             self.structures.append(generator)
 
     def generate(self):
