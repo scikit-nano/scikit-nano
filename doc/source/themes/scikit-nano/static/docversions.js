@@ -12,7 +12,7 @@ function insert_version_links() {
         document.write(open_list);
         document.write('<a href="URL">sknano VERSION</a> </li>\n'
                         .replace('VERSION', versions[i])
-                        .replace('URL', 'http://scikit-nano.org/doc/' + versions[i]));
+                        .replace('URL', 'http://docs.scikit-nano.org/' + versions[i]));
     }
 }
 

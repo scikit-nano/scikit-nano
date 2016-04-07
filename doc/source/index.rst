@@ -79,8 +79,8 @@ Other versions
 
 .. ifconfig:: 'dev' in release
 
-   |stable| `documentation <http://scikit-nano.org/doc>`_
+   |stable| `documentation <http://docs.scikit-nano.org/>`_
 
 .. ifconfig:: 'dev' not in release
 
-   `scikit-nano development documentation <http://scikit-nano.org/doc/dev>`_
+   `scikit-nano development documentation <http://docs.scikit-nano.org/dev>`_

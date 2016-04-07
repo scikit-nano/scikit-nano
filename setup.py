@@ -56,7 +56,7 @@ AUTHOR = 'Andrew Merrill'
 AUTHOR_EMAIL = 'androomerrill@gmail.com'
 MAINTAINER = AUTHOR
 MAINTAINER_EMAIL = AUTHOR_EMAIL
-URL = 'http://scikit-nano.org/doc'
+URL = 'http://docs.scikit-nano.org'
 DOWNLOAD_URL = 'https://github.com/scikit-nano/scikit-nano'
 KEYWORDS = ['structure data', 'nanoscience', 'nanostructure', 'nanotube',
             'graphene', 'structure generator', 'structure analysis']

@@ -50,7 +50,7 @@ Secondary to its structure generating functions are its
 Important links
 ===============
 
-* Documentation: http://scikit-nano.org/doc
+* Documentation: http://docs.scikit-nano.org
 * Source code repo: https://github.com/scikit-nano/scikit-nano
 * Download releases: https://github.com/scikit-nano/scikit-nano/releases
 * Issue tracker: https://github.com/scikit-nano/scikit-nano/issues

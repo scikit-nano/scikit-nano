@@ -197,7 +197,7 @@ html_theme = 'scikit-nano'
 #     "scikit_nano_logo": False,
 #     "rootlinks":
 #     [("https://github.com/scikit-nano/scikit-nano", "scikit-nano"),
-#      ("https://scikit-nano.org/doc", "Docs")]}
+#      ("http://docs.scikit-nano.org", "Docs")]}
 
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = ['themes']
