@@ -10,11 +10,9 @@ dependencies:
   - cython
   - ipython
   - matplotlib
-  - argcomplete
   - pandas
   - xlsxwriter
   - nose
   - sphinx
-  - hdf5
-  - h5py
-  - tables
+  - pytables
+  - jupyter
