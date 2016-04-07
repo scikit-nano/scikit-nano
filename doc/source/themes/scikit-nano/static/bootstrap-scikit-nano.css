@@ -23,14 +23,14 @@ body {
 /* Hyperlinks ----------------------------------------------------------------*/
 
 a {
-  color: #1F6AD5;
+  color: #005F06;
   text-decoration: none;
   line-height: inherit;
   font-weight: inherit;
 }
 
 a:hover {
-  color: #FB6200;
+  color: #9BFF8C;
   text-decoration: underline;
 }
 
@@ -309,7 +309,7 @@ div.topbar ul li a.homelink {
   display: block;
   height: 20px;
   padding: 5px 0px;
-  background: transparent url("scikit-nano_linkout_20.png") no-repeat 10px 5px;
+  background: transparent url("scikit-nano_linkout.png") no-repeat 10px 5px;
   background-image: url("scikit-nano_linkout.svg"), none;
   background-size: 91px 20px;
 }
@@ -499,7 +499,7 @@ a.headerlink {
 }
 
 a.headerlink:hover {
-    background-color: #1F6AD5;
+    background-color: #005F06;
     color: white;
     text-docoration: none;
 }
