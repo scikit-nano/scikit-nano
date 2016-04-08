@@ -2,8 +2,6 @@
 
 .. _sknano-generators:
 
-.. currentmodule:: sknano.generators
-
 ======================================================================
 Structure generators (:mod:`sknano.generators`)
 ======================================================================
@@ -32,5 +30,7 @@ implementation of the `~sknano.generators.GeneratorBase.generate` method.
 
 Reference/API
 =============
+
+.. module:: sknano.generators
 
 .. automodapi:: sknano.generators

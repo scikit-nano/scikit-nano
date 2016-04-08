@@ -1,24 +1,20 @@
-.. _tutorial:
+.. _tutorials:
 
-=======================
+======================
 Tutorials and Examples
-=======================
-
-.. sectionauthor:: Andrew Merrill <androomerrill@gmail.com>
+======================
 
 The current state of the tutorial leaves much to be desired.
 For now, please see the module doc pages for examples to help get you started.
 
-.. todo::
+.. contents::
+   :local:
+   :depth: 3
 
-   Write script to walk the package directories, parse examples
-   from docstrings, autogenerate literalincludes directive, and
-   reproduce the content here.
+.. include:: analysis.rst
 
-.. toctree::
-   :maxdepth: 1
+.. include:: generators.rst
 
-   analysis.rst
-   generators.rst
-   scripts.rst
-   examples.rst
+.. include:: scripts.rst
+
+.. include:: examples.rst

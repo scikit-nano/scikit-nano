@@ -1,14 +1,10 @@
-.. _scripts_tutorial:
+.. _scripts-tutorial:
 
-==============================
-Command-line scripts tutorial
+Tutorial: command-line scripts
 ==============================
 
 The tutorials below describe the scripts available in the
 :py:mod:`~sknano.scripts` package.
-
-
-.. currentmodule: sknano.scripts
 
 :mod:`~sknano.scripts.nanogen` script
 -------------------------------------

@@ -39,18 +39,44 @@ User Documentation
 
       releases/0.4.0-notes
 
+scikit-nano quick start guide
+---------------------------------
 .. toctree::
    :maxdepth: 1
 
+   overview
    install
    getting_started
+   tutorials/index
+
+Core data structures
+----------------------
+.. toctree::
+   :maxdepth: 1
+
+   core/index
+   generators/index
+
+Structure data: Supported formats and I/O
+-----------------------------------------
+.. toctree::
+   :maxdepth: 1
+
+   io/index
+
+scikit-nano data analysis and utilities
+-----------------------------------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   tutorial/index
+   apps/index
+   scripts/index
+   testing/index
+   utils/index
 
-**scikit-nano project details**
+scikit-nano project details
+-----------------------------
 
 .. toctree::
    :maxdepth: 1
@@ -79,19 +105,6 @@ Developer Documentation
 
 .. _reference:
 
-API Reference
-=============
-
-.. toctree::
-   :maxdepth: 1
-
-   apps/index
-   core/index
-   generators/index
-   io/index
-   scripts/index
-   testing/index
-   utils/index
 
 Indices and Tables
 ==================

@@ -1,28 +1,27 @@
-.. _generators_tutorial:
+.. _generators-tutorial:
 
-==============================
-Structure generators tutorial
-==============================
+Tutorial: structure generator classes
+======================================
 
 .. sectionauthor:: Andrew Merrill <androomerrill@gmail.com>
 
-The :mod:`~sknano.generators` module provides the following
+The `~sknano.generators` module provides the following
 classes for generating nanostructures:
 
 Fullerene Structure Generators
-=================================
-* :class:`~sknano.generators.FullereneGenerator`
+------------------------------
+`~sknano.generators.FullereneGenerator`
 
 Graphene Structure Generators
-=================================
-* :class:`~sknano.generators.GrapheneGenerator`
-* :class:`~sknano.generators.BilayerGrapheneGenerator`
-* :class:`~sknano.generators.UnrolledSWNTGenerator`
+------------------------------
+* `~sknano.generators.GrapheneGenerator`
+* `~sknano.generators.BilayerGrapheneGenerator`
+* `~sknano.generators.UnrolledSWNTGenerator`
 
 Nanotube Structure Generators
-=================================
-* :class:`~sknano.generators.SWNTGenerator`
-* :class:`~sknano.generators.MWNTGenerator`
+------------------------------
+* `~sknano.generators.SWNTGenerator`
+* `~sknano.generators.MWNTGenerator`
 
 For example, if you have a list of chiralities that you want structure data
 for, you can do something like this from within an interactive session::
@@ -43,17 +42,18 @@ for, you can do something like this from within an interactive session::
 
    In [3]: bundle.save()
 
-Bulk Structure Generators
-===========================
-* :class:`~sknano.generators.AlphaQuartzGenerator`
-* :class:`~sknano.generators.DiamondGenerator`
-* :class:`~sknano.generators.CsClGenerator`
-* :class:`~sknano.generators.NaClGenerator`
-* :class:`~sknano.generators.ZincblendeGenerator`
-* :class:`~sknano.generators.BCCGenerator`
-* :class:`~sknano.generators.FCCGenerator`
-* :class:`~sknano.generators.MoS2Generator`
+Crystal Structure Generators
+------------------------------
+
+* `~sknano.generators.AlphaQuartzGenerator`
+* `~sknano.generators.DiamondGenerator`
+* `~sknano.generators.CsClGenerator`
+* `~sknano.generators.NaClGenerator`
+* `~sknano.generators.ZincblendeGenerator`
+* `~sknano.generators.BCCGenerator`
+* `~sknano.generators.FCCGenerator`
+* `~sknano.generators.MoS2Generator`
 
 Composite Structure Generators
-===============================
-* :class:`~sknano.generators.LayeredStructureGenerator`
+------------------------------
+* `~sknano.generators.LayeredStructureGenerator`
