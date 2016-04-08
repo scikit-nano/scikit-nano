@@ -37,7 +37,7 @@ help:
 	@echo "  upload USER=...  to upload results to docs.scipy.org"
 
 clean:
-	-rm -rf $(BUILD_DIR)/* source/generated *.xyz
+	-rm -rf $(BUILD_DIR)/* source/generated source/*/generated source/*/api source/*.automodsumm source/*/*.automodsumm *.xyz
 
 
 #------------------------------------------------------------------------------
