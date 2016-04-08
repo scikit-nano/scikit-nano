@@ -27,6 +27,18 @@ intended for nanoscience.
 User Documentation
 ==================
 
+.. only:: html
+
+   :doc:`releases/0.4.0-notes`
+   ---------------------
+
+.. only:: latex
+
+   .. toctree::
+      :maxdepth: 1
+
+      releases/0.4.0-notes
+
 .. toctree::
    :maxdepth: 1
 
@@ -38,15 +50,32 @@ User Documentation
 
    tutorial/index
 
+**scikit-nano project details**
+
+.. toctree::
+   :maxdepth: 1
+
+   releases/index
+   known_issues
+   license
+
+Contributing
+============
+
 .. toctree::
    :maxdepth: 1
 
    contribute
 
+.. _developer-docs:
+
+Developer Documentation
+=======================
+
 .. toctree::
    :maxdepth: 1
 
-   release
+   changelog
 
 .. _reference:
 

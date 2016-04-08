@@ -1,7 +1,8 @@
 .. _getting_started:
 
-Getting started
-===============
+=================================
+Getting started with scikit-nano
+=================================
 
-.. include:: ../../README.rst
-   :start-line: 4
+Importing scikit-nano
+=====================

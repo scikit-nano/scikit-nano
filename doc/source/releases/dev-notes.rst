@@ -1,12 +1,12 @@
-================================
-scikit-nano X.X.0 Release Notes
-================================
+====================================
+scikit-nano 0.5.0 Development Notes
+====================================
 
 .. contents::
 
 **Release date:** (MONTH DAY, YEAR)
 
-scikit-nano X.X.X...
+scikit-nano 0.5.0
 
 Highlights of this release include:
 

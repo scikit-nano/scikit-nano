@@ -4,21 +4,23 @@ scikit-nano 0.4.0 Release Notes
 
 .. contents::
 
-**Release date:** (MONTH DAY, YEAR)
+**Release date:** (April 8, 2016)
 
 scikit-nano 0.4.0 brings many new features, improvements, and bug fixes.
 
 Highlights of this release include:
 
-* scikit-nano is now
-* New :mod:`~sknano.core.analysis` package with ring statistics modules.
-* New :class:`~sknano.generators.LayeredStructureGenerator` class.
-* New :class:`~sknano.io.PDBReader`/:class:`~sknano.io.PDBWriter` classes.
+* New :mod:`~sknano.core.analysis` package with Cython accelerated functions
+  for performing rings statistics analysis of atomic netorks.
+* New :class:`~sknano.generators.LayeredStructureGenerator` class for
+  creating compound layered nanostructure devices.
+* New :class:`~sknano.io.DUMPReader`/:class:`~sknano.io.DUMPWriter` classes.
+* New :class:`~sknano.io.PDBReader` class.
 
 
 New Features
 ============
-
+New modules for structure analysis.
 
 Improvements
 ============
@@ -51,8 +53,5 @@ Contributors to this release
 =============================
 
 
-Issues closed for vX.X.0
-------------------------
-
-Pull requests for vX.X.0
+Issues closed for v0.4.0
 ------------------------
