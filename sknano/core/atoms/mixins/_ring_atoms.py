@@ -17,7 +17,6 @@ import numpy as np
 import pandas as pd
 
 from sknano.core import timethis
-# from sknano.core.analysis import _ring_finder
 from sknano.core.analysis import find_rings
 # from sknano.core.math import Vector
 

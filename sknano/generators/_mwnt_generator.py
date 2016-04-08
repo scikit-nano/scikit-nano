@@ -48,7 +48,7 @@ class MWNTGeneratorBase(NanoStructureGenerator):
 class MWNTGenerator(NanotubeBundleGeneratorBase, MWNTGeneratorBase, MWNT):
     """Class for generating multi-walled nanotubes (MWNT).
 
-    .. versionchanged:: 0.3.22
+    .. versionchanged:: 0.4.0
 
        `MWNTGenerator` now generates both *single* MWNTs and
        MWNT bundles.

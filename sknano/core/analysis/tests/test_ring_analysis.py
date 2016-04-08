@@ -8,8 +8,7 @@ from __future__ import unicode_literals
 # from collections import Counter
 # from operator import attrgetter
 
-# import networkx as nx
-import numpy as np
+# import numpy as np
 
 import nose
 from nose.tools import assert_equal, assert_true

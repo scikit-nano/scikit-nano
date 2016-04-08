@@ -40,7 +40,7 @@ class DUMPReader(StructureData):
     autoread : :class:`~python:bool`, optional
         Automatically read dump files. Default is `True`
 
-        .. versionadded:: 0.3.22
+        .. versionadded:: 0.4.0
 
     reference_timestep : :class:`~python:int`, optional
         The `timestep` corresponding to the
@@ -52,7 +52,7 @@ class DUMPReader(StructureData):
         .. note::
            **Overrides** `reference_index` if not `None`
 
-        .. versionadded:: 0.3.22
+        .. versionadded:: 0.4.0
 
     reference_index : :class:`~python:int`, optional
         The :class:`~python:list` index corresponding to the
@@ -61,7 +61,7 @@ class DUMPReader(StructureData):
         :attr:`~sknano.core.atoms.Trajectory.reference_snapshot`.
         Default is `None`.
 
-        .. versionadded:: 0.3.22
+        .. versionadded:: 0.4.0
 
     dumpattrmap : class:`~python:dict`
         Python :class:`~python:dict` mapping custom dump attributes

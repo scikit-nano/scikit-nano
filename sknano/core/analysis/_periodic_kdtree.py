@@ -6,7 +6,7 @@ Periodic KD-Tree (:mod:`sknano.core.analysis._periodic_kdtree`)
 
 .. currentmodule:: sknano.core.analysis._periodic_kdtree
 
-.. versionadded:: 0.3.22
+.. versionadded:: 0.4.0
 
 A wrapper around scipy.spatial.kdtree to implement periodic boundary
 conditions
