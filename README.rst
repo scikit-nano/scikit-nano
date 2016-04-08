@@ -1,51 +1,33 @@
+===========
+scikit-nano
+===========
+
+.. image:: https://img.shields.io/pypi/v/scikit-nano.svg
+    :target: https://pypi.python.org/pypi/scikit-nano
+
+.. image:: https://img.shields.io/pypi/dm/scikit-nano.svg
+    :target: https://pypi.python.org/pypi/scikit-nano
+
+*scikit-nano* (http://scikit-nano.org) is a Python toolkit for
+nanoscience, intended to provide a robust set of programming tools
+to the science community.
+
+Releases are available on `PyPI <http://pypi.python.org/pypy/scikit-nano>`_,
+with primary development occurring on
+`github <http://github.com/scikit-nano/scikit-nano>`_.
+
+For installation instructions, see the
+`online documentation <http://docs.scikit-nano.org>`_ or
+``doc/install.rst`` in the source distribution.
+
+Project Status
+==============
+
 .. image:: https://travis-ci.org/scikit-nano/scikit-nano.svg?branch=master
    :target: https://travis-ci.org/scikit-nano/scikit-nano
 
 .. image:: https://coveralls.io/repos/scikit-nano/scikit-nano/badge.svg?branch=master&service=github
   :target: https://coveralls.io/github/scikit-nano/scikit-nano?branch=master
-
-
-===========
-scikit-nano
-===========
-
-*scikit-nano* is a python toolkit for generating and analyzing
-nanostructure data.
-
-*scikit-nano* can generate structure data (i.e., atomic coordinates)
-for the following classes of nanostructures:
-
-    * Nano Structures
-
-        * Fullerenes
-        * Graphene
-        * Nanotubes
-
-            * Single-walled nanotubes (SWNTs) and SWNT bundles.
-            * Multi-walled nanotubes (MWNTs) and MWNT bundles
-
-    * Crystal Structures
-
-    * Layered Structures
-
-
-The following structure data formats are supported:
-
-    * `xyz`
-    * `LAMMPS data` (*limited support for full format spec.*)
-    * `LAMMPS dump` (*limited support for full format spec.*)
-
-
-Extending input/output capabilities with more structure data formats
-such as *pdb*, *json*, *zmatrix*, etc. is queued for development
-
-Secondary to its structure generating functions are its
-*structure analysis tools* including:
-
-    * defect/vacancy structure analysis
-    * nearest-neighbor analysis
-    * POAV analysis
-
 
 Important links
 ===============
@@ -55,41 +37,3 @@ Important links
 * Download releases: https://github.com/scikit-nano/scikit-nano/releases
 * Issue tracker: https://github.com/scikit-nano/scikit-nano/issues
 * PyPI page: https://pypi.python.org/pypi/scikit-nano
-
-Dependencies
-============
-
-* `Python 3.4+ <http://python.org/download/>`_
-* `numpy 1.10+ <http://sourceforge.net/projects/numpy/files/NumPy/>`_
-* `scipy 0.16+ <http://sourceforge.net/projects/scipy/files/scipy/>`_
-
-
-Installation
-=============
-
-You can install the latest stable release from the
-`Python Package Index <http://pypi.python.org/pypi/scikit-nano>`_
-using **pip**::
-
-    > pip install scikit-nano
-
-Alternatively you can download a source code tarball from
-http://pypi.python.org/pypi/scikit-nano or clone the source code
-from the `github repo <http://github.com/scikit-nano/scikit-nano>`_
-using **git**::
-
-    > git clone https://github.com/scikit-nano/scikit-nano.git
-
-**cd** into the source code directory and run::
-
-    > python setup.py install
-
-These commands will probabily fail if you don't have *admin privileges*.
-In that case, try installing to the user base directory.
-Using **pip**::
-
-    > pip install --user scikit-nano
-
-Or from source::
-
-    > python setup.py install --user
