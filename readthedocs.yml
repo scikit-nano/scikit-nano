@@ -1,7 +1,7 @@
 requirements_file: tools/ci/rtd-pip-requirements.txt
 
-conda:
-  file: tools/ci/rtd-conda-env.yml
+# conda:
+#   file: tools/ci/rtd-conda-env.yml
 
 python:
   version: 3
