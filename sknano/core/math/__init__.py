@@ -58,8 +58,8 @@ from .transforms import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
 
-from . import _point as point
-from . import _vector as vector
-from . import _transforms as transforms
+from . import point as point
+from . import vector as vector
+from . import transforms as transforms
 
 __all__ += ['point', 'vector', 'transforms']
