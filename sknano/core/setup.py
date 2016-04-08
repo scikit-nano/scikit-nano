@@ -8,6 +8,7 @@ def configuration(parent_package='', top_path=None):
     config = Configuration('core', parent_package, top_path)
     config.add_subpackage('analysis')
     config.add_subpackage('atoms')
+    config.add_subpackage('compat')
     config.add_subpackage('crystallography')
     config.add_subpackage('geometric_regions')
     config.add_subpackage('math')
