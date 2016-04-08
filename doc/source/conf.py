@@ -33,39 +33,39 @@ needs_sphinx = '1.3'
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../sphinxext'))
 sys.path.insert(0, os.path.abspath('../sphinxext/numpydoc'))
-sys.path.insert(0, os.path.abspath('../sphinxext/edit_on_github'))
-sys.path.insert(0, os.path.abspath('../sphinxext/autodoc_enhancements'))
-sys.path.insert(0, os.path.abspath('../sphinxext/automodsumm'))
-sys.path.insert(0, os.path.abspath('../sphinxext/automodapi'))
-sys.path.insert(0, os.path.abspath('../sphinxext/tocdepthfix'))
-sys.path.insert(0, os.path.abspath('../sphinxext/changelog_links'))
-sys.path.insert(0, os.path.abspath('../sphinxext/viewcode'))
-sys.path.insert(0, os.path.abspath('../sphinxext/smart_resolver'))
+# sys.path.insert(0, os.path.abspath('../sphinxext/edit_on_github'))
+# sys.path.insert(0, os.path.abspath('../sphinxext/autodoc_enhancements'))
+# sys.path.insert(0, os.path.abspath('../sphinxext/automodsumm'))
+# sys.path.insert(0, os.path.abspath('../sphinxext/automodapi'))
+# sys.path.insert(0, os.path.abspath('../sphinxext/tocdepthfix'))
+# sys.path.insert(0, os.path.abspath('../sphinxext/changelog_links'))
+# sys.path.insert(0, os.path.abspath('../sphinxext/viewcode'))
+# sys.path.insert(0, os.path.abspath('../sphinxext/smart_resolver'))
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 
 extensions = ['sphinx.ext.autodoc',
-              'sphinx.ext.autosummary',
-              'sphinx.ext.mathjax',
-              'sphinx.ext.ifconfig',
               'sphinx.ext.intersphinx',
-              'sphinx.ext.coverage',
-              'sphinx.ext.inheritance_diagram',
-              'sphinx.ext.todo',
-              'IPython.sphinxext.ipython_console_highlighting',
-              'IPython.sphinxext.ipython_directive',
-              'viewcode',
-              'numpydoc',
               'sphinxcontrib.epydoc',
-              'sphinxarg.ext',
+              'sphinx.ext.coverage',
+              'sphinx.ext.todo',
+              'sphinx.ext.inheritance_diagram',
+              'numpydoc',
+              'sphinx.ext.autosummary',
               'autodoc_enhancements',
               'automodsumm',
               'automodapi',
               'tocdepthfix',
               'changelog_links',
+              'viewcode',
               'smart_resolver',
-              'edit_on_github']
+              'edit_on_github',
+              'sphinxarg.ext',
+              'sphinx.ext.mathjax',
+              'sphinx.ext.ifconfig',
+              'IPython.sphinxext.ipython_console_highlighting',
+              'IPython.sphinxext.ipython_directive']
 
 # Show todo items
 todo_include_todos = True
@@ -168,6 +168,10 @@ numpydoc_show_class_members = False
 # -----------------------------------------------------------------------------
 
 autosummary_generate = True
+
+automodapi_toctreedirnm = 'api'
+
+# automodsumm_writereprocessed = True
 
 # -- Options for graphviz -----------------------------------------------------
 # Render inheritance diagrams in SVG
