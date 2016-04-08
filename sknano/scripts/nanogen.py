@@ -75,7 +75,7 @@ import sys
 
 from sknano.core.refdata import aCC, element_data
 # from sknano.core.structures import get_chiral_indices_from_str
-from ._parser import add_default_arguments
+from .parser import add_default_arguments
 
 _r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 

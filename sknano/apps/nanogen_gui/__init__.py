@@ -14,9 +14,9 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 try:
-    from ._nanogen_models import *
-    from ._nanogen_views import *
-    from ._nanogen_controllers import *
+    from .nanogen_models import *
+    from .nanogen_views import *
+    from .nanogen_controllers import *
 except ImportError:
 	pass
 

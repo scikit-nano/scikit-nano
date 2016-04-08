@@ -17,7 +17,7 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 
 from sknano.core.math import Point, Vector
-from ._base import GeometricRegion, GeometricTransformsMixin, ndim_errmsg
+from .base import GeometricRegion, GeometricTransformsMixin, ndim_errmsg
 
 __all__ = ['Geometric2DRegion', 'Parallelogram', 'Rectangle', 'Square',
            'Ellipse', 'Circle', 'Triangle', 'geometric_2D_regions']

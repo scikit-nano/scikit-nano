@@ -13,7 +13,7 @@ Base/mixin classes for all geometric regions
 ----------------------------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    GeometricRegion
    Geometric2DRegion
@@ -24,7 +24,7 @@ Base/mixin classes for all geometric regions
 ----------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    Parallelogram
    Rectangle
@@ -37,7 +37,7 @@ Base/mixin classes for all geometric regions
 ----------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    Parallelepiped
    Cuboid
@@ -50,7 +50,7 @@ Base/mixin classes for all geometric regions
 Other
 -------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    generate_bounding_box
 
@@ -66,9 +66,9 @@ from __future__ import unicode_literals
 
 __docformat__ = 'restructuredtext en'
 
-from ._base import *
+from .base import *
 from ._2D_regions import *
 from ._3D_regions import *
-from ._misc import *
+from .misc import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]

@@ -12,13 +12,13 @@ Contents
 Classes for performing molcular dynamics runs
 ------------------------------------------------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
 
 Helper functions
 ------------------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
 """
 from __future__ import absolute_import, division, print_function

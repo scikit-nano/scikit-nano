@@ -12,7 +12,7 @@ Contents
 Abstract object representations for points and vectors
 -------------------------------------------------------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    Point
    Points
@@ -22,7 +22,7 @@ Abstract object representations for points and vectors
 Linear algebra transforms
 ----------------------------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    rotate
    Rx
@@ -39,7 +39,7 @@ Linear algebra transforms
 Number theory
 ---------------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    totient_func
 
@@ -48,13 +48,13 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from ._extras import *
-from ._point import *
-from ._points import *
-from ._vector import *
-from ._vectors import *
-from ._quaternion import *
-from ._transforms import *
+from .extras import *
+from .point import *
+from .points import *
+from .vector import *
+from .vectors import *
+from .quaternion import *
+from .transforms import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
 

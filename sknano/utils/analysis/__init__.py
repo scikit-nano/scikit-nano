@@ -12,14 +12,14 @@ Contents
 Classes for structure analysis
 ------------------------------------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    StructureAnalyzer
 
 Helper functions
 ------------------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    find_defect_chains
    find_target_atom
@@ -30,7 +30,7 @@ from __future__ import unicode_literals
 
 __docformat__ = 'restructuredtext en'
 
-from ._funcs import *
-from ._structure_analyzer import *
+from .funcs import *
+from .structure_analyzer import *
 
-__all__ = [s for s in dir() if not s.startswith('_')]
+# __all__ = [s for s in dir() if not s.startswith('_')]

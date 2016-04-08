@@ -16,7 +16,7 @@ import numbers
 import numpy as np
 
 from sknano.core.math import Point, Vector, vector as vec
-from ._base import GeometricRegion, GeometricTransformsMixin, ndim_errmsg
+from .base import GeometricRegion, GeometricTransformsMixin, ndim_errmsg
 
 __all__ = ['Geometric3DRegion', 'Parallelepiped', 'Cuboid', 'Cube',
            'Ellipsoid', 'Sphere', 'Cylinder', 'Cone', 'geometric_3D_regions']

@@ -12,14 +12,14 @@ Contents
 Periodic KD-Tree class
 ------------------------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    PeriodicKDTree
 
 Network connectivity analysis
 -----------------------------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    find_rings
    py_find_rings
@@ -30,8 +30,8 @@ from __future__ import unicode_literals
 
 __docformat__ = 'restructuredtext en'
 
-from ._periodic_kdtree import *
-from ._ring_analysis import *
-# from ._ring_finder import *
+from .periodic_kdtree import *
+from .ring_analysis import *
+# from .ring_finder import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]

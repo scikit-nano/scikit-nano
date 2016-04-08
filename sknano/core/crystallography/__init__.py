@@ -13,7 +13,7 @@ Base crystallography classes
 ------------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    LatticeBase
    ReciprocalLatticeBase
@@ -26,7 +26,7 @@ Base crystallography classes
 ---------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    Direct2DLatticeMixin
    Reciprocal2DLatticeMixin
@@ -37,7 +37,7 @@ Base crystallography classes
 ---------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    Direct3DLatticeMixin
    Reciprocal3DLatticeMixin
@@ -48,7 +48,7 @@ Helper functions
 ----------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    pbc_diff
    supercell_lattice_points
@@ -57,8 +57,8 @@ Helper functions
 from __future__ import absolute_import, unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from ._extras import *
-from ._xtal_cells import *
-from ._xtal_lattices import *
+from .extras import *
+from .xtal_cells import *
+from .xtal_lattices import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]

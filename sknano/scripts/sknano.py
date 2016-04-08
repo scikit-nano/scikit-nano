@@ -28,7 +28,7 @@ __docformat__ = 'restructuredtext en'
 # import importlib
 import sys
 
-# from ._parser import add_default_arguments
+# from .parser import add_default_arguments
 from .nanogen import nanogen_parser, nanogen
 
 __all__ = ['sknano', 'sknano_parser']

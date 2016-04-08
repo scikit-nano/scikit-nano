@@ -25,7 +25,7 @@ Sub-packages
 Data structures & algorithms
 -----------------------------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    dedupe
    rezero_array
@@ -35,7 +35,7 @@ Data structures & algorithms
 Iterator functions
 ------------------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    cyclic_pairs
    take
@@ -69,7 +69,7 @@ Iterator functions
 Meta functions/classes
 -----------------------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    check_type
    deprecated
@@ -96,7 +96,7 @@ Meta functions/classes
 I/O functions
 --------------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    get_fname
    get_fpath
@@ -109,7 +109,7 @@ I/O functions
 String functions/classes
 -------------------------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    asbool
    asdict
@@ -129,7 +129,7 @@ Custom container datatypes
 ---------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    ListBasedSet
    UserList
@@ -140,11 +140,11 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from ._collections import *
-from ._extras import *
-from ._io import *
-from ._itertools import *
-from ._meta import *
-from ._strings import *
+from .collections import *
+from .extras import *
+from .io import *
+from .itertools import *
+from .meta import *
+from .strings import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]

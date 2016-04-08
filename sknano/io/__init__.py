@@ -13,7 +13,7 @@ Base I/O classes to inherit from when creating new I/O classes
 ----------------------------------------------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    StructureData
    StructureDataConverter
@@ -29,7 +29,7 @@ I/O classes for the LAMMPS `data` structure data format
 -----------------------------------------------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    DATAData
    DATAReader
@@ -40,7 +40,7 @@ I/O classes for the LAMMPS `dump` structure data format
 -----------------------------------------------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    DUMPData
    DUMPReader
@@ -51,7 +51,7 @@ I/O classes for the `pdb` structure data format
 -----------------------------------------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    PDBData
    PDBReader
@@ -62,7 +62,7 @@ I/O classes for the `xyz` structure data format
 -------------------------------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    XYZData
    XYZReader
@@ -79,10 +79,11 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from ._base import *
-from ._lammps_data import *
-from ._lammps_dump import *
-from ._pdb import *
-from ._xyz import *
+from .base import *
+from .lammps_data import *
+from .lammps_dump import *
+from .pdb import *
+from .xyz import *
 
-__all__ = [s for s in dir() if not s.startswith('_')]
+# __all__ = [s for s in dir() if not s.startswith('_')]
+__all__ = [s for s in dir()]

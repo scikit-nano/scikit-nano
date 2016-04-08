@@ -13,7 +13,7 @@ Mixin `Atom`/`Atoms` classes
 ----------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    AtomAdapterMixin
    AtomsAdapterMixin
@@ -36,7 +36,7 @@ Mixin `Atom`/`Atoms` classes
 Atomic network topology classes
 -------------------------------
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    Topology
    TopologyCollection
@@ -56,19 +56,19 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from ._adapters import *
-from ._angles import *
-from ._bonds import *
-from ._dihedrals import *
-from ._impropers import *
-from ._kdtree_atoms import *
-from ._poav_atoms import *
-from ._periodic_atoms import *
-from ._ring_atoms import *
-from ._topology_base import *
-from ._topology import AtomTopologyMixin, AtomsTopologyMixin
-from ._bounding_regions import BoundingRegionsMixin
-from ._transformations import AtomTransformationsMixin, \
+from .adapters import *
+from .angles import *
+from .bonds import *
+from .dihedrals import *
+from .impropers import *
+from .kdtree_atoms import *
+from .poav_atoms import *
+from .periodic_atoms import *
+from .ring_atoms import *
+from .topology_base import *
+from .topology import AtomTopologyMixin, AtomsTopologyMixin
+from .bounding_regions import BoundingRegionsMixin
+from .transformations import AtomTransformationsMixin, \
     AtomsTransformationsMixin
 
 __all__ = [s for s in dir() if not s.startswith('_')]

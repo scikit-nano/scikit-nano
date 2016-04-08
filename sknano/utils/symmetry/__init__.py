@@ -13,7 +13,7 @@ Point Groups
 -------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    PointGroup
 
@@ -22,7 +22,7 @@ Space Groups
 -------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    SpaceGroup
 
@@ -32,7 +32,9 @@ from __future__ import unicode_literals
 
 __docformat__ = 'restructuredtext en'
 
-from ._point_groups import *
-from ._space_groups import *
+from .point_groups import *
+from .space_groups import *
 
-__all__ = [s for s in dir() if not s.startswith('_')]
+# __all__ = [s for s in dir() if not s.startswith('_')]
+
+__all__ = [s for s in dir()]

@@ -19,7 +19,7 @@ Base/Mixin structure classes
 ----------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    StructureBase
    StructureMixin
@@ -40,7 +40,7 @@ Crystal structure classes
 --------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    Crystal2DStructure
    Crystal3DStructure
@@ -64,7 +64,7 @@ Nanostructure Classes
 ----------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    Fullerene
    Graphene
@@ -82,7 +82,7 @@ Composite structure classes
 ----------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    Composition
    Compositions
@@ -91,7 +91,7 @@ Helper functions for nanotube properties
 ------------------------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    pymatgen_structure
 
@@ -101,7 +101,7 @@ Helper functions for nanotube properties
 Nanotube compute functions:
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    compute_d
    compute_dR
@@ -133,7 +133,7 @@ Helper functions for working with :math:`(n, m)` chirality data
 -----------------------------------------------------------------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: api/
 
    cmp_Ch
    filter_Ch
@@ -149,17 +149,17 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from ._base import *
-from ._xtal_structures import *
-from ._compositions import *
-from ._nanotube_bundle import *
-from ._fullerenes import *
-from ._graphene import *
-from ._bilayer_graphene import *
-from ._swnt import *
-from ._mwnt import *
-from ._unrolled_swnt import *
-from ._extras import *
-from ._defects import *
+from .base import *
+from .xtal_structures import *
+from .compositions import *
+from .nanotube_bundle import *
+from .fullerenes import *
+from .graphene import *
+from .bilayer_graphene import *
+from .swnt import *
+from .mwnt import *
+from .unrolled_swnt import *
+from .extras import *
+from .defects import *
 
 __all__ = [s for s in dir() if not s.startswith('_')]
