@@ -21,6 +21,8 @@ doc/_build
 doc/build
 # sphinx autodoc generated directory
 doc/source/generated
+doc/source/api
+doc/source/*/api
 # misc sphinx generated output
 doc/*.data
 doc/*.dump
