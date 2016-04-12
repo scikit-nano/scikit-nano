@@ -17,7 +17,7 @@ scikit-nano |version| docs
 
 .. only:: latex
 
-    .. image:: _static/scikit-nano_logo.pdf
+    .. image:: _static/scikit-nano_banner.pdf
 
 Welcome to the scikit-nano documentation! scikit-nano is a Python package
 intended for nanoscience.
