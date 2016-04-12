@@ -10,18 +10,18 @@ classes for generating nanostructures:
 
 Fullerene Structure Generators
 ------------------------------
-`~sknano.generators.FullereneGenerator`
+* :class:`~sknano.generators.FullereneGenerator`
 
 Graphene Structure Generators
 ------------------------------
-* `~sknano.generators.GrapheneGenerator`
-* `~sknano.generators.BilayerGrapheneGenerator`
-* `~sknano.generators.UnrolledSWNTGenerator`
+* :class:`~sknano.generators.GrapheneGenerator`
+* :class:`~sknano.generators.BilayerGrapheneGenerator`
+* :class:`~sknano.generators.UnrolledSWNTGenerator`
 
 Nanotube Structure Generators
 ------------------------------
-* `~sknano.generators.SWNTGenerator`
-* `~sknano.generators.MWNTGenerator`
+* :class:`~sknano.generators.SWNTGenerator`
+* :class:`~sknano.generators.MWNTGenerator`
 
 For example, if you have a list of chiralities that you want structure data
 for, you can do something like this from within an interactive session::
@@ -45,15 +45,15 @@ for, you can do something like this from within an interactive session::
 Crystal Structure Generators
 ------------------------------
 
-* `~sknano.generators.AlphaQuartzGenerator`
-* `~sknano.generators.DiamondGenerator`
-* `~sknano.generators.CsClGenerator`
-* `~sknano.generators.NaClGenerator`
-* `~sknano.generators.ZincblendeGenerator`
-* `~sknano.generators.BCCGenerator`
-* `~sknano.generators.FCCGenerator`
-* `~sknano.generators.MoS2Generator`
+* :class:`~sknano.generators.AlphaQuartzGenerator`
+* :class:`~sknano.generators.DiamondGenerator`
+* :class:`~sknano.generators.CsClGenerator`
+* :class:`~sknano.generators.NaClGenerator`
+* :class:`~sknano.generators.ZincblendeGenerator`
+* :class:`~sknano.generators.BCCGenerator`
+* :class:`~sknano.generators.FCCGenerator`
+* :class:`~sknano.generators.MoS2Generator`
 
 Composite Structure Generators
 ------------------------------
-* `~sknano.generators.LayeredStructureGenerator`
+* :class:`~sknano.generators.LayeredStructureGenerator`

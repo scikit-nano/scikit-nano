@@ -16,12 +16,12 @@ import os
 
 import numpy as np
 # import copy
-from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
+from sknano.core.atoms import StructureAtom as Atom
 from sknano.core.structures import StructureBase
 from sknano.io import StructureWriterMixin, supported_structure_formats
 
 
-__all__ = ['Atom', 'Atoms', 'GeneratorBase', 'GeneratorMixin',
+__all__ = ['GeneratorBase', 'GeneratorMixin',
            'CrystalStructureGenerator', 'NanoStructureGenerator',
            'STRUCTURE_GENERATORS']
 

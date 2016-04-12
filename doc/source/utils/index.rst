@@ -1,10 +1,14 @@
-.. _sknano-utils:
-
 .. currentmodule:: sknano.utils
+
+.. _sknano-utils:
 
 ===============================================================================
 Utility modules (:mod:`sknano.utils`)
 ===============================================================================
+
+Contents
+=========
+
 
 Introduction
 ============
@@ -15,8 +19,4 @@ classes.
 Reference/API
 =============
 
-.. module:: sknano.utils
-
-.. automodapi:: sknano.utils.analysis
-
-.. automodapi:: sknano.utils.symmetry
+.. automodapi:: sknano.utils

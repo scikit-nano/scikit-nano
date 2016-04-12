@@ -1,3 +1,5 @@
+.. currentmodule:: sknano.testing
+
 .. _sknano-testing:
 
 ============================================================================
@@ -9,7 +11,11 @@ Introduction
 
 This module contains test fixtures for unit testings.
 
+Contents
+========
+
+
 Reference/API
 =============
 
-.. module:: sknano.testing
+.. automodapi:: sknano.testing

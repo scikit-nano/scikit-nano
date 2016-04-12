@@ -30,7 +30,7 @@ User Documentation
 .. only:: html
 
    :doc:`releases/0.4.0-notes`
-   ---------------------
+   ---------------------------
 
 .. only:: latex
 
@@ -40,7 +40,8 @@ User Documentation
       releases/0.4.0-notes
 
 scikit-nano quick start guide
----------------------------------
+------------------------------
+
 .. toctree::
    :maxdepth: 1
 
@@ -51,6 +52,7 @@ scikit-nano quick start guide
 
 Core data structures
 ----------------------
+
 .. toctree::
    :maxdepth: 1
 
@@ -59,6 +61,7 @@ Core data structures
 
 Structure data: Supported formats and I/O
 -----------------------------------------
+
 .. toctree::
    :maxdepth: 1
 
@@ -85,15 +88,16 @@ scikit-nano project details
    known_issues
    license
 
+.. _developer-docs:
+
 Contributing
 ============
 
 .. toctree::
    :maxdepth: 1
 
-   contribute
-
-.. _developer-docs:
+   dev/contribute
+   dev/release_guide
 
 Developer Documentation
 =======================
@@ -102,9 +106,6 @@ Developer Documentation
    :maxdepth: 1
 
    changelog
-
-.. _reference:
-
 
 Indices and Tables
 ==================

@@ -16,5 +16,3 @@ from .mwnt_generator import *
 from .unrolled_swnt_generator import *
 from .layered_structure_generator import *
 # from .defect_generators import *
-
-__all__ = [s for s in dir() if not s.startswith('_')]

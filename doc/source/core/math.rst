@@ -1,10 +1,10 @@
+.. currentmodule:: sknano.core.math
+
 .. _sknano-core-math:
 
 ======================================================================
 Core data structures for math (:mod:`sknano.core.math`)
 ======================================================================
-
-.. currentmodule:: sknano.core.math
 
 Introduction
 =============
@@ -14,6 +14,9 @@ object representations for points and vectors.
 
 Getting Started
 ===============
+
+Contents
+========
 
 
 Reference/API

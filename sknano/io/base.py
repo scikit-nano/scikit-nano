@@ -16,7 +16,7 @@ import copy
 import os
 
 from sknano.core import BaseClass, TabulateMixin, get_fpath
-from sknano.core.atoms import MDAtom as Atom, MDAtoms as Atoms
+from sknano.core.atoms import MDAtoms as Atoms
 from sknano.core.structures import StructureBase
 # from sknano.utils.analysis import StructureAnalyzer
 from sknano.version import version
@@ -26,8 +26,7 @@ default_comment_line = \
 default_structure_format = 'xyz'
 supported_structure_formats = ('xyz', 'data', 'dump')
 
-__all__ = ['Atom', 'Atoms',
-           'StructureData',
+__all__ = ['StructureData',
            'StructureDataConverter',
            'StructureDataFormatter',
            'StructureDataError',

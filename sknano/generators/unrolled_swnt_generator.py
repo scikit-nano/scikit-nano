@@ -25,10 +25,11 @@ import copy
 # import numpy as np
 
 from sknano.core import pluralize
+from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from sknano.core.crystallography import SuperCell
 from sknano.core.math import Vector
 from sknano.core.structures import UnrolledSWNT
-from .base import Atom, Atoms, NanoStructureGenerator
+from .base import NanoStructureGenerator
 
 __all__ = ['UnrolledSWNTGenerator']
 

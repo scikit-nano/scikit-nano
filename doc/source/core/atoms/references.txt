@@ -1,0 +1,6 @@
+.. |Atom| replace:: `~sknano.core.atoms.Atom`
+.. |Atoms| replace:: `~sknano.core.atoms.Atoms`
+.. |Trajectory| replace:: `~sknano.core.atoms.Trajectory`
+.. |Snapshot| replace:: `~sknano.core.atoms.Snapshot`
+.. |StructureAtom| replace:: `~sknano.core.atoms.StructureAtom`
+.. |StructureAtoms| replace:: `~sknano.core.atoms.StructureAtoms`

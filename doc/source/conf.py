@@ -33,25 +33,18 @@ needs_sphinx = '1.3'
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../sphinxext'))
 sys.path.insert(0, os.path.abspath('../sphinxext/numpydoc'))
-# sys.path.insert(0, os.path.abspath('../sphinxext/edit_on_github'))
-# sys.path.insert(0, os.path.abspath('../sphinxext/autodoc_enhancements'))
-# sys.path.insert(0, os.path.abspath('../sphinxext/automodsumm'))
-# sys.path.insert(0, os.path.abspath('../sphinxext/automodapi'))
-# sys.path.insert(0, os.path.abspath('../sphinxext/tocdepthfix'))
-# sys.path.insert(0, os.path.abspath('../sphinxext/changelog_links'))
-# sys.path.insert(0, os.path.abspath('../sphinxext/viewcode'))
-# sys.path.insert(0, os.path.abspath('../sphinxext/smart_resolver'))
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.intersphinx',
-              'sphinxcontrib.epydoc',
               'sphinx.ext.coverage',
               'sphinx.ext.todo',
+              'sphinx.ext.mathjax',
+              'sphinx.ext.ifconfig',
+              'sphinx.ext.napoleon',
               'sphinx.ext.inheritance_diagram',
-              'numpydoc',
               'sphinx.ext.autosummary',
               'autodoc_enhancements',
               'automodsumm',
@@ -62,8 +55,7 @@ extensions = ['sphinx.ext.autodoc',
               'smart_resolver',
               'edit_on_github',
               'sphinxarg.ext',
-              'sphinx.ext.mathjax',
-              'sphinx.ext.ifconfig',
+              'sphinxcontrib.epydoc',
               'IPython.sphinxext.ipython_console_highlighting',
               'IPython.sphinxext.ipython_directive']
 
@@ -86,9 +78,6 @@ if use_matplotlib_plot_directive:
     extensions.append('matplotlib.sphinxext.plot_directive')
 else:
     raise RuntimeError("You need a recent enough version of matplotlib")
-
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -125,7 +114,7 @@ today_fmt = '%B %d, %Y'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns = []
-exclude_patterns.append('_templates')
+# exclude_patterns.append('_templates')
 # List of documents that shouldn't be included in the build.
 # unused_docs = []
 
@@ -136,6 +125,9 @@ default_role = 'obj'
 # List of directories, relative to source directories, that shouldn't be
 # searched for source files.
 exclude_dirs = []
+
+# Add any paths that contain templates here, relative to this directory.
+templates_path = ['_templates']
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = False
@@ -169,6 +161,7 @@ numpydoc_show_class_members = False
 
 autosummary_generate = True
 
+# automodapi_toctreedirnm = os.path.join(os.getcwd(), 'api')
 automodapi_toctreedirnm = 'api'
 
 # automodsumm_writereprocessed = True

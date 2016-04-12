@@ -1,3 +1,7 @@
+.. include:: references.txt
+
+.. currentmodule:: sknano.io
+
 .. _sknano-io:
 
 ==========================================================
@@ -10,9 +14,13 @@ Introduction
 The `sknano.io` package provides the main data structures for dealing
 with input/output streams of various types of structure data file formats.
 
+Contents
+========
+
+
 Reference/API
 =============
 
-.. module:: sknano.io
+.. automodapi:: sknano.io
 
-.. automodule:: sknano.io.tokenizers
+.. automodapi:: sknano.io.tokenizers

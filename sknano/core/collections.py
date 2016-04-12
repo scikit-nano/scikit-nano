@@ -35,7 +35,7 @@ class ListBasedSet(Set):
 
     Parameters
     ----------
-    iterable : :class:`~python:collections.Iterable`
+    iterable : :class:`~python:collections.abc.Iterable`
 
     """
     def __init__(self, iterable):

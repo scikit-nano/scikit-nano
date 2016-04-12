@@ -1,6 +1,9 @@
-.. automodule:: sknano.apps
+.. currentmodule:: sknano.apps
 
-.. toctree::
-   :hidden:
+.. _sknano-apps:
 
-   nanogen_gui
+===============================================================================
+Bundled apps (:mod:`sknano.apps`)
+===============================================================================
+
+.. include:: nanogen_gui.rst

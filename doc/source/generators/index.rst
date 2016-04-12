@@ -1,10 +1,13 @@
 .. include:: references.txt
 
+.. currentmodule:: sknano.generators
+
 .. _sknano-generators:
 
 ======================================================================
 Structure generators (:mod:`sknano.generators`)
 ======================================================================
+
 
 Introduction
 =============
@@ -16,21 +19,23 @@ Getting Started
 ===============
 
 Crystal structure generator classes are sub-classes of
-`~sknano.generators.CrystalStructureGenerator`, while
+|CrystalStructureGenerator|, while
 nanostructure generator classes inherit from
-`~sknano.generators.NanoStructureGenerator` base class.
+|NanoStructureGenerator| base class.
 
-Both `~sknano.generators.CrystalStructureGenerator` and
-`~sknano.generators.NanoStructureGenerator` inherit from
-`~sknano.generators.GeneratorBase` base class.
+Both |CrystalStructureGenerator| and
+|NanoStructureGenerator| inherit from
+|GeneratorBase| base class.
 
-The `~sknano.generators.GeneratorMixin` class provides a simple concrete
+The |GeneratorMixin| class provides a simple concrete
 implementation of the `~sknano.generators.GeneratorBase.generate` method.
 
 
+Example::
+
+    >>> from sknano.generators import SWNTGenerator
+
 Reference/API
 =============
-
-.. module:: sknano.generators
 
 .. automodapi:: sknano.generators

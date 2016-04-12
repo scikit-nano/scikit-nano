@@ -1,8 +1,14 @@
+.. currentmodule:: sknano.scripts
+
 .. _sknano-scripts:
 
 =============================================
 Command-line scripts (:mod:`sknano.scripts`)
 =============================================
+
+Contents
+========
+
 
 Introduction
 ============
@@ -13,6 +19,4 @@ scikit-nano library.
 Reference/API
 =============
 
-.. module:: sknano.scripts
-
-.. automodule:: sknano.scripts.nanogen
+.. automodapi:: sknano.scripts

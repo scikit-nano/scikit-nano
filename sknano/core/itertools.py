@@ -45,7 +45,7 @@ def cyclic_pairs(iterable):
 
     Returns
     -------
-    :class:`~python:iterator`
+    :class:`~python:collections.abc.Iterator`
 
     Examples
     --------
@@ -63,7 +63,7 @@ def take(n, iterable):
     Parameters
     ----------
     n : :class:`~python:int`
-    iterable : :class:`collections.Iterable`
+    iterable : :class:`collections.abc.Iterable`
 
     Returns
     -------
@@ -96,7 +96,7 @@ def tabulate(function, start=0):
 
     Returns
     -------
-    :class:`~python:collections.Iterator`
+    :class:`~python:collections.abc.Iterator`
 
     Examples
     --------
@@ -122,11 +122,11 @@ def tail(n, iterable):
     Parameters
     ----------
     n : :class:`~python:int`
-    iterable : :class:`~python:collections.Iterable`
+    iterable : :class:`~python:collections.abc.Iterable`
 
     Returns
     -------
-    :class:`~python:collections.Iterator`.
+    :class:`~python:collections.abc.Iterator`.
 
     """
     return iter(collections.deque(iterable, maxlen=n))
@@ -137,7 +137,7 @@ def consume(iterator, n=None):
 
     Parameters
     ----------
-    iterator : :class:`~python:collections.Iterator`
+    iterator : :class:`~python:collections.abc.Iterator`
     n : {:class:`~python:None`, :class:`~python:int`}, optional
 
     """
@@ -154,7 +154,7 @@ def nth(iterable, n, default=None):
 
     Parameters
     ----------
-    iterable : :class:`~python:collections.Iterable`
+    iterable : :class:`~python:collections.abc.Iterable`
     n : :class:`~python:int`
     default : {:class:`~python:None`, :class:`~python:object`}, optional
 
@@ -175,7 +175,7 @@ def all_equal(iterable):
 
     Parameters
     ----------
-    iterable : :class:`~python:collections.Iterable`
+    iterable : :class:`~python:collections.abc.Iterable`
 
     Returns
     -------
@@ -218,11 +218,12 @@ def ncycles(iterable, n):
 
 
 def dotproduct(vec1, vec2):
-    """Returns the dot product of two :class:`~python:collections.Iterable`\ s.
+    """Returns the dot product of two \
+        :class:`~python:collections.abc.Iterable`\ s.
 
     Parameters
     ----------
-    vec1, vec2 : :class:`~python:collections.Iterable`
+    vec1, vec2 : :class:`~python:collections.abc.Iterable`
 
     """
     return sum(map(operator.mul, vec1, vec2))
@@ -237,9 +238,9 @@ def flatten(items, ignore_types=(str, bytes)):
         nested sequence that you want to flatten into a single sequence with
         no nesting
     ignore_types : :class:`~python:tuple`, optional
-        :class:`~python:tuple` of :class:`~python:collections.Iterable`
+        :class:`~python:tuple` of :class:`~python:collections.abc.Iterable`
         :class:`~python:type`\ s to that should not be interpreted as
-        :class:`~python:collections.Iterable`\ s to be flattened.
+        :class:`~python:collections.abc.Iterable`\ s to be flattened.
         Default is (:class:`~python:str`, :class:`~python:bytes`) to
         prevent strings and bytes from being interpreted as iterables
         and expanded as individual characters.
@@ -338,11 +339,11 @@ def partition(pred, iterable):
     pred : callable
         callable function taking one argument and returning
         :class:`~python:True` or :class:`~python:False`.
-    iterable : :class:`~python:collections.Iterable`
+    iterable : :class:`~python:collections.abc.Iterable`
 
     Returns
     -------
-    :class:`~python:tuple` of :class:`~pyton:collections.Iterables`
+    :class:`~python:tuple` of :class:`~pyton:collections.abc.Iterables`
 
     Examples
     --------
@@ -377,7 +378,7 @@ def unique_everseen(iterable, key=None):
 
     Parameters
     ----------
-    iterable : :class:`~python:collections.Iterable`
+    iterable : :class:`~python:collections.abc.Iterable`
     key : {None, callable}, optional
 
     Yields
@@ -419,7 +420,7 @@ def unique_justseen(iterable, key=None):
 
     Parameters
     ----------
-    iterable : :class:`~python:collections.Iterable`
+    iterable : :class:`~python:collections.abc.Iterable`
     key : {None, callable}, optional
 
     Yields

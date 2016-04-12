@@ -14,9 +14,10 @@ from collections import deque
 
 import numpy as np
 
-__all__ = ['find_defect_chains', 'find_target_atom']
-
 from sknano.core.atoms import Atoms
+
+
+__all__ = ['find_defect_chains', 'find_target_atom']
 
 
 def find_defect_chains(atoms, defect_condition, max_length=None,
@@ -73,7 +74,7 @@ def find_target_atom(atoms, target_coords=None, search_radius=1.0,
 
     Returns
     -------
-    target_atom :class:`~sknano.core.atoms.Atom`
+    target_atom : :class:`~sknano.core.atoms.Atom`
         An :class:`~sknano.core.atoms.Atom` instance.
 
     """
