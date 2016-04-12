@@ -24,27 +24,14 @@ __all__ = ['RingAtomMixin', 'RingAtomsMixin']
 
 
 class RingAtomMixin:
-    """Mixin `Atom` class for ring statistics/network connectivity analysis.
-
-    Attributes
-    ----------
-    Rn : :class:`~python:int`
-
-    """
+    """Mixin `Atom` class for ring statistics/network connectivity analysis."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.Rn = 0
 
 
 class RingAtomsMixin:
-    """Mixin `Atoms` class for ring statistics/network connectivity analysis.
-
-    Attributes
-    ----------
-    ring_counter : :class:`~python:collections.Counter`
-    rings : :class:`~python:collections.OrderedDict`
-
-    """
+    """Mixin `Atoms` class for ring statistics analysis."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ring_counter = Counter()

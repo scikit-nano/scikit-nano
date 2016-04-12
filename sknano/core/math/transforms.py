@@ -98,6 +98,14 @@ def Rx(angle, degrees=False):
     """Generate the :math:`3\\times3` rotation matrix :math:`R_x(\\theta)` \
         for a rotation about the :math:`x` axis by an angle :math:`\\theta`.
 
+    .. math::
+
+       R_x = \\begin{bmatrix}
+       1 & 0 & 0\\\\
+       0 & \\cos\\theta & -\\sin\\theta\\\\
+       0 & \\sin\\theta & \\cos\\theta
+       \\end{bmatrix}
+
     Parameters
     ----------
     angle : float
@@ -112,14 +120,6 @@ def Rx(angle, degrees=False):
     :class:`~numpy:numpy.ndarray`
         :math:`3\\times3` rotation matrix :math:`R_x(\\theta)` for a
         rotation about the :math:`x` axis by an angle :math:`\\theta`.
-
-    .. math::
-
-       R_x = \\begin{pmatrix}
-       1 & 0 & 0\\\\
-       0 & \\cos\\theta & -\\sin\\theta\\\\
-       0 & \\sin\\theta & \\cos\\theta
-       \\end{pmatrix}
 
     Examples
     --------
@@ -147,6 +147,14 @@ def Ry(angle, degrees=False):
     """Generate the :math:`3\\times3` rotation matrix :math:`R_y(\\theta)` \
         for a rotation about the :math:`y` axis by an angle :math:`\\theta`.
 
+    .. math::
+
+       R_y = \\begin{pmatrix}
+       \\cos\\theta & 0 & \\sin\\theta\\\\
+       0 & 1 & 0\\\\
+       -\\sin\\theta & 0 & \\cos\\theta
+       \\end{pmatrix}
+
     Parameters
     ----------
     angle : float
@@ -161,14 +169,6 @@ def Ry(angle, degrees=False):
     :class:`~numpy:numpy.ndarray`
         :math:`3\\times3` rotation matrix :math:`R_y(\\theta)` for a
         rotation about the :math:`y` axis by an angle :math:`\\theta`:
-
-    .. math::
-
-       R_y = \\begin{pmatrix}
-       \\cos\\theta & 0 & \\sin\\theta\\\\
-       0 & 1 & 0\\\\
-       -\\sin\\theta & 0 & \\cos\\theta
-       \\end{pmatrix}
 
     Examples
     --------
@@ -196,6 +196,14 @@ def Rz(angle, degrees=False):
     """Generate the :math:`3\\times3` rotation matrix :math:`R_z(\\theta)` \
         for a rotation about the :math:`z` axis by an angle :math:`\\theta`.
 
+    .. math::
+
+       R_z = \\begin{pmatrix}
+       \\cos\\theta & -\\sin\\theta & 0\\\\
+       \\sin\\theta & \\cos\\theta & 0\\\\
+       0 & 0 & 1
+       \\end{pmatrix}
+
     Parameters
     ----------
     angle : float
@@ -210,14 +218,6 @@ def Rz(angle, degrees=False):
     :class:`~numpy:numpy.ndarray`
         :math:`3\\times3` rotation matrix :math:`R_z(\\theta)` for a
         rotation about the :math:`z` axis by an angle :math:`\\theta`.
-
-    .. math::
-
-       R_z = \\begin{pmatrix}
-       \\cos\\theta & -\\sin\\theta & 0\\\\
-       \\sin\\theta & \\cos\\theta & 0\\\\
-       0 & 0 & 1
-       \\end{pmatrix}
 
     Examples
     --------

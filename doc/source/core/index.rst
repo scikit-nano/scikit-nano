@@ -29,7 +29,7 @@ Sub-packages
 Data structures & algorithms
 -----------------------------
 
-.. automodapi:: sknano.core.extras
+.. automodapi:: sknano.core.array
 
 
 Iterator functions

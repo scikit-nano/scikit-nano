@@ -18,8 +18,18 @@ Getting Started
 Contents
 ========
 
+.. automodapi:: sknano.core.math.point
+
+.. automodapi:: sknano.core.math.vector
+
+.. automodapi:: sknano.core.math.points
+
+.. automodapi:: sknano.core.math.vectors
+
+.. automodapi:: sknano.core.math.transforms
+
 
 Reference/API
 =============
 
-.. automodule:: sknano.core.math
+.. automodapi:: sknano.core.math

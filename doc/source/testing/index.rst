@@ -9,7 +9,7 @@ Tools for testing (:mod:`sknano.testing`)
 Introduction
 ============
 
-This module contains test fixtures for unit testings.
+This module contains test fixtures for unit testing.
 
 Contents
 ========

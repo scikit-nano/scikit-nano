@@ -35,12 +35,6 @@ class POAV(BaseClass):
     atom : :class:`~sknano.core.atoms.Atom`
         :class:`~sknano.core.atoms.Atom` instance.
 
-    Attributes
-    ----------
-    cosa12
-    cosa23
-    cosa31
-
     """
     def __init__(self, atom):
         super().__init__()
@@ -564,13 +558,7 @@ class POAVAtomMixin:
 
 
 class POAVAtomsMixin:
-    """Mixin class for POAV analysis.
-
-    Attributes
-    ----------
-    poavs : :class:`~python:collections.OrderedDict`
-
-    """
+    """Mixin class for POAV analysis."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.poavs = OrderedDict()

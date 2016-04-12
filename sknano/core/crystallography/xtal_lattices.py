@@ -358,11 +358,12 @@ class LatticeBase(TabulateMixin, BaseClass):
 
         .. math::
 
-           [M] = \\begin{pmatrix}
+           [M] =
+           \\begin{pmatrix}
            \\mathbf{a} & \\mathbf{b} & \\mathbf{c}
            \\end{pmatrix}
-
-           =\\begin{pmatrix}
+           =
+           \\begin{pmatrix}
            a & b\\cos\\gamma & c\\cos\\beta\\\\
            0 & b\\sin\\gamma & c(\\cos\\alpha - \\cos\\beta\\cos\\gamma)/\\sin\\gamma\\\\
            0 & 0 & c\\sin\\alpha\\sin\\beta\\sin\\gamma^*/\\sin\\gamma

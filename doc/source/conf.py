@@ -46,6 +46,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.napoleon',
               'sphinx.ext.inheritance_diagram',
               'sphinx.ext.autosummary',
+              'numpydoc',
               'autodoc_enhancements',
               'automodsumm',
               'automodapi',
@@ -153,7 +154,7 @@ show_authors = False
 # the __init__ docstring
 # autoclass_content = "both"
 
-numpydoc_show_class_members = False
+numpydoc_show_class_members = True
 
 # -----------------------------------------------------------------------------
 # Autosummary

@@ -80,7 +80,7 @@ class AtomTopologyMixin:
 
     @property
     def impropers(self):
-        """Atom :class:`~sknano.core.atoms.mixins.Dihedrals`"""
+        """Atom :class:`~sknano.core.atoms.mixins.Impropers`"""
         try:
             return self._impropers
         except AttributeError:
