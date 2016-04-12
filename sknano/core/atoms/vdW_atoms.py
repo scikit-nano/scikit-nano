@@ -87,7 +87,7 @@ class VanDerWaalsAtom(Atom):
 
     @property
     def r_vdw(self):
-        """van der Waals radius :math:`r_{\\mathrm{vdW}` in units of \
+        """van der Waals radius :math:`r_{\\mathrm{vdW}}` in units of \
             :math:`\\AA`.
         """
         return self._r_vdw
@@ -119,9 +119,9 @@ class VanDerWaalsAtoms(Atoms):
 
     Parameters
     ----------
-    atoms : {None, sequence, `ChargedAtoms`}, optional
-        if not `None`, then a list of `ChargedAtom` instance objects or an
-        existing `ChargedAtoms` instance object.
+    atoms : {None, sequence, `VanDerWaalsAtoms`}, optional
+        if not `None`, then a list of `VanDerWaalsAtom` instance objects or an
+        existing `VanDerWaalsAtoms` instance object.
 
     """
     @property
