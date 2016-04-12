@@ -30,13 +30,46 @@ import random
 from itertools import chain, combinations, count, cycle, filterfalse, \
     groupby, islice, repeat, starmap, tee, zip_longest
 
-__all__ = ['cyclic_pairs', 'take', 'tabulate', 'tail', 'consume', 'nth',
-           'all_equal', 'quantify', 'padnone', 'ncycles', 'dotproduct',
+__all__ = ['cyclic_pairs', 'dedupe', 'take', 'tabulate', 'tail', 'consume',
+           'nth', 'all_equal', 'quantify', 'padnone', 'ncycles', 'dotproduct',
            'flatten', 'repeatfunc', 'pairwise', 'grouper', 'roundrobin',
            'partition', 'powerset', 'unique_elements', 'unique_everseen',
            'unique_justseen', 'iter_except', 'first_true', 'random_product',
            'random_permutation', 'random_combination',
            'random_combination_with_replacement']
+
+
+def dedupe(items, key=None):
+    """Remove duplicate values in a sequence, but preserve order of remaining \
+        items.
+
+    Parameters
+    ----------
+    items : sequence
+    key : {None, function}, optional
+        function that converts sequence items into a hashable type for
+        the purposes of duplicate detection.
+
+    Returns
+    -------
+    items : set
+
+    Examples
+    --------
+    >>> a = [{'x': 1, 'y': 2}, {'x': 1, 'y': 3},
+    ...      {'x': 1, 'y': 2}, {'x': 2, 'y': 4}]
+    >>> list(dedupe(a, key=lambda d: (d['x'], d['y'])))
+    [{'x': 1, 'y': 2}, {'x': 1, 'y': 3}, {'x': 2, 'y': 4}]
+    >>> list(dedupe(a, key=lambda d: d['x']))
+    [{'x': 1, 'y': 2}, {'x': 2, 'y': 4}]
+
+    """
+    seen = set()
+    for item in items:
+        val = item if key is None else key(item)
+        if val not in seen:
+            yield item
+            seen.add(val)
 
 
 def cyclic_pairs(iterable):
