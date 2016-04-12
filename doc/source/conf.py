@@ -296,7 +296,7 @@ latex_documents = [('index', project + '.tex', project + ' Documentation',
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-latex_logo = '_static/scikit-nano_logo'
+latex_logo = '_static/scikit-nano_banner.pdf'
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
 # not chapters.
