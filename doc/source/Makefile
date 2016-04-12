@@ -138,7 +138,7 @@ htmlhelp-build: htmlhelp $(BUILDDIR)/htmlhelp/scikit-nano.chm
 latex:
 	mkdir -p $(BUILDDIR)/latex $(BUILDDIR)/doctrees
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
-	$(PYTHON) postprocess.py tex $(BUILDDIR)/latex/*.tex
+	$(PYTHON) ../postprocess.py tex $(BUILDDIR)/latex/*.tex
 	perl -pi -e 's/\t(latex.*|pdflatex) (.*)/\t-$$1 -interaction batchmode $$2/' $(BUILDDIR)/latex/Makefile
 	@echo
 	@echo "Build finished; the LaTeX files are in $(BUILDDIR)/latex."
