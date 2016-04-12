@@ -21,8 +21,11 @@ doc/_build
 doc/build
 # sphinx autodoc generated directory
 doc/source/generated
+doc/api
 doc/source/api
-doc/source/*/api
+doc/source/*.xyz
+doc/source/_build
+
 # misc sphinx generated output
 doc/*.data
 doc/*.dump
@@ -32,6 +35,15 @@ doc/*.xyz
 doc/*.data.*
 doc/*.dump.*
 doc/*.xyz.*
+
+doc/source/*.data
+doc/source/*.dump
+doc/source/*.json
+doc/source/*.pdb
+doc/source/*.xyz
+doc/source/*.data.*
+doc/source/*.dump.*
+doc/source/*.xyz.*
 
 # setup.py dist directory
 dist
