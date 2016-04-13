@@ -239,12 +239,17 @@ class DUMPReader(StructureData):
         trajectory = self.trajectory
         for dumpfile in self.dumpfiles:
             with zopen(dumpfile) as f:
-                snapshot = self.read_snapshot(f)
-                while snapshot is not None:
-                    trajectory.append(snapshot)
-                    print(snapshot.timestep, end=' ')
-                    sys.stdout.flush()
+                try:
                     snapshot = self.read_snapshot(f)
+                    while snapshot is not None:
+                        trajectory.append(snapshot)
+                        print(snapshot.timestep, end=' ')
+                        sys.stdout.flush()
+                        snapshot = self.read_snapshot(f)
+                except DUMPError as e:
+                    print(e)
+                    continue
+
         print()
 
         trajectory.sort(key=attrgetter('timestep'))
@@ -252,27 +257,28 @@ class DUMPReader(StructureData):
 
         print("read {:d} snapshots".format(self.Nsnaps))
 
-        trajectory.time_selection.all()
-        self._update_reference_snapshot()
+        if len(trajectory) > 0:
+            trajectory.time_selection.all()
+            self._update_reference_snapshot()
 
-        fmt = self.formatter
-        dumpattrs = fmt.dumpattrs
+            fmt = self.formatter
+            dumpattrs = fmt.dumpattrs
 
-        if dumpattrs:
-            print('Dumped Atom attributes: {}'.format(fmt.dumpattrs2str()))
-        else:
-            print('No dump column assignments')
-
-        if 'x' not in dumpattrs or 'y' not in dumpattrs or \
-                'z' not in dumpattrs:
-            print('dump scaling status unknown')
-        elif self.Nsnaps > 0:
-            if self.scale_original:
-                self.unscale()
-            elif self.scale_original is None:
-                print('dump scaling status unknown')
+            if dumpattrs:
+                print('Dumped Atom attributes: {}'.format(fmt.dumpattrs2str()))
             else:
-                print('dump is already unscaled')
+                print('No dump column assignments')
+
+            if 'x' not in dumpattrs or 'y' not in dumpattrs or \
+                    'z' not in dumpattrs:
+                print('dump scaling status unknown')
+            elif self.Nsnaps > 0:
+                if self.scale_original:
+                    self.unscale()
+                elif self.scale_original is None:
+                    print('dump scaling status unknown')
+                else:
+                    print('dump is already unscaled')
 
     def read_snapshot(self, f):
         """Read snapshot from file."""
@@ -365,6 +371,8 @@ class DUMPReader(StructureData):
             return snapshot
         except IndexError:
             return None
+        except ValueError:
+            raise DUMPError('Invalid dumpfile: {}'.format(f.name))
 
     def scale(self):
         """Scale cartesian coordinates to fractional coordinates."""
