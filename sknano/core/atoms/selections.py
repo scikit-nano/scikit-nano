@@ -50,11 +50,12 @@ class Selection(BaseClass):
         self.selection = selection
         self.fmtstr = "{selection!r}"
 
-    def apply(self, atoms, mask):
-        if isinstance(mask, np.ndarray) and (mask.dtype in (bool, int)):
+    def apply(self, atoms, filtered=None, mask=None):
+        if mask is not None and isinstance(mask, np.ndarray) and \
+                (mask.dtype in (bool, int)):
             return atoms.filtered(mask)
-        else:
-            return atoms.__class__(atoms=mask[:], **atoms.kwargs)
+        elif filtered is not None:
+            return atoms.__class__(atoms=filtered[:], **atoms.kwargs)
 
     def todict(self):
         return dict(selection=self.selection)
@@ -79,9 +80,9 @@ class AndSelection(Selection):
                               [sel.apply(atoms) for sel in self.selection[0]])
 
         if mask is not None:
-            return super().apply(atoms, mask)
+            return super().apply(atoms, mask=mask)
         else:
-            return super().apply(atoms, filtered)
+            return super().apply(atoms, filtered=filtered)
 
 
 class OrSelection(Selection):
@@ -99,9 +100,9 @@ class OrSelection(Selection):
                               [sel.apply(atoms) for sel in self.selection[0]])
 
         if mask is not None:
-            return super().apply(atoms, mask)
+            return super().apply(atoms, mask=mask)
         else:
-            return super().apply(atoms, filtered)
+            return super().apply(atoms, filtered=filtered)
 
 
 class NotSelection(Selection):
@@ -128,7 +129,7 @@ class IDSelection(Selection):
         mask = np.in1d(atoms.ids, self.selection.asList()).nonzero()[0]
         if as_mask:
             return mask
-        return super().apply(atoms, mask)
+        return super().apply(atoms, mask=mask)
 
 
 class MolIDSelection(Selection):
@@ -137,7 +138,7 @@ class MolIDSelection(Selection):
         mask = np.in1d(atoms.mol_ids, self.selection.asList()).nonzero()[0]
         if as_mask:
             return mask
-        return super().apply(atoms, mask)
+        return super().apply(atoms, mask=mask)
 
 
 class TypeSelection(Selection):
@@ -146,7 +147,7 @@ class TypeSelection(Selection):
         mask = np.in1d(atoms.types, self.selection.asList()).nonzero()[0]
         if as_mask:
             return mask
-        return super().apply(atoms, mask)
+        return super().apply(atoms, mask=mask)
 
 
 class AttributeSelection(Selection):
@@ -173,7 +174,7 @@ class AttributeSelection(Selection):
         if as_mask:
             return mask
         else:
-            return super().apply(atoms, mask)
+            return super().apply(atoms, mask=mask)
 
 
 class WithinSelection(Selection):
@@ -182,12 +183,12 @@ class WithinSelection(Selection):
         try:
             other = self.selection[-1].apply(atoms)
             filtered = atoms.query_ball_tree(other, self.selection[0])
-            return super().apply(atoms, filtered)
+            return super().apply(atoms, filtered=filtered)
         except AttributeError:
             region = self.selection[-1]
             mask = \
                 np.asarray([region.contains(atom.r) for atom in atoms])
-            return super().apply(atoms, mask)
+            return super().apply(atoms, mask=mask)
 
 
 class ExWithinSelection(Selection):
@@ -195,8 +196,8 @@ class ExWithinSelection(Selection):
     def apply(self, atoms):
         other = self.selection[-1].apply(atoms)
         filtered = atoms.query_ball_tree(other, self.selection[0])
-        filtered = super().apply(atoms, filtered) - other
-        return super().apply(atoms, filtered)
+        filtered = super().apply(atoms, filtered=filtered) - other
+        return super().apply(atoms, filtered=filtered)
 
 
 class SelectionParser(BaseClass):
