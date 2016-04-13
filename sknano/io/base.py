@@ -24,7 +24,7 @@ from sknano.version import version
 default_comment_line = \
     'Structure data generated using scikit-nano version {}'.format(version)
 default_structure_format = 'xyz'
-supported_structure_formats = ('xyz', 'data', 'dump')
+supported_structure_formats = ('xyz', 'data', 'dump', 'pdb')
 
 __all__ = ['StructureData',
            'StructureDataConverter',
@@ -208,7 +208,7 @@ class StructureDataWriterMixin:
 
         if not fname.endswith(structure_format):
             fname += '.' + structure_format
-        self.fname = fname
+        self.fname = kwargs['fname'] = fname
 
         if outpath is not None:
             fpath = os.path.join(outpath, fname)
@@ -252,7 +252,7 @@ class StructureDataWriterMixin:
         self._update_fpath(**kwargs)
         # self._update_atoms(**kwargs)
         structure_format = self.structure_format
-        print('writing {}'.format(kwargs['fname']))
+        print('writing {}'.format(self.fname))
         getattr(self, 'write_' + structure_format)(structure=self, **kwargs)
 
     def write_data(self, **kwargs):
@@ -443,7 +443,6 @@ class StructureDataConverter(BaseClass, metaclass=ABCMeta):
     outfile : str
 
     """
-
     def __init__(self, infile=None, outfile=None, **kwargs):
         self.infile = infile
         self.outfile = outfile
