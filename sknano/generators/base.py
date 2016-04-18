@@ -12,10 +12,15 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from abc import ABCMeta, abstractmethod
+from collections import OrderedDict
+import importlib
 import os
+
+import configparser
 
 import numpy as np
 # import copy
+from sknano.core import BaseClass, call_signature
 from sknano.core.atoms import StructureAtom as Atom
 from sknano.core.structures import StructureBase
 from sknano.io import StructureWriterMixin, supported_structure_formats
@@ -23,7 +28,7 @@ from sknano.io import StructureWriterMixin, supported_structure_formats
 
 __all__ = ['GeneratorBase', 'GeneratorMixin',
            'CrystalStructureGenerator', 'NanoStructureGenerator',
-           'STRUCTURE_GENERATORS']
+           'CompoundStructureGenerator', 'STRUCTURE_GENERATORS']
 
 
 #: Tuple of structure generator classes.
@@ -162,3 +167,76 @@ class NanoStructureGenerator(GeneratorBase):
     """:class:`GeneratorBase` sub-class for \
         :class:`~sknano.core.structures.NanoStructureBase` class."""
     pass
+
+
+class CompoundStructureGenerator(GeneratorBase, BaseClass):
+    """Base class for compound structures.
+
+    Parameters
+    ----------
+    cfgfile : :class:`~python:str`
+
+    """
+    # call_signature = Forward()
+    # args = Group(Optional(delimitedList(expr_item) + COMMA))
+    # parameters = Group(args + ZeroOrMore(kwarg_expr))
+    call_signature = call_signature.copy()
+
+    def __init__(self, cfgfile=None, autogen=True, **kwargs):
+        super().__init__(autogen=False, **kwargs)
+        self.fmtstr = "{cfgfile!r}"
+        self.cfgfile = cfgfile
+        self.parser = configparser.ConfigParser()
+        self.config = OrderedDict()
+        self.structures = []
+        self.fnames = []
+
+        if cfgfile is not None:
+            self._parse_config()
+
+        if autogen:
+            self.generate()
+
+    def _parse_config(self):
+        parser = self.parser
+        parser.read(self.cfgfile)
+        generator_module = 'sknano.generators'
+
+        del self.structures[:]
+        fnames = []
+        structures = []
+        for section in parser.sections():
+            if section == 'settings':
+                [self.config.update({option: value}) for option, value
+                 in zip(parser[section].keys(), parser[section].values())]
+                if self.verbose:
+                    print(self.config)
+                continue
+
+            parameters = parser[section]['parameters']
+            fname = '{}({})'.format(section[:-len('Generator')], parameters)
+            fnames.append(fname.replace(' ', ''))
+
+            call_sig = \
+                self.call_signature.parseString(parameters, parseAll=True)[0]
+            try:
+                args, kwargs = call_sig
+            except ValueError:
+                args, kwargs = tuple(), call_sig[0]
+
+            generator = getattr(importlib.import_module(generator_module),
+                                section)(*args, **kwargs)
+            structures.append(generator)
+        self.fnames = list(reversed(fnames[:]))
+        self.structures = list(reversed(structures[:]))
+
+    def save(self, fname=None, structure_format=None, **kwargs):
+        if fname is None:
+            kwargs['fname'] = self.config.get('fname', self.generate_fname())
+        if structure_format is None:
+            kwargs['structure_format'] = \
+                self.config.get('structure_format', 'xyz')
+        super().save(**kwargs)
+
+    def todict(self):
+        return dict(cfgfile=self.cfgfile)
