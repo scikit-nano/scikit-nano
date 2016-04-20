@@ -25,11 +25,9 @@ from pyparsing import CaselessKeyword, Forward, Keyword, OneOrMore, Optional, \
 
 from sknano.core import BaseClass, binary_operator, integer, kwargs_expr, \
     number
-# from sknano.core.geometric_regions import Sphere
-# from .md_atoms import MDAtom as Atom, MDAtoms as Atoms
 
-__all__ = ['SelectionException', 'SelectionParser',
-           'generate_vmd_selection_string']
+__all__ = ['AtomsSelectionException', 'AtomsSelectionParser',
+           'AtomsSelectionMixin', 'generate_vmd_selection_string']
 
 
 def make_selection(cls):
@@ -61,7 +59,7 @@ class Selection(BaseClass):
         return dict(selection=self.selection)
 
 
-class SelectionException(ParseException):
+class AtomsSelectionException(ParseException):
     """Custom :class:`Exception` class for :class:`Selection`\ s."""
     pass
 
@@ -178,7 +176,7 @@ class AttributeSelection(Selection):
 
 
 class WithinSelection(Selection):
-
+    """:class:`Selection` class for selections within regions or distance."""
     def apply(self, atoms):
         try:
             other = self.selection[-1].apply(atoms)
@@ -192,7 +190,7 @@ class WithinSelection(Selection):
 
 
 class ExWithinSelection(Selection):
-
+    """Exclusive within :class:`Selection` class."""
     def apply(self, atoms):
         other = self.selection[-1].apply(atoms)
         filtered = atoms.query_ball_tree(other, self.selection[0])
@@ -200,7 +198,7 @@ class ExWithinSelection(Selection):
         return super().apply(atoms, filtered=filtered)
 
 
-class SelectionParser(BaseClass):
+class AtomsSelectionParser(BaseClass):
     """Selection parser class."""
     ALL = CaselessKeyword('all')
     NONE = CaselessKeyword('none')
@@ -311,12 +309,51 @@ class SelectionParser(BaseClass):
                 print('selstr: {}'.format(selstr))
                 print('selection: {}'.format(selection))
         except ParseException as e:
-            raise SelectionException(e.pstr, e.loc, e.msg, e.parseElement)
+            raise AtomsSelectionException(e.pstr, e.loc, e.msg, e.parseElement)
         else:
             return selection.apply(self.atoms)
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         return dict(atoms=self.atoms, selstr=self.selstr)
+
+
+class AtomsSelectionMixin:
+    """Mixin class for applying selections to Atoms."""
+    def select(self, selstr=None, selstrlist=None, verbose=False):
+        """Return `Atom` or `Atoms` from selection command.
+
+        Parameters
+        ----------
+        selstr : :class:`~python:str`, optional
+            optional if `selstrlist` is not `None`
+        selstrlist : {`None`, :class:`~python:list`}, optional
+            :class:`~python:list` of selection strings.
+
+        Returns
+        -------
+        :class:`~python:list` of `Atom` or `Atoms` objects
+            if `selstrlist` is not `None`
+        :class:`Atom` or :class:`Atoms` if `selstr` is not `None`
+
+        """
+        if selstrlist is not None:
+            selections = []
+            for selstr in selstrlist:
+                try:
+                    selections.append(self.select(selstr, verbose=verbose))
+                except AtomsSelectionException as e:
+                    print(e)
+            return selections
+        elif selstr is not None:
+            try:
+                return \
+                    AtomsSelectionParser(self, verbose=verbose).parse(selstr)
+            except AtomsSelectionException as e:
+                print(e)
+                return None
+        else:
+            return self.__class__()
 
 
 def generate_vmd_selection_string(keyword, iterable):
