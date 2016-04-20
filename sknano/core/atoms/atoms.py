@@ -23,6 +23,7 @@ from sknano.core import BaseClass, UserList, TabulateMixin, dedupe
 from sknano.core.math import convert_condition_str
 from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols, element_names
+from .selections import AtomsSelectionMixin
 
 __all__ = ['Atom', 'Atoms']
 
@@ -287,7 +288,7 @@ class Atom(BaseClass):
                     parent=self.parent)
 
 
-class Atoms(TabulateMixin, UserList):
+class Atoms(AtomsSelectionMixin, TabulateMixin, UserList):
     """Base class for collection of `Atom` objects.
 
     Parameters
@@ -641,41 +642,6 @@ class Atoms(TabulateMixin, UserList):
         except AttributeError:
             return self.__class__(atoms=np.asarray(self)[condition],
                                   **self.kwargs)
-
-    def select(self, selstr=None, selstrlist=None, verbose=False):
-        """Return `Atom` or `Atoms` from selection command.
-
-        Parameters
-        ----------
-        selstr : :class:`~python:str`, optional
-            optional if `selstrlist` is not `None`
-        selstrlist : {`None`, :class:`~python:list`}, optional
-            :class:`~python:list` of selection strings.
-
-        Returns
-        -------
-        :class:`~python:list` of `Atom` or `Atoms` objects
-            if `selstrlist` is not `None`
-        :class:`Atom` or :class:`Atoms` if `selstr` is not `None`
-
-        """
-        from .selections import SelectionParser, SelectionException
-        if selstrlist is not None:
-            selections = []
-            for selstr in selstrlist:
-                try:
-                    selections.append(self.select(selstr, verbose=verbose))
-                except SelectionException as e:
-                    print(e)
-            return selections
-        elif selstr is not None:
-            try:
-                return SelectionParser(self, verbose=verbose).parse(selstr)
-            except SelectionException as e:
-                print(e)
-                return None
-        else:
-            return self.__class__()
 
     def get_atoms(self, asarray=False, aslist=True):
         """Return `Atoms` either as list (default) or numpy array or self.
