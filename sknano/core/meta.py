@@ -619,7 +619,13 @@ class BaseClass(metaclass=ABCMeta):
     """
 
     def __init__(self, *args, verbose=False, debug=False, **kwargs):
-        super().__init__(*args, **kwargs)
+        try:
+            super().__init__(*args, **kwargs)
+        except TypeError as e:
+            print(e)
+            print(args)
+            print(kwargs)
+
         self.verbose = verbose
         self.debug = debug
         self.fmtstr = ""
