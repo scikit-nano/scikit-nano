@@ -124,7 +124,56 @@ class TempfileTestFixture(unittest.TestCase):
 class GeneratorTestFixture(TempfileTestFixture):
     """Mixin :class:`~python:unittest.TestCase` class for \
         :py:mod:`sknano.generators` tests."""
-    pass
+    @property
+    def structure(self):
+        """:class:`~sknano.generators.SWNTGenerator`"""
+        return self.swnt
+
+    @property
+    def buckyball(self):
+        """:class:`~sknano.generators.FullereneGenerator`."""
+        buckyball = generate_structure(generator_class='FullereneGenerator',
+                                       N=60)
+        buckyball.update_attrs()
+        return buckyball
+
+    @property
+    def graphene(self):
+        """:class:`~sknano.generators.GrapheneGenerator` structure."""
+        graphene = generate_structure(generator_class='GrapheneGenerator',
+                                      armchair_edge_length=10,
+                                      zigzag_edge_length=10)
+        graphene.update_attrs()
+        return graphene
+
+    @property
+    def bilayer_graphene(self):
+        """:class:`~sknano.generators.GrapheneGenerator` structure."""
+        blg = generate_structure(generator_class='BilayerGrapheneGenerator',
+                                 armchair_edge_length=10,
+                                 zigzag_edge_length=10)
+        blg.update_attrs()
+        return blg
+
+    @property
+    def dumpdata1(self):
+        """:class:`~sknano.io.DUMPReader` object."""
+        dumpfile = \
+            resource_filename('sknano',
+                              'data/lammpstrj/' +
+                              'irradiated_graphene.system.dump.02000')
+
+        return DUMPReader(dumpfile,
+                          dumpattrmap={'c_atom_pe': 'pe', 'c_atom_ke': 'ke'},
+                          atomattrmap={('type', 'element'): {1: 'C', 2: 'Ar'}})
+
+    @property
+    def swnt(self):
+        """:class:`~sknano.generators.SWNTGenerator` structure."""
+        swnt = generate_structure(generator_class='SWNTGenerator',
+                                  n=5, m=0, nz=5)
+        swnt.update_attrs()
+        return swnt
 
 
 class IOTestFixture(TempfileTestFixture):
