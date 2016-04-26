@@ -16,10 +16,13 @@ from functools import total_ordering
 import numpy as np
 
 from sknano.core import BaseClass, TabulateMixin
-from sknano.core.atoms import StructureAtoms, vdw_radius_from_basis
+from sknano.core.atoms import Atoms, BasisAtoms, StructureAtoms, \
+    vdw_radius_from_basis
 from sknano.core.crystallography import CrystalCell, UnitCell, SuperCell
 from sknano.core.math import Vector
 from sknano.core.refdata import aCC, element_data
+
+from .selections import StructureSelectionMixin
 
 
 __all__ = ['StructureMixin', 'StructureBase',
@@ -36,7 +39,7 @@ class StructureMixin:
     def __getattr__(self, name):
         try:
             if name not in _list_methods and not name.startswith('_') \
-                    and len(self.atoms) == 0:
+                    and self.atoms is None:
                 raise ValueError
             return getattr(self.atoms, name)
         except (AttributeError, ValueError):
@@ -49,6 +52,13 @@ class StructureMixin:
     def atoms(self):
         """Structure :class:`~sknano.core.atoms.Atoms`."""
         return self._atoms
+
+    @atoms.setter
+    def atoms(self, value):
+        if not isinstance(value, Atoms):
+            errmsg = '{} is not a valid `Atoms` object.'.format(value)
+            raise ValueError(errmsg)
+        self._atoms = value
 
     @property
     def crystal_cell(self):
@@ -66,6 +76,8 @@ class StructureMixin:
 
     @basis.setter
     def basis(self, value):
+        if not isinstance(value, BasisAtoms):
+            raise ValueError('Expected a `BasisAtoms` object')
         self.crystal_cell.basis = value
 
     @property
@@ -169,13 +181,14 @@ class StructureMixin:
     #     return cp
 
 
-class StructureBase(TabulateMixin, StructureMixin):
+class StructureBase(StructureSelectionMixin, TabulateMixin, StructureMixin):
     """Base structure class for structure data."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._atoms = StructureAtoms()
         self._crystal_cell = CrystalCell()
         self._lattice_shift = Vector()
+        self._region = None
 
     def __str__(self):
         strrep = self._table_title_str()
