@@ -25,7 +25,7 @@ __docformat__ = 'restructuredtext en'
 
 # from sknano.core import BaseClass, binary_operator, integer, kwargs_expr, \
 #     number
-from sknano.core.atoms import AtomsSelectionMixin
+# from sknano.core.atoms import AtomsSelectionMixin
 # from sknano.core.geometric_regions import Sphere
 
 __all__ = ['StructureSelectionMixin']
@@ -298,6 +298,23 @@ __all__ = ['StructureSelectionMixin']
 #         return dict(structure=self.structure, selstr=self.selstr)
 
 
-class StructureSelectionMixin(AtomsSelectionMixin):
+class StructureSelectionMixin:
     """Mixin class for applying selections."""
-    pass
+    def select(self, selstr=None, selstrlist=None, verbose=False):
+        """Return `Atom` or `Atoms` from selection command.
+
+        Parameters
+        ----------
+        selstr : :class:`~python:str`, optional
+            optional if `selstrlist` is not `None`
+        selstrlist : {`None`, :class:`~python:list`}, optional
+            :class:`~python:list` of selection strings.
+
+        Returns
+        -------
+        :class:`~python:list` of `Atom` or `Atoms` objects
+            if `selstrlist` is not `None`
+        :class:`Atom` or :class:`Atoms` if `selstr` is not `None`
+
+        """
+        return self.atoms.select(selstr, selstrlist, verbose)
