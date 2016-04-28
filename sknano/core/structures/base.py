@@ -185,7 +185,7 @@ class StructureBase(StructureSelectionMixin, TabulateMixin, StructureMixin):
     """Base structure class for structure data."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._atoms = StructureAtoms()
+        self._atoms = None
         self._crystal_cell = CrystalCell()
         self._lattice_shift = Vector()
         self._region = None
