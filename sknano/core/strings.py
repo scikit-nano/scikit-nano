@@ -76,8 +76,10 @@ def obj_mro_str(obj, include_obj_name=True, sep='.'):
     mro_str = obj.__name__
     for base in bases:
         name = base.__name__
-        if name.endswith('Mixin') or \
-                name in ('BaseClass', 'UserList', 'object', 'type'):
+        if name == obj.__name__:
+            continue
+        if name in ('MutableSequence', 'UserList', 'BaseClass',
+                    'object', 'type') or name.endswith('Mixin'):
             break
         mro_str = sep.join((name, mro_str))
     return mro_str
