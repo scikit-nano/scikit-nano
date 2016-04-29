@@ -16,8 +16,7 @@ from functools import total_ordering
 import numpy as np
 
 from sknano.core import BaseClass, TabulateMixin
-from sknano.core.atoms import Atoms, BasisAtoms, StructureAtoms, \
-    vdw_radius_from_basis
+from sknano.core.atoms import Atoms, BasisAtoms, vdw_radius_from_basis
 from sknano.core.crystallography import CrystalCell, UnitCell, SuperCell
 from sknano.core.math import Vector
 from sknano.core.refdata import aCC, element_data
@@ -117,11 +116,6 @@ class StructureMixin:
     def unit_cell(self, value):
         self.crystal_cell.unit_cell = value
 
-    @property
-    def structure(self):
-        """An alias to `self`."""
-        return self
-
     def clear(self):
         """Clear list of :attr:`StructureMixin.atoms`."""
         self.atoms.clear()
@@ -189,6 +183,7 @@ class StructureBase(StructureSelectionMixin, TabulateMixin, StructureMixin):
         self._crystal_cell = CrystalCell()
         self._lattice_shift = Vector()
         self._region = None
+        self._structure = self
 
     def __str__(self):
         strrep = self._table_title_str()
@@ -202,6 +197,15 @@ class StructureBase(StructureSelectionMixin, TabulateMixin, StructureMixin):
         title = '.'.join((objstr, xtal_cell.__class__.__name__))
         strrep = '\n'.join((strrep, title, str(xtal_cell)))
         return strrep
+
+    @property
+    def structure(self):
+        """Reference to `self` or instance of :class:`StructureBase`."""
+        return self._structure
+
+    @structure.setter
+    def structure(self, value):
+        self._structure = value
 
 
 @total_ordering
