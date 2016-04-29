@@ -69,6 +69,16 @@ class StructureMixin:
         self._crystal_cell = value
 
     @property
+    def region(self):
+        """Structure \
+            :class:`~sknano.core.geometric_regions.GeometricRegion`."""
+        return self._region
+
+    @region.setter
+    def region(self, value):
+        self._region = value
+
+    @property
     def basis(self):
         """Structure :class:`~sknano.core.atoms.BasisAtoms`."""
         return self.crystal_cell.basis
@@ -175,15 +185,16 @@ class StructureMixin:
     #     return cp
 
 
+@total_ordering
 class StructureBase(StructureSelectionMixin, TabulateMixin, StructureMixin):
     """Base structure class for structure data."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._structure = self
         self._atoms = None
         self._crystal_cell = CrystalCell()
         self._lattice_shift = Vector()
         self._region = None
-        self._structure = self
 
     def __str__(self):
         strrep = self._table_title_str()
@@ -198,6 +209,26 @@ class StructureBase(StructureSelectionMixin, TabulateMixin, StructureMixin):
         strrep = '\n'.join((strrep, title, str(xtal_cell)))
         return strrep
 
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        if self.atoms is None and other.atoms is None:
+            return self is other or self.crystal_cell == other.crystal_cell
+        else:
+            return self is other or (self.atoms == other.atoms and
+                                     self.crystal_cell == other.crystal_cell)
+
+    def __lt__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        if self.atoms is None and other.atoms is None:
+            return self.crystal_cell < other.crystal_cell
+        else:
+            return ((self.atoms < other.atoms and
+                     self.crystal_cell <= other.crystal_cell) or
+                    (self.atoms <= other.atoms and
+                     self.crystal_cell < other.crystal_cell))
+
     @property
     def structure(self):
         """Reference to `self` or instance of :class:`StructureBase`."""
@@ -208,7 +239,6 @@ class StructureBase(StructureSelectionMixin, TabulateMixin, StructureMixin):
         self._structure = value
 
 
-@total_ordering
 class CrystalStructureBase(StructureBase, BaseClass):
     """Base class for abstract representions of crystal structures.
 
@@ -234,14 +264,6 @@ class CrystalStructureBase(StructureBase, BaseClass):
 
     def __dir__(self):
         return dir(self.crystal_cell)
-
-    def __eq__(self, other):
-        if isinstance(other, CrystalStructureBase):
-            return self is other or self.crystal_cell == other.crystal_cell
-
-    def __lt__(self, other):
-        if isinstance(other, CrystalStructureBase):
-            return self.crystal_cell < other.crystal_cell
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
