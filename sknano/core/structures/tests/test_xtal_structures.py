@@ -7,6 +7,7 @@ import nose
 from nose.tools import assert_equal, assert_true, assert_raises, assert_false
 import numpy as np
 
+from sknano.core.crystallography import Crystal2DLattice
 from sknano.core.structures import Crystal2DStructure, \
     AlphaQuartz, BetaQuartz, DiamondStructure, HexagonalStructure, \
     BCCStructure, FCCStructure, Gold, Copper, CaesiumChlorideStructure, \
@@ -99,7 +100,6 @@ def test12():
 
 
 def test13():
-    from sknano.core.crystallography import Crystal2DLattice
     lattice = Crystal2DLattice(a=3, b=3, gamma=60)
     lattice.rotate(angle=-np.pi/6)
     structure = Crystal2DStructure(lattice=lattice, basis=['C', 'C'],
