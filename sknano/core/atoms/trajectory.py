@@ -18,7 +18,6 @@ from operator import attrgetter
 import numpy as np
 
 from sknano.core import BaseClass, UserList, TabulateMixin
-from sknano.core.crystallography import Domain
 from .md_atoms import MDAtom as Atom, MDAtoms as Atoms
 
 __all__ = ['Snapshot', 'Trajectory']
@@ -145,7 +144,7 @@ class Snapshot(TabulateMixin, BaseClass):
 
         self.trajectory = trajectory
         self.timestep = None
-        self.domain = Domain()
+        self.domain = None
         self._atoms = None
         self._atoms_array = None
         self._formatter = None
