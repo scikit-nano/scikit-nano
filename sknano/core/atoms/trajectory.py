@@ -139,7 +139,6 @@ class Snapshot(TabulateMixin, BaseClass):
 
     """
     def __init__(self, trajectory=None):
-
         super().__init__()
 
         self.trajectory = trajectory
