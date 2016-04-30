@@ -66,6 +66,12 @@ class XYZReader(StructureData):
         if len(set(self.atoms.elements)) > 1:
             self.assign_unique_types()
 
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        attr_dict = super().todict()
+        attr_dict.update(self.formatter.todict())
+        return attr_dict
+
 XYZIOReader = XYZReader
 
 
