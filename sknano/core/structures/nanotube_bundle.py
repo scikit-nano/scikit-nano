@@ -336,6 +336,11 @@ class NanotubeBundleBase(NanotubeBundleMixin, NanoStructureBase):
         if nx != 1 or ny != 1 or bundle_geometry is not None:
             self.is_bundle = True
             self.init_bundle_parameters()
+            self.generate_unit_cell()
+
+    def generate_unit_cell(self):
+        """Generate Nanotube unit cell."""
+        self.scaling_matrix = [self.nx, self.ny, 1]
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
