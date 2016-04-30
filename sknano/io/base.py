@@ -323,6 +323,11 @@ class StructureData(StructureDataMixin, StructureBase, BaseClass):
         #     strrep = '\n'.join((strrep, str(formatter)))
         return strrep
 
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return NotImplemented
+        return self is other or self._atoms == other._atoms
+
     @property
     def comment_line(self):
         """Comment line."""
