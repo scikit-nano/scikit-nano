@@ -22,6 +22,7 @@ from monty.io import zopen
 from sknano.core import deprecate_kwarg, get_fpath, flatten, grouper
 from sknano.core.atoms import Trajectory, Snapshot, Atoms, MDAtoms, \
     MDAtom as Atom
+from sknano.core.crystallography import Domain
 # from sknano.core.crystallography import Crystal3DLattice
 from .base import StructureData, StructureDataError, StructureDataFormatter
 
@@ -284,7 +285,7 @@ class DUMPReader(StructureData):
         """Read snapshot from file."""
         try:
             snapshot = Snapshot(self.trajectory)
-            domain = snapshot.domain
+            domain = snapshot.domain = Domain()
 
             f.readline()
             snapshot.timestep = int(f.readline().strip().split()[0])
@@ -664,7 +665,7 @@ class DUMPWriter:
             snapshot.boxstr = boxstr
 
             if domain is None:
-                domain = snapshot.domain
+                domain = Domain()
                 if bounding_box is not None:
                     domain.update(from_region=bounding_box,
                                   allow_triclinic_box=allow_triclinic_box,
