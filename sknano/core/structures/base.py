@@ -13,7 +13,7 @@ __docformat__ = 'restructuredtext en'
 
 from functools import total_ordering
 
-import numpy as np
+# import numpy as np
 
 from sknano.core import BaseClass, TabulateMixin
 from sknano.core.atoms import Atoms, BasisAtoms, vdw_radius_from_basis
@@ -35,6 +35,16 @@ _list_methods = ('append', 'extend', 'insert', 'remove', 'pop', 'clear',
 
 class StructureMixin:
     """Mixin class for crystal structures."""
+
+    # def __deepcopy__(self, memo):
+    #     from copy import deepcopy
+    #     cp = self.__class__()
+    #     memo[id(self)] = cp
+    #     for attr in dir(self):
+    #         if not attr.startswith('_'):
+    #             setattr(cp, attr, deepcopy(getattr(self, attr), memo))
+    #     return cp
+
     def __getattr__(self, name):
         try:
             if name not in _list_methods and not name.startswith('_') \
@@ -150,39 +160,16 @@ class StructureMixin:
         """Transform structure lattice."""
         if self.lattice is None:
             return
-        self.lattice = self.lattice.__class__(
-            cell_matrix=np.asmatrix(scaling_matrix) * self.lattice.matrix)
+
+        self.scaling_matrix = scaling_matrix
 
         if wrap_coords:
             self.crystal_cell.basis.wrap_coords(pbc=pbc)
-            self.atoms.wrap_coords(pbc=pbc)
 
-        # tvecs = \
-        #     np.asarray(
-        #         np.asmatrix(supercell_lattice_points(scaling_matrix)) *
-        #         self.lattice.matrix)
-
-        # if self.crystal_cell.basis is not None:
-        #     basis = self.crystal_cell.basis[:]
-        #     self.crystal_cell.basis = BasisAtoms()
-        #     for atom in basis:
-        #         xs, ys, zs = \
-        #             self.lattice.cartesian_to_fractional(atom.r)
-        #         if wrap_coords:
-        #             xs, ys, zs = \
-        #                 self.lattice.wrap_fractional_coordinate([xs, ys, zs])
-        #         self.crystal_cell.basis.append(
-        #             BasisAtom(atom.element, lattice=self.lattice,
-        #                       xs=xs, ys=ys, zs=zs))
-
-    # def __deepcopy__(self, memo):
-    #     from copy import deepcopy
-    #     cp = self.__class__()
-    #     memo[id(self)] = cp
-    #     for attr in dir(self):
-    #         if not attr.startswith('_'):
-    #             setattr(cp, attr, deepcopy(getattr(self, attr), memo))
-    #     return cp
+            if self.atoms is not None and len(self.atoms) > 0:
+                self.atoms.wrap_coords(pbc=pbc)
+            if hasattr(self, 'generate'):
+                self.generate(finalize=True)
 
 
 @total_ordering
