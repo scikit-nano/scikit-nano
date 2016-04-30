@@ -15,4 +15,4 @@ from .swnt_generator import *
 from .mwnt_generator import *
 from .unrolled_swnt_generator import *
 from .layered_structure_generator import *
-# from .defect_generators import *
+from .defect_generators import *
