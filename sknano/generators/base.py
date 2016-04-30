@@ -22,12 +22,14 @@ import numpy as np
 from sknano.core import BaseClass, call_signature
 from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from sknano.core.structures import StructureBase
-from sknano.io import StructureWriterMixin, supported_structure_formats
+from sknano.io import StructureReaderMixin, StructureWriterMixin, \
+    supported_structure_formats
 
 
 __all__ = ['GeneratorBase', 'GeneratorMixin',
            'CrystalStructureGenerator', 'NanoStructureGenerator',
-           'CompoundStructureGenerator', 'STRUCTURE_GENERATORS']
+           'CompoundStructureGenerator', 'DefectGeneratorBase',
+           'STRUCTURE_GENERATORS']
 
 
 #: Tuple of structure generator classes.
@@ -65,19 +67,21 @@ class GeneratorBase(StructureWriterMixin, StructureBase, metaclass=ABCMeta):
         if autogen:
             self.generate(finalize=finalize)
 
-    # def __getattr__(self, name):
-    #     print('getting attribute: {}'.format(name))
-    #     if name != 'atoms' and len(self.atoms) > 0:
-    #         attr = getattr(self.atoms, name, None)
-    #         if attr:
-    #             return attr
-    #     super().__getattr__(name)
-
     def __getattr__(self, name):
+        # print('getting attribute: {}'.format(name))
+        # if name != 'atoms' and len(self.atoms) > 0:
+        #     attr = getattr(self.atoms, name, None)
+        #     if attr:
+        #         return attr
         try:
             return getattr(self.atoms, name)
         except AttributeError:
             return super().__getattr__(name)
+
+    # def __eq__(self, other):
+    #     if not isinstance(other, self.__class__):
+    #         return NotImplemented
+    #     return (self is other or self._atoms == other._atoms)
 
     @property
     def Natoms(self):
@@ -223,3 +227,44 @@ class CompoundStructureGenerator(GeneratorBase, BaseClass):
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
         return dict(cfgfile=self.cfgfile)
+
+
+class DefectGeneratorBase(StructureReaderMixin, GeneratorBase, BaseClass):
+    """Base class for generating structure data with defects.
+
+    Parameters
+    ----------
+
+    """
+    def __init__(self, structure_obj=None, autogen=True, **kwargs):
+        super().__init__(autogen=False, **kwargs)
+        self.fmtstr = "{structure!r}"
+        if structure_obj is not None:
+            if not isinstance(structure_obj, StructureBase):
+                structure_obj = self.read(structure_obj).structure
+            else:
+                structure_obj = structure_obj.structure
+        self.structure = structure_obj
+        self.__update_attrs()
+
+    def update_attrs(self):
+        structure = self.structure
+        if structure is not None:
+            self._atoms = structure.atoms
+            self._crystal_cell = structure.crystal_cell
+            self._lattice_shift = structure.lattice_shift
+            self._region = structure.region
+
+    __update_attrs = update_attrs
+
+    @property
+    def atom_ids(self):
+        return self.atoms.ids
+
+    @property
+    def atom_coords(self):
+        return self.atoms.get_coords(asdict=True)
+
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        return dict(structure=self.structure)
