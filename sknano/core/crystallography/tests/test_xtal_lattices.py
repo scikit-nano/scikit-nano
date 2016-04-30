@@ -580,5 +580,20 @@ def test20():
                             pmg_rlattice.matrix))
 
 
+def test21():
+    a = np.sqrt(3) * aCC
+    dlattice = Crystal3DLattice(a=a, b=a, c=2 * r_CC_vdw,
+                                alpha=90, beta=90, gamma=120)
+    double_dlattice = 2 * dlattice
+    assert_true(np.allclose(2 * np.asarray(dlattice.lengths),
+                            double_dlattice.lengths))
+    double_dlattice_from_matrix = \
+        Crystal3DLattice(cell_matrix=double_dlattice.matrix)
+    assert_equal(double_dlattice, double_dlattice_from_matrix)
+    assert_true(np.allclose(double_dlattice.matrix,
+                            double_dlattice_from_matrix.matrix))
+    dlattice *= 2
+    assert_equal(dlattice, double_dlattice)
+
 if __name__ == '__main__':
     nose.runmodule()
