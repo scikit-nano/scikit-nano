@@ -89,8 +89,6 @@ class PBCAtomsMixin:
         dims : :class:`~python:str`
 
         """
-        if 'x' in dims:
-            self.xperiodic = True
         for dim in 'xyz':
             if dim in dims:
                 setattr(self, dim + 'periodic', True)
