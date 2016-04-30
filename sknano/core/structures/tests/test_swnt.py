@@ -156,9 +156,14 @@ def test7():
 
 def test8():
     bundle = SWNT(n=10, m=10, nx=3, ny=3)
+    print(bundle.scaling_matrix)
+    print(bundle.Natoms)
     assert_equal(bundle.element1, 'C')
     assert_equal(bundle.element2, 'C')
     assert_equal(bundle.Ntubes, 9)
+    print(bundle.lattice)
+    assert_equal(bundle.Ntubes * bundle.unit_cell.basis.Natoms,
+                 bundle.crystal_cell.basis.Natoms)
 
 
 if __name__ == '__main__':
