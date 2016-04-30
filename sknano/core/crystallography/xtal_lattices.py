@@ -537,7 +537,10 @@ class LatticeBase(TabulateMixin, BaseClass):
         """
         if pbc is None:
             pbc = np.asarray(np.ones(3), dtype=bool)
-
+        elif isinstance(pbc, bool):
+            pbc = np.asarray(3 * [pbc], dtype=bool)
+        else:
+            pbc = np.asarray(pbc, dtype=bool)
         p = np.ma.array(p, mask=~pbc)
         p = np.ma.fmod(p, 1)
         p[np.ma.where(p < 0)] += 1
