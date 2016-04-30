@@ -1293,6 +1293,49 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin):
 
         return strrep
 
+    def __mul__(self, other):
+        if not np.isscalar(other):
+            return NotImplemented
+        return self.__class__(a1=other * self.a1,
+                              a2=other * self.a2,
+                              a3=other * self.a3,
+                              offset=self.offset)
+
+    __rmul__ = __mul__
+
+    def __imul__(self, other):
+        if not np.isscalar(other):
+            return NotImplemented
+        self._a = other * self._a
+        self._b = other * self._b
+        self._c = other * self._c
+        self._update_ortho_matrix()
+        return self
+
+    def __truediv__(self, other):
+        if not np.isscalar(other) or np.allclose(other, 0.0):
+            return NotImplemented
+        return self.__mul__(1 / other)
+
+    __div__ = __truediv__
+
+    def __itruediv__(self, other):
+        if not np.isscalar(other) or np.allclose(other, 0.0):
+            return NotImplemented
+        return self.__imul__(1 / other)
+
+    __idiv__ = __itruediv__
+
+    def __floordiv__(self, other):
+        if not np.isscalar(other) or np.allclose(other, 0.0):
+            return NotImplemented
+        return self.__mul__(1 // other)
+
+    def __ifloordiv__(self, other):
+        if not np.isscalar(other) or np.allclose(other, 0.0):
+            return NotImplemented
+        return self.__imul__(1 // other)
+
     def todict(self):
         """Return `dict` of `Crystal3DLattice` parameters."""
         return dict(a=self.a, b=self.b, c=self.c,
