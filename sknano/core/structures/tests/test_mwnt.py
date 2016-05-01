@@ -2,6 +2,9 @@
 from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 
+import warnings
+warnings.simplefilter('always')
+
 import nose
 from nose.tools import assert_equal
 from sknano.core.structures import MWNT
