@@ -13,6 +13,7 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
+from sknano.core import deprecate_kwarg, deprecated
 from sknano.core.atoms import BasisAtoms
 # from sknano.core.crystallography import UnitCell
 from sknano.core.refdata import element_data
@@ -25,7 +26,7 @@ from .extras import generate_Ch_list, get_chiral_type
 __all__ = ['MWNTMixin', 'MWNTBase', 'MWNT']
 
 
-nz_errmsg = ("Currently, setting `nz` requires specifying a single\n"
+n3_errmsg = ("Currently, setting `n3` requires specifying a single\n"
              "chiral type that is achiral ('armchair' or 'zigzag')\n"
              "or providing a list of chiralities that are\n"
              "of one achiral type.")
@@ -151,23 +152,35 @@ class MWNTMixin:
         return self.mass
 
     @property
+    @deprecated(since='0.4.0', alternative='L', obj_type='attribute')
     def Lz(self):
         """MWNT length in Angstroms."""
-        Lz = self._Lz
-        if Lz is None:
-            return self._nz * self.T_list[0]
-        else:
-            return Lz
-
-    @Lz.setter
-    def Lz(self, value):
-        self._Lz = value
+        return self.L
 
     @property
+    def L(self):
+        """MWNT length in Angstroms."""
+        L = self._L
+        if L is None:
+            return self._n3 * self.T_list[0]
+        else:
+            return L
+
+    @L.setter
+    def L(self, value):
+        self._L = value
+
+    @property
+    @deprecated(since='0.4.0', alternative='n3', obj_type='attribute')
     def nz(self):
         """Number of nanotube unit cells along the :math:`z`-axis."""
+        return self.n3
+
+    @property
+    def n3(self):
+        """Number of nanotube unit cells along the :math:`z`-axis."""
         try:
-            return self._nz
+            return self._n3
         except AttributeError:
             return None
 
@@ -183,14 +196,26 @@ class MWNTMixin:
         return [swnt.Natoms for swnt in self.walls]
 
     @property
+    @deprecated(since='0.4.0', alternative='n3_list', obj_type='attribute')
     def nz_list(self):
         """Number of nanotube unit cells along the :math:`z`-axis."""
-        return [swnt.nz for swnt in self.walls]
+        return self.n3_list
 
     @property
+    def n3_list(self):
+        """Number of nanotube unit cells along the :math:`z`-axis."""
+        return [swnt.n3 for swnt in self.walls]
+
+    @property
+    @deprecated(since='0.4.0', alternative='L_list', obj_type='attribute')
     def Lz_list(self):
         """MWNT length :math:`L_z = L_{\\mathrm{tube}}` in **Angstroms**."""
-        return [swnt.Lz for swnt in self.walls]
+        return self.L_list
+
+    @property
+    def L_list(self):
+        """MWNT length :math:`L_z = L_{\\mathrm{tube}}` in **Angstroms**."""
+        return [swnt.L for swnt in self.walls]
 
     @property
     def T_list(self):
@@ -228,7 +253,7 @@ class MWNTMixin:
     @property
     def walls(self):
         """List of `MWNT` `SWNT` wall structures."""
-        return [SWNT(Ch, nz=self._nz, Lz=self._Lz, fix_Lz=self.fix_Lz,
+        return [SWNT(Ch, n3=self._n3, L=self._L, fix_L=self.fix_L,
                      basis=self.basis, bond=self.bond) for Ch in self.Ch_list]
 
     def get_wall(self, Ch):
@@ -236,7 +261,7 @@ class MWNTMixin:
             chirality `Ch`.
 
         """
-        return SWNT(Ch, nz=self._nz, Lz=self._Lz, fix_Lz=self.fix_Lz,
+        return SWNT(Ch, n3=self._n3, L=self._L, fix_L=self.fix_L,
                     basis=self.basis, bond=self.bond) if Ch in self.Ch_list \
             else None
 
@@ -339,7 +364,7 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
         (:attr:`~SWNT.n`, :attr:`~SWNT.m`) for each `SWNT` wall in `MWNT`.
     Nwalls : int, optional
         Number of `SWNT` walls in `MWNT`.
-    Lz : float, optional
+    L : float, optional
         `MWNT` length in **Angstroms**.
     min_wall_diameter : float, optional
         Minimum `MWNT` wall diameter, in units of **Angstroms**.
@@ -375,7 +400,9 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
         if `True`, show verbose output
 
     """
-    def __init__(self, Ch_list=None, Nwalls=None, Lz=None, nz=None,
+    @deprecate_kwarg(kwarg='Lz', since='0.4.0', alternative='L')
+    @deprecate_kwarg(kwarg='nz', since='0.4.0', alternative='n3')
+    def __init__(self, Ch_list=None, Nwalls=None, L=None, n3=None,
                  min_wall_diameter=None, max_wall_diameter=None,
                  max_walls=None, chiral_types=None, wall_spacing=2 * r_CC_vdw,
                  **kwargs):
@@ -383,18 +410,18 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
         Ch_list = kwargs.pop('Ch', Ch_list)
         super().__init__(**kwargs)
 
-        self._nz = nz
-        if nz is not None:
+        self._n3 = n3
+        if n3 is not None:
             if Ch_list is not None:
                 chiral_set = set(get_chiral_type(Ch) for Ch in Ch_list)
             if chiral_types is not None:
                 chiral_set = set(chiral_types)
             if Ch_list is None and chiral_set is None or \
                     (len(chiral_set) > 1 or 'chiral' in chiral_set):
-                raise ValueError(nz_errmsg)
-            self.fix_Lz = False
+                raise ValueError(n3_errmsg)
+            self.fix_L = False
         else:
-            self.fix_Lz = True
+            self.fix_L = True
 
         if Ch_list is None or not isinstance(Ch_list, list):
             Ch_list = \
@@ -412,21 +439,21 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
         self._max_walls = max_walls
         self._wall_spacing = wall_spacing
 
-        if nz is None and Lz is None:
-            Lz = 10.0
+        if n3 is None and L is None:
+            L = 10.0
 
-        self._Lz = Lz
+        self._L = L
 
-        self.generate_unit_cell()
+        self.__generate_unit_cell()
 
         if self.verbose:
             print(self.walls)
 
         fmtstr = ", ".join((super().fmtstr, "Ch_list={Ch_list!r}"))
-        if self.fix_Lz:
-            fmtstr = ", ".join((fmtstr, "Lz={Lz!r}"))
+        if self.fix_L:
+            fmtstr = ", ".join((fmtstr, "L={L!r}"))
         else:
-            fmtstr = ", ".join((fmtstr, "nz={nz!r}"))
+            fmtstr = ", ".join((fmtstr, "n3={n3!r}"))
 
         self.fmtstr = ', '.join((fmtstr,
                                  "min_wall_diameter={min_wall_diameter!r}",
@@ -442,12 +469,13 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
         [basis.extend(swnt.unit_cell.basis) for swnt in self.walls]
         self.unit_cell = NanotubeUnitCell(lattice=outside_unit_cell.lattice,
                                           basis=basis)
+    __generate_unit_cell = generate_unit_cell
 
     def todict(self):
         """Return :class:`~python:dict` of `MWNT` attributes."""
         attr_dict = super().todict()
-        attr_dict.update(dict(Ch_list=self.Ch_list, nz=self._nz, Lz=self._Lz,
-                              fix_Lz=self.fix_Lz,
+        attr_dict.update(dict(Ch_list=self.Ch_list, n3=self._n3, L=self._L,
+                              fix_L=self.fix_L,
                               min_wall_diameter=self.min_wall_diameter,
                               max_wall_diameter=self.max_wall_diameter,
                               max_walls=self.max_walls,
@@ -465,7 +493,7 @@ class MWNT(NanotubeBundleBase, MWNTBase):
         (:attr:`~SWNT.n`, :attr:`~SWNT.m`) for each `SWNT` wall in `MWNT`.
     Nwalls : int, optional
         Number of `SWNT` walls in `MWNT`.
-    Lz : float, optional
+    L : float, optional
         `MWNT` length in **Angstroms**.
 
         .. versionchanged:: 0.4.0
@@ -502,7 +530,7 @@ class MWNT(NanotubeBundleBase, MWNTBase):
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms, in units of **Angstroms**.
-    nx, ny : int, optional
+    n1, n2 : int, optional
         Number of repeat unit cells in the :math:`x, y` dimensions.
     vdw_radius : float, optional
         van der Waals radius of nanotube atoms

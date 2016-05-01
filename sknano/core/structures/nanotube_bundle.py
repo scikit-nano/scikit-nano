@@ -16,6 +16,7 @@ import re
 
 import numpy as np
 
+from sknano.core import deprecated, deprecate_kwarg
 from sknano.core.atoms import Atom, vdw_radius_from_basis
 from sknano.core.refdata import aCC, grams_per_Da
 from sknano.core.math import Vector
@@ -92,62 +93,86 @@ class NanotubeBundleMixin:
                                       bond=self.bond, basis=self.basis)
 
     @property
+    @deprecated(since='0.4.0', alternative='n1', obj_type='attribute')
     def nx(self):
         """Number of nanotubes along the :math:`x`-axis."""
-        return self._nx
+        return self.n1
 
     @nx.setter
     def nx(self, value):
-        """Set :math:`n_x`"""
-        if not (isinstance(value, numbers.Number) or value > 0):
-            raise TypeError('Expected a positive integer.')
-        self._nx = int(value)
-
-    @nx.deleter
-    def nx(self):
-        del self._nx
+        self.n1 = value
 
     @property
+    @deprecated(since='0.4.0', alternative='n2', obj_type='attribute')
     def ny(self):
-        """Number of nanotubes along the :math:`y`-axis."""
-        return self._ny
+        """Number of nanotubes along the :math:`x`-axis."""
+        return self.n2
 
     @ny.setter
     def ny(self, value):
+        self.n2 = value
+
+    @property
+    @deprecated(since='0.4.0', alternative='l1', obj_type='attribute')
+    def Lx(self):
+        """Axis-aligned length along the `x`-axis in **Angstroms**."""
+        return self.l1
+
+    @property
+    @deprecated(since='0.4.0', alternative='l2', obj_type='attribute')
+    def Ly(self):
+        """Axis-aligned length along the `y`-axis in **Angstroms**."""
+        return self.l2
+
+    @property
+    def n1(self):
+        """Number of nanotubes along the :math:`x`-axis."""
+        return self._n1
+
+    @n1.setter
+    def n1(self, value):
+        """Set :math:`n_x`"""
+        if not (isinstance(value, numbers.Number) or value > 0):
+            raise TypeError('Expected a positive integer.')
+        self._n1 = int(value)
+
+    @property
+    def n2(self):
+        """Number of nanotubes along the :math:`y`-axis."""
+        return self._n2
+
+    @n2.setter
+    def n2(self, value):
         """Set :math:`n_y`"""
         if not (isinstance(value, numbers.Number) or value > 0):
             raise TypeError('Expected a positive integer.')
-        self._ny = int(value)
-
-    @ny.deleter
-    def ny(self):
-        del self._ny
+        self._n2 = int(value)
 
     @property
-    def Lx(self):
+    def l1(self):
         """Axis-aligned length along the `x`-axis in **Angstroms**.
 
         Calculated as:
 
         .. math::
 
-           L_x = n_x * (d_t + 2 r_{\\mathrm{vdW}})
+           \\ell_1 = n_1 * (d_t + 2 r_{\\mathrm{vdW}})
 
         """
-        return self.nx * (self.dt + 2 * self.vdw_radius)
+        return self.n1 * (self.dt + 2 * self.vdw_radius)
 
     @property
-    def Ly(self):
+    def l2(self):
         """Axis-aligned length along the `y`-axis in **Angstroms**.
 
         Calculated as:
 
         .. math::
 
-           L_y = n_y * (d_t + 2 r_{\\mathrm{vdW}})
+           \\ell_2 = n_2 * (d_t + 2 r_{\\mathrm{vdW}})
 
         """
-        return self.ny * (self.dt + 2 * self.vdw_radius)
+        return self.n2 * (self.dt + 2 * self.vdw_radius)
 
     @property
     def bundle_geometry(self):
@@ -243,10 +268,10 @@ class NanotubeBundleMixin:
         self.bundle_list = []
         self.generate_bundle_coords()
         fmtstr = super().fmtstr
-        match = re.search('[nL]z=', fmtstr)
+        match = re.search('(n3|L)=', fmtstr)
         if match:
             self.fmtstr = fmtstr[:match.start()] + \
-                "nx={nx!r}, ny={ny!r}, " + fmtstr[match.start():] + \
+                "n1={n1!r}, n2={n2!r}, " + fmtstr[match.start():] + \
                 ", bundle_packing={bundle_packing!r}, " + \
                 "bundle_geometry={bundle_geometry!r}"
 
@@ -266,7 +291,7 @@ class NanotubeBundleMixin:
                 self._bundle_packing = 'hcp'
 
         if self.bundle_geometry == 'hexagon':
-            nrows = max(self.nx, self.ny, 3)
+            nrows = max(self.n1, self.n2, 3)
             if nrows % 2 != 1:
                 nrows += 1
 
@@ -280,23 +305,23 @@ class NanotubeBundleMixin:
                         dr = n * self.r1
                         self.bundle_coords.append(dr)
                 else:
-                    for nx in range(ntubes_per_row):
-                        for ny in (-row, row):
+                    for n1 in range(ntubes_per_row):
+                        for n2 in (-row, row):
                             dr = Vector()
-                            dr.x = abs(ny * self.r2.x)
-                            dr.y = ny * self.r2.y
-                            dr = nx * self.r1 + dr
+                            dr.x = abs(n2 * self.r2.x)
+                            dr.y = n2 * self.r2.y
+                            dr = n1 * self.r1 + dr
                             self.bundle_coords.append(dr)
                 row += 1
                 ntubes_per_row = nrows - row
 
         elif self.bundle_geometry == 'rectangle':
-            Lx = self.Lx
-            for nx in range(self.nx):
-                for ny in range(self.ny):
-                    dr = nx * self.r1 + ny * self.r2
+            l1 = self.l1
+            for n1 in range(self.n1):
+                for n2 in range(self.n2):
+                    dr = n1 * self.r1 + n2 * self.r2
                     while dr.x < 0:
-                        dr.x += Lx
+                        dr.x += l1
                     self.bundle_coords.append(dr)
 
         elif self.bundle_geometry == 'square':
@@ -304,9 +329,9 @@ class NanotubeBundleMixin:
         elif self.bundle_geometry == 'triangle':
             pass
         else:
-            for nx in range(self.nx):
-                for ny in range(self.ny):
-                    dr = nx * self.r1 + ny * self.r2
+            for n1 in range(self.n1):
+                for n2 in range(self.n2):
+                    dr = n1 * self.r1 + n2 * self.r2
                     self.bundle_coords.append(dr)
 
 
@@ -315,7 +340,7 @@ class NanotubeBundleBase(NanotubeBundleMixin, NanoStructureBase):
 
     Parameters
     ----------
-    nx, ny : :class:`~python:int`
+    n1, n2 : :class:`~python:int`
     bundle_packing : {None, 'hcp', 'ccp'}, optional
     bundle_geometry : {None, 'hexagon', 'rectangle'}, optional
 
@@ -323,30 +348,32 @@ class NanotubeBundleBase(NanotubeBundleMixin, NanoStructureBase):
 
     _bundle_geometries = ['square', 'rectangle', 'hexagon']
 
-    def __init__(self, *args, nx=1, ny=1, bundle_packing=None,
+    @deprecate_kwarg(kwarg='nx', since='0.4.0', alternative='n1')
+    @deprecate_kwarg(kwarg='ny', since='0.4.0', alternative='n2')
+    def __init__(self, *args, n1=1, n2=1, bundle_packing=None,
                  bundle_geometry=None, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.nx = nx
-        self.ny = ny
+        self.n1 = n1
+        self.n2 = n2
         self.bundle_geometry = bundle_geometry
         self.bundle_packing = bundle_packing
 
         self.is_bundle = False
-        if nx != 1 or ny != 1 or bundle_geometry is not None:
+        if n1 != 1 or n2 != 1 or bundle_geometry is not None:
             self.is_bundle = True
             self.init_bundle_parameters()
             self.generate_unit_cell()
 
     def generate_unit_cell(self):
         """Generate Nanotube unit cell."""
-        self.scaling_matrix = [self.nx, self.ny, 1]
+        self.scaling_matrix = [self.n1, self.n2, 1]
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
         attrdict = super().todict()
         if self.is_bundle:
-            attrdict.update(dict(nx=self.nx, ny=self.ny,
+            attrdict.update(dict(n1=self.n1, n2=self.n2,
                                  bundle_packing=self.bundle_packing,
                                  bundle_geometry=self.bundle_geometry))
         return attrdict

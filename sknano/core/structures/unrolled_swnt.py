@@ -15,6 +15,7 @@ import numbers
 
 import numpy as np
 
+from sknano.core import deprecated, deprecate_kwarg
 from sknano.core.atoms import BasisAtom as Atom, BasisAtoms as Atoms
 from sknano.core.crystallography import Crystal3DLattice, UnitCell
 # from sknano.core.math import Vector
@@ -30,50 +31,68 @@ __all__ = ['UnrolledSWNTMixin', 'UnrolledSWNTBase', 'UnrolledSWNT']
 
 class UnrolledSWNTMixin:
     """Mixin class for unrolled nanotubes."""
-
     @property
-    def fix_Lx(self):
-        """:class:`~python:bool` indicating whether \
-            :attr:`UnrolledSWNTMixin.Lx` is fixed or calculated."""
-        return self._fix_Lx
-
-    @fix_Lx.setter
-    def fix_Lx(self, value):
-        if not isinstance(value, bool):
-            raise TypeError('Expected `True` or `False`')
-        self._fix_Lx = value
-        self._integral_nx = False if self.fix_Lx else True
-
-    @property
+    @deprecated(since='0.4.0', alternative='l1', obj_type='attribute')
     def Lx(self):
         """Axis-aligned length along the `x`-axis in **Angstroms**."""
-        return self.nx * self.Ch
+        return self.r1
 
     @property
+    @deprecated(since='0.4.0', alternative='l2', obj_type='attribute')
+    def Ly(self):
+        """Axis-aligned length along the `y`-axis in **Angstroms**."""
+        return self.r2
+
+    @property
+    @deprecated(since='0.4.0', alternative='n1', obj_type='attribute')
     def nx(self):
         """Number of unit cells along the :math:`x`-axis."""
-        return self._nx
+        return self.n1
 
     @nx.setter
     def nx(self, value):
-        """Set :math:`n_x`"""
-        if not (isinstance(value, numbers.Number) or value > 0):
-            raise TypeError('Expected a real positive number.')
-        self._nx = int(value)
+        self.n1 = value
 
     @property
-    def Ly(self):
-        """Axis-aligned length along the `y`-axis in **Angstroms**."""
-        return self.ny * self.layer_spacing
-
-    @property
+    @deprecated(since='0.4.0', alternative='n2', obj_type='attribute')
     def ny(self):
         """An alias for :attr:`UnrolledSWNTMixin.nlayers`."""
-        return self._nlayers
+        return self.n2
 
     @ny.setter
     def ny(self, value):
-        self.nalyers = value
+        self.n2 = value
+
+    @property
+    def l1(self):
+        """Axis-aligned length along the `y`-axis in **Angstroms**."""
+        return self.n1 * self.Ch
+
+    @property
+    def l2(self):
+        """Axis-aligned length along the `y`-axis in **Angstroms**."""
+        return self.n2 * self.layer_spacing
+
+    @property
+    def n1(self):
+        """Number of nanotubes along the :math:`x`-axis."""
+        return self._n1
+
+    @n1.setter
+    def n1(self, value):
+        """Set :math:`n_x`"""
+        if not (isinstance(value, numbers.Number) or value > 0):
+            raise TypeError('Expected a positive integer.')
+        self._n1 = int(value)
+
+    @property
+    def n2(self):
+        """Number of nanotubes along the :math:`y`-axis."""
+        return self.nlayers
+
+    @n2.setter
+    def n2(self, value):
+        self.nlayers = value
 
     @property
     def nlayers(self):
@@ -92,17 +111,13 @@ class UnrolledSWNTBase(UnrolledSWNTMixin, SWNTBase, GrapheneBase,
                        NanoStructureBase):
     """Base unrolled SWNT structure class."""
 
-    def __init__(self, *args, nx=1, Lx=None, fix_Lx=False, **kwargs):
-
+    @deprecate_kwarg(kwarg='nx', since='0.4.0', alternative='n1')
+    @deprecate_kwarg(kwarg='Lx', since='0.4.0')
+    @deprecate_kwarg(kwarg='fix_Lx', since='0.4.0')
+    def __init__(self, *args, n1=1, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fix_Lx = fix_Lx
-        if Lx is not None:
-            self.nx = float(Lx) / self.Ch
-        elif nx is not None:
-            self.nx = nx
-        else:
-            self.nx = 1
+        self.n1 = n1
 
         if self.nlayers > 1 and self.stacking_order == 'AB':
             chiral_angle = compute_chiral_angle(self.n, self.m, degrees=False)
@@ -111,13 +126,13 @@ class UnrolledSWNTBase(UnrolledSWNTMixin, SWNTBase, GrapheneBase,
 
         self.generate_unit_cell()
         self.scaling_matrix = \
-            [int(np.ceil(self.nx)), self.ny, int(np.ceil(self.nz))]
-        self.fmtstr = ", ".join((super().fmtstr, "nx={nx!r}", "Lx={Lx!r}"))
+            [int(np.ceil(self.n1)), self.nlayers, int(np.ceil(self.n3))]
+        self.fmtstr = ", ".join((super().fmtstr, "n1={n1!r}"))
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
         attr_dict = super().todict()
-        attr_dict.update(dict(nx=self.nx, Lx=self.Lx, fix_Lx=self.fix_Lx))
+        attr_dict.update(dict(n1=self.n1))
         return attr_dict
 
 
@@ -131,10 +146,10 @@ class UnrolledSWNT(UnrolledSWNTBase, NanoStructureBase):
         2 integers (i.e., *Ch = (n, m) specifying the chiral indices
         of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-    nx : :class:`python:int`, optional
+    n1 : :class:`python:int`, optional
         Number of repeat unit cells in the :math:`x` direction, along
         the *unrolled* chiral vector.
-    nz : :class:`python:int`, optional
+    n3 : :class:`python:int`, optional
         Number of repeat unit cells in the :math:`z` direction, along
         the *length* of the nanotube.
     basis : {:class:`python:list`}, optional
@@ -169,21 +184,9 @@ class UnrolledSWNT(UnrolledSWNTBase, NanoStructureBase):
         Each subsequent layer will
         be rotated by `layer_rotation_increment` relative to the layer
         below it.
-    Lx : float, optional
-        Length of the unrolled swnt sheet along the chiral vector
-        in units of **Angstroms**. Overrides the `nx` value.
-
-        .. versionchanged:: 0.4.0
-
-           Changed units from nanometers to **Angstroms**
-
-    fix_Lx : bool, optional
-        Generate the unrolled swnt sheet with the length along the
-        chiral vector as close to the specified :math:`L_x` as possible.
-        If `True`, then non integer :math:`n_x` cells are permitted.
     Lz : float, optional
         Length of the unrolled swnt sheet along the translation vector
-        in units of **Angstroms**. Overrides the `nz` value.
+        in units of **Angstroms**. Overrides the `n3` value.
 
         .. versionchanged:: 0.4.0
 
@@ -203,7 +206,7 @@ class UnrolledSWNT(UnrolledSWNTBase, NanoStructureBase):
     >>> from sknano.core.structures import UnrolledSWNT
     >>> unrolled_swnt = UnrolledSWNT(10, 5)
     >>> unrolled_swnt
-    UnrolledSWNT((10, 5), nx=1, nz=1, bond=1.42, basis=['C', 'C'], nlayers=1,
+    UnrolledSWNT((10, 5), n1=1, n3=1, bond=1.42, basis=['C', 'C'], nlayers=1,
     layer_spacing=3.4, stacking_order='AB')
 
     """

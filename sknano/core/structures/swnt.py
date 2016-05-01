@@ -11,10 +11,15 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 __docformat__ = 'restructuredtext en'
 
-from fractions import gcd
+try:
+    from math import gcd
+except ImportError:
+    from fractions import gcd
+
 import numbers
 import numpy as np
 
+from sknano.core import deprecated, deprecate_kwarg
 from sknano.core.atoms import Atom, BasisAtom, BasisAtoms
 from sknano.core.crystallography import Crystal3DLattice, UnitCell
 from sknano.core.refdata import aCC, grams_per_Da
@@ -29,6 +34,7 @@ __all__ = ['compute_d', 'compute_dR', 'compute_N', 'compute_t1', 'compute_t2',
            'compute_rt', 'compute_M', 'compute_R', 'compute_R_chiral_angle',
            'compute_symmetry_operation', 'compute_unit_cell_symmetry_params',
            'compute_psi', 'compute_tau',
+           'compute_l1', 'compute_l2', 'compute_L',
            'compute_Lx', 'compute_Ly', 'compute_Lz',
            'compute_electronic_type', 'compute_Natoms',
            'compute_Natoms_per_tube', 'compute_Natoms_per_unit_cell',
@@ -766,13 +772,14 @@ def compute_electronic_type(*Ch):
         return 'metallic'
 
 
-def compute_Natoms(*Ch, nz=1):
+@deprecate_kwarg(kwarg='nz', since='0.4.0', alternative='n3')
+def compute_Natoms(*Ch, n3=1):
     """Compute :math:`N_{\\mathrm{atoms/tube}}`
 
     .. math::
 
         N_{\\mathrm{atoms/tube}} = N_{\\mathrm{atoms/cell}} \\times
-        n_{z-\\mathrm{cells}}
+        n_{3-\\mathrm{cells}}
 
     Parameters
     ----------
@@ -780,7 +787,7 @@ def compute_Natoms(*Ch, nz=1):
         Either a 2-tuple of ints or 2 integers giving the chiral indices
         of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-    nz : {int, float}
+    n3 : {int, float}
         Number of nanotube unit cells
 
     Returns
@@ -791,16 +798,17 @@ def compute_Natoms(*Ch, nz=1):
     n, m, _ = get_chiral_indices(*Ch)
 
     Natoms_per_unit_cell = compute_Natoms_per_unit_cell(n, m)
-    return int(Natoms_per_unit_cell * nz)
+    return int(Natoms_per_unit_cell * n3)
 
 
-def compute_Natoms_per_tube(*Ch, nz=1):
+@deprecate_kwarg(kwarg='nz', since='0.4.0', alternative='n3')
+def compute_Natoms_per_tube(*Ch, n3=1):
     """Compute :math:`N_{\\mathrm{atoms/tube}}`
 
     .. math::
 
         N_{\\mathrm{atoms/tube}} = N_{\\mathrm{atoms/cell}} \\times
-        n_{z-\\mathrm{cells}}
+        n_{3-\\mathrm{cells}}
 
     Parameters
     ----------
@@ -808,7 +816,7 @@ def compute_Natoms_per_tube(*Ch, nz=1):
         Either a 2-tuple of ints or 2 integers giving the chiral indices
         of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-    nz : {int, float}
+    n3 : {int, float}
         Number of nanotube unit cells
 
     Returns
@@ -816,7 +824,7 @@ def compute_Natoms_per_tube(*Ch, nz=1):
     int
         :math:`N_{\\mathrm{atoms/tube}}`
     """
-    return compute_Natoms(*Ch, nz=nz)
+    return compute_Natoms(*Ch, n3=n3)
 
 
 def compute_Natoms_per_unit_cell(*Ch):
@@ -932,7 +940,8 @@ def compute_linear_mass_density(*Ch, bond=None, element1=None, element2=None,
         return 0
 
 
-def compute_Lx(*Ch, nx=1, bond=None, gutter=r_CC_vdw):
+@deprecated(since='0.4.0', alternative='compute_l1')
+def compute_Lx(*Ch, **kwargs):
     """Compute the axis-aligned length along the `x`-axis in **Angstroms**.
 
     Calculated as:
@@ -942,10 +951,11 @@ def compute_Lx(*Ch, nx=1, bond=None, gutter=r_CC_vdw):
        L_x = n_x * (d_t + 2 r_{\\mathrm{vdW}})
 
     """
-    return nx * (compute_dt(*Ch, bond=bond) + 2 * gutter)
+    return compute_l1(*Ch, **kwargs)
 
 
-def compute_Ly(*Ch, ny=1, bond=None, gutter=r_CC_vdw):
+@deprecated(since='0.4.0', alternative='compute_l2')
+def compute_Ly(*Ch, **kwargs):
     """Compute the axis-aligned length along the `y`-axis in **Angstroms**.
 
     Calculated as:
@@ -955,10 +965,11 @@ def compute_Ly(*Ch, ny=1, bond=None, gutter=r_CC_vdw):
        L_y = n_y * (d_t + 2 r_{\\mathrm{vdW}})
 
     """
-    return ny * (compute_dt(*Ch, bond=bond) + 2 * gutter)
+    return compute_l2(*Ch, **kwargs)
 
 
-def compute_Lz(*Ch, nz=1, bond=None, **kwargs):
+@deprecated(since='0.4.0', alternative='compute_L')
+def compute_Lz(*Ch, **kwargs):
     """Compute the axis-aligned length along the `z`-axis in **Angstroms**.
 
     :math:`L_z = L_{\\mathrm{tube}}` in **Angstroms**.
@@ -992,13 +1003,75 @@ def compute_Lz(*Ch, nz=1, bond=None, **kwargs):
         :math:`L_z = L_{\\mathrm{tube}}` in **Angstroms**
 
     """
+    return compute_L(*Ch, **kwargs)
+
+
+def compute_l1(*Ch, n1=1, bond=None, gutter=r_CC_vdw):
+    """Compute the length along the :math:`\\mathbf{a}_1` lattice vector in \
+        **Angstroms**.
+
+    Calculated as:
+
+    .. math::
+
+       \\ell_1 = n_1 * (d_t + 2 r_{\\mathrm{vdW}})
+
+    """
+    return n1 * (compute_dt(*Ch, bond=bond) + 2 * gutter)
+
+
+def compute_l2(*Ch, n2=1, bond=None, gutter=r_CC_vdw):
+    """Compute the length along the :math:`\\mathbf{a}_2` lattice vector in \
+        **Angstroms**.
+
+    Calculated as:
+
+    .. math::
+
+       \\ell_2 = n_2 * (d_t + 2 r_{\\mathrm{vdW}})
+
+    """
+    return n2 * (compute_dt(*Ch, bond=bond) + 2 * gutter)
+
+
+def compute_L(*Ch, n3=1, bond=None, **kwargs):
+    """Compute the length along the :math:`\\mathbf{a}_3` lattice vector in \
+        **Angstroms**.
+
+    :math:`\\ell_3 = \\ell_{\\mathrm{tube}}` in **Angstroms**.
+
+    .. math::
+
+       \\ell_3 = n_3 |\\mathbf{T}|
+
+
+    Parameters
+    ----------
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of ints or 2 integers giving the chiral indices
+        of the nanotube chiral vector
+        :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+    n3 : {int, float}
+        Number of nanotube unit cells all :math:`\\mathbf{a}_3`
+    bond : float, optional
+        Distance between nearest neighbor atoms (i.e., bond length).
+        Must be in units of **\u212b**. Default value is
+        the carbon-carbon bond length in graphite, approximately
+        :math:`\\mathrm{a}_{\\mathrm{CC}} = 1.42` \u212b
+
+    Returns
+    -------
+    float
+        :math:`\\ell_3 = \\ell_{\\mathrm{tube}}` in **Angstroms**
+
+    """
     n, m, _ = get_chiral_indices(*Ch)
 
-    if not (isinstance(nz, numbers.Real) or nz > 0):
+    if not (isinstance(n3, numbers.Real) or n3 > 0):
         raise TypeError('Expected a real, positive number')
 
     T = compute_T(n, m, bond=bond, **kwargs)
-    return nz * T
+    return n3 * T
 
 
 def compute_symmetry_chiral_angle(*Ch, degrees=True):
@@ -1016,12 +1089,14 @@ def compute_tube_radius(*Ch, bond=None, **kwargs):
     return compute_rt(*Ch, bond=bond, **kwargs)
 
 
-def compute_tube_length(*Ch, nz=1, bond=None, **kwargs):
-    """Alias for :func:`compute_Lz`"""
-    return compute_Lz(*Ch, nz=nz, bond=bond, **kwargs)
+@deprecate_kwarg(kwarg='nz', since='0.4.0', alternative='n3')
+def compute_tube_length(*Ch, n3=1, bond=None, **kwargs):
+    """Alias for :func:`compute_L`"""
+    return compute_L(*Ch, n3=n3, bond=bond, **kwargs)
 
 
-def compute_tube_mass(*Ch, nz=1, element1=None, element2=None):
+@deprecate_kwarg(kwarg='nz', since='0.4.0', alternative='n3')
+def compute_tube_mass(*Ch, n3=1, element1=None, element2=None, **kwargs):
     """Compute nanotube mass in **grams**.
 
     Parameters
@@ -1030,7 +1105,7 @@ def compute_tube_mass(*Ch, nz=1, element1=None, element2=None):
         Either a 2-tuple of ints or 2 integers giving the chiral indices
         of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-    nz : {int, float}
+    n3 : {int, float}
         Number of nanotube unit cells
     element1, element2 : {str, int}, optional
         Element symbol or atomic number of basis
@@ -1052,10 +1127,10 @@ def compute_tube_mass(*Ch, nz=1, element1=None, element2=None):
     """
     n, m, _ = get_chiral_indices(*Ch)
 
-    if not (isinstance(nz, numbers.Real) or nz > 0):
+    if not (isinstance(n3, numbers.Real) or n3 > 0):
         raise TypeError('Expected a real, positive number')
 
-    Natoms = compute_Natoms(n, m, nz=nz)
+    Natoms = compute_Natoms(n, m, n3=n3)
 
     if element1 is None:
         element1 = 'C'
@@ -1262,22 +1337,35 @@ class SWNTMixin:
         return compute_R(self.n, self.m, bond=self.bond, length=False)
 
     @property
+    @deprecated(since='0.4.0', alternative='n3', obj_type='attribute')
     def nz(self):
         """Number of nanotube unit cells along the :math:`z`-axis."""
-        return self._nz
+        return self.n3
 
     @nz.setter
     def nz(self, value):
-        """Set number of nanotube unit cells along the :math:`z`-axis."""
-        if not (isinstance(value, numbers.Real) or value > 0):
-            raise TypeError('Expected a real, positive number.')
-        self._nz = value
-        if self._integral_nz:
-            self._nz = int(np.ceil(value))
+        self.n3 = value
 
     def _update_nz(self):
+        self._update_n3()
+
+    @property
+    def n3(self):
+        """Number of nanotube unit cells along the :math:`\\mathbf{a}_3` \
+            lattice vector."""
+        return self._n3
+
+    @n3.setter
+    def n3(self, value):
+        if not (isinstance(value, numbers.Real) or value > 0):
+            raise TypeError('Expected a real, positive number.')
+        self._n3 = value
+        if self._integral_n3:
+            self._n3 = int(np.ceil(value))
+
+    def _update_n3(self):
         try:
-            self.nz = self.nz
+            self.n3 = self.n3
         except AttributeError:
             pass
 
@@ -1327,32 +1415,49 @@ class SWNTMixin:
         return compute_electronic_type(self.n, self.m)
 
     @property
+    @deprecated(since='0.4.0', alternative='L', obj_type='attribute')
     def Lz(self):
         """SWNT length :math:`L_z = L_{\\mathrm{tube}}` in **Angstroms**."""
-        return self.nz * self.T
+        return self.L
 
     @property
+    @deprecated(since='0.4.0', alternative='fix_L', obj_type='attribute')
     def fix_Lz(self):
         """:class:`~python:bool` indicating whether :attr:`SWNTMixin.Lz` is \
             fixed or calculated."""
-        return self._fix_Lz
+        return self.fix_L
 
     @fix_Lz.setter
     def fix_Lz(self, value):
+        self.fix_L = value
+
+    @property
+    def L(self):
+        """SWNT length :math:`L = L_{\\mathrm{tube}}` in **Angstroms**."""
+        return self.n3 * self.T
+
+    @property
+    def fix_L(self):
+        """:class:`~python:bool` indicating whether :attr:`SWNTMixin.L` is \
+            fixed or calculated."""
+        return self._fix_L
+
+    @fix_L.setter
+    def fix_L(self, value):
         if not isinstance(value, bool):
             raise TypeError('Expected `True` or `False`')
-        self._fix_Lz = value
-        self._integral_nz = False if self.fix_Lz else True
-        self._update_nz()
+        self._fix_L = value
+        self._integral_n3 = False if self.fix_L else True
+        self._update_n3()
         self._update_fmtstr()
 
     def _update_fmtstr(self):
-        if self.fix_Lz:
-            self.fmtstr = self.fmtstr.replace("nz={nz!r}",
-                                              "Lz={Lz!r}, fix_Lz=True")
+        if self.fix_L:
+            self.fmtstr = self.fmtstr.replace("n3={n3!r}",
+                                              "L={L!r}, fix_L=True")
         else:
-            self.fmtstr = self.fmtstr.replace("Lz={Lz!r}, fix_Lz=True",
-                                              "nz={nz!r}")
+            self.fmtstr = self.fmtstr.replace("L={L!r}, fix_L=True",
+                                              "n3={n3!r}")
 
     @property
     def Natoms(self):
@@ -1370,11 +1475,10 @@ class SWNTMixin:
            \\frac{4(n^2 + m^2 + nm)}{d_R}\\times n_z
 
         where :math:`N` is the number of graphene hexagons mapped to the
-        nanotube unit cell and :math:`n_z` is the number of unit cells.
+        nanotube unit cell and :math:`n_3` is the number of unit cells.
 
         """
-        print('in SWNTMixin.Natoms')
-        return compute_Natoms(self.n, self.m, nz=self.nz)
+        return compute_Natoms(self.n, self.m, n3=self.n3)
 
     @property
     def Natoms_per_unit_cell(self):
@@ -1404,13 +1508,13 @@ class SWNTMixin:
 
     @property
     def tube_length(self):
-        """Alias for :attr:`SWNT.Lz`"""
-        return self.Lz
+        """Alias for :attr:`SWNT.L`"""
+        return self.L
 
     @property
     def mass(self):
         """SWNT mass in **grams**."""
-        return compute_tube_mass(self.n, self.m, nz=self.nz,
+        return compute_tube_mass(self.n, self.m, n3=self.n3,
                                  element1=self.element1,
                                  element2=self.element2)
 
@@ -1447,11 +1551,14 @@ class SWNTBase(SWNTMixin, NanoStructureBase):
                         'chiral_angle', 'Ch', 'T', 'dt', 'rt',
                         'electronic_type']
 
-    def __init__(self, *Ch, nz=None, gutter=None, Lz=None, fix_Lz=False,
+    @deprecate_kwarg(kwarg='nz', since='0.4.0', alternative='n3')
+    @deprecate_kwarg(kwarg='Lz', since='0.4.0', alternative='L')
+    @deprecate_kwarg(kwarg='fix_Lz', since='0.4.0', alternative='fix_L')
+    def __init__(self, *Ch, n3=None, gutter=None, L=None, fix_L=False,
                  wrap_coords=False, **kwargs):
 
         n, m, kwargs = get_chiral_indices(*Ch, **kwargs)
-        Lz = kwargs.pop('tube_length', Lz)
+        L = kwargs.pop('tube_length', L)
 
         super().__init__(**kwargs)
 
@@ -1460,30 +1567,30 @@ class SWNTBase(SWNTMixin, NanoStructureBase):
         self.gutter = gutter
         self.wrap_coords = wrap_coords
 
-        self.L0 = Lz  # store initial value of Lz
+        self.L0 = L  # store initial value of L
 
         self.n = n
         self.m = m
 
-        self.fix_Lz = fix_Lz
-        if Lz is not None:
-            self.nz = float(Lz) / self.T
-        elif nz is not None:
-            self.nz = nz
+        self.fix_L = fix_L
+        if L is not None:
+            self.n3 = float(L) / self.T
+        elif n3 is not None:
+            self.n3 = n3
         else:
-            self.nz = 1
+            self.n3 = 1
 
         # self.generate_unit_cell()
         self.unit_cell = \
             NanotubeUnitCell((self.n, self.m), bond=self.bond,
                              basis=self.basis, gutter=self.gutter,
                              wrap_coords=wrap_coords)
-        self.scaling_matrix = [1, 1, int(np.ceil(self.nz))]
+        self.scaling_matrix = [1, 1, int(np.ceil(self.n3))]
         fmtstr = ", ".join(("{Ch!r}", super().fmtstr))
-        if self.fix_Lz:
-            fmtstr = ", ".join((fmtstr, "Lz={Lz!r}", "fix_Lz=True"))
+        if self.fix_L:
+            fmtstr = ", ".join((fmtstr, "L={L!r}", "fix_L=True"))
         else:
-            fmtstr = ", ".join((fmtstr, "nz={nz!r}"))
+            fmtstr = ", ".join((fmtstr, "n3={n3!r}"))
         self.fmtstr = ", ".join((fmtstr, "gutter={gutter!r}",
                                  "wrap_coords={wrap_coords!r}"))
 
@@ -1519,7 +1626,7 @@ class SWNTBase(SWNTMixin, NanoStructureBase):
         """Return :class:`~python:dict` of `SWNT` attributes."""
         attr_dict = super().todict()
         attr_dict.update(dict(Ch=(self.n, self.m),
-                              nz=self.nz, Lz=self.Lz, fix_Lz=self.fix_Lz,
+                              n3=self.n3, L=self.L, fix_L=self.fix_L,
                               gutter=self.gutter,
                               wrap_coords=self.wrap_coords))
         return attr_dict
@@ -1535,11 +1642,11 @@ class SWNT(NanotubeBundleBase, SWNTBase):
         2 integers (i.e., *Ch = (n, m) specifying the chiral indices
         of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-    nx : :class:`python:int`, optional
+    n1 : :class:`python:int`, optional
         Number of nanotubes along the :math:`x` axis
-    ny : :class:`python:int`, optional
+    n2 : :class:`python:int`, optional
         Number of nanotubes along the :math:`y` axis
-    nz : :class:`python:int`, optional
+    n3 : :class:`python:int`, optional
         Number of repeat unit cells in the :math:`z` direction, along
         the *length* of the nanotube.
     basis : {:class:`python:list`}, optional
@@ -1558,9 +1665,9 @@ class SWNT(NanotubeBundleBase, SWNTBase):
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
-    Lz : float, optional
+    L : float, optional
         Length of nanotube in units of **Angstroms**.
-        Overrides the `nz` value.
+        Overrides the `n3` value.
 
         .. versionadded:: 0.2.5
 
@@ -1570,12 +1677,12 @@ class SWNT(NanotubeBundleBase, SWNTBase):
 
     tube_length : float, optional
         Length of nanotube in units of **Angstroms**.
-        Overrides the `nz` value.
+        Overrides the `n3` value.
 
         .. deprecated:: 0.2.5
-           Use `Lz` instead
+           Use `L` instead
 
-    fix_Lz : bool, optional
+    fix_L : bool, optional
         Generate the nanotube with length as close to the specified
         :math:`L_z` as possible. If `True`, then
         non integer :math:`n_z` cells are permitted.
@@ -1594,7 +1701,7 @@ class SWNT(NanotubeBundleBase, SWNTBase):
 
     >>> swnt = SWNT((10, 10), verbose=True)
     >>> print(swnt)
-    SWNT((10, 10), nz=1)
+    SWNT((10, 10), n3=1)
     n: 10
     m: 10
     t₁: 1
@@ -1614,7 +1721,7 @@ class SWNT(NanotubeBundleBase, SWNTBase):
 
     >>> swnt.n = 20
     >>> print(swnt)
-    SWNT((20, 10), nz=1)
+    SWNT((20, 10), n3=1)
     n: 20
     m: 10
     t₁: 4
@@ -1634,7 +1741,7 @@ class SWNT(NanotubeBundleBase, SWNTBase):
 
     >>> swnt.m = 0
     >>> print(swnt)
-    SWNT((20, 0), nz=1)
+    SWNT((20, 0), n3=1)
     n: 20
     m: 0
     t₁: 1
@@ -1654,9 +1761,9 @@ class SWNT(NanotubeBundleBase, SWNTBase):
     hexagonally close packed (*hcp*)
     :math:`5\\times 3\\times 10` :class:`SWNT` bundle.
 
-    >>> swnt_bundle = SWNT((10, 10), nx=5, ny=3, nz=10, bundle_packing='hcp')
+    >>> swnt_bundle = SWNT((10, 10), n1=5, n2=3, n3=10, bundle_packing='hcp')
     >>> print(swnt_bundle)
-    SWNT((10, 10), nx=5, ny=3, nz=10, basis=['C', 'C'], bond=1.42,
+    SWNT((10, 10), n1=5, n2=3, n3=10, basis=['C', 'C'], bond=1.42,
     bundle_packing='hcp', bundle_geometry=None)
 
     """
