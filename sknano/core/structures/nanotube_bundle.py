@@ -16,7 +16,7 @@ import re
 
 import numpy as np
 
-from sknano.core import deprecated, deprecate_kwarg
+from sknano.core import deprecated, deprecated_kwargs
 from sknano.core.atoms import Atom, vdw_radius_from_basis
 from sknano.core.refdata import aCC, grams_per_Da
 from sknano.core.math import Vector
@@ -348,8 +348,7 @@ class NanotubeBundleBase(NanotubeBundleMixin, NanoStructureBase):
 
     _bundle_geometries = ['square', 'rectangle', 'hexagon']
 
-    @deprecate_kwarg(kwarg='nx', since='0.4.0', alternative='n1')
-    @deprecate_kwarg(kwarg='ny', since='0.4.0', alternative='n2')
+    @deprecated_kwargs({'nx': 'n1', 'ny': 'n2'}, since='0.4.0')
     def __init__(self, *args, n1=1, n2=1, bundle_packing=None,
                  bundle_geometry=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -363,11 +362,13 @@ class NanotubeBundleBase(NanotubeBundleMixin, NanoStructureBase):
         if n1 != 1 or n2 != 1 or bundle_geometry is not None:
             self.is_bundle = True
             self.init_bundle_parameters()
-            self.generate_unit_cell()
+            self.__generate_unit_cell()
 
     def generate_unit_cell(self):
         """Generate Nanotube unit cell."""
         self.scaling_matrix = [self.n1, self.n2, 1]
+
+    __generate_unit_cell = generate_unit_cell
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""

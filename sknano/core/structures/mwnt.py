@@ -13,7 +13,7 @@ __docformat__ = 'restructuredtext en'
 
 import numpy as np
 
-from sknano.core import deprecate_kwarg, deprecated
+from sknano.core import deprecated, deprecated_kwargs
 from sknano.core.atoms import BasisAtoms
 # from sknano.core.crystallography import UnitCell
 from sknano.core.refdata import element_data
@@ -400,8 +400,7 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
         if `True`, show verbose output
 
     """
-    @deprecate_kwarg(kwarg='Lz', since='0.4.0', alternative='L')
-    @deprecate_kwarg(kwarg='nz', since='0.4.0', alternative='n3')
+    @deprecated_kwargs(dict(Lz='L', nz='n3'), since='0.4.0')
     def __init__(self, Ch_list=None, Nwalls=None, L=None, n3=None,
                  min_wall_diameter=None, max_wall_diameter=None,
                  max_walls=None, chiral_types=None, wall_spacing=2 * r_CC_vdw,

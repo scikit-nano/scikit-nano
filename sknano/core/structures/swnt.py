@@ -19,7 +19,7 @@ except ImportError:
 import numbers
 import numpy as np
 
-from sknano.core import deprecated, deprecate_kwarg
+from sknano.core import deprecated, deprecated_kwargs
 from sknano.core.atoms import Atom, BasisAtom, BasisAtoms
 from sknano.core.crystallography import Crystal3DLattice, UnitCell
 from sknano.core.refdata import aCC, grams_per_Da
@@ -772,7 +772,7 @@ def compute_electronic_type(*Ch):
         return 'metallic'
 
 
-@deprecate_kwarg(kwarg='nz', since='0.4.0', alternative='n3')
+@deprecated_kwargs(dict(nz='n3'), since='0.4.0')
 def compute_Natoms(*Ch, n3=1):
     """Compute :math:`N_{\\mathrm{atoms/tube}}`
 
@@ -801,7 +801,7 @@ def compute_Natoms(*Ch, n3=1):
     return int(Natoms_per_unit_cell * n3)
 
 
-@deprecate_kwarg(kwarg='nz', since='0.4.0', alternative='n3')
+@deprecated_kwargs(dict(nz='n3'), since='0.4.0')
 def compute_Natoms_per_tube(*Ch, n3=1):
     """Compute :math:`N_{\\mathrm{atoms/tube}}`
 
@@ -1089,13 +1089,13 @@ def compute_tube_radius(*Ch, bond=None, **kwargs):
     return compute_rt(*Ch, bond=bond, **kwargs)
 
 
-@deprecate_kwarg(kwarg='nz', since='0.4.0', alternative='n3')
+@deprecated_kwargs(dict(nz='n3'), since='0.4.0')
 def compute_tube_length(*Ch, n3=1, bond=None, **kwargs):
     """Alias for :func:`compute_L`"""
     return compute_L(*Ch, n3=n3, bond=bond, **kwargs)
 
 
-@deprecate_kwarg(kwarg='nz', since='0.4.0', alternative='n3')
+@deprecated_kwargs(dict(nz='n3'), since='0.4.0')
 def compute_tube_mass(*Ch, n3=1, element1=None, element2=None, **kwargs):
     """Compute nanotube mass in **grams**.
 
@@ -1551,9 +1551,7 @@ class SWNTBase(SWNTMixin, NanoStructureBase):
                         'chiral_angle', 'Ch', 'T', 'dt', 'rt',
                         'electronic_type']
 
-    @deprecate_kwarg(kwarg='nz', since='0.4.0', alternative='n3')
-    @deprecate_kwarg(kwarg='Lz', since='0.4.0', alternative='L')
-    @deprecate_kwarg(kwarg='fix_Lz', since='0.4.0', alternative='fix_L')
+    @deprecated_kwargs(dict(nz='n3', Lz='L', fix_Lz='fix_L'), since='0.4.0')
     def __init__(self, *Ch, n3=None, gutter=None, L=None, fix_L=False,
                  wrap_coords=False, **kwargs):
 

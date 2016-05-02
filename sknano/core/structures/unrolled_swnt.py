@@ -15,7 +15,7 @@ import numbers
 
 import numpy as np
 
-from sknano.core import deprecated, deprecate_kwarg
+from sknano.core import deprecated, deprecated_kwargs
 from sknano.core.atoms import BasisAtom as Atom, BasisAtoms as Atoms
 from sknano.core.crystallography import Crystal3DLattice, UnitCell
 # from sknano.core.math import Vector
@@ -111,9 +111,7 @@ class UnrolledSWNTBase(UnrolledSWNTMixin, SWNTBase, GrapheneBase,
                        NanoStructureBase):
     """Base unrolled SWNT structure class."""
 
-    @deprecate_kwarg(kwarg='nx', since='0.4.0', alternative='n1')
-    @deprecate_kwarg(kwarg='Lx', since='0.4.0')
-    @deprecate_kwarg(kwarg='fix_Lx', since='0.4.0')
+    @deprecated_kwargs(dict(nx='n1', Lx=None, fix_Lx=None), since='0.4.0')
     def __init__(self, *args, n1=1, **kwargs):
         super().__init__(*args, **kwargs)
 
