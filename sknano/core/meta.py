@@ -31,8 +31,8 @@ import numpy as np
 from numpy.compat import formatargspec, getargspec
 
 __all__ = ['attach_wrapper', 'logged', 'check_type', 'deprecated',
-           'deprecate_kwarg', 'find_mod_objs', 'get_object_signature',
-           'memoize', 'method_func', 'optional_debug',
+           'deprecate_kwarg', 'deprecated_kwargs', 'find_mod_objs',
+           'get_object_signature', 'memoize', 'method_func', 'optional_debug',
            'removed_package_warning', 'lazy_property', 'timethis',
            'typeassert', 'typed_property', 'with_doc', 'make_sig',
            'ClassSignature', 'Cached', 'NoInstances', 'Singleton', 'BaseClass']
@@ -247,7 +247,7 @@ def deprecated(since=None, message=None, name=None, alternative=None,
 
 
 def deprecate_kwarg(kwarg, since=None, message=None, alternative=None,
-                    mapping=None, pending=False, obj_type='keyword argument'):
+                    mapping=None, pending=False):
     """Decorator to deprecate a keyword argument of a function.
 
     Modified implementation of
@@ -317,7 +317,7 @@ def deprecate_kwarg(kwarg, since=None, message=None, alternative=None,
             is_classmethod = False
 
         message = _generate_deprecation_message(
-            since, message, kwarg, alternative, pending, obj_type)
+            since, message, kwarg, alternative, pending, 'keyword argument')
 
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -376,6 +376,61 @@ def deprecate_kwarg(kwarg, since=None, message=None, alternative=None,
             wrapper = classmethod(wrapper)
         return wrapper
     return decorated
+
+
+def deprecated_kwargs(keywords, since=None):
+    """
+    Decorator for marking keyword args as deprecated.
+
+    .. note::
+       Actually, this is not a decorator itself but a decorator factory,
+       returning the correct decorator for the specified options. It can be
+       used just like a decorator.
+
+    Parameters
+    ----------
+    keywords : :class:`python:dict`
+        old/new keyword names as key/value pairs.
+    """
+    def fdec(func, since=since):
+        fname = func.__name__
+        msg = "Deprecated keyword %s in %s() call - please use %s instead."
+        msg2 = "Deprecated keyword %s in %s() call - ignoring."
+        msg3 = ("Conflicting deprecated keywords (%s) in %s() call"
+                " - please use new '%s' keyword instead.")
+
+        @wraps(func)
+        def echo_func(*args, **kwargs):
+            # check if multiple deprecated keywords get mapped to the same new
+            # keyword
+            new_keyword_appearance_counts = dict.fromkeys(keywords.values(), 0)
+            for key, new_key in keywords.items():
+                if key in kwargs:
+                    new_keyword_appearance_counts[new_key] += 1
+            for key_ in keywords.values():
+                if new_keyword_appearance_counts[key_] > 1:
+                    conflicting_keys = ", ".join(
+                        [old_key for old_key, new_key in keywords.items()
+                         if new_key == key_])
+                    raise Exception(msg3 % (conflicting_keys, fname, new_key))
+            # map deprecated keywords to new keywords
+            for kw in kwargs.keys():
+                if kw in keywords:
+                    nkw = keywords[kw]
+                    if nkw is None:
+                        warnings.warn(msg2 % (kw, fname),
+                                      category=DeprecationWarning,
+                                      stacklevel=2)
+                    else:
+                        warnings.warn(msg % (kw, fname, nkw),
+                                      category=DeprecationWarning,
+                                      stacklevel=2)
+                        kwargs[nkw] = kwargs[kw]
+                    del(kwargs[kw])
+            return func(*args, **kwargs)
+        return echo_func
+
+    return fdec
 
 
 class lazy_property:
