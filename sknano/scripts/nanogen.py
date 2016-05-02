@@ -62,7 +62,7 @@ LAMMPS data format.::
 This command will generate a :math:`(20, 0)` SWNT, 5 unit cells
 long and saves the data in `xyz` format.::
 
-    > nanogen swnt --Ch 20 0 --nz 5
+    > nanogen swnt --Ch 20 0 --n3 5
 
 """
 from __future__ import absolute_import, division, print_function, \
@@ -176,18 +176,18 @@ def nanogen_parser():
                                     '(default: %(default)s)')
     swnt_parent_parser_group = \
         swnt_parent_parser.add_mutually_exclusive_group()
-    swnt_parent_parser_group.add_argument('--nz', type=int, default=1,
+    swnt_parent_parser_group.add_argument('--n3', type=int, default=1,
                                           help='Number of repeat unit cells '
-                                          'along `z` axis '
+                                          'along a3 lattice vector '
                                           '(default: %(default)s)')
-    swnt_parent_parser_group.add_argument('--Lz', type=float, default=None,
+    swnt_parent_parser_group.add_argument('--L', type=float, default=None,
                                           help='Length of nanotube along `z` '
                                           'axis in **Angstroms**. '
                                           '(default: %(default)s)')
     swnt_parent_parser.add_argument(
-        '--fix-Lz', action='store_true', help='Generate the nanotube with '
-        'length as close to the specified `Lz` as possible. If `True`, then '
-        'non integer `nz` cells are permitted. (default: %(default)s)')
+        '--fix-L', action='store_true', help='Generate the nanotube with '
+        'length as close to the specified `L` as possible. If `True`, then '
+        'non integer `n3` cells are permitted. (default: %(default)s)')
 
     unrolled_swnt_parser = \
         subparsers.add_parser('unrolled_swnt',
@@ -197,17 +197,9 @@ def nanogen_parser():
     unrolled_swnt_parser_group = \
         unrolled_swnt_parser.add_mutually_exclusive_group()
     unrolled_swnt_parser_group.add_argument(
-        '--nx', type=int, default=1,
-        help='Number of repeat unit cells along `x` axis '
+        '--n1', type=int, default=1,
+        help='Number of repeat unit cells along a1 lattice vector '
         '(default: %(default)s)')
-    unrolled_swnt_parser_group.add_argument(
-        '--Lx', type=float, default=None,
-        help='Length of unrolled nanotube along `x` axis in **Angstroms**. '
-        '(default: %(default)s)')
-    unrolled_swnt_parser.add_argument(
-        '--fix-Lx', action='store_true', help='Generate the nanotube with '
-        'length as close to the specified `Lx` as possible. If `True`, then '
-        'non integer `nx` cells are permitted. (default: %(default)s)')
 
     unrolled_swnt_parser.set_defaults(generator_class='UnrolledSWNTGenerator')
 
@@ -222,7 +214,7 @@ def nanogen_parser():
                                     default=3,
                                     help='Number of `SWNT` walls in `MWNT` '
                                     '(default: %(default)s)')
-    mwnt_parent_parser.add_argument('--Lz', type=float, default=None,
+    mwnt_parent_parser.add_argument('--L', type=float, default=None,
                                     help='Length of nanotube along `z` axis '
                                     'in **Angstroms**. '
                                     '(default: %(default)s)')
@@ -241,12 +233,14 @@ def nanogen_parser():
                                     '(default: %(default)s)')
 
     bundle_parent_parser = argparse.ArgumentParser(add_help=False)
-    bundle_parent_parser.add_argument('--nx', type=int, default=1,
+    bundle_parent_parser.add_argument('--n1', type=int, default=1,
                                       help='Number of repeat unit cells '
-                                      'along `x` axis (default: %(default)s)')
-    bundle_parent_parser.add_argument('--ny', type=int, default=1,
+                                      'along a1 lattice vector '
+                                      '(default: %(default)s)')
+    bundle_parent_parser.add_argument('--n2', type=int, default=1,
                                       help='Number of repeat unit cells '
-                                      'along `y` axis (default: %(default)s)')
+                                      'along a2 lattice vector '
+                                      '(default: %(default)s)')
     bundle_parent_parser.add_argument('--vdw-radius', type=float,
                                       default=_r_CC_vdw,
                                       help='van der Waals '
