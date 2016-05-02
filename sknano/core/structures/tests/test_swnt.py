@@ -16,12 +16,12 @@ from sknano.core.structures import SWNT
 def test1():
     swnt = SWNT(n=10, m=10)
     assert_is_instance(swnt.todict(), dict)
-    assert_true('nx' not in swnt.todict())
+    assert_true('n1' not in swnt.todict())
     assert_equal(swnt.n, 10)
     assert_equal(swnt.m, 10)
     assert_equal(swnt.element1, 'C')
     assert_equal(swnt.element2, 'C')
-    assert_equal(swnt.nz, 1.0)
+    assert_equal(swnt.n3, 1.0)
     assert_equal(swnt.t1, 1)
     assert_equal(swnt.t2, -1)
     assert_equal(swnt.d, 10)
@@ -42,7 +42,7 @@ def test2():
     assert_equal(swnt.element2, 'C')
     assert_equal(swnt.n, 20)
     assert_equal(swnt.m, 10)
-    assert_equal(swnt.nz, 1.0)
+    assert_equal(swnt.n3, 1.0)
     assert_equal(swnt.t1, 4)
     assert_equal(swnt.t2, -5)
     assert_equal(swnt.d, 10)
@@ -63,7 +63,7 @@ def test3():
     assert_equal(swnt.element2, 'C')
     assert_equal(swnt.n, 20)
     assert_equal(swnt.m, 0)
-    assert_equal(swnt.nz, 1.0)
+    assert_equal(swnt.n3, 1.0)
     assert_equal(swnt.t1, 1)
     assert_equal(swnt.t2, -2)
     assert_equal(swnt.d, 20)
@@ -142,7 +142,7 @@ def test7():
     assert_equal(swnt.m, 10)
     assert_equal(swnt.element1, 'C')
     assert_equal(swnt.element2, 'C')
-    assert_equal(swnt.nz, 1.0)
+    assert_equal(swnt.n3, 1.0)
     assert_equal(swnt.t1, 1)
     assert_equal(swnt.t2, -1)
     assert_equal(swnt.d, 10)
@@ -158,7 +158,7 @@ def test7():
 
 
 def test8():
-    bundle = SWNT(n=10, m=10, nx=3, ny=3)
+    bundle = SWNT(n=10, m=10, n1=3, n2=3)
     print(bundle.scaling_matrix)
     print(bundle.Natoms)
     assert_equal(bundle.element1, 'C')
@@ -168,6 +168,17 @@ def test8():
     assert_equal(bundle.Ntubes * bundle.unit_cell.basis.Natoms,
                  bundle.crystal_cell.basis.Natoms)
 
+
+def test9():
+    bundle = SWNT(n=10, m=10, n1=3, n2=3, n3=2)
+    print(bundle.scaling_matrix)
+    print(bundle.Natoms)
+    assert_equal(bundle.element1, 'C')
+    assert_equal(bundle.element2, 'C')
+    assert_equal(bundle.Ntubes, 9)
+    print(bundle.lattice)
+    assert_equal(bundle.Ntubes * bundle.n3 * bundle.unit_cell.basis.Natoms,
+                 bundle.crystal_cell.basis.Natoms)
 
 if __name__ == '__main__':
     nose.runmodule()

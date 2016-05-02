@@ -10,16 +10,33 @@ from nose.tools import *
 
 import numpy as np
 
-# from sknano.generators import DefectGenerator
+from sknano.generators import CrossLinkedDefectGenerator
 from sknano.io import XYZReader
-from sknano.testing import GeneratorTestFixture
+from sknano.testing import GeneratorTestFixture, IOTestFixture
 
 
-# class Tests(GeneratorTestFixture):
+class Tests(GeneratorTestFixture, IOTestFixture):
 
-#     def test1(self):
-#         generator = DefectGenerator()
-#         assert_true(isinstance(generator, DefectGenerator))
+    def test1(self):
+        generator = CrossLinkedDefectGenerator()
+        assert_true(isinstance(generator, CrossLinkedDefectGenerator))
+        assert_true(generator.structure is None)
+        print(generator)
+
+    def test2(self):
+        structure = self.swnt.structure
+        generator = CrossLinkedDefectGenerator(self.swnt)
+        assert_true(isinstance(generator, CrossLinkedDefectGenerator))
+        assert_equal(generator.structure, structure)
+        print(generator)
+
+    def test3(self):
+        structure = self.xyzdata.structure
+        generator = CrossLinkedDefectGenerator(self.xyzdata)
+        assert_true(isinstance(generator, CrossLinkedDefectGenerator))
+        assert_equal(generator.structure, structure)
+        print(generator)
+
 
 if __name__ == '__main__':
     nose.runmodule()

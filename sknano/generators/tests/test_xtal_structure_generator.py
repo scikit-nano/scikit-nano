@@ -5,6 +5,9 @@ from __future__ import unicode_literals
 
 from pkg_resources import resource_filename
 
+import warnings
+warnings.simplefilter('always')
+
 import nose
 from nose.tools import assert_equal
 
