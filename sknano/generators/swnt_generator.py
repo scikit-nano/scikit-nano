@@ -50,7 +50,7 @@ class SWNTGenerator(NanotubeBundleGeneratorBase, SWNTGeneratorBase, SWNT):
         2 integers (i.e., *Ch = [n, m]) specifying the chiral indices
         of the nanotube chiral vector
         :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-    nx, ny, nz : int, optional
+    n1, n2, n3 : int, optional
         Number of repeat unit cells in the :math:`x, y, z` dimensions.
     basis : {:class:`python:list`}, optional
         List of :class:`python:str`\ s of element symbols or atomic number
@@ -68,9 +68,9 @@ class SWNTGenerator(NanotubeBundleGeneratorBase, SWNTGeneratorBase, SWNT):
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
-    Lz : float, optional
+    L : float, optional
         Length of nanotube in units of **Angstroms**.
-        Overrides the `nz` value.
+        Overrides the `n3` value.
 
         .. versionadded:: 0.2.5
 
@@ -80,12 +80,12 @@ class SWNTGenerator(NanotubeBundleGeneratorBase, SWNTGeneratorBase, SWNT):
 
     tube_length : float, optional
         Length of nanotube in units of **Angstroms**.
-        Overrides the `nz` value.
+        Overrides the `n3` value.
 
         .. deprecated:: 0.2.5
-           Use `Lz` instead
+           Use `L` instead
 
-    fix_Lz : bool, optional
+    fix_L : bool, optional
         Generate the nanotube with length as close to the specified
         :math:`L_z` as possible. If `True`, then
         non integer :math:`n_z` cells are permitted.
@@ -153,7 +153,7 @@ class SWNTGenerator(NanotubeBundleGeneratorBase, SWNTGeneratorBase, SWNT):
     :math:`C_{\\mathrm{h}} = (10, 5)` SWCNTs and cell count
     :math:`n_x=10, n_y=3, n_z=5`.
 
-    >>> SWCNTbundle = SWNTGenerator(n=10, m=5, nx=10, ny=3, nz=5)
+    >>> SWCNTbundle = SWNTGenerator(n=10, m=5, n1=10, n2=3, n3=5)
     >>> SWCNTbundle.save()
 
     The rendered structure looks like:
@@ -163,7 +163,7 @@ class SWNTGenerator(NanotubeBundleGeneratorBase, SWNTGeneratorBase, SWNT):
     Now let's generate a nice hexagon bundle, 3 tubes wide, with
     :math:`C_{\\mathrm{h}} = (6, 5)`.
 
-    >>> SWCNTbundle = SWNTGenerator(n=6, m=5, nz=5, bundle_geometry='hexagon')
+    >>> SWCNTbundle = SWNTGenerator(n=6, m=5, n3=5, bundle_geometry='hexagon')
     >>> SWCNTbundle.save()
 
     which looks like:
@@ -181,7 +181,7 @@ class SWNTGenerator(NanotubeBundleGeneratorBase, SWNTGeneratorBase, SWNT):
     Now, just because we can, let's make a big ass hexagon bundle with
     :math:`C_{\\mathrm{h}} = (10, 0)`.
 
-    >>> big_hexagonal_bundle = SWNTGenerator(10, 0, nx=25, ny=25, nz=1,
+    >>> big_hexagonal_bundle = SWNTGenerator(10, 0, n1=25, n2=25, n3=1,
     ...                                      bundle_geometry='hexagon')
     >>> big_hexagonal_bundle.save()
 
@@ -192,7 +192,7 @@ class SWNTGenerator(NanotubeBundleGeneratorBase, SWNTGeneratorBase, SWNT):
     Lastly, here's a look at a bundle generated with cubic close packed
     bundle arrangement:
 
-    >>> SWCNTbundle = SWNTGenerator(10, 10, nx=3, ny=3, nz=5,
+    >>> SWCNTbundle = SWNTGenerator(10, 10, n1=3, n2=3, n3=5,
     ...                             bundle_packing='ccp')
     >>> SWCNTbundle.save()
 
@@ -203,33 +203,33 @@ class SWNTGenerator(NanotubeBundleGeneratorBase, SWNTGeneratorBase, SWNT):
     """
     def finalize(self):
         """Finalize structure data by clipping region bounds if \
-                :attr:`~SWNT.fix_Lz` is `True`."""
-        if self.L0 is not None and self.fix_Lz:
-            Lz_cutoff = self.L0 + self.bond
+                :attr:`~SWNT.fix_L` is `True`."""
+        if self.L0 is not None and self.fix_L:
+            L_cutoff = self.L0 + self.bond
             region_bounds = Cuboid(pmin=Point([-np.inf, -np.inf, 0]),
-                                   pmax=Point([np.inf, np.inf, Lz_cutoff]))
+                                   pmax=Point([np.inf, np.inf, L_cutoff]))
             self.atoms.clip_bounds(region_bounds)
         super().finalize()
 
     @classmethod
-    def generate_fname(cls, n=None, m=None, nx=None, ny=None, nz=None,
-                       fix_Lz=False, Ntubes=None, bundle_geometry=None,
+    def generate_fname(cls, n=None, m=None, n1=None, n2=None, n3=None,
+                       fix_L=False, Ntubes=None, bundle_geometry=None,
                        bundle_packing=None, **kwargs):
         """Generate filename string."""
         fname = '{}{}'.format('{}'.format(n).zfill(2), '{}'.format(m).zfill(2))
 
-        if nx == ny == 1 and bundle_geometry is None:
-            nz_fmtstr = '{:.2f}' if fix_Lz else '{:.0f}'
-            nz = ''.join((nz_fmtstr.format(nz), pluralize('cell', nz)))
-            return '_'.join((fname, nz))
+        if n1 == n2 == 1 and bundle_geometry is None:
+            n3_fmtstr = '{:.2f}' if fix_L else '{:.0f}'
+            n3 = ''.join((n3_fmtstr.format(n3), pluralize('cell', n3)))
+            return '_'.join((fname, n3))
 
         packing = '{}cp'.format(bundle_packing[0])
         Ntubes = '{}tube'.format(Ntubes)
-        nx = ''.join(('{}'.format(nx), pluralize('cell', nx)))
-        ny = ''.join(('{}'.format(ny), pluralize('cell', ny)))
-        nz_fmtstr = '{:.2f}' if fix_Lz else '{:.0f}'
-        nz = ''.join((nz_fmtstr.format(nz), pluralize('cell', nz)))
-        cells = 'x'.join((nx, ny, nz))
+        n1 = ''.join(('{}'.format(n1), pluralize('cell', n1)))
+        n2 = ''.join(('{}'.format(n2), pluralize('cell', n2)))
+        n3_fmtstr = '{:.2f}' if fix_L else '{:.0f}'
+        n3 = ''.join((n3_fmtstr.format(n3), pluralize('cell', n3)))
+        cells = 'x'.join((n1, n2, n3))
 
         fname = '_'.join((fname, cells, packing))
 
@@ -247,8 +247,8 @@ class SWNTGenerator(NanotubeBundleGeneratorBase, SWNTGeneratorBase, SWNT):
         """
         if fname is None:
             fname = self.generate_fname(n=self.n, m=self.m,
-                                        nx=self.nx, ny=self.ny, nz=self.nz,
-                                        fix_Lz=self.fix_Lz,
+                                        n1=self.n1, n2=self.n2, n3=self.n3,
+                                        fix_L=self.fix_L,
                                         Ntubes=self.Ntubes,
                                         bundle_geometry=self.bundle_geometry,
                                         bundle_packing=self.bundle_packing)

@@ -44,7 +44,7 @@ class UnrolledSWNTGenerator(NanoStructureGenerator, UnrolledSWNT):
     n, m : int
         Chiral indices defining the nanotube chiral vector
         :math:`\\mathbf{C}_{h} = n\\mathbf{a}_{1} + m\\mathbf{a}_{2} = (n, m)`.
-    nx, ny, nz : int, optional
+    n1, n2, n3 : int, optional
         Number of repeat unit cells in the :math:`x, y, z` dimensions
     basis : {:class:`python:list`}, optional
         List of :class:`python:str`\ s of element symbols or atomic number
@@ -62,18 +62,6 @@ class UnrolledSWNTGenerator(NanoStructureGenerator, UnrolledSWNT):
     bond : float, optional
         :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
         nearest neighbor atoms. Must be in units of **Angstroms**.
-    Lx, Ly, Lz : float, optional
-        Length of bundle in :math:`x, y, z` dimensions in **Angstroms**.
-        Overrides the :math:`n_x, n_y, n_z` cell values.
-
-        .. versionchanged:: 0.4.0
-
-           Changed units from nanometers to **Angstroms**
-
-    fix_Lz : bool, optional
-        Generate the nanotube with length as close to the specified
-        :math:`L_z` as possible. If `True`, then
-        non integer :math:`n_z` cells are permitted.
     autogen : bool, optional
         if `True`, automatically call
         :meth:`~UnrolledSWNTGenerator.generate`.
@@ -140,14 +128,13 @@ class UnrolledSWNTGenerator(NanoStructureGenerator, UnrolledSWNT):
             self.finalize()
 
     @classmethod
-    def generate_fname(cls, n=None, m=None, nx=None, nz=None,
-                       fix_Lx=False, fix_Lz=False, **kwargs):
+    def generate_fname(cls, n=None, m=None, n1=None, n3=None,
+                       fix_L=False, **kwargs):
         fname = '{}{}'.format('{}'.format(n).zfill(2), '{}'.format(m).zfill(2))
-        nx_fmtstr = '{:.2f}' if fix_Lx else '{:.0f}'
-        nx = ''.join((nx_fmtstr.format(nx), pluralize('cell', nx)))
-        nz_fmtstr = '{:.2f}' if fix_Lz else '{:.0f}'
-        nz = ''.join((nz_fmtstr.format(nz), pluralize('cell', nz)))
-        cells = 'x'.join((nx, nz))
+        n1 = ''.join(('{}'.format(n1), pluralize('cell', n1)))
+        n3_fmtstr = '{:.2f}' if fix_L else '{:.0f}'
+        n3 = ''.join((n3_fmtstr.format(n3), pluralize('cell', n3)))
+        cells = 'x'.join((n1, n3))
         return '_'.join(('unrolled', fname, cells))
 
     def save(self, fname=None, outpath=None, structure_format=None,
@@ -160,9 +147,8 @@ class UnrolledSWNTGenerator(NanoStructureGenerator, UnrolledSWNT):
         """
         if fname is None:
             fname = self.generate_fname(n=self.n, m=self.m,
-                                        nx=self.nx, nz=self.nz,
-                                        fix_Lx=self.fix_Lx,
-                                        fix_Lz=self.fix_Lz)
+                                        n1=self.n1, n3=self.n3,
+                                        fix_L=self.fix_L)
 
         if center_centroid:
             self.atoms.center_centroid()
