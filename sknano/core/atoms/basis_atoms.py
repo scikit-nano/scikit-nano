@@ -11,6 +11,7 @@ from __future__ import absolute_import, division, print_function
 from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
+from .id_atoms import IDAtom, IDAtoms
 from .lattice_atoms import LatticeAtom, LatticeAtoms
 from .xyz_atoms import XYZAtom, XYZAtoms
 from .mixins import AtomTransformationsMixin, AtomsTransformationsMixin, \
@@ -19,7 +20,7 @@ from .mixins import AtomTransformationsMixin, AtomsTransformationsMixin, \
 __all__ = ['BasisAtom', 'BasisAtoms']
 
 
-class BasisAtom(AtomTransformationsMixin, LatticeAtom, XYZAtom):
+class BasisAtom(AtomTransformationsMixin, LatticeAtom, XYZAtom, IDAtom):
     """An `Atom` sub-class for a crystal structure basis atom.
 
     Parameters
@@ -31,7 +32,7 @@ class BasisAtom(AtomTransformationsMixin, LatticeAtom, XYZAtom):
 
 
 class BasisAtoms(AtomsTransformationsMixin, BoundingRegionsMixin,
-                 LatticeAtoms, XYZAtoms):
+                 LatticeAtoms, XYZAtoms, IDAtoms):
     """An `Atoms` sub-class for crystal structure basis atoms.
 
     Sub-class of `Atoms` class, and a container class for lists of
