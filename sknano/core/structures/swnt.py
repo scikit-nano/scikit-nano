@@ -121,7 +121,9 @@ class NanotubeUnitCell(UnitCell):
                     print('xs, ys, zs = ({:.6f}, {:.6f}, {:.6f})'.format(
                         xs, ys, zs))
 
-                atom = BasisAtom(element, lattice=lattice, xs=xs, ys=ys, zs=zs)
+                atom = BasisAtom(element,
+                                 mol=1,
+                                 lattice=lattice, xs=xs, ys=ys, zs=zs)
                 atom.rezero()
 
                 if verbose:
@@ -1363,6 +1365,10 @@ class SWNTMixin:
         if self._integral_n3:
             self._n3 = int(np.ceil(value))
 
+        self.crystal_cell.reset_lattice_and_basis()
+        self.scaling_matrix = [1, 1, int(np.ceil(self._n3))]
+        self._Natoms_per_tube = self.crystal_cell.basis.Natoms
+
     def _update_n3(self):
         try:
             self.n3 = self.n3
@@ -1497,7 +1503,10 @@ class SWNTMixin:
     @property
     def Natoms_per_tube(self):
         """Number of atoms in nanotube :math:`N_{\\mathrm{atoms/tube}}`."""
-        return self.Natoms
+        try:
+            return self._Natoms_per_tube
+        except AttributeError:
+            return self.Natoms
 
     @property
     def linear_mass_density(self):
@@ -1570,6 +1579,12 @@ class SWNTBase(SWNTMixin, NanoStructureBase):
         self.n = n
         self.m = m
 
+        # self.generate_unit_cell()
+        self.unit_cell = \
+            NanotubeUnitCell((self.n, self.m), bond=self.bond,
+                             basis=self.basis, gutter=self.gutter,
+                             wrap_coords=wrap_coords)
+
         self.fix_L = fix_L
         if L is not None:
             self.n3 = float(L) / self.T
@@ -1578,12 +1593,6 @@ class SWNTBase(SWNTMixin, NanoStructureBase):
         else:
             self.n3 = 1
 
-        # self.generate_unit_cell()
-        self.unit_cell = \
-            NanotubeUnitCell((self.n, self.m), bond=self.bond,
-                             basis=self.basis, gutter=self.gutter,
-                             wrap_coords=wrap_coords)
-        self.scaling_matrix = [1, 1, int(np.ceil(self.n3))]
         fmtstr = ", ".join(("{Ch!r}", super().fmtstr))
         if self.fix_L:
             fmtstr = ", ".join((fmtstr, "L={L!r}", "fix_L=True"))
