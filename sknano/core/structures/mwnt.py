@@ -91,7 +91,10 @@ class MWNTMixin:
     @property
     def Natoms_per_tube(self):
         """Number of atoms in `MWNT`."""
-        return self.Natoms
+        try:
+            return self._Natoms_per_tube
+        except AttributeError:
+            return self.Natoms
 
     @property
     def Nwalls(self):
@@ -444,6 +447,7 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
         self._L = L
 
         self.__generate_unit_cell()
+        self._Natoms_per_tube = self.crystal_cell.basis.Natoms
 
         if self.verbose:
             print(self.walls)
@@ -463,11 +467,10 @@ class MWNTBase(MWNTMixin, NanoStructureBase):
 
     def generate_unit_cell(self):
         """Generate Nanotube unit cell."""
-        outside_unit_cell = self.get_wall(self.Ch_list[-1]).unit_cell
+        lattice = self.get_wall(self.Ch_list[-1]).crystal_cell.lattice
         basis = BasisAtoms()
-        [basis.extend(swnt.unit_cell.basis) for swnt in self.walls]
-        self.unit_cell = NanotubeUnitCell(lattice=outside_unit_cell.lattice,
-                                          basis=basis)
+        [basis.extend(swnt.crystal_cell.basis) for swnt in self.walls]
+        self.unit_cell = NanotubeUnitCell(lattice=lattice, basis=basis)
     __generate_unit_cell = generate_unit_cell
 
     def todict(self):
