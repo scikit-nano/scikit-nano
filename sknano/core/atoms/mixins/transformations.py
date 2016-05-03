@@ -22,7 +22,7 @@ __all__ = ['AtomTransformationsMixin', 'AtomsTransformationsMixin']
 class AtomTransformationsMixin:
     """Mixin `Atom` class for performing affine transformations."""
 
-    def rotate(self, **kwargs):
+    def rotate(self, with_lattice=True, **kwargs):
         """Rotate `Atom` position vector.
 
         Parameters
@@ -40,14 +40,16 @@ class AtomTransformationsMixin:
         if transform_matrix is None:
             kwargs['transform_matrix'] = transformation_matrix(**kwargs)
 
-        try:
-            self.lattice.rotate(**kwargs)
-        except AttributeError:
-            pass
+        if with_lattice:
+            try:
+                self.lattice.rotate(**kwargs)
+            except AttributeError:
+                pass
         self.r.rotate(**kwargs)
         self.r0.rotate(**kwargs)
 
-    def translate(self, t, fix_anchor_point=True, cartesian=True):
+    def translate(self, t, fix_anchor_point=True, cartesian=True,
+                  with_lattice=True):
         """Translate :class:`Atom` position vector by :class:`Vector` `t`.
 
         Parameters
@@ -62,7 +64,8 @@ class AtomTransformationsMixin:
                 t = self.lattice.fractional_to_cartesian(t)
             # if not fix_anchor_point:
             #     self.lattice.translate(t)
-            self.lattice.translate(t)
+            if with_lattice:
+                self.lattice.translate(t)
         except AttributeError:
             pass
 
@@ -103,7 +106,8 @@ class AtomsTransformationsMixin:
             kwargs['transform_matrix'] = transformation_matrix(**kwargs)
         [atom.rotate(**kwargs) for atom in self]
 
-    def translate(self, t, fix_anchor_points=True, cartesian=True):
+    def translate(self, t, fix_anchor_points=True, cartesian=True,
+                  with_lattice=True):
         """Translate `Atom` vectors by :class:`Vector` `t`.
 
         Parameters
@@ -113,4 +117,5 @@ class AtomsTransformationsMixin:
 
         """
         [atom.translate(t, fix_anchor_point=fix_anchor_points,
-                        cartesian=cartesian) for atom in self]
+                        cartesian=cartesian, with_lattice=with_lattice)
+         for atom in self]
