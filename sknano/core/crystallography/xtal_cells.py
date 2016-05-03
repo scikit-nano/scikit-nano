@@ -329,16 +329,20 @@ class CrystalCell(BaseClass, TabulateMixin):
                 self.lattice.matrix)
 
         basis = self.basis[:]
+        max_mol = max(set(basis.mols))
         self.basis = BasisAtoms()
         for atom in basis:
-            for tvec in tvecs:
+            for i, tvec in enumerate(tvecs):
                 xs, ys, zs = \
                     self.lattice.cartesian_to_fractional(atom.r + tvec)
                 if self.wrap_coords:
                     xs, ys, zs = \
                         self.lattice.wrap_fractional_coordinate(
                             [xs, ys, zs])
-                self.basis.append(BasisAtom(atom.element, lattice=self.lattice,
+                mol = i * max_mol + atom.mol
+                self.basis.append(BasisAtom(atom.element,
+                                            mol=mol, id=atom.id,
+                                            lattice=self.lattice,
                                             xs=xs, ys=ys, zs=zs))
 
     def rotate(self, **kwargs):
@@ -371,7 +375,9 @@ class CrystalCell(BaseClass, TabulateMixin):
             if wrap_coords:
                 xs, ys, zs = \
                     self.lattice.wrap_fractional_coordinate([xs, ys, zs])
-            self.basis.append(BasisAtom(atom.element, lattice=self.lattice,
+            self.basis.append(BasisAtom(atom.element,
+                                        mol=atom.mol, id=atom.id,
+                                        lattice=self.lattice,
                                         xs=xs, ys=ys, zs=zs))
 
     def update_basis(self, element, index=None, step=None):
@@ -391,6 +397,12 @@ class CrystalCell(BaseClass, TabulateMixin):
         elif isinstance(index, (list, np.ndarray)):
             [self.unit_cell.basis.__setitem__(i, element) for i in index]
             [self.basis.__setitem__(i, element) for i in index]
+
+    def reset_lattice_and_basis(self):
+        """Reset the crystal cell lattice and basis to the unit cell values."""
+        if self.unit_cell is not None:
+            self._lattice = self.unit_cell.lattice
+            self._basis = self.unit_cell.basis
 
     def todict(self):
         """:class:`~python:dict` of :class:`CrystalCell` parameters."""
