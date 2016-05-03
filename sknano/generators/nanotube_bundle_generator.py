@@ -17,7 +17,7 @@ import copy
 
 # from sknano.core.crystallography import SuperCell
 # from sknano.core.math import Vector
-from sknano.core import grouper
+# from sknano.core import grouper
 from .base import NanoStructureGenerator
 
 __all__ = ['NanotubeBundleGeneratorBase']
@@ -28,23 +28,12 @@ class NanotubeBundleGeneratorBase(NanoStructureGenerator):
     def generate(self, finalize=True):
         """Generate structure data."""
         super().generate(finalize=False)
-        if self.is_bundle:
-            if self.bundle_geometry is not None or \
-                    self.__class__.__qualname__ == 'MWNTGenerator' or \
-                    self.fix_L:
-                self._generate_bundle_from_bundle_coords()
-                # for mol, dr in enumerate(self.bundle_coords, start=1):
-                #     atoms = self.atoms.filtered(self.atoms.mols == mol)
-                #     atomsobj.translate(dr)
-                #     [setattr(atom, 'mol', mol_id) for atom in atomsobj]
-                #     self.bundle_list.append(atomsobj)
-            else:
-                atoms = self.atoms
-                Natoms_per_tube = self.unit_cell.basis.Natoms * self.n3
-                # if atoms.Natoms % Natoms_per_tube == 0:
-                for mol, atoms in enumerate(grouper(atoms, Natoms_per_tube),
-                                            start=1):
-                    [setattr(atom, 'mol', mol) for atom in atoms]
+        if self.is_bundle and self.bundle_geometry is not None:
+            self._generate_bundle_from_bundle_coords()
+
+        atoms = self.atoms
+        for mol in set(atoms.mol_ids):
+            self.bundle_list.append(atoms.filtered(atoms.mols == mol))
 
         if finalize:
             self.finalize()
