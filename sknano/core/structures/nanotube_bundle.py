@@ -257,11 +257,12 @@ class NanotubeBundleMixin:
     @property
     def Natoms_per_tube(self):
         """Alias for :attr:`~NanotubeBundleMixin.Natoms_list`."""
-        try:
-            val = self.Natoms_list[:]
-            return val if len(val) > 1 else val[0]
-        except AttributeError:
-            return super().Natoms_per_tube
+        # try:
+        #     val = self.Natoms_list[:]
+        #     return val if len(val) > 1 else val[0]
+        # except AttributeError:
+        #     return super().Natoms_per_tube
+        return super().Natoms_per_tube
 
     def init_bundle_parameters(self):
         """Initialize bundle attributes."""
@@ -352,6 +353,8 @@ class NanotubeBundleBase(NanotubeBundleMixin, NanoStructureBase):
     def __init__(self, *args, n1=1, n2=1, bundle_packing=None,
                  bundle_geometry=None, **kwargs):
         super().__init__(*args, **kwargs)
+
+        [setattr(atom, 'mol', 1) for atom in self.crystal_cell.basis]
 
         self.n1 = n1
         self.n2 = n2
