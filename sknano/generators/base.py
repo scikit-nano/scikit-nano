@@ -236,9 +236,13 @@ class DefectGeneratorBase(StructureReaderMixin, GeneratorBase, BaseClass):
     ----------
 
     """
-    def __init__(self, structure_obj=None, autogen=True, **kwargs):
+    def __init__(self, structure_obj=None, autogen=True,
+                 echo_vmd_selection=True, **kwargs):
         super().__init__(autogen=False, **kwargs)
+
         self.fmtstr = "{structure!r}"
+        self.echo_vmd_selection = echo_vmd_selection
+
         if structure_obj is not None:
             if not isinstance(structure_obj, StructureBase):
                 structure_obj = self.read(structure_obj).structure
