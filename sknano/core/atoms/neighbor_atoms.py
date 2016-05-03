@@ -47,8 +47,10 @@ class NeighborAtom(Atom):
        Deprecate/replace `neighbors` parameter with `neighbor_map`
 
     """
-    def __init__(self, *args, neighbors=None, neighbor_map=None, **kwargs):
+    def __init__(self, *args, CN=0, neighbors=None, neighbor_map=None,
+                 **kwargs):
         super().__init__(*args, **kwargs)
+        self.CN = CN
         self.neighbors = neighbors
         self.neighbor_map = neighbor_map
         self.nn_adjacency_map = {}
@@ -57,7 +59,7 @@ class NeighborAtom(Atom):
 
     def __dir__(self):
         attrs = super().__dir__()
-        attrs.extend(['neighbors', 'neighbor_map'])
+        attrs.extend(['CN', 'neighbors', 'neighbor_map'])
         return attrs
 
     @property
@@ -87,10 +89,11 @@ class NeighborAtom(Atom):
     @property
     def CN(self):
         """`NeighborAtom` coordination number."""
-        try:
-            return self.neighbors.Natoms
-        except AttributeError:
-            return 0
+        return self._CN
+
+    @CN.setter
+    def CN(self, value):
+        self._CN = int(value)
 
     @property
     def Nneighbors(self):
@@ -194,7 +197,7 @@ class NeighborAtom(Atom):
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()
-        super_dict.update(dict(neighbors=self.neighbors,
+        super_dict.update(dict(CN=self.CN, neighbors=self.neighbors,
                                neighbor_map=self.neighbor_map))
         return super_dict
 
@@ -424,6 +427,7 @@ class NeighborAtoms(KDTreeAtomsMixin, Atoms):
                     neighbors.distances = distances
                     if np.allclose(cutoff, self.NNrc):
                         atom.neighbors = neighbors
+                        atom.CN = neighbors.Natoms
                     atom.set_nth_nearest_neighbors(n, neighbors[:])
 
             except ValueError:
