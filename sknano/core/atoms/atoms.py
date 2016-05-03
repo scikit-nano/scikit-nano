@@ -13,6 +13,7 @@ __docformat__ = 'restructuredtext en'
 
 from collections.abc import Iterable
 from operator import attrgetter
+import copy
 import numbers
 import re
 # import warnings
@@ -25,7 +26,7 @@ from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols, element_names
 from .selections import AtomsSelectionMixin
 
-__all__ = ['Atom', 'Atoms']
+__all__ = ['Atom', 'Atoms', 'update_atoms']
 
 
 class Atom(BaseClass):
@@ -753,3 +754,58 @@ class Atoms(AtomsSelectionMixin, TabulateMixin, UserList):
         #     warnings.warn('`Atoms.update_attrs` received unused kwargs: \n'
         #                   '{}'.format(kwargs))
         assert not hasattr(super(), 'update_attrs')
+
+
+def update_atoms(atoms, kwargs, deepcopy=True, update_kwargs=False):
+    if not update_kwargs:
+        kwargs = kwargs.copy()
+
+    atoms = atoms[:]
+    if deepcopy:
+        atoms = copy.deepcopy(atoms)
+
+    if any([kw in kwargs for kw
+            in ('center_CM', 'center_center_of_mass')]):
+        center_com = \
+            kwargs.pop('center_CM', kwargs.pop('center_center_of_mass'))
+
+    region_bounds = kwargs.pop('region_bounds', None)
+    center_centroid = kwargs.pop('center_centroid', True)
+    center_com = kwargs.pop('center_com', False)
+    filter_condition = kwargs.pop('filter_condition', None)
+    rotation_parameters = kwargs.pop('rotation_parameters', None)
+
+    if region_bounds is not None:
+        atoms.clip_bounds(region_bounds)
+
+    if center_centroid:
+        atoms.center_centroid()
+    elif center_com:
+        atoms.center_com()
+
+    if filter_condition is not None:
+        atoms.filter(filter_condition)
+        # atoms = atoms.filtered(filter_condition)
+
+    rotation_kwargs = ['rotation_angle', 'angle', 'rot_axis', 'axis',
+                       'anchor_point', 'deg2rad', 'degrees', 'rot_point',
+                       'from_vector', 'to_vector', 'transform_matrix']
+
+    if rotation_parameters is None and \
+            any([kw in kwargs for kw in rotation_kwargs]):
+        rotation_parameters = {kw: kwargs.pop(kw) for kw in rotation_kwargs
+                               if kw in kwargs}
+        if 'rotation_angle' in rotation_parameters:
+            rotation_parameters['angle'] = \
+                rotation_parameters.pop('rotation_angle')
+        if 'rot_axis' in rotation_parameters:
+            rotation_parameters['axis'] = rotation_parameters.pop('rot_axis')
+        if 'deg2rad' in rotation_parameters:
+            rotation_parameters['degrees'] = rotation_parameters.pop('deg2rad')
+
+    if rotation_parameters is not None and \
+            isinstance(rotation_parameters, dict):
+        atoms.rotate(**rotation_parameters)
+
+    atoms.rezero()
+    return atoms
