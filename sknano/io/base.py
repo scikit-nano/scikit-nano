@@ -190,8 +190,10 @@ class StructureDataWriterMixin:
         atoms.rezero()
         self._atoms = atoms
 
-    def _update_fpath(self, fname=None, outpath=None, structure_format=None,
-                      **kwargs):
+    def _update_fpath(self, kwargs):
+        fname = kwargs.get('fname', None)
+        outpath = kwargs.get('outpath', None)
+        structure_format = kwargs.get('structure_format', None)
         if fname.endswith(supported_structure_formats) and \
                 structure_format is None:
             for ext in supported_structure_formats:
@@ -249,7 +251,7 @@ class StructureDataWriterMixin:
         filter_condition : array_like, optional
 
         """
-        self._update_fpath(**kwargs)
+        self._update_fpath(kwargs)
         # self._update_atoms(**kwargs)
         structure_format = kwargs.pop('structure_format')
         print('writing {}'.format(self.fname))
