@@ -19,30 +19,16 @@ from sknano.core import pluralize
 from sknano.core.math import Point
 from sknano.core.structures import MWNT
 from sknano.core.geometric_regions import Cuboid
-from .base import NanoStructureGenerator
+from .base import GeneratorMixin, NanoStructureGenerator
 from .nanotube_bundle_generator import NanotubeBundleGeneratorBase
-from .swnt_generator import SWNTGenerator
+# from .swnt_generator import SWNTGenerator
 
 __all__ = ['MWNTGeneratorBase', 'MWNTGenerator']
 
 
-class MWNTGeneratorBase(NanoStructureGenerator):
+class MWNTGeneratorBase(GeneratorMixin, NanoStructureGenerator):
     """Mixin :class:`~sknano.core.structures.MWNT` structure generator."""
-    def generate(self, finalize=True):
-        """Generate structure data.
-
-        .. todo::
-
-           Load the diameter and chirality data from file instead of
-           generating it every time.
-
-        """
-        self.structure.clear()
-        for swnt in self.walls:
-            self.atoms.extend(SWNTGenerator(finalize=False,
-                                            **swnt.todict()).atoms)
-        if finalize:
-            self.finalize()
+    pass
 
 
 class MWNTGenerator(NanotubeBundleGeneratorBase, MWNTGeneratorBase, MWNT):
