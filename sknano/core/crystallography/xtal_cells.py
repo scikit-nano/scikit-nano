@@ -359,6 +359,21 @@ class CrystalCell(BaseClass, TabulateMixin):
             self.basis.translate(t, fix_anchor_points=fix_anchor_points)
         self.unit_cell.translate(t, fix_anchor_points=fix_anchor_points)
 
+    def translate_basis(self, t, cartesian=True, wrap_coords=True):
+        if cartesian:
+            t = self.lattice.cartesian_to_fractional(t)
+
+        basis = self.basis[:]
+        self.basis = BasisAtoms()
+
+        for atom in basis:
+            xs, ys, zs = atom.rs + t
+            if wrap_coords:
+                xs, ys, zs = \
+                    self.lattice.wrap_fractional_coordinate([xs, ys, zs])
+            self.basis.append(BasisAtom(atom.element, lattice=self.lattice,
+                                        xs=xs, ys=ys, zs=zs))
+
     def update_basis(self, element, index=None, step=None):
         """Update a crystal cell basis element."""
         if index is None:
