@@ -15,7 +15,7 @@ import os
 
 from monty.io import zopen
 from sknano.core import get_fpath
-from sknano.core.atoms import StructureAtom as Atom
+from sknano.core.atoms import StructureAtom as Atom, update_atoms
 
 from .base import StructureData, StructureDataError, StructureDataConverter, \
     StructureDataFormatter, default_comment_line
@@ -100,6 +100,7 @@ class XYZWriter:
 
         if structure is not None and atoms is None:
             atoms = structure.atoms
+        atoms = update_atoms(atoms, kwargs, update_kwargs=True)
 
         if fpath is None:
             fpath = get_fpath(fname=fname, ext='xyz', outpath=outpath,

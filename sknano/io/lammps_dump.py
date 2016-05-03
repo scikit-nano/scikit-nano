@@ -21,7 +21,7 @@ import numpy as np
 from monty.io import zopen
 from sknano.core import deprecate_kwarg, get_fpath, flatten, grouper
 from sknano.core.atoms import Trajectory, Snapshot, Atoms, MDAtoms, \
-    MDAtom as Atom
+    MDAtom as Atom, update_atoms
 from sknano.core.crystallography import Domain
 # from sknano.core.crystallography import Crystal3DLattice
 from .base import StructureData, StructureDataError, StructureDataFormatter
@@ -647,12 +647,14 @@ class DUMPWriter:
             fpath = get_fpath(fname=fname, ext='dump', outpath=outpath,
                               overwrite=True, add_fnum=False)
 
+        if not isinstance(atoms, MDAtoms):
+            atoms = MDAtoms(atoms)
+        atoms = update_atoms(atoms, kwargs, update_kwargs=True)
+
         dump = DUMPIO(**kwargs)
         formatter = dump.formatter
         if trajectory is None and snapshot is None:
             trajectory = dump.trajectory
-            if not isinstance(atoms, MDAtoms):
-                atoms = MDAtoms(atoms)
             snapshot = Snapshot(trajectory)
             if timestep is None:
                 timestep = 0

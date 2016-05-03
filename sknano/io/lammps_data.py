@@ -18,7 +18,7 @@ import numpy as np
 
 from monty.io import zopen
 from sknano.core import get_fpath, minmax
-from sknano.core.atoms import Atoms, MDAtoms, MDAtom as Atom
+from sknano.core.atoms import Atoms, MDAtoms, MDAtom as Atom, update_atoms
 from sknano.core.crystallography import Domain
 from .base import StructureData, StructureDataError, StructureDataFormatter, \
     StructureDataConverter, default_comment_line
@@ -401,6 +401,7 @@ class DATAWriter:
 
         if not isinstance(atoms, MDAtoms):
             atoms = MDAtoms(atoms)
+        atoms = update_atoms(atoms, kwargs, update_kwargs=True)
 
         formatter = DATAFormatter(atom_style=atom_style,
                                   bond_style=bond_style,
