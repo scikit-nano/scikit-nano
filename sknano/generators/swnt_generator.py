@@ -216,8 +216,9 @@ class SWNTGenerator(NanotubeBundleGeneratorBase, SWNTGeneratorBase, SWNT):
                        fix_L=False, Ntubes=None, bundle_geometry=None,
                        bundle_packing=None, **kwargs):
         """Generate filename string."""
-        fname = '{}{}'.format('{}'.format(n).zfill(2), '{}'.format(m).zfill(2))
-
+        # fname = \
+        #     '{}{}'.format('{}'.format(n).zfill(2), '{}'.format(m).zfill(2))
+        fname = str((n, m)).replace(' ', '')
         if n1 == n2 == 1 and bundle_geometry is None:
             n3_fmtstr = '{:.2f}' if fix_L else '{:.0f}'
             n3 = ''.join((n3_fmtstr.format(n3), pluralize('cell', n3)))
