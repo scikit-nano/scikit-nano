@@ -166,10 +166,16 @@ class StructureMixin:
         if wrap_coords:
             self.crystal_cell.basis.wrap_coords(pbc=pbc)
 
-            if self.atoms is not None and len(self.atoms) > 0:
-                self.atoms.wrap_coords(pbc=pbc)
+            # if self.atoms is not None and len(self.atoms) > 0:
+            #     self.atoms.wrap_coords(pbc=pbc)
             if hasattr(self, 'generate'):
                 self.generate(finalize=True)
+
+    def translate_basis(self, t, cartesian=True, wrap_coords=True):
+        self.crystal_cell.translate_basis(t, cartesian=cartesian,
+                                          wrap_coords=wrap_coords)
+        if hasattr(self, 'generate'):
+            self.generate(finalize=True)
 
 
 @total_ordering
