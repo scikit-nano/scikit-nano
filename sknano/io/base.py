@@ -204,7 +204,7 @@ class StructureDataWriterMixin:
              structure_format not in supported_structure_formats):
             structure_format = default_structure_format
 
-        self.structure_format = structure_format
+        self.structure_format = kwargs['structure_format'] = structure_format
 
         if not fname.endswith(structure_format):
             fname += '.' + structure_format
@@ -251,7 +251,7 @@ class StructureDataWriterMixin:
         """
         self._update_fpath(**kwargs)
         # self._update_atoms(**kwargs)
-        structure_format = self.structure_format
+        structure_format = kwargs.pop('structure_format')
         print('writing {}'.format(self.fname))
         getattr(self, 'write_' + structure_format)(structure=self, **kwargs)
 
