@@ -33,9 +33,7 @@ __all__ = ['compute_d', 'compute_dR', 'compute_N', 'compute_t1', 'compute_t2',
            'compute_Ch', 'compute_chiral_angle', 'compute_T', 'compute_dt',
            'compute_rt', 'compute_M', 'compute_R', 'compute_R_chiral_angle',
            'compute_symmetry_operation', 'compute_unit_cell_symmetry_params',
-           'compute_psi', 'compute_tau',
-           'compute_l1', 'compute_l2', 'compute_L',
-           'compute_Lx', 'compute_Ly', 'compute_Lz',
+           'compute_psi', 'compute_tau', 'compute_L', 'compute_Lz',
            'compute_electronic_type', 'compute_Natoms',
            'compute_Natoms_per_tube', 'compute_Natoms_per_unit_cell',
            'compute_unit_cell_mass', 'compute_linear_mass_density',
@@ -942,34 +940,6 @@ def compute_linear_mass_density(*Ch, bond=None, element1=None, element2=None,
         return 0
 
 
-@deprecated(since='0.4.0', alternative='compute_l1')
-def compute_Lx(*Ch, **kwargs):
-    """Compute the axis-aligned length along the `x`-axis in **Angstroms**.
-
-    Calculated as:
-
-    .. math::
-
-       L_x = n_x * (d_t + 2 r_{\\mathrm{vdW}})
-
-    """
-    return compute_l1(*Ch, **kwargs)
-
-
-@deprecated(since='0.4.0', alternative='compute_l2')
-def compute_Ly(*Ch, **kwargs):
-    """Compute the axis-aligned length along the `y`-axis in **Angstroms**.
-
-    Calculated as:
-
-    .. math::
-
-       L_y = n_y * (d_t + 2 r_{\\mathrm{vdW}})
-
-    """
-    return compute_l2(*Ch, **kwargs)
-
-
 @deprecated(since='0.4.0', alternative='compute_L')
 def compute_Lz(*Ch, **kwargs):
     """Compute the axis-aligned length along the `z`-axis in **Angstroms**.
@@ -1006,34 +976,6 @@ def compute_Lz(*Ch, **kwargs):
 
     """
     return compute_L(*Ch, **kwargs)
-
-
-def compute_l1(*Ch, n1=1, bond=None, gutter=r_CC_vdw):
-    """Compute the length along the :math:`\\mathbf{a}_1` lattice vector in \
-        **Angstroms**.
-
-    Calculated as:
-
-    .. math::
-
-       \\ell_1 = n_1 * (d_t + 2 r_{\\mathrm{vdW}})
-
-    """
-    return n1 * (compute_dt(*Ch, bond=bond) + 2 * gutter)
-
-
-def compute_l2(*Ch, n2=1, bond=None, gutter=r_CC_vdw):
-    """Compute the length along the :math:`\\mathbf{a}_2` lattice vector in \
-        **Angstroms**.
-
-    Calculated as:
-
-    .. math::
-
-       \\ell_2 = n_2 * (d_t + 2 r_{\\mathrm{vdW}})
-
-    """
-    return n2 * (compute_dt(*Ch, bond=bond) + 2 * gutter)
 
 
 def compute_L(*Ch, n3=1, bond=None, **kwargs):
