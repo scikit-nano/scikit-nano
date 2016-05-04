@@ -113,16 +113,16 @@ class NanotubeBundleMixin:
         self.n2 = value
 
     @property
-    @deprecated(since='0.4.0', alternative='l1', obj_type='attribute')
+    @deprecated(since='0.4.0', alternative='lattice.a', obj_type='attribute')
     def Lx(self):
         """Axis-aligned length along the `x`-axis in **Angstroms**."""
-        return self.l1
+        return self.lattice.a
 
     @property
-    @deprecated(since='0.4.0', alternative='l2', obj_type='attribute')
+    @deprecated(since='0.4.0', alternative='lattice.b', obj_type='attribute')
     def Ly(self):
         """Axis-aligned length along the `y`-axis in **Angstroms**."""
-        return self.l2
+        return self.lattice.b
 
     @property
     def n1(self):
@@ -147,32 +147,6 @@ class NanotubeBundleMixin:
         if not (isinstance(value, numbers.Number) or value > 0):
             raise TypeError('Expected a positive integer.')
         self._n2 = int(value)
-
-    @property
-    def l1(self):
-        """Axis-aligned length along the `x`-axis in **Angstroms**.
-
-        Calculated as:
-
-        .. math::
-
-           \\ell_1 = n_1 * (d_t + 2 r_{\\mathrm{vdW}})
-
-        """
-        return self.n1 * (self.dt + 2 * self.vdw_radius)
-
-    @property
-    def l2(self):
-        """Axis-aligned length along the `y`-axis in **Angstroms**.
-
-        Calculated as:
-
-        .. math::
-
-           \\ell_2 = n_2 * (d_t + 2 r_{\\mathrm{vdW}})
-
-        """
-        return self.n2 * (self.dt + 2 * self.vdw_radius)
 
     @property
     def bundle_geometry(self):
@@ -317,12 +291,12 @@ class NanotubeBundleMixin:
                 ntubes_per_row = nrows - row
 
         elif self.bundle_geometry == 'rectangle':
-            l1 = self.l1
+            a = self.lattice.a
             for n1 in range(self.n1):
                 for n2 in range(self.n2):
                     dr = n1 * self.r1 + n2 * self.r2
                     while dr.x < 0:
-                        dr.x += l1
+                        dr.x += a
                     self.bundle_coords.append(dr)
 
         elif self.bundle_geometry == 'square':
