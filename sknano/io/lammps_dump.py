@@ -649,7 +649,7 @@ class DUMPWriter:
 
         if not isinstance(atoms, MDAtoms):
             atoms = MDAtoms(atoms)
-        atoms = update_atoms(atoms, kwargs, update_kwargs=True)
+        atoms = update_atoms(atoms, kwargs, deepcopy=False, update_kwargs=True)
 
         dump = DUMPIO(**kwargs)
         formatter = dump.formatter
