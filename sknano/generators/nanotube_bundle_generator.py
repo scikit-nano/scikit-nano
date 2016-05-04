@@ -28,12 +28,13 @@ class NanotubeBundleGeneratorBase(NanoStructureGenerator):
     def generate(self, finalize=True):
         """Generate structure data."""
         super().generate(finalize=False)
-        if self.is_bundle and self.bundle_geometry is not None:
-            self._generate_bundle_from_bundle_coords()
+        if self.is_bundle:
+            if self.bundle_geometry is not None:
+                self._generate_bundle_from_bundle_coords()
 
-        atoms = self.atoms
-        for mol in set(atoms.mol_ids):
-            self.bundle_list.append(atoms.filtered(atoms.mols == mol))
+            atoms = self.atoms
+            for mol in set(atoms.mol_ids):
+                self.bundle_list.append(atoms.filtered(atoms.mols == mol))
 
         if finalize:
             self.finalize()
