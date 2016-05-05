@@ -128,12 +128,12 @@ class UnrolledSWNTGenerator(NanoStructureGenerator, UnrolledSWNT):
             self.finalize()
 
     @classmethod
-    def generate_fname(cls, n=None, m=None, n1=None, n3=None,
-                       fix_L=False, **kwargs):
-        fname = '{}{}'.format('{}'.format(n).zfill(2), '{}'.format(m).zfill(2))
+    def generate_fname(cls, n=None, m=None, n1=None, n3=None, **kwargs):
+        # fname = \
+        #     '{}{}'.format('{}'.format(n).zfill(2), '{}'.format(m).zfill(2))
+        fname = str((n, m)).replace(' ', '')
         n1 = ''.join(('{}'.format(n1), pluralize('cell', n1)))
-        n3_fmtstr = '{:.2f}' if fix_L else '{:.0f}'
-        n3 = ''.join((n3_fmtstr.format(n3), pluralize('cell', n3)))
+        n3 = ''.join(('{}'.format(n3), pluralize('cell', n3)))
         cells = 'x'.join((n1, n3))
         return '_'.join(('unrolled', fname, cells))
 
@@ -147,8 +147,7 @@ class UnrolledSWNTGenerator(NanoStructureGenerator, UnrolledSWNT):
         """
         if fname is None:
             fname = self.generate_fname(n=self.n, m=self.m,
-                                        n1=self.n1, n3=self.n3,
-                                        fix_L=self.fix_L)
+                                        n1=self.n1, n3=self.n3)
 
         if center_centroid:
             self.atoms.center_centroid()
