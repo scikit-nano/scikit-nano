@@ -32,16 +32,16 @@ __all__ = ['UnrolledSWNTMixin', 'UnrolledSWNTBase', 'UnrolledSWNT']
 class UnrolledSWNTMixin:
     """Mixin class for unrolled nanotubes."""
     @property
-    @deprecated(since='0.4.0', alternative='l1', obj_type='attribute')
+    @deprecated(since='0.4.0', alternative='lattice.a', obj_type='attribute')
     def Lx(self):
         """Axis-aligned length along the `x`-axis in **Angstroms**."""
-        return self.r1
+        return self.lattice.a
 
     @property
-    @deprecated(since='0.4.0', alternative='l2', obj_type='attribute')
+    @deprecated(since='0.4.0', alternative='lattice.b', obj_type='attribute')
     def Ly(self):
         """Axis-aligned length along the `y`-axis in **Angstroms**."""
-        return self.r2
+        return self.lattice.b
 
     @property
     @deprecated(since='0.4.0', alternative='n1', obj_type='attribute')
@@ -122,92 +122,11 @@ class UnrolledSWNTBase(UnrolledSWNTMixin, SWNTBase, GrapheneBase,
             self.layer_shift.x = self.bond * np.cos(np.pi/6 - chiral_angle)
             self.layer_shift.z = -self.bond * np.sin(np.pi/6 - chiral_angle)
 
-        self.generate_unit_cell()
+        self.__generate_unit_cell()
         self.scaling_matrix = \
             [int(np.ceil(self.n1)), self.nlayers, int(np.ceil(self.n3))]
         self.fmtstr = ", ".join((super().fmtstr, "n1={n1!r}"))
 
-    def todict(self):
-        """Return :class:`~python:dict` of constructor parameters."""
-        attr_dict = super().todict()
-        attr_dict.update(dict(n1=self.n1))
-        return attr_dict
-
-
-class UnrolledSWNT(UnrolledSWNTBase, NanoStructureBase):
-    """Unrolled SWNT structure class.
-
-    Parameters
-    ----------
-    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
-        Either a 2-tuple of integers (i.e., *Ch = ((n, m)) or
-        2 integers (i.e., *Ch = (n, m) specifying the chiral indices
-        of the nanotube chiral vector
-        :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
-    n1 : :class:`python:int`, optional
-        Number of repeat unit cells in the :math:`x` direction, along
-        the *unrolled* chiral vector.
-    n3 : :class:`python:int`, optional
-        Number of repeat unit cells in the :math:`z` direction, along
-        the *length* of the nanotube.
-    basis : {:class:`python:list`}, optional
-        List of :class:`python:str`\ s of element symbols or atomic number
-        of the two atom basis (default: ['C', 'C'])
-
-        .. versionadded:: 0.3.10
-
-    element1, element2 : {str, int}, optional
-        Element symbol or atomic number of basis
-        :class:`~sknano.core.Atom`\ s 1 and 2
-
-        .. deprecated:: 0.3.10
-           Use `basis` instead
-
-    bond : float, optional
-        :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
-        nearest neighbor atoms. Must be in units of **Angstroms**.
-    nlayers : int, optional
-        Number of layers (default: 1)
-    layer_spacing : float, optional
-        Distance between layers in **Angstroms** (default: 3.4).
-    stacking_order : {'AA', 'AB'}, optional
-        Stacking order of layers.
-    layer_rotation_angles : list, optional
-        list of rotation angles for each layer in **degrees** if
-        `degrees` is `True` (default), otherwise in radians.
-        The list length must equal the number of layers.
-    layer_rotation_increment : float, optional
-        incremental layer rotation angle in **degrees** if
-        `degrees` is `True` (default), otherwise in radians.
-        Each subsequent layer will
-        be rotated by `layer_rotation_increment` relative to the layer
-        below it.
-    Lz : float, optional
-        Length of the unrolled swnt sheet along the translation vector
-        in units of **Angstroms**. Overrides the `n3` value.
-
-        .. versionchanged:: 0.4.0
-
-           Changed units from nanometers to **Angstroms**
-
-    fix_Lz : bool, optional
-        Generate the unrolled swnt sheet with the length along the
-        translation vector as close to the specified :math:`L_z` as possible.
-        If `True`, then non integer :math:`n_z` cells are permitted.
-
-    verbose : bool, optional
-        if `True`, show verbose output
-
-    Examples
-    --------
-
-    >>> from sknano.core.structures import UnrolledSWNT
-    >>> unrolled_swnt = UnrolledSWNT(10, 5)
-    >>> unrolled_swnt
-    UnrolledSWNT((10, 5), n1=1, n3=1, bond=1.42, basis=['C', 'C'], nlayers=1,
-    layer_spacing=3.4, stacking_order='AB')
-
-    """
     def generate_unit_cell(self):
         """Generate the nanotube unit cell."""
         eps = 0.01
@@ -266,3 +185,75 @@ class UnrolledSWNT(UnrolledSWNTBase, NanoStructureBase):
                 basis.append(atom)
 
         self.unit_cell = UnitCell(lattice=lattice, basis=basis)
+
+    __generate_unit_cell = generate_unit_cell
+
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        attr_dict = super().todict()
+        attr_dict.update(dict(n1=self.n1))
+        return attr_dict
+
+
+class UnrolledSWNT(UnrolledSWNTBase, NanoStructureBase):
+    """Unrolled SWNT structure class.
+
+    Parameters
+    ----------
+    *Ch : {:class:`python:tuple` or :class:`python:int`\ s}
+        Either a 2-tuple of integers (i.e., *Ch = ((n, m)) or
+        2 integers (i.e., *Ch = (n, m) specifying the chiral indices
+        of the nanotube chiral vector
+        :math:`\\mathbf{C}_h = n\\mathbf{a}_1 + m\\mathbf{a}_2 = (n, m)`.
+    n1 : :class:`python:int`, optional
+        Number of repeat unit cells in the :math:`x` direction, along
+        the *unrolled* chiral vector.
+    n3 : :class:`python:int`, optional
+        Number of repeat unit cells in the :math:`z` direction, along
+        the *length* of the nanotube.
+    basis : {:class:`python:list`}, optional
+        List of :class:`python:str`\ s of element symbols or atomic number
+        of the two atom basis (default: ['C', 'C'])
+
+        .. versionadded:: 0.3.10
+
+    element1, element2 : {str, int}, optional
+        Element symbol or atomic number of basis
+        :class:`~sknano.core.Atom`\ s 1 and 2
+
+        .. deprecated:: 0.3.10
+           Use `basis` instead
+
+    bond : float, optional
+        :math:`\\mathrm{a}_{\\mathrm{CC}} =` distance between
+        nearest neighbor atoms. Must be in units of **Angstroms**.
+    nlayers : int, optional
+        Number of layers (default: 1)
+    layer_spacing : float, optional
+        Distance between layers in **Angstroms** (default: 3.4).
+    stacking_order : {'AA', 'AB'}, optional
+        Stacking order of layers.
+    layer_rotation_angles : list, optional
+        list of rotation angles for each layer in **degrees** if
+        `degrees` is `True` (default), otherwise in radians.
+        The list length must equal the number of layers.
+    layer_rotation_increment : float, optional
+        incremental layer rotation angle in **degrees** if
+        `degrees` is `True` (default), otherwise in radians.
+        Each subsequent layer will
+        be rotated by `layer_rotation_increment` relative to the layer
+        below it.
+    verbose : bool, optional
+        if `True`, show verbose output
+
+    Examples
+    --------
+
+    >>> from sknano.core.structures import UnrolledSWNT
+    >>> unrolled_swnt = UnrolledSWNT(10, 5)
+    >>> unrolled_swnt
+    UnrolledSWNT((10, 5), n1=1, n3=1, bond=1.42, basis=['C', 'C'], nlayers=1,
+    layer_spacing=3.4, stacking_order='AB')
+
+    """
+    pass
