@@ -15,6 +15,7 @@ import copy
 
 # import numpy as np
 
+from sknano.core import pluralize
 # from sknano.core.crystallography import SuperCell
 # from sknano.core.math import Vector
 # from sknano.core import grouper
@@ -55,3 +56,28 @@ class NanotubeBundleGeneratorBase(NanoStructureGenerator):
             [setattr(atom, 'mol', mol) for atom in atomsobj]
             self.atoms.extend(atomsobj)
             self.bundle_list.append(atomsobj)
+
+    @classmethod
+    def generate_fname(cls, n1=None, n2=None, n3=None, L=None, fix_L=False,
+                       Ntubes=None, bundle_geometry=None, bundle_packing=None,
+                       **kwargs):
+        """Generate filename string."""
+        packing = '{}cp'.format(bundle_packing[0])
+        Ntubes = '{}tube'.format(Ntubes)
+        n1 = ''.join(('{}'.format(n1), pluralize('cell', n1)))
+        n2 = ''.join(('{}'.format(n2), pluralize('cell', n2)))
+        cells = 'x'.join((n1, n2))
+
+        if fix_L:
+            cells = 'x'.join((cells, '{:.1f}Å'.format(L)))
+        else:
+            n3 = ''.join(('{}'.format(n3), pluralize('cell', n3)))
+            cells = 'x'.join((cells, n3))
+
+        fname = '_'.join((cells, packing))
+        if bundle_geometry is not None:
+            fname = '_'.join((fname, Ntubes, bundle_geometry))
+        else:
+            fname = '_'.join((fname, 'bundle'))
+
+        return fname
