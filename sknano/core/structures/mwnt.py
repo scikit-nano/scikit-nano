@@ -63,13 +63,13 @@ class MWNTMixin:
 
     @property
     def dt(self):
-        """`MWNT` wall diameters :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}` \
+        """`MWNT` wall diameter :math:`d_t=\\frac{|\\mathbf{C}_h|}{\\pi}` \
         in \u212b."""
         return self.walls[-1].dt
 
     @property
     def rt(self):
-        """`MWNT` wall radii :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}` \
+        """`MWNT` wall radius :math:`r_t=\\frac{|\\mathbf{C}_h|}{2\\pi}` \
         in \u212b."""
         return self.walls[-1].rt
 
@@ -268,7 +268,7 @@ class MWNTMixin:
                     basis=self.basis, bond=self.bond) if Ch in self.Ch_list \
             else None
 
-    def generate_dt_mask(self, dt, max_dt_diff=0.5):
+    def generate_dt_mask(self, dt, dt_pool, max_dt_diff=0.5):
         """Generate boolean mask array.
 
         Parameters
@@ -281,10 +281,10 @@ class MWNTMixin:
         dt_mask : :class:`~numpy:numpy.ndarray`
 
         """
-        dt_mask = np.abs(self._dt_pool - dt) <= max_dt_diff
+        dt_mask = np.abs(dt_pool - dt) <= max_dt_diff
         while not np.any(dt_mask):
             max_dt_diff += max_dt_diff
-            dt_mask = np.abs(self._dt_pool - dt) <= max_dt_diff
+            dt_mask = np.abs(dt_pool - dt) <= max_dt_diff
         return dt_mask
 
     def generate_Ch_list(self, Nwalls=None, max_walls=None,
@@ -308,54 +308,75 @@ class MWNTMixin:
 
         delta_dt = 2 * wall_spacing
 
+        if max_wall_diameter <= \
+                min_wall_diameter + (max_walls - 1) * delta_dt:
+            max_wall_diameter = np.inf
+
         imax = 100
 
-        self._Ch_pool = \
-            np.asarray(generate_Ch_list(imax=imax,
-                                        chiral_types=chiral_types))
-        self._dt_pool = np.asarray([compute_dt(_Ch, bond=self.bond) for _Ch
-                                    in self._Ch_pool])
+        Ch_pool = np.asarray(generate_Ch_list(imax=imax,
+                                              chiral_types=chiral_types))
+        dt_pool = np.asarray([compute_dt(Ch, bond=self.bond) for Ch
+                              in Ch_pool])
 
-        dt_mask = np.logical_and(self._dt_pool >= min_wall_diameter,
-                                 self._dt_pool <= max_wall_diameter)
+        dt_mask = np.logical_and(dt_pool >= min_wall_diameter,
+                                 dt_pool <= max_wall_diameter)
 
-        self._Ch_pool = self._Ch_pool[dt_mask]
-        self._dt_pool = self._dt_pool[dt_mask]
+        Ch_pool = Ch_pool[dt_mask]
+        dt_pool = dt_pool[dt_mask]
 
         if max_wall_diameter < np.inf:
             dt_list = []
-            dt = self._dt_pool.min()
+            dt = dt_pool.min()
             while dt <= max_wall_diameter and len(dt_list) < max_walls:
                 dt_list.append(dt)
                 dt += delta_dt
         else:
-            dt_list = [self._dt_pool.min() + i * delta_dt
-                       for i in range(max_walls)]
+            dt_list = [dt_pool.min() + i * delta_dt for i in range(max_walls)]
 
-        dt_masks = [self.generate_dt_mask(_dt) for _dt in dt_list]
+        dt_masks = [self.generate_dt_mask(dt_, dt_pool) for dt_ in dt_list]
 
-        return [tuple(self._Ch_pool[_mask][np.random.choice(
-            list(range(len(self._Ch_pool[_mask]))))].tolist())
-            for _mask in dt_masks]
+        return [tuple(Ch_pool[_mask][np.random.choice(
+            list(range(len(Ch_pool[_mask]))))].tolist()) for _mask in dt_masks]
 
-    def update_Ch_list(self, Nwalls=None, min_wall_diameter=None,
-                       max_wall_diameter=None, wall_spacing=None,
-                       chiral_types=None):
+    def update_Ch_list(self, **kwargs):
         """Update :attr:`MWNTMixin.Ch_list`."""
-        if Nwalls is None:
-            Nwalls = self.Nwalls
-        if min_wall_diameter is None:
-            min_wall_diameter = self.min_wall_diameter
-        if max_wall_diameter is None:
-            max_wall_diameter = self.max_wall_diameter
-        if wall_spacing is None:
-            wall_spacing = self.wall_spacing
-        self.Ch_list = \
-            self.generate_Ch_list(Nwalls=Nwalls,
-                                  min_wall_diameter=min_wall_diameter,
-                                  max_wall_diameter=max_wall_diameter,
-                                  chiral_types=chiral_types,
-                                  wall_spacing=wall_spacing)
+        update_list = False
+
+        Nwalls = kwargs.get('Nwalls', None)
+        max_walls = kwargs.get('max_walls', None)
+        min_wall_diameter = kwargs.get('min_wall_diameter', None)
+        max_wall_diameter = kwargs.get('max_wall_diameter', None)
+        wall_spacing = kwargs.get('wall_spacing', None)
+        chiral_types = kwargs.get('chiral_types', None)
+
+        dt_list = self.dt_list
+
+        if (Nwalls is not None and Nwalls != self.Nwalls) or \
+                (min_wall_diameter is not None and min_wall_diameter > dt_list[0]) or \
+                (max_wall_diameter is not None and max_wall_diameter < dt_list[-1]) or \
+                (wall_spacing is not None and np.any(np.diff(dt_list) < 2 * wall_spacing)) or \
+                (chiral_types is not None and set(chiral_types) < self.chiral_set):
+            update_list = True
+
+        if update_list:
+            if Nwalls is None:
+                Nwalls = self.Nwalls
+            if max_walls is None:
+                max_walls = self.max_walls
+            if min_wall_diameter is None:
+                min_wall_diameter = self.min_wall_diameter
+            if max_wall_diameter is None:
+                max_wall_diameter = self.max_wall_diameter
+            if wall_spacing is None:
+                wall_spacing = self.wall_spacing
+            self.Ch_list = \
+                self.generate_Ch_list(Nwalls=Nwalls,
+                                      max_walls=max_walls,
+                                      min_wall_diameter=min_wall_diameter,
+                                      max_wall_diameter=max_wall_diameter,
+                                      chiral_types=chiral_types,
+                                      wall_spacing=wall_spacing)
 
 
 class MWNTBase(MWNTMixin, NanoStructureBase):
