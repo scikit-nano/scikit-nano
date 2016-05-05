@@ -254,8 +254,10 @@ class StructureDataWriterMixin:
         self._update_fpath(kwargs)
         # self._update_atoms(**kwargs)
         structure_format = kwargs.pop('structure_format')
+        structure = kwargs.pop('structure', self)
         print('writing {}'.format(self.fname))
-        getattr(self, 'write_' + structure_format)(structure=self, **kwargs)
+        getattr(self, 'write_' + structure_format)(structure=structure,
+                                                   **kwargs)
 
     def write_data(self, **kwargs):
         """Write LAMMPS data file."""
