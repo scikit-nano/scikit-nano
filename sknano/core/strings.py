@@ -115,7 +115,13 @@ def pluralize(word, count):
     ['0 apples', '1 apple', '2 apples']
 
     """
-    return word if count == 1 else word + 's'
+    if count == 1:
+        return word
+
+    if word.endswith('y'):
+        return word[-1] + 'ies'
+    else:
+        return word + 's'
 
 
 def plural_word_check(word, count):
