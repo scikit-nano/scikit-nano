@@ -19,11 +19,11 @@ except ImportError:
 
 from .nanogen_views import NanoGenView, SWNTGeneratorView, \
     MWNTGeneratorView, GrapheneGeneratorView, \
-    FullereneGeneratorView, BulkStructureGeneratorView
+    FullereneGeneratorView, CrystalStructureGeneratorView
 
 __all__ = ['NanoGenController', 'SWNTGeneratorController',
            'MWNTGeneratorController', 'GrapheneGeneratorController',
-           'BulkStructureGeneratorController', 'ViewControllerMixin',
+           'CrystalStructureGeneratorController', 'ViewControllerMixin',
            'GeneratorViewController']
 
 
@@ -71,6 +71,8 @@ class SWNTGeneratorController(GeneratorViewController):
 
 class MWNTGeneratorController(GeneratorViewController):
     def __init__(self, model=None, **kwargs):
+        print('in MWNTGeneratorController')
+        print('kwargs: {}'.format(kwargs))
         super().__init__(model=model, view=MWNTGeneratorView, **kwargs)
 
 
@@ -84,7 +86,7 @@ class FullereneGeneratorController(GeneratorViewController):
         super().__init__(model=model, view=FullereneGeneratorView, **kwargs)
 
 
-class BulkStructureGeneratorController(GeneratorViewController):
+class CrystalStructureGeneratorController(GeneratorViewController):
     def __init__(self, model=None, **kwargs):
-        super().__init__(model=model, view=BulkStructureGeneratorView,
+        super().__init__(model=model, view=CrystalStructureGeneratorView,
                          **kwargs)

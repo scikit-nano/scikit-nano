@@ -2,29 +2,29 @@
 
 # Form implementation generated from reading ui file 'xtal_structure_generator.ui'
 #
-# Created: Thu May  5 10:35:40 2016
+# Created: Thu May  5 11:45:35 2016
 #      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class Ui_BulkStructureGenerator(object):
-    def setupUi(self, BulkStructureGenerator):
-        BulkStructureGenerator.setObjectName("BulkStructureGenerator")
-        BulkStructureGenerator.resize(350, 400)
+class Ui_CrystalStructureGenerator(object):
+    def setupUi(self, CrystalStructureGenerator):
+        CrystalStructureGenerator.setObjectName("CrystalStructureGenerator")
+        CrystalStructureGenerator.resize(350, 400)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(BulkStructureGenerator.sizePolicy().hasHeightForWidth())
-        BulkStructureGenerator.setSizePolicy(sizePolicy)
-        BulkStructureGenerator.setMinimumSize(QtCore.QSize(350, 400))
-        BulkStructureGenerator.setMaximumSize(QtCore.QSize(800, 1000))
+        sizePolicy.setHeightForWidth(CrystalStructureGenerator.sizePolicy().hasHeightForWidth())
+        CrystalStructureGenerator.setSizePolicy(sizePolicy)
+        CrystalStructureGenerator.setMinimumSize(QtCore.QSize(350, 400))
+        CrystalStructureGenerator.setMaximumSize(QtCore.QSize(800, 1000))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(14)
-        BulkStructureGenerator.setFont(font)
-        self.centralwidget = QtWidgets.QWidget(BulkStructureGenerator)
+        CrystalStructureGenerator.setFont(font)
+        self.centralwidget = QtWidgets.QWidget(CrystalStructureGenerator)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout(self.centralwidget)
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
@@ -36,12 +36,12 @@ class Ui_BulkStructureGenerator(object):
         self.label.setFont(font)
         self.label.setObjectName("label")
         self.verticalLayout_3.addWidget(self.label)
-        self.bulk_structure_list_widget = QtWidgets.QListWidget(self.centralwidget)
+        self.xtal_structure_list_widget = QtWidgets.QListWidget(self.centralwidget)
         font = QtGui.QFont()
         font.setFamily("Arial")
-        self.bulk_structure_list_widget.setFont(font)
-        self.bulk_structure_list_widget.setObjectName("bulk_structure_list_widget")
-        self.verticalLayout_3.addWidget(self.bulk_structure_list_widget)
+        self.xtal_structure_list_widget.setFont(font)
+        self.xtal_structure_list_widget.setObjectName("xtal_structure_list_widget")
+        self.verticalLayout_3.addWidget(self.xtal_structure_list_widget)
         self.horizontalLayout_6.addLayout(self.verticalLayout_3)
         self.line = QtWidgets.QFrame(self.centralwidget)
         self.line.setFrameShape(QtWidgets.QFrame.VLine)
@@ -116,17 +116,17 @@ class Ui_BulkStructureGenerator(object):
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_2.addItem(spacerItem)
         self.horizontalLayout_6.addLayout(self.verticalLayout_2)
-        BulkStructureGenerator.setCentralWidget(self.centralwidget)
+        CrystalStructureGenerator.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi(BulkStructureGenerator)
-        QtCore.QMetaObject.connectSlotsByName(BulkStructureGenerator)
+        self.retranslateUi(CrystalStructureGenerator)
+        QtCore.QMetaObject.connectSlotsByName(CrystalStructureGenerator)
 
-    def retranslateUi(self, BulkStructureGenerator):
+    def retranslateUi(self, CrystalStructureGenerator):
         _translate = QtCore.QCoreApplication.translate
-        BulkStructureGenerator.setWindowTitle(_translate("BulkStructureGenerator", "Bulk Structure Generator"))
-        self.label.setText(_translate("BulkStructureGenerator", "Select Bulk Structure:"))
-        self.label_2.setText(_translate("BulkStructureGenerator", "Unit Cells:"))
-        self.label_3.setText(_translate("BulkStructureGenerator", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">1 </span>=</p></body></html>"))
-        self.label_7.setText(_translate("BulkStructureGenerator", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">2 </span>=</p></body></html>"))
-        self.label_6.setText(_translate("BulkStructureGenerator", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">3 </span>=</p></body></html>"))
+        CrystalStructureGenerator.setWindowTitle(_translate("CrystalStructureGenerator", "Bulk Structure Generator"))
+        self.label.setText(_translate("CrystalStructureGenerator", "Select Crystal Structure:"))
+        self.label_2.setText(_translate("CrystalStructureGenerator", "Unit Cells:"))
+        self.label_3.setText(_translate("CrystalStructureGenerator", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">1 </span>=</p></body></html>"))
+        self.label_7.setText(_translate("CrystalStructureGenerator", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">2 </span>=</p></body></html>"))
+        self.label_6.setText(_translate("CrystalStructureGenerator", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">3 </span>=</p></body></html>"))
 

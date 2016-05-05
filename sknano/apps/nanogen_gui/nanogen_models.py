@@ -12,18 +12,18 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 from sknano.core.refdata import aCC, element_data
-from sknano.core.structures import compute_Lx, compute_Ly, compute_Lz, \
-    compute_Ch, compute_T, SWNT, MWNT, Graphene, \
-    UnrolledSWNT, Fullerene
+from sknano.core.structures import compute_L, compute_T, \
+    SWNT, MWNT, Graphene, UnrolledSWNT, Fullerene
 
 _r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
 __all__ = ['NanoGenModel', 'SWNTModel', 'MWNTModel',
            'GrapheneModel', 'FullereneModel',
-           'BulkStructureModel', 'ObserverModelMixin']
+           'CrystalStructureModel', 'ObserverModelMixin']
 
 
 class ObserverModelMixin:
+    """Observer model mixin for registering/removing/notifying observers."""
     def register_observer(self, observer):
         self._observers.append(observer)
 
@@ -90,118 +90,102 @@ class SWNTModelMixin:
     @property
     def n(self):
         """Chiral index :math:`n`"""
-        # return self._n
         return self.structure.n
 
     @n.setter
     def n(self, value):
-        # self._n = value
-        # self.structure.n = self.n
         self.structure.n = value
         self.notify_observers()
 
     @property
     def m(self):
         """Chiral index :math:`m`"""
-        # return self._m
         return self.structure.m
 
     @m.setter
     def m(self, value):
-        # self._m = value
-        # self.structure.m = self.m
         self.structure.m = value
         self.notify_observers()
 
     @property
-    def Lz(self):
-        return compute_Lz(self.Ch, nz=self.nz, bond=self.bond)
+    def L(self):
+        return compute_L(self.Ch, n3=self.n3, bond=self.bond)
 
-    @Lz.setter
-    def Lz(self, value):
-        nz = 10 * value / compute_T(self.Ch, bond=self.bond, length=True)
-        if not self.structure.fix_Lz:
-            nz = int(nz)
-        self.structure.nz = nz
+    @L.setter
+    def L(self, value):
+        n3 = value / compute_T(self.Ch, bond=self.bond, length=True)
+        if not self.structure.fix_L:
+            n3 = int(n3)
+        self.structure.n3 = n3
         self.notify_observers()
 
     @property
-    def nz(self):
-        # return self._nz
-        return self.structure.nz
+    def n3(self):
+        return self.structure.n3
 
-    @nz.setter
-    def nz(self, value):
-        # self._nz = value
-        # self.structure.nz = self.nz
-        self.structure.nz = value
+    @n3.setter
+    def n3(self, value):
+        self.structure.n3 = value
         self.notify_observers()
 
     @property
-    def fix_Lz(self):
-        return self.structure.fix_Lz
+    def fix_L(self):
+        return self.structure.fix_L
 
-    @fix_Lz.setter
-    def fix_Lz(self, value):
-        self.structure.fix_Lz = value
+    @fix_L.setter
+    def fix_L(self, value):
+        self.structure.fix_L = value
         self.notify_observers()
 
 
 class MWNTModelMixin:
     @property
-    def Lz(self):
-        return self.structure.Lz
+    def L(self):
+        return self.structure.L
 
-    @Lz.setter
-    def Lz(self, value):
-        # self._Lz = value
-        # self.structure.Lz = self.Lz
-        self.structure.Lz = value
+    @L.setter
+    def L(self, value):
+        self.structure.L = value
         self.notify_observers()
 
 
 class BundleModelMixin:
     @property
-    def Lx(self):
-        return compute_Lx(self.Ch, nx=self.nx, bond=self.bond,
-                          gutter=_r_CC_vdw)
+    def l1(self):
+        # return compute_l1(self.Ch, n1=self.n1, bond=self.bond,
+        #                   gutter=_r_CC_vdw)
+        return self.structure.lattice.a1.length
 
     @property
-    def Ly(self):
-        return compute_Ly(self.Ch, ny=self.ny, bond=self.bond,
-                          gutter=_r_CC_vdw)
+    def l2(self):
+        # return compute_l2(self.Ch, n2=self.n2, bond=self.bond,
+        #                   gutter=_r_CC_vdw)
+        return self.structure.lattice.a2.length
 
     @property
-    def nx(self):
-        # return self._nx
-        return self.structure.nx
+    def n1(self):
+        return self.structure.n1
 
-    @nx.setter
-    def nx(self, value):
-        # self._nx = value
-        # self.structure.nx = self.nx
-        self.structure.nx = value
+    @n1.setter
+    def n1(self, value):
+        self.structure.n1 = value
         self.notify_observers()
 
     @property
-    def ny(self):
-        # return self._ny
-        return self.structure.ny
+    def n2(self):
+        return self.structure.n2
 
-    @ny.setter
-    def ny(self, value):
-        # self._ny = value
-        # self.structure.ny = self.ny
-        self.structure.ny = value
+    @n2.setter
+    def n2(self, value):
+        self.structure.n2 = value
         self.notify_observers()
 
 
 class SWNTModel(GeneratorModelBase, SWNTModelMixin, BundleModelMixin):
     def __init__(self):
         super().__init__()
-        # self._n = self._m = 10
         self.structure = SWNT((10, 10), basis=self.basis, bond=self.bond,
-                              nx=1, ny=1, nz=1, bundle_packing='hcp')
+                              n1=1, n2=1, n3=1, bundle_packing='hcp')
         self.notify_observers()
 
 
@@ -209,9 +193,9 @@ class MWNTModel(GeneratorModelBase, MWNTModelMixin, BundleModelMixin):
     def __init__(self):
         super().__init__()
         self.structure = \
-            MWNT(Ch_list=None, Nwalls=3, min_wall_diameter=5,
-                 max_wall_diameter=100, wall_spacing=2 * _r_CC_vdw,
-                 basis=self.basis, bond=self.bond, nx=1, ny=1, Lz=1,
+            MWNT(Ch_list=[(10, 10), (20, 20), (30, 30)], min_wall_diameter=5,
+                 max_wall_diameter=50, wall_spacing=2 * _r_CC_vdw,
+                 basis=self.basis, bond=self.bond, n1=1, n2=1, L=5,
                  bundle_packing='hcp')
 
         self.notify_observers()
@@ -286,28 +270,14 @@ class MWNTModel(GeneratorModelBase, MWNTModelMixin, BundleModelMixin):
 
 
 class UnrolledSWNTModelMixin(SWNTModelMixin):
-    @property
-    def Lx(self):
-        # return self.nx * compute_Ch(self.Ch, bond=self.bond) / 10
-        return self.structure.Lx
-
-    @Lx.setter
-    def Lx(self, value):
-        # self._nx = 10 * value / compute_Ch(self.Ch, bond=self.bond)
-        # self.structure.nx = self.nx
-        self.structure.nx = 10 * value / compute_Ch(self.Ch, bond=self.bond)
-        self.notify_observers()
 
     @property
-    def nx(self):
-        # return self._nx
-        return self.structure.nx
+    def n1(self):
+        return self.structure.n1
 
-    @nx.setter
-    def nx(self, value):
-        # self._nx = value
-        # self.structure.nx = self.nx
-        self.structure.nx = value
+    @n1.setter
+    def n1(self, value):
+        self.structure.n1 = value
         self.notify_observers()
 
 
@@ -325,9 +295,9 @@ class GrapheneModel(GeneratorModelBase, UnrolledSWNTModelMixin):
             Graphene.from_primitive_cell(edge_length=1,
                                          basis=self.basis,
                                          bond=self.bond)
-        # self._n = self._m = 10
+
         self.structure = UnrolledSWNT((10, 10), basis=self.basis,
-                                      bond=self.bond, nx=1, nz=1)
+                                      bond=self.bond, n1=1, n3=1)
         self.nlayers = 1
         self.layer_rotation_increment = 0.0
         self.notify_observers()
@@ -366,7 +336,6 @@ class GrapheneModel(GeneratorModelBase, UnrolledSWNTModelMixin):
     @nlayers.setter
     def nlayers(self, value):
         self._nlayers = value
-        # self.graphene.nlayers = self.structure.nlayers = self.nlayers
         self.notify_observers()
 
     @property
@@ -391,5 +360,5 @@ class FullereneModel(ObserverModelMixin):
         return self.structure.fullerenes
 
 
-class BulkStructureModel(ObserverModelMixin):
+class CrystalStructureModel(ObserverModelMixin):
     pass

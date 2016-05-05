@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'mwnt_Ch_list_item_dialog.ui'
 #
-# Created by: PyQt5 UI code generator 5.5
+# Created: Thu May  5 11:45:35 2016
+#      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
 

@@ -27,31 +27,29 @@ if PyQt is not None:
     try:
         from PyQt5.QtCore import pyqtSlot
         from PyQt5.QtWidgets import QMainWindow
-        from .pyqt5_ui_nanogen import Ui_NanoGen
-        from .pyqt5_ui_swnt_generator import Ui_SWNTGenerator
-        from .pyqt5_ui_mwnt_generator import Ui_MWNTGenerator
-        from .pyqt5_ui_graphene_generator import Ui_GrapheneGenerator
-        from .pyqt5_ui_fullerene_generator import Ui_FullereneGenerator
-        from .pyqt5_ui_bulk_structure_generator import \
-            Ui_BulkStructureGenerator
+        from ._pyqt5_ui_nanogen import Ui_NanoGen
+        from ._pyqt5_ui_swnt_generator import Ui_SWNTGenerator
+        from ._pyqt5_ui_mwnt_generator import Ui_MWNTGenerator
+        from ._pyqt5_ui_graphene_generator import Ui_GrapheneGenerator
+        from ._pyqt5_ui_fullerene_generator import Ui_FullereneGenerator
+        from ._pyqt5_ui_xtal_structure_generator import \
+            Ui_CrystalStructureGenerator
     except ImportError:
         from PyQt4.QtCore import pyqtSlot
         from PyQt4.QtGui import QMainWindow
-        from .pyqt4_ui_nanogen import Ui_NanoGen
-        from .pyqt4_ui_swnt_generator import Ui_SWNTGenerator
-        from .pyqt4_ui_mwnt_generator import Ui_MWNTGenerator
-        from .pyqt4_ui_graphene_generator import Ui_GrapheneGenerator
-        from .pyqt4_ui_fullerene_generator import Ui_FullereneGenerator
-        from .pyqt4_ui_bulk_structure_generator import \
-            Ui_BulkStructureGenerator
+        from ._pyqt4_ui_nanogen import Ui_NanoGen
+        from ._pyqt4_ui_swnt_generator import Ui_SWNTGenerator
+        from ._pyqt4_ui_mwnt_generator import Ui_MWNTGenerator
+        from ._pyqt4_ui_graphene_generator import Ui_GrapheneGenerator
+        from ._pyqt4_ui_fullerene_generator import Ui_FullereneGenerator
+        from ._pyqt4_ui_xtal_structure_generator import \
+            Ui_CrystalStructureGenerator
 
 from sknano.core import get_fpath
 from sknano.core.structures import get_chiral_indices_from_str
-# from .nanogen_controllers import NanoGenController
-# from .nanogen_models import NanoGenModel
 from .view_mixins import NanoGenViewMixin, SWNTViewMixin, MWNTViewMixin, \
     BundleViewMixin, GrapheneViewMixin, FullereneViewMixin, \
-    BulkStructureViewMixin
+    CrystalStructureViewMixin
 
 __all__ = ['NanoGenView']
 
@@ -85,6 +83,7 @@ class NanoGenView(QMainWindow, Ui_NanoGen):
 
     @pyqtSlot()
     def on_mwnt_generator_push_button_clicked(self):
+        print('in on_mwnt_generator_push_button_clicked')
         from .nanogen_controllers import MWNTGeneratorController
         from .nanogen_models import MWNTModel
         self.generator_controller = \
@@ -108,12 +107,12 @@ class NanoGenView(QMainWindow, Ui_NanoGen):
         self.update_app_view()
 
     @pyqtSlot()
-    def on_bulk_structure_generator_push_button_clicked(self):
-        from .nanogen_controllers import BulkStructureGeneratorController
-        from .nanogen_models import BulkStructureModel
+    def on_xtal_structure_generator_push_button_clicked(self):
+        from .nanogen_controllers import CrystalStructureGeneratorController
+        from .nanogen_models import CrystalStructureModel
         self.generator_controller = \
-            BulkStructureGeneratorController(model=BulkStructureModel(),
-                                             parent=self)
+            CrystalStructureGeneratorController(model=CrystalStructureModel(),
+                                                parent=self)
         self.update_app_view()
 
     @pyqtSlot()
@@ -200,15 +199,15 @@ class SWNTGeneratorView(QMainWindow, Ui_SWNTGenerator, NanoGenViewMixin,
 
         kwargs['n'] = self.swnt_n_spin_box.value()
         kwargs['m'] = self.swnt_m_spin_box.value()
-        kwargs['fix_Lz'] = self.swnt_fix_Lz_check_box.isChecked()
-        kwargs['Lz'] = self.swnt_Lz_double_spin_box.value()
-        kwargs['nz'] = self.swnt_nz_double_spin_box.value()
+        kwargs['fix_L'] = self.swnt_fix_L_check_box.isChecked()
+        kwargs['L'] = self.swnt_L_double_spin_box.value()
+        kwargs['n3'] = self.swnt_n3_double_spin_box.value()
 
         kwargs['generator_class'] = 'SWNTGenerator'
         if self.bundle_generator_check_box.isChecked():
             kwargs['bundle_packing'] = 'hcp'
-            kwargs['nx'] = self.bundle_nx_spin_box.value()
-            kwargs['ny'] = self.bundle_ny_spin_box.value()
+            kwargs['n1'] = self.bundle_n1_spin_box.value()
+            kwargs['n2'] = self.bundle_n2_spin_box.value()
             # kwargs['Ntubes'] = self.model.structure.Ntubes
 
         return kwargs
@@ -222,18 +221,18 @@ class SWNTGeneratorView(QMainWindow, Ui_SWNTGenerator, NanoGenViewMixin,
         self.swnt_n_spin_box.setValue(self.model.n)
         self.swnt_m_spin_box.setValue(self.model.m)
 
-        self.swnt_nz_double_spin_box.blockSignals(True)
-        self.swnt_Lz_double_spin_box.blockSignals(True)
-        self.swnt_Lz_double_spin_box.setValue(self.model.Lz)
-        self.swnt_nz_double_spin_box.setValue(self.model.nz)
-        self.swnt_nz_double_spin_box.blockSignals(False)
-        self.swnt_Lz_double_spin_box.blockSignals(False)
+        self.swnt_n3_double_spin_box.blockSignals(True)
+        self.swnt_L_double_spin_box.blockSignals(True)
+        self.swnt_L_double_spin_box.setValue(self.model.L)
+        self.swnt_n3_double_spin_box.setValue(self.model.n3)
+        self.swnt_n3_double_spin_box.blockSignals(False)
+        self.swnt_L_double_spin_box.blockSignals(False)
 
-        self.bundle_nx_spin_box.setValue(self.model.nx)
-        self.bundle_ny_spin_box.setValue(self.model.ny)
+        self.bundle_n1_spin_box.setValue(self.model.n1)
+        self.bundle_n2_spin_box.setValue(self.model.n2)
 
-        self.bundle_Lx_line_edit.setText('{:.4f} nm'.format(self.model.Lx))
-        self.bundle_Ly_line_edit.setText('{:.4f} nm'.format(self.model.Ly))
+        # self.bundle_l1_line_edit.setText('{:.4f} Å'.format(self.model.l1))
+        # self.bundle_l2_line_edit.setText('{:.4f} Å'.format(self.model.l2))
         self.parent.update_app_view()
 
 
@@ -250,7 +249,7 @@ class MWNTGeneratorView(QMainWindow, Ui_MWNTGenerator, NanoGenViewMixin,
     def get_generator_parameters(self):
         kwargs = {}
         kwargs['generator_class'] = 'MWNTGenerator'
-        kwargs['Lz'] = self.mwnt_Lz_double_spin_box.value()
+        kwargs['L'] = self.mwnt_L_double_spin_box.value()
         kwargs['Ch_list'] = \
             [get_chiral_indices_from_str(i.text()) for i in
              [self.mwnt_Ch_list_widget.item(index) for
@@ -269,8 +268,8 @@ class MWNTGeneratorView(QMainWindow, Ui_MWNTGenerator, NanoGenViewMixin,
 
         if self.bundle_generator_check_box.isChecked():
             kwargs['bundle_packing'] = 'hcp'
-            kwargs['nx'] = self.bundle_nx_spin_box.value()
-            kwargs['ny'] = self.bundle_ny_spin_box.value()
+            kwargs['n1'] = self.bundle_n1_spin_box.value()
+            kwargs['n2'] = self.bundle_n2_spin_box.value()
             # kwargs['Ntubes'] = self.model.structure.Ntubes
         return kwargs
 
@@ -291,16 +290,16 @@ class MWNTGeneratorView(QMainWindow, Ui_MWNTGenerator, NanoGenViewMixin,
             self.model.max_wall_diameter)
         self.wall_spacing_double_spin_box.setValue(
             self.model.wall_spacing)
-        self.mwnt_Lz_double_spin_box.setValue(self.model.Lz)
+        self.mwnt_L_double_spin_box.setValue(self.model.L)
 
-        self.bundle_nx_spin_box.setValue(self.model.nx)
-        self.bundle_ny_spin_box.setValue(self.model.ny)
-        try:
-            self.bundle_Lx_line_edit.setText('{:.4f} nm'.format(self.model.Lx))
-            self.bundle_Ly_line_edit.setText('{:.4f} nm'.format(self.model.Ly))
-        except IndexError:
-            self.bundle_Lx_line_edit.setText('{:.4f} nm'.format(0.0))
-            self.bundle_Ly_line_edit.setText('{:.4f} nm'.format(0.0))
+        self.bundle_n1_spin_box.setValue(self.model.n1)
+        self.bundle_n2_spin_box.setValue(self.model.n2)
+        # try:
+        #     self.bundle_l1_line_edit.setText('{:.4f} Å'.format(self.model.l1))
+        #     self.bundle_l2_line_edit.setText('{:.4f} Å'.format(self.model.l2))
+        # except IndexError:
+        #     self.bundle_l1_line_edit.setText('{:.4f} Å'.format(0.0))
+        #     self.bundle_l2_line_edit.setText('{:.4f} Å'.format(0.0))
         self.parent.update_app_view()
 
 
@@ -335,8 +334,8 @@ class GrapheneGeneratorView(QMainWindow, Ui_GrapheneGenerator,
         else:
             kwargs['n'] = self.swnt_n_spin_box.value()
             kwargs['m'] = self.swnt_m_spin_box.value()
-            kwargs['nx'] = self.unrolled_swnt_nx_spin_box.value()
-            kwargs['nz'] = self.unrolled_swnt_nz_spin_box.value()
+            kwargs['n1'] = self.unrolled_swnt_n1_spin_box.value()
+            kwargs['n3'] = self.unrolled_swnt_n3_spin_box.value()
             kwargs['generator_class'] = 'UnrolledSWNTGenerator'
 
         kwargs['layer_rotation_increment'] = \
@@ -389,8 +388,8 @@ class FullereneGeneratorView(QMainWindow, Ui_FullereneGenerator,
         self.parent.update_app_view()
 
 
-class BulkStructureGeneratorView(QMainWindow, Ui_BulkStructureGenerator,
-                                 BulkStructureViewMixin):
+class CrystalStructureGeneratorView(QMainWindow, Ui_CrystalStructureGenerator,
+                                 CrystalStructureViewMixin):
     def __init__(self, controller=None, model=None, parent=None):
         self.controller = controller
         self.model = model

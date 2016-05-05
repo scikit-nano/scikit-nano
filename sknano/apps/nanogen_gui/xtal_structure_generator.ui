@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BulkStructureGenerator</class>
- <widget class="QMainWindow" name="BulkStructureGenerator">
+ <class>CrystalStructureGenerator</class>
+ <widget class="QMainWindow" name="CrystalStructureGenerator">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -49,12 +49,12 @@
          </font>
         </property>
         <property name="text">
-         <string>Select Bulk Structure:</string>
+         <string>Select Crystal Structure:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QListWidget" name="bulk_structure_list_widget">
+       <widget class="QListWidget" name="xtal_structure_list_widget">
         <property name="font">
          <font>
           <family>Arial</family>
@@ -98,12 +98,12 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;n&lt;/span&gt;&lt;span style=&quot; vertical-align:sub;&quot;&gt;x &lt;/span&gt;=&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;n&lt;/span&gt;&lt;span style=&quot; vertical-align:sub;&quot;&gt;1 &lt;/span&gt;=&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="nx_spin_box">
+           <widget class="QSpinBox" name="n1_spin_box">
             <property name="font">
              <font>
               <family>Arial</family>
@@ -130,12 +130,12 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;n&lt;/span&gt;&lt;span style=&quot; vertical-align:sub;&quot;&gt;y &lt;/span&gt;=&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;n&lt;/span&gt;&lt;span style=&quot; vertical-align:sub;&quot;&gt;2 &lt;/span&gt;=&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="ny_spin_box">
+           <widget class="QSpinBox" name="n2_spin_box">
             <property name="font">
              <font>
               <family>Arial</family>
@@ -162,12 +162,12 @@
              </font>
             </property>
             <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;n&lt;/span&gt;&lt;span style=&quot; vertical-align:sub;&quot;&gt;z &lt;/span&gt;=&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;n&lt;/span&gt;&lt;span style=&quot; vertical-align:sub;&quot;&gt;3 &lt;/span&gt;=&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QSpinBox" name="nz_spin_box">
+           <widget class="QSpinBox" name="n3_spin_box">
             <property name="font">
              <font>
               <family>Arial</family>

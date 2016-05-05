@@ -14,10 +14,11 @@ from __future__ import unicode_literals
 __docformat__ = 'restructuredtext en'
 
 try:
-    from .nanogen_models import *
-    from .nanogen_views import *
-    from .nanogen_controllers import *
-except ImportError:
-	pass
+    # from .nanogen_models import *
+    # from .nanogen_views import *
+    # from .nanogen_controllers import *
+    from .nanogen_mvc import *
+except ImportError as e:
+    print(e)
 
 __all__ = [s for s in dir() if not s.startswith('_')]
