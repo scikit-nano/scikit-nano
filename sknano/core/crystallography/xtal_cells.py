@@ -284,10 +284,12 @@ class CrystalCell(BaseClass, TabulateMixin):
             raise ValueError('Expected a `UnitCell` object')
         self._unit_cell = value
         if value is not None:
-            if self.lattice is None:
-                self._lattice = self.unit_cell.lattice
-            if self.basis is None or self.basis.Natoms == 0:
-                self._basis = self.unit_cell.basis
+            self._lattice = self.unit_cell.lattice
+            self._basis = self.unit_cell.basis
+            # if self.lattice is None:
+            #     self._lattice = self.unit_cell.lattice
+            # if self.basis is None or self.basis.Natoms == 0:
+            #     self._basis = self.unit_cell.basis
 
     @property
     def scaling_matrix(self):
