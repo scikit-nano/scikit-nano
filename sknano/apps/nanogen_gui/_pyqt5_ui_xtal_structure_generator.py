@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'bulk_structure_generator.ui'
+# Form implementation generated from reading ui file 'xtal_structure_generator.ui'
 #
-# Created by: PyQt5 UI code generator 5.5
+# Created: Thu May  5 10:35:40 2016
+#      by: PyQt5 UI code generator 5.2.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -66,14 +67,14 @@ class Ui_BulkStructureGenerator(object):
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
         self.horizontalLayout.addWidget(self.label_3)
-        self.nx_spin_box = QtWidgets.QSpinBox(self.centralwidget)
+        self.n1_spin_box = QtWidgets.QSpinBox(self.centralwidget)
         font = QtGui.QFont()
         font.setFamily("Arial")
-        self.nx_spin_box.setFont(font)
-        self.nx_spin_box.setMinimum(1)
-        self.nx_spin_box.setMaximum(999)
-        self.nx_spin_box.setObjectName("nx_spin_box")
-        self.horizontalLayout.addWidget(self.nx_spin_box)
+        self.n1_spin_box.setFont(font)
+        self.n1_spin_box.setMinimum(1)
+        self.n1_spin_box.setMaximum(999)
+        self.n1_spin_box.setObjectName("n1_spin_box")
+        self.horizontalLayout.addWidget(self.n1_spin_box)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
@@ -84,14 +85,14 @@ class Ui_BulkStructureGenerator(object):
         self.label_7.setFont(font)
         self.label_7.setObjectName("label_7")
         self.horizontalLayout_5.addWidget(self.label_7)
-        self.ny_spin_box = QtWidgets.QSpinBox(self.centralwidget)
+        self.n2_spin_box = QtWidgets.QSpinBox(self.centralwidget)
         font = QtGui.QFont()
         font.setFamily("Arial")
-        self.ny_spin_box.setFont(font)
-        self.ny_spin_box.setMinimum(1)
-        self.ny_spin_box.setMaximum(999)
-        self.ny_spin_box.setObjectName("ny_spin_box")
-        self.horizontalLayout_5.addWidget(self.ny_spin_box)
+        self.n2_spin_box.setFont(font)
+        self.n2_spin_box.setMinimum(1)
+        self.n2_spin_box.setMaximum(999)
+        self.n2_spin_box.setObjectName("n2_spin_box")
+        self.horizontalLayout_5.addWidget(self.n2_spin_box)
         self.verticalLayout.addLayout(self.horizontalLayout_5)
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
@@ -102,14 +103,14 @@ class Ui_BulkStructureGenerator(object):
         self.label_6.setFont(font)
         self.label_6.setObjectName("label_6")
         self.horizontalLayout_4.addWidget(self.label_6)
-        self.nz_spin_box = QtWidgets.QSpinBox(self.centralwidget)
+        self.n3_spin_box = QtWidgets.QSpinBox(self.centralwidget)
         font = QtGui.QFont()
         font.setFamily("Arial")
-        self.nz_spin_box.setFont(font)
-        self.nz_spin_box.setMinimum(1)
-        self.nz_spin_box.setMaximum(999)
-        self.nz_spin_box.setObjectName("nz_spin_box")
-        self.horizontalLayout_4.addWidget(self.nz_spin_box)
+        self.n3_spin_box.setFont(font)
+        self.n3_spin_box.setMinimum(1)
+        self.n3_spin_box.setMaximum(999)
+        self.n3_spin_box.setObjectName("n3_spin_box")
+        self.horizontalLayout_4.addWidget(self.n3_spin_box)
         self.verticalLayout.addLayout(self.horizontalLayout_4)
         self.verticalLayout_2.addLayout(self.verticalLayout)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -125,7 +126,7 @@ class Ui_BulkStructureGenerator(object):
         BulkStructureGenerator.setWindowTitle(_translate("BulkStructureGenerator", "Bulk Structure Generator"))
         self.label.setText(_translate("BulkStructureGenerator", "Select Bulk Structure:"))
         self.label_2.setText(_translate("BulkStructureGenerator", "Unit Cells:"))
-        self.label_3.setText(_translate("BulkStructureGenerator", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">x </span>=</p></body></html>"))
-        self.label_7.setText(_translate("BulkStructureGenerator", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">y </span>=</p></body></html>"))
-        self.label_6.setText(_translate("BulkStructureGenerator", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">z </span>=</p></body></html>"))
+        self.label_3.setText(_translate("BulkStructureGenerator", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">1 </span>=</p></body></html>"))
+        self.label_7.setText(_translate("BulkStructureGenerator", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">2 </span>=</p></body></html>"))
+        self.label_6.setText(_translate("BulkStructureGenerator", "<html><head/><body><p><span style=\" font-style:italic;\">n</span><span style=\" vertical-align:sub;\">3 </span>=</p></body></html>"))
 
