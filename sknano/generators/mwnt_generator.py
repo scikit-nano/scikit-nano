@@ -142,34 +142,17 @@ class MWNTGenerator(NanotubeBundleGeneratorBase, MWNTGeneratorBase, MWNT):
         super().finalize()
 
     @classmethod
-    def generate_fname(cls, Ch_list=None, Nwalls=None, Ntubes=None, L=None,
-                       n1=None, n2=None, n3=None, bundle_geometry=None,
-                       bundle_packing=None, **kwargs):
+    def generate_fname(cls, Ch_list=None, L=None, n3=None, **kwargs):
         """Generate a filename string."""
         # Nwalls = '{}wall_mwnt'.format(Nwalls)
         fname = '@'.join([str(Ch).replace(' ', '') for Ch in Ch_list])
-        if n1 == n2 == 1 and bundle_geometry is None:
-            return fname
-            # fname = '_'.join((Nwalls, chiralities))
-            # return fname
-
-        packing = '{}cp'.format(bundle_packing[0])
-        Ntubes = '{}tube'.format(Ntubes)
-
-        n1 = ''.join(('{}'.format(n1), pluralize('cell', n1)))
-        n2 = ''.join(('{}'.format(n2), pluralize('cell', n2)))
-        cells = 'x'.join((n1, n2))
 
         if n3 is not None:
             n3 = ''.join(('{}'.format(n3), pluralize('cell', n3)))
-            cells = 'x'.join((cells, n3))
+            fname = '_'.join((fname, n3))
         else:
-            cells = 'x'.join((cells, '{:.1f}Å'.format(L)))
+            fname = '_'.join((fname, '{:.1f}Å'.format(L)))
 
-        fname = '_'.join((fname, cells, packing))
-
-        if bundle_geometry is not None:
-            fname = '_'.join((fname, Ntubes, bundle_geometry))
         return fname
 
     def save(self, fname=None, outpath=None, structure_format=None,
@@ -182,11 +165,17 @@ class MWNTGenerator(NanotubeBundleGeneratorBase, MWNTGeneratorBase, MWNT):
         """
         if fname is None:
             fname = self.generate_fname(Ch_list=self.Ch_list,
-                                        Nwalls=self.Nwalls, Ntubes=self.Ntubes,
-                                        L=self.L,
-                                        n1=self.n1, n2=self.n2, n3=self.n3,
-                                        bundle_geometry=self.bundle_geometry,
-                                        bundle_packing=self.bundle_packing)
+                                        L=self.L, n3=self.n3)
+
+            if self.is_bundle:
+                fname_split = fname.split('_')
+                fname = \
+                    super().generate_fname(n1=self.n1, n2=self.n2, n3=self.n3,
+                                           L=self.L, fix_L=self.fix_L,
+                                           Ntubes=self.Ntubes,
+                                           bundle_geometry=self.bundle_geometry,
+                                           bundle_packing=self.bundle_packing)
+                fname = '_'.join((fname_split[0], fname))
 
         super().save(fname=fname, outpath=outpath,
                      structure_format=structure_format,
