@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>300</height>
+    <height>343</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -89,6 +89,18 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPushButton" name="xtal_structure_generator_push_button">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+         </font>
+        </property>
+        <property name="text">
+         <string>Crystal Structure Generator</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
@@ -143,8 +155,11 @@
             <pointsize>14</pointsize>
            </font>
           </property>
+          <property name="currentText">
+           <string>xyz</string>
+          </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>3</number>
           </property>
           <property name="modelColumn">
            <number>0</number>
@@ -152,6 +167,16 @@
           <item>
            <property name="text">
             <string>data</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>dump</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>pdb</string>
            </property>
           </item>
           <item>
@@ -222,6 +247,9 @@
      </spacer>
     </item>
    </layout>
+   <zorder>line</zorder>
+   <zorder></zorder>
+   <zorder>xtal_structure_generator_push_button</zorder>
   </widget>
   <widget class="QStatusBar" name="nanogen_status_bar"/>
  </widget>
