@@ -354,15 +354,6 @@ class StructureData(StructureDataMixin, StructureBase, BaseClass):
     def comment_line(self):
         del self._comment_line
 
-    def __deepcopy__(self, memo):
-        from copy import deepcopy
-        cp = self.__class__(None)
-        memo[id(self)] = cp
-        for attr in dir(self):
-            if not attr.startswith('_'):
-                setattr(cp, attr, deepcopy(getattr(self, attr), memo))
-        return cp
-
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
         return dict(fpath=self.fpath, formatter=self.formatter)
