@@ -21,7 +21,8 @@ import re
 import numpy as np
 
 from sknano.core import BaseClass, UserList, TabulateMixin, dedupe
-from sknano.core.math import convert_condition_str
+from sknano.core.math import convert_condition_str, \
+    get_rotation_parameters_from_kwargs
 from sknano.core.refdata import atomic_masses, atomic_mass_symbol_map, \
     atomic_numbers, atomic_number_symbol_map, element_symbols, element_names
 from .selections import AtomsSelectionMixin
@@ -348,6 +349,22 @@ class Atoms(AtomsSelectionMixin, TabulateMixin, UserList):
             table = self._tabulate(list(zip(items, values)))
             strrep = '\n'.join((strrep, objstr, table))
         return strrep
+
+    def __deepcopy__(self, memo=None):
+        if memo is None:
+            memo = {}
+        result = self.__class__()
+        memo[id(self)] = result
+        for atom in self:
+            # try:
+            atomdict = atom.todict()
+            atom_copy = self.__atom_class__(
+                **{k: atomdict[k] for k in set(dir(atom)) &
+                   set(dir(self.__atom_class__()))})
+            # except AttributeError as e:
+            #     atom_copy = self.__atom_class__(atom)
+            result.append(atom_copy)
+        return result
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -756,7 +773,8 @@ class Atoms(AtomsSelectionMixin, TabulateMixin, UserList):
         assert not hasattr(super(), 'update_attrs')
 
 
-def update_atoms(atoms, kwargs, deepcopy=True, update_kwargs=False):
+def update_atoms(atoms, deepcopy=True, update_kwargs=False,
+                 return_codes=None, **kwargs):
     if not update_kwargs:
         kwargs = kwargs.copy()
 
@@ -764,48 +782,58 @@ def update_atoms(atoms, kwargs, deepcopy=True, update_kwargs=False):
     if deepcopy:
         atoms = copy.deepcopy(atoms)
 
-    if any([kw in kwargs for kw
-            in ('center_CM', 'center_center_of_mass')]):
-        center_com = \
-            kwargs.pop('center_CM', kwargs.pop('center_center_of_mass'))
-
     region_bounds = kwargs.pop('region_bounds', None)
-    center_centroid = kwargs.pop('center_centroid', True)
-    center_com = kwargs.pop('center_com', False)
     filter_condition = kwargs.pop('filter_condition', None)
-    rotation_parameters = kwargs.pop('rotation_parameters', None)
 
     if region_bounds is not None:
         atoms.clip_bounds(region_bounds)
-
-    if center_centroid:
-        atoms.center_centroid()
-    elif center_com:
-        atoms.center_com()
 
     if filter_condition is not None:
         atoms.filter(filter_condition)
         # atoms = atoms.filtered(filter_condition)
 
-    rotation_kwargs = ['rotation_angle', 'angle', 'rot_axis', 'axis',
-                       'anchor_point', 'deg2rad', 'degrees', 'rot_point',
-                       'from_vector', 'to_vector', 'transform_matrix']
+    center_centroid = kwargs.pop('center_centroid', True)
+    center_com = kwargs.pop('center_com', False)
 
-    if rotation_parameters is None and \
-            any([kw in kwargs for kw in rotation_kwargs]):
-        rotation_parameters = {kw: kwargs.pop(kw) for kw in rotation_kwargs
-                               if kw in kwargs}
-        if 'rotation_angle' in rotation_parameters:
-            rotation_parameters['angle'] = \
-                rotation_parameters.pop('rotation_angle')
-        if 'rot_axis' in rotation_parameters:
-            rotation_parameters['axis'] = rotation_parameters.pop('rot_axis')
-        if 'deg2rad' in rotation_parameters:
-            rotation_parameters['degrees'] = rotation_parameters.pop('deg2rad')
+    if any([kw in kwargs for kw
+            in ('center_CM', 'center_center_of_mass')]):
+        center_com = \
+            kwargs.pop('center_CM', kwargs.pop('center_center_of_mass'))
 
-    if rotation_parameters is not None and \
-            isinstance(rotation_parameters, dict):
+    centering_vector = None
+    if center_centroid:
+        centering_vector = -atoms.centroid
+    elif center_com:
+        centering_vector = -atoms.center_of_mass
+
+    if centering_vector is not None:
+        atoms.translate(centering_vector)
+        atoms.rezero()
+
+    rotation_parameters = kwargs.pop('rotation_parameters', None)
+    if rotation_parameters is None:
+        rotation_parameters = \
+            get_rotation_parameters_from_kwargs(kwargs,
+                                                update_kwargs=update_kwargs)
+
+    if rotation_parameters is not None:
         atoms.rotate(**rotation_parameters)
+        atoms.rezero()
 
-    atoms.rezero()
-    return atoms
+    if return_codes is None:
+        if update_kwargs:
+            return atoms, kwargs
+        else:
+            return atoms
+    else:
+        retvals = []
+        for retcode in return_codes:
+            if retcode == 'atoms':
+                retvals.append(atoms)
+            elif retcode == 'centering_vector':
+                retvals.append(centering_vector)
+            elif retcode == 'rotation_parameters':
+                retvals.append(rotation_parameters)
+        if update_kwargs:
+            retvals.append(kwargs)
+        return tuple(retvals)
