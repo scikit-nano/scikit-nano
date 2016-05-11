@@ -15,10 +15,13 @@ import unittest
 
 from pkg_resources import resource_filename
 
+from sknano.core.crystallography import Crystal2DLattice, Crystal3DLattice, \
+    Reciprocal2DLattice, Reciprocal3DLattice
 from sknano.core.geometric_regions import Parallelogram, Rectangle, Square, \
     Ellipse, Circle, Triangle, Parallelepiped, Cuboid, Cube, Ellipsoid, \
     Sphere, Cylinder, Cone
 
+from sknano.generators import SWNTGenerator
 from sknano.io import DATAReader, DUMPReader, PDBReader, XYZReader, \
     DATAData, DUMPData, PDBData, XYZData
 
@@ -26,7 +29,8 @@ from .funcs import generate_atoms, generate_structure
 
 __all__ = ['AtomsTestFixture', 'TempfileTestFixture', 'GeneratorTestFixture',
            'IOTestFixture', 'DUMPTestFixture', 'GeometricRegionsTestFixture',
-           'Geometric2DRegionsTestFixture', 'Geometric3DRegionsTestFixture']
+           'Geometric2DRegionsTestFixture', 'Geometric3DRegionsTestFixture',
+           'CrystallographyTestFixture']
 
 
 class AtomsTestFixture(unittest.TestCase):
@@ -348,3 +352,34 @@ class Geometric3DRegionsTestFixture(GeometricRegionsTestFixture):
     def cone(self):
         """Return :class:`~sknano.core.geometric_regions.Cone`"""
         return Cone()
+
+
+class CrystallographyTestFixture(unittest.TestCase):
+    """Mixin :class:`~python:unittest.TestCase` class for \
+        :class:`~sknano.core.crystallography` unit tests."""
+    def get_xtal_lattice(self, nd=3, **kwargs):
+        if nd == 2:
+            return Crystal2DLattice(**kwargs)
+        else:
+            return Crystal3DLattice(**kwargs)
+
+    def get_reciprocal_lattice(self, nd=3, **kwargs):
+        if nd == 2:
+            return Reciprocal2DLattice(**kwargs)
+        else:
+            return Reciprocal3DLattice(**kwargs)
+
+    def get_swnt_lattice(self, *Ch, **kwargs):
+        return SWNTGenerator(*Ch, **kwargs).lattice
+
+    def get_square_lattice(self, a):
+        return Crystal2DLattice.square(a)
+
+    def get_hexagonal_lattice(self, *args, nd=3):
+        if nd == 2:
+            return Crystal2DLattice.hexagonal(*args)
+        else:
+            return Crystal3DLattice.hexagonal(*args)
+
+    def get_cubic_lattice(self, a):
+        return Crystal3DLattice.cubic(a)
