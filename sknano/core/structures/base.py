@@ -13,19 +13,21 @@ __docformat__ = 'restructuredtext en'
 
 from functools import total_ordering
 
+import copy
 # import numpy as np
 
 from sknano.core import BaseClass, TabulateMixin
 from sknano.core.atoms import Atoms, BasisAtoms, vdw_radius_from_basis
 from sknano.core.crystallography import CrystalCell, UnitCell, SuperCell
-from sknano.core.math import Vector
+from sknano.core.math import Vector, get_rotation_parameters_from_kwargs
 from sknano.core.refdata import aCC, element_data
 
 from .selections import StructureSelectionMixin
 
 
 __all__ = ['StructureMixin', 'StructureBase',
-           'CrystalStructureBase', 'NanoStructureBase']
+           'CrystalStructureBase', 'NanoStructureBase',
+           'update_structure']
 
 r_CC_vdw = element_data['C']['VanDerWaalsRadius']
 
@@ -35,15 +37,6 @@ _list_methods = ('append', 'extend', 'insert', 'remove', 'pop', 'clear',
 
 class StructureMixin:
     """Mixin class for crystal structures."""
-
-    # def __deepcopy__(self, memo):
-    #     from copy import deepcopy
-    #     cp = self.__class__()
-    #     memo[id(self)] = cp
-    #     for attr in dir(self):
-    #         if not attr.startswith('_'):
-    #             setattr(cp, attr, deepcopy(getattr(self, attr), memo))
-    #     return cp
 
     def __getattr__(self, name):
         try:
@@ -135,6 +128,7 @@ class StructureMixin:
     @unit_cell.setter
     def unit_cell(self, value):
         self.crystal_cell.unit_cell = value
+        self.crystal_cell.update_lattice_and_basis(to_unit_cell=True)
 
     def clear(self):
         """Clear list of :attr:`StructureMixin.atoms`."""
@@ -144,6 +138,10 @@ class StructureMixin:
         """Make supercell."""
         return SuperCell(self.unit_cell, scaling_matrix,
                          wrap_coords=wrap_coords)
+
+    def rezero(self, **kwargs):
+        self.crystal_cell.rezero(**kwargs)
+        self.atoms.rezero(**kwargs)
 
     def rotate(self, **kwargs):
         """Rotate crystal cell lattice, basis, and unit cell."""
@@ -181,13 +179,26 @@ class StructureMixin:
 @total_ordering
 class StructureBase(StructureSelectionMixin, TabulateMixin, StructureMixin):
     """Base structure class for structure data."""
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, structure=None, atoms=None, crystal_cell=None,
+                 lattice_shift=None, region=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self._structure = self
-        self._atoms = None
-        self._crystal_cell = CrystalCell()
-        self._lattice_shift = Vector()
-        self._region = None
+        if structure is None:
+            structure = self
+        if crystal_cell is None:
+            crystal_cell = CrystalCell()
+        if lattice_shift is None:
+            lattice_shift = Vector()
+
+        self._structure = structure
+        self._atoms = atoms
+        self._crystal_cell = crystal_cell
+        self._lattice_shift = lattice_shift
+        self._region = region
+
+        self.fmtstr = ', '.join(('atoms={atoms!r}',
+                                 'crystal_cell={crystal_cell!r}',
+                                 'lattice_shift={lattice_shift!r}',
+                                 'region={region!r}'))
 
     def __str__(self):
         strrep = self._table_title_str()
@@ -222,6 +233,13 @@ class StructureBase(StructureSelectionMixin, TabulateMixin, StructureMixin):
                     (self.atoms <= other.atoms and
                      self.crystal_cell < other.crystal_cell))
 
+    def __deepcopy__(self, memo):
+        obj = self.__class__(**self.todict())
+        if self._structure is not self:
+            obj._structure = self.structure
+        memo[id(self)] = obj
+        return obj
+
     @property
     def structure(self):
         """Reference to `self` or instance of :class:`StructureBase`."""
@@ -230,6 +248,12 @@ class StructureBase(StructureSelectionMixin, TabulateMixin, StructureMixin):
     @structure.setter
     def structure(self, value):
         self._structure = value
+
+    def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
+        return dict(atoms=self.atoms, crystal_cell=self.crystal_cell,
+                    lattice_shift=self.lattice_shift,
+                    region=self.region)
 
 
 class CrystalStructureBase(StructureBase, BaseClass):
@@ -252,15 +276,17 @@ class CrystalStructureBase(StructureBase, BaseClass):
                                   coords=coords, cartesian=cartesian)
 
         self.scaling_matrix = scaling_matrix
-        self.fmtstr = self.unit_cell.fmtstr + \
-            ", scaling_matrix={scaling_matrix!r}"
+        self.fmtstr = ', '.join((super().fmtstr,
+                                 self.unit_cell.fmtstr,
+                                 'scaling_matrix={scaling_matrix!r}'))
 
     def __dir__(self):
         return dir(self.crystal_cell)
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
-        attrdict = self.unit_cell.todict()
+        attrdict = super().todict()
+        attrdict.update(self.unit_cell.todict())
         attrdict.update(dict(scaling_matrix=self.scaling_matrix.tolist()))
         return attrdict
 
@@ -303,8 +329,9 @@ class NanoStructureBase(StructureBase, BaseClass):
         self.bond = bond
         self.basis = basis
         self.vdw_radius = vdw_radius
-        self.fmtstr = "bond={bond!r}, basis={basis!r}, " + \
-            "vdw_radius={vdw_radius!r}"
+        self.fmtstr = \
+            ', '.join((super().fmtstr, 'bond={bond!r}', 'basis={basis!r}',
+                       'vdw_radius={vdw_radius!r}'))
 
     @property
     def basis(self):
@@ -369,5 +396,97 @@ class NanoStructureBase(StructureBase, BaseClass):
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
-        return dict(bond=self.bond, basis=self.basis,
-                    vdw_radius=self.vdw_radius)
+        attrdict = super().todict()
+        attrdict.update(dict(bond=self.bond, basis=self.basis,
+                             vdw_radius=self.vdw_radius))
+        return attrdict
+
+
+def update_structure(structure=None, atoms=None, deepcopy=True,
+                     update_kwargs=False, return_codes=None, **kwargs):
+    if not update_kwargs:
+        kwargs = kwargs.copy()
+
+    if structure is not None:
+        if deepcopy:
+            structure = copy.deepcopy(structure)
+            deepcopy = False
+        atoms = structure.atoms
+
+    if atoms is not None:
+        atoms = atoms[:]
+        if deepcopy:
+            atoms = copy.deepcopy(atoms)
+
+    region_bounds = kwargs.pop('region_bounds', None)
+    filter_condition = kwargs.pop('filter_condition', None)
+
+    if region_bounds is not None and atoms is not None:
+        atoms.clip_bounds(region_bounds)
+
+    if filter_condition is not None and atoms is not None:
+        atoms.filter(filter_condition)
+        # atoms = atoms.filtered(filter_condition)
+
+    center_centroid = kwargs.pop('center_centroid', True)
+    center_com = kwargs.pop('center_com', False)
+
+    if any([kw in kwargs for kw
+            in ('center_CM', 'center_center_of_mass')]):
+        center_com = \
+            kwargs.pop('center_CM', kwargs.pop('center_center_of_mass'))
+
+    centering_vector = None
+
+    if center_centroid:
+        centering_vector = -atoms.centroid
+    elif center_com:
+        centering_vector = -atoms.center_of_mass
+
+    if structure is not None:
+        # structure.atoms = atoms
+        if centering_vector is not None:
+            structure.translate(centering_vector)
+            structure.rezero()
+        # atoms = structure.atoms
+    else:
+        if centering_vector is not None:
+            atoms.translate(centering_vector)
+            atoms.rezero()
+
+    rotation_parameters = kwargs.pop('rotation_parameters', None)
+    if rotation_parameters is None:
+        rotation_parameters = \
+            get_rotation_parameters_from_kwargs(kwargs,
+                                                update_kwargs=update_kwargs)
+
+    if structure is not None:
+        # structure.atoms = atoms
+        if rotation_parameters is not None:
+            structure.rotate(**rotation_parameters)
+            structure.rezero()
+        # atoms = structure.atoms
+    else:
+        if rotation_parameters is not None:
+            atoms.rotate(**rotation_parameters)
+            atoms.rezero()
+
+    if return_codes is None:
+        if update_kwargs:
+            return structure, kwargs
+        else:
+            return structure
+    else:
+        retvals = []
+        for retcode in return_codes:
+            if retcode == 'structure':
+                retvals.append(structure)
+            elif retcode == 'atoms':
+                retvals.append(atoms)
+            elif retcode == 'centering_vector':
+                retvals.append(centering_vector)
+            elif retcode == 'rotation_parameters':
+                retvals.append(rotation_parameters)
+        if update_kwargs:
+            retvals.append(kwargs)
+        return tuple(retvals)
