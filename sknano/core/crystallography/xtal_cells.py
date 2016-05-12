@@ -76,6 +76,11 @@ class UnitCell(BaseClass, TabulateMixin):
             strrep = '\n'.join((strrep, title, str(basis)))
         return strrep
 
+    def __deepcopy__(self, memo):
+        obj = self.__class__(**self.todict())
+        memo[id(self)] = obj
+        return obj
+
     def __dir__(self):
         return ['lattice', 'basis']
 
@@ -159,7 +164,8 @@ class CrystalCell(BaseClass, TabulateMixin):
                  wrap_coords=False, unit_cell=None, scaling_matrix=None):
         super().__init__()
 
-        if unit_cell is None and basis is not None:
+        # if unit_cell is None and basis is not None:
+        if basis is not None:
             basis = BasisAtoms(basis)
             if lattice is not None:
                 basis.lattice = lattice
@@ -188,6 +194,11 @@ class CrystalCell(BaseClass, TabulateMixin):
             "lattice={lattice!r}, basis={basis!r}, coords={coords!r}, " + \
             "cartesian=False, wrap_coords={wrap_coords!r}, " + \
             "unit_cell={unit_cell!r}, scaling_matrix={scaling_matrix!r}"
+
+    def __deepcopy__(self, memo):
+        obj = self.__class__(**self.todict())
+        memo[id(self)] = obj
+        return obj
 
     def __dir__(self):
         return ['lattice', 'basis', 'unit_cell', 'scaling_matrix']
@@ -284,8 +295,10 @@ class CrystalCell(BaseClass, TabulateMixin):
             raise ValueError('Expected a `UnitCell` object')
         self._unit_cell = value
         if value is not None:
-            self._lattice = self.unit_cell.lattice
-            self._basis = self.unit_cell.basis
+            if self.basis is None:
+                self._basis = self.unit_cell.basis
+            if self.lattice is None:
+                self._lattice = self.unit_cell.lattice
             # if self.lattice is None:
             #     self._lattice = self.unit_cell.lattice
             # if self.basis is None or self.basis.Natoms == 0:
@@ -299,10 +312,13 @@ class CrystalCell(BaseClass, TabulateMixin):
     @scaling_matrix.setter
     def scaling_matrix(self, value):
         if value is None:
-            self._scaling_matrix = np.asmatrix(np.ones(3, dtype=int))
+            self._scaling_matrix = np.asmatrix(np.eye(3, dtype=int))
             return
 
         if not isinstance(value, (int, float, tuple, list, np.ndarray)):
+            return
+
+        if self.lattice is None:
             return
 
         if isinstance(value, np.ndarray) and \
@@ -347,6 +363,11 @@ class CrystalCell(BaseClass, TabulateMixin):
                                             lattice=self.lattice,
                                             xs=xs, ys=ys, zs=zs))
 
+    def rezero(self, **kwargs):
+        """Rezero the crystal cell basis coordinates."""
+        if self.basis is not None:
+            self.basis.rezero(**kwargs)
+
     def rotate(self, **kwargs):
         """Rotate crystal cell lattice, basis, and unit cell."""
         if kwargs.get('anchor_point', None) is None:
@@ -355,17 +376,20 @@ class CrystalCell(BaseClass, TabulateMixin):
             self.lattice.rotate(**kwargs)
         if self.basis is not None:
             self.basis.rotate(**kwargs)
-        self.unit_cell.rotate(**kwargs)
+        if self.unit_cell is not None:
+            self.unit_cell.rotate(**kwargs)
 
     def translate(self, t, fix_anchor_points=True):
-        """Translate crystal cell basis."""
+        """Translate crystal cell lattice, basis, and unit cell."""
         if self.lattice is not None:
             self.lattice.translate(t)
         if self.basis is not None:
             self.basis.translate(t, fix_anchor_points=fix_anchor_points)
-        self.unit_cell.translate(t, fix_anchor_points=fix_anchor_points)
+        if self.unit_cell is not None:
+            self.unit_cell.translate(t, fix_anchor_points=fix_anchor_points)
 
     def translate_basis(self, t, cartesian=True, wrap_coords=True):
+        """Translate the crystal cell basis."""
         if cartesian:
             t = self.lattice.cartesian_to_fractional(t)
 
@@ -400,11 +424,16 @@ class CrystalCell(BaseClass, TabulateMixin):
             [self.unit_cell.basis.__setitem__(i, element) for i in index]
             [self.basis.__setitem__(i, element) for i in index]
 
-    def reset_lattice_and_basis(self):
-        """Reset the crystal cell lattice and basis to the unit cell values."""
-        if self.unit_cell is not None:
-            self._lattice = self.unit_cell.lattice
-            self._basis = self.unit_cell.basis
+    def update_lattice_and_basis(self, to_unit_cell=False,
+                                 from_unit_cell=None):
+        """Update/set the crystal cell lattice and basis."""
+        if to_unit_cell:
+            if self.unit_cell is not None:
+                self._basis = self.unit_cell.basis
+                self._lattice = self.unit_cell.lattice
+        elif from_unit_cell is not None:
+            self._basis = from_unit_cell.basis
+            self._lattice = from_unit_cell.lattice
 
     def todict(self):
         """:class:`~python:dict` of :class:`CrystalCell` parameters."""
