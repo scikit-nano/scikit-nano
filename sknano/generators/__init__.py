@@ -9,7 +9,6 @@ from .xtal_structure_generator import *
 from .mixins import *
 from .fullerene_generator import *
 from .graphene_generator import *
-from .bilayer_graphene_generator import *
 from .nanotube_bundle_generator import *
 from .swnt_generator import *
 from .mwnt_generator import *
