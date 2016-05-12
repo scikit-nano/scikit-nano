@@ -1307,7 +1307,7 @@ class SWNTMixin:
         if self._integral_n3:
             self._n3 = int(np.ceil(value))
 
-        self.crystal_cell.reset_lattice_and_basis()
+        self.crystal_cell.update_lattice_and_basis(to_unit_cell=True)
         self.scaling_matrix = [1, 1, int(np.ceil(self._n3))]
         self._Natoms_per_tube = self.crystal_cell.basis.Natoms
 
