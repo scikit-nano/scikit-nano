@@ -7,13 +7,14 @@ from collections import OrderedDict
 
 import nose
 from nose.tools import assert_equal, assert_not_equal, assert_is_instance
-from sknano.testing import IOTestFixture, generate_structure
+from sknano.testing import IOTestFixture, GeneratorTestFixture, \
+    generate_structure
 
 from sknano.io import DATAData, DATAReader, DATAWriter, DATAFormatter, \
     atom_styles
 
 
-class DATATestFixture(IOTestFixture):
+class DATATestFixture(IOTestFixture, GeneratorTestFixture):
 
     @property
     def atoms(self):
@@ -50,7 +51,8 @@ class Tests(DATATestFixture):
         assert_equal(atoms, test_atoms1)
         testfile2 = 'test3-2.data'
         self.tmpdata.append(testfile2)
-        DATAWriter.write(datafile=testfile2, atoms=atoms, verbose=True)
+        DATAWriter.write(datafile=testfile2, atoms=atoms,
+                         center_centroid=False, verbose=True)
         test_atoms2 = DATAReader(testfile2).atoms
         assert_equal(atoms, test_atoms2)
         testfile3 = 'test3-3.data'
@@ -58,7 +60,7 @@ class Tests(DATATestFixture):
         swnt = generate_structure(generator_class='SWNTGenerator',
                                   Ch=(10, 10))
         DATAWriter.write(testfile3, structure=swnt.structure,
-                         atoms=swnt.atoms, verbose=True)
+                         center_centroid=False, verbose=True)
         test_atoms3 = DATAReader(testfile3).atoms
         # print(test_atoms3.ids)
         assert_equal(atoms, test_atoms3)
@@ -68,11 +70,17 @@ class Tests(DATATestFixture):
         swnt = generate_structure(generator_class='SWNTGenerator',
                                   Ch=(10, 10))
         DATAWriter.write(testfile4, structure=swnt.structure,
-                         atoms=swnt.atoms, allow_triclinic_box=True,
+                         center_centroid=False, allow_triclinic_box=True,
                          verbose=True)
         test_atoms4 = DATAReader(testfile4).atoms
         # print(test_atoms3.ids)
         assert_equal(atoms, test_atoms4)
+
+    def test4(self):
+        swnt = self.swnt
+        swnt.center_centroid()
+        print(swnt.crystal_cell.lattice)
+        swnt.save(structure_format='data')
 
 if __name__ == '__main__':
     nose.runmodule()

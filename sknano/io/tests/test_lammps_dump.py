@@ -9,11 +9,11 @@ import numpy as np
 
 import nose
 from nose.tools import assert_equal, assert_true
-from sknano.testing import DUMPTestFixture
+from sknano.testing import DUMPTestFixture, GeneratorTestFixture
 from sknano.io import DUMPData, DUMPWriter
 
 
-class Tests(DUMPTestFixture):
+class Tests(DUMPTestFixture, GeneratorTestFixture):
 
     def test1(self):
         dump = self.dump_reader
@@ -96,7 +96,9 @@ class Tests(DUMPTestFixture):
                          style=dump.style,
                          dumpattrs=dump.dumpattrs,
                          dumpattrmap=dump.dumpattrmap,
-                         atomattrmap=dump.atomattrmap, verbose=True)
+                         atomattrmap=dump.atomattrmap,
+                         center_centroid=False,
+                         verbose=True)
         self.print_dumpattrs(dump)
         test_dump = DUMPData(testfile, dumpattrmap=dump.dumpattrmap,
                              atomattrmap=dump.atomattrmap)
@@ -121,13 +123,27 @@ class Tests(DUMPTestFixture):
                          style=dump.style,
                          dumpattrs=dump.dumpattrs,
                          dumpattrmap=dump.dumpattrmap,
-                         atomattrmap=dump.atomattrmap, verbose=True)
+                         atomattrmap=dump.atomattrmap,
+                         center_centroid=False,
+                         verbose=True)
         test_dump = DUMPData(testfile, dumpattrmap=dump.dumpattrmap,
                              atomattrmap=dump.atomattrmap)
         self.print_dumpattrs(test_dump)
         test_atoms = test_dump[0].atoms
         test_atoms.sort(key=attrgetter('id'))
         assert_equal(atoms[:100], test_atoms[:100])
+
+    def test8(self):
+        swnt = self.swnt
+        # swnt.center_centroid()
+        print(swnt.atoms.centroid)
+        print(swnt.atoms.lattice.centroid)
+        print(swnt.crystal_cell.basis.centroid)
+        print(swnt.crystal_cell.lattice.centroid)
+        print(swnt.lattice.offset)
+        swnt.save(structure_format='dump',
+                  dumpattrs=['id', 'type', 'x', 'y', 'z'])
+
 
 if __name__ == '__main__':
     nose.runmodule()
