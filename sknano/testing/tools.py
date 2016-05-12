@@ -121,7 +121,7 @@ class TempfileTestFixture(unittest.TestCase):
         for f in self.tmpdata:
             try:
                 os.remove(f)
-            except IOError:
+            except OSError:
                 continue
 
 
