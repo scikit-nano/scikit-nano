@@ -20,7 +20,8 @@ __all__ = ['rotate', 'Rx', 'Ry', 'Rz', 'rotation_matrix',
            'reflection_matrix', 'scaling_matrix', 'translation_matrix',
            'translation_from_augmented_matrix', 'translation_from_matrix',
            'rotation_matrix_from_augmented_matrix',
-           'transformation_matrix', 'axis_angle_from_rotation_matrix']
+           'transformation_matrix', 'axis_angle_from_rotation_matrix',
+           'get_rotation_parameters_from_kwargs']
 
 I = np.identity(4)
 
@@ -619,3 +620,26 @@ def axis_angle_from_rotation_matrix(rmatrix):
     axis.rezero()
 
     return axis, angle
+
+
+def get_rotation_parameters_from_kwargs(kwargs, update_kwargs=False):
+    """Return dictionary of rotation parameters."""
+    if not update_kwargs:
+        kwargs = kwargs.copy()
+
+    rotation_kwargs = ['rotation_angle', 'angle', 'rot_axis', 'axis',
+                       'anchor_point', 'deg2rad', 'degrees', 'rot_point',
+                       'from_vector', 'to_vector', 'transform_matrix']
+
+    rotation_parameters = None
+    if any([kw in kwargs for kw in rotation_kwargs]):
+        rotation_parameters = {kw: kwargs.pop(kw) for kw in rotation_kwargs
+                               if kw in kwargs}
+        if 'rotation_angle' in rotation_parameters:
+            rotation_parameters['angle'] = \
+                rotation_parameters.pop('rotation_angle')
+        if 'rot_axis' in rotation_parameters:
+            rotation_parameters['axis'] = rotation_parameters.pop('rot_axis')
+        if 'deg2rad' in rotation_parameters:
+            rotation_parameters['degrees'] = rotation_parameters.pop('deg2rad')
+    return rotation_parameters
