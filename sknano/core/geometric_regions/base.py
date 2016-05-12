@@ -99,6 +99,11 @@ class GeometricRegion(BaseClass, TabulateMixin, metaclass=ABCMeta):
         self.points = Points()
         self.vectors = Vectors()
 
+    def __deepcopy__(self, memo):
+        obj = self.__class__(**self.todict())
+        memo[id(self)] = obj
+        return obj
+
     def __eq__(self, other):
         return isinstance(other, type(self)) and \
             self.points == other.points and self.vectors == other.vectors
