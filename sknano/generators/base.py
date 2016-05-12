@@ -236,20 +236,31 @@ class DefectGeneratorBase(StructureReaderMixin, GeneratorBase, BaseClass):
     ----------
 
     """
-    def __init__(self, structure_obj=None, autogen=True,
+    def __init__(self, *args, structure_or_file=None, autogen=True,
                  echo_vmd_selection=True, **kwargs):
         super().__init__(autogen=False, **kwargs)
 
-        self.fmtstr = "{structure!r}"
+        self.structure_or_file = structure_or_file
         self.echo_vmd_selection = echo_vmd_selection
+        self.fmtstr = ', '.join(("{structure_or_file!r}",
+                                 "echo_vmd_selection={echo_vmd_selection!r}"))
 
-        if structure_obj is not None:
-            if not isinstance(structure_obj, StructureBase):
-                structure_obj = self.read(structure_obj).structure
+        self.vmd_selection_cmd = None
+
+        if len(args) > 0 and structure_or_file is None:
+            structure_or_file = args[0]
+
+        if structure_or_file is not None:
+            if not isinstance(structure_or_file, StructureBase):
+                structure = self.read(structure_or_file).structure
             else:
-                structure_obj = structure_obj.structure
-        self.structure = structure_obj
-        self.__update_attrs()
+                structure = structure_or_file.structure
+
+            self.structure = structure
+            self.__update_attrs()
+
+            if autogen:
+                self.generate()
 
     def update_attrs(self):
         structure = self.structure
@@ -261,14 +272,18 @@ class DefectGeneratorBase(StructureReaderMixin, GeneratorBase, BaseClass):
 
     __update_attrs = update_attrs
 
-    @property
-    def atom_ids(self):
-        return self.atoms.ids
+    def finalize(self):
+        """Finalize structure data by assigning unique ids and types to \
+            structure atoms."""
+        super().finalize()
+        if self.echo_vmd_selection:
+            pass
 
-    @property
-    def atom_coords(self):
-        return self.atoms.get_coords(asdict=True)
+    def save(self, **kwargs):
+        """Save structure data."""
+        super().save(structure=self.structure, **kwargs)
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
-        return dict(structure=self.structure)
+        return dict(structure_or_file=self.structure_or_file,
+                    echo_vmd_selection=self.echo_vmd_selection)
