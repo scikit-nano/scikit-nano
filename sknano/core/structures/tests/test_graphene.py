@@ -12,7 +12,8 @@ from nose.tools import assert_equal, assert_true
 import numpy as np
 
 from sknano.core.structures import Graphene, PrimitiveCellGraphene, \
-    ConventionalCellGraphene, GraphenePrimitiveCell, GrapheneConventionalCell
+    ConventionalCellGraphene, GraphenePrimitiveCell, \
+    GrapheneConventionalCell, BilayerGraphene
 
 
 def test1():
@@ -62,6 +63,12 @@ def test5():
     assert_true(isinstance(s, PrimitiveCellGraphene))
     assert_true(isinstance(s.unit_cell, GraphenePrimitiveCell))
 
+
+def test6():
+    blg = BilayerGraphene(armchair_edge_length=10, zigzag_edge_length=10,
+                          layer_rotation_increment=45, degrees=True)
+    assert_equal(blg.nlayers, 2)
+    assert_equal(blg.layer_rotation_angles[-1], np.pi/4)
 
 if __name__ == '__main__':
     nose.runmodule()

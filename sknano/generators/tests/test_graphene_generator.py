@@ -9,7 +9,8 @@ warnings.simplefilter('always')
 import nose
 from nose.tools import *
 from sknano.generators import GrapheneGenerator, \
-    PrimitiveCellGrapheneGenerator, ConventionalCellGrapheneGenerator
+    PrimitiveCellGrapheneGenerator, ConventionalCellGrapheneGenerator, \
+    BilayerGrapheneGenerator
 from sknano.testing import GeneratorTestFixture
 
 
@@ -77,6 +78,12 @@ class Tests(GeneratorTestFixture):
         generator.save(fname='10Å_3layer_primitive_cell_graphene.data')
         self.tmpdata.append(generator.fname)
 
+    def test10(self):
+        generator = BilayerGrapheneGenerator(armchair_edge_length=10,
+                                             zigzag_edge_length=10,
+                                             layer_rotation_increment=45)
+        generator.save()
+        self.tmpdata.append(generator.fname)
 
 if __name__ == '__main__':
     nose.runmodule()
