@@ -13,6 +13,7 @@ __docformat__ = 'restructuredtext en'
 
 # from abc import ABCMeta, abstractproperty
 from functools import total_ordering
+import copy
 
 import numpy as np
 
@@ -209,7 +210,7 @@ class Domain(TabulateMixin, BaseClass):
 
     def update(self, from_lattice=None, from_region=None, from_array=None,
                allow_triclinic_box=False, pad_box=False,
-               pad_tol=0.01, xpad=10., ypad=10., zpad=10., verbose=False,
+               pad_tol=0.01, xpad=10., ypad=10., zpad=10., verbose=True,
                **kwargs):
         """Update simulation domain attributes from lattice."""
         bounding_box = \
@@ -324,6 +325,13 @@ class LatticeBase(TabulateMixin, BaseClass):
         self.lattice_type = None
         self._offset = Point(offset, nd=3)
         self._update_region()
+        self.fmtstr = "orientation_matrix={orientation_matrix!r}, " + \
+            "offset={offset!r}"
+
+    def __deepcopy__(self, memo):
+        obj = self.__class__(**self.todict())
+        memo[id(self)] = obj
+        return obj
 
     def __dir__(self):
         return ['nd', 'offset', 'orientation_matrix']
@@ -646,6 +654,11 @@ class LatticeBase(TabulateMixin, BaseClass):
         self.offset.translate(t)
         self.region.translate(t)
 
+    def todict(self):
+        """Return dict of constructor parameters."""
+        return dict(orientation_matrix=self.orientation_matrix.tolist(),
+                    offset=self.offset.tolist())
+
 
 class ReciprocalLatticeBase(LatticeBase):
     """Base class for crystallographic reciprocal lattice objects.
@@ -887,7 +900,7 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin):
                          orientation_matrix=orientation_matrix,
                          offset=offset)
 
-        self.fmtstr = "a={a!r}, b={b!r}, gamma={gamma!r}"
+        self.fmtstr = "a={a!r}, b={b!r}, gamma={gamma!r}, " + super().fmtstr
 
     def __dir__(self):
         attrs = super().__dir__()
@@ -922,10 +935,6 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin):
         strrep = '\n'.join((strrep, title, str(bbox)))
 
         return strrep
-
-    def todict(self):
-        """Return `dict` of `Crystal2DLattice` parameters."""
-        return dict(a=self.a, b=self.b, gamma=self.gamma)
 
     @property
     def a(self):
@@ -1058,6 +1067,12 @@ class Crystal2DLattice(LatticeBase, Reciprocal2DLatticeMixin):
         """Tuple of lattice vectors :math:`\\mathbf{a}_1, \\mathbf{a}_2`."""
         return self.a1, self.a2
 
+    def todict(self):
+        """Return `dict` of `Crystal2DLattice` parameters."""
+        attr_dict = super().todict()
+        attr_dict.update(dict(a=self.a, b=self.b, gamma=self.gamma))
+        return attr_dict
+
 
 class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin):
     """2D reciprocal lattice class.
@@ -1083,17 +1098,12 @@ class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin):
         super().__init__(direct_lattice, nd=2, offset=offset)
 
         self.fmtstr = "a_star={a_star!r}, b_star={b_star!r}, " + \
-            "gamma_star={gamma_star!r}"
+            "gamma_star={gamma_star!r}, " + super().fmtstr
 
     def __dir__(self):
         attrs = super().__dir__()
         attrs.extend(['a_star', 'b_star', 'gamma_star'])
         return attrs
-
-    def todict(self):
-        """Return `dict` of `Reciprocal2DLattice` parameters."""
-        return dict(a_star=self.a_star, b_star=self.b_star,
-                    gamma_star=self.gamma_star)
 
     @property
     def a_star(self):
@@ -1196,6 +1206,13 @@ class Reciprocal2DLattice(ReciprocalLatticeBase, Direct2DLatticeMixin):
         """Tuple of lattice vectors :math:`\\mathbf{b}_1, \\mathbf{b}_2`."""
         return self.b1, self.b2
 
+    def todict(self):
+        """Return `dict` of `Reciprocal2DLattice` parameters."""
+        attr_dict = super().todict()
+        attr_dict.update(dict(a_star=self.a_star, b_star=self.b_star,
+                              gamma_star=self.gamma_star))
+        return attr_dict
+
 
 class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin):
     """3D crystal lattice class.
@@ -1258,7 +1275,8 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin):
                          offset=offset)
 
         self.fmtstr = "a={a!r}, b={b!r}, c={c!r}, " + \
-            "alpha={alpha!r}, beta={beta!r}, gamma={gamma!r}"
+            "alpha={alpha!r}, beta={beta!r}, gamma={gamma!r}, " + \
+            super().fmtstr
 
     def __dir__(self):
         attrs = super().__dir__()
@@ -1338,11 +1356,6 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin):
         if not np.isscalar(other) or np.allclose(other, 0.0):
             return NotImplemented
         return self.__imul__(1 // other)
-
-    def todict(self):
-        """Return `dict` of `Crystal3DLattice` parameters."""
-        return dict(a=self.a, b=self.b, c=self.c,
-                    alpha=self.alpha, beta=self.beta, gamma=self.gamma)
 
     @property
     def a(self):
@@ -1560,6 +1573,14 @@ class Crystal3DLattice(LatticeBase, ReciprocalLatticeMixin):
             :math:`\\mathbf{a}_1, \\mathbf{a}_2, \\mathbf{a}_3`."""
         return self.a1, self.a2, self.a3
 
+    def todict(self):
+        """Return `dict` of `Crystal3DLattice` parameters."""
+        attr_dict = super().todict()
+        attr_dict.update(dict(a=self.a, b=self.b, c=self.c,
+                              alpha=self.alpha, beta=self.beta,
+                              gamma=self.gamma))
+        return attr_dict
+
 
 CrystalLattice = Crystal3DLattice
 
@@ -1590,7 +1611,8 @@ class Reciprocal3DLattice(ReciprocalLatticeBase, DirectLatticeMixin):
 
         self.fmtstr = "a_star={a_star!r}, b_star={b_star!r}, " + \
             "c_star={c_star!r}, alpha_star={alpha_star!r}, " + \
-            "beta_star={beta_star!r}, gamma_star={gamma_star!r}"
+            "beta_star={beta_star!r}, gamma_star={gamma_star!r}, " + \
+            super().fmtstr
 
     def __dir__(self):
         attrs = super().__dir__()
@@ -1749,12 +1771,6 @@ class Reciprocal3DLattice(ReciprocalLatticeBase, DirectLatticeMixin):
         return cls(a_star=a_star, b_star=a_star, c_star=a_star,
                    alpha_star=90, beta_star=90, gamma_star=90)
 
-    def todict(self):
-        """Return `dict` of `Reciprocal3DLattice` parameters."""
-        return dict(a_star=self.a_star, b_star=self.b_star,
-                    c_star=self.c_star, alpha_star=self.alpha_star,
-                    beta_star=self.beta_star, gamma_star=self.gamma_star)
-
     @property
     def lengths(self):
         """Tuple of lattice vector lengths :math:`a^*, b^*, c^*`."""
@@ -1779,6 +1795,14 @@ class Reciprocal3DLattice(ReciprocalLatticeBase, DirectLatticeMixin):
             :math:`\\mathbf{b}_1, \\mathbf{b}_2, \\mathbf{b}_3`."""
         return self.b1, self.b2, self.b3
 
+    def todict(self):
+        """Return `dict` of `Reciprocal3DLattice` parameters."""
+        attr_dict = super().todict()
+        attr_dict.update(dict(a_star=self.a_star, b_star=self.b_star,
+                              c_star=self.c_star, alpha_star=self.alpha_star,
+                              beta_star=self.beta_star,
+                              gamma_star=self.gamma_star))
+        return attr_dict
 
 ReciprocalLattice = Reciprocal3DLattice
 
