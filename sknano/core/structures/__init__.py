@@ -9,7 +9,6 @@ from .compositions import *
 from .nanotube_bundle import *
 from .fullerenes import *
 from .graphene import *
-from .bilayer_graphene import *
 from .swnt import *
 from .mwnt import *
 from .unrolled_swnt import *
