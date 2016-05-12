@@ -565,4 +565,5 @@ class BilayerGraphene(Graphene):
 
     """
     def __init__(self, **kwargs):
-        super().__init__(nlayers=2, **kwargs)
+        kwargs['nlayers'] = 2
+        super().__init__(**kwargs)

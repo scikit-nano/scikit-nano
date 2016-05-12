@@ -19,7 +19,7 @@ from sknano.core.atoms import StructureAtom as Atom, StructureAtoms as Atoms
 from sknano.core.math import Vector
 from sknano.core.crystallography import SuperCell
 from sknano.core.structures import PrimitiveCellGraphene, \
-    ConventionalCellGraphene
+    ConventionalCellGraphene, BilayerGraphene
 from .base import NanoStructureGenerator
 
 __all__ = ['GrapheneGenerator',
