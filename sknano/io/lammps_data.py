@@ -18,8 +18,10 @@ import numpy as np
 
 from monty.io import zopen
 from sknano.core import get_fpath, minmax
-from sknano.core.atoms import Atoms, MDAtoms, MDAtom as Atom, update_atoms
+from sknano.core.atoms import Atoms, MDAtoms, MDAtom as Atom
 from sknano.core.crystallography import Domain
+from sknano.core.structures import update_structure
+
 from .base import StructureData, StructureDataError, StructureDataFormatter, \
     StructureDataConverter, default_comment_line
 
@@ -390,18 +392,24 @@ class DATAWriter:
         if structure is None and atoms is None:
             raise ValueError('Expected either `structure` or `atoms` object.')
 
-        if structure is not None and atoms is None:
-            atoms = structure.atoms
-
         if fpath is None:
             if 'datafile' in kwargs and fname is None:
                 fname = kwargs.pop('datafile')
             fpath = get_fpath(fname=fname, ext='data', outpath=outpath,
                               overwrite=True, add_fnum=False)
 
+        structure, atoms, centering_vector, rotation_parameters, kwargs = \
+            update_structure(structure, atoms=atoms, update_kwargs=True,
+                             return_codes=('structure', 'atoms',
+                                           'centering_vector',
+                                           'rotation_parameters'),
+                             **kwargs)
+
+        if structure is not None:
+            atoms = structure.atoms
+
         if not isinstance(atoms, MDAtoms):
             atoms = MDAtoms(atoms)
-        atoms = update_atoms(atoms, kwargs, update_kwargs=True)
 
         formatter = DATAFormatter(atom_style=atom_style,
                                   bond_style=bond_style,
@@ -543,8 +551,6 @@ class DATAData(DATAReader):
                     raise ValueError(error_msg)
                 else:
                     datafile = self.fpath
-            elif self.fpath is None:
-                self.fpath = datafile
 
             if comment_line is None:
                 comment_line = default_comment_line
@@ -554,7 +560,7 @@ class DATAData(DATAReader):
                     atoms = MDAtoms(atoms)
                 self._atoms = atoms
 
-            super()._update_atoms(**kwargs)
+            super()._update_structure(**kwargs)
             atoms = self._atoms
             atoms.assign_unique_ids()
             atoms.assign_unique_types()
@@ -569,7 +575,7 @@ class DATAData(DATAReader):
             except OSError as e:
                 print(e)
 
-            self._atoms = self._atoms_copy
+            super()._reset_structure()
 
         except (TypeError, ValueError) as e:
             print(e)

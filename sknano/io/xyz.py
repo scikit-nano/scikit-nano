@@ -15,7 +15,8 @@ import os
 
 from monty.io import zopen
 from sknano.core import get_fpath
-from sknano.core.atoms import StructureAtom as Atom, update_atoms
+from sknano.core.atoms import StructureAtom as Atom
+from sknano.core.structures import update_structure
 
 from .base import StructureData, StructureDataError, StructureDataConverter, \
     StructureDataFormatter, default_comment_line
@@ -98,9 +99,15 @@ class XYZWriter:
         if structure is None and atoms is None:
             raise ValueError('Expected either `structure` or `atoms` object.')
 
-        if structure is not None and atoms is None:
+        structure, atoms, centering_vector, rotation_parameters, kwargs = \
+            update_structure(structure, atoms=atoms, update_kwargs=True,
+                             return_codes=('structure', 'atoms',
+                                           'centering_vector',
+                                           'rotation_parameters'),
+                             **kwargs)
+
+        if structure is not None:
             atoms = structure.atoms
-        atoms = update_atoms(atoms, kwargs, update_kwargs=True)
 
         if fpath is None:
             fpath = get_fpath(fname=fname, ext='xyz', outpath=outpath,
@@ -150,7 +157,7 @@ class XYZData(XYZReader):
             if atoms is not None:
                 self._atoms = atoms
 
-            super()._update_atoms(**kwargs)
+            super()._update_structure(**kwargs)
 
             try:
                 with zopen(xyzfile, 'wt') as stream:
@@ -159,7 +166,7 @@ class XYZData(XYZReader):
             except OSError as e:
                 print(e)
 
-            self._atoms = self._atoms_copy
+            super()._reset_structure()
 
         except (TypeError, ValueError) as e:
             print(e)

@@ -21,9 +21,11 @@ import numpy as np
 from monty.io import zopen
 from sknano.core import deprecate_kwarg, get_fpath, flatten, grouper
 from sknano.core.atoms import Trajectory, Snapshot, Atoms, MDAtoms, \
-    MDAtom as Atom, update_atoms
+    MDAtom as Atom
 from sknano.core.crystallography import Domain
 # from sknano.core.crystallography import Crystal3DLattice
+from sknano.core.structures import update_structure
+
 from .base import StructureData, StructureDataError, StructureDataFormatter
 
 __all__ = ['DUMP', 'DUMPData', 'DUMPReader', 'DUMPWriter', 'DUMPError',
@@ -640,16 +642,22 @@ class DUMPWriter:
                  'or an `Atoms` object for kwarg `atoms`.')
             raise ValueError(error_msg)
 
-        if structure is not None and atoms is None:
-            atoms = structure.atoms
-
         if fpath is None:
             fpath = get_fpath(fname=fname, ext='dump', outpath=outpath,
                               overwrite=True, add_fnum=False)
 
+        structure, atoms, centering_vector, rotation_parameters, kwargs = \
+            update_structure(structure, atoms=atoms, update_kwargs=True,
+                             return_codes=('structure', 'atoms',
+                                           'centering_vector',
+                                           'rotation_parameters'),
+                             **kwargs)
+
+        if structure is not None:
+            atoms = structure.atoms
+
         if not isinstance(atoms, MDAtoms):
             atoms = MDAtoms(atoms)
-        atoms = update_atoms(atoms, kwargs, deepcopy=False, update_kwargs=True)
 
         dump = DUMPIO(**kwargs)
         formatter = dump.formatter
@@ -761,8 +769,6 @@ class DUMPData(DUMPReader):
                         raise ValueError(error_msg)
                     else:
                         dumpfile = self.fpath
-                elif self.fpath is None:
-                    self.fpath = dumpfile
 
                 trajectory.sort(key=attrgetter('timestep'))
                 trajectory.cull()
@@ -806,11 +812,11 @@ class DUMPData(DUMPReader):
         pass
 
     def _write_header(self, stream, ss):
-            """Write snapshot header info."""
-            stream.write('ITEM: TIMESTEP\n')
-            stream.write('{}\n'.format(ss.timestep))
-            stream.write('ITEM: NUMBER OF ATOMS\n')
-            stream.write('{}\n'.format(ss.nselected))
+        """Write snapshot header info."""
+        stream.write('ITEM: TIMESTEP\n')
+        stream.write('{}\n'.format(ss.timestep))
+        stream.write('ITEM: NUMBER OF ATOMS\n')
+        stream.write('{}\n'.format(ss.nselected))
 
     def _write_domain(self, stream, ss):
             """Write snapshot bounding box info."""

@@ -156,7 +156,7 @@ class PDBData(PDBReader):
             if atoms is not None:
                 self._atoms = atoms
 
-            super()._update_atoms(**kwargs)
+            super()._update_structure(**kwargs)
 
             mode += 't'
 
@@ -167,7 +167,7 @@ class PDBData(PDBReader):
             except OSError as e:
                 print(e)
 
-            self._atoms = self._atoms_copy
+            super()._reset_structure()
 
         except (TypeError, ValueError) as e:
             print(e)
