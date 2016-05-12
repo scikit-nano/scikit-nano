@@ -17,6 +17,7 @@ import os
 
 from sknano.core import BaseClass, TabulateMixin, get_fpath
 from sknano.core.atoms import MDAtoms as Atoms
+from sknano.core.math import get_rotation_parameters_from_kwargs
 from sknano.core.structures import StructureBase
 # from sknano.utils.analysis import StructureAnalyzer
 from sknano.version import version
@@ -129,66 +130,63 @@ StructureReaderMixin = StructureIOReaderMixin = StructureDataReaderMixin
 
 class StructureDataWriterMixin:
     """Mixin class for saving structure data."""
-    def _update_atoms(self, deepcopy=True, center_centroid=True,
-                      center_com=False, region_bounds=None,
-                      filter_condition=None, rotation_parameters=None,
-                      **kwargs):
-        atoms_copy = self._atoms[:]
-        if deepcopy:
-            atoms_copy = copy.deepcopy(atoms_copy)
+    def _update_structure(self, deepcopy=True, center_centroid=True,
+                          center_com=False, region_bounds=None,
+                          filter_condition=None, rotation_parameters=None,
+                          **kwargs):
 
-        self._atoms_copy = atoms_copy
+        structure_copy = copy.deepcopy(self._structure)
+        # if deepcopy:
+        #     structure_copy = copy.deepcopy(self)
+        self._copy = structure_copy
+
         atoms = self._atoms
-
-        if any([kw in kwargs for kw
-                in ('center_CM', 'center_center_of_mass')]):
-            if 'center_CM' in kwargs:
-                center_com = kwargs['center_CM']
-                del kwargs['center_CM']
-            else:
-                center_com = kwargs['center_center_of_mass']
-                del kwargs['center_center_of_mass']
 
         if region_bounds is not None:
             atoms.clip_bounds(region_bounds)
-
-        if center_centroid:
-            atoms.center_centroid()
-        elif center_com:
-            atoms.center_com()
 
         if filter_condition is not None:
             atoms.filter(filter_condition)
             # atoms = atoms.filtered(filter_condition)
 
-        rotation_kwargs = ['rotation_angle', 'angle', 'rot_axis', 'axis',
-                           'anchor_point', 'deg2rad', 'degrees', 'rot_point',
-                           'from_vector', 'to_vector', 'transform_matrix']
+        center_centroid = kwargs.pop('center_centroid', True)
+        center_com = kwargs.pop('center_com', False)
 
-        if rotation_parameters is None and \
-                any([kw in kwargs for kw in rotation_kwargs]):
-            rotation_parameters = {kw: kwargs[kw] for kw in rotation_kwargs
-                                   if kw in kwargs}
-            if 'rotation_angle' in rotation_parameters:
-                rotation_parameters['angle'] = \
-                    rotation_parameters['rotation_angle']
-                del rotation_parameters['rotation_angle']
-            if 'rot_axis' in rotation_parameters:
-                rotation_parameters['axis'] = rotation_parameters['rot_axis']
-                del rotation_parameters['rot_axis']
-            if 'deg2rad' in rotation_parameters:
-                rotation_parameters['degrees'] = rotation_parameters['deg2rad']
-                del rotation_parameters['deg2rad']
+        if any([kw in kwargs for kw
+                in ('center_CM', 'center_center_of_mass')]):
+            center_com = \
+                kwargs.pop('center_CM', kwargs.pop('center_center_of_mass'))
 
-            kwargs = {k: v for k, v in kwargs.items()
-                      if k not in rotation_kwargs}
+        centering_vector = None
+        if center_centroid:
+            centering_vector = -atoms.centroid
+        elif center_com:
+            centering_vector = -atoms.center_of_mass
+
+        if centering_vector is not None:
+            self.structure.translate(centering_vector)
+            self.structure.rezero()
+        self.centering_vector = centering_vector
+
+        if rotation_parameters is None:
+            rotation_parameters = \
+                get_rotation_parameters_from_kwargs(kwargs,
+                                                    update_kwargs=False)
 
         if rotation_parameters is not None and \
                 isinstance(rotation_parameters, dict):
-            atoms.rotate(**rotation_parameters)
+            self.structure.rotate(**rotation_parameters)
+            self.structure.rezero()
+        self.rotation_parameters = rotation_parameters
 
-        atoms.rezero()
-        self._atoms = atoms
+        # self._atoms = atoms
+
+    def _reset_structure(self):
+        self.structure = self._copy
+        if self.centering_vector is not None:
+            self.translate(-self.centering_vector)
+        if self.rotation_parameters is not None:
+            pass
 
     def _update_fpath(self, kwargs):
         fname = kwargs.get('fname', None)
@@ -252,7 +250,7 @@ class StructureDataWriterMixin:
 
         """
         self._update_fpath(kwargs)
-        # self._update_atoms(**kwargs)
+        # self._update_structure(**kwargs)
         structure_format = kwargs.pop('structure_format')
         structure = kwargs.pop('structure', self)
         print('writing {}'.format(self.fname))
