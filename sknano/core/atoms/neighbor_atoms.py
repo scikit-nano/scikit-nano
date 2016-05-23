@@ -57,6 +57,10 @@ class NeighborAtom(Atom):
         # self.nn_adjacency_list = []
         # self.fmtstr = super().fmtstr + ", neighbors={neighbors!r}"
 
+    @property
+    def __atoms_class__(self):
+        return NeighborAtoms
+
     def __dir__(self):
         attrs = super().__dir__()
         attrs.extend(['CN', 'neighbors', 'neighbor_map'])
@@ -164,16 +168,15 @@ class NeighborAtom(Atom):
     def third_neighbors(self, value):
         self.set_nth_nearest_neighbors(3, value)
 
-    def get_nth_nearest_neighbors(self, n, exclusive=True):
-        """Get the `n`th set of neighbors."""
-        if exclusive:
-            return getattr(self, '_{}_neighbors'.format(ordinal_form(n)))
-        else:
-            neighbors = self.__class__(**self.kwargs)
+    def get_nth_nearest_neighbors(self, n, inclusive=False):
+        """Get 1st, 2nd, 3rd...`n`th set of neighbors."""
+        if inclusive:
+            neighbors = self.__atoms_class__()
             for i in range(1, n + 1):
                 neighbors.extend(
-                    getattr(self, '_{}_neighbors'.format(ordinal_form(n))))
+                    getattr(self, '_{}_neighbors'.format(ordinal_form(i))))
             return neighbors
+        return getattr(self, '_{}_neighbors'.format(ordinal_form(n)))
 
     def set_nth_nearest_neighbors(self, n, neighbors):
         """Set nth nearest neighbors"""
@@ -193,6 +196,18 @@ class NeighborAtom(Atom):
 
         setattr(self, '_{}_neighbors'.format(ordinal_form(n)), neighbors)
         neighbor_map[ordinal_form(n)] = neighbors
+
+    def get_n_neighbors(self, n, max_depth=3, walk_neighbor_tree=True):
+        """Return `n` nearest-neighbors."""
+        neighbors = self.neighbors
+        depth = 1
+        while neighbors.Natoms < n and depth < max_depth:
+            for neighbor in neighbors[:]:
+                [neighbors.append(nnn) for nnn in neighbor.neighbors
+                 if nnn not in neighbors and neighbors.Natoms < n]
+            depth += 1
+
+        return neighbors
 
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
@@ -384,8 +399,10 @@ class NeighborAtoms(KDTreeAtomsMixin, Atoms):
         """Third neighbors."""
         return [atom.third_neighbors for atom in self]
 
-    def get_nth_nearest_neighbors(self, n, exclusive=True):
+    def get_nth_nearest_neighbors(self, n, inclusive=False):
         """Return `n`th nearest neighbors."""
+        if inclusive:
+            pass
         return [getattr(atom, '_{}_neighbors'.format(ordinal_form(n)))
                 for atom in self]
 
