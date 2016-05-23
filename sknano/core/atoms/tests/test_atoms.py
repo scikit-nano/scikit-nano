@@ -512,5 +512,15 @@ class Tests(AtomsTestFixture):
         neighbors = atoms[0].get_n_neighbors(Nneighbors)
         assert_equal(neighbors.Natoms, Nneighbors)
 
+    def test49(self):
+        atoms = self.atoms
+        atoms.set_pbc('z')
+        atoms.kNN = 3
+        atoms.NNrc = 1.5
+        atoms.update_neighbors()
+        Nneighbors = 2
+        neighbors = atoms[0].get_n_neighbors(Nneighbors)
+        assert_equal(neighbors.Natoms, Nneighbors)
+
 if __name__ == '__main__':
     nose.runmodule()
