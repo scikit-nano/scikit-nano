@@ -493,6 +493,24 @@ class Tests(AtomsTestFixture):
         print(rminmax)
         assert_equal(coordinates_bbox, coordinates_bbox.bounding_box)
 
+    def test47(self):
+        atoms = self.atoms
+        atoms.set_pbc('z')
+        atoms.kNN = 15
+        atoms.NNrc = 1.5
+        atoms.update_neighbors(cutoffs=[1.5, 2.0, 3.0])
+        assert_true(all([atom.get_nth_nearest_neighbors(3, inclusive=True)
+                        .Natoms == 12 for atom in atoms]))
+
+    def test48(self):
+        atoms = self.atoms
+        atoms.set_pbc('z')
+        atoms.kNN = 3
+        atoms.NNrc = 1.5
+        atoms.update_neighbors()
+        Nneighbors = 10
+        neighbors = atoms[0].get_n_neighbors(Nneighbors)
+        assert_equal(neighbors.Natoms, Nneighbors)
 
 if __name__ == '__main__':
     nose.runmodule()
