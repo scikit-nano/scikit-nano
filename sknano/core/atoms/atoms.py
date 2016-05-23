@@ -74,6 +74,10 @@ class Atom(BaseClass):
     def __atoms_class__(self):
         return Atoms
 
+    @property
+    def __collection_class__(self):
+        return self.__atoms_class__
+
     def __eq__(self, other):
         """Test equality of two `Atom` object instances."""
         if not self._is_valid_operand(other):

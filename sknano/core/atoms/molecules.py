@@ -39,6 +39,10 @@ class Molecule(BaseClass):
         self.atoms = atoms
         self.fmtstr = "atoms={atoms!r}"
 
+    @property
+    def __collection_class__(self):
+        return Molecules
+
     # def __eq__(self, other):
     #     """Test equality of two `Molecule` object instances."""
     #     return self is other or self.atoms == other.atoms
