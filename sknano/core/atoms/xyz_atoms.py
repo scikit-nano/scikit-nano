@@ -48,6 +48,10 @@ class XYZAtom(Atom):
         self._r = Vector([x, y, z])
         self.fmtstr = super().fmtstr + ", x={x:.6f}, y={y:.6f}, z={z:.6f}"
 
+    @property
+    def __atoms_class__(self):
+        return XYZAtoms
+
     def __eq__(self, other):
         if not self._is_valid_operand(other):
             return NotImplemented

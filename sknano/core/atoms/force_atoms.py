@@ -42,6 +42,10 @@ class ForceAtom(Atom):
         self.fmtstr = super().fmtstr + \
             ", fx={fx:.6f}, fy={fy:.6f}, fz={fz:.6f}"
 
+    @property
+    def __atoms_class__(self):
+        return ForceAtoms
+
     # def __eq__(self, other):
     #     return self.f == other.f and super().__eq__(other)
 

@@ -37,7 +37,9 @@ class StructureAtom(AtomAdapterMixin, AtomTopologyMixin,
                     NeighborAtom, ImageAtom, LatticeAtom, XYZAtom,
                     ChargedAtom, TypeAtom, IDAtom):
     """An :class:`Atom` class for structure analysis."""
-    pass
+    @property
+    def __atoms_class__(self):
+        return StructureAtoms
 
 
 class StructureAtoms(AtomsAdapterMixin, AtomsTopologyMixin,

@@ -47,6 +47,10 @@ class TypeAtom(Atom):
         self.type = type
         self.fmtstr = super().fmtstr + ", type={type!r}"
 
+    @property
+    def __atoms_class__(self):
+        return TypeAtoms
+
     def __eq__(self, other):
         if not self._is_valid_operand(other):
             return NotImplemented
@@ -106,6 +110,7 @@ class TypeAtom(Atom):
 
     @property
     def atomtype(self):
+        """Alias for :attr:`~TypeAtom.type`."""
         return self.type
 
     @atomtype.setter
@@ -113,6 +118,7 @@ class TypeAtom(Atom):
         self.type = value
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()
         super_dict.update(dict(type=self.type))
         return super_dict

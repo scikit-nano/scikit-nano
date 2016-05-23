@@ -40,6 +40,10 @@ class VanDerWaalsAtom(Atom):
         self.r_vdw = r_vdw
         self.fmtstr = super().fmtstr + ", r_vdw={r_vdw!r}"
 
+    @property
+    def __atoms_class__(self):
+        return VanDerWaalsAtoms
+
     # def __eq__(self, other):
     #     return np.allclose(self.r_vdw, other.r_vdw) and super().__eq__(other)
 
@@ -87,7 +91,7 @@ class VanDerWaalsAtom(Atom):
 
     @property
     def r_vdw(self):
-        """van der Waals radius :math:`r_{\\mathrm{vdW}}` in units of \
+        """Van der Waals radius :math:`r_{\\mathrm{vdW}}` in units of \
             :math:`\\AA`.
         """
         return self._r_vdw
@@ -107,6 +111,7 @@ class VanDerWaalsAtom(Atom):
         self._r_vdw = float(value)
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()
         super_dict.update(dict(r_vdw=self.r_vdw))
         return super_dict

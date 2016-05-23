@@ -42,6 +42,10 @@ class EnergyAtom(Atom):
         self.fmtstr = super().fmtstr + \
             ", pe={pe!r}, ke={ke!r}, etotal={etotal!r}"
 
+    @property
+    def __atoms_class__(self):
+        return EnergyAtoms
+
     # def __eq__(self, other):
     #     return np.allclose([self.pe, self.ke, self.etotal],
     #                        [other.pe, other.ke, other.etotal]) and \
@@ -135,6 +139,7 @@ class EnergyAtom(Atom):
         self._etotal = value
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()
         super_dict.update(dict(pe=self.pe, ke=self.ke, etotal=self.etotal))
         return super_dict

@@ -28,7 +28,9 @@ class BasisAtom(AtomTransformationsMixin, LatticeAtom, XYZAtom, IDAtom):
     lattice : :class:`~sknano.core.crystallography.Crystal3DLattice`
     xs, ys, zs : :class:`~python:float`
     """
-    pass
+    @property
+    def __atoms_class__(self):
+        return BasisAtoms
 
 
 class BasisAtoms(AtomsTransformationsMixin, BoundingRegionsMixin,

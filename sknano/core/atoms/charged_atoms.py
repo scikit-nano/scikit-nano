@@ -39,6 +39,10 @@ class ChargedAtom(Atom):
         self.q = q
         self.fmtstr = super().fmtstr + ", q={q!r}"
 
+    @property
+    def __atoms_class__(self):
+        return ChargedAtoms
+
     # def __lt__(self, other):
     #     return (self.q < other.q and super().__le__(other)) or \
     #         (self.q <= other.q and super().__lt__(other))
@@ -104,6 +108,7 @@ class ChargedAtom(Atom):
         self._q = value
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()
         super_dict.update(dict(q=self.q))
         return super_dict

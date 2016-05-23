@@ -54,6 +54,10 @@ class IDAtom(Atom):
         self.mol = mol
         self.fmtstr = super().fmtstr + ", id={id!r}, mol={mol!r}"
 
+    @property
+    def __atoms_class__(self):
+        return IDAtoms
+
     # def __eq__(self, other):
     #     return self.id == other.id and self.mol == other.mol and \
     #         super().__eq__(other)

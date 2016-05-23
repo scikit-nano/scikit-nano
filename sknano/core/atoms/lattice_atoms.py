@@ -49,6 +49,10 @@ class LatticeAtom(Atom):
             ", lattice={lattice!r}, xs={xs!r}, ys={ys!r}, zs={zs!r}"
         # ", lattice={lattice!r}, xs={xs:.6f}, ys={ys:.6f}, zs={zs:.6f}"
 
+    @property
+    def __atoms_class__(self):
+        return LatticeAtoms
+
     def __eq__(self, other):
         if not self._is_valid_operand(other):
             return NotImplemented

@@ -38,6 +38,10 @@ class ImageAtom(Atom):
         self._i = Point([ix, iy, iz], dtype=int)
         self.fmtstr = super().fmtstr + ", ix={ix:d}, iy={iy:d}, iz={iz:d}"
 
+    @property
+    def __atoms_class__(self):
+        return ImageAtoms
+
     # def __lt__(self, other):
     #     return (self.i < other.i and super().__le__(other)) or \
     #         (self.i <= other.i and super().__lt__(other))
@@ -142,6 +146,7 @@ class ImageAtom(Atom):
         self._i[:] = Point(value, nd=3, dtype=int)
 
     def todict(self):
+        """Return :class:`~python:dict` of constructor parameters."""
         super_dict = super().todict()
         super_dict.update(dict(ix=self.ix, iy=self.iy, iz=self.iz))
         return super_dict

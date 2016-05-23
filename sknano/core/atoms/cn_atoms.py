@@ -39,6 +39,10 @@ class CNAtom(Atom):
         self.CN = CN
         self.fmtstr = super().fmtstr + ", CN={CN!r}"
 
+    @property
+    def __atoms_class__(self):
+        return CNAtoms
+
     # def __eq__(self, other):
     #     return np.allclose(self.CN, other.CN) and super().__eq__(other)
 

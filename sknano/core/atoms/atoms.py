@@ -70,6 +70,10 @@ class Atom(BaseClass):
     def _is_valid_operand(self, other):
         return isinstance(other, self.__class__)
 
+    @property
+    def __atoms_class__(self):
+        return Atoms
+
     def __eq__(self, other):
         """Test equality of two `Atom` object instances."""
         if not self._is_valid_operand(other):

@@ -46,6 +46,10 @@ class DipoleAtom(Atom):
     #     return (self.p < other.p and super().__le__(other)) or \
     #         (self.p <= other.p and super().__lt__(other))
 
+    @property
+    def __atoms_class__(self):
+        return DipoleAtoms
+
     def __eq__(self, other):
         if not self._is_valid_operand(other):
             return NotImplemented

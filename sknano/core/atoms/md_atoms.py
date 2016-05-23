@@ -38,6 +38,10 @@ class MDAtom(EnergyAtom, ForceAtom, VelocityAtom, StructureAtom):
         super().__init__(*args, **kwargs)
         self.reference_atom = reference_atom
 
+    @property
+    def __atoms_class__(self):
+        return MDAtoms
+
     def __dir__(self):
         attrs = super().__dir__()
         attrs.append('reference_atom')

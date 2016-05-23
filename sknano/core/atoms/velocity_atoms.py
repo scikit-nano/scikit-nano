@@ -42,6 +42,10 @@ class VelocityAtom(Atom):
         self.fmtstr = super().fmtstr + \
             ", vx={vx:.6f}, vy={vy:.6f}, vz={vz:.6f}"
 
+    @property
+    def __atoms_class__(self):
+        return VelocityAtoms
+
     def __eq__(self, other):
         if not self._is_valid_operand(other):
             return NotImplemented
