@@ -197,15 +197,24 @@ class NeighborAtom(Atom):
         setattr(self, '_{}_neighbors'.format(ordinal_form(n)), neighbors)
         neighbor_map[ordinal_form(n)] = neighbors
 
-    def get_n_neighbors(self, n, max_depth=3, walk_neighbor_tree=True):
+    def get_n_neighbors(self, n, exclude=None, max_depth=3,
+                        walk_neighbor_tree=True):
         """Return `n` nearest-neighbors."""
+        if exclude is None:
+            exclude = []
         neighbors = self.neighbors
         depth = 1
         while neighbors.Natoms < n and depth < max_depth:
             for neighbor in neighbors[:]:
                 [neighbors.append(nnn) for nnn in neighbor.neighbors
-                 if nnn not in neighbors and neighbors.Natoms < n]
+                 if all([nnn not in (neighbors, exclude)]) and
+                 neighbors.Natoms < n]
             depth += 1
+
+        if neighbors.Natoms > n:
+            neighbors = \
+                self.__atoms_class__(np.random.choice(neighbors, size=n,
+                                                      replace=False).tolist())
 
         return neighbors
 
