@@ -81,6 +81,7 @@ class Tests(DATATestFixture):
         swnt.center_centroid()
         print(swnt.crystal_cell.lattice)
         swnt.save(structure_format='data')
+        self.tmpdata.append(swnt.fname)
 
 if __name__ == '__main__':
     nose.runmodule()

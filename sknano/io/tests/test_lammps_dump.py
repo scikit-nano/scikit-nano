@@ -143,6 +143,7 @@ class Tests(DUMPTestFixture, GeneratorTestFixture):
         print(swnt.lattice.offset)
         swnt.save(structure_format='dump',
                   dumpattrs=['id', 'type', 'x', 'y', 'z'])
+        self.tmpdata.append(swnt.fname)
 
 
 if __name__ == '__main__':
