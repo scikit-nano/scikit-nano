@@ -47,6 +47,17 @@ Other changes
 
 * The :mod:`~sknano.core.structures` package was moved from the toplevel
   :mod:`sknano` package to the :mod:`~sknano.core` subpackage.
+* Several `__deepcopy__` methods were added to the core classes to allow
+  deepcopying all custom classes. The reason for this was to allow the
+  user to generate a structure, save the structure to
+  one or more structure formats (which may modify the structure),
+  and continue working on the structure as it was prior to saving. Therefore,
+  methods and functions were implemented to create deepcopys of the
+  structure data during output. However, this operation incurs a huge
+  performance penalty and I'm not satisifed with how things turned out.
+  I want to find a better way to preserve the structure data when saving or
+  else abandon this idea of preserving the original structure between
+  output operations...
 
 
 Contributors to this release
