@@ -405,6 +405,8 @@ class Atoms(AtomsSelectionMixin, TabulateMixin, UserList):
         return self.data >= other.data
 
     def sort(self, key=attrgetter('element', 'Z', 'mass'), reverse=False):
+        if isinstance(key, str):
+            key = attrgetter(key)
         super().sort(key=key, reverse=reverse)
 
     @classmethod
