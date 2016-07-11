@@ -597,6 +597,10 @@ class Cuboid(Geometric3DRegion):
             (py >= self.ymin) and (py <= self.ymax) and \
             (pz >= self.zmin) and (pz <= self.zmax)
 
+    def rotate(self, **kwargs):
+        super().rotate(**kwargs)
+        self._update_points()
+
     def todict(self):
         """Returns a :class:`~python:dict` of the :class:`Cuboid` \
             constructor parameters."""

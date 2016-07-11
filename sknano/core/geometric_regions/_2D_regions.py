@@ -451,6 +451,10 @@ class Rectangle(Geometric2DRegion):
 
         return (px >= xmin) and (px <= xmax) and (py >= ymin) and (py <= ymax)
 
+    def rotate(self, **kwargs):
+        super().rotate(**kwargs)
+        self._update_points()
+
     def todict(self):
         """Returns a :class:`~python:dict` of the :class:`Rectangle` \
             constructor parameters."""
