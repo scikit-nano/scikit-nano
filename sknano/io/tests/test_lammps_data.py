@@ -79,7 +79,7 @@ class Tests(DATATestFixture):
     def test4(self):
         swnt = self.swnt
         swnt.center_centroid()
-        print(swnt.crystal_cell.lattice)
+        # print(swnt.crystal_cell.lattice)
         swnt.save(structure_format='data')
         self.tmpdata.append(swnt.fname)
 

@@ -41,7 +41,7 @@ class Tests(XYZTestFixture):
 
     def test2(self):
         xyz_reader = self.xyz_reader
-        print(xyz_reader)
+        # print(xyz_reader)
 
     # def test2(self):
     #     # data = XYZData()

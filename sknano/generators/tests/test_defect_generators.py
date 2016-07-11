@@ -20,21 +20,21 @@ class Tests(GeneratorTestFixture, IOTestFixture):
     def test1(self):
         generator = CrossLinkedDefectGenerator()
         assert_true(isinstance(generator, CrossLinkedDefectGenerator))
-        print(generator)
+        # print(generator)
 
     def test2(self):
         structure = self.swnt.structure
         generator = CrossLinkedDefectGenerator(self.swnt)
         assert_true(isinstance(generator, CrossLinkedDefectGenerator))
         assert_equal(generator.structure, structure)
-        print(generator)
+        # print(generator)
 
     def test3(self):
         structure = self.xyzdata.structure
         generator = CrossLinkedDefectGenerator(self.xyzdata)
         assert_true(isinstance(generator, CrossLinkedDefectGenerator))
         assert_equal(generator.structure, structure)
-        print(generator)
+        # print(generator)
 
     def test4(self):
         structure = self.swnt.structure

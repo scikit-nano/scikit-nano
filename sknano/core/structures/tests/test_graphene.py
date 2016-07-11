@@ -54,7 +54,7 @@ def test4():
     assert_equal(s.zigzag_edge_length, 10)
     assert_equal(s.armchair_edge_length, 10)
     assert_true(isinstance(s.unit_cell, GrapheneConventionalCell))
-    print(s.unit_cell)
+    # print(s.unit_cell)
     assert_true(isinstance(s, ConventionalCellGraphene))
 
 

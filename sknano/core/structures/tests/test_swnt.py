@@ -164,7 +164,7 @@ def test8():
     assert_equal(bundle.element1, 'C')
     assert_equal(bundle.element2, 'C')
     assert_equal(bundle.Ntubes, 9)
-    print(bundle.lattice)
+    # print(bundle.lattice)
     assert_equal(bundle.Ntubes * bundle.unit_cell.basis.Natoms,
                  bundle.crystal_cell.basis.Natoms)
 
@@ -176,7 +176,7 @@ def test9():
     assert_equal(bundle.element1, 'C')
     assert_equal(bundle.element2, 'C')
     assert_equal(bundle.Ntubes, 9)
-    print(bundle.lattice)
+    # print(bundle.lattice)
     assert_equal(bundle.Ntubes * bundle.n3 * bundle.unit_cell.basis.Natoms,
                  bundle.crystal_cell.basis.Natoms)
 

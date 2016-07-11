@@ -19,14 +19,14 @@ class Tests(GeneratorTestFixture):
     def test1(self):
         config = os.path.join(os.path.dirname(__file__),
                               'test_generator_configparser.cfg')
-        print(config)
+        # print(config)
         parser = GeneratorConfigParser(cfgfile=config)
-        print(parser)
+        # print(parser)
 
     def test2(self):
         structure = generate_structure(generator_class='SWNTGenerator',
                                        n=10, m=5, nz=5)
-        print(structure)
+        # print(structure)
         parser = GeneratorConfigParser(structure=structure)
 
 

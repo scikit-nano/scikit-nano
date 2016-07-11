@@ -116,7 +116,7 @@ def test14():
     structure = \
         generate_structure(generator_class='SWNTGenerator', n=5, m=0, nz=2)
     print(structure)
-    print(structure.crystal_cell)
+    # print(structure.crystal_cell)
 
 
 def test15():

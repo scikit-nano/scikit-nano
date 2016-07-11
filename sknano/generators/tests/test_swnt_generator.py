@@ -23,7 +23,7 @@ class Tests(GeneratorTestFixture):
 
     def test1(self):
         swnt = SWNTGenerator(n=5, m=5)
-        print(swnt)
+        # print(swnt)
         swnt.save()
         self.tmpdata.append(swnt.fname)
         swnt.save(structure_format='data')
@@ -31,7 +31,7 @@ class Tests(GeneratorTestFixture):
 
     def test2(self):
         swnt = SWNTGenerator(n=5, m=5, L=10.0, fix_L=True)
-        print(swnt)
+        # print(swnt)
         swnt.save()
         self.tmpdata.append(swnt.fname)
         swnt.save(structure_format='data')
@@ -61,10 +61,10 @@ class Tests(GeneratorTestFixture):
     def test5(self):
         bundle = SWNTGenerator(n=5, m=5, n1=3, n2=3, n3=1,
                                bundle_geometry='hexagon')
-        print(bundle)
-        print(bundle.scaling_matrix)
+        # print(bundle)
+        # print(bundle.scaling_matrix)
         assert_equal(bundle.Ntubes, len(set(bundle.mol_ids)))
-        print(bundle.lattice)
+        # print(bundle.lattice)
         assert_equal(bundle.Ntubes, 7)
         assert_equal(bundle.unit_cell.basis.Natoms, 20)
         assert_equal(bundle.Ntubes * bundle.unit_cell.basis.Natoms,
@@ -129,8 +129,8 @@ class Tests(GeneratorTestFixture):
         bundle = SWNTGenerator(n=5, m=5, n1=3, n2=3, n3=2)
         # print(bundle.scaling_matrix)
         assert_equal(bundle.Ntubes, len(set(bundle.mol_ids)))
-        print(set(bundle.mol_ids))
-        print(bundle.lattice)
+        # print(set(bundle.mol_ids))
+        # print(bundle.lattice)
         assert_equal(bundle.Ntubes, 9)
         assert_equal(bundle.unit_cell.basis.Natoms, 20)
         assert_equal(len(set(bundle.atoms.mol_ids)), bundle.Ntubes)
@@ -143,10 +143,10 @@ class Tests(GeneratorTestFixture):
 
     def test14(self):
         bundle = SWNTGenerator(n=5, m=5, n1=3, n2=3, L=5, fix_L=True)
-        print(bundle)
-        print(bundle.scaling_matrix)
+        # print(bundle)
+        # print(bundle.scaling_matrix)
         # assert_equal(bundle.Ntubes, len(set(bundle.mol_ids)))
-        print(bundle.lattice)
+        # print(bundle.lattice)
         assert_equal(bundle.Ntubes, 9)
         assert_equal(bundle.unit_cell.basis.Natoms, 20)
         bundle.save()
