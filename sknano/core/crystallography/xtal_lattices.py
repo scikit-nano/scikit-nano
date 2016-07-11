@@ -49,14 +49,23 @@ class Domain(TabulateMixin, BaseClass):
         lattice : :class:`~sknano.core.crystallography.Crystal3DLattice`.
 
         """
+        super().__init__()
         self.bounding_box = Cuboid()
         self.triclinic = False
         self.xy = self.xz = self.yz = 0.0
         self.lattice = None
+        self.fmtstr = ', '.join(('xlo_bound={xlo_bound!r}',
+                                 'xhi_bound={xhi_bound!r}',
+                                 'ylo_bound={ylo_bound!r}',
+                                 'yhi_bound={yhi_bound!r}',
+                                 'zlo_bound={zlo_bound!r}',
+                                 'zhi_bound={zhi_bound!r}'))
 
     def __str__(self):
         strrep = self._table_title_str()
-        attrs = ['triclinic', 'xy', 'xz', 'yz']
+        attrs = ['triclinic', 'xy', 'xz', 'yz',
+                 'xlo_bound', 'xhi_bound', 'ylo_bound', 'yhi_bound',
+                 'zlo_bound', 'zhi_bound']
         values = [getattr(self, attr) for attr in attrs]
         table = self._tabulate(list(zip(attrs, values)))
         strrep = '\n'.join((strrep, table))
@@ -258,9 +267,14 @@ class Domain(TabulateMixin, BaseClass):
         else:
             self.bounding_box = bounding_box
 
+    def rotate(self, **kwargs):
+        self.bounding_box.rotate(**kwargs)
+
     def todict(self):
         """Return :class:`~python:dict` of constructor parameters."""
-        return dict()
+        return dict(xlo_bound=self.xlo_bound, xhi_bound=self.xhi_bound,
+                    ylo_bound=self.ylo_bound, yhi_bound=self.yhi_bound,
+                    zlo_bound=self.zlo_bound, zhi_bound=self.zhi_bound)
 
 
 def generate_lattice(from_domain=None, from_region=None, offset=None):
