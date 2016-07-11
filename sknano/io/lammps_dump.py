@@ -695,6 +695,10 @@ class DUMPWriter:
                         domain.update(from_array=atoms.coords,
                                       allow_triclinic_box=allow_triclinic_box,
                                       **kwargs)
+
+            if rotation_parameters is not None:
+                domain.rotate(anchor_point=[0, 0, 0], **rotation_parameters)
+
             snapshot.domain = domain
 
             # scale_original = None
